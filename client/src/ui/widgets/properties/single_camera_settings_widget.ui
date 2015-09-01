@@ -10,9 +10,6 @@
     <height>634</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Camera Settings</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_8">
    <item>
     <widget class="QTabWidget" name="tabWidget">

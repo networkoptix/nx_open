@@ -5,6 +5,9 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QtMath>
 
+#include <core/resource/resource_name.h>
+#include <core/resource/camera_resource.h>
+
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/animation/opacity_animator.h>
@@ -46,13 +49,16 @@ namespace {
 } // anonymous namespace
 
 
-QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::WindowFlags windowFlags)
+QnStatusOverlayWidget::QnStatusOverlayWidget(const QnResourcePtr &resource, QGraphicsWidget *parent, Qt::WindowFlags windowFlags)
     : base_type(parent, windowFlags)
+    , m_resource(resource)
     , m_statusOverlay(Qn::EmptyOverlay)
     , m_buttonType(NoButton)
     , m_button(new QnTextButtonWidget(this))
 {
     setAcceptedMouseButtons(0);
+
+    QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
     /* Init static text. */
     m_staticFont.setPointSizeF(staticFontSize);
@@ -62,7 +68,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[OfflineText] = tr("NO SIGNAL");
     m_staticTexts[ServerOfflineText] = tr("Server Offline");
     m_staticTexts[UnauthorizedText] = tr("Unauthorized");
-    m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information in camera settings");
+    m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information in %1 settings").arg(getDefaultDeviceNameLower(camera));
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
     m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");

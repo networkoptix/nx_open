@@ -61,6 +61,8 @@ private:
     void submitToResources(bool checkControls = false);
     
     void saveCameras(const QnVirtualCameraResourceList &cameras);
+
+    void retranslateUi();
 private:
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;

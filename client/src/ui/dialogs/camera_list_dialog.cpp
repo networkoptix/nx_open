@@ -87,10 +87,27 @@ void QnCameraListDialog::updateWindowTitleLater() {
 void QnCameraListDialog::updateWindowTitle() {
     m_pendingWindowTitleUpdate = false;
     
-    if (!m_model->server())
-        setWindowTitle(tr("Camera List - %n camera(s) found", "", m_resourceSearch->rowCount()));
-    else
-        setWindowTitle(tr("Camera List for '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(getFullResourceName(m_model->server(), true)));
+    QnVirtualCameraResourceList cameras;
+    for (int row = 0; row < m_resourceSearch->rowCount(); ++row) {
+        QModelIndex index = m_resourceSearch->index(row, 0);
+        if (!index.isValid())
+            continue;
+        if (QnVirtualCameraResourcePtr camera = index.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnVirtualCameraResource>())
+            cameras << camera;
+    }
+    Q_ASSERT_X(cameras.size() == m_resourceSearch->rowCount(), Q_FUNC_INFO, "Make sure all found resources are cameras");
+
+    const QString title = m_model->server()
+        ? tr("%1 List for '%2' - %3 found")
+            .arg(getDefaultDevicesName())
+            .arg(getFullResourceName(m_model->server(), true))
+            .arg(getNumericDevicesName(cameras))
+        : tr("%1 List - %2 found")
+            .arg(getDefaultDevicesName())
+            .arg(getNumericDevicesName(cameras))
+            ;
+
+    setWindowTitle(title);
 }
 
 void QnCameraListDialog::updateCriterion() {
@@ -143,7 +160,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
 }
 
 void QnCameraListDialog::at_exportAction_triggered() {
-    QnGridWidgetHelper::exportToFile(ui->camerasView, this, tr("Export selected cameras to a file."));
+    QnGridWidgetHelper::exportToFile(ui->camerasView, this, tr("Export selected %1 to a file.").arg(getDefaultDeviceNameLower()));
 }
 
 void QnCameraListDialog::at_clipboardAction_triggered() {

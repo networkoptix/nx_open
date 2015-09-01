@@ -29,6 +29,7 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/layout_resource.h>
@@ -838,7 +839,9 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Cannot move camera(s) to server %1. Server is unresponsive.", NULL, modifiedResources.size()).arg(server->getName()),
+            tr("Cannot move %1 to server %2. Server is unresponsive.")
+                .arg(getNumericDevicesName(modifiedResources))
+                .arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -861,7 +864,9 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 errorResources,
                 Qn::MainWindow_Tree_DragCameras_Help,
                 tr("Error"),
-                tr("Server %1 is unable to find and access these cameras. Are you sure you would like to move them?", NULL, errorResources.size()).arg(server->getName()),
+                tr("Server %1 is unable to find and access these %2. Are you sure you would like to move them?")
+                    .arg(server->getName())
+                    .arg(getNumericDevicesName(errorResources, false)),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
                 );
         /* If user is sure, return invalid cameras back to list. */
@@ -1479,7 +1484,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
             int result = QMessageBox::warning(
                         mainWindow(),
                         tr("Process in progress..."),
-                        tr("Camera addition is already in progress."\
+                        tr("Device addition is already in progress."\
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
@@ -1867,10 +1872,12 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if(resources.isEmpty())
         return; /* Nothing to delete. */
 
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    Q_ASSERT_X(cameras.size() == resources.size(), Q_FUNC_INFO, "Only cameras must stay here.");
+
     /* Check that we are deleting online auto-found cameras */ 
-    QnResourceList onlineAutoDiscoveredCameras;
-    foreach(const QnResourcePtr &resource, resources) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourceList onlineAutoDiscoveredCameras;
+    for (const QnVirtualCameraResourcePtr &camera: cameras) {
         if (!camera ||
             camera->getStatus() == Qn::Offline || 
             camera->isManuallyAdded()) 
@@ -1880,9 +1887,9 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     QString question;
     /* First version of the dialog if all cameras are auto-discovered. */
-    if (resources.size() == onlineAutoDiscoveredCameras.size()) {
+    if (cameras.size() == onlineAutoDiscoveredCameras.size()) {
         question =
-            tr("These %n cameras are auto-discovered.", "", resources.size()) + L'\n' 
+            tr("These %1 are auto-discovered.").arg(getNumericDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
@@ -1890,12 +1897,17 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* Second version - some cameras are auto-discovered, some not. */
     if (!onlineAutoDiscoveredCameras.isEmpty()) {
         question = 
-            tr("%n of these %1 cameras are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(resources.size()) + L'\n' 
+            tr("%n of these %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getNumericDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
+    else if (cameras.size() == resources.size()) {
+        /* Third version - no auto-discovered cameras in the list. */
+        question =
+            tr("Do you really want to delete the following %1?").arg(getNumericDevicesName(cameras, false));
+    }
     else {
-    /* Third version - no auto-discovered cameras in the list. */
+        /* Forth version - cameras and other items. */
         question =
             tr("Do you really want to delete the following %n item(s)?", "", resources.size());
     }

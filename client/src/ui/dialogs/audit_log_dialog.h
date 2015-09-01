@@ -106,6 +106,9 @@ private:
     void makeCameraData();
     void setupContextMenu(QTableView* gridMaster);
     QTableView* currentGridView() const;
+
+    void retranslateUi();
+
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 

@@ -125,19 +125,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera actions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sessions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -164,20 +156,12 @@
         <translation>在</translation>
     </message>
     <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
-    </message>
-    <message>
         <source>Schedule...</source>
         <translation>日程...</translation>
     </message>
     <message>
         <source>Action</source>
         <translation>动作</translation>
-    </message>
-    <message>
-        <source>&lt;Select at least one camera&gt;</source>
-        <translation>&lt;选择至少一台摄像机&gt;</translation>
     </message>
     <message>
         <source>Comments:</source>
@@ -217,10 +201,6 @@
     <message>
         <source>X</source>
         <translation>X</translation>
-    </message>
-    <message>
-        <source>filter by camera...</source>
-        <translation type="unfinished">以摄像机过滤...</translation>
     </message>
 </context>
 <context>
@@ -274,20 +254,8 @@
         <translation>IP，主机名，RTSP链接...</translation>
     </message>
     <message>
-        <source>Ca&amp;mera Address:</source>
-        <translation>&amp;摄像机地址:</translation>
-    </message>
-    <message>
         <source>Stop</source>
         <translation>停止</translation>
-    </message>
-    <message>
-        <source>Discovered Cameras:</source>
-        <translation>已搜索摄像机:</translation>
-    </message>
-    <message>
-        <source>Add camera(s)...</source>
-        <translation type="unfinished">添加摄像机...</translation>
     </message>
     <message>
         <source>Selected Server:</source>
@@ -308,6 +276,18 @@
     <message>
         <source>New Scan...</source>
         <translation type="unfinished">新搜索中...</translation>
+    </message>
+    <message>
+        <source>Add device(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Address:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discovered Devices:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -338,24 +318,6 @@
     <message>
         <source>No connection to Server %1.</source>
         <translation>未连接到服务器 %1.</translation>
-    </message>
-</context>
-<context>
-    <name>CameraDiagnosticsDialog</name>
-    <message>
-        <source>Camera Diagnostics</source>
-        <translation>摄像机诊断</translation>
-    </message>
-    <message>
-        <source>Camera:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CameraDisconnectedBusinessEventWidget</name>
-    <message>
-        <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished">当有摄像机离线时事件会产生</translation>
     </message>
 </context>
 <context>
@@ -467,10 +429,6 @@
 <context>
     <name>CameraListDialog</name>
     <message>
-        <source>Camera list</source>
-        <translation>摄像机列表</translation>
-    </message>
-    <message>
         <source>Filter:</source>
         <translation>过滤器:</translation>
     </message>
@@ -498,10 +456,6 @@
 ----------
 Short for &quot;seconds&quot;</extracomment>
         <translation>秒</translation>
-    </message>
-    <message>
-        <source>Camera Schedule Editor</source>
-        <translation>摄像机日程编辑器</translation>
     </message>
     <message>
         <source>Enable Recording</source>
@@ -582,10 +536,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Do Not Record</source>
         <translation type="unfinished">不录像</translation>
-    </message>
-    <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Min. Days</source>
@@ -692,10 +642,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>-</source>
         <translation>-</translation>
-    </message>
-    <message>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
     </message>
     <message>
         <source>Refresh</source>
@@ -825,10 +771,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>&amp;Camera List</source>
-        <translation>&amp;摄像机列表</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
@@ -1647,10 +1589,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>延迟拖放资源</translation>
     </message>
     <message>
-        <source>Move Cameras</source>
-        <translation>移动摄像机</translation>
-    </message>
-    <message>
         <source>Next Layout</source>
         <translation>下个视窗</translation>
     </message>
@@ -2139,14 +2077,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>用户设置...</translation>
     </message>
     <message>
-        <source>Camera Settings...</source>
-        <translation>摄像机设置...</translation>
-    </message>
-    <message>
-        <source>Open in Camera Settings Dialog</source>
-        <translation>在摄像机设置中打开</translation>
-    </message>
-    <message>
         <source>Server Settings...</source>
         <translation>服务器设定...</translation>
     </message>
@@ -2539,14 +2469,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>设置为视窗背景</translation>
     </message>
     <message>
-        <source>Add Camera(s)...</source>
-        <translation>添加摄像机...</translation>
-    </message>
-    <message>
-        <source>Camera(s) List by Server...</source>
-        <translation>服务器摄像机列表...</translation>
-    </message>
-    <message>
         <source>Ping...</source>
         <translation>Ping...</translation>
     </message>
@@ -2591,10 +2513,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>打开Web客户端...</translation>
     </message>
     <message>
-        <source>Camera List...</source>
-        <translation>摄像机列表...</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>图像增强...</translation>
     </message>
@@ -2605,14 +2523,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Open Current Layout in a New Window</source>
         <translation>在新窗口打开当前视窗</translation>
-    </message>
-    <message>
-        <source>Camera Rules...</source>
-        <translation>摄像机规则...</translation>
-    </message>
-    <message>
-        <source>Check Camera Issues...</source>
-        <translation>检查摄像机的问题...</translation>
     </message>
     <message>
         <source>How-to Videos and FAQ...</source>
@@ -2655,10 +2565,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>获取数据统计报告</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation type="unfinished">文件设置...</translation>
-    </message>
-    <message>
         <source>Drop Resources into New Layout</source>
         <translation type="unfinished">将资源拖放到一个新的Layout</translation>
     </message>
@@ -2679,11 +2585,35 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
+        <source>Move %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module Rules...</source>
+        <source>Check %1 Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in %1 Settings Dialog...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Device(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List by Server...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2770,6 +2700,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Audit log replay</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 actions</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
@@ -2814,10 +2748,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>System name changed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2835,10 +2765,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera removed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2874,12 +2800,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>%n cameras</source>
-        <translation type="unfinished">
-            <numerusform>%n 摄像机</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n action(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2910,10 +2830,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Date</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2938,11 +2854,23 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera added</source>
+        <source>E-mail settings changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>E-mail settings changed</source>
+        <source>%1 updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2988,25 +2916,19 @@ Short for &quot;seconds&quot;</extracomment>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
-    </message>
     <message numerus="yes">
-        <source>%n Camera(s)</source>
-        <translation>
-            <numerusform>%n 台摄像机</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 cameras</source>
-        <translation>
-            <numerusform>%n 台摄像机中的%1</numerusform>
+        <source>%n of %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <source>Select at least one camera.</source>
-        <translation type="unfinished">选择至少一台摄像机</translation>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3023,16 +2945,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Camera(s)</source>
-        <translation>
-            <numerusform>%n 台摄像机</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>&lt;System&gt;</source>
         <translation>&lt;系统&gt;</translation>
     </message>
@@ -3045,10 +2957,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform>%n 台服务器</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Select at least one camera</source>
-        <translation>选择至少一台摄像机</translation>
     </message>
     <message>
         <source>Instant</source>
@@ -3114,6 +3022,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Enter Text</source>
         <translation type="unfinished">输入文字</translation>
     </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -3124,6 +3040,14 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>to</source>
         <translation>到</translation>
+    </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Select at least one %1&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3196,6 +3120,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Confirm Exit</source>
         <translation type="unfinished">确认退出</translation>
     </message>
+    <message>
+        <source>filter by %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
@@ -3247,22 +3175,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>错误</translation>
     </message>
     <message>
-        <source>Add cameras to %1</source>
-        <translation>添加摄像机到 %1</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translation>添加摄像机...</translation>
-    </message>
-    <message>
-        <source>All cameras are already in the resource tree.</source>
-        <translation>摄像机已经添加到左侧资源树中。</translation>
-    </message>
-    <message>
-        <source>No cameras found.</source>
-        <translation>未搜索到摄像机。</translation>
-    </message>
-    <message>
         <source>Initializing scan...</source>
         <translation>初始搜索...</translation>
     </message>
@@ -3274,12 +3186,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Scanning hosts... (%1)</source>
         <translation>
             <numerusform>搜索主机中... (%1)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n cameras found</source>
-        <translation>
-            <numerusform>发现%n 台摄像机</numerusform>
         </translation>
     </message>
     <message>
@@ -3299,64 +3205,86 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>服务器已离线.</translation>
     </message>
     <message>
-        <source>Camera addition is possible for online servers only.</source>
-        <translation>只能为在线的服务器添加摄像机</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n cameras added successfully.</source>
-        <translation>
-            <numerusform>%n 摄像机添加成功.</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>It might take a few moments to populate them in the tree.</source>
         <translation>请等待系统加载资源树.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Error while adding %n cameras.</source>
-        <translation>
-            <numerusform>添加%n 摄像机时发生错误.</numerusform>
-        </translation>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
         <translation type="unfinished">超出IP地址区间，最大允许255个地址。</translation>
     </message>
     <message>
-        <source>Camera address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished">摄像机地址栏必须包含有效的网址，IP地址或rtsp链接.</translation>
-    </message>
-    <message>
         <source>Finished searching...</source>
         <translation type="unfinished">搜索结束...</translation>
-    </message>
-    <message>
-        <source>No cameras selected.</source>
-        <translation type="unfinished">无选中的摄像机。</translation>
-    </message>
-    <message>
-        <source>Please select at least one camera.</source>
-        <translation type="unfinished">请选择至少一台摄像机</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
         <translation type="unfinished">服务器离线, 搜索中止.</translation>
     </message>
     <message>
-        <source>Server is offline, cameras can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server has been removed - search aborted.</source>
         <translation type="unfinished">服务器已被移除, 搜索中止.</translation>
     </message>
     <message>
-        <source>Server has been removed - cannot add cameras.</source>
+        <source>Device addition is possible for online servers only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error while searching for camera(s).</source>
-        <translation type="unfinished">搜索摄像机时发生错误.</translation>
+        <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select at least one device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices added successfully.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n devices.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server is offline, devices can only be added to an online server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been removed - cannot add devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while searching for device(s).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>All devices are already in the resource tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add devices to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add devices...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3465,22 +3393,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics for %1 %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
         <translation type="unfinished"></translation>
@@ -3492,12 +3404,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming camera is accessible.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming target IO module provides media stream.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3531,21 +3441,17 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Export Selection to File...</source>
         <translation>导出选择到文件...</translation>
     </message>
-    <message numerus="yes">
-        <source>Camera List - %n camera(s) found</source>
-        <translation>
-            <numerusform>摄像机列表-找到%n台摄像机</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
-        <translation>
-            <numerusform>摄像机列表-%1找到%n台摄像机</numerusform>
-        </translation>
+    <message>
+        <source>%1 List for &apos;%2&apos; - %3 found</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export selected cameras to a file.</source>
-        <translation type="unfinished">导出选取的摄像机文件</translation>
+        <source>%1 List - %2 found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export selected %1 to a file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3651,20 +3557,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>注意</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation>移动侦测录像被禁止或所选摄像机不支持，请到摄像机移动侦测配置界面确认是否支持该功能并启用。</translation>
+        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>此摄像机不支持双码流和移动侦测。</translation>
+        <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
-        <translation>移动侦测录像被禁用，请到摄像机移动侦测设置界面设置移动区域和敏感度。</translation>
+        <source>Dual-Streaming is not supported by this %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>此摄像机不支持双码流。</translation>
+        <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3674,36 +3584,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>在新标签页中打开</translation>
     </message>
     <message>
-        <source>Camera Diagnostics</source>
-        <translation>摄像机诊断</translation>
-    </message>
-    <message>
-        <source>Camera Rules</source>
-        <translation>摄像机规则</translation>
-    </message>
-    <message numerus="yes">
-        <source>Save changes to the following %n camera(s)?</source>
-        <translation>
-            <numerusform>是否保存以下%n台摄像机修改?</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>错误</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n cameras to Server.</source>
-        <translation>
-            <numerusform>无法保存以下 %n 摄像机到服务器上。</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished">摄像机设置</translation>
-    </message>
-    <message>
-        <source>Camera(s) not saved.</source>
-        <translation type="unfinished">摄像机未保存</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
@@ -3725,6 +3607,30 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Could not apply changes.</source>
         <translation type="unfinished">无法进行修改</translation>
     </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save changes to the following %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save the following %1 to Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraSettingsWidget</name>
@@ -3733,8 +3639,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>无法编辑不同类型项的属性。</translation>
     </message>
     <message>
-        <source>No cameras selected.</source>
-        <translation>无选中的摄像机。</translation>
+        <source>No %1 selected.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4118,22 +4024,16 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>&lt;Any camera&gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation>
-            <numerusform>%n 台摄像机</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Export selected events to file</source>
         <translation>导出选取的事件至文件</translation>
     </message>
     <message>
         <source>Any Action</source>
         <translation type="unfinished">任何动作</translation>
+    </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4186,15 +4086,15 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>复制存储大小设置</translation>
     </message>
     <message>
-        <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished">部分摄像机不支持移动侦测录像计划类型</translation>
+        <source>Schedule motion type is not supported by some %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished">部分摄像机无法启用录像</translation>
+        <source>Recording cannot be enabled for some %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Schedule settings are not compatible with some cameras.</source>
+        <source>Schedule settings are not compatible with some %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4259,8 +4159,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>打开事件日志</translation>
     </message>
     <message>
-        <source>Open Camera List</source>
-        <translation>打开摄像机列表</translation>
+        <source>Open %1 List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4476,8 +4380,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished">无法创建导出文件%1.</translation>
     </message>
     <message>
-        <source>Could not export camera %1.</source>
-        <translation type="unfinished">无法导出摄像机%1.</translation>
+        <source>Could not export %1 %2.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4862,18 +4766,8 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Use I/O licenses to enable these %n modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
-        <source>Use licenses for selected cameras and modules</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use licenses for selected cameras</source>
+        <source>Use licenses for selected %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5204,7 +5098,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5375,20 +5269,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>浏览文档</translation>
     </message>
     <message>
-        <source>Open Camera</source>
-        <translation>打开摄像机</translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation>摄像机设置</translation>
-    </message>
-    <message>
         <source>Server settings</source>
         <translation>服务器设置</translation>
-    </message>
-    <message>
-        <source>Open camera web page...</source>
-        <translation>打开摄像机网页...</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -5413,6 +5295,22 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Connect to server</source>
         <translation>连接到服务器</translation>
+    </message>
+    <message>
+        <source>Open %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation type="unfinished">服务器设置</translation>
+    </message>
+    <message>
+        <source>Open %1 Web Page...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5768,23 +5666,11 @@ If you understand this and would like to proceed please click Merge to continue.
         </translation>
     </message>
     <message>
-        <source>Total %1 camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storage space occupied by camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Archived duration in calendar days between the first record and the current moment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5812,7 +5698,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cameras with non-empty archive</source>
+        <source>Total %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 with non-empty archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage space occupied by %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5862,8 +5756,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>图像文件</translation>
     </message>
     <message>
-        <source>Live Cameras</source>
-        <translation>实时摄像机</translation>
+        <source>Live %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5896,12 +5790,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">选择用户...</translation>
     </message>
     <message>
-        <source>Select Cameras...</source>
-        <translation type="unfinished">选择摄像机...</translation>
+        <source>Select Resources...</source>
+        <translation type="unfinished">选择资源...</translation>
     </message>
     <message>
-        <source>Slect Resources...</source>
-        <translation type="unfinished">选择资源...</translation>
+        <source>Select %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6042,7 +5936,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">一般</translation>
     </message>
     <message>
-        <source>Statistics</source>
+        <source>Storage Analytics</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6101,20 +5995,28 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">此功能需要两个服务器才开启.</translation>
     </message>
     <message>
-        <source>This server already has more than max cameras</source>
-        <translation type="unfinished">服务器摄像机数量已超出限定范围</translation>
-    </message>
-    <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished">为避免故障请调整最大允许的摄像机数量</translation>
-    </message>
-    <message>
         <source>Could not load storages from server.</source>
         <translation type="unfinished">无法从服务器加载存储资源。</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
         <translation type="unfinished">添加外部存储...</translation>
+    </message>
+    <message>
+        <source>Enable failover (server will take %1 automatically from offline servers)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max. %1 on this server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This server already has more than max %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To avoid malfunction adjust max number of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6480,6 +6382,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Do Not Record Motion</source>
         <translation type="unfinished">选择在摄像机上启用移动侦测</translation>
     </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -6586,10 +6492,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>激活模拟许可来删除此信息</translation>
     </message>
     <message>
-        <source>Please check authentication information in camera settings</source>
-        <translation>请检查摄像机设置中的身份验证信息</translation>
-    </message>
-    <message>
         <source>No video stream</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6612,6 +6514,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Server Offline</source>
         <translation type="unfinished">服务器离线</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6701,6 +6607,17 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Users</source>
         <translation type="unfinished">用户</translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemSettingsWidget</name>
+    <message>
+        <source>Enable %1 and servers auto discovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow system to optimize %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6990,10 +6907,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adjust camera settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use PTZ controls</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7007,6 +6920,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Edit Video Walls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust %1 settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7108,10 +7025,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>自定义...</translation>
     </message>
     <message>
-        <source>Can adjust camera settings</source>
-        <translation>可以调整摄像机设置</translation>
-    </message>
-    <message>
         <source>Can view video archives</source>
         <translation>可以浏览存储视频</translation>
     </message>
@@ -7134,6 +7047,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>User has been renamed. Password must be updated.</source>
         <translation type="unfinished">用户重命名，密码需要更换。</translation>
+    </message>
+    <message>
+        <source>Can adjust %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7334,10 +7251,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>版本不匹配</translation>
     </message>
     <message>
-        <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>增加摄像机已经进行,请确定是否要取消当前进度?</translation>
-    </message>
-    <message>
         <source>Select folder...</source>
         <translation>选择文件夹...</translation>
     </message>
@@ -7349,12 +7262,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Beta version %1</source>
         <translation>测试版%1</translation>
     </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered.</source>
-        <translation>
-            <numerusform> %n 摄像机可被自动发现.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>They may be auto-discovered again after removing.</source>
         <translation>摄像机移除后将被重新自动发现.</translation>
@@ -7362,12 +7269,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Are you sure you want to delete them?</source>
         <translation>请确定是否删除?</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.</source>
-        <translation>
-            <numerusform> %1台摄像机中的%n台被自动发现.</numerusform>
-        </translation>
     </message>
     <message>
         <source>An error has occurred while trying to delete a resource from Server. </source>
@@ -7432,14 +7333,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation type="unfinished">新视窗%1</translation>
     </message>
     <message>
-        <source>Cannot move camera(s) to server %1. Server is unresponsive.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server %1 is unable to find and access these cameras. Are you sure you would like to move them?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open File</source>
         <translation type="unfinished">打开文件</translation>
     </message>
@@ -7470,6 +7363,32 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Launcher process not found.</source>
         <translation type="unfinished">未发现启动过程</translation>
+    </message>
+    <message>
+        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These %1 are auto-discovered.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Do you really want to delete the following %1?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7890,10 +7809,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnWorkbenchNavigator</name>
     <message>
-        <source>All Cameras</source>
-        <translation>所有摄像机</translation>
-    </message>
-    <message>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>hh:mm:ss</translation>
@@ -7912,6 +7827,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Live</source>
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
         <translation>实时</translation>
+    </message>
+    <message>
+        <source>All %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8153,10 +8072,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>%1&apos;屏幕</translation>
     </message>
     <message>
-        <source>%n cameras</source>
-        <translation>%n 摄像机</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation type="unfinished">控制任务正在进行</translation>
     </message>
@@ -8191,6 +8106,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>A Video Wall with the same name already exists.</source>
         <translation type="unfinished">相同名称的电视墙已存在</translation>
+    </message>
+    <message>
+        <source>%n items</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8479,14 +8398,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">服务器冗余</translation>
     </message>
     <message>
-        <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished">使用冗余（将从离线服务器上自动接管摄像机）</translation>
-    </message>
-    <message>
-        <source>Max. cameras on this server:</source>
-        <translation type="unfinished">允许管理的最大摄像机数量:</translation>
-    </message>
-    <message>
         <source>Storages</source>
         <translation type="unfinished">存储空间</translation>
     </message>
@@ -8636,10 +8547,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>IO ports</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished">摄像机设置</translation>
     </message>
     <message>
         <source>Enable Audio</source>
@@ -8831,14 +8738,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished">允许自动扫描在线摄像机和服务器</translation>
-    </message>
-    <message>
-        <source>Allow system to optimize camera settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

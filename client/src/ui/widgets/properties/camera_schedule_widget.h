@@ -121,6 +121,8 @@ private:
 
     void connectToGridWidget();
     void disconnectFromGridWidget();
+
+    void retranslateUi();
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 

@@ -48,7 +48,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->setupUi(this);
   
     addPage(SettingsPage, new QnServerSettingsWidget(server, this), tr("General"));
-    addPage(StatisticsPage, new QnRecordingStatisticsWidget(server, this), tr("Statistics"));
+    addPage(StatisticsPage, new QnRecordingStatisticsWidget(server, this), tr("Storage Analytics"));
 
     QPushButton* webPageButton = new QPushButton(this);
     webPageButton->setText(tr("Open Web Page..."));
