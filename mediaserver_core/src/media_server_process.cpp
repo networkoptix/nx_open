@@ -1423,7 +1423,8 @@ bool MediaServerProcess::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
-    QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"));
+    AuthMethod::Values methods = AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam;
+    QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
@@ -2357,6 +2358,9 @@ protected:
         m_main.reset(new MediaServerProcess(m_argc, m_argv));
 
         int res = application()->exec();
+
+        m_main.reset();
+
 #ifdef Q_OS_WIN
         // stop the service unexpectedly to let windows service management system restart it
         if (restartFlag) {

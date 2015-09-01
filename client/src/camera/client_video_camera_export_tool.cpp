@@ -1,4 +1,5 @@
 #include "client_video_camera_export_tool.h"
+#include <core/resource/media_resource.h>
 
 #include <QtCore/QFileInfo>
 
@@ -37,19 +38,23 @@ void QnClientVideoCameraExportTool::start() {
     emit rangeChanged(0, 100);
     emit valueChanged(0);
 
+    QnImageFilterHelper transcodeParams;
+    transcodeParams.setSrcRect(m_sourceRect);
+    transcodeParams.setContrastParams(m_imageCorrectionParams);
+    transcodeParams.setDewarpingParams(m_camera->resource()->getDewarpingParams(), m_itemDewarpingParams);
+    transcodeParams.setRotation(m_rotationAngle);
+    transcodeParams.setCustomAR(m_customAR);
+    transcodeParams.setTimeCorner(m_timestampPos, m_timeOffsetMs, 0);
+    transcodeParams.setVideoLayout(m_camera->resource()->getVideoLayout());
+
     m_camera->exportMediaPeriodToFile(
                 m_timePeriod.startTimeMs * 1000ll, (m_timePeriod.startTimeMs + m_timePeriod.durationMs) * 1000ll,
                 m_fileName, QFileInfo(m_fileName).suffix(),
                 QnStorageResourcePtr(),
                 QnStreamRecorder::Role_FileExport,
-                m_timestampPos,
-                m_timeOffsetMs,
                 m_serverTimeZoneMs,
-                m_sourceRect,
-                m_imageCorrectionParams,
-                m_itemDewarpingParams,
-                m_rotationAngle,
-                m_customAR);
+                transcodeParams
+                );
 }
 
 int QnClientVideoCameraExportTool::status() const {
