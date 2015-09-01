@@ -53,7 +53,6 @@ private slots:
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 
 private:
-    QString getTextForNCameras(int n) const;
     QStandardItem* createEventTree(QStandardItem* rootItem, QnBusiness::EventType value);
 
     void updateHeaderWidth();
@@ -69,6 +68,8 @@ private:
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
     void query(qint64 fromMsec, qint64 toMsec, QnBusiness::EventType eventType, QnBusiness::ActionType actionType);
+
+    void retranslateUi();
 
 private:
     QScopedPointer<Ui::EventLogDialog> ui;

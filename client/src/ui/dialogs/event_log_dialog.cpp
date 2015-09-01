@@ -8,6 +8,7 @@
 
 #include <utils/common/event_processors.h>
 
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -49,6 +50,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_lastMouseButton(Qt::NoButton)
 {
     ui->setupUi(this);
+    retranslateUi();
+
     setWarningStyle(ui->warningLabel);
 
     setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
@@ -260,6 +263,26 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
     }
 }
 
+void QnEventLogDialog::retranslateUi()
+{
+    ui->retranslateUi(this);
+
+    const auto resources = [](const QnResourceList &resources) -> QnVirtualCameraResourceList 
+    {
+        QnVirtualCameraResourceList result;
+        for (const auto &resource: resources)
+            result.push_back(resource.dynamicCast<QnVirtualCameraResource>());
+
+        return result;
+    }(m_filterCameraList);
+
+    const QString cameraButtonText = (resources.empty() ?
+        tr("<Any %1>").arg(getDefaultDevicesName(false, false)) 
+        : tr("<%n %1>", "", resources.count()).arg(getDefaultDevicesName(resources, false)));
+
+    ui->cameraButton->setText(cameraButtonText);
+}
+
 void QnEventLogDialog::updateHeaderWidth()
 {
     if (ui->dateEditFrom->width() == 0)
@@ -382,14 +405,6 @@ void QnEventLogDialog::setEventType(QnBusiness::EventType value)
         ui->eventComboBox->setCurrentIndex(found.first());
 }
 
-QString QnEventLogDialog::getTextForNCameras(int n) const
-{
-    if (n == 0)
-        return tr("<Any camera>");
-    else 
-        return tr("<%n camera(s)>", "", n);
-}
-
 void QnEventLogDialog::setDateRange(const QDate& from, const QDate& to)
 {
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), to);
@@ -413,7 +428,8 @@ void QnEventLogDialog::setCameraList(const QnResourceList &cameras)
     }
 
     m_filterCameraList = cameras;
-    ui->cameraButton->setText(getTextForNCameras(m_filterCameraList.size()));
+
+    retranslateUi();
 
     updateData();
 }
