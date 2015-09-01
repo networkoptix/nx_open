@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>  //TODO #ak maybe boost::variant?
 
+#include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <utils/db/types.h>
 
 
@@ -23,7 +24,8 @@ enum class ResultCode
     notAuthorized,
     notFound,
     alreadyExists,
-    dbError
+    dbError,
+    notImplemented
 };
 
 ResultCode fromDbResultCode( nx::db::DBResult );
@@ -48,6 +50,9 @@ enum class DataActionType
 
 
 class DataFilter
+:
+    public stree::AbstractIteratableContainer,
+    public stree::AbstractResourceReader
 {
 public:
     //!Empty filter means data should not be filtered

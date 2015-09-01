@@ -28,6 +28,22 @@ public:
     std::string systemID;
 };
 
+namespace SystemAccessRole
+{
+    enum Value
+    {
+        none = 0,
+        owner = 1,
+        maintenance,
+        viewer,
+        editor,
+        editorWithSharing
+    };
+
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION( Value )
+    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (Value), (lexical) )
+}
+
 //!Information required to register system in cloud
 class SystemRegistrationData
 :
@@ -77,13 +93,12 @@ class SystemData
     public stree::AbstractResourceReader
 {
 public:
-    //!Globally unique id assigned to the system. Usually, it is GUID
-    std::string id;
+    QnUuid id;
     //!Not unique system name
     std::string name;
     //!Key, system uses to authenticate requests to any cloud module
     std::string authKey;
-    std::string ownerAccountID;
+    QnUuid ownerAccountID;
     SystemStatus status;
     //!a true, if cloud connection is activated for this system
     bool cloudConnectionSubscriptionStatus;
@@ -105,8 +120,32 @@ public:
 #define SystemData_Fields (id)(name)(authKey)(ownerAccountID)(status)(cloudConnectionSubscriptionStatus)
 
 
+class SystemSharing
+:
+    public stree::AbstractResourceReader
+{
+public:
+    std::string accountID;
+    std::string systemID;
+    SystemAccessRole::Value accessRole;
+
+    SystemSharing()
+    :
+        accessRole( SystemAccessRole::none )
+    {
+    }    
+
+    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    virtual bool getAsVariant( int resID, QVariant* const value ) const override;
+};
+
+bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSharing );
+
+#define SystemSharing_Fields (accountID)(systemID)(accessRole)
+
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData),
+    (SystemRegistrationData)(SystemData)(SystemSharing),
     (json)(sql_record) )
 
 

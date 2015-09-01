@@ -60,6 +60,8 @@ private:
         const AuthorizationManager& authorizationManager,
         AccountManager* const accountManager,
         SystemManager* const systemManager );
+    bool initializeDB( nx::db::DBManager* const dbManager );
+    bool tuneDB( nx::db::DBManager* const dbManager );
     bool updateDB( nx::db::DBManager* const dbManager );
 };
 

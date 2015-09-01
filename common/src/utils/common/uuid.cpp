@@ -45,6 +45,18 @@ QnUuid::QnUuid( const QByteArray& text )
     }
 }
 
+QnUuid::QnUuid( const std::string& text )
+:
+    m_uuid( QByteArray(text.c_str()) )
+{
+    if( !text.empty() )
+    {
+        Q_ASSERT(
+            text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+    }
+}
+
 QnUuid::QnUuid(const QUuid &uuid)
 :
     m_uuid(uuid)
