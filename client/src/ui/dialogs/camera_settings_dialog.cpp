@@ -159,8 +159,8 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             this,
             notSavedCameras,
-            tr("%1 not saved.").arg(getDevicesName(notSavedCameras)),
-            tr("Save changes to the following %1?").arg(getDevicesNameLower(notSavedCameras)),
+            tr("%1 not saved.").arg(getDefaultDevicesName(notSavedCameras)),
+            tr("Save changes to the following %1?").arg(getDefaultDevicesName(notSavedCameras, false)),
             QDialogButtonBox::Yes | QDialogButtonBox::No
             );
         if(button == QDialogButtonBox::Yes)
@@ -236,7 +236,7 @@ void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const Qn
 
     QnResourceListDialog::exec(this, cameras,
         tr("Error"),
-        tr("Could not save the following %1 to Server.").arg(getDevicesNameLower(cameras)),
+        tr("Could not save the following %1 to Server.").arg(getDefaultDevicesName(cameras, false)),
         QDialogButtonBox::Ok);
 }
 

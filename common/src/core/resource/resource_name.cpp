@@ -136,3 +136,17 @@ QString getNumericDevicesName(const QnVirtualCameraResourceList &devices, bool c
     /* Both of them - or none. */
     return QnResourceNameStrings::numericDevices(devices.size(), capitalize);
 }
+
+QString getDefaultDeviceNameLower(const QnVirtualCameraResourcePtr &device /*= QnVirtualCameraResourcePtr()*/)
+{
+    if (device)
+        return getDefaultDevicesName(QnVirtualCameraResourceList() << device, false);
+    return getDefaultDevicesName(false, false);
+}
+
+QString getDefaultDeviceNameUpper(const QnVirtualCameraResourcePtr &device /*= QnVirtualCameraResourcePtr()*/)
+{
+    if (device)
+        return getDefaultDevicesName(QnVirtualCameraResourceList() << device, true);
+    return getDefaultDevicesName(false, true);
+}

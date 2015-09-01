@@ -18,14 +18,6 @@ inline QString getShortResourceName(const QnResourcePtr& resource) { return getF
  */
 QString getDefaultDevicesName(bool plural = true, bool capitalize = true);
 
-inline QString getDefaultDeviceNameLower() {
-    return getDefaultDevicesName(false, false);
-}
-
-inline QString getDefaultDeviceNameUpper() {
-    return getDefaultDevicesName(false, true);
-}
-
 /**
  * @brief Calculate default devices name for the given devices list.
  * @details Following rules are applied:
@@ -37,9 +29,11 @@ inline QString getDefaultDeviceNameUpper() {
  */
 QString getDefaultDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize = true);
 
-inline QString getDefaultDevicesName(const QnVirtualCameraResourcePtr &device, bool capitalize = true) {
-    return getDefaultDevicesName(QnVirtualCameraResourceList() << device, capitalize);
-}
+/** Shortcut for single device or singular form. */
+QString getDefaultDeviceNameLower(const QnVirtualCameraResourcePtr &device = QnVirtualCameraResourcePtr());
+
+/** Shortcut for single device or singular form. */
+QString getDefaultDeviceNameUpper(const QnVirtualCameraResourcePtr &device = QnVirtualCameraResourcePtr());
 
 /**
  * @brief Calculate common name for the target devices list.

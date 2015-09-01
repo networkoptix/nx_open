@@ -179,9 +179,9 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
     switch (column)
     {
         case CameraNameColumn:
-            return tr("%1 with non-empty archive").arg(getDevicesName());
+            return tr("%1 with non-empty archive").arg(getDefaultDevicesName());
         case BytesColumn:
-            return tr("Storage space occupied by %1").arg(getDevicesName());
+            return tr("Storage space occupied by %1").arg(getDefaultDevicesName());
         case DurationColumn:
             return tr("Archived duration in calendar days between the first record and the current moment");
         case BitrateColumn:

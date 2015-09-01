@@ -86,7 +86,7 @@ void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &came
     if (analogCameras == m_cameras.size())
         title = tr("Use analog licenses to view these %n cameras", "", analogCameras);
     else 
-        title = tr("Use licenses for selected %1").arg(getDevicesNameLower(m_cameras));
+        title = tr("Use licenses for selected %1").arg(getNumericDevicesName(m_cameras));
     ui->useLicenseCheckBox->setText(title);
 
     bool licenseUsed = m_cameras.isEmpty() ? false : m_cameras.front()->isLicenseUsed();

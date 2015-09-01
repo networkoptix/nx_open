@@ -91,7 +91,7 @@ void QnResourceSelectionDialog::init() {
         break;
     case CameraResourceTarget:
         scope = QnResourcePoolModel::CamerasScope;
-        setWindowTitle(tr("Select %1...").arg(getDevicesNameUpper()));
+        setWindowTitle(tr("Select %1...").arg(getDefaultDevicesName()));
         break;
     default:
         scope = QnResourcePoolModel::FullScope;

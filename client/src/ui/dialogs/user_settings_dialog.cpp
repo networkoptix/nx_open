@@ -507,7 +507,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
         previous = createAccessRightCheckBox(tr("Administrator"),
                      Qn::ExcludingAdminPermission,
                      previous);
-    previous = createAccessRightCheckBox(tr("Can adjust %1 settings").arg(getDevicesNameLower()), Qn::GlobalEditCamerasPermission, previous);
+    previous = createAccessRightCheckBox(tr("Can adjust %1 settings").arg(getDefaultDevicesName(false)), Qn::GlobalEditCamerasPermission, previous);
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
