@@ -67,6 +67,8 @@ void QnGeneralSystemAdministrationWidget::retranslateUi() {
     ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open %1 List").arg(getDefaultDevicesName())));
 
     ui->cameraListButton->setText(tr("%1 List").arg(getDefaultDevicesName()));
+
+    ui->systemSettingsWidget->retranslateUi();
 }
 
 
