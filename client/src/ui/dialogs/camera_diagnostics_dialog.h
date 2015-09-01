@@ -37,7 +37,7 @@ private:
     QString diagnosticsStepText(int stepType);
 
 private slots:
-    void updateTexts();
+    void retranslateUi();
     void updateOkButtonEnabled();
     void clearLog();
 

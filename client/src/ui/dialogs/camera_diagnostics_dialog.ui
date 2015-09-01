@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="titleLabel">
      <property name="text">
-      <string>Camera:</string>
+      <string notr="true">[CHANGE TO DEVICE TYPE AT RUNTIME]:</string>
      </property>
     </widget>
    </item>

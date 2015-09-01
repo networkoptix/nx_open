@@ -20,7 +20,10 @@ public:
 
     void forcedUpdate();
     bool tryClose(bool force);
+
 protected:
+    virtual void retranslateUi() {}
+
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
     void setPageEnabled(int key, bool enabled);
 

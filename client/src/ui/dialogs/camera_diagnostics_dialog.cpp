@@ -26,7 +26,8 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     m_finished(false)
 {
     ui->setupUi(this);
-    
+    retranslateUi();
+
     QPushButton *copyButton = new QPushButton(tr("Copy to Clipboard"), this);
     ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
     connect(copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
@@ -46,7 +47,7 @@ void QnCameraDiagnosticsDialog::setResource(const QnVirtualCameraResourcePtr &re
 
     m_resource = resource;
 
-    updateTexts();
+    retranslateUi();
     clearLog();
 }
 
@@ -92,8 +93,10 @@ void QnCameraDiagnosticsDialog::stop() {
     updateOkButtonEnabled();
 }
 
-void QnCameraDiagnosticsDialog::updateTexts() {
+void QnCameraDiagnosticsDialog::retranslateUi() {
     
+    ui->retranslateUi(this);
+
     if(!m_resource)
     {
         ui->titleLabel->clear();

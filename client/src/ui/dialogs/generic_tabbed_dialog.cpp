@@ -207,5 +207,6 @@ bool QnGenericTabbedDialog::tryClose(bool force) {
 }
 
 void QnGenericTabbedDialog::forcedUpdate() {
+    retranslateUi();
     loadData();
 }
