@@ -51,7 +51,7 @@
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return nullptr;
 
     QString fileName = removeProtocolPrefix(translateUrlToLocal(url));
@@ -97,17 +97,43 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
-bool QnFileStorageResource::updatePermissions() const
+bool QnFileStorageResource::initOrUpdate() const
 {
     QMutexLocker lock(&m_mutexPermission);
     
-    if (m_durty) {
-        m_durty = false;
-#ifdef WIN32
-        if (!m_localPath.isEmpty() && !mountTmpDrive(getUrl()))
-            return false;
+    if (getUrl().isEmpty())
+        return false;
+
+    if (m_dirty)
+    {
+        m_dirty = false;
+#ifndef _WIN32
+        if (m_firstCall)
+        {
+            m_firstCall = false;
+            removeOldDirs();
+        }
 #endif
+
+        if (getUrl().contains("://"))
+        {
+#ifndef _WIN32
+            if (mountTmpDrive() != 0)
+                return false;
+            if (!m_localPath.isEmpty() && m_storageManager)
+                m_storageManager->addLocalPathInUse(m_localPath);
+#else
+            if (!mountTmpDrive())
+                return false;
+#endif
+        }
     }
+
+#ifdef _WIN32
+    if (!updatePermissions())
+        return false;
+#endif
+
     return true;
 }
 
@@ -117,7 +143,7 @@ bool QnFileStorageResource::checkWriteCap() const
     if( !isStorageDirMounted() )
         return false;
     
-    if (!updatePermissions())
+    if (!initOrUpdate())
     	return false;
     
     if (hasFlags(Qn::deprecated))
@@ -148,7 +174,7 @@ bool QnFileStorageResource::checkWriteCap() const
 
 bool QnFileStorageResource::checkDBCap() const
 {
-    if (!m_valid || !m_localPath.isEmpty())
+    if (!initOrUpdate() || !m_localPath.isEmpty())
         return false;
 #ifdef _WIN32
     return true;
@@ -168,7 +194,7 @@ bool QnFileStorageResource::checkDBCap() const
 
 int QnFileStorageResource::getCapabilities() const
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return 0;
 
     if (checkDBCap())
@@ -205,7 +231,7 @@ QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
 }
 
 #ifndef _WIN32
-void QnFileStorageResource::removeOldDirs()
+void QnFileStorageResource::removeOldDirs() const
 {
     QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(
         QStringList() << (lit("*") + NX_TEMP_FOLDER_NAME + lit("*")),
@@ -248,9 +274,9 @@ void QnFileStorageResource::removeOldDirs()
     }
 }
 
-int QnFileStorageResource::mountTmpDrive(const QString &remoteUrl)
+int QnFileStorageResource::mountTmpDrive() const
 {
-    QUrl url(remoteUrl);
+    QUrl url(getUrl());
     if (!url.isValid())
         return -1;
 
@@ -296,19 +322,9 @@ int QnFileStorageResource::mountTmpDrive(const QString &remoteUrl)
     return 0;
 }
 #else
-
-bool QnFileStorageResource::mountTmpDrive(const QString &url) const
+bool QnFileStorageResource::updatePermissions() const
 {
-    QUrl storageUrl(url);
-    if (!storageUrl.isValid())
-        return false;
-
-    QString path = 
-        lit("\\\\") + 
-        storageUrl.host() + 
-        storageUrl.path().replace(lit("/"), lit("\\"));
-
-    if (url.startsWith("smb://") && !storageUrl.userName().isEmpty())
+    if (getUrl().startsWith("smb://") && !QUrl(getUrl()).userName().isEmpty())
     {
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));
@@ -319,7 +335,22 @@ bool QnFileStorageResource::mountTmpDrive(const QString &url) const
         if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
             return false;
     }
-    
+}
+
+bool QnFileStorageResource::mountTmpDrive() const
+{
+    QUrl storageUrl(getUrl());
+    if (!storageUrl.isValid())
+        return false;
+
+    QString path = 
+        lit("\\\\") + 
+        storageUrl.host() + 
+        storageUrl.path().replace(lit("/"), lit("\\"));
+
+    if (!updatePermissons_2())
+        return false;
+
     m_localPath = path;
     return true;
 }
@@ -328,37 +359,14 @@ bool QnFileStorageResource::mountTmpDrive(const QString &url) const
 void QnFileStorageResource::setUrl(const QString& url)
 {
     QMutexLocker lock(&m_mutex);
-#ifndef _WIN32
-    if (m_firstCall)
-    {
-        m_firstCall = false;
-        removeOldDirs();
-    }
-#endif
-
-    if (url.contains("://"))
-    {
-#ifndef _WIN32
-        if (mountTmpDrive(url) != 0)
-            return;
-        if (!m_localPath.isEmpty() && m_storageManager)
-            m_storageManager->addLocalPathInUse(m_localPath);
-#else
-        if (!mountTmpDrive(url))
-            return;
-#endif
-    }
     QnStorageResource::setUrl(url);
-    m_valid = true;
-    m_durty = true;
-
+    m_dirty = true;
 }
 
 QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
     m_storageBitrateCoeff(1.0),
-    m_durty(false),
+    m_dirty(false),
     m_capabilities(0),
-    m_valid(false),
     m_storageManager(storageManager)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
@@ -382,60 +390,53 @@ QnFileStorageResource::~QnFileStorageResource()
 
 bool QnFileStorageResource::removeFile(const QString& url)
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return false;
 
-    updatePermissions();
     qnFileDeletor->deleteFile(removeProtocolPrefix(translateUrlToLocal(url)));
     return true;
 }
 
 bool QnFileStorageResource::renameFile(const QString& oldName, const QString& newName)
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return false;
 
-    updatePermissions();
     return QFile::rename(translateUrlToLocal(oldName), translateUrlToLocal(newName));
 }
 
 
 bool QnFileStorageResource::removeDir(const QString& url)
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return false;
 
-    updatePermissions();
     QDir dir;
     return dir.rmdir(removeProtocolPrefix(translateUrlToLocal(url)));
 }
 
 bool QnFileStorageResource::isDirExists(const QString& url)
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return false;
 
-    updatePermissions();
     QDir d(translateUrlToLocal(url));
     return d.exists(removeProtocolPrefix(translateUrlToLocal(url)));
 }
 
 bool QnFileStorageResource::isFileExists(const QString& url)
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return false;
 
-    updatePermissions();
     return QFile::exists(removeProtocolPrefix(translateUrlToLocal(url)));
 }
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return 0;
 
-    if (!updatePermissions())
-        return -1;
     return getDiskFreeSpace(
         m_localPath.isEmpty() ?
         getPath() :
@@ -445,11 +446,9 @@ qint64 QnFileStorageResource::getFreeSpace()
 
 qint64 QnFileStorageResource::getTotalSpace()
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return 0;
 
-    if (!updatePermissions())
-        return -1;
     return getDiskTotalSpace(
         m_localPath.isEmpty() ?
         getPath() :
@@ -459,10 +458,9 @@ qint64 QnFileStorageResource::getTotalSpace()
 
 QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return QnAbstractStorageResource::FileInfoList();
 
-    updatePermissions();
     QDir dir(translateUrlToLocal(dirName));
 
     QFileInfoList localList = dir.entryInfoList(
@@ -487,23 +485,19 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
 
 qint64 QnFileStorageResource::getFileSize(const QString& url) const
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return 0;
 
-    updatePermissions();
     return QnFile::getFileSize(translateUrlToLocal(url));
 }
 
 bool QnFileStorageResource::isAvailable() const 
 {
-    if (!m_valid)
+    if (!initOrUpdate())
         return false;
 
     if(!isStorageDirMounted())
         return false;
-
-    if (!updatePermissions())
-		return false;
 
     QString tmpDir = closeDirPath(translateUrlToLocal(getPath())) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
