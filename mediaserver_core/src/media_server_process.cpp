@@ -1423,7 +1423,7 @@ bool MediaServerProcess::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
-    AuthMethod::Values methods = AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam;
+    AuthMethod::Values methods = (AuthMethod::Values)(AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
@@ -1477,6 +1477,9 @@ QHostAddress MediaServerProcess::getPublicAddress()
 
 void MediaServerProcess::run()
 {
+
+    QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
+
 #ifdef _WIN32
     win32_exception::setCreateFullCrashDump( MSSettings::roSettings()->value(
         nx_ms_conf::CREATE_FULL_CRASH_DUMP,
