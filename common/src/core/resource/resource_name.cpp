@@ -75,13 +75,13 @@ QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {
     return baseName;
 }
 
-QString getDefaultDevicesName(bool plural /*= true*/, bool capitalize /*= true*/) {
+QString getDefaultDevicesName(bool plural /* = true*/, bool capitalize /* = true*/) {
     if (!qnResPool || !qnResPool->containsIoModules())
         return QnResourceNameStrings::defaultCameras(plural, capitalize);
     return QnResourceNameStrings::defaultDevices(plural, capitalize);
 }
 
-QString getDefaultDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /*= true*/) {
+QString getDefaultDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /* = true*/) {
     bool plural = devices.size() != 1;
 
     /* Quick check - if there are no io modules in the system at all. */
@@ -110,7 +110,7 @@ QString getDefaultDevicesName(const QnVirtualCameraResourceList &devices, bool c
     return QnResourceNameStrings::defaultDevices(plural, capitalize);
 }
 
-QString getNumericDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /*= true*/) {
+QString getNumericDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /* = true*/) {
     /* Quick check - if there are no io modules in the system at all. */
     if (!qnResPool || !qnResPool->containsIoModules())
         return QnResourceNameStrings::numericCameras(devices.size(), capitalize);
@@ -137,14 +137,14 @@ QString getNumericDevicesName(const QnVirtualCameraResourceList &devices, bool c
     return QnResourceNameStrings::numericDevices(devices.size(), capitalize);
 }
 
-QString getDefaultDeviceNameLower(const QnVirtualCameraResourcePtr &device /*= QnVirtualCameraResourcePtr()*/)
+QString getDefaultDeviceNameLower(const QnVirtualCameraResourcePtr &device /* = QnVirtualCameraResourcePtr()*/)
 {
     if (device)
         return getDefaultDevicesName(QnVirtualCameraResourceList() << device, false);
     return getDefaultDevicesName(false, false);
 }
 
-QString getDefaultDeviceNameUpper(const QnVirtualCameraResourcePtr &device /*= QnVirtualCameraResourcePtr()*/)
+QString getDefaultDeviceNameUpper(const QnVirtualCameraResourcePtr &device /* = QnVirtualCameraResourcePtr()*/)
 {
     if (device)
         return getDefaultDevicesName(QnVirtualCameraResourceList() << device, true);

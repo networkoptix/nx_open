@@ -28,21 +28,8 @@
 <context>
     <name>QnBusinessStringsHelper</name>
     <message>
-        <source>Camera output</source>
-        <translatorcomment>แสดงผลกล้อง</translatorcomment>
-        <translation>Camera output</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>แสดงผลกล้องสำหรับ 30 วินาที</translation>
-    </message>
-    <message>
         <source>Bookmark</source>
         <translation>บุ๊คมาร์ก</translation>
-    </message>
-    <message>
-        <source>Camera recording</source>
-        <translation>กำลังบันทึกภาพ</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -85,24 +72,12 @@
         <translation>การเคลื่อนไหวบนกล้อง</translation>
     </message>
     <message>
-        <source>Input Signal on Camera</source>
-        <translation>สัญญาณเข้าในกล้อง</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>กล้องขาดการเชื่อมต่อ</translation>
-    </message>
-    <message>
         <source>Storage Failure</source>
         <translation>ที่เก็บข้อมูลผิดพลาด</translation>
     </message>
     <message>
         <source>Network Issue</source>
         <translation>ปัญหาเครือข่าย</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>กล้อง IP ขัดข้อง</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -121,10 +96,6 @@
         <translation>ปัญหาใบอนุญาต</translation>
     </message>
     <message>
-        <source>Any Camera Issue</source>
-        <translation>ปัญหาบาง กล้อง</translation>
-    </message>
-    <message>
         <source>Any Server Issue</source>
         <translation>ปัญหาบางเซิร์ฟเวอร์</translation>
     </message>
@@ -135,10 +106,6 @@
     <message>
         <source>Undefined event has occurred on %1</source>
         <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน  %1</translation>
-    </message>
-    <message>
-        <source>Camera %1 was disconnected</source>
-        <translation>กล้อง %1 ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Input on %1</source>
@@ -159,10 +126,6 @@
     <message>
         <source>Server &quot;%1&quot; Failure</source>
         <translation>เซิร์ฟเวอร์r &quot;%1&quot; ล้มเหลว</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict at %1</source>
-        <translation>กล้อง IP ขัดข้อง%1</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Conflict</source>
@@ -187,10 +150,6 @@
     <message>
         <source>Reason: %1</source>
         <translation>เหตุผล: %1</translation>
-    </message>
-    <message>
-        <source>Camera #%1 MAC: %2</source>
-        <translation>กล้อง #%1 MAC: %2</translation>
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
@@ -221,14 +180,6 @@
         </translation>
     </message>
     <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation>การเชื่อมต่อกับกล้อง (ช่องทางหลัก) ถูกปิดอย่างไม่คาดคิด.</translation>
-    </message>
-    <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation>การเชื่อมต่อกับกล้อง (ช่องทางสำรอง) ถูกปิดอย่างไม่คาดคิด.</translation>
-    </message>
-    <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย, prev seq.=%1 next seq.=%2.</translation>
     </message>
@@ -251,10 +202,6 @@
     <message>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
         <translation>HDD/SSD disk %1 เต็ม ดิสก์มีข้อมูลมากเกินไปที่ไม่ได้รับการจัดการโดย VMS.</translation>
-    </message>
-    <message>
-        <source>Recording on %n camera(s) is disabled: </source>
-        <translation>การบันทึกบน %n กล้อง(s) ปิดการทำงาน: </translation>
     </message>
     <message>
         <source>Conflicting Server: %1</source>
@@ -305,6 +252,61 @@
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>%1 output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 output for 30 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Signal on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any %1 Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2 was disconnected</source>
+        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict at %2</source>
+        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 #%2 MAC: %3</source>
+        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on %1 is disabled: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -388,22 +390,6 @@
     <message>
         <source>Not authorised. Url %1.</source>
         <translation type="unfinished">ไม่ได้รับอนุญาต. Url %1.</translation>
-    </message>
-    <message>
-        <source>camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network.</source>
@@ -749,6 +735,93 @@
     </message>
 </context>
 <context>
+    <name>QnResourceNameStrings</name>
+    <message numerus="yes">
+        <source>%n Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>device</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSignHelper</name>
     <message>
         <source>Unknown</source>
@@ -959,7 +1032,7 @@
         <translation type="unfinished">หน่วยความจำไม่ได้กำหนดค่า</translation>
     </message>
     <message>
-        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

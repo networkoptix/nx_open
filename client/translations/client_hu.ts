@@ -125,19 +125,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera actions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sessions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -168,10 +160,6 @@
         <translation>-</translation>
     </message>
     <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Bármely kamera&gt;</translation>
-    </message>
-    <message>
         <source>Schedule...</source>
         <translation>Ütemzés...</translation>
     </message>
@@ -182,10 +170,6 @@
     <message>
         <source>Do</source>
         <translation>Feladat</translation>
-    </message>
-    <message>
-        <source>&lt;Select at least one camera&gt;</source>
-        <translation>&lt;Válasszon legalább egy kamerát&gt;</translation>
     </message>
     <message>
         <source>Comments:</source>
@@ -218,20 +202,12 @@
         <source>X</source>
         <translation>X</translation>
     </message>
-    <message>
-        <source>filter by camera...</source>
-        <translation type="unfinished">Szűrés kamerák szerint...</translation>
-    </message>
 </context>
 <context>
     <name>CameraAdditionDialog</name>
     <message>
         <source>Server is offline</source>
         <translation>A szerver offline</translation>
-    </message>
-    <message>
-        <source>Ca&amp;mera Address:</source>
-        <translation>Ka&amp;mera címe:</translation>
     </message>
     <message>
         <source>IP, hostname, RTSP link...</source>
@@ -262,10 +238,6 @@
         <translation>&amp;Felderítéshez használt port:</translation>
     </message>
     <message>
-        <source>Discovered Cameras:</source>
-        <translation>Megtalált kamerák:</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>Cím</translation>
     </message>
@@ -286,10 +258,6 @@
         <translation>A kiválasztott hozzá&amp;adása</translation>
     </message>
     <message>
-        <source>Add camera(s)...</source>
-        <translation type="unfinished">Kamerák hozzáadása...</translation>
-    </message>
-    <message>
         <source>Selected Server:</source>
         <translation type="unfinished">Kiválasztott szerver:</translation>
     </message>
@@ -308,6 +276,18 @@
     <message>
         <source>New Scan...</source>
         <translation type="unfinished">Új keresés...</translation>
+    </message>
+    <message>
+        <source>Add device(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Address:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discovered Devices:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -338,24 +318,6 @@
     <message>
         <source>No connection to Server %1.</source>
         <translation>Nincs kapcsolat a %1 szerverrel.</translation>
-    </message>
-</context>
-<context>
-    <name>CameraDiagnosticsDialog</name>
-    <message>
-        <source>Camera Diagnostics</source>
-        <translation>Kamera diagnosztika</translation>
-    </message>
-    <message>
-        <source>Camera:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CameraDisconnectedBusinessEventWidget</name>
-    <message>
-        <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished">Eseményindítása, ha a bármely kamera offline lesz</translation>
     </message>
 </context>
 <context>
@@ -467,10 +429,6 @@
 <context>
     <name>CameraListDialog</name>
     <message>
-        <source>Camera list</source>
-        <translation>Kamera lista</translation>
-    </message>
-    <message>
         <source>Filter:</source>
         <translation>Szűrő:</translation>
     </message>
@@ -488,10 +446,6 @@
 </context>
 <context>
     <name>CameraScheduleWidget</name>
-    <message>
-        <source>Camera Schedule Editor</source>
-        <translation>Kamera ütemezés szerkesztő</translation>
-    </message>
     <message>
         <source>Enable Recording</source>
         <translation>Rögzítés engedélyezése</translation>
@@ -582,10 +536,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Do Not Record</source>
         <translation type="unfinished">Ne rögzítse</translation>
-    </message>
-    <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Min. Days</source>
@@ -696,10 +646,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Refresh</source>
         <translation>Frissítés</translation>
-    </message>
-    <message>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt; Bármelyik kamera &gt;</translation>
     </message>
     <message>
         <source>Alarm/Event Rules</source>
@@ -825,10 +771,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>&amp;Camera List</source>
-        <translation>&amp;Kameralista</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
@@ -1668,10 +1610,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Eszköz azonnali bedobása</translation>
     </message>
     <message>
-        <source>Move Cameras</source>
-        <translation>Kamerák áthelyezése</translation>
-    </message>
-    <message>
         <source>Next Layout</source>
         <translation>Következő elrendezés</translation>
     </message>
@@ -1718,10 +1656,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Help</source>
         <translation>Súgó</translation>
-    </message>
-    <message>
-        <source>Check Camera Issues...</source>
-        <translation>Kamerák ellenőrzése...</translation>
     </message>
     <message>
         <source>Event Log...</source>
@@ -1982,10 +1916,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Camera List...</source>
-        <translation>Kameralista...</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
@@ -2300,14 +2230,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Felhasználó beállítások...</translation>
     </message>
     <message>
-        <source>Camera Rules...</source>
-        <translation>Kamera szabályok...</translation>
-    </message>
-    <message>
-        <source>Camera Settings...</source>
-        <translation>Kamera beállítások...</translation>
-    </message>
-    <message>
         <source>File Settings...</source>
         <translation>Fájl beállítások...</translation>
     </message>
@@ -2318,18 +2240,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Video Wall Settings...</source>
         <translation>Videófal beállításai...</translation>
-    </message>
-    <message>
-        <source>Open in Camera Settings Dialog</source>
-        <translation>Megnyitás a kamera beállítás ablakban</translation>
-    </message>
-    <message>
-        <source>Add Camera(s)...</source>
-        <translation>Kamera(k) hozzáadása...</translation>
-    </message>
-    <message>
-        <source>Camera(s) List by Server...</source>
-        <translation>Kamera(k) listázása szerverenként...</translation>
     </message>
     <message>
         <source>Ping...</source>
@@ -2656,10 +2566,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Statisztikai jelentések kérése</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation type="unfinished">Fájl beállítások...</translation>
-    </message>
-    <message>
         <source>Drop Resources into New Layout</source>
         <translation type="unfinished">Eszköz bedobása új elrednezésre</translation>
     </message>
@@ -2680,11 +2586,35 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
+        <source>Move %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module Rules...</source>
+        <source>Check %1 Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in %1 Settings Dialog...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Device(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List by Server...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2771,6 +2701,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 actions</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
@@ -2815,14 +2749,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera added</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>System name changed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2844,10 +2770,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>E-mail settings changed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera removed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2883,12 +2805,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>%n cameras</source>
-        <translation type="unfinished">
-            <numerusform>%n kamerák</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n action(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2919,10 +2835,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Date</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2944,6 +2856,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Red mark means that an archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2989,25 +2917,19 @@ Short for &quot;seconds&quot;</extracomment>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Bármely kamera&gt;</translation>
-    </message>
     <message numerus="yes">
-        <source>%n Camera(s)</source>
-        <translation>
-            <numerusform>%n Kamerá(k)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 cameras</source>
-        <translation>
-            <numerusform>%1 kamerából %n</numerusform>
+        <source>%n of %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <source>Select at least one camera.</source>
-        <translation type="unfinished">&lt;Válasszon legalább egy kamerát&gt;</translation>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3040,20 +2962,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform>%n szerver</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Bármely kamera&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Camera(s)</source>
-        <translation>
-            <numerusform>%n Kamera</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Select at least one camera</source>
-        <translation>Válasszom ki legalább egy kamerát</translation>
     </message>
     <message>
         <source>Not Applied</source>
@@ -3115,6 +3023,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Enter Text</source>
         <translation type="unfinished">Adja meg a szöveget</translation>
     </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -3125,6 +3041,14 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>at</source>
         <translation>at</translation>
+    </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Select at least one %1&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3197,6 +3121,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Confirm Exit</source>
         <translation type="unfinished">Kilépés jóváhagyása</translation>
     </message>
+    <message>
+        <source>filter by %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
@@ -3252,10 +3180,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>A szerver offline.</translation>
     </message>
     <message>
-        <source>Camera addition is possible for online servers only.</source>
-        <translation>Kamerahozzáadás csak online szerverhez lehetséges.</translation>
-    </message>
-    <message>
         <source>First address in range is greater than the last one.</source>
         <translation>Az első cím nagyobb a sorban mint az utolsó.</translation>
     </message>
@@ -3263,21 +3187,9 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Success</source>
         <translation>Kész</translation>
     </message>
-    <message numerus="yes">
-        <source>%n cameras added successfully.</source>
-        <translation>
-            <numerusform>%n kamera sikeresen hozzáadva.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>It might take a few moments to populate them in the tree.</source>
         <translation>Néhány pillanatig eltarthat amíg az eszközlisában megjelennek.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Error while adding %n cameras.</source>
-        <translation>
-            <numerusform>Hiba a %n kamera hozzáadása közben.</numerusform>
-        </translation>
     </message>
     <message>
         <source>Scanning online hosts...</source>
@@ -3289,31 +3201,9 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>Hostok keresése... (%1)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n cameras found</source>
-        <translation>
-            <numerusform>%n kamera megtalálva</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Finished</source>
         <translation>Kész</translation>
-    </message>
-    <message>
-        <source>All cameras are already in the resource tree.</source>
-        <translation>Minden kamera elérhető az eszközlistában.</translation>
-    </message>
-    <message>
-        <source>No cameras found.</source>
-        <translation>Nem található kamera.</translation>
-    </message>
-    <message>
-        <source>Add cameras to %1</source>
-        <translation>Kamerák hozzáadása ehhez: %1</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translation>Kamerák hozzáadása...</translation>
     </message>
     <message>
         <source>Select target server...</source>
@@ -3324,40 +3214,78 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished">Az IP tartomány több mint 255 címet tartalmaz.</translation>
     </message>
     <message>
-        <source>Camera address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished">A kameracím mező érvényes URL-t, IP címet, vagy RTSP linket kell, tartalmazzon.</translation>
-    </message>
-    <message>
         <source>Finished searching...</source>
         <translation type="unfinished">Keresés befejezése...</translation>
-    </message>
-    <message>
-        <source>No cameras selected.</source>
-        <translation type="unfinished">Nincs kamera kijelölve.</translation>
-    </message>
-    <message>
-        <source>Please select at least one camera.</source>
-        <translation type="unfinished">Válasszon ki legalább egy kamerát</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
         <translation type="unfinished">Szerver offline lett, keresés megszakítva.</translation>
     </message>
     <message>
-        <source>Server is offline, cameras can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server has been removed - search aborted.</source>
         <translation type="unfinished">A szervert eltávolították, a keresés megszakadt.</translation>
     </message>
     <message>
-        <source>Server has been removed - cannot add cameras.</source>
+        <source>Device addition is possible for online servers only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error while searching for camera(s).</source>
-        <translation type="unfinished">Hiba a kamerák keresése közben.</translation>
+        <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select at least one device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices added successfully.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n devices.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server is offline, devices can only be added to an online server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been removed - cannot add devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while searching for device(s).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>All devices are already in the resource tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add devices to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add devices...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3467,22 +3395,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics for %1 %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
         <translation type="unfinished"></translation>
@@ -3494,12 +3406,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming camera is accessible.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming target IO module provides media stream.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3533,21 +3443,17 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Select All</source>
         <translation>Mind kijelölése</translation>
     </message>
-    <message numerus="yes">
-        <source>Camera List - %n camera(s) found</source>
-        <translation>
-            <numerusform>Kameralista - %n kamera megtalálva</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
-        <translation>
-            <numerusform>Kameralista &apos;%1&apos; - %n kamera megtalálva</numerusform>
-        </translation>
+    <message>
+        <source>%1 List for &apos;%2&apos; - %3 found</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export selected cameras to a file.</source>
-        <translation type="unfinished">Kiválasztott kamerák exportálása fájlba</translation>
+        <source>%1 List - %2 found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export selected %1 to a file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3653,20 +3559,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Figyelem</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation>Mozgás rögzítés kikapcsolva vagy nincs támogatva egyes kameráknál. A kamera mozgásbeállítás lapon ellenőrizheti a funkció állapotát.</translation>
+        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>A kamera nem támogatja a duál-streaming funkciót.</translation>
+        <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>Duál-streaming és mozgás érzékelés nem elérhető ezen kamera számára.</translation>
+        <source>Dual-Streaming is not supported by this %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
-        <translation>Mozgásrögzítés kikapcsolav. A kamera mozgásbeállítás lapján beállíthatja az éllenőrzési területet és érzékenységet.</translation>
+        <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3676,36 +3586,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Megnyitás új fülön</translation>
     </message>
     <message>
-        <source>Camera Diagnostics</source>
-        <translation>Kamera diagnosztika</translation>
-    </message>
-    <message>
-        <source>Camera Rules</source>
-        <translation>Kamera szabályok</translation>
-    </message>
-    <message numerus="yes">
-        <source>Save changes to the following %n camera(s)?</source>
-        <translation>
-            <numerusform>Menti a változásokat a következő %n kamerá(k)ban?</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Hiba</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n cameras to Server.</source>
-        <translation>
-            <numerusform>A következő %n kamera nem menthető el a szerverre.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished">Kamera beállítások</translation>
-    </message>
-    <message>
-        <source>Camera(s) not saved.</source>
-        <translation type="unfinished">Kamerá(k) nincsenek elmentve</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
@@ -3727,6 +3609,30 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Could not apply changes.</source>
         <translation type="unfinished">A változtatás nem hajthaó végre</translation>
     </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save changes to the following %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save the following %1 to Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraSettingsWidget</name>
@@ -3735,8 +3641,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Különböző típusú eszközök tulajdonságait nem lehet menteni.</translation>
     </message>
     <message>
-        <source>No cameras selected.</source>
-        <translation>Nincs kamera kijelölve.</translation>
+        <source>No %1 selected.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4120,22 +4026,16 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>&lt;Any camera&gt;</source>
-        <translation>&lt;Bármely kamera&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation>
-            <numerusform>&lt;%n kamera&gt;</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Export selected events to file</source>
         <translation>Kiválasztott események exportálása fájlba</translation>
     </message>
     <message>
         <source>Any Action</source>
         <translation type="unfinished">Bármilyen eljárás</translation>
+    </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4188,15 +4088,15 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Archív hossz beállítás másolása</translation>
     </message>
     <message>
-        <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished">Mozgásrögzítés nem támogatott néhány kamerában</translation>
+        <source>Schedule motion type is not supported by some %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished">Rögzítés nem engedélyezhető néhány kamerához</translation>
+        <source>Recording cannot be enabled for some %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Schedule settings are not compatible with some cameras.</source>
+        <source>Schedule settings are not compatible with some %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4261,8 +4161,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Eseménylista megnyitása</translation>
     </message>
     <message>
-        <source>Open Camera List</source>
-        <translation>Kameralista megnyitása</translation>
+        <source>Open %1 List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4478,8 +4382,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished">&apos;%1.&apos; fájl létrehozása sikertelen</translation>
     </message>
     <message>
-        <source>Could not export camera %1.</source>
-        <translation type="unfinished">%1. kamera exportálása nem lehetséges</translation>
+        <source>Could not export %1 %2.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4864,18 +4768,8 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Use I/O licenses to enable these %n modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
-        <source>Use licenses for selected cameras and modules</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use licenses for selected cameras</source>
+        <source>Use licenses for selected %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5206,8 +5100,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Érvénytelen ütemzés</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished">A másodlagos stream le van tiltva ezen a kamerán. A mozgásnak és az LQ opciónak nincs hatása. &quot;Igen&quot; a &quot;Folyamatos&quot; felvételi módra váltáshoz vagy &quot;Nem&quot; a második stream engedélyezéséhez.</translation>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5377,20 +5271,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Böngészési archívum</translation>
     </message>
     <message>
-        <source>Open Camera</source>
-        <translation>Kamera megnyitása</translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation>Kamera beállítások</translation>
-    </message>
-    <message>
         <source>Server settings</source>
         <translation>Szerver beállítások</translation>
-    </message>
-    <message>
-        <source>Open camera web page...</source>
-        <translation>Kamera weboldal megnyitása...</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -5415,6 +5297,22 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>SMTP Settings</source>
         <translation>SMTP beállítások</translation>
+    </message>
+    <message>
+        <source>Open %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation type="unfinished">Szerver beállítások</translation>
+    </message>
+    <message>
+        <source>Open %1 Web Page...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5774,23 +5672,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Total %1 camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storage space occupied by camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Archived duration in calendar days between the first record and the current moment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5814,7 +5700,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cameras with non-empty archive</source>
+        <source>Total %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 with non-empty archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage space occupied by %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5864,8 +5758,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Kép fájl</translation>
     </message>
     <message>
-        <source>Live Cameras</source>
-        <translation>Élő kamerák</translation>
+        <source>Live %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5898,12 +5792,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Felhasználó választása...</translation>
     </message>
     <message>
-        <source>Select Cameras...</source>
-        <translation type="unfinished">Kamerák választása...</translation>
-    </message>
-    <message>
         <source>Select Resources...</source>
         <translation type="unfinished">Források választása...</translation>
+    </message>
+    <message>
+        <source>Select %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6103,20 +5997,28 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Ennek a funkciónak a használatához legalább két szerverre van szükség.</translation>
     </message>
     <message>
-        <source>This server already has more than max cameras</source>
-        <translation type="unfinished">A szerverern már több kamera van a maximumnál</translation>
-    </message>
-    <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished">A rendellenes működés elkerülése végett állítsa be a kamerák maximális számát</translation>
-    </message>
-    <message>
         <source>Could not load storages from server.</source>
         <translation type="unfinished">Nem lehet a tárhelyet a szerverről betölteni.</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
         <translation type="unfinished">Külső tárhely hozzáadása...</translation>
+    </message>
+    <message>
+        <source>Enable failover (server will take %1 automatically from offline servers)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max. %1 on this server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This server already has more than max %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To avoid malfunction adjust max number of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6482,6 +6384,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Do Not Record Motion</source>
         <translation type="unfinished">Ne rögzítse a mozgást</translation>
     </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -6588,10 +6494,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Beolvasás...</translation>
     </message>
     <message>
-        <source>Please check authentication information in camera settings</source>
-        <translation>Kérem ellenőrizze a hitelesítési információkat a kamera beállításokban</translation>
-    </message>
-    <message>
         <source>No video stream</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6614,6 +6516,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Server Offline</source>
         <translation type="unfinished">Szerver nem elérhető</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6703,6 +6609,17 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Users</source>
         <translation type="unfinished">Felhasználók</translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemSettingsWidget</name>
+    <message>
+        <source>Enable %1 and servers auto discovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow system to optimize %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6992,10 +6909,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adjust camera settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use PTZ controls</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7009,6 +6922,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Edit Video Walls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust %1 settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7110,10 +7027,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Egyedi...</translation>
     </message>
     <message>
-        <source>Can adjust camera settings</source>
-        <translation>Módosíthatja a beállításokat</translation>
-    </message>
-    <message>
         <source>Can use PTZ controls</source>
         <translation>Használhatja a PTZ vezérlést</translation>
     </message>
@@ -7136,6 +7049,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>User has been renamed. Password must be updated.</source>
         <translation type="unfinished">A felhasználó át lett nevezve. A jelszót frissíteni kell.</translation>
+    </message>
+    <message>
+        <source>Can adjust %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7266,10 +7183,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>%1 előnézetes keresése</translation>
     </message>
     <message>
-        <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Kamera hozzáadása már folyamatban van. Biztos benn, hogy szeretné megszakítani a jelenlegi folyamatot?</translation>
-    </message>
-    <message>
         <source>Delete Files</source>
         <translation>Fájlok törlése</translation>
     </message>
@@ -7309,12 +7222,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Enter new name for the selected item:</source>
         <translation>Adja meg a kiválasztott elem új nevét:</translation>
     </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered.</source>
-        <translation>
-            <numerusform>A következő %n kamera automatikusan felderítve.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>They may be auto-discovered again after removing.</source>
         <translation>Lehetséges, hogy az eltávolítás után újra felderítésre keültek.</translation>
@@ -7322,12 +7229,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Are you sure you want to delete them?</source>
         <translation>Biztos benn, hogy szeretné törölni őket?</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.</source>
-        <translation>
-            <numerusform>%n/%1 kamera automatikusan felderítve.</numerusform>
-        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n item(s)?</source>
@@ -7434,14 +7335,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation type="unfinished">Új elrendezés %1</translation>
     </message>
     <message>
-        <source>Cannot move camera(s) to server %1. Server is unresponsive.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server %1 is unable to find and access these cameras. Are you sure you would like to move them?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open File</source>
         <translation type="unfinished">Fájl megnyitása</translation>
     </message>
@@ -7472,6 +7365,32 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     <message>
         <source>Launcher process not found.</source>
         <translation type="unfinished">Az indító folyamat nem található</translation>
+    </message>
+    <message>
+        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These %1 are auto-discovered.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Do you really want to delete the following %1?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7892,10 +7811,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnWorkbenchNavigator</name>
     <message>
-        <source>All Cameras</source>
-        <translation>Minden kamera</translation>
-    </message>
-    <message>
         <source>yyyy MMM dd</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>yyyy MMM dd</translation>
@@ -7914,6 +7829,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Live</source>
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
         <translation>Élő</translation>
+    </message>
+    <message>
+        <source>All %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8155,10 +8074,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>%1 képernyője</translation>
     </message>
     <message>
-        <source>%n cameras</source>
-        <translation>%n kamerák</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation type="unfinished">A munkamenet már fut</translation>
     </message>
@@ -8193,6 +8108,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>A Video Wall with the same name already exists.</source>
         <translation type="unfinished">Videofal ezzel a névvel már létezik</translation>
+    </message>
+    <message>
+        <source>%n items</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8481,14 +8400,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Feladatátvétel</translation>
     </message>
     <message>
-        <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished">Feladatátvétel engedélyezése (a szerver automatikusan átveszi a kamerákat az offline szerverekről)</translation>
-    </message>
-    <message>
-        <source>Max. cameras on this server:</source>
-        <translation type="unfinished">Max. kamerák ezen a szerveren:</translation>
-    </message>
-    <message>
         <source>Storages</source>
         <translation type="unfinished">Tárhelyek</translation>
     </message>
@@ -8638,10 +8549,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>IO ports</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished">Kamera beállítások</translation>
     </message>
     <message>
         <source>Enable Audio</source>
@@ -8833,14 +8740,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished">Kamerák és szerverek automatikus felderítésének engedélyezése</translation>
-    </message>
-    <message>
-        <source>Allow system to optimize camera settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -234,7 +234,6 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
                 int m = 0;
                 for (const QString &mac: conflicts.camerasByServer[server]) {
                     result += delimiter;
-                    //: Camera #5 MAC: 00-55-11-22-54-55
                     result += tr("%1 #%2 MAC: %3")
                         .arg(getDefaultDeviceNameUpper())
                         .arg(++m)

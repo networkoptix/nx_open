@@ -125,19 +125,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera actions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sessions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -164,20 +156,12 @@
         <translation>en</translation>
     </message>
     <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>Cualquier cámara</translation>
-    </message>
-    <message>
         <source>Schedule...</source>
         <translation>horario... </translation>
     </message>
     <message>
         <source>Action</source>
         <translation>acción </translation>
-    </message>
-    <message>
-        <source>&lt;Select at least one camera&gt;</source>
-        <translation>&lt;Seleccione al menos una cámara&gt;</translation>
     </message>
     <message>
         <source>Comments:</source>
@@ -217,10 +201,6 @@
     <message>
         <source>X</source>
         <translation>X</translation>
-    </message>
-    <message>
-        <source>filter by camera...</source>
-        <translation type="unfinished">Filtrar por las cámaras...</translation>
     </message>
 </context>
 <context>
@@ -274,20 +254,8 @@
         <translation>Servidor está desconectado</translation>
     </message>
     <message>
-        <source>Ca&amp;mera Address:</source>
-        <translation>&amp;Dirección de cámara:</translation>
-    </message>
-    <message>
         <source>&amp;Add selected</source>
         <translation>&amp;Añadir seleccionados</translation>
-    </message>
-    <message>
-        <source>Discovered Cameras:</source>
-        <translation>Cámaras descubiertas:</translation>
-    </message>
-    <message>
-        <source>Add camera(s)...</source>
-        <translation type="unfinished">Añadir cámaras...</translation>
     </message>
     <message>
         <source>Selected Server:</source>
@@ -308,6 +276,18 @@
     <message>
         <source>New Scan...</source>
         <translation type="unfinished">Nueva adquisición...</translation>
+    </message>
+    <message>
+        <source>Add device(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Address:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discovered Devices:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -338,24 +318,6 @@
     <message>
         <source>No connection to Server %1.</source>
         <translation>No hay conexión con el servidor %1.</translation>
-    </message>
-</context>
-<context>
-    <name>CameraDiagnosticsDialog</name>
-    <message>
-        <source>Camera Diagnostics</source>
-        <translation>Diagnostico de cámara</translation>
-    </message>
-    <message>
-        <source>Camera:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CameraDisconnectedBusinessEventWidget</name>
-    <message>
-        <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished">Evento se planteará cuando cualquier cámara está desconectada</translation>
     </message>
 </context>
 <context>
@@ -467,10 +429,6 @@
 <context>
     <name>CameraListDialog</name>
     <message>
-        <source>Camera list</source>
-        <translation>Lista de cámaras</translation>
-    </message>
-    <message>
         <source>Filter:</source>
         <translation>Filtro:</translation>
     </message>
@@ -488,10 +446,6 @@
 </context>
 <context>
     <name>CameraScheduleWidget</name>
-    <message>
-        <source>Camera Schedule Editor</source>
-        <translation>Editor de programación de cámara</translation>
-    </message>
     <message>
         <source>Enable Recording</source>
         <translation>Activar la grabación</translation>
@@ -582,10 +536,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Do Not Record</source>
         <translation type="unfinished">No registran</translation>
-    </message>
-    <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Min. Days</source>
@@ -696,10 +646,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Refresh</source>
         <translation>Refrescar</translation>
-    </message>
-    <message>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;Cualquier cámara&gt;</translation>
     </message>
     <message>
         <source>Alarm/Event Rules</source>
@@ -825,10 +771,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>&amp;Camera List</source>
-        <translation>&amp;Lista de cámaras</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
@@ -1658,10 +1600,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Recursos caída instantánea</translation>
     </message>
     <message>
-        <source>Move Cameras</source>
-        <translation>Mover las cámaras</translation>
-    </message>
-    <message>
         <source>Next Layout</source>
         <translation>Diseño de página siguiente</translation>
     </message>
@@ -1704,10 +1642,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Help</source>
         <translation>Ayuda</translation>
-    </message>
-    <message>
-        <source>Check Camera Issues...</source>
-        <translation>Compruebe Problemas con la cámara ...</translation>
     </message>
     <message>
         <source>Alarm/Event Rules...</source>
@@ -1940,10 +1874,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Camera List...</source>
-        <translation>Lista de cámaras...</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
@@ -2322,32 +2252,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Configuración de usuario...</translation>
     </message>
     <message>
-        <source>Camera Rules...</source>
-        <translation>Reglas de la cámara...</translation>
-    </message>
-    <message>
-        <source>Camera Settings...</source>
-        <translation>Ajustes de la Cámara...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>Ajustes de diseño...</translation>
     </message>
     <message>
         <source>Video Wall Settings...</source>
         <translation>Ajustes de Pared de Vídeo...</translation>
-    </message>
-    <message>
-        <source>Open in Camera Settings Dialog</source>
-        <translation>Abrir diálogo de ajustes de la cámara</translation>
-    </message>
-    <message>
-        <source>Add Camera(s)...</source>
-        <translation>Agregar Camera(s)...</translation>
-    </message>
-    <message>
-        <source>Camera(s) List by Server...</source>
-        <translation>Lista de cámaras por servidor...</translation>
     </message>
     <message>
         <source>Ping...</source>
@@ -2662,10 +2572,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Pedir información acerca de las Estadísticas</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation type="unfinished">Ajustes del archivo...</translation>
-    </message>
-    <message>
         <source>Drop Resources into New Layout</source>
         <translation type="unfinished">Colocar los recursos en un nuevo diseño</translation>
     </message>
@@ -2686,11 +2592,35 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
+        <source>Move %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module Rules...</source>
+        <source>Check %1 Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in %1 Settings Dialog...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Device(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List by Server...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2777,6 +2707,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Audit log replay</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 actions</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
@@ -2821,10 +2755,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>System name changed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2842,10 +2772,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera removed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2881,13 +2807,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>%n cameras</source>
-        <translation type="unfinished">
-            <numerusform>%n cámara</numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n action(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -2919,10 +2838,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Date</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2947,11 +2862,23 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera added</source>
+        <source>E-mail settings changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>E-mail settings changed</source>
+        <source>%1 updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2998,27 +2925,20 @@ Short for &quot;seconds&quot;</extracomment>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Cualquier Cámara&gt;</translation>
-    </message>
     <message numerus="yes">
-        <source>%n Camera(s)</source>
-        <translation>
-            <numerusform>%n cámara</numerusform>
-            <numerusform>%n cámaras</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 cameras</source>
-        <translation>
-            <numerusform>%n%1 cámara</numerusform>
-            <numerusform>%n%1 de las cámaras</numerusform>
+        <source>%n of %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <source>Select at least one camera.</source>
-        <translation type="unfinished">Seleccione al menos una cámara</translation>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3034,17 +2954,6 @@ Short for &quot;seconds&quot;</extracomment>
 </context>
 <context>
     <name>QnBusinessRuleViewModel</name>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Cualquier Cámara&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Camera(s)</source>
-        <translation>
-            <numerusform>%n cámara</numerusform>
-            <numerusform>%n cámaras</numerusform>
-        </translation>
-    </message>
     <message>
         <source>&lt;System&gt;</source>
         <translation>&lt;Sistema&gt;</translation>
@@ -3063,10 +2972,6 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>%n Servidor</numerusform>
             <numerusform>%n Servidores</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Select at least one camera</source>
-        <translation>Seleccione al menos una cámara</translation>
     </message>
     <message>
         <source>Not Applied</source>
@@ -3132,6 +3037,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Enter Text</source>
         <translation type="unfinished">Introduzca el texto</translation>
     </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -3142,6 +3055,14 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>to</source>
         <translation>a</translation>
+    </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Select at least one %1&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3214,6 +3135,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Confirm Exit</source>
         <translation type="unfinished">Confirmar la salida</translation>
     </message>
+    <message>
+        <source>filter by %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
@@ -3253,28 +3178,12 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnCameraAdditionDialog</name>
     <message>
-        <source>Add cameras to %1</source>
-        <translation>Añadir cámaras a %1</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translation>Añadir cámaras...</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
         <source>Finished</source>
         <translation>Terminado</translation>
-    </message>
-    <message>
-        <source>All cameras are already in the resource tree.</source>
-        <translation>Todas las cámaras ya están en el árbol de recursos.</translation>
-    </message>
-    <message>
-        <source>No cameras found.</source>
-        <translation>Las cámaras no se encontraron.</translation>
     </message>
     <message>
         <source>Initializing scan...</source>
@@ -3299,13 +3208,6 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>Exploración de Anfitriones... (%1)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n cameras found</source>
-        <translation>
-            <numerusform>%n cámara encontrada</numerusform>
-            <numerusform>%n cámaras encontradas</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Select target server...</source>
         <translation>Seleccione servidor de destino...</translation>
@@ -3319,66 +3221,89 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Servidor está desconectado.</translation>
     </message>
     <message>
-        <source>Camera addition is possible for online servers only.</source>
-        <translation>La adición de la cámara es posible para servidores en línea sólamente.</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n cameras added successfully.</source>
-        <translation>
-            <numerusform>%n cámara añadio correctamente.</numerusform>
-            <numerusform>%n cámaras añadieron correctamente.</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>It might take a few moments to populate them in the tree.</source>
         <translation>Puede llevar unos momentos para poblarlas en el árbol.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Error while adding %n cameras.</source>
-        <translation>
-            <numerusform>Error añadiendo %n cámara.</numerusform>
-            <numerusform>Error añadiendo %n cámaras.</numerusform>
-        </translation>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
         <translation type="unfinished">Rango de direcciones IP especificado contiene más de 255 direcciones.</translation>
     </message>
     <message>
-        <source>Camera address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished">Dirección de la Cámara debe contener URL válido, dirección IP o RTSP enlace.</translation>
-    </message>
-    <message>
         <source>Finished searching...</source>
         <translation type="unfinished">Terminando la búsqueda...</translation>
-    </message>
-    <message>
-        <source>No cameras selected.</source>
-        <translation type="unfinished">No hay cámaras seleccionadas.</translation>
-    </message>
-    <message>
-        <source>Please select at least one camera.</source>
-        <translation type="unfinished">Por favor, seleccione al menos una cámara</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
         <translation type="unfinished">Servidor estuvo fuera de línea, búsqueda anulada.</translation>
     </message>
     <message>
-        <source>Server is offline, cameras can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server has been removed - search aborted.</source>
         <translation type="unfinished">Se eliminó servidor, búsqueda anulada.</translation>
     </message>
     <message>
-        <source>Server has been removed - cannot add cameras.</source>
+        <source>Device addition is possible for online servers only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error while searching for camera(s).</source>
-        <translation type="unfinished">Error al buscar cámaras.</translation>
+        <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select at least one device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices added successfully.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n devices.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server is offline, devices can only be added to an online server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been removed - cannot add devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while searching for device(s).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>All devices are already in the resource tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add devices to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add devices...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3487,22 +3412,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics for %1 %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
         <translation type="unfinished"></translation>
@@ -3514,12 +3423,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming camera is accessible.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming target IO module provides media stream.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3554,23 +3461,17 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Select All</source>
         <translation>Seleccionar todo</translation>
     </message>
-    <message numerus="yes">
-        <source>Camera List - %n camera(s) found</source>
-        <translation>
-            <numerusform>Lista de cámaras - %n cámara encontrada</numerusform>
-            <numerusform>Lista de cámaras - %n cámaras encontradas</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
-        <translation>
-            <numerusform>Lista de cámaras de &apos;%1&apos; - %n cámara encontrada</numerusform>
-            <numerusform>Lista de cámaras de &apos;%1&apos; - %n cámaras encontradas</numerusform>
-        </translation>
+    <message>
+        <source>%1 List for &apos;%2&apos; - %3 found</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export selected cameras to a file.</source>
-        <translation type="unfinished">Exportación a archivo cámaras seleccionadas</translation>
+        <source>%1 List - %2 found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export selected %1 to a file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3679,20 +3580,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Advertencia</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation>Grabación de movimiento está deshabilitada o no apoyada por algunas de las cámaras seleccionadas. Por favor vaya a la página de configuración de movimiento de las cámaras para garantizar que está soportado y habilitado.</translation>
+        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>Doble Secuencia de vídeo no es compatible con esta cámara.</translation>
+        <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>Doble Secuencia y detección de movimiento no están disponibles para esta cámara.</translation>
+        <source>Dual-Streaming is not supported by this %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
-        <translation>Movimiento de grabación está desactivada. Por favor, vaya a la página de configuración de movimiento para configurar el área de movimiento de la cámara y la sensibilidad.</translation>
+        <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3702,38 +3607,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Abrir en una nueva pestaña</translation>
     </message>
     <message>
-        <source>Camera Diagnostics</source>
-        <translation>Diagnóstico de la cámara</translation>
-    </message>
-    <message>
-        <source>Camera Rules</source>
-        <translation>Reglas de la cámara</translation>
-    </message>
-    <message numerus="yes">
-        <source>Save changes to the following %n camera(s)?</source>
-        <translation>
-            <numerusform>¿Guardar los cambios a las siguientes cámaras %n?</numerusform>
-            <numerusform>¿Guardar los cambios a las siguientes cámaras %n?</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Error</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n cameras to Server.</source>
-        <translation>
-            <numerusform>No se pueden guardar las siguientes cámaras %n al servidor.</numerusform>
-            <numerusform>No se pueden guardar las siguientes cámaras %n al servidor.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished">Ajustes de la cámara</translation>
-    </message>
-    <message>
-        <source>Camera(s) not saved.</source>
-        <translation type="unfinished">Cámara(s) no se ha guardado</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
@@ -3755,6 +3630,30 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Could not apply changes.</source>
         <translation type="unfinished">No se pueden aplicar los cambios</translation>
     </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save changes to the following %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save the following %1 to Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraSettingsWidget</name>
@@ -3763,8 +3662,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>No puede editar las propiedades de elementos de distintos tipos.</translation>
     </message>
     <message>
-        <source>No cameras selected.</source>
-        <translation>No hay cámaras seleccionadas.</translation>
+        <source>No %1 selected.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4150,23 +4049,16 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>&lt;Any camera&gt;</source>
-        <translation>&lt;Cualquier cámara&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation>
-            <numerusform>&lt;%n cámara&gt;</numerusform>
-            <numerusform>&lt;%n cámaras&gt;</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Export selected events to file</source>
         <translation>Exportar eventos seleccionados en un archivo</translation>
     </message>
     <message>
         <source>Any Action</source>
         <translation type="unfinished">Cualquier acción</translation>
+    </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4219,15 +4111,15 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Copiar ajustes de longitud de archivo</translation>
     </message>
     <message>
-        <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished">Tipo de movimiento no es compatible con algunas cámaras</translation>
+        <source>Schedule motion type is not supported by some %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished">No se puede activar Grabación para algunas cámaras</translation>
+        <source>Recording cannot be enabled for some %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Schedule settings are not compatible with some cameras.</source>
+        <source>Schedule settings are not compatible with some %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4292,8 +4184,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Abrir registro de eventos</translation>
     </message>
     <message>
-        <source>Open Camera List</source>
-        <translation>Abrir lista de cámaras</translation>
+        <source>Open %1 List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4509,8 +4405,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished">No se pudo crear el archivo de salida %1.</translation>
     </message>
     <message>
-        <source>Could not export camera %1.</source>
-        <translation type="unfinished">No se pudo exportar cámara %1.</translation>
+        <source>Could not export %1 %2.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4900,19 +4796,8 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Use I/O licenses to enable these %n modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
-        <source>Use licenses for selected cameras and modules</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use licenses for selected cameras</source>
+        <source>Use licenses for selected %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5243,8 +5128,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Horario válido</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished">Segunda secuencia está desactivado en esta cámara. Movimiento LQ opción no tiene ningún efecto.Pulse &quot;Sí&quot; para cambiar tipo de grabación que &quot;siempre&quot; o &quot;No&quot; para volver a habilitar segundo stream.</translation>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5415,20 +5300,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Buscar archivo</translation>
     </message>
     <message>
-        <source>Open Camera</source>
-        <translation>Abrir Cámara</translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation>Ajustes de la cámara</translation>
-    </message>
-    <message>
         <source>Server settings</source>
         <translation>Configuración del servidor</translation>
-    </message>
-    <message>
-        <source>Open camera web page...</source>
-        <translation>Abrir la página web de la cámara...</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -5453,6 +5326,22 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Connect to server</source>
         <translation>Conectar al servidor</translation>
+    </message>
+    <message>
+        <source>Open %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation type="unfinished">Configuración del servidor</translation>
+    </message>
+    <message>
+        <source>Open %1 Web Page...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5816,23 +5705,11 @@ If you understand this and would like to proceed please click Merge to continue.
         </translation>
     </message>
     <message>
-        <source>Total %1 camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storage space occupied by camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Archived duration in calendar days between the first record and the current moment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5860,7 +5737,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cameras with non-empty archive</source>
+        <source>Total %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 with non-empty archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage space occupied by %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5910,8 +5795,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Archivos de imagen</translation>
     </message>
     <message>
-        <source>Live Cameras</source>
-        <translation>Cámaras en vivo</translation>
+        <source>Live %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5944,12 +5829,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Seleccione los usuarios...</translation>
     </message>
     <message>
-        <source>Select Cameras...</source>
-        <translation type="unfinished">Select cameras...</translation>
-    </message>
-    <message>
         <source>Select Resources...</source>
         <translation type="unfinished">Seleccione los recursos...</translation>
+    </message>
+    <message>
+        <source>Select %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6150,20 +6035,28 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Por lo menos dos servidores son necesarios para esta función.</translation>
     </message>
     <message>
-        <source>This server already has more than max cameras</source>
-        <translation type="unfinished">Este servidor ya cuenta con más de cámaras máx</translation>
-    </message>
-    <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished">Para evitar mal funcionamiento ajuste máximo número de cámaras</translation>
-    </message>
-    <message>
         <source>Could not load storages from server.</source>
         <translation type="unfinished">No se ha podido cargar almacenamiento del servidor.</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
         <translation type="unfinished">Añadir Almacenamiento externo ...</translation>
+    </message>
+    <message>
+        <source>Enable failover (server will take %1 automatically from offline servers)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max. %1 on this server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This server already has more than max %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To avoid malfunction adjust max number of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6533,6 +6426,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Do Not Record Motion</source>
         <translation type="unfinished">No registre movimiento</translation>
     </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -6639,10 +6536,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Activar licencia analógica para eliminar este mensaje</translation>
     </message>
     <message>
-        <source>Please check authentication information in camera settings</source>
-        <translation>Por favor comprueba la información de autenticación en ajustes de la cámara</translation>
-    </message>
-    <message>
         <source>No video stream</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6665,6 +6558,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Server Offline</source>
         <translation type="unfinished">Servidor está desconectado</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6754,6 +6651,17 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Users</source>
         <translation type="unfinished">Usuarios</translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemSettingsWidget</name>
+    <message>
+        <source>Enable %1 and servers auto discovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow system to optimize %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7047,10 +6955,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adjust camera settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use PTZ controls</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7064,6 +6968,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Edit Video Walls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust %1 settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7165,10 +7073,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Personalizar ...</translation>
     </message>
     <message>
-        <source>Can adjust camera settings</source>
-        <translation>Puede ajustar la configuración de la cámara</translation>
-    </message>
-    <message>
         <source>Can use PTZ controls</source>
         <translation>Puede utilizar controles de PTZ</translation>
     </message>
@@ -7191,6 +7095,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>User has been renamed. Password must be updated.</source>
         <translation type="unfinished">El usuario fue renombrado. La contraseña debe ser actualizada.</translation>
+    </message>
+    <message>
+        <source>Can adjust %1 settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7322,10 +7230,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Búsqueda de vista previa para %1</translation>
     </message>
     <message>
-        <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Adición de la cámara ya está en marcha.¿Está seguro de que desea cancelar el proceso actual?</translation>
-    </message>
-    <message>
         <source>Delete Files</source>
         <translation>Eliminar archivos</translation>
     </message>
@@ -7412,13 +7316,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Version Mismatch</source>
         <translation>Versión no Coincide </translation>
     </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered.</source>
-        <translation>
-            <numerusform>Estas cámaras %n son auto-descubiertas.</numerusform>
-            <numerusform>Estas cámaras %n son auto-descubiertas.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>They may be auto-discovered again after removing.</source>
         <translation>Pueden ser auto-descubriertas de nuevo tras la extracción.</translation>
@@ -7426,13 +7323,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Are you sure you want to delete them?</source>
         <translation>¿Está seguro de que desea eliminarlas?</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.</source>
-        <translation>
-            <numerusform>%n de estas cámaras de %1 son auto-descubiertas.</numerusform>
-            <numerusform>%n de estas cámaras de %1 son auto-descubiertas.</numerusform>
-        </translation>
     </message>
     <message>
         <source>An error has occurred while trying to delete a resource from Server. </source>
@@ -7496,14 +7386,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation type="unfinished">Nuevo Diseño %1</translation>
     </message>
     <message>
-        <source>Cannot move camera(s) to server %1. Server is unresponsive.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server %1 is unable to find and access these cameras. Are you sure you would like to move them?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open File</source>
         <translation type="unfinished">Abrir el archivo</translation>
     </message>
@@ -7534,6 +7416,33 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Launcher process not found.</source>
         <translation type="unfinished">Proceso de inicio no se encuentra</translation>
+    </message>
+    <message>
+        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These %1 are auto-discovered.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Do you really want to delete the following %1?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7959,10 +7868,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnWorkbenchNavigator</name>
     <message>
-        <source>All Cameras</source>
-        <translation>Todas las cámaras</translation>
-    </message>
-    <message>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>hh:mm:ss</translation>
@@ -7981,6 +7886,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Live</source>
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
         <translation>EN VIVO</translation>
+    </message>
+    <message>
+        <source>All %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8225,10 +8134,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>%1&apos;s Pantalla</translation>
     </message>
     <message>
-        <source>%n cameras</source>
-        <translation>%n cámara</translation>
-    </message>
-    <message>
         <source>A control session is already running.</source>
         <translation type="unfinished">Sesión de control ya está funcionando</translation>
     </message>
@@ -8263,6 +8168,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>A Video Wall with the same name already exists.</source>
         <translation type="unfinished">Pared de video con el mismo nombre ya existe</translation>
+    </message>
+    <message>
+        <source>%n items</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8551,14 +8460,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Conmutación por error</translation>
     </message>
     <message>
-        <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished">Habilitar la conmutación por error (servidor tomará cámaras directamente desde los servidores fuera de línea)</translation>
-    </message>
-    <message>
-        <source>Max. cameras on this server:</source>
-        <translation type="unfinished">Max. cámaras en este servidor:</translation>
-    </message>
-    <message>
         <source>Storages</source>
         <translation type="unfinished">Almacenes informáticos</translation>
     </message>
@@ -8708,10 +8609,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>IO ports</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished">Ajustes de la cámara</translation>
     </message>
     <message>
         <source>Enable Audio</source>
@@ -8903,14 +8800,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished">Permita el descubrimiento automático de servidores y cámaras</translation>
-    </message>
-    <message>
-        <source>Allow system to optimize camera settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
