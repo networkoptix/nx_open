@@ -371,24 +371,41 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 				else
 					m_secondaryGopKeeper = gopKeeper;
 				reader->addDataProcessor(gopKeeper);
-
-                //if camera has one stream only and it is suitable for motion then caching first stream
-                const bool isSingleStreamCameraAndHiSuitableForCaching =
-                    (catalog == QnServer::HiQualityCatalog && m_primaryReader &&
-                     !cameraResource->hasDualStreaming2() &&
-                     cameraResource->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability ));
-                const bool isLowQualityReader = catalog == QnServer::LowQualityCatalog && m_secondaryReader;
-                if( isSingleStreamCameraAndHiSuitableForCaching || isLowQualityReader )
-                {
-                    ensureLiveCacheStarted(
-                        catalog == QnServer::LowQualityCatalog ? MEDIA_Quality_Low : MEDIA_Quality_High,
-                        reader,
-                        MSSettings::roSettings()->value(
-                            nx_ms_conf::HLS_TARGET_DURATION_MS,
-                            nx_ms_conf::DEFAULT_TARGET_DURATION_MS ).toUInt() * USEC_PER_MSEC );
-                }
             }
 		}
+    }
+}
+
+void QnVideoCamera::startLiveCacheIfNeeded()
+{
+    QMutexLocker lock(&m_getReaderMutex);
+
+    if (!isSomeActivity())
+        return;
+
+    const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
+    if (m_secondaryReader && !m_liveCache[MEDIA_Quality_Low])
+    {
+        ensureLiveCacheStarted(
+            MEDIA_Quality_Low,
+            m_secondaryReader,
+            MSSettings::roSettings()->value(
+                nx_ms_conf::HLS_TARGET_DURATION_MS,
+                nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
+    }
+    else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
+    {
+        //if camera has one stream only and it is suitable for motion then caching first stream
+        if (!cameraResource->hasDualStreaming2() &&
+            cameraResource->hasCameraCapabilities(Qn::PrimaryStreamSoftMotionCapability))
+        {
+            ensureLiveCacheStarted(
+                MEDIA_Quality_High,
+                m_primaryReader,
+                MSSettings::roSettings()->value(
+                    nx_ms_conf::HLS_TARGET_DURATION_MS,
+                    nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
+        }
     }
 }
 
@@ -489,6 +506,7 @@ void QnVideoCamera::updateActivity()
     if (m_secondaryGopKeeper)
         m_secondaryGopKeeper->updateCameraActivity();
     stopIfNoActivity();
+    startLiveCacheIfNeeded();
 }
 
 void QnVideoCamera::stopIfNoActivity()
