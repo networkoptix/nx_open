@@ -303,9 +303,9 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_ExportVideo:
             return tr("Exporting video");
         case Qn::AR_CameraUpdate:
-            return tr("Camera updated");
+            return tr("%1 updated").arg(getDefaultDeviceNameUpper());
         case Qn::AR_CameraInsert:
-            return tr("Camera added");
+            return tr("%1 added").arg(getDefaultDeviceNameUpper());
         case Qn::AR_SystemNameChanged:
             return tr("System name changed");
         case Qn::AR_SystemmMerge:
@@ -319,7 +319,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_EmailSettings:
             return tr("E-mail settings changed");
         case Qn::AR_CameraRemove:
-            return tr("Camera removed");
+            return tr("%1 removed").arg(getDefaultDeviceNameUpper());
         case Qn::AR_ServerRemove:
             return tr("Server removed");
         case Qn::AR_BEventRemove:
@@ -612,7 +612,7 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
             case EventTypeColumn:
                 return tr("Activity");
             case CameraNameColumn:
-                return tr("Camera name");
+                return tr("%1 name").arg(getDefaultDeviceNameUpper());
             case CameraIpColumn:
                 return tr("IP");
             case DateColumn:

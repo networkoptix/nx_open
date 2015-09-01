@@ -839,7 +839,9 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Cannot move camera(s) to server %1. Server is unresponsive.", NULL, modifiedResources.size()).arg(server->getName()),
+            tr("Cannot move %1 to server %2. Server is unresponsive.")
+                .arg(getNumericDevicesName(modifiedResources))
+                .arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -1482,7 +1484,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
             int result = QMessageBox::warning(
                         mainWindow(),
                         tr("Process in progress..."),
-                        tr("Camera addition is already in progress."\
+                        tr("Device addition is already in progress."\
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
