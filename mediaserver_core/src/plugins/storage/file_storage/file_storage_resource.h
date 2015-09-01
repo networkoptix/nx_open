@@ -4,12 +4,16 @@
 #include <atomic>
 #include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
+#include <utils/common/app_info.h>
+
 
 /*
 * QnFileStorageResource uses custom implemented IO access
 */
 
 class QnStorageManager;
+
+const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
 
 class QnFileStorageResource: public QnStorageResource
 {

@@ -9,7 +9,6 @@
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
-#include <utils/common/app_info.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -42,7 +41,6 @@
 #ifndef Q_OS_WIN
     const QString QnFileStorageResource::FROM_SEP = lit("\\");
     const QString QnFileStorageResource::TO_SEP = lit("/");
-    const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
     std::atomic<bool> QnFileStorageResource::m_firstCall(true);
 #else
     const QString QnFileStorageResource::FROM_SEP = lit("/");
@@ -234,17 +232,17 @@ void QnFileStorageResource::removeOldDirs()
             {
                 NX_LOG(
                     lit("QnFileStorageResource::removeOldDirs: umount %1 failed").arg(entry.absoluteFilePath()),
-                    cl_logDEBUG2
+                    cl_logDEBUG1
                 );
                 continue;
             }
         }
 
-        if (!QDir(entry.absoluteFilePath()).removeRecursively())
+        if (rmdir(entry.absoluteFilePath().toLatin1().constData()) != 0)
         {
             NX_LOG(
                 lit("QnFileStorageResource::removeOldDirs: remove %1 failed").arg(entry.absoluteFilePath()),
-                cl_logDEBUG2
+                cl_logDEBUG1
             );
         }
     }
@@ -252,12 +250,6 @@ void QnFileStorageResource::removeOldDirs()
 
 int QnFileStorageResource::mountTmpDrive(const QString &remoteUrl)
 {
-    if (m_firstCall)
-    {
-        m_firstCall = false;
-        removeOldDirs();
-    }
-
     QUrl url(remoteUrl);
     if (!url.isValid())
         return -1;
@@ -336,6 +328,14 @@ bool QnFileStorageResource::mountTmpDrive(const QString &url) const
 void QnFileStorageResource::setUrl(const QString& url)
 {
     QMutexLocker lock(&m_mutex);
+#ifndef _WIN32
+    if (m_firstCall)
+    {
+        m_firstCall = false;
+        removeOldDirs();
+    }
+#endif
+
     if (url.contains("://"))
     {
 #ifndef _WIN32
@@ -364,8 +364,6 @@ QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
     m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
-
-    std::srand(std::time(0));
 }
 
 QnFileStorageResource::~QnFileStorageResource()
