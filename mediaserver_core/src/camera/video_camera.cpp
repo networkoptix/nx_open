@@ -384,14 +384,15 @@ void QnVideoCamera::startLiveCacheIfNeeded()
         return;
 
     const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
-    if (m_secondaryReader && !m_liveCache[MEDIA_Quality_Low])
+    if (m_secondaryReader)
     {
-        ensureLiveCacheStarted(
-            MEDIA_Quality_Low,
-            m_secondaryReader,
-            MSSettings::roSettings()->value(
-                nx_ms_conf::HLS_TARGET_DURATION_MS,
-                nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
+        if (!m_liveCache[MEDIA_Quality_Low])
+            ensureLiveCacheStarted(
+                MEDIA_Quality_Low,
+                m_secondaryReader,
+                MSSettings::roSettings()->value(
+                    nx_ms_conf::HLS_TARGET_DURATION_MS,
+                    nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
     }
     else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
     {
