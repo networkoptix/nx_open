@@ -105,6 +105,7 @@ private:
     int minWidthForColumn(const Column &column) const;
     QSize sectionSizeFromContents(int logicalIndex) const;
     static QString getResourcesString(const std::vector<QnUuid>& resources);
+    static QnVirtualCameraResourceList getCameras(const std::vector<QnUuid>& resources);
     static QString searchData(const Column& column, const QnAuditRecord* data);
     QString descriptionTooltip(const QnAuditRecord *record) const;
 protected:

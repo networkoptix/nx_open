@@ -74,6 +74,8 @@ private slots:
     void updateControlButtons();
 
     void updateFilter();
+    
+    void retranslateUi();
 
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)

@@ -14,6 +14,7 @@ bool QnWorkbenchStateDependentButtonBoxDialog::tryClose(bool force) {
 }
 
 void QnWorkbenchStateDependentButtonBoxDialog::forcedUpdate() {
+    retranslateUi();
     tryClose(true);
 }
 

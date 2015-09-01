@@ -9,6 +9,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <core/resource/resource_name.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -707,6 +708,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     m_skipNextPressSignal(false)
 {
     ui->setupUi(this);
+    retranslateUi();
+
     setWarningStyle(ui->warningLabel);
 
     //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
@@ -1166,6 +1169,15 @@ QTableView* QnAuditLogDialog::currentGridView() const
         return ui->gridMaster;
     else
         return ui->gridCameras;
+}
+
+void QnAuditLogDialog::retranslateUi()
+{
+    ui->retranslateUi(this);
+
+    enum { kDevicesTabIndex = 1 };
+    ui->tabWidget->setTabText(kDevicesTabIndex, getDefaultDevicesName());
+    ui->checkBoxCameras->setText(tr("%1 actions").arg(getDefaultDeviceNameUpper()));
 }
 
 void QnAuditLogDialog::at_exportAction_triggered()

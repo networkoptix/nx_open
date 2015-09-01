@@ -9,6 +9,7 @@
 #include <QList>
 #include <QString>
 
+#include <core/resource/resource_fwd.h>
 
 //!Holds types related to performing camera availability diagnostics
 namespace CameraDiagnostics
@@ -74,22 +75,16 @@ namespace CameraDiagnostics
             unknown
         };
 
-        enum ErrorTarget
-        {
-            kCameraTarget
-            , kIoModuleTarget
-        };
-
         //!Returns textual description of error with  parameters
 
         typedef QList<QString> ErrorParams;
 
         QString toString(Value val
-            , ErrorTarget target = kCameraTarget
+            , const QnVirtualCameraResourcePtr &device
             , const ErrorParams& errorParams = ErrorParams());
 
         QString toString(int val
-            , ErrorTarget target = kCameraTarget
+            , const QnVirtualCameraResourcePtr &device
             , const ErrorParams& errorParams = ErrorParams());
     }
 
