@@ -33,8 +33,6 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_selectionScope(Qn::SceneScope),
     m_ignoreAccept(false)
 {
-    setWindowTitle(tr("Camera Settings"));
-
     m_settingsWidget = new QnCameraSettingsWidget(this);
 
     m_buttonBox = new QDialogButtonBox(this);
@@ -45,10 +43,10 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_openButton = new QPushButton(tr("Open in New Tab"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
-    m_diagnoseButton = new QPushButton(tr("Camera Diagnostics"));
+    m_diagnoseButton = new QPushButton();
     m_buttonBox->addButton(m_diagnoseButton, QDialogButtonBox::HelpRole);
 
-    m_rulesButton = new QPushButton(tr("Camera Rules"));
+    m_rulesButton = new QPushButton();
     m_buttonBox->addButton(m_rulesButton, QDialogButtonBox::HelpRole);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -74,10 +72,20 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, &QnCameraSettingsDialog::at_cameras_properties_saved);
 
     at_settingsWidget_hasChangesChanged();
+    retranslateUi();
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 }
+
+void QnCameraSettingsDialog::retranslateUi() {
+    auto cameras = m_settingsWidget->cameras();
+
+    setWindowTitle(tr("%1 Settings").arg(getDefaultDevicesName(cameras)));
+    m_diagnoseButton->setText(tr("%1 Diagnostics").arg(getDefaultDevicesName(cameras)));
+    m_rulesButton->setText(tr("%1 Rules").arg(getDefaultDevicesName(cameras)));
+}
+
 
 bool QnCameraSettingsDialog::tryClose(bool force) {
     setCameras(QnVirtualCameraResourceList(), force);
@@ -113,9 +121,9 @@ void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     m_okButton->setEnabled(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_openButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
+    m_openButton->setVisible(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
     m_diagnoseButton->setVisible(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
+    m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement
 }
 
 void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
@@ -168,6 +176,7 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
     }
 
     m_settingsWidget->setCameras(cameras);
+    retranslateUi();
 }
 
 void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) {
@@ -227,7 +236,7 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) 
 
     /* Submit and save it. */
     m_settingsWidget->submitToResources();
-        saveCameras(cameras);
+    saveCameras(cameras);
 }
 
 void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList& cameras) {
@@ -268,7 +277,7 @@ void QnCameraSettingsDialog::at_openButton_clicked() {
     QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
     menu()->trigger(Qn::OpenInNewLayoutAction, cameras);
     m_settingsWidget->setCameras(cameras);
-
+    retranslateUi();
     m_selectionUpdatePending = false;
 }
 
