@@ -91,7 +91,7 @@
       <item>
        <widget class="QCheckBox" name="failoverCheckBox">
         <property name="text">
-         <string>Enable failover (server will take cameras automatically from offline servers)</string>
+         <string notr="true">&lt;Enable failover (server will take cameras/devices automatically from offline servers)&gt;</string>
         </property>
        </widget>
       </item>
@@ -116,7 +116,7 @@
          <item>
           <widget class="QLabel" name="maxCamerasLabel">
            <property name="text">
-            <string>Max. cameras on this server:</string>
+            <string notr="true">&lt;Max. cameras on this server:&gt;</string>
            </property>
           </widget>
          </item>

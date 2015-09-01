@@ -47,7 +47,7 @@
    <item row="0" column="0">
     <widget class="QCheckBox" name="autoDiscoveryCheckBox">
      <property name="text">
-      <string>Enable cameras and servers auto discovery</string>
+      <string notr="true">&lt;Enable cameras and servers auto discovery&gt;</string>
      </property>
      <property name="tristate">
       <bool>true</bool>
