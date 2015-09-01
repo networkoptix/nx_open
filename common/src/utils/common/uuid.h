@@ -72,7 +72,8 @@ public:
     /*! Construct QnUuid from string representation.
      * If the string is not a valid UUID null QnUuid will be returned.
      */
-    static QnUuid fromStringSafe( const QString &uuid );
+    static QnUuid fromStringSafe( const QString& uuid );
+    static QnUuid fromStringSafe( const QByteArray& uuid );
 
 private:
     QUuid m_uuid;

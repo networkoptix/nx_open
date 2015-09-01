@@ -251,7 +251,7 @@ bool CloudDBProcess::initializeDB( nx::db::DBManager* const dbManager )
 
     return true;
 }
-//a3270856235d48e5f5af1fca6af673c7
+
 bool CloudDBProcess::tuneDB( nx::db::DBManager* const dbManager )
 {
     if( dbManager->connectionOptions().driverName != lit("QSQLITE") )

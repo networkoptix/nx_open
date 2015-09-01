@@ -90,7 +90,11 @@ bool AuthenticationManager::authenticate(
         authzHeader );
 }
 
-static const nx::String staticRealm( QN_PRODUCT_NAME_SHORT );
+namespace
+{
+    const nx::String staticRealm(QN_PRODUCT_NAME_SHORT);
+}
+
 nx::String AuthenticationManager::realm() const
 {
     return staticRealm;
@@ -103,18 +107,28 @@ bool AuthenticationManager::findHa1(
     nx::Buffer* const ha1,
     stree::AbstractResourceWriter* const authProperties ) const
 {
-    //TODO #ak also have to check systems, and some defined by tree credentials
-
     if( auto accountData = m_accountManager.findAccountByUserName( username ) )
     {
         *ha1 = accountData.get().passwordHa1.c_str();
-        authProperties->put( cdb::param::accountID, QVariant::fromValue(accountData.get().id) );
+        authProperties->put(
+            cdb::param::accountID,
+            QVariant::fromValue(accountData.get().id) );
     }
-    //else if( auto systemData = m_systemManager.findSystemByID( username ) )
-    //{
-    //    *ha1 = calcHa1( username, realm(), nx::String(systemData.get().authKey.c_str()) );
-    //    authProperties->put( cdb::param::systemID, QVariant::fromValue(QnUuid(systemData.get().id)) );
-    //}
+    else if( auto systemData = m_systemManager.findSystemByID( QnUuid::fromStringSafe(username) ) )
+    {
+        *ha1 = calcHa1(
+            username,
+            realm(),
+            nx::String(systemData.get().authKey.c_str()) );
+        authProperties->put(
+            cdb::param::systemID,
+            QVariant::fromValue(QnUuid(systemData.get().id)) );
+    }
+    else
+    {
+        //TODO #ak authenticating other nx_cloud modules by some. 
+        //  Probably, should use stree to specify authentication rules
+    }
 
     return true;
 }
