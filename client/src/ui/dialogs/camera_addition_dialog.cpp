@@ -562,7 +562,9 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
             QMessageBox::information(
                 this,
                 tr("Success"),
-                tr("%n devices added successfully.", "", camerasToAdd.size()) + L'\n' + tr("It might take a few moments to populate them in the tree."),
+                tr("%n devices added successfully.", "", camerasToAdd.size()) 
+                    + L'\n' 
+                    + tr("It might take a few moments to populate them in the tree."),
                 QMessageBox::Ok
             );
         } else {

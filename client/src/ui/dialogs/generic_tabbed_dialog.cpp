@@ -210,3 +210,8 @@ void QnGenericTabbedDialog::forcedUpdate() {
     retranslateUi();
     loadData();
 }
+
+void QnGenericTabbedDialog::retranslateUi() {
+    for(const Page &page: m_pages)
+        page.widget->retranslateUi();
+}
