@@ -54,6 +54,10 @@ public:
     //!Not unique system name
     std::string name;
 
+    SystemRegistrationData() {}
+    SystemRegistrationData(SystemRegistrationData&& right);
+    SystemRegistrationData(const SystemRegistrationData& right);
+
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
@@ -65,11 +69,13 @@ class SystemRegistrationDataWithAccountID
 public:
     QnUuid accountID;
 
-    SystemRegistrationDataWithAccountID( SystemRegistrationData&& right )
+    SystemRegistrationDataWithAccountID(SystemRegistrationData&& right)
     :
-        SystemRegistrationData( std::move( right ) )
+        SystemRegistrationData(std::move(right))
     {
     }
+    SystemRegistrationDataWithAccountID(SystemRegistrationDataWithAccountID&& right);
+    SystemRegistrationDataWithAccountID(const SystemRegistrationDataWithAccountID& right);
 };
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
@@ -106,10 +112,12 @@ public:
 
     SystemData()
     :
-        status( ssInvalid ),
-        cloudConnectionSubscriptionStatus( false )
+        status(ssInvalid),
+        cloudConnectionSubscriptionStatus(false)
     {
     }
+    SystemData(SystemData&& right);
+    SystemData(const SystemData& right);
 
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
@@ -125,6 +133,10 @@ class SystemDataList
 {
 public:
     std::vector<SystemData> systems;
+
+    SystemDataList() {}
+    SystemDataList(const SystemDataList&);
+    SystemDataList(SystemDataList&&);
 };
 
 #define SystemDataList_Fields (systems)
@@ -135,15 +147,17 @@ class SystemSharing
     public stree::AbstractResourceReader
 {
 public:
-    std::string accountID;
-    std::string systemID;
+    QnUuid accountID;
+    QnUuid systemID;
     SystemAccessRole::Value accessRole;
 
     SystemSharing()
     :
-        accessRole( SystemAccessRole::none )
+        accessRole(SystemAccessRole::none)
     {
-    }    
+    }
+    SystemSharing(const SystemSharing& right);
+    SystemSharing(SystemSharing&& right);
 
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
@@ -154,8 +168,29 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSha
 #define SystemSharing_Fields (accountID)(systemID)(accessRole)
 
 
+//!for requests passing just system id
+class SystemID
+:
+    public stree::AbstractResourceReader
+{
+public:
+    QnUuid id;
+
+    SystemID() {}
+    SystemID(const SystemID& right);
+    SystemID(SystemID&& right);
+
+    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+};
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
+
+#define SystemID_Fields (id)
+
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
     (json)(sql_record) )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

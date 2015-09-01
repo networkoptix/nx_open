@@ -116,6 +116,7 @@ bool AuthenticationManager::findHa1(
     }
     else if( auto systemData = m_systemManager.findSystemByID( QnUuid::fromStringSafe(username) ) )
     {
+        //TODO #ak successfull system authentication should activate system
         *ha1 = calcHa1(
             username,
             realm(),

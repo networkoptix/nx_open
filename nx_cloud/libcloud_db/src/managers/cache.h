@@ -19,9 +19,9 @@ namespace cdb {
 
 //!Data cache to be used by managers to reduce number of data fetch requests to DB
 /*!
-Should support:
-- data update events
-- custom indexes?
+    Should support:
+    - data update events
+    - custom indexes?
 */
 template<class KeyType, class CachedType>
 class Cache
@@ -46,10 +46,17 @@ public:
         return it->second;
     }
 
+    //!Returns \a true if erased something
+    bool erase(const KeyType& key)
+    {
+        QnMutexLocker lk(&m_mutex);
+        return m_data.erase(key) > 0;
+    }
+
     //!Executes \a updateFunc on item with \a key
     /*!
-    \return \a true if item found and updated. \a false otherwise
-    \warning \a updateFunc is executed with internal mutex locked, so it MUST NOT BLOCK!
+        \return \a true if item found and updated. \a false otherwise
+        \warning \a updateFunc is executed with internal mutex locked, so it MUST NOT BLOCK!
     */
     template<class Func>
     bool atomicUpdate(

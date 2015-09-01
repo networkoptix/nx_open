@@ -23,7 +23,6 @@ class GetSystemsHandler
 :
     public AbstractFiniteMsgBodyHttpHandler<DataFilter, data::SystemDataList>
 {
-
 public:
     static const QString HANDLER_PATH;
 

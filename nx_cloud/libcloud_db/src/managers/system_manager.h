@@ -65,7 +65,7 @@ public:
         std::function<void(ResultCode, data::SystemData)> completionHandler);
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
-        const QnUuid& systemID,
+        data::SystemID systemID,
         std::function<void(ResultCode)> completionHandler);
     //!Fetches systems sutisfying specified \a filter
     /*!
@@ -122,21 +122,29 @@ private:
     Cache<QnUuid, data::SystemData> m_cache;
 
     nx::db::DBResult insertSystemToDB(
-        QSqlDatabase* const tran,
+        QSqlDatabase* const connection,
         const data::SystemRegistrationDataWithAccountID& newSystem,
         data::SystemData* const systemData);
     void systemAdded(
-        nx::db::DBResult resultCode,
+        nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccountID systemRegistrationData,
         data::SystemData systemData,
         std::function<void(ResultCode, data::SystemData)> completionHandler);
 
     nx::db::DBResult insertSystemSharingToDB(
-        QSqlDatabase* const tran,
+        QSqlDatabase* const connection,
         const data::SystemSharing& systemSharing);
     void systemSharingAdded(
-        nx::db::DBResult resultCode,
+        nx::db::DBResult dbResult,
         data::SystemSharing sytemSharing,
+        std::function<void(ResultCode)> completionHandler);
+
+    nx::db::DBResult deleteSystemFromDB(
+        QSqlDatabase* const connection,
+        const data::SystemID& systemID);
+    void systemDeleted(
+        nx::db::DBResult dbResult,
+        data::SystemID systemID,
         std::function<void(ResultCode)> completionHandler);
 
     nx::db::DBResult fillCache();

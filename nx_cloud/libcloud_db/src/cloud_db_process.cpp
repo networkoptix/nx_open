@@ -29,6 +29,7 @@
 #include "db/structure_update_statements.h"
 #include "http_handlers/add_account_handler.h"
 #include "http_handlers/bind_system_handler.h"
+#include "http_handlers/unbind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
 #include "http_handlers/get_systems_handler.h"
 #include "http_handlers/verify_email_address_handler.h"
@@ -232,6 +233,12 @@ void CloudDBProcess::registerApiHandlers(
         GetSystemsHandler::HANDLER_PATH,
         [systemManager, &authorizationManager]() -> std::unique_ptr<GetSystemsHandler> {
             return std::make_unique<GetSystemsHandler>( systemManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<UnbindSystemHandler>(
+        UnbindSystemHandler::HANDLER_PATH,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<UnbindSystemHandler> {
+            return std::make_unique<UnbindSystemHandler>( systemManager, authorizationManager );
         } );
 }
 

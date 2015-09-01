@@ -51,12 +51,15 @@ void SystemManager::bindSystemToAccount(
 }
 
 void SystemManager::unbindSystem(
-    const AuthorizationInfo& /*authzInfo*/,
-    const QnUuid& /*systemID*/,
+    const AuthorizationInfo& authzInfo,
+    data::SystemID systemID,
     std::function<void(ResultCode)> completionHandler)
 {
-    //TODO #ak can be done by system owner only
-    completionHandler(ResultCode::notImplemented);
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<data::SystemID>(
+        std::bind(&SystemManager::deleteSystemFromDB, this, _1, _2),
+        std::move(systemID),
+        std::bind(&SystemManager::systemDeleted, this, _1, _2, std::move(completionHandler)));
 }
 
 namespace {
@@ -207,8 +210,8 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
     if (!insertSystemToAccountBinding.exec())
     {
         NX_LOG(lit("Could not insert system %1 to account %2 binding into DB. %3").
-            arg(QString::fromStdString(systemSharing.systemID)).
-            arg(QString::fromStdString(systemSharing.accountID)).
+            arg(systemSharing.systemID.toString()).
+            arg(systemSharing.accountID.toString()).
             arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -223,6 +226,51 @@ void SystemManager::systemSharingAdded(
 {
     if (dbResult == nx::db::DBResult::ok)
     {
+        //TODO #ak updating "systems by account id" index
+    }
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+        ? ResultCode::ok
+        : ResultCode::dbError);
+}
+
+nx::db::DBResult SystemManager::deleteSystemFromDB(
+    QSqlDatabase* const connection,
+    const data::SystemID& systemID)
+{
+    QSqlQuery removeSystemToAccountBinding(*connection);
+    removeSystemToAccountBinding.prepare(
+        "DELETE FROM system_to_account WHERE system_id=:id");
+    QnSql::bind(systemID, &removeSystemToAccountBinding);
+    if (!removeSystemToAccountBinding.exec())
+    {
+        NX_LOG(lit("Could not delete system %1 from system_to_account. %2").
+            arg(systemID.id.toString()).arg(connection->lastError().text()), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    QSqlQuery removeSystem(*connection);
+    removeSystem.prepare(
+        "DELETE FROM system WHERE id=:id");
+    QnSql::bind(systemID, &removeSystem);
+    if (!removeSystem.exec())
+    {
+        NX_LOG(lit("Could not delete system %1. %2").
+            arg(systemID.id.toString()).arg(connection->lastError().text()), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+void SystemManager::systemDeleted(
+    nx::db::DBResult dbResult,
+    data::SystemID systemID,
+    std::function<void(ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        m_cache.erase(systemID.id);
         //TODO #ak updating "systems by account id" index
     }
     completionHandler(
