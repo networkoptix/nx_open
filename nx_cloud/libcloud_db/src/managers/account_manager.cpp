@@ -35,17 +35,14 @@ static const int UNCONFIRMED_ACCOUNT_EXPIRATION_SEC = 3*24*60*60;
 AccountManager::AccountManager(
     const conf::Settings& settings,
     nx::db::DBManager* const dbManager,
-    EMailManager* const emailManager )
+    EMailManager* const emailManager ) throw( std::runtime_error )
 :
     m_settings( settings ),
     m_dbManager( dbManager ),
     m_emailManager( emailManager )
 {
-}
-
-bool AccountManager::init()
-{
-    return fillCache() == db::DBResult::ok;
+    if( fillCache() != db::DBResult::ok )
+        throw std::runtime_error( "Failed to fill account cache" );
 }
 
 void AccountManager::addAccount(
@@ -83,29 +80,25 @@ void AccountManager::getAccount(
         return;
     }
 
-    data::AccountData resultData;
-    if( !m_cache.get( accountID, &resultData ) )
+    if( auto accountData = m_cache.find( accountID ) )
     {
-        //very strange: account has been authenticated, but not found in the database
-        completionHandler( ResultCode::notFound, data::AccountData() );
+        accountData.get().passwordHa1.clear();
+        completionHandler( ResultCode::ok, std::move(accountData.get()) );
         return;
     }
 
-    //not returning password digest due to security reason
-    resultData.passwordHa1.clear();
-    completionHandler( ResultCode::ok, std::move(resultData) );
+    //very strange: account has been authenticated, but not found in the database
+    completionHandler( ResultCode::notFound, data::AccountData() );
 }
 
-bool AccountManager::findAccountByUserName(
-    const nx::String& userName,
-    data::AccountData* const accountData ) const
+boost::optional<data::AccountData> AccountManager::findAccountByUserName(
+    const nx::String& userName ) const
 {
     //TODO #ak improve search
     return m_cache.findIf(
         [&]( const std::pair<const QnUuid, data::AccountData>& val ) {
             return val.second.login == userName;
-        },
-        accountData );
+        } );
 }
 
 db::DBResult AccountManager::fillCache()
@@ -146,9 +139,9 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
     for( auto& account: accounts )
     {
         auto idCopy = account.id;
-        if( !m_cache.add( std::move(idCopy), std::move(account) ) )
+        if( !m_cache.insert( std::move(idCopy), std::move(account) ) )
         {
-            Q_ASSERT( false );
+            assert( false );
         }
     }
 
@@ -224,7 +217,7 @@ void AccountManager::accountAdded(
     if( resultCode == db::DBResult::ok )
     {
         //updating cache
-        m_cache.add( accountData.id, std::move(accountData) );
+        m_cache.insert( accountData.id, std::move(accountData) );
     }
     
     completionHandler( resultCode == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError );
