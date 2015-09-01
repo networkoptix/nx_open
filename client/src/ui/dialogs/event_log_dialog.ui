@@ -125,7 +125,7 @@
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>&lt; Any camera &gt;</string>
+        <string notr="true">&lt; Any camera &gt;</string>
        </property>
        <property name="flat">
         <bool>false</bool>

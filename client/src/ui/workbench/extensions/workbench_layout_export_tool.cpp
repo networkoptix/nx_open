@@ -12,8 +12,10 @@
 #include <camera/client_video_camera.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -379,7 +381,9 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
     camera->deleteLater();
 
     if (error) {
-        m_errorMessage = tr("Could not export camera %1.").arg(camera->resource()->toResource()->getName());
+        QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        Q_ASSERT_X(camRes, Q_FUNC_INFO, "Make sure camera exists");
+        m_errorMessage = tr("Could not export %1 %2.").arg(getDefaultDeviceNameLower(camRes)).arg(getShortResourceName(camera->resource()->toResourcePtr()));
         finishExport(false);
     } else {
         exportNextCamera();

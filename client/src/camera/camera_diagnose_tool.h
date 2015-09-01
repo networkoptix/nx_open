@@ -100,9 +100,9 @@ namespace CameraDiagnostics
         Step::Value m_step;
         QString m_serverHostAddress;
         QnMediaServerResourcePtr m_server;
+        QnVirtualCameraResourcePtr m_camera;
         bool m_result;
         QString m_errorMessage;
-        bool m_isPureIoModule;
 
         void doMediaServerAvailabilityStep();
     };

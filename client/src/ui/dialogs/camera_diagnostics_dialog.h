@@ -37,7 +37,7 @@ private:
     QString diagnosticsStepText(int stepType);
 
 private slots:
-    void updateTexts();
+    void retranslateUi();
     void updateOkButtonEnabled();
     void clearLog();
 
@@ -55,8 +55,6 @@ private:
     bool m_started, m_finished;
 
     QString m_lastLine;
-    QString m_targetDevice;
-    QString m_upperCaseDevice;
 };
 
 

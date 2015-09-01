@@ -21,6 +21,7 @@
 #include <common/common_meta_types.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
@@ -169,7 +170,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->typeComboBox->addItem(tr("Any Type"), 0);
     ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(Qn::local | Qn::video));
     ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(Qn::still_image));
-    ui->typeComboBox->addItem(tr("Live Cameras"), static_cast<int>(Qn::live));
+    ui->typeComboBox->addItem(tr("Live %1").arg(getDefaultDevicesName()), static_cast<int>(Qn::live));
 
     ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
