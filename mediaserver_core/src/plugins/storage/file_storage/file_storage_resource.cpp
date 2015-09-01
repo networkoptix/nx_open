@@ -582,7 +582,6 @@ bool QnFileStorageResource::isStorageDirMounted() const
 {
     if (!m_localPath.isEmpty()) // smb
     {
-#ifndef _WIN32
         QUrl url(getUrl());
 
         QString cifsOptionsString =
@@ -631,7 +630,6 @@ bool QnFileStorageResource::isStorageDirMounted() const
             umount(tmpPath.toLatin1().constData());
             rmdir(tmpPath.toLatin1().constData());
         }
-#endif
         return true;
     }
 
