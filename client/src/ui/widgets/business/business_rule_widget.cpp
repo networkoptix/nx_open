@@ -13,12 +13,8 @@
 #include <QtGui/QDragEnterEvent>
 
 #include <business/business_resource_validation.h>
-//#include <business/events/motion_business_event.h>
-//#include <business/events/camera_input_business_event.h>
-//#include <business/actions/recording_business_action.h>
-//#include <business/actions/camera_output_business_action.h>
-//#include <business/actions/sendmail_business_action.h>
 
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -88,11 +84,19 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     connect(ui->aggregationWidget,          SIGNAL(valueChanged()),             this, SLOT(updateModelAggregationPeriod()));
 
     connect(ui->commentsLineEdit,           SIGNAL(textChanged(QString)),       this, SLOT(at_commentsLineEdit_textChanged(QString)));
+
+    retranslateUi();
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
 {
 }
+
+void QnBusinessRuleWidget::retranslateUi() {
+    ui->eventResourcesHolder->setText(tr("<Any %1>").arg(getDefaultDeviceNameUpper()));
+    ui->actionResourcesHolder->setText(tr("<Select at least one %1>").arg(getDefaultDeviceNameLower()));
+}
+
 
 QnBusinessRuleViewModel* QnBusinessRuleWidget::model() const {
     return m_model;
@@ -390,5 +394,3 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked() {
         return;
     m_model->setSchedule(dialog->scheduleTasks());
 }
-
-

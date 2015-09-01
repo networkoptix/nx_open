@@ -89,7 +89,7 @@
            <item>
             <widget class="QPushButton" name="eventResourcesHolder">
              <property name="text">
-              <string>&lt;Any Camera&gt;</string>
+              <string notr="true">&lt;Any Camera&gt;</string>
              </property>
              <property name="flat">
               <bool>true</bool>
@@ -240,7 +240,7 @@
            <item>
             <widget class="QPushButton" name="actionResourcesHolder">
              <property name="text">
-              <string>&lt;Select at least one camera&gt;</string>
+              <string notr="true">&lt;Select at least one camera&gt;</string>
              </property>
              <property name="flat">
               <bool>true</bool>

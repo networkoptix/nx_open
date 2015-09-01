@@ -249,10 +249,16 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
     connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
+
+    retranslateUi();
 }
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget() {
     return;
+}
+
+void QnCameraScheduleWidget::retranslateUi() {
+    ui->minArchiveDaysWarningLabel->setText(tr("Warning! High minimum value could decrease other %1' recording durations.").arg(getDefaultDevicesName(true, false)));
 }
 
 void QnCameraScheduleWidget::afterContextInitialized() {
@@ -359,6 +365,7 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     updatePanicLabelText();
     updateMotionButtons();
     updateLicensesLabelText();
+    retranslateUi();
 }
 
 void QnCameraScheduleWidget::updateScheduleEnabled() {
