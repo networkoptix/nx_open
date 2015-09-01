@@ -9,6 +9,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <string>
+#include <vector>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <utils/common/model_functions_fwd.h>
@@ -120,6 +121,15 @@ public:
 #define SystemData_Fields (id)(name)(authKey)(ownerAccountID)(status)(cloudConnectionSubscriptionStatus)
 
 
+class SystemDataList
+{
+public:
+    std::vector<SystemData> systems;
+};
+
+#define SystemDataList_Fields (systems)
+
+
 class SystemSharing
 :
     public stree::AbstractResourceReader
@@ -147,6 +157,10 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSha
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing),
     (json)(sql_record) )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (SystemDataList),
+    (json))
 
 
 }   //data

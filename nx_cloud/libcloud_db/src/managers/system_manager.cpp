@@ -79,21 +79,20 @@ bool applyFilter(
 
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
-    const DataFilter& filter,
-    std::function<void(ResultCode, TransactionSequence, std::vector<data::SystemData>)> completionHandler,
-    std::function<void(DataChangeEvent)> /*eventReceiver*/)
+    DataFilter filter,
+    std::function<void(ResultCode, data::SystemDataList)> completionHandler )
 {
     stree::MultiIteratableResourceReader wholeFilter(filter, authzInfo);
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
-    std::vector<data::SystemData> resultData;
+    data::SystemDataList resultData;
     if (auto systemID = wholeFilterMap.get(cdb::param::systemID))
     {
         //selecting system by id
         auto system = m_cache.find(systemID.get().value<QnUuid>());
         if (!system || !applyFilter(system.get(), wholeFilter))
-            return completionHandler(ResultCode::notFound, 0, resultData);
-        resultData.emplace_back(std::move(system.get()));
+            return completionHandler(ResultCode::notFound, resultData);
+        resultData.systems.emplace_back(std::move(system.get()));
     }
     //    else if(auto accountID = wholeFilterMap.get<QnUuid>(cdb::param::accountID)) 
     //        ;//TODO #ak effectively selecting systems with specified account id
@@ -102,14 +101,13 @@ void SystemManager::getSystems(
         //filtering full system list
         m_cache.forEach(
             [&](const std::pair<const QnUuid, data::SystemData>& data) {
-            if (applyFilter(data.second, wholeFilter))
-                resultData.push_back(data.second);
-        });
+                if (applyFilter(data.second, wholeFilter))
+                    resultData.systems.push_back(data.second);
+            });
     }
 
     completionHandler(
-        resultData.empty() ? ResultCode::notFound : ResultCode::ok,
-        0,
+        ResultCode::ok,
         resultData);
 }
 

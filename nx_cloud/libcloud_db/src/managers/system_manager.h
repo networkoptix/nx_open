@@ -76,9 +76,8 @@ public:
     */
     void getSystems(
         const AuthorizationInfo& authzInfo,
-        const DataFilter& filter,
-        std::function<void(ResultCode, TransactionSequence, std::vector<data::SystemData>)> completionHandler,
-        std::function<void(DataChangeEvent)> eventReceiver = std::function<void(DataChangeEvent)>());
+        DataFilter filter,
+        std::function<void(ResultCode, data::SystemDataList)> completionHandler );
     //!Share system with specified account. Operation allowed for system owner and editor_with_sharing only
     void shareSystem(
         const AuthorizationInfo& authzInfo,

@@ -30,6 +30,7 @@
 #include "http_handlers/add_account_handler.h"
 #include "http_handlers/bind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
+#include "http_handlers/get_systems_handler.h"
 #include "http_handlers/verify_email_address_handler.h"
 #include "managers/account_manager.h"
 #include "managers/email_manager.h"
@@ -201,6 +202,7 @@ void CloudDBProcess::registerApiHandlers(
     AccountManager* const accountManager,
     SystemManager* const systemManager )
 {
+    //accounts
     msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
         AddAccountHttpHandler::HANDLER_PATH,
         [accountManager, &authorizationManager]() -> std::unique_ptr<AddAccountHttpHandler> {
@@ -219,10 +221,17 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
+    //systems
     msgDispatcher->registerRequestProcessor<BindSystemHandler>(
         BindSystemHandler::HANDLER_PATH,
         [systemManager, &authorizationManager]() -> std::unique_ptr<BindSystemHandler> {
             return std::make_unique<BindSystemHandler>( systemManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<GetSystemsHandler>(
+        GetSystemsHandler::HANDLER_PATH,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<GetSystemsHandler> {
+            return std::make_unique<GetSystemsHandler>( systemManager, authorizationManager );
         } );
 }
 

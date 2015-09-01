@@ -7,6 +7,8 @@
 
 #include <utils/common/model_functions.h>
 
+#include "cdb_ns.h"
+
 
 namespace nx {
 namespace cdb {
@@ -45,8 +47,18 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemRegistrationData* const 
 }
 
 
-bool SystemData::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
+bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 {
+    switch( resID )
+    {
+        case param::accountID:
+            *value = QVariant::fromValue(ownerAccountID);
+            return true;
+        case param::systemID:
+            *value = QVariant::fromValue(id);
+            return true;
+    }
+
     //TODO #ak
     return false;
 }
@@ -72,6 +84,11 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSha
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing),
     (json)(sql_record),
+    _Fields )
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemDataList),
+    (json),
     _Fields )
 
 }   //data
