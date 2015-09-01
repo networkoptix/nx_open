@@ -1168,6 +1168,12 @@ QTableView* QnAuditLogDialog::currentGridView() const
         return ui->gridCameras;
 }
 
+void QnAuditLogDialog::retranslateUi()
+{
+    ui->retranslateUi(this);
+
+}
+
 void QnAuditLogDialog::at_exportAction_triggered()
 {
     if (currentGridView())
