@@ -45,6 +45,8 @@ private:
         int key;
         QString title;
         QnAbstractPreferencesWidget* widget;
+
+        Page(): key(-1), widget(nullptr){}
     };
 
     QList<Page> modifiedPages() const;
