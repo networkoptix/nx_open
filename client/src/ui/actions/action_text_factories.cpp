@@ -47,5 +47,5 @@ QString QnActionTextFactory::text(const QnActionParameters &parameters) const {
 }
 
 QString QnDevicesNameActionTextFactory::text(const QnResourceList &resources) const {
-    return m_template.arg(getDevicesName(resources.filtered<QnVirtualCameraResource>()));
+    return m_template.arg(getDefaultDevicesName(resources.filtered<QnVirtualCameraResource>()));
 }

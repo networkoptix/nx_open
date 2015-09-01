@@ -435,7 +435,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MoveCameraAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
         requiredPermissions(Qn::RemovePermission).
-        text(tr("Move %1").arg(getDevicesName())).
+        text(tr("Move %1").arg(getDefaultDevicesName())).
         condition(hasFlags(Qn::network));
 
     factory(Qn::NextLayoutAction).
@@ -864,7 +864,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("%1 List...").arg(getDevicesName())).
+        text(tr("%1 List...").arg(getDefaultDevicesName())).
         shortcut(tr("Ctrl+M")).
         autoRepeat(false);
 

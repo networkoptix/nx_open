@@ -13,7 +13,7 @@ namespace {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
     public:
         static QString subsetCameras(int count, const QnVirtualCameraResourceList &total) { 
-            return tr("%n of %1", "", count).arg(getDevicesName(total, false)); 
+            return tr("%n of %1", "", count).arg(getNumericDevicesName(total, false)); 
         } 
     };
 
@@ -33,8 +33,8 @@ namespace {
     QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool detailed, const QString &baseText, int invalid) {
         if (cameras.isEmpty())
             return CheckingPolicy::emptyListIsValid()
-                    ? lit("<%1>").arg(anyDevice())
-                    : selectDevice();
+                    ? tr("<Any %1>").arg(getDefaultDevicesName(false))
+                    : tr("Select at least one %1.").arg(getDefaultDevicesName(false, false));
 
         if (detailed && invalid > 0)
             return baseText.arg(
@@ -44,7 +44,7 @@ namespace {
                            );
         if (cameras.size() == 1)
             return getShortResourceName(cameras.first());
-        return getDevicesName(cameras);
+        return getNumericDevicesName(cameras);
 
     }
 

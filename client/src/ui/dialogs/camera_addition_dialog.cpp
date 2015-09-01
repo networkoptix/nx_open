@@ -539,7 +539,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
         camerasToAdd << info;
     }
     if (camerasToAdd.empty()){
-        QMessageBox::information(this, tr("No %1 selected.").arg(getDevicesNameLower()), selectDevice());
+        QMessageBox::information(this, tr("No devices selected."), tr("Please select at least one device"));
         return;
     }
 

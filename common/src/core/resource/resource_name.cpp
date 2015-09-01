@@ -11,35 +11,36 @@ namespace {
 
     class QnResourceNameStrings {
         Q_DECLARE_TR_FUNCTIONS(QnResourceNameStrings)
-    public:       
-        static QString cameras(bool capitalize, int count) { 
-            if (count == 0)
-                return capitalize   ? tr("Camera(s)")                   : tr("camera(s)"); 
-            if (count == 1)
-                return capitalize   ? tr("Camera")                      : tr("camera"); 
+    public:
+        static QString numericCameras(int count, bool capitalize) { 
             return capitalize       ? tr("%n Camera(s)", 0, count)      : tr("%n camera(s)", 0, count); 
         }
 
-        static QString iomodules(bool capitalize, int count) {
-            if (count == 0)
-                return capitalize   ? tr("IO Module(s)")                : tr("IO module(s)"); 
-            if (count == 1)
-                return capitalize   ? tr("IO Module")                   : tr("IO module");
+        static QString numericIoModules(int count, bool capitalize) {
             return capitalize       ? tr("%n IO Module(s)", 0, count)   : tr("%n IO module(s)", 0, count); 
         }
 
-        static QString devices(bool capitalize, int count) { 
-            if (count == 0)
-                return capitalize   ? tr("Device(s)")                   : tr("device(s)"); 
-            if (count == 1)
-                return capitalize   ? tr("Device")                      : tr("device");
+        static QString numericDevices(int count, bool capitalize) { 
             return capitalize       ? tr("%n Device(s)", 0, count)      : tr("%n device(s)", 0, count); 
         }
 
-        static QString selectCamera()   {   return tr("Please select at least one camera."); }
-        static QString selectDevice()   {   return tr("Please select at least one device."); }
-        static QString anyCamera()      {   return tr("Any Camera"); }
-        static QString anyDevice()      {   return tr("Any Device"); }
+        static QString defaultCameras(bool plural, bool capitalize) { 
+            if (plural)
+                return capitalize   ? tr("Cameras")                     : tr("cameras"); 
+            return capitalize       ? tr("Camera")                      : tr("camera"); 
+        }
+
+        static QString defaultIoModules(bool plural, bool capitalize) { 
+            if (plural)
+                return capitalize   ? tr("IO Modules")                  : tr("IO modules"); 
+            return capitalize       ? tr("IO Module")                   : tr("IO module"); 
+        }
+
+        static QString defaultDevices(bool plural, bool capitalize) { 
+            if (plural)
+                return capitalize   ? tr("Devices")                     : tr("devices"); 
+            return capitalize       ? tr("Device")                      : tr("device");
+        }
 
     };
 
@@ -74,11 +75,18 @@ QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {
     return baseName;
 }
 
-QString getDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /* = true*/) {
+QString getDefaultDevicesName(bool plural /*= true*/, bool capitalize /*= true*/) {
+    if (!qnResPool->containsIoModules())
+        return QnResourceNameStrings::defaultCameras(plural, capitalize);
+    return QnResourceNameStrings::defaultDevices(plural, capitalize);
+}
+
+QString getDefaultDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /*= true*/) {
+    bool plural = devices.size() != 1;
 
     /* Quick check - if there are no io modules in the system at all. */
     if (!qnResPool->containsIoModules())
-        return QnResourceNameStrings::cameras(capitalize, devices.size());
+        return QnResourceNameStrings::defaultCameras(plural, capitalize);
 
     using boost::algorithm::any_of;
 
@@ -93,25 +101,38 @@ QString getDevicesName(const QnVirtualCameraResourceList &devices, bool capitali
     /* Only one type of devices. */
     if (hasCameras ^ hasIoModules) {
         if (hasCameras)
-            return QnResourceNameStrings::cameras(capitalize, devices.size());
+            return QnResourceNameStrings::defaultCameras(plural, capitalize);
         if (hasIoModules)
-            return QnResourceNameStrings::iomodules(capitalize, devices.size());
+            return QnResourceNameStrings::defaultIoModules(plural, capitalize);
     }
 
     /* Both of them - or none. */
-    return QnResourceNameStrings::devices(capitalize, devices.size());
+    return QnResourceNameStrings::defaultDevices(plural, capitalize);
 }
 
-QString selectDevice() {
+QString getNumericDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /*= true*/) {
     /* Quick check - if there are no io modules in the system at all. */
     if (!qnResPool->containsIoModules())
-        return QnResourceNameStrings::selectCamera();
-    return QnResourceNameStrings::selectDevice();
-}
+        return QnResourceNameStrings::numericCameras(devices.size(), capitalize);
 
-QString anyDevice() {
-    /* Quick check - if there are no io modules in the system at all. */
-    if (!qnResPool->containsIoModules())
-        return QnResourceNameStrings::anyCamera();
-    return QnResourceNameStrings::anyDevice();
+    using boost::algorithm::any_of;
+
+    bool hasCameras = any_of(devices, [](const QnVirtualCameraResourcePtr &device) {
+        return device->hasVideo(nullptr);
+    });
+
+    bool hasIoModules = any_of(devices, [](const QnVirtualCameraResourcePtr &device) {
+        return device->isIOModule() && !device->hasVideo(nullptr);
+    });
+
+    /* Only one type of devices. */
+    if (hasCameras ^ hasIoModules) {
+        if (hasCameras)
+            return QnResourceNameStrings::numericCameras(devices.size(), capitalize);
+        if (hasIoModules)
+            return QnResourceNameStrings::numericIoModules(devices.size(), capitalize);
+    }
+
+    /* Both of them - or none. */
+    return QnResourceNameStrings::numericDevices(devices.size(), capitalize);
 }
