@@ -415,7 +415,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
                 disabledCameras << camera;
         Q_ASSERT_X(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
         
-        result = tr("Recording on %1 is disabled: ").arg(getDevicesName(disabledCameras, false));
+        result = tr("Recording on %1 is disabled: ").arg(getNumericDevicesName(disabledCameras, false));
         for (const auto &camera: disabledCameras)
             result += L'\n' + getFullResourceName(camera, true);
         break;

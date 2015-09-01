@@ -1250,12 +1250,25 @@ void QnWorkbenchNavigator::updateLines() {
 
     bool isZoomed = display()->widget(Qn::ZoomedRole) != NULL;
 
+    auto syncedCameras = [this]() {
+        QnVirtualCameraResourceList result;
+        for(const QnResourceWidget *widget: m_syncedWidgets) {
+            if (!widget->resource())
+                continue;
+            if (QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
+                result << camera;
+        }
+        if (QnVirtualCameraResourcePtr camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>())
+            result << camera;
+        return result;
+    };
+
     if(m_currentWidgetFlags & WidgetSupportsPeriods) {
         m_timeSlider->setLineVisible(CurrentLine, true);
         m_timeSlider->setLineVisible(SyncedLine, !isZoomed);
 
         m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
-        m_timeSlider->setLineComment(SyncedLine, tr("All %1").arg(getDevicesName()));
+        m_timeSlider->setLineComment(SyncedLine, tr("All %1").arg(getDefaultDevicesName(syncedCameras())));
     } else {
         m_timeSlider->setLineVisible(CurrentLine, false);
         m_timeSlider->setLineVisible(SyncedLine, false);

@@ -24,7 +24,7 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent):
     invalidWidget->setAlignment(Qt::AlignCenter);
     m_invalidWidget = invalidWidget;
 
-    QLabel *emptyWidget = new QLabel(tr("No %1 selected.").arg(getDevicesNameLower()), this);
+    QLabel *emptyWidget = new QLabel(tr("No %1 selected.").arg(getDefaultDeviceNameLower()), this);
     emptyWidget->setAlignment(Qt::AlignCenter);
     m_emptyWidget = emptyWidget;
 

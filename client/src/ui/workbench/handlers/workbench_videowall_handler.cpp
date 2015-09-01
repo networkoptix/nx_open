@@ -1162,7 +1162,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
     else {
         QnVirtualCameraResourceList cameras = filtered.filtered<QnVirtualCameraResource>();
         if (cameras.size() == filtered.size()) /* Cameras only */
-            layout->setName(getDevicesName(cameras));
+            layout->setName(getNumericDevicesName(cameras));
         else
             layout->setName(tr("%n items", NULL, filtered.size()));
     }

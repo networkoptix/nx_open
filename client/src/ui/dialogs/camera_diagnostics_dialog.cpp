@@ -23,9 +23,7 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     ui(new Ui::CameraDiagnosticsDialog),
     m_tool(NULL),
     m_started(false),
-    m_finished(false),
-    m_targetDevice(),
-    m_upperCaseDevice()
+    m_finished(false)
 {
     ui->setupUi(this);
     

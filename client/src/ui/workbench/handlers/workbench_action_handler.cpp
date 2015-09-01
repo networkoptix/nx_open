@@ -864,7 +864,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 tr("Error"),
                 tr("Server %1 is unable to find and access these %2. Are you sure you would like to move them?")
                     .arg(server->getName())
-                    .arg(getDevicesNameLower(errorResources)),
+                    .arg(getNumericDevicesName(errorResources, false)),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
                 );
         /* If user is sure, return invalid cameras back to list. */
@@ -1887,7 +1887,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* First version of the dialog if all cameras are auto-discovered. */
     if (cameras.size() == onlineAutoDiscoveredCameras.size()) {
         question =
-            tr("These %1 are auto-discovered.").arg(getDevicesNameLower(cameras)) + L'\n' 
+            tr("These %1 are auto-discovered.").arg(getNumericDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
@@ -1895,14 +1895,14 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* Second version - some cameras are auto-discovered, some not. */
     if (!onlineAutoDiscoveredCameras.isEmpty()) {
         question = 
-            tr("%n of these %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getDevicesNameLower(cameras)) + L'\n' 
+            tr("%n of these %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getNumericDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
     else if (cameras.size() == resources.size()) {
         /* Third version - no auto-discovered cameras in the list. */
         question =
-            tr("Do you really want to delete the following %1?").arg(getDevicesNameLower(cameras));
+            tr("Do you really want to delete the following %1?").arg(getNumericDevicesName(cameras, false));
     }
     else {
         /* Forth version - cameras and other items. */

@@ -15,6 +15,14 @@ namespace {
         static QString subsetCameras(int count, const QnVirtualCameraResourceList &total) { 
             return tr("%n of %1", "", count).arg(getNumericDevicesName(total, false)); 
         } 
+
+        static QString anyCamera() {
+            return tr("<Any %1>").arg(getDefaultDeviceNameUpper());
+        }
+
+        static QString selectCamera() {
+            return tr("Select at least one %1.").arg(getDefaultDeviceNameLower());
+        }
     };
 
     template <typename CheckingPolicy>
@@ -33,8 +41,8 @@ namespace {
     QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool detailed, const QString &baseText, int invalid) {
         if (cameras.isEmpty())
             return CheckingPolicy::emptyListIsValid()
-                    ? tr("<Any %1>").arg(getDefaultDeviceNameUpper())
-                    : tr("Select at least one %1.").arg(getDefaultDeviceNameLower());
+                    ? QnBusinessResourceValidationStrings::anyCamera()
+                    : QnBusinessResourceValidationStrings::selectCamera();
 
         if (detailed && invalid > 0)
             return baseText.arg(
