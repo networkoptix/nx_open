@@ -147,7 +147,7 @@ void AuthenticationManager::addWWWAuthenticateHeader(
 nx::Buffer AuthenticationManager::generateNonce()
 {
     const size_t nonce = m_dist( m_rd ) | ::time( NULL );
-    return nx::Buffer::number( nonce );
+    return nx::Buffer::number( (qulonglong)nonce );
 }
 
 }   //cdb
