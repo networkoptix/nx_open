@@ -39,7 +39,8 @@ public:
 
 class AuthorizationInfo
 :
-    public stree::AbstractResourceReader
+    public stree::AbstractResourceReader,
+    public stree::AbstractIteratableContainer
 {
 public:
     AuthorizationInfo();
@@ -47,6 +48,8 @@ public:
 
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
+    //!Implementation of AbstractIteratableContainer::begin
+    virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
 
     bool accessAllowedToOwnDataOnly() const;
 

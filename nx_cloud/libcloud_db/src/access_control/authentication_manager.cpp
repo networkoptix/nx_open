@@ -12,6 +12,7 @@
 
 #include "../data/cdb_ns.h"
 #include "../managers/account_manager.h"
+#include "../managers/system_manager.h"
 #include "version.h"
 
 
@@ -89,6 +90,12 @@ bool AuthenticationManager::authenticate(
         authzHeader );
 }
 
+static const nx::String staticRealm( QN_PRODUCT_NAME_SHORT );
+nx::String AuthenticationManager::realm() const
+{
+    return staticRealm;
+}
+
 bool AuthenticationManager::findHa1(
     const nx_http::HttpServerConnection& /*connection*/,
     const nx_http::Request& /*request*/,
@@ -98,12 +105,16 @@ bool AuthenticationManager::findHa1(
 {
     //TODO #ak also have to check systems, and some defined by tree credentials
 
-    data::AccountData accountData;
-    if( !m_accountManager.findAccountByUserName( username, &accountData ) )
-        return false;
-
-    *ha1 = accountData.passwordHa1.c_str();
-    authProperties->put( cdb::param::accountID, QVariant::fromValue(accountData.id) );
+    if( auto accountData = m_accountManager.findAccountByUserName( username ) )
+    {
+        *ha1 = accountData.get().passwordHa1.c_str();
+        authProperties->put( cdb::param::accountID, QVariant::fromValue(accountData.get().id) );
+    }
+    //else if( auto systemData = m_systemManager.findSystemByID( username ) )
+    //{
+    //    *ha1 = calcHa1( username, realm(), nx::String(systemData.get().authKey.c_str()) );
+    //    authProperties->put( cdb::param::systemID, QVariant::fromValue(QnUuid(systemData.get().id)) );
+    //}
 
     return true;
 }
@@ -115,7 +126,7 @@ void AuthenticationManager::addWWWAuthenticateHeader(
     *wwwAuthenticate = header::WWWAuthenticate();
     wwwAuthenticate->get().authScheme = header::AuthScheme::digest;
     wwwAuthenticate->get().params.insert( "nonce", generateNonce() );
-    wwwAuthenticate->get().params.insert( "realm", QN_PRODUCT_NAME_SHORT );
+    wwwAuthenticate->get().params.insert( "realm", realm() );
     wwwAuthenticate->get().params.insert( "algorithm", "MD5" );
 }
 

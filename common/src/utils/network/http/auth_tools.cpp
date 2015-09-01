@@ -36,7 +36,7 @@ namespace nx_http
                     userName,
                     userPassword,
                     predefinedHA1,
-                    request->requestLine.url,
+                    request->requestLine.url.path().toUtf8(),
                     wwwAuthenticateHeader,
                     &digestAuthorizationHeader ) )
             {
@@ -136,7 +136,7 @@ namespace nx_http
             const StringType& userName,
             const boost::optional<StringType>& userPassword,
             const boost::optional<BufferType>& predefinedHA1,
-            const QUrl& url,
+            const StringType& uri,
             const QMap<BufferType, BufferType>& inputParams,
             QMap<BufferType, BufferType>* const outputParams )
         {
@@ -160,12 +160,12 @@ namespace nx_http
             //HA2, qop=auth-int is not supported
             const BufferType& ha2 = calcHa2(
                 method,
-                url.path().toLatin1() );
+                uri );
             //response
             outputParams->insert( "username", userName );
             outputParams->insert( "realm", realm );
             outputParams->insert( "nonce", nonce );
-            outputParams->insert( "uri", url.path().toLatin1() );
+            outputParams->insert( "uri", uri );
 
             const BufferType nonceCount = "00000001";     //TODO #ak generate it
             const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
@@ -192,7 +192,7 @@ namespace nx_http
         const StringType& userName,
         const boost::optional<StringType>& userPassword,
         const boost::optional<BufferType>& predefinedHA1,
-        const QUrl& url,
+        const StringType& uri,
         const header::WWWAuthenticate& wwwAuthenticateHeader,
         header::DigestAuthorization* const digestAuthorizationHeader )
     {
@@ -206,7 +206,7 @@ namespace nx_http
             userName,
             userPassword,
             predefinedHA1,
-            url,
+            uri,
             wwwAuthenticateHeader.params,
             &digestAuthorizationHeader->digest->params );
     }
@@ -228,7 +228,7 @@ namespace nx_http
                 userName,
                 userPassword,
                 predefinedHA1,
-                QUrl(QLatin1String(uriIter.value())),
+                uriIter.value(),
                 digestAuthorizationHeader.digest->params,
                 &outputParams ) )
             return false;

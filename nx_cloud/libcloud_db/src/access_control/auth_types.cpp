@@ -29,6 +29,11 @@ bool AuthorizationInfo::getAsVariant( int resID, QVariant* const value ) const
     return false;
 }
 
+std::unique_ptr<stree::AbstractConstIterator> AuthorizationInfo::begin() const
+{
+    return m_rc.begin();
+}
+
 bool AuthorizationInfo::accessAllowedToOwnDataOnly() const
 {
     //TODO #ak

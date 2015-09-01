@@ -108,7 +108,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
     nx_http::header::DigestAuthorization digestHeader;
     if (!nx_http::calcDigestResponse(
                 H_METHOD, admin->getName().toUtf8(), boost::none, admin->getDigest(),
-                url, authHeader, &digestHeader))
+                url.path().toUtf8(), authHeader, &digestHeader))
         return QByteArray();
 
     return QString(QLatin1String(
