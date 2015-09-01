@@ -118,8 +118,11 @@ void SystemManager::shareSystem(
     data::SystemSharing sharingData,
     std::function<void(ResultCode)> completionHandler)
 {
-    //TODO #ak
-    completionHandler(ResultCode::notImplemented);
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<data::SystemSharing>(
+        std::bind(&SystemManager::insertSystemSharingToDB, this, _1, _2),
+        std::move(sharingData),
+        std::bind(&SystemManager::systemSharingAdded, this, _1, _2, std::move(completionHandler)));
 }
 
 boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const
@@ -192,6 +195,42 @@ void SystemManager::systemAdded(
         ? ResultCode::ok
         : ResultCode::dbError,
         std::move(systemData));
+}
+
+nx::db::DBResult SystemManager::insertSystemSharingToDB(
+    QSqlDatabase* const connection,
+    const data::SystemSharing& systemSharing)
+{
+    QSqlQuery insertSystemToAccountBinding(*connection);
+    insertSystemToAccountBinding.prepare(
+        "INSERT INTO system_to_account( account_id, system_id, access_role_id ) "
+        " VALUES( :accountID, :systemID, :accessRole )");
+    QnSql::bind(systemSharing, &insertSystemToAccountBinding);
+    if (!insertSystemToAccountBinding.exec())
+    {
+        NX_LOG(lit("Could not insert system %1 to account %2 binding into DB. %3").
+            arg(QString::fromStdString(systemSharing.systemID)).
+            arg(QString::fromStdString(systemSharing.accountID)).
+            arg(connection->lastError().text()), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+void SystemManager::systemSharingAdded(
+    nx::db::DBResult dbResult,
+    data::SystemSharing sytemSharing,
+    std::function<void(ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        //TODO #ak updating "systems by account id" index
+    }
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+        ? ResultCode::ok
+        : ResultCode::dbError);
 }
 
 nx::db::DBResult SystemManager::fillCache()

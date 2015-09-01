@@ -132,6 +132,14 @@ private:
         data::SystemData systemData,
         std::function<void(ResultCode, data::SystemData)> completionHandler);
 
+    nx::db::DBResult insertSystemSharingToDB(
+        QSqlDatabase* const tran,
+        const data::SystemSharing& systemSharing);
+    void systemSharingAdded(
+        nx::db::DBResult resultCode,
+        data::SystemSharing sytemSharing,
+        std::function<void(ResultCode)> completionHandler);
+
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchSystems(QSqlDatabase* connection, int* const /*dummy*/);
 };
