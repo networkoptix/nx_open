@@ -6001,7 +6001,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Выберите камеры...</translation>
     </message>
     <message>
-        <source>Slect Resources...</source>
+        <source>Select Resources...</source>
         <translation type="unfinished">Выберите ресурсы...</translation>
     </message>
 </context>
