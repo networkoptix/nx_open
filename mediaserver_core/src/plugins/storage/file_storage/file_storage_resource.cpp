@@ -120,11 +120,11 @@ bool QnFileStorageResource::initOrUpdate() const
 
 bool QnFileStorageResource::checkWriteCap() const
 {
+    if (!initOrUpdate())
+        return false;
+
     if( !isStorageDirMounted() )
         return false;
-    
-    if (!initOrUpdate())
-    	return false;
     
     if (hasFlags(Qn::deprecated))
         return false;
@@ -580,8 +580,61 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
 
 bool QnFileStorageResource::isStorageDirMounted() const
 {
-    if (!m_localPath.isEmpty())
+    if (!m_localPath.isEmpty()) // smb
+    {
+#ifndef _WIN32
+        QUrl url(getUrl());
+
+        QString cifsOptionsString =
+            lit("username=%1,password=%2")
+                .arg(url.userName())
+                .arg(url.password());
+
+        QString srcString = lit("//") + url.host() + url.path();
+
+        auto randomString = []
+        {
+            std::stringstream randomStringStream;
+            randomStringStream << std::hex << std::rand() << std::rand();
+
+            return randomStringStream.str();
+        };
+
+        QString tmpPath = "/tmp/" + NX_TEMP_FOLDER_NAME + QString::fromStdString(randomString());
+        rmdir(tmpPath.toLatin1().constData());
+
+        mkdir(
+            tmpPath.toLatin1().constData(),
+            S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
+        );
+
+        int retCode = mount(
+            srcString.toLatin1().constData(),
+            tmpPath.toLatin1().constData(),
+            "cifs",
+            MS_NOSUID | MS_NODEV | MS_NOEXEC | MS_SILENT,
+            cifsOptionsString.toLatin1().constData()
+        );
+
+        if (retCode == -1)
+        {
+            int err = errno;
+            if (err != EBUSY)
+            {
+                rmdir(tmpPath.toLatin1().constData());
+                m_dirty = true;
+                return false;
+            }
+        }
+        else
+        {
+            umount(tmpPath.toLatin1().constData());
+            rmdir(tmpPath.toLatin1().constData());
+        }
+#endif
         return true;
+    }
+
     const QString notResolvedStoragePath = closeDirPath(getPath());
     const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
     //on unix, checking that storage directory is mounted, if it is to be mounted
