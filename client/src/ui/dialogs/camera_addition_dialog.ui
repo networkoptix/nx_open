@@ -133,7 +133,7 @@
                   <item row="0" column="0">
                    <widget class="QLabel" name="singleCameraLabel">
                     <property name="text">
-                     <string>Ca&amp;mera Address:</string>
+                     <string>Device Address:</string>
                     </property>
                     <property name="buddy">
                      <cstring>singleCameraLineEdit</cstring>
