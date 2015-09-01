@@ -109,10 +109,6 @@ bool QnFileStorageResource::initOrUpdate() const
         {
             if (mountTmpDrive() != 0)
                 return false;
-#ifndef _WIN32
-            if (!m_localPath.isEmpty() && m_storageManager)
-                m_storageManager->addLocalPathInUse(m_localPath);
-#endif
         }
         m_dirty = false;
     }
