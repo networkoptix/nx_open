@@ -671,7 +671,7 @@ void QnRecordingManager::at_licenseMutexLocked()
                 continue;
             }
             propertyDictionary->saveParams( camera->getId() );
-            disabledCameras << camera->getId()->toString();
+            disabledCameras << camera->getId().toString();
             helper.invalidate();
         }
     }
