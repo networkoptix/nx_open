@@ -7,12 +7,12 @@ Base.Column
     id: thisComponent;
 
     property int dhcpState: 0;
-    property alias forceUseDHCP: forceUseDHCPChecklBox.checked;
-    property alias changed: forceUseDHCPChecklBox.changed;
-    
-    function tryApplyChanges() 
+    property alias forceUseDHCPControl: forceUseDHCPCheckBox;
+    property alias forceUseDHCP: forceUseDHCPCheckBox.checked;
+    property alias changed: forceUseDHCPCheckBox.changed;
+    function tryApplyChanges(warnings)
     {
-        if (!forceUseDHCPChecklBox.changed)
+        if (!forceUseDHCPCheckBox.changed)
             return true;
 
         rtuContext.changesManager().addDHCPChange("doesn't matter for multiple selection", true);
@@ -39,8 +39,13 @@ Base.Column
 
     Base.CheckBox
     {
-        id: forceUseDHCPChecklBox;
+        id: forceUseDHCPCheckBox;
         enabled: (thisComponent.dhcpState !== Qt.Checked);
+
+        activeFocusOnTab: true;
+        activeFocusOnPress: true;
+
+        KeyNavigation.backtab: forceUseDHCPCheckBox;
 
         text: qsTr("Enable DHCP on all servers");
         initialCheckedState: Qt.Unchecked;

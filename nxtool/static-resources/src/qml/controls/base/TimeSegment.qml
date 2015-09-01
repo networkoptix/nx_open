@@ -15,7 +15,7 @@ TextInput
     text: initialText;
     selectByMouse: true;
 
-    width: implicitHeight * 1;
+    width: implicitHeight;
     renderType: Text.NativeRendering;
     font.pixelSize: Common.SizeManager.fontSizes.base;
 
@@ -50,7 +50,7 @@ TextInput
                 KeyNavigation.backtab.forceActiveFocus();
             }
         }
-        else if (digital && (event.key >= Qt.Key_0) && (event.key < Qt.Key_9)
+        else if (digital && (event.key >= Qt.Key_0) && (event.key <= Qt.Key_9)
             && (cursorPosition == 2) && (selectionStart == selectionEnd) && KeyNavigation.tab)
         {
             KeyNavigation.tab.forceActiveFocus();

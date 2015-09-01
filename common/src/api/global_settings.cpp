@@ -43,7 +43,7 @@ namespace {
     const QString nameFrom(lit("emailFrom"));
     const QString nameSignature(lit("emailSignature"));
     const QString nameSupportEmail(lit("emailSupportEmail"));
-    const QString nameUpdateNotificationsEnabled(lit("updateNotificationEnabled"));
+    const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
     
 }
@@ -56,7 +56,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
-    m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, false, this);
+    m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, true, this);
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);

@@ -4,7 +4,10 @@ import QtQuick.Controls 1.1;
 import "../common" as Common
 import "../settings" as Settings;
 import "../controls/base" as Base;
+import "../dialogs" as Dialogs;
 import "../controls/rtu" as Rtu;
+
+import networkoptix.rtu 1.0 as NxRtu;
 
 FocusScope
 {
@@ -16,12 +19,71 @@ FocusScope
 
     anchors.fill: parent;
    
+    Dialogs.MessageDialog
+    {
+        id: warningDialog;
+
+        title: "Warning";
+        buttons: (NxRtu.Buttons.Cancel | NxRtu.Buttons.Ok);
+        styledButtons: NxRtu.Buttons.Ok;
+        dontShowText: "Do not show warnings";
+
+        function showWarnings(warnings, onFinishedCallback, onCanceledCallback)
+        {
+            impl.onFinishedCallback = onFinishedCallback;
+            impl.onCanceledCallback = onCanceledCallback;
+            impl.warnings = warnings;
+            impl.show(0);
+        }
+
+        onButtonClicked:
+        {
+            if (id === NxRtu.Buttons.Ok)
+            {
+                impl.show(impl.currentIndex + 1);
+            }
+            else if (impl.onCanceledCallback)
+            {
+                impl.onCanceledCallback();
+            }
+        }
+
+        onDontShowNextTimeChanged: { rtuContext.showWarnings = !dontShow; }
+
+        property QtObject impl: QtObject
+        {
+            id: impl;
+
+            property var onFinishedCallback;
+            property var onCanceledCallback;
+            property var warnings;
+            property int currentIndex: 0;
+
+            function show(index)
+            {
+                if (!rtuContext.showWarnings
+                    || ((index < 0) || (index >= impl.warnings.length)))
+                {
+                    if (impl.onFinishedCallback)
+                        impl.onFinishedCallback();
+                    return;
+                }
+
+                impl.currentIndex = index;
+                warningDialog.message = impl.warnings[index];
+                warningDialog.show();
+            }
+        }
+    }
+
     function applyChanges()
     {
         var children = settingsColumn.children;
         var childrenCount = children.length;
         var changesCount = 0;
         var entitiesCount = 0;
+
+        var warnings = [];
         for (var i = 0; i !== childrenCount; ++i)
         {
             var child = children[i];
@@ -29,14 +91,30 @@ FocusScope
                 continue;
             ++entitiesCount;
             
-            if (!child.tryApplyChanges())
+            if (!child.tryApplyChanges(warnings))
                 break;
             ++changesCount;
         }
 
         if (changesCount && (changesCount == entitiesCount))
         {
-            rtuContext.changesManager().applyChanges();
+            if (warnings.length)
+            {
+                var finishCallback = function()
+                {
+                    rtuContext.changesManager().applyChanges();
+                };
+
+                var cancelCallback = function()
+                {
+                    rtuContext.changesManager().clearChanges();
+                }
+
+                warningDialog.showWarnings(warnings
+                    , finishCallback, cancelCallback);
+            }
+            else
+                rtuContext.changesManager().applyChanges();
         }
         else
         {

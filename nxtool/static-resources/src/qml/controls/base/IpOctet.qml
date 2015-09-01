@@ -44,7 +44,15 @@ TextInput
     Keys.onPressed:
     {
         if ((event.key === Qt.Key_Backspace) && !length)
+        {
             impl.moveToPrevOctet();
+        }
+        else if ((event.text === '.') && (cursorPosition == length))
+        {
+            if (!text.length)
+                text = "0";
+            impl.moveToNextOctet();
+        }
         else
             event.accepted = false;
     }

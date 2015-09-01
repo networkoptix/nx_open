@@ -17,12 +17,24 @@ Expandable.MaskedSettingsPanel
     extraWarned: !((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
         || (rtuContext.selection.count === 1));
 
-    function tryApplyChanges()
+    function tryApplyChanges(warnings)
     {
         if (!changed)
             return true;
         
         return maskedArea.flaggedItem.currentItem.tryApplyChanges();
+    }
+
+    onMaskedAreaChanged:
+    {
+        if (!warned)
+            return;
+
+        var flagged = maskedArea.flaggedItem;
+        if (!flagged || !flagged.currentItem || !flagged.currentItem.timeZonePickerControl)
+            return;
+
+        flagged.currentItem.timeZonePickerControl.forceActiveFocus();
     }
 
     propertiesGroupName: qsTr("Set Device Date & Time");
@@ -111,9 +123,12 @@ Expandable.MaskedSettingsPanel
                         return true;
                     }
 
+                    property alias timeZonePickerControl: timeZonePicker;
+
                     property bool changed: (timeZonePicker.changed || timePicker.changed
                         || datePicker.changed || useCurrentTimeCheckbox.changed);
     
+                    property bool dontConvertTimeZone: false;
                     verticalItemAlignment: Grid.AlignVCenter;
                     
                     spacing: Common.SizeManager.spacing.base;
@@ -157,36 +172,52 @@ Expandable.MaskedSettingsPanel
     
                         onTimeZoneChanged:
                         {
-                            if (useCurrentTimeCheckbox.checked || !timePicker.acceptableInput
+                            if (dontConvertTimeZone || !timePicker.acceptableInput
                                     || !datePicker.acceptableInput)
                                 return;
                             
                             var prevZoneId = timeZonePicker.model.timeZoneIdByIndex(from);
                             var curZoneId = timeZonePicker.model.timeZoneIdByIndex(to);
+
+                            if (!timeZonePicker.model.isValidValue(from)
+                                || !timeZonePicker.model.isValidValue(to))
+                            {
+                                console.log("Can't change timezone form " + prevZoneId + " to " + curZoneId);
+                                return;
+                            }
+
                             console.log("Chaning timezone from " + prevZoneId + " to " + curZoneId);
                             var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, prevZoneId, curZoneId);
                             datePicker.setDate(dateTime);
                             timePicker.setTime(dateTime, true);
                         }
+
+                        KeyNavigation.tab: datePicker;
                     }
 
                     Row
                     {
                         spacing: Common.SizeManager.spacing.small;
 
-                        Base.DatePicker
+                        Base.DateEdit
                         {
                             id: datePicker;
-
                             initDate: (rtuContext.selection && rtuContext.selection !== null ?
                                 rtuContext.selection.dateTime : new Date());
 
                             enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
                                 && !useCurrentTimeCheckbox.checked;
+
+                            KeyNavigation.tab: selectDateButton;
+                            KeyNavigation.backtab: timeZonePicker;
                         }
 
                         Base.Button
                         {
+                            id: selectDateButton;
+
+                            activeFocusOnTab: true;
+
                             width: datePicker.height;
                             height: datePicker.height;
 
@@ -212,6 +243,9 @@ Expandable.MaskedSettingsPanel
                                 anchors.centerIn: parent;
                                 source: "qrc:/resources/calendar.png";
                             }
+
+                            KeyNavigation.tab: timePicker;
+                            KeyNavigation.backtab: datePicker;
                         }
                     }
 
@@ -223,23 +257,35 @@ Expandable.MaskedSettingsPanel
                             && !useCurrentTimeCheckbox.checked;
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
+
+                        KeyNavigation.tab: useCurrentTimeCheckbox;
+                        KeyNavigation.backtab: selectDateButton;
                     }
                     
                     Base.CheckBox
                     {
                         id: useCurrentTimeCheckbox;
         
+                        activeFocusOnTab: true;
+                        activeFocusOnPress: true;
+
                         text: qsTr("Set current date/time");
                         initialCheckedState: Qt.Unchecked;
                         enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
 
                         onCheckedChanged: 
                         {
+                            dateTimeGrid.dontConvertTimeZone = true;
+
                             if (checked)
                                 timeZonePicker.currentIndex = timeZonePicker.model.currentTimeZoneIndex;
-                            
+                            else
+                                timeZonePicker.currentIndex = timeZonePicker.lastSelectedIndex;
+
                             datePicker.showNow = checked;
                             timePicker.showNow = checked;
+
+                            dateTimeGrid.dontConvertTimeZone = false;
                         }
                     }
                 }
