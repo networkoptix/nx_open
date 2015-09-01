@@ -50,7 +50,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_lastMouseButton(Qt::NoButton)
 {
     ui->setupUi(this);
-    retranslateUi();
 
     setWarningStyle(ui->warningLabel);
 
@@ -97,6 +96,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
         }
         ui->actionComboBox->setModel(m_actionTypesModel);
     }
+
+    retranslateUi();
 
     m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
     m_filterAction->setShortcut(Qt::ControlModifier + Qt::Key_F);
@@ -196,7 +197,7 @@ void QnEventLogDialog::updateData()
         bool serverIssue = QnBusiness::parentEvent(eventType) == QnBusiness::AnyServerEvent || eventType == QnBusiness::AnyServerEvent;
         ui->cameraButton->setEnabled(!serverIssue);
         if (serverIssue)
-            setCameraList(QnResourceList());
+            setCameraList(QnVirtualCameraResourceList());
 
         bool istantOnly = !QnBusiness::hasToggleState(eventType) && eventType != QnBusiness::UndefinedEvent;
         updateActionList(istantOnly);
@@ -254,7 +255,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
         {
             m_requests << mserver->apiConnection()->getEventLogAsync(
                 fromMsec, toMsec,
-                m_filterCameraList,
+                m_filterCameraList.filtered<QnResource>(),
                 eventType,
                 actionType,
                 QnUuid(),
@@ -267,20 +268,22 @@ void QnEventLogDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    const auto resources = [](const QnResourceList &resources) -> QnVirtualCameraResourceList 
-    {
-        QnVirtualCameraResourceList result;
-        for (const auto &resource: resources)
-            result.push_back(resource.dynamicCast<QnVirtualCameraResource>());
-
-        return result;
-    }(m_filterCameraList);
-
-    const QString cameraButtonText = (resources.empty() ?
+    const QString cameraButtonText = (m_filterCameraList.empty() ?
         tr("<Any %1>").arg(getDefaultDeviceNameUpper()) 
-        : tr("<%n %1>", "", resources.count()).arg(getDefaultDevicesName(resources, false)));
+        : lit("<%1>").arg(getNumericDevicesName(m_filterCameraList, false)));
 
     ui->cameraButton->setText(cameraButtonText);
+
+    /// Updates action type combobox model
+    const auto actions = QnBusiness::allActions();
+    for (int row = 0; row != actions.size(); ++row)
+    {
+        const QString actionName = QnBusinessStringsHelper::actionName(actions[row]);
+
+        enum { kStandardItemsBefore = 1 };
+        const auto index = m_actionTypesModel->index(row + kStandardItemsBefore, 0);
+        m_actionTypesModel->setData(index, actionName, Qt::DisplayRole);
+    }
 }
 
 void QnEventLogDialog::updateHeaderWidth()
@@ -414,7 +417,7 @@ void QnEventLogDialog::setDateRange(const QDate& from, const QDate& to)
     ui->dateEditFrom->setDate(from);
 }
 
-void QnEventLogDialog::setCameraList(const QnResourceList &cameras)
+void QnEventLogDialog::setCameraList(const QnVirtualCameraResourceList &cameras)
 {
     if (cameras.size() == m_filterCameraList.size())
     {
@@ -448,7 +451,7 @@ void QnEventLogDialog::at_resetFilterAction_triggered()
 {
     disableUpdateData();
     setEventType(QnBusiness::AnyBusinessEvent);
-    setCameraList(QnResourceList());
+    setCameraList(QnVirtualCameraResourceList());
     setActionType(QnBusiness::UndefinedAction);
     enableUpdateData();
 }
@@ -462,8 +465,8 @@ void QnEventLogDialog::at_filterAction_triggered()
     if (parentEventType != QnBusiness::AnyBusinessEvent && parentEventType != QnBusiness::UndefinedEvent)
         eventType = parentEventType;
 
-    QnSecurityCamResourcePtr cameraResource = m_model->eventResource(idx.row()).dynamicCast<QnSecurityCamResource>();
-    QnResourceList camList;
+    QnVirtualCameraResourceList camList;
+    const auto cameraResource = m_model->eventResource(idx.row()).dynamicCast<QnVirtualCameraResource>();
     if (cameraResource)
         camList << cameraResource;
 
@@ -530,10 +533,10 @@ void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 void QnEventLogDialog::at_cameraButton_clicked()
 {
     QnResourceSelectionDialog dialog(this);
-    dialog.setSelectedResources(m_filterCameraList);
+    dialog.setSelectedResources(m_filterCameraList.filtered<QnResource>());
 
     if (dialog.exec() == QDialog::Accepted)
-        setCameraList(dialog.selectedResources());
+        setCameraList(dialog.selectedResources().filtered<QnVirtualCameraResource>());
 }
 
 void QnEventLogDialog::disableUpdateData()

@@ -82,7 +82,7 @@
      <item>
       <widget class="QLineEdit" name="filterLineEdit">
        <property name="placeholderText">
-        <string notr="true">filter by [CHANGE TO DEVICE TYPE RUNTIME]...</string>
+        <string notr="true">&lt; filter by camera... &gt;</string>
        </property>
       </widget>
      </item>
