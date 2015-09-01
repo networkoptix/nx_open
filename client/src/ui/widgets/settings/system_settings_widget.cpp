@@ -36,8 +36,8 @@ QnSystemSettingsWidget::~QnSystemSettingsWidget() {
 }
 
 void QnSystemSettingsWidget::retranslateUi() {
-    ui->autoDiscoveryCheckBox->setText(tr("Enable %1 and servers auto discovery").arg(getDefaultDevicesName(false)));
-    ui->autoSettingsCheckBox->setText(tr("Allow system to optimize %1 settings").arg(getDefaultDevicesName(false)));
+    ui->autoDiscoveryCheckBox->setText(tr("Enable %1 and servers auto discovery").arg(getDefaultDevicesName(true, false)));
+    ui->autoSettingsCheckBox->setText(tr("Allow system to optimize %1 settings").arg(getDefaultDevicesName(true, false)));
 }
 
 

@@ -277,7 +277,7 @@ void QnEventLogDialog::retranslateUi()
     }(m_filterCameraList);
 
     const QString cameraButtonText = (resources.empty() ?
-        tr("<Any %1>").arg(getDefaultDevicesName(false, false)) 
+        tr("<Any %1>").arg(getDefaultDeviceNameUpper()) 
         : tr("<%n %1>", "", resources.count()).arg(getDefaultDevicesName(resources, false)));
 
     ui->cameraButton->setText(cameraButtonText);

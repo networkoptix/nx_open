@@ -24,8 +24,7 @@ QString getDefaultDevicesName(bool plural = true, bool capitalize = true);
  * * If all devices in the list are cameras - "Cameras";
  * * If all devices in the list are IO modules - "IO Modules";
  * * Otherwise "Devices" is used;
- * @param plural        Should the word be in the plural form, default value is true.
- * @param capitalize    Should the word begin from the capital letter, default value is true.
+  * @param capitalize    Should the word begin from the capital letter, default value is true.
  */
 QString getDefaultDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize = true);
 

@@ -447,7 +447,7 @@ void QnBusinessRulesDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    const QString deviceName = getDefaultDevicesName(false, false);
+    const QString deviceName = getDefaultDevicesName(true, false);
     ui->filterLineEdit->setPlaceholderText(tr("filter by %1...").arg(deviceName));
 }
 

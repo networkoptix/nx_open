@@ -215,8 +215,8 @@ bool QnServerSettingsWidget::hasChanges() const {
 }
 
 void QnServerSettingsWidget::retranslateUi() {
-    ui->failoverCheckBox->setText(tr("Enable failover (server will take %1 automatically from offline servers)").arg(getDefaultDevicesName(false)));
-    ui->maxCamerasLabel->setText(tr("Max. %1 on this server:").arg(getDefaultDevicesName(false)));
+    ui->failoverCheckBox->setText(tr("Enable failover (server will take %1 automatically from offline servers)").arg(getDefaultDevicesName(true, false)));
+    ui->maxCamerasLabel->setText(tr("Max. %1 on this server:").arg(getDefaultDevicesName(true, false)));
     updateFailoverLabel();
 }
 
