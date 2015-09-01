@@ -104,10 +104,10 @@ void QnCameraDiagnosticsDialog::updateTexts() {
     
     //: %1 - will be substituted by type of device ("camera", "io module", etc..); %2 - will be substituted by model of device; Example: "Diagnostics for camera X1323"
     const QString titleLabelText = tr("Diagnostics for %1 %2.");
-    ui->titleLabel->setText(titleLabelText.arg(getDevicesName(QnVirtualCameraResourceList() << m_resource, false)).arg(getResourceName(m_resource)));
+    ui->titleLabel->setText(titleLabelText.arg(getDefaultDevicesName(m_resource, false)).arg(getResourceName(m_resource)));
 
     //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..); Example: "IO Module Diagnostics"
-    setWindowTitle(tr("%1 Diagnostics").arg(getDevicesName(QnVirtualCameraResourceList() << m_resource)));
+    setWindowTitle(tr("%1 Diagnostics").arg(getDefaultDevicesName(m_resource)));
 }
 
 void QnCameraDiagnosticsDialog::updateOkButtonEnabled() {
@@ -123,9 +123,9 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
-        return tr("Confirming %1 is accessible.").arg(getDevicesName(QnVirtualCameraResourceList() << m_resource, false));
+        return tr("Confirming %1 is accessible.").arg(getDefaultDevicesName(m_resource, false));
     case CameraDiagnostics::Step::mediaStreamAvailability:
-        return tr("Confirming target %1 provides media stream.").arg(getDevicesName(QnVirtualCameraResourceList() << m_resource, false));
+        return tr("Confirming target %1 provides media stream.").arg(getDefaultDevicesName(m_resource, false));
     case CameraDiagnostics::Step::mediaStreamIntegrity: 
         return tr("Evaluating media stream for errors.");
     default:

@@ -33,8 +33,8 @@ namespace {
     QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool detailed, const QString &baseText, int invalid) {
         if (cameras.isEmpty())
             return CheckingPolicy::emptyListIsValid()
-                    ? tr("<Any %1>").arg(getDefaultDevicesName(false))
-                    : tr("Select at least one %1.").arg(getDefaultDevicesName(false, false));
+                    ? tr("<Any %1>").arg(getDefaultDeviceNameUpper())
+                    : tr("Select at least one %1.").arg(getDefaultDeviceNameLower());
 
         if (detailed && invalid > 0)
             return baseText.arg(

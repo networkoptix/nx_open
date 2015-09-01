@@ -18,8 +18,12 @@ inline QString getShortResourceName(const QnResourcePtr& resource) { return getF
  */
 QString getDefaultDevicesName(bool plural = true, bool capitalize = true);
 
-inline QString getDefaultDevicesNameLower(bool plural = true) {
-    return getDefaultDevicesName(plural);
+inline QString getDefaultDeviceNameLower() {
+    return getDefaultDevicesName(false, false);
+}
+
+inline QString getDefaultDeviceNameUpper() {
+    return getDefaultDevicesName(false, true);
 }
 
 /**
