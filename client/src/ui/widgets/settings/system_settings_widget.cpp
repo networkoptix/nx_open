@@ -104,7 +104,6 @@ bool QnSystemSettingsWidget::hasChanges() const  {
     if (ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed)
         return true;
 
-    bool auditLogAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
     if (ui->auditTrailCheckBox->isChecked() != settings->isAuditTrailEnabled())
         return true;
 
