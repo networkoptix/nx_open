@@ -107,33 +107,16 @@ bool QnFileStorageResource::initOrUpdate() const
     if (m_dirty)
     {
         m_dirty = false;
-#ifndef _WIN32
-        if (m_firstCall)
-        {
-            m_firstCall = false;
-            removeOldDirs();
-        }
-#endif
-
         if (getUrl().contains("://"))
         {
-#ifndef _WIN32
             if (mountTmpDrive() != 0)
                 return false;
+#ifndef _WIN32
             if (!m_localPath.isEmpty() && m_storageManager)
                 m_storageManager->addLocalPathInUse(m_localPath);
-#else
-            if (!mountTmpDrive())
-                return false;
 #endif
         }
     }
-
-#ifdef _WIN32
-    if (!updatePermissions())
-        return false;
-#endif
-
     return true;
 }
 
@@ -231,7 +214,7 @@ QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
 }
 
 #ifndef _WIN32
-void QnFileStorageResource::removeOldDirs() const
+void QnFileStorageResource::removeOldDirs()
 {
     QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(
         QStringList() << (lit("*") + NX_TEMP_FOLDER_NAME + lit("*")),
@@ -348,7 +331,7 @@ bool QnFileStorageResource::mountTmpDrive() const
         storageUrl.host() + 
         storageUrl.path().replace(lit("/"), lit("\\"));
 
-    if (!updatePermissons_2())
+    if (!updatePermissons())
         return false;
 
     m_localPath = path;
@@ -435,7 +418,7 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 qint64 QnFileStorageResource::getFreeSpace()
 {
     if (!initOrUpdate())
-        return 0;
+        return -1;
 
     return getDiskFreeSpace(
         m_localPath.isEmpty() ?
@@ -447,7 +430,7 @@ qint64 QnFileStorageResource::getFreeSpace()
 qint64 QnFileStorageResource::getTotalSpace()
 {
     if (!initOrUpdate())
-        return 0;
+        return -1;
 
     return getDiskTotalSpace(
         m_localPath.isEmpty() ?
@@ -486,7 +469,7 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
 qint64 QnFileStorageResource::getFileSize(const QString& url) const
 {
     if (!initOrUpdate())
-        return 0;
+        return -1;
 
     return QnFile::getFileSize(translateUrlToLocal(url));
 }

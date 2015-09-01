@@ -1477,6 +1477,15 @@ QHostAddress MediaServerProcess::getPublicAddress()
 
 void MediaServerProcess::run()
 {
+
+#ifndef _WIN32
+    if (QnFileStorageResource::m_firstCall)
+    {
+        QnFileStorageResource::m_firstCall = false;
+        QnFileStorageResource::removeOldDirs();
+    }
+#endif
+
 #ifdef _WIN32
     win32_exception::setCreateFullCrashDump( MSSettings::roSettings()->value(
         nx_ms_conf::CREATE_FULL_CRASH_DUMP,

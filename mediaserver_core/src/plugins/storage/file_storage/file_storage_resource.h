@@ -69,11 +69,11 @@ private:
     // returns not 0 if something went wrong, 0 otherwise
     int mountTmpDrive() const;
 
+public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
     // was not called.
-    void removeOldDirs() const;
-
+    static void removeOldDirs();
     // Try to remove old dirs only once, when the first
     // file storage resource constructor is called.
     static std::atomic<bool> m_firstCall;
