@@ -42,6 +42,7 @@ static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
 {
     80,
     8032, // DW default port
+    50080, // NEW DW cam default port
     9988 // Dahui default port
 };
 

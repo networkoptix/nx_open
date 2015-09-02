@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <client/client_color_types.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
@@ -19,6 +21,7 @@ class QnCheckBoxedHeaderView;
 
 class QnUserManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
+    Q_PROPERTY(QnUserManagementColors colors READ colors WRITE setColors)
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 
 public:
@@ -26,6 +29,9 @@ public:
     ~QnUserManagementWidget();
 
     virtual void updateFromSettings() override;
+
+    const QnUserManagementColors colors() const;
+    void setColors(const QnUserManagementColors &colors);
 private:
     void at_usersTable_activated(const QModelIndex &index);
     void at_usersTable_clicked(const QModelIndex &index);
@@ -52,4 +58,5 @@ private:
     QnUserListModel *m_usersModel;
     QnSortedUserListModel *m_sortModel;
     QnCheckBoxedHeaderView* m_header;
+    QnUserManagementColors m_colors;
 };

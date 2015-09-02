@@ -5,6 +5,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QKeyEvent>
 
+#include <core/resource/resource_name.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/event_processors.h>
@@ -24,10 +25,6 @@
 namespace Qn {
     const quint64 ExcludingOwnerPermission = GlobalOwnerPermissions & ~GlobalAdminPermissions;
     const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
-}
-
-namespace {
-    const QString defaultPlaceholder(6, L'*');
 }
 
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent): 
@@ -231,7 +228,6 @@ void QnUserSettingsDialog::updateFromResource() {
 
         loadAccessRightsToUi(accessController()->globalPermissions(m_user));
     }
-    updatePlaceholders();
     updateLogin();
     updatePassword();
 
@@ -511,7 +507,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
         previous = createAccessRightCheckBox(tr("Administrator"),
                      Qn::ExcludingAdminPermission,
                      previous);
-    previous = createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission, previous);
+    previous = createAccessRightCheckBox(tr("Can adjust %1 settings").arg(getDefaultDevicesName(true, false)), Qn::GlobalEditCamerasPermission, previous);
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
@@ -586,21 +582,6 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
         widget = widget->parentWidget();
     }
     updateSizeLimits();
-}
-
-void QnUserSettingsDialog::updatePlaceholders() {
-
-    bool showPlaceholder = m_mode == Mode::OwnUser;
-
-    QString placeholder = showPlaceholder 
-        ? defaultPlaceholder 
-        : QString();
-
-    ui->currentPasswordEdit->clear();
-    ui->passwordEdit->clear();
-    ui->passwordEdit->setPlaceholderText(placeholder);
-    ui->confirmPasswordEdit->clear();
-    ui->confirmPasswordEdit->setPlaceholderText(placeholder);
 }
 
 // Utility functions

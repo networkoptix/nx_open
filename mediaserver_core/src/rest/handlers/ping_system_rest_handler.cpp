@@ -82,7 +82,7 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
         /* Warn that some of the licenses will be deactivated. */
         QnLicenseListHelper remoteHelper(remoteLicensesList);
-        if (remoteHelper.totalLicenseByType(Qn::LC_Start) > 0)
+        if (remoteHelper.totalLicenseByType(Qn::LC_Start, true) > 0)
             result.setError(QnJsonRestResult::CantProcessRequest, lit("STARTER_LICENSE_ERROR"));
     }
 

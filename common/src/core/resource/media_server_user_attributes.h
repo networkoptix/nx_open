@@ -8,6 +8,7 @@
 
 #include <utils/common/singleton.h>
 
+#include <utils/common/model_functions_fwd.h>
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/resource_fwd.h>
 
@@ -22,6 +23,8 @@ public:
     QnMediaServerUserAttributes();
     void assign( const QnMediaServerUserAttributes& right, QSet<QByteArray>* const modifiedFields );
 };
+#define QnMediaServerUserAttributes_Fields (serverID)(maxCameras)(isRedundancyEnabled)(name)
+QN_FUSION_DECLARE_FUNCTIONS(QnMediaServerUserAttributes, (eq))
 
 Q_DECLARE_METATYPE(QnMediaServerUserAttributes)
 Q_DECLARE_METATYPE(QnMediaServerUserAttributesPtr)

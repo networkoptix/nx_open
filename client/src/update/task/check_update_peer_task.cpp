@@ -240,7 +240,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
 
     reply->deleteLater();
 
-    if (reply->isFailed()) {
+    if (reply->isFailed()  || (reply->response().statusLine.statusCode != nx_http::StatusCode::ok)) {
         NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.").arg(reply->url().toString()), cl_logDEBUG2);
 
         if (!tryNextServer())

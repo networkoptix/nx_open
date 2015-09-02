@@ -5,6 +5,9 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QtMath>
 
+#include <core/resource/resource_name.h>
+#include <core/resource/camera_resource.h>
+
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/animation/opacity_animator.h>
@@ -46,13 +49,16 @@ namespace {
 } // anonymous namespace
 
 
-QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::WindowFlags windowFlags)
+QnStatusOverlayWidget::QnStatusOverlayWidget(const QnResourcePtr &resource, QGraphicsWidget *parent, Qt::WindowFlags windowFlags)
     : base_type(parent, windowFlags)
+    , m_resource(resource)
     , m_statusOverlay(Qn::EmptyOverlay)
     , m_buttonType(NoButton)
     , m_button(new QnTextButtonWidget(this))
 {
     setAcceptedMouseButtons(0);
+
+    QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
     /* Init static text. */
     m_staticFont.setPointSizeF(staticFontSize);
@@ -62,7 +68,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[OfflineText] = tr("NO SIGNAL");
     m_staticTexts[ServerOfflineText] = tr("Server Offline");
     m_staticTexts[UnauthorizedText] = tr("Unauthorized");
-    m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information in camera settings");
+    m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information in %1 settings").arg(getDefaultDeviceNameLower(camera));
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
     m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");
@@ -79,6 +85,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_button->setObjectName(lit("statusOverlayButton"));
     m_button->setFrameShape(Qn::RectangularFrame);
     m_button->setRelativeFrameWidth(1.0 / 16.0);
+    m_button->setOpacity(0);
     m_button->setStateOpacity(0, 0.4);
     m_button->setStateOpacity(QnImageButtonWidget::Hovered, 0.7);
     m_button->setStateOpacity(QnImageButtonWidget::Pressed, 1.0);
@@ -132,6 +139,24 @@ void QnStatusOverlayWidget::updateLayout() {
     m_button->setGeometry(QRectF(rect.center() - toPoint(size) / 2.0 + QPointF(0.0, point * 4.0), size));
 }
 
+void QnStatusOverlayWidget::setButtonVisible(bool visible
+    , bool animate)
+{
+    static const char kVisiblePropertyName[] = "isVisible";
+    const bool currentVisible = m_button->property(kVisiblePropertyName).toBool();
+
+    if (currentVisible == visible) 
+        return;
+
+    m_button->setProperty(kVisiblePropertyName, visible);
+
+    const qreal buttonOpacity = (visible ? 1.0 : 0.0);
+    if (animate)
+        opacityAnimator(m_button)->animateTo(buttonOpacity);
+    else
+        m_button->setOpacity(buttonOpacity);
+}
+
 void QnStatusOverlayWidget::updateButtonOpacity(bool animate) {
     bool visible = false;
 
@@ -147,14 +172,7 @@ void QnStatusOverlayWidget::updateButtonOpacity(bool animate) {
         break;
     }
 
-    qreal buttonOpacity = visible ? 1.0 : 0.0;
-
-    if (!qFuzzyEquals(buttonOpacity, m_button->opacity())) {
-        if (animate)
-            opacityAnimator(m_button)->animateTo(buttonOpacity);
-        else
-            m_button->setOpacity(buttonOpacity);
-    }
+    setButtonVisible(visible, animate);
 }
 
 void QnStatusOverlayWidget::updateButtonText() {

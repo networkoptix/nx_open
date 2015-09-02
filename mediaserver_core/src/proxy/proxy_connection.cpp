@@ -50,7 +50,7 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
 
 QnProxyConnectionProcessor::~QnProxyConnectionProcessor()
 {
-	pleaseStop();
+    pleaseStop();
     stop();
 }
 
@@ -122,6 +122,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             tran.params.socketCount = socketCount;
             qnTransactionBus->sendTransaction(tran, target);
         });
+    } else {
+        d->dstSocket.clear();
     }
 
     if (!d->dstSocket) {
@@ -327,13 +329,13 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
 
 void QnProxyConnectionProcessor::pleaseStop()
 {
-	Q_D(QnProxyConnectionProcessor);
+    Q_D(QnProxyConnectionProcessor);
 
-	QnTCPConnectionProcessor::pleaseStop();
-	if (d->socket)
-		d->socket->close();
-	if (d->dstSocket)
-		d->dstSocket->close();
+    QnTCPConnectionProcessor::pleaseStop();
+    if (d->socket)
+        d->socket->close();
+    if (d->dstSocket)
+        d->dstSocket->close();
 }
 
 void QnProxyConnectionProcessor::run()

@@ -3,6 +3,7 @@
 
 #include "utils/network/tcp_connection_processor.h"
 #include "universal_tcp_listener.h"
+#include "authenticate_helper.h"
 
 class QnUniversalRequestProcessorPrivate;
 
@@ -18,7 +19,7 @@ public:
 
     virtual ~QnUniversalRequestProcessor();
 
-    static void setUnauthorizedPageBody(const QByteArray& value);
+    static void setUnauthorizedPageBody(const QByteArray& value, AuthMethod::Values methods);
     static QByteArray unauthorizedPageBody();
 
 protected:

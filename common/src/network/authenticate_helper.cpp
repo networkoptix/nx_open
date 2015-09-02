@@ -156,6 +156,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
         if( authorization.isEmpty() )
         {
             Qn::AuthResult authResult = Qn::Auth_WrongDigest;
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::httpDigest;
             QnUserResourcePtr userResource;
             if( !nxUserName.isEmpty() )
             {
@@ -231,7 +233,14 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             }
 
             if( userResource->getDigest().isEmpty() )
+            {
+                if (userResource->isLdap())
+                    nx_http::insertOrReplaceHeader(
+                        &response.headers,
+                        nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
+
                 return Qn::Auth_WrongDigest;   //user has no password yet
+            }
         }
 
         nx_http::StringType authType;
@@ -273,7 +282,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             //saving new user's digest
             applyClientCalculatedPasswordHashToResource( userResource, userDigestData );
         }
-        else if( userResource && userResource->isLdap() )
+        else if(  userResource && userResource->isLdap() )
         {
             //password has been changed in active directory? Requesting new digest...
             nx_http::insertOrReplaceHeader(

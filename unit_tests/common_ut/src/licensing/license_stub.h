@@ -20,4 +20,11 @@ private:
     bool m_armServer;
 };
 
+class QnFutureLicenseStub: public QnLicense {
+public:
+    QnFutureLicenseStub(int count);
+
+    virtual bool isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const;
+};
+
 #endif //QN_LICENSE_STUB_H

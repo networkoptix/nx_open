@@ -114,6 +114,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
 
+    /* Initialize resource. */
+    m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
+
     /* Set up frame. */
     setFrameWidth(0.0);
 
@@ -131,7 +135,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     createCustomOverlays();
 
     /* Status overlay. */
-    m_statusOverlayWidget = new QnStatusOverlayWidget(this);
+    m_statusOverlayWidget = new QnStatusOverlayWidget(m_resource, this);
     addOverlayWidget(m_statusOverlayWidget, UserVisible, true, false, StatusLayer);
 
 
@@ -296,7 +300,6 @@ void QnResourceWidget::createFooterOverlay() {
             m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
             lowerLayout->addStretch(0x1000);
-
             m_footerRightLabel = new GraphicsLabel();
             lowerLayout->addItem(m_footerRightLabel);
             m_footerRightLabel->setAcceptedMouseButtons(0);

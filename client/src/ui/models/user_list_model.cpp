@@ -1,7 +1,9 @@
 #include "user_list_model.h"
 
 #include <core/resource/user_resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
+
 #include <common/user_permissions.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -17,6 +19,7 @@ public:
 
     QnUserResourceList userList;
     QSet<QnUserResourcePtr> checkedUsers;
+    QnUserManagementColors colors;
 
     QnUserListModelPrivate(QnUserListModel *parent)
         : base_type(parent)
@@ -124,7 +127,7 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user)
     if ((permissions & Qn::GlobalViewLivePermission) && permissionStrings.isEmpty())
         permissionStrings.append(tr("View live video"));
     if (permissions & Qn::GlobalEditCamerasPermission)
-        permissionStrings.append(tr("Adjust camera settings"));
+        permissionStrings.append(tr("Adjust %1 settings").arg(getDefaultDeviceNameLower()));
     if (permissions & Qn::GlobalPtzControlPermission)
         permissionStrings.append(tr("Use PTZ controls"));
     if (permissions & Qn::GlobalViewArchivePermission)
@@ -230,24 +233,37 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
     case Qt::DecorationRole:
         switch (index.column()) {
         case EditIconColumn:
-            return qnSkin->icon("/edit.png");
+            return qnSkin->icon("edit.png");
         case LdapColumn:
             if (user->isLdap())
-                return qnSkin->icon("/done.png");
+                return qnSkin->icon("done.png");
             break;
         case EnabledColumn:
             if (user->isEnabled())
-                return qnSkin->icon("/done.png");
+                return qnSkin->icon("done.png");
             break;
         default:
             break;
         }
         break;
     case Qt::ForegroundRole:
-        if (!user->isEnabled())
+        /* Always use default color for checkboxes. */
+        if (index.column() == CheckBoxColumn)
+            return QVariant();
+        /* Gray out disabled users. */
+        if (!user->isEnabled()) {
+            /* Highlighted users are brighter. */
+            if (d->checkedUsers.contains(user))
+                return d->colors.disabledSelectedText;
             return qApp->palette().color(QPalette::Disabled, QPalette::Text);
+        }
+        /* Highlight conflicting users. */
         if (user->isLdap() && !d->isUnique(user))
             return qnGlobals->errorTextColor();
+        break;
+    case Qt::BackgroundRole:
+        if (d->checkedUsers.contains(user))
+            return qApp->palette().color(QPalette::Highlight);
         break;
     case Qn::UserResourceRole:
         return QVariant::fromValue(user);
@@ -313,16 +329,28 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
     if (state == Qt::PartiallyChecked)
         return;
 
+    auto roles = QVector<int>() << Qt::CheckStateRole << Qt::BackgroundRole << Qt::ForegroundRole;
+
     d->setCheckState(state, user);  
     if (!user) {
-        emit dataChanged(index(0, CheckBoxColumn), index(d->userList.size() - 1, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
+        emit dataChanged(index(0, CheckBoxColumn), index(d->userList.size() - 1, ColumnCount - 1), roles);
     }
     else {
         auto row = d->userIndex(user->getId());
         if (row >= 0)
-            emit dataChanged(index(row, CheckBoxColumn), index(row, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
+            emit dataChanged(index(row, CheckBoxColumn), index(row, ColumnCount - 1), roles);
     }
         
+}
+
+const QnUserManagementColors QnUserListModel::colors() const {
+    return d->colors;
+}
+
+void QnUserListModel::setColors(const QnUserManagementColors &colors) {
+    beginResetModel();
+    d->colors = colors;
+    endResetModel();
 }
 
 QnSortedUserListModel::QnSortedUserListModel(QObject *parent)

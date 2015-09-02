@@ -106,7 +106,8 @@
         },
         {
             "keys": [
-                "ACTI|V32"
+                "ACTI|V32",
+                "ACTi Corporation|V32"
             ],
             "forceONVIF": true
         },
@@ -160,6 +161,13 @@
                 "VISTA|*"
             ],
             "forceArFromPrimaryStream": true
+        },
+        {
+            "keys": [
+                "ACTi|V32"
+            ],
+            "defaultAR": "16x9",
+            "ptzTraits": "EightWayPtz"
         },
         {
             "keys": [

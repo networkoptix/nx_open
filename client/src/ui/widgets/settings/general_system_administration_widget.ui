@@ -69,7 +69,7 @@
       <item row="4" column="0">
        <widget class="QPushButton" name="cameraListButton">
         <property name="text">
-         <string>&amp;Camera List</string>
+         <string notr="true">Camera/Devices List</string>
         </property>
         <property name="shortcut">
          <string>Ctrl+M</string>

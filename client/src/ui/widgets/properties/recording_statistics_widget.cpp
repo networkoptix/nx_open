@@ -377,9 +377,8 @@ void QnRecordingStatisticsWidget::requestFinished()
             m_hiddenCameras << camera;
     }
     m_model->setModelData(existsCameras);
-    at_forecastParamsChanged();
-
     ui->gridEvents->setDisabled(false);
+    at_forecastParamsChanged();
     setCursor(Qt::ArrowCursor);
     ui->loadingProgressBar->hide();
 }
