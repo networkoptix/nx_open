@@ -253,7 +253,7 @@ bool CloudDBProcess::initializeDB( nx::db::DBManager* const dbManager )
             std::chrono::seconds(DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC));
     }
 
-    if (!tuneDB(dbManager))
+    if (!configureDB(dbManager))
     {
         NX_LOG("Failed to tune DB", cl_logALWAYS);
         return false;
@@ -268,7 +268,7 @@ bool CloudDBProcess::initializeDB( nx::db::DBManager* const dbManager )
     return true;
 }
 
-bool CloudDBProcess::tuneDB( nx::db::DBManager* const dbManager )
+bool CloudDBProcess::configureDB( nx::db::DBManager* const dbManager )
 {
     if( dbManager->connectionOptions().driverName != lit("QSQLITE") )
         return true;
@@ -283,12 +283,20 @@ bool CloudDBProcess::tuneDB( nx::db::DBManager* const dbManager )
             QSqlQuery enableWalQuery(*connection);
             enableWalQuery.prepare("PRAGMA journal_mode = WAL");
             if (!enableWalQuery.exec())
+            {
+                NX_LOG(lit("sqlite configure. Failed to enable WAL mode. %1").
+                    arg(connection->lastError().text()), cl_logWARNING);
                 return nx::db::DBResult::ioError;
+            }
 
             QSqlQuery enableFKQuery(*connection);
             enableFKQuery.prepare("PRAGMA foreign_keys = ON");
             if (!enableFKQuery.exec())
+            {
+                NX_LOG(lit("sqlite configure. Failed to enable foreign keys. %1").
+                    arg(connection->lastError().text()), cl_logWARNING);
                 return nx::db::DBResult::ioError;
+            }
 
             return nx::db::DBResult::ok;
         },
