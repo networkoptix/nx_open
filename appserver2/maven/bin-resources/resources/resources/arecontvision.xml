@@ -66,6 +66,19 @@
         <resource name = "2215" public = "2115"/>
         <resource name = "2216" public = "2215"/>
         <resource name = "5215" public = "5115"/>
-        
+        <resource name = "3556" public = "3100">
+            <params>
+                <param name = "MaxFPS" default_value = "21"/>
+            </params>
+        </resource>
+        <resource name = "3555" public = "3556"/>        
+        <resource name = "2555" public = "2115">
+            <params>
+                <param name = "MaxFPS" default_value = "30"/>
+                <param name = "MaxSensorHeight" default_value ="1080"/>
+            </params>
+        </resource>
+        <resource name = "2556" public = "2555"/>
+        <resource name = "5555" public = "5115"/>
     </oem>
 </resources>
