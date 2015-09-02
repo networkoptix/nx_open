@@ -131,6 +131,7 @@ public:
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
+class QnFfmpegVideoTranscoder;
 
 //!Multiplexes one or more raw media streams into container format. Can apply transcoding to input media streams
 /*
@@ -223,6 +224,8 @@ public:
         QnCodecParams::Value* const params = NULL );
 
     void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
+
+    void setUseRealTimeOptimization(bool value);
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -233,7 +236,7 @@ protected:
 
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) = 0;
 
-    QnVideoTranscoderPtr m_vTranscoder;
+    QSharedPointer<QnFfmpegVideoTranscoder> m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
     CodecID m_videoCodec;
     CodecID m_audioCodec;
@@ -242,7 +245,6 @@ protected:
     QnByteArray m_internalBuffer;
     QVector<int> m_outputPacketSize;
     qint64 m_firstTime;
-
 protected:
     bool m_initialized;
 private:
@@ -252,6 +254,7 @@ private:
     int m_eofCounter;
     bool m_packetizedMode;
     QnImageFilterHelper m_extraTranscodeParams;
+    bool m_useRealTimeOptimization;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;

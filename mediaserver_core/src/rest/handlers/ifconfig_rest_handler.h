@@ -7,8 +7,12 @@
 class QnIfConfigRestHandler : public QnJsonRestHandler {
     Q_OBJECT
 public:
+    QnIfConfigRestHandler();
+
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
+    bool m_modified;
+
     bool checkData(const QnNetworkAddressEntryList& newSettings, QString* errString);
     virtual void afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
 };

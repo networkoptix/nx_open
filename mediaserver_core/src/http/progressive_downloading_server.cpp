@@ -321,6 +321,7 @@ public:
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
 static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
+static const QLatin1String RT_OPTIMIZATION_PARAM_NAME( "rt" ); // realtime transcode optimization
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
@@ -477,7 +478,6 @@ void QnProgressiveDownloadingConsumer::run()
         Qn::StreamQuality quality = Qn::QualityNormal;
         if( decodedUrlQuery.hasQueryItem(QnCodecParams::quality) )
             quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::QualityNotDefined);
-
         QnCodecParams::Value codecParams;
         QList<QPair<QString, QString> > queryItems = decodedUrlQuery.queryItems();
         for( QList<QPair<QString, QString> >::const_iterator
@@ -540,6 +540,11 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
+        
+        const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
+        if (rtOptimization && MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
+            d->transcoder.setUseRealTimeOptimization(true);
+
 
         QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
