@@ -23,6 +23,7 @@
 #include "recorder/storage_manager.h"
 #include "http/custom_headers.h"
 #include "rest/server/rest_connection_processor.h"
+#include <rest/helpers/chunks_request_helper.h>
 #include "utils/network/tcp_listener.h"
 
 namespace {
@@ -98,9 +99,7 @@ void QnMultiserverChunksRestHandler::loadLocalData(MultiServerPeriodDataList& ou
 {
     MultiServerPeriodData record;
     record.guid = qnCommon->moduleGUID();
-    record.periods = qnStorageMan->getRecordedPeriods(ctx->request.resList, ctx->request.startTimeMs, ctx->request.endTimeMs, ctx->request.detailLevel,
-        QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog,
-        ctx->request.limit);
+    record.periods = QnChunksRequestHelper::load(ctx->request);
 
     if (!record.periods.empty()) {
         QnMutexLocker lock(&ctx->mutex);
