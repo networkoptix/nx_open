@@ -1027,7 +1027,7 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const 
             if (newValue.outputName != currentValue.outputName)
                 changedParams.insert(paramNamePrefix + lit("Output.Name"), newValue.outputName);
             if (newValue.oDefaultState != currentValue.oDefaultState)
-                changedParams.insert(paramNamePrefix + lit("Output.Trig"), newValue.oDefaultState == Qn::IO_OpenCircuit ? lit("closed") : lit("open"));
+                changedParams.insert(paramNamePrefix + lit("Output.Active"), newValue.oDefaultState == Qn::IO_OpenCircuit ? lit("closed") : lit("open"));
 
             if (newValue.autoResetTimeoutMs != currentValue.autoResetTimeoutMs)
                 changedParams.insert(paramNamePrefix + lit("Output.PulseTime"), QString::number(newValue.autoResetTimeoutMs));

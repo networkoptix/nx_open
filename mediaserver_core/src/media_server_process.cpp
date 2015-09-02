@@ -220,7 +220,6 @@ static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
 static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
-static const QByteArray DISABLE_FFMPEG_OPTIMIZATION("disableFfmpegOptimization");
 
 class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
@@ -399,9 +398,6 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 void ffmpegInit()
 {
-    if (MSSettings::roSettings()->value(DISABLE_FFMPEG_OPTIMIZATION, false).toBool())
-        QnFfmpegVideoTranscoder::isOptimizationDisabled = true;
-
     //avcodec_init();
     av_register_all();
 
@@ -1425,7 +1421,7 @@ bool MediaServerProcess::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
-    AuthMethod::Values methods = AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam;
+    AuthMethod::Values methods = (AuthMethod::Values)(AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
@@ -1479,6 +1475,9 @@ QHostAddress MediaServerProcess::getPublicAddress()
 
 void MediaServerProcess::run()
 {
+
+    QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
+
 #ifdef _WIN32
     win32_exception::setCreateFullCrashDump( MSSettings::roSettings()->value(
         nx_ms_conf::CREATE_FULL_CRASH_DUMP,

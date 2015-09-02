@@ -4,12 +4,16 @@
 #include <atomic>
 #include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
+#include <utils/common/app_info.h>
+
 
 /*
 * QnFileStorageResource uses custom implemented IO access
 */
 
 class QnStorageManager;
+
+const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
 
 class QnFileStorageResource: public QnStorageResource
 {
@@ -48,6 +52,7 @@ public:
 private:
     virtual QString getPath() const override;
     QString removeProtocolPrefix(const QString& url);
+    bool initOrUpdate() const;
     bool updatePermissions() const;
     bool checkWriteCap() const;
     bool isStorageDirMounted() const;
@@ -59,33 +64,26 @@ private:
     QString translateUrlToLocal(const QString &url) const;
     QString translateUrlToRemote(const QString &url) const;
 
-#ifndef _WIN32
     // mounts network (smb) folder to temporary local path
     // returns not 0 if something went wrong, 0 otherwise
-    int mountTmpDrive(const QString &remoteUrl);
+    int mountTmpDrive() const;
 
+public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
     // was not called.
-    void removeOldDirs();
-
-    // Try to remove old dirs only once, when the first
-    // file storage resource constructor is called.
-    static std::atomic<bool> m_firstCall;
-#else
-    bool mountTmpDrive(const QString &url) const;
-#endif
+    static void removeOldDirs();
 
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
     float m_storageBitrateCoeff;
-    mutable bool m_durty;
+    mutable bool m_dirty;
+    mutable bool m_valid;
 
 private:
     mutable QMutex      m_mutexPermission;
     mutable int         m_capabilities;
     mutable QString     m_localPath;
-    bool                m_valid;
     QnStorageManager    *m_storageManager;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;

@@ -29,7 +29,8 @@
             "keys": [
                 "DW|*"
             ],
-            "bitratePerGOP": true
+            "bitratePerGOP": true,
+            "defaultCredentials" : "admin:admin"
         },
 
         {
