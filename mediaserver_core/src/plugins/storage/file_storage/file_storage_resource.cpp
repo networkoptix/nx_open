@@ -107,12 +107,9 @@ bool QnFileStorageResource::initOrUpdate() const
     {
         m_dirty = false;
         if (getUrl().contains("://"))
-        {
-            if (mountTmpDrive() != 0)
-                m_valid = false;
-            else
-                m_valid = true;
-        }
+            m_valid = mountTmpDrive() == 0; // true if no error code
+        else
+            m_valid = true;
     }
     return m_valid;
 }

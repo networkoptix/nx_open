@@ -175,6 +175,7 @@ private:
     mutable QMutex m_mutexCatalog;
     mutable QMutex m_mutexRebuild;
     mutable QMutex m_rebuildStateMtx;
+    mutable QMutex m_localPatches;
 
     QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storagesStatisticsReady;
