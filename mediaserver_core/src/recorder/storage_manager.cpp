@@ -279,7 +279,7 @@ QnStorageManager::QnStorageManager():
 void QnStorageManager::getCurrentlyUsedLocalPathes(QList<QString> *pathList) const
 {
     assert(pathList);
-    QMutexLocker lock(&m_localPatches);
+    QnMutexLocker lock(&m_localPatches);
     for (const auto &entry: m_localPathsInUse)
         pathList->append(entry);
 }
@@ -287,13 +287,13 @@ void QnStorageManager::getCurrentlyUsedLocalPathes(QList<QString> *pathList) con
 
 void QnStorageManager::addLocalPathInUse(const QString &path)
 {
-    QMutexLocker lock(&m_localPatches);
+    QnMutexLocker lock(&m_localPatches);
     m_localPathsInUse.append(path);
 }
 
 void QnStorageManager::removeFromLocalPathInUse(const QString &path)
 {
-    QMutexLocker lock(&m_localPatches);
+    QnMutexLocker lock(&m_localPatches);
     m_localPathsInUse.removeAll(path);
 }
 
