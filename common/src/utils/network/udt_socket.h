@@ -133,9 +133,9 @@ public:
 
 protected:
     //!Implementation of AbstractSocket::postImpl
-    virtual bool postImpl( std::function<void()>&& handler ) override;
+    virtual void postImpl( std::function<void()>&& handler ) override;
     //!Implementation of AbstractSocket::dispatchImpl
-    virtual bool dispatchImpl( std::function<void()>&& handler ) override;
+    virtual void dispatchImpl( std::function<void()>&& handler ) override;
 
 private:
     std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
@@ -183,9 +183,9 @@ public:
 
 protected:
     //!Implementation of AbstractSocket::postImpl
-    virtual bool postImpl( std::function<void()>&& handler ) override;
+    virtual void postImpl( std::function<void()>&& handler ) override;
     //!Implementation of AbstractSocket::dispatchImpl
-    virtual bool dispatchImpl( std::function<void()>&& handler ) override;
+    virtual void dispatchImpl( std::function<void()>&& handler ) override;
     virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) ;
 
 private:

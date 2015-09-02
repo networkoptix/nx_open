@@ -215,14 +215,14 @@ void MixedTcpUdtServerSocket::terminateAsyncIO( bool /*waitForRunningHandlerComp
     assert( false );
 }
 
-bool MixedTcpUdtServerSocket::postImpl( std::function<void()>&& handler )
+void MixedTcpUdtServerSocket::postImpl( std::function<void()>&& handler )
 {
-    return m_socketDelegates[0]->post( std::move(handler) );
+    m_socketDelegates[0]->post( std::move(handler) );
 }
 
-bool MixedTcpUdtServerSocket::dispatchImpl( std::function<void()>&& handler )
+void MixedTcpUdtServerSocket::dispatchImpl( std::function<void()>&& handler )
 {
-    return m_socketDelegates[0]->dispatch( std::move(handler) );
+    m_socketDelegates[0]->dispatch( std::move(handler) );
 }
 
 bool MixedTcpUdtServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)

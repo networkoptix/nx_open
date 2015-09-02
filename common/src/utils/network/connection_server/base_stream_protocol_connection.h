@@ -160,27 +160,28 @@ namespace nx_api
             Initiates asynchoronous message send
         */
         template<class Handler>
-        bool sendMessage( MessageType msg, Handler&& handler )
+        void sendMessage( MessageType msg, Handler&& handler )
         {
             auto newTask = std::make_shared<SendTask>(
                 std::move( msg ),
                 std::forward<Handler>( handler ) ); //TODO #ak get rid of shared_ptr here when generic lambdas are available
-            return addNewTaskToQueue( std::move( newTask ) );
+            addNewTaskToQueue( std::move( newTask ) );
         }
 
-        bool sendMessage( MessageType msg ) // template cannot be resolved by default value
+        void sendMessage( MessageType msg ) // template cannot be resolved by default value
         {
-            return sendMessage( std::move(msg),
-                                std::function< void( SystemError::ErrorCode ) >() );
+            sendMessage(
+                std::move(msg),
+                std::function< void( SystemError::ErrorCode ) >() );
         }
 
         template<class BufferType, class Handler>
-        bool sendData( BufferType&& data, Handler&& handler )
+        void sendData( BufferType&& data, Handler&& handler )
         {
             auto newTask = std::make_shared<SendTask>(
                 std::forward<BufferType>( data ),
                 std::forward<Handler>( handler ) );
-            return addNewTaskToQueue( std::move( newTask ) );
+            addNewTaskToQueue( std::move( newTask ) );
         }
 
     private:
@@ -251,9 +252,9 @@ namespace nx_api
             readyToSendData();
         }
 
-        bool addNewTaskToQueue( std::shared_ptr<SendTask> newTask )
+        void addNewTaskToQueue( std::shared_ptr<SendTask> newTask )
         {
-            return this->socket()->dispatch(
+            this->socket()->dispatch(
                 [this, newTask]()
                 {
                     m_sendQueue.push_back( std::move( *newTask ) );
