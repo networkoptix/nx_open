@@ -178,7 +178,8 @@ QnTranscoder::QnTranscoder():
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
     m_eofCounter(0),
-    m_packetizedMode(false)
+    m_packetizedMode(false),
+    m_useRealTimeOptimization(false)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
@@ -279,7 +280,7 @@ int QnTranscoder::setVideoCodec(
     switch (method)
     {
         case TM_DirectStreamCopy:
-            m_vTranscoder = QnVideoTranscoderPtr();
+            m_vTranscoder.reset();
             break;
         case TM_FfmpegTranscode:
         {
@@ -289,6 +290,7 @@ int QnTranscoder::setVideoCodec(
             ffmpegTranscoder->setBitrate(bitrate);
             ffmpegTranscoder->setParams(params);
             ffmpegTranscoder->setQuality(quality);
+            ffmpegTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
             m_extraTranscodeParams.setCodec(codec);
             ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
 
@@ -298,7 +300,7 @@ int QnTranscoder::setVideoCodec(
                 if (isAtom || resolution.height() >= 1080)
                     ffmpegTranscoder->setMTMode(true);
             }
-            m_vTranscoder = QnVideoTranscoderPtr(ffmpegTranscoder);
+            m_vTranscoder = QSharedPointer<QnFfmpegVideoTranscoder>(ffmpegTranscoder);
             break;
         }
             /*
@@ -314,6 +316,13 @@ int QnTranscoder::setVideoCodec(
             return OperationResult::Error;
     }
     return OperationResult::Success;
+}
+
+void QnTranscoder::setUseRealTimeOptimization(bool value) 
+{ 
+    m_useRealTimeOptimization = value; 
+    if (m_vTranscoder)
+        m_vTranscoder->setUseRealTimeOptimization(value);
 }
 
 QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)

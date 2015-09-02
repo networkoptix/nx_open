@@ -20,8 +20,6 @@ class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    static bool isOptimizationDisabled;
-
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
@@ -32,6 +30,7 @@ public:
 
     /* Allow multithread transcoding */
     void setMTMode(bool value);
+    void setUseRealTimeOptimization(bool value);
     virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
 
 private:
@@ -56,6 +55,7 @@ private:
     qint64 m_averageVideoTimePerFrame;
     qint64 m_encodedFrames;
     qint64 m_droppedFrames;
+    bool m_useRealTimeOptimization;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
