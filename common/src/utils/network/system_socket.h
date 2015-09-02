@@ -94,9 +94,9 @@ public:
     //!Implementation of Pollable::getLastError
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
     //!Implementation of AbstractSocket::postImpl
-    bool post( std::function<void()>&& handler );
+    void post( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
-    bool dispatch( std::function<void()>&& handler );
+    void dispatch( std::function<void()>&& handler );
 
     /**
      *   Get the local port

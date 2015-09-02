@@ -118,7 +118,7 @@ namespace aio
             \warning Currently, there is no way to find out whether call has been posted or being executed currently
         */
         template<class SocketType, class Handler>
-        bool post( SocketType* sock, Handler&& handler )
+        void post( SocketType* sock, Handler&& handler )
         {
             QnMutexLocker lk( &m_mutex );
 
@@ -126,9 +126,8 @@ namespace aio
             typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
             if( !threadToUse )  //socket has not been bound to aio thread yet
                 threadToUse = bindSocketToAioThread( sock );
-            if( !threadToUse )
-                return false;
-            return threadToUse->post( sock, std::forward<Handler>(handler) );
+            assert( threadToUse );
+            threadToUse->post( sock, std::forward<Handler>(handler) );
         }
 
         //!Call \a handler from within aio thread \a sock is bound to
@@ -136,16 +135,15 @@ namespace aio
             \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a aio::AIOService::post does
         */
         template<class SocketType, class Handler>
-        bool dispatch( SocketType* sock, Handler&& handler )
+        void dispatch( SocketType* sock, Handler&& handler )
         {
             QnMutexLocker lk( &m_mutex );
             //if sock is not still bound to aio thread, binding it
             typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
             if( !threadToUse )  //socket has not been bound to aio thread yet
                 threadToUse = bindSocketToAioThread( sock );
-            if( !threadToUse )
-                return false;
-            return threadToUse->dispatch( sock, std::forward<Handler>(handler) );
+            assert( threadToUse );
+            threadToUse->dispatch( sock, std::forward<Handler>(handler) );
         }
 
         //TODO #ak better remove this method, violates encapsulation
@@ -221,8 +219,7 @@ namespace aio
             typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
             if( !threadToUse )  //socket has not been bound to aio thread yet
                 threadToUse = bindSocketToAioThread( sock );
-            if( !threadToUse )
-                return false;
+            assert( threadToUse );
 
             if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get(), socketAddedToPollHandler ) )
             {
@@ -320,21 +317,6 @@ namespace aio
                 if( threadToUse && threadToUse->socketsHandled() < (*threadIter)->socketsHandled() )
                     continue;
                 threadToUse = *threadIter;
-            }
-
-            if( !threadToUse )
-            {
-                //TODO #ak place mutex here when watchSocket is reenterable
-                //creating new thread
-                std::unique_ptr<typename SocketAIOContext<SocketType>::AIOThreadType> newThread( new typename SocketAIOContext<SocketType>::AIOThreadType( &m_mutex ) );
-                newThread->start();
-                if( !newThread->isRunning() )
-                {
-                    SystemError::setLastErrorCode( SystemError::nomem );
-                    return nullptr;
-                }
-                threadToUse = newThread.get();
-                aioHandlingContext.aioThreadPool.push_back( newThread.release() );
             }
 
             //assigning thread to socket once and for all
