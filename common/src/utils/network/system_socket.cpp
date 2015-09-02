@@ -292,14 +292,14 @@ bool Socket::getLastError( SystemError::ErrorCode* errorCode )
     return getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
 }
 
-bool Socket::postImpl( std::function<void()>&& handler )
+void Socket::postImpl( std::function<void()>&& handler )
 {
-    return m_baseAsyncHelper->post( std::move(handler) );
+    m_baseAsyncHelper->post( std::move(handler) );
 }
 
-bool Socket::dispatchImpl( std::function<void()>&& handler )
+void Socket::dispatchImpl( std::function<void()>&& handler )
 {
-    return m_baseAsyncHelper->dispatch( std::move(handler) );
+    m_baseAsyncHelper->dispatch( std::move(handler) );
 }
 
 unsigned short Socket::getLocalPort() const
