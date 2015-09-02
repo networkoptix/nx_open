@@ -14,6 +14,7 @@
 #include <utils/network/stun/message_serializer.h>
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
 #include <utils/network/connection_server/stream_socket_server.h>
+#include <utils/thread/mutex.h>
 
 namespace nx {
 namespace stun {
@@ -25,7 +26,8 @@ class ServerConnection
         StreamConnectionHolder<ServerConnection>,
         Message,
         MessageParser,
-        MessageSerializer>
+        MessageSerializer>,
+    public std::enable_shared_from_this<ServerConnection>
 {
 public:
     typedef nx_api::BaseStreamProtocolConnection<
@@ -39,15 +41,20 @@ public:
     ServerConnection(
         StreamConnectionHolder<ServerConnection>* socketServer,
         std::unique_ptr<AbstractCommunicatingSocket> sock );
+    ~ServerConnection();
 
     void processMessage( Message message );
+    void setDestructHandler( std::function< void() > handler = nullptr );
 
 private:
     void processBindingRequest( Message message );
     void processCustomRequest( Message message );
 
 private:
-    SocketAddress peer_address_;
+    const SocketAddress m_peerAddress;
+
+    QnMutex m_mutex;
+    std::function< void() > m_destructHandler;
 };
 
 } // namespace stun

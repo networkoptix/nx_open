@@ -12,20 +12,18 @@ ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher )
     const auto result =
         dispatcher->registerRequestProcessor(
             methods::listen,
-            [this]( stun::ServerConnection* connection, stun::Message message ) {
-                listen( connection, std::move( message ) );
-            } ) &&
+            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
+                { listen( connection, std::move( message ) ); } ) &&
         dispatcher->registerRequestProcessor(
             methods::connect,
-            [this]( stun::ServerConnection* connection, stun::Message message ) {
-                connect( connection, std::move( message ) );
-            } );
+            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
+                { connect( connection, std::move( message ) ); } );
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register one of processors" );
 }
 
-void ListeningPeerPool::listen( stun::ServerConnection* connection,
+void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
                                 stun::Message message )
 {
     //retrieving requests parameters:
@@ -44,7 +42,7 @@ void ListeningPeerPool::listen( stun::ServerConnection* connection,
                    "Method is not implemented yet" );
 }
 
-void ListeningPeerPool::connect( stun::ServerConnection* connection,
+void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
                                  stun::Message message )
 {
     //retrieving requests parameters:

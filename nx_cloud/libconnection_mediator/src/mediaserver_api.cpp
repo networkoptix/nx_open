@@ -16,16 +16,14 @@ MediaserverApiIf::MediaserverApiIf( stun::MessageDispatcher* dispatcher )
     const auto result =
         dispatcher->registerRequestProcessor(
             methods::ping, 
-            [this]( stun::ServerConnection* connection, stun::Message message ) {
-                ping( connection, std::move( message ) );
-        } );
+            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
+                { ping( connection, std::move( message ) ); } );
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
 }
 
-void MediaserverApiIf::ping( stun::ServerConnection* connection,
-                             stun::Message message )
+void MediaserverApiIf::ping( const ConnectionSharedPtr& connection, stun::Message message )
 {
     if( const auto mediaserver = getMediaserverData( connection, message ) )
     {

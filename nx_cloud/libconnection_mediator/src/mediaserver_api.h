@@ -15,7 +15,7 @@ class MediaserverApiIf
 public:
     MediaserverApiIf( stun::MessageDispatcher* dispatcher );
 
-    void ping( stun::ServerConnection* connection, stun::Message message );
+    void ping( const ConnectionSharedPtr& connection, stun::Message message );
 
     //! Pings \a address and verifies if the is the mediaservers with \a expectedId
     virtual bool pingServer( const SocketAddress& address, const QnUuid& expectedId ) = 0;

@@ -237,7 +237,7 @@ public:
     void addAttribute( std::unique_ptr<attrs::Attribute>&& attribute );
 
     template< typename T >
-    const T* getAttribute( size_t index = 0 ) const;
+    const T* getAttribute( int type = 0, size_t index = 0 ) const;
 
     // TODO: variadic template when possible
     template< typename T, typename A1 >
@@ -258,9 +258,9 @@ private:
 };
 
 template< typename T >
-const T* Message::getAttribute( size_t index ) const
+const T* Message::getAttribute( int type, size_t index ) const
 {
-    const auto aType = T::TYPE;
+    const auto aType = type ? type : T::TYPE;
 
     auto it = attributes.find( aType );
     if( it == attributes.end() )

@@ -9,7 +9,7 @@ RequestProcessor::~RequestProcessor()
 
 boost::optional< RequestProcessor::MediaserverData >
     RequestProcessor::getMediaserverData(
-        stun::ServerConnection* connection, stun::Message& request)
+        ConnectionSharedPtr connection, stun::Message& request)
 {
     // TODO: verify paramiters and authorization in CloudDb
 
@@ -57,8 +57,8 @@ boost::optional< RequestProcessor::MediaserverData >
     return data;
 }
 
-bool RequestProcessor::errorResponse(
-        stun::ServerConnection* connection, stun::Header& request,
+void RequestProcessor::errorResponse(
+        ConnectionSharedPtr connection, stun::Header& request,
         int code, String reason )
 {
     stun::Message response( stun::Header(
@@ -66,7 +66,7 @@ bool RequestProcessor::errorResponse(
         std::move( request.transactionId ) ) );
 
     response.newAttribute< stun::attrs::ErrorDescription >( code, std::move(reason) );
-    return connection->sendMessage( std::move( response ) );
+    connection->sendMessage( std::move( response ) );
 }
 
 } // namespace hpm

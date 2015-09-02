@@ -22,8 +22,8 @@ class ListeningPeerPool
 public:
     ListeningPeerPool( stun::MessageDispatcher* dispatcher );
 
-    void listen( stun::ServerConnection* connection, stun::Message message );
-    void connect( stun::ServerConnection* connection, stun::Message message );
+    void listen( const ConnectionSharedPtr& connection, stun::Message message );
+    void connect( const ConnectionSharedPtr& connection, stun::Message message );
 };
 
 } // namespace hpm

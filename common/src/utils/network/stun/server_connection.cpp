@@ -17,8 +17,17 @@ ServerConnection::ServerConnection(
     std::unique_ptr<AbstractCommunicatingSocket> sock )
 :
     BaseType( socketServer, std::move( sock ) ),
-    peer_address_( BaseType::getForeignAddress() )
+    m_peerAddress( BaseType::getForeignAddress() )
 {
+}
+
+ServerConnection::~ServerConnection()
+{
+    // notify, that connection is being destruct
+    // NOTE: this is needed only by weak_ptr holders to know, that this
+    //       weak_ptr is not valid any more
+    if( m_destructHandler )
+        m_destructHandler();
 }
 
 void ServerConnection::processMessage( Message message )
@@ -43,15 +52,23 @@ void ServerConnection::processMessage( Message message )
     }
 }
 
+void ServerConnection::setDestructHandler( std::function< void() > handler )
+{
+    QnMutexLocker lk( &m_mutex );
+    Q_ASSERT_X( !(handler && m_destructHandler), Q_FUNC_INFO,
+                "Can not set new hadler while previous is not removed" );
+
+    m_destructHandler = std::move( handler );
+}
+
 void ServerConnection::processBindingRequest( Message message )
 {
     Message response( stun::Header(
         MessageClass::successResponse,
         bindingMethod, std::move( message.header.transactionId ) ) );
 
-    SocketAddress peer( peer_address_ );
     response.newAttribute< stun::attrs::XorMappedAddress >(
-                peer.port, peer.address.ipv4() );
+                m_peerAddress.port, m_peerAddress.address.ipv4() );
 
     sendMessage( std::move( response ) );
 }
@@ -59,7 +76,7 @@ void ServerConnection::processBindingRequest( Message message )
 void ServerConnection::processCustomRequest( Message message )
 {
     if( auto disp = MessageDispatcher::instance() )
-        if( disp->dispatchRequest( this, std::move(message) ) )
+        if( disp->dispatchRequest( shared_from_this(), std::move(message) ) )
             return;
 
     stun::Message response( stun::Header(

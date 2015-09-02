@@ -135,7 +135,8 @@ namespace nx_http
                     &msg.response->headers,
                     nx_http::HttpHeader(
                         "Content-Length",
-                        nx_http::StringType::number((qulonglong)contentLength.get()) ) );
+                        nx_http::StringType::number(
+                            static_cast<qulonglong>( contentLength.get() ) ) ) );
         }
         else
         {
