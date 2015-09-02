@@ -31,20 +31,20 @@ public:
 
     virtual ~BaseAsyncSocketImplHelper() {}
 
-    bool post( std::function<void()>&& handler )
+    void post( std::function<void()>&& handler )
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
-            return true;
+            return;
 
-        return aio::AIOService::instance()->post( m_socket, std::move(handler) );
+        aio::AIOService::instance()->post( m_socket, std::move(handler) );
     }
 
-    bool dispatch( std::function<void()>&& handler )
+    void dispatch( std::function<void()>&& handler )
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
-            return true;
+            return;
 
-        return aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
+        aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
     }
     
     //!This call stops async I/O on socket and it can never be resumed!

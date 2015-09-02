@@ -93,9 +93,9 @@ public:
     //!Implementation of Pollable::getLastError
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) override;
     //!Implementation of AbstractSocket::postImpl
-    bool postImpl( std::function<void()>&& handler );
+    void postImpl( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
-    bool dispatchImpl( std::function<void()>&& handler );
+    void dispatchImpl( std::function<void()>&& handler );
 
     /**
      *   Get the local port
@@ -282,9 +282,9 @@ public:
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_implDelegate.handle(); }
     //!Implementation of AbstractSocket::postImpl
-    virtual bool postImpl( std::function<void()>&& handler ) override { return m_implDelegate.postImpl( std::move(handler) ); }
+    virtual void postImpl( std::function<void()>&& handler ) override { m_implDelegate.postImpl( std::move(handler) ); }
     //!Implementation of AbstractSocket::dispatchImpl
-    virtual bool dispatchImpl( std::function<void()>&& handler ) override { return m_implDelegate.dispatchImpl( std::move(handler) ); }
+    virtual void dispatchImpl( std::function<void()>&& handler ) override { m_implDelegate.dispatchImpl( std::move(handler) ); }
 
     AbstractSocketMethodsImplementorType* implementationDelegate() { return &m_implDelegate; }
     const AbstractSocketMethodsImplementorType* implementationDelegate() const { return &m_implDelegate; }
