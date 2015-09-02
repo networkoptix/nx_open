@@ -1214,6 +1214,20 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
         return; // skip unknown event
 
     bool isOnState = (eventType == '/') || (eventType == 'H');
+
+    // Axis camera sends inversed output port state for 'grounded circuit' ports (seems like it sends physical state instead of logical state)
+    {
+        QMutexLocker lock(&m_mutex);
+        for (auto& port: m_ioPorts) {
+            if (port.id == portId)
+            {
+                if (port.portType == Qn::PT_Output && port.oDefaultState == Qn::IO_GroundedCircuit)
+                    isOnState = !isOnState;
+                break;
+            }
+        }
+    }
+
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     updateIOState(portId, isOnState, timestamp, true);
 }
