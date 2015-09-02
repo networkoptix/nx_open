@@ -22,7 +22,6 @@ public:
     virtual ~QnAbstractCameraDataLoader();
 
     /**
-     * \param timePeriod                Time period to get data for. - Temporary disabled
      * \param filter                    Custom data filter.
      * \param resolutionMs              Minimal length of the data period that should be loaded, in milliseconds.
      * \returns                         Request handle.
