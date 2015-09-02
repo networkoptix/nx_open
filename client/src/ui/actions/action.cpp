@@ -42,9 +42,7 @@ QnAction::QnAction(Qn::ActionId id, QObject *parent):
 }
 
 QnAction::~QnAction() {
-    qDeleteAll(m_textConditions.uniqueKeys());
 }
-
 
 void QnAction::setRequiredPermissions(Qn::Permissions requiredPermissions) {
     setRequiredPermissions(-1, requiredPermissions);
@@ -104,6 +102,10 @@ void QnAction::setCondition(QnActionCondition *condition) {
 
 void QnAction::setChildFactory(QnActionFactory *childFactory) {
     m_childFactory = childFactory;
+}
+
+void QnAction::setTextFactory(QnActionTextFactory *textFactory) {
+    m_textFactory = textFactory;
 }
 
 void QnAction::addChild(QnAction *action) {
@@ -314,17 +316,17 @@ void QnAction::updateToolTipSilent() {
 }
 
 void QnAction::addConditionalText(QnActionCondition *condition, const QString &text) {
-    m_textConditions[condition] = text;
+    m_conditionalTexts << ConditionalText(condition, text);    
 }
 
 bool QnAction::hasConditionalTexts() {
-    return !m_textConditions.isEmpty();
+    return !m_conditionalTexts.isEmpty();
 }
 
 QString QnAction::checkConditionalText(const QnActionParameters &parameters) const {
-    foreach (QnActionCondition *condition, m_textConditions.uniqueKeys()){
-        if (condition->check(parameters))
-            return m_textConditions[condition];
+    for (const ConditionalText &conditionalText: m_conditionalTexts){
+        if (conditionalText.condition->check(parameters))
+            return conditionalText.text;
     }
     return normalText();
 }

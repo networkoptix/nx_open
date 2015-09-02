@@ -36,28 +36,12 @@
         <translation>Mouvement sur caméra</translation>
     </message>
     <message>
-        <source>Input Signal on Camera</source>
-        <translation>Signal d&apos;entrée sur la caméra</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>Caméra Déconnectée</translation>
-    </message>
-    <message>
         <source>Storage Failure</source>
         <translation>Échec de stockage</translation>
     </message>
     <message>
         <source>Network Issue</source>
         <translation>Problème de réseau</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>Conflt de Caméra IP</translation>
-    </message>
-    <message>
-        <source>Camera %1 was disconnected</source>
-        <translation>Caméra %1 a été déconnectée</translation>
     </message>
     <message>
         <source>Input on %1</source>
@@ -76,24 +60,8 @@
         <translation>Problème de réseau à %1</translation>
     </message>
     <message>
-        <source>Camera IP Conflict at %1</source>
-        <translation>Conflit de Caméra IP à %1</translation>
-    </message>
-    <message>
-        <source>Camera output</source>
-        <translation>Sortie de caméra</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>Sortie de caméra pour 30 sec</translation>
-    </message>
-    <message>
         <source>Bookmark</source>
         <translation>Signet</translation>
-    </message>
-    <message>
-        <source>Camera recording</source>
-        <translation>Enregistrement Caméra</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -126,10 +94,6 @@
     <message>
         <source>Unknown (%1)</source>
         <translation>Inconnue (%1)</translation>
-    </message>
-    <message>
-        <source>Any Camera Issue</source>
-        <translation>Tout problème de caméra</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
@@ -188,24 +152,8 @@
         <translation>Raison: %1</translation>
     </message>
     <message>
-        <source>Camera #%1 MAC: %2</source>
-        <translation>Caméra #%1 MAC: %2</translation>
-    </message>
-    <message>
         <source>Conflicting Server #%1: %2</source>
         <translation>Conflit de serveur#%1: %2</translation>
-    </message>
-    <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation>Connexion à la caméra (flux primaire) a été fermée de manière inattendue.</translation>
-    </message>
-    <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation>Connexion à la caméra (flux secondaire) a été fermée de manière inattendue.</translation>
-    </message>
-    <message>
-        <source>Recording on %n camera(s) is disabled: </source>
-        <translation>Enregistrement sur %n camera(s) désactivé: </translation>
     </message>
     <message>
         <source>%2 %1</source>
@@ -308,6 +256,61 @@
             <numerusform></numerusform>
         </translation>
     </message>
+    <message>
+        <source>%1 output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 output for 30 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Signal on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any %1 Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2 was disconnected</source>
+        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict at %2</source>
+        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 #%2 MAC: %3</source>
+        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on %1 is disabled: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -390,22 +393,6 @@
     <message>
         <source>Not authorised. Url %1.</source>
         <translation type="unfinished">Non autorisé. URL %1.</translation>
-    </message>
-    <message>
-        <source>camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network.</source>
@@ -755,6 +742,99 @@
     </message>
 </context>
 <context>
+    <name>QnResourceNameStrings</name>
+    <message numerus="yes">
+        <source>%n Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>device</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSignHelper</name>
     <message>
         <source>Unknown</source>
@@ -965,7 +1045,7 @@
         <translation type="unfinished">Les périphériques de stockages ne sont pas configurés</translation>
     </message>
     <message>
-        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -3,6 +3,7 @@
 
 #include <api/global_settings.h>
 
+#include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/general_attribute_pool.h>
@@ -27,10 +28,18 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(ui->autoSettingsCheckBox,   &QCheckBox::clicked,  this,  [this]{
         ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked());
     });
+
+    retranslateUi();
 }
 
 QnSystemSettingsWidget::~QnSystemSettingsWidget() {
 }
+
+void QnSystemSettingsWidget::retranslateUi() {
+    ui->autoDiscoveryCheckBox->setText(tr("Enable %1 and servers auto discovery").arg(getDefaultDevicesName(true, false)));
+    ui->autoSettingsCheckBox->setText(tr("Allow system to optimize %1 settings").arg(getDefaultDevicesName(true, false)));
+}
+
 
 void QnSystemSettingsWidget::updateFromSettings() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
@@ -95,7 +104,6 @@ bool QnSystemSettingsWidget::hasChanges() const  {
     if (ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed)
         return true;
 
-    bool auditLogAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
     if (ui->auditTrailCheckBox->isChecked() != settings->isAuditTrailEnabled())
         return true;
 

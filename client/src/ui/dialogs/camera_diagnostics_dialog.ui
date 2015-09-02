@@ -10,14 +10,11 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Camera Diagnostics</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="titleLabel">
      <property name="text">
-      <string>Camera:</string>
+      <string notr="true">&lt; Camera : &gt;</string>
      </property>
     </widget>
    </item>

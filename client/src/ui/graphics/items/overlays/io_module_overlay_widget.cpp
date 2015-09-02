@@ -107,9 +107,9 @@ public:
     QnIoModuleColors colors;
 
     struct ModelData {
-        ModelData() : indicator(0) {}
+        ModelData() : indicator(nullptr) {}
 
-        QnIOPortData ioConfigData;      // port configurating parameters: name e.t.c
+        QnIOPortData ioConfigData;      // port configuration parameters: name e.t.c
         QnIOStateData ioState;          // current port state on or off
         IndicatorWidget *indicator;
         QElapsedTimer buttonPressTime;  // button press timeout
@@ -369,7 +369,8 @@ void QnIoModuleOverlayWidgetPrivate::at_ioStateChanged(const QnIOStateData &valu
         return;
 
     it->buttonPressTime.invalidate();
-    it->indicator->setOn(value.isActive);
+    if (it->indicator)
+        it->indicator->setOn(value.isActive);
     it->ioState = value;
 }
 
@@ -400,13 +401,17 @@ void QnIoModuleOverlayWidgetPrivate::at_buttonClicked() {
     if (connection)
         connection->getBusinessEventManager()->sendBusinessAction(action, camera->getParentId(), this, []{});
 
-    it->indicator->setOn(!it->ioState.isActive);
+    if (it->indicator)
+        it->indicator->setOn(!it->ioState.isActive);
     it->buttonPressTime.restart();
 }
 
 void QnIoModuleOverlayWidgetPrivate::at_timerTimeout() {
     for (auto it = model.begin(); it != model.end(); ++it) {
         ModelData &data = it.value();
+        if (!data.indicator)
+            continue;
+
         if (data.indicator->isOn() != data.ioState.isActive && data.buttonPressTime.isValid() && data.buttonPressTime.hasExpired(commandExecuteTimeout)) {
             bool wrongState = data.indicator->isOn();
             data.indicator->setOn(data.ioState.isActive);

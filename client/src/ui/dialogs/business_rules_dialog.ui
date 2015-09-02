@@ -82,7 +82,7 @@
      <item>
       <widget class="QLineEdit" name="filterLineEdit">
        <property name="placeholderText">
-        <string>filter by camera...</string>
+        <string notr="true">&lt; filter by camera... &gt;</string>
        </property>
       </widget>
      </item>
@@ -161,15 +161,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QnTableView</class>
+   <extends>QTableView</extends>
+   <header location="global">ui/widgets/table_view.h</header>
+  </customwidget>
+  <customwidget>
    <class>QnBusinessRuleWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/business/business_rule_widget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnTableView</class>
-   <extends>QTableView</extends>
-   <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources>

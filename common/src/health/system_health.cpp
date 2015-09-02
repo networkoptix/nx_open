@@ -53,7 +53,7 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive system notifications via email.");
         break;
     case QnSystemHealth::NoPrimaryTimeServer:
-        messageParts << tr("Server times are not synchronised and a common time could not be detected automatically." );
+        messageParts << tr("Server times are not synchronized and a common time could not be detected automatically." );
         break;
     case QnSystemHealth::StoragesAreFull:
         messageParts << tr("Storages are full on the following Server:") << resourceName;

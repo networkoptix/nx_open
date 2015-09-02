@@ -9,6 +9,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <core/resource/resource_name.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -426,17 +427,22 @@ void QnAuditLogDialog::at_typeCheckboxChanged()
     bool hasUnchecked = false;
     for (const auto& checkbox: m_filterCheckboxes)
     {
+        if (!checkbox->isEnabled())
+            continue;
+
         if (checkbox->isChecked())
             hasChecked = true;
         else
             hasUnchecked = true;
     }
+
     Qt::CheckState checkState = Qt::Unchecked;
     if (hasChecked && hasUnchecked)
         checkState = Qt::PartiallyChecked;
     else if(hasChecked)
         checkState = Qt::Checked;
 
+    //TODO: #GDM get rid of this magic and use common setupTristateCheckbox framework
     ui->selectAllCheckBox->blockSignals(true);
     ui->selectAllCheckBox->setCheckState(checkState);
     ui->selectAllCheckBox->blockSignals(false);
@@ -454,6 +460,8 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
 
     for (const auto& checkbox: m_filterCheckboxes)
     {
+        if (!checkbox->isEnabled())
+            continue;
         checkbox->blockSignals(true);
         checkbox->setChecked(state == Qt::Checked);
         checkbox->blockSignals(false);
@@ -659,7 +667,7 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
     headers->setVisible(true);
     headers->setSectionsClickable(true);
     headers->setSectionResizeMode(QHeaderView::ResizeToContents);
-//    headers->setStretchLastSection(true);
+    headers->setStretchLastSection(true);
 
     gridMaster->setHorizontalHeader(headers);
     gridMaster->setItemDelegate(m_itemDelegate);
@@ -707,6 +715,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     m_skipNextPressSignal(false)
 {
     ui->setupUi(this);
+    retranslateUi();
+
     setWarningStyle(ui->warningLabel);
 
     //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
@@ -1166,6 +1176,15 @@ QTableView* QnAuditLogDialog::currentGridView() const
         return ui->gridMaster;
     else
         return ui->gridCameras;
+}
+
+void QnAuditLogDialog::retranslateUi()
+{
+    ui->retranslateUi(this);
+
+    enum { kDevicesTabIndex = 1 };
+    ui->tabWidget->setTabText(kDevicesTabIndex, getDefaultDevicesName());
+    ui->checkBoxCameras->setText(tr("%1 actions").arg(getDefaultDeviceNameUpper()));
 }
 
 void QnAuditLogDialog::at_exportAction_triggered()

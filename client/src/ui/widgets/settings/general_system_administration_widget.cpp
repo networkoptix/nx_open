@@ -4,6 +4,7 @@
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx_ec/data/api_runtime_data.h>
@@ -23,18 +24,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 {
     ui->setupUi(this);
 
-    auto shortcutString = [this](const Qn::ActionId actionId, const QString &baseString) -> QString {
-        auto shortcut = action(actionId)->shortcut();
-        if (shortcut.isEmpty())
-            return baseString;
-        return lit("%1 (<b>%2</b>)")
-            .arg(baseString)
-            .arg(shortcut.toString(QKeySequence::NativeText));
-    };
-
-    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
-    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log")));
-    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open Camera List")));
+    retranslateUi();
 
     setHelpTopic(ui->businessRulesButton,   Qn::EventsActions_Help);
     setHelpTopic(ui->cameraListButton,      Qn::Administration_General_CamerasList_Help);
@@ -61,6 +51,26 @@ void QnGeneralSystemAdministrationWidget::submitToSettings() {
 bool QnGeneralSystemAdministrationWidget::hasChanges() const  {
     return ui->systemSettingsWidget->hasChanges();
 }
+
+void QnGeneralSystemAdministrationWidget::retranslateUi() {
+    auto shortcutString = [this](const Qn::ActionId actionId, const QString &baseString) -> QString {
+        auto shortcut = action(actionId)->shortcut();
+        if (shortcut.isEmpty())
+            return baseString;
+        return lit("%1 (<b>%2</b>)")
+            .arg(baseString)
+            .arg(shortcut.toString(QKeySequence::NativeText));
+    };
+
+    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
+    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log")));
+    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open %1 List").arg(getDefaultDevicesName())));
+
+    ui->cameraListButton->setText(tr("%1 List").arg(getDefaultDevicesName()));
+
+    ui->systemSettingsWidget->retranslateUi();
+}
+
 
 void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);

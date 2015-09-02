@@ -23,12 +23,11 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     ui(new Ui::CameraDiagnosticsDialog),
     m_tool(NULL),
     m_started(false),
-    m_finished(false),
-    m_targetDevice(),
-    m_upperCaseDevice()
+    m_finished(false)
 {
     ui->setupUi(this);
-    
+    retranslateUi();
+
     QPushButton *copyButton = new QPushButton(tr("Copy to Clipboard"), this);
     ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
     connect(copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
@@ -48,13 +47,7 @@ void QnCameraDiagnosticsDialog::setResource(const QnVirtualCameraResourcePtr &re
 
     m_resource = resource;
 
-    const bool isPureIoModule = 
-        (m_resource && !resource->hasVideo(nullptr) && resource->hasFlags(Qn::io_module));
-
-    m_upperCaseDevice = (isPureIoModule ? tr("IO Module") : tr("Camera"));
-    m_targetDevice = (isPureIoModule ? tr("IO module") : tr("camera"));
-
-    updateTexts();
+    retranslateUi();
     clearLog();
 }
 
@@ -100,8 +93,10 @@ void QnCameraDiagnosticsDialog::stop() {
     updateOkButtonEnabled();
 }
 
-void QnCameraDiagnosticsDialog::updateTexts() {
+void QnCameraDiagnosticsDialog::retranslateUi() {
     
+    ui->retranslateUi(this);
+
     if(!m_resource)
     {
         ui->titleLabel->clear();
@@ -110,10 +105,10 @@ void QnCameraDiagnosticsDialog::updateTexts() {
     
     //: %1 - will be substituted by type of device ("camera", "io module", etc..); %2 - will be substituted by model of device; Example: "Diagnostics for camera X1323"
     const QString titleLabelText = tr("Diagnostics for %1 %2.");
-    ui->titleLabel->setText(titleLabelText.arg(m_targetDevice).arg(getResourceName(m_resource)));
+    ui->titleLabel->setText(titleLabelText.arg(getDefaultDevicesName(m_resource, false)).arg(getResourceName(m_resource)));
 
     //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..); Example: "IO Module Diagnostics"
-    setWindowTitle(tr("%1 Diagnostics").arg(m_upperCaseDevice));
+    setWindowTitle(tr("%1 Diagnostics").arg(getDefaultDevicesName(m_resource)));
 }
 
 void QnCameraDiagnosticsDialog::updateOkButtonEnabled() {
@@ -129,11 +124,9 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
-        //: %1 - will be substituted by type of device ("camera", "IO module", etc..); Example: "Confirming camera is accessible."
-        return tr("Confirming %1 is accessible.").arg(m_targetDevice);
+        return tr("Confirming %1 is accessible.").arg(getDefaultDevicesName(m_resource, false));
     case CameraDiagnostics::Step::mediaStreamAvailability:
-        //: %1 - will be substituted by type of device ("camera", "IO module", etc..); Example: "Confirming target IO module provides media stream."
-        return tr("Confirming target %1 provides media stream.").arg(m_targetDevice);
+        return tr("Confirming target %1 provides media stream.").arg(getDefaultDevicesName(m_resource, false));
     case CameraDiagnostics::Step::mediaStreamIntegrity: 
         return tr("Evaluating media stream for errors.");
     default:

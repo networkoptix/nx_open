@@ -1,7 +1,9 @@
 #include "user_list_model.h"
 
 #include <core/resource/user_resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
+
 #include <common/user_permissions.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -125,7 +127,7 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user)
     if ((permissions & Qn::GlobalViewLivePermission) && permissionStrings.isEmpty())
         permissionStrings.append(tr("View live video"));
     if (permissions & Qn::GlobalEditCamerasPermission)
-        permissionStrings.append(tr("Adjust camera settings"));
+        permissionStrings.append(tr("Adjust %1 settings").arg(getDefaultDeviceNameLower()));
     if (permissions & Qn::GlobalPtzControlPermission)
         permissionStrings.append(tr("Use PTZ controls"));
     if (permissions & Qn::GlobalViewArchivePermission)
