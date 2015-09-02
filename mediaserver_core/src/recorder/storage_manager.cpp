@@ -735,7 +735,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
     }
     if (storageIndex != -1)
     {
-        QMutexLocker lock(&m_mutexCatalog);
+        QnMutexLocker lock(&m_mutexCatalog);
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
             for (const auto catalog: m_devFileCatalog[i].values())
                 catalog->removeChunks(storageIndex);

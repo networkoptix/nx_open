@@ -378,7 +378,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 
 void QnVideoCamera::startLiveCacheIfNeeded()
 {
-    QMutexLocker lock(&m_getReaderMutex);
+    QnMutexLocker lock(&m_getReaderMutex);
 
     if (!isSomeActivity())
         return;

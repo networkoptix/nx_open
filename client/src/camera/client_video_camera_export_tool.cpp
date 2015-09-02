@@ -29,15 +29,6 @@ void QnClientVideoCameraExportTool::start() {
     emit rangeChanged(0, 100);
     emit valueChanged(0);
 
-    QnImageFilterHelper transcodeParams;
-    transcodeParams.setSrcRect(m_sourceRect);
-    transcodeParams.setContrastParams(m_imageCorrectionParams);
-    transcodeParams.setDewarpingParams(m_camera->resource()->getDewarpingParams(), m_itemDewarpingParams);
-    transcodeParams.setRotation(m_rotationAngle);
-    transcodeParams.setCustomAR(m_customAR);
-    transcodeParams.setTimeCorner(m_timestampPos, m_timeOffsetMs, 0);
-    transcodeParams.setVideoLayout(m_camera->resource()->getVideoLayout());
-
     m_camera->exportMediaPeriodToFile(
                 m_timePeriod,
                 m_fileName,
@@ -45,7 +36,7 @@ void QnClientVideoCameraExportTool::start() {
                 QnStorageResourcePtr(),
                 QnStreamRecorder::Role_FileExport,
                 m_serverTimeZoneMs,
-                transcodeParams
+                m_parameters
                 );
 }
 

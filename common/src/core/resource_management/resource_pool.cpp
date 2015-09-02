@@ -463,7 +463,7 @@ void QnResourcePool::clear()
 }
 
 bool QnResourcePool::containsIoModules() const {
-    QMutexLocker lk( &m_resourcesMtx );
+    QnMutexLocker lk( &m_resourcesMtx );
     ensureCache();
     return m_cache.containsIoModules;
 }
