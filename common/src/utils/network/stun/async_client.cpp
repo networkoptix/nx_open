@@ -159,7 +159,8 @@ bool AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
         auto transactionId = request.header.transactionId;
         m_requestQueue.pop_front();
 
-        const auto ret = m_baseConnection->sendMessage(
+        const bool ret = true;
+        m_baseConnection->sendMessage(
             std::move( request ),
             // TODO: #c++14 [ transactionId{ std::move( transactionId ) }, handler ]
             [ = ]( SystemError::ErrorCode code ) mutable

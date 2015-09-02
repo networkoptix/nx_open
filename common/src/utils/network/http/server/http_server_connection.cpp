@@ -145,7 +145,6 @@ namespace nx_http
         }
 
         m_currentMsgBody = std::move(responseMsgBody);
-        //TODO #ak check sendMessage error code
         sendMessage(
             std::move( msg ),
             std::bind( &HttpServerConnection::responseSent, this ) );
@@ -189,13 +188,9 @@ namespace nx_http
         //TODO #ak read and send message body async
         //    move async reading/writing to some separate class (async pipe) to enable reusage
 
-        if( !sendData(
-                std::move( buf ),
-                std::bind( &HttpServerConnection::someMessageBodySent, this ) ) )
-        {
-            closeConnection();
-            return;
-        }
+        sendData(
+            std::move( buf ),
+            std::bind( &HttpServerConnection::someMessageBodySent, this ) );
     }
 
     void HttpServerConnection::someMessageBodySent()
