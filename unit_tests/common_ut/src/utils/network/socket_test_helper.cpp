@@ -22,7 +22,7 @@ namespace
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
     size_t bytesToSendThrough,
-    std::function<void(TestConnection*, SystemError::ErrorCode)> handler )
+    std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler )
 :
     m_socket( std::move( socket ) ),
     m_bytesToSendThrough( bytesToSendThrough ),
@@ -40,7 +40,7 @@ TestConnection::TestConnection(
 TestConnection::TestConnection(
     const SocketAddress& remoteAddress,
     size_t bytesToSendThrough,
-    std::function<void(TestConnection*, SystemError::ErrorCode)> handler )
+    std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler )
 :
     m_socket( SocketFactory::createStreamSocket() ),
     m_bytesToSendThrough( bytesToSendThrough ),
@@ -58,6 +58,10 @@ TestConnection::TestConnection(
     m_outData.resize( READ_BUF_SIZE );
 }
 
+//static std::mutex mtx1;
+//static std::vector<std::pair<int, bool>> terminatedSocketsIDs;
+
+
 TestConnection::~TestConnection()
 {
     std::unique_ptr<AbstractStreamSocket> _socket;
@@ -68,9 +72,19 @@ TestConnection::~TestConnection()
     }
     if( _socket )
         _socket->terminateAsyncIO( true );
+
+    {
+        //std::unique_lock<std::mutex> lk(mtx1);
+        //terminatedSocketsIDs.emplace_back(m_id, _socket ? true : false);
+    }
 #ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::~TestConnection. "<<m_id<<std::endl;
 #endif
+}
+
+int TestConnection::id() const
+{
+    return m_id;
 }
 
 void TestConnection::pleaseStop()
@@ -80,6 +94,8 @@ void TestConnection::pleaseStop()
 
 bool TestConnection::start()
 {
+    std::unique_lock<std::mutex> lk(m_mutex);
+
     if( m_connected )
         return startIO();
 
@@ -114,17 +130,15 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
     if( errorCode != SystemError::noError )
     {
         auto handler = std::move( m_handler );
-        m_socket.reset();
         lk.unlock();
-        return handler( this, errorCode );
+        return handler( id, this, errorCode );
     }
 
     if( !startIO() )
     {
         auto handler = std::move( m_handler );
-        m_socket.reset();
         lk.unlock();
-        return handler( this, SystemError::getLastOSErrorCode() );
+        return handler( id, this, SystemError::getLastOSErrorCode() );
     }
 }
 
@@ -163,11 +177,9 @@ void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, s
         return;
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
-        m_socket->terminateAsyncIO( true );
         auto handler = std::move(m_handler);
-        m_socket.reset();
         lk.unlock();
-        return handler( this, errorCode );
+        return handler( id, this, errorCode );
     }
 
     m_totalBytesReceived += bytesRead;
@@ -179,11 +191,9 @@ void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, s
             &m_readBuffer,
             std::bind(&TestConnection::onDataReceived, this, m_id,  _1, _2) ) )
     {
-        m_socket->terminateAsyncIO( true );
         auto handler = std::move( m_handler );
-        m_socket.reset();
         lk.unlock();
-        handler( this, SystemError::getLastOSErrorCode() );
+        handler( id, this, SystemError::getLastOSErrorCode() );
     }
 }
 
@@ -198,21 +208,17 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
         return;
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
-        m_socket->terminateAsyncIO( true );
         auto handler = std::move( m_handler );
-        m_socket.reset();
         lk.unlock();
-        return handler( this, errorCode );
+        return handler( id, this, errorCode );
     }
 
     m_totalBytesSent += bytesWritten;
     if( m_totalBytesSent >= m_bytesToSendThrough )
     {
-        m_socket->terminateAsyncIO( true );
         auto handler = std::move( m_handler );
-        m_socket.reset();
         lk.unlock();
-        handler( this, SystemError::getLastOSErrorCode() );
+        handler( id, this, SystemError::getLastOSErrorCode() );
         return;
     }
 
@@ -221,11 +227,9 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
             m_outData,
             std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) ) )
     {
-        m_socket->terminateAsyncIO( true );
         auto handler = std::move( m_handler );
-        m_socket.reset();
         lk.unlock();
-        handler( this, SystemError::getLastOSErrorCode() );
+        handler( id, this, SystemError::getLastOSErrorCode() );
     }
 }
 
@@ -289,7 +293,7 @@ void RandomDataTcpServer::onNewConnection( SystemError::ErrorCode errorCode, Abs
         std::unique_ptr<TestConnection> testConnection( new TestConnection(
             std::unique_ptr<AbstractStreamSocket>(newConnection),
             m_bytesToSendThrough,
-            std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_1 ) ) );
+            std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_2 ) ) );
         if( testConnection->start() )
             testConnection.release();
         //TODO #ak save connection somewhere
@@ -343,8 +347,7 @@ void ConnectionsGenerator::join()
     assert( m_terminated );
     while( !m_connections.empty() )
     {
-        std::unique_ptr<TestConnection> connection;
-        m_connections.front().swap( connection );
+        std::unique_ptr<TestConnection> connection = std::move(m_connections.front());
         lk.unlock();
         connection.reset();
         lk.lock();
@@ -365,7 +368,8 @@ bool ConnectionsGenerator::start()
         std::unique_ptr<TestConnection> connection( new TestConnection(
             m_remoteAddress,
             m_bytesToSendThrough,
-            std::bind(&ConnectionsGenerator::onConnectionFinished, this, std::prev(m_connections.end())) ) );
+            std::bind(&ConnectionsGenerator::onConnectionFinished, this,
+                      std::placeholders::_1, std::prev(m_connections.end())) ) );
         m_connections.back().swap( connection );
         if( !m_connections.back()->start() )
         {
@@ -397,9 +401,11 @@ size_t ConnectionsGenerator::totalBytesReceived() const
     return m_totalBytesReceived;
 }
 
-void ConnectionsGenerator::onConnectionFinished( ConnectionsContainer::iterator connectionIter )
+void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::iterator connectionIter)
 {
     std::unique_lock<std::mutex> lk( m_mutex );
+    //if( !m_finishedConnectionsIDs.insert( id ).second )
+    //    int x = 0;
     if( *connectionIter )
     {
         m_totalBytesSent += connectionIter->get()->totalBytesSent();
@@ -415,12 +421,15 @@ void ConnectionsGenerator::onConnectionFinished( ConnectionsContainer::iterator 
         std::unique_ptr<TestConnection> connection( new TestConnection(
             m_remoteAddress,
             m_bytesToSendThrough,
-            std::bind(&ConnectionsGenerator::onConnectionFinished, this, std::prev(m_connections.end())) ) );
+            std::bind(&ConnectionsGenerator::onConnectionFinished, this,
+                      std::placeholders::_1, std::prev(m_connections.end())) ) );
         m_connections.back().swap( connection );
         if( !m_connections.back()->start() )
         {
             SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
             std::cerr<<"Failed to start test connection. "<<SystemError::toString(osErrorCode).toStdString()<<std::endl;
+            //if (!m_finishedConnectionsIDs.insert(m_connections.back()->id()).second)
+            //    int x = 0;
             //ignoring error for now
             m_connections.pop_back();
             return;

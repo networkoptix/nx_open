@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include <condition_variable>
+#include <chrono>
 #include <deque>
 #include <future>
 #include <mutex>
@@ -103,18 +104,20 @@ protected:
     }
 };
 
+#if 1
+
 /*!
     This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
 */
 TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
 {
-    static const int TEST_DURATION_SECONDS = 1;
-    static const int TEST_RUNS = 5;
+    static const std::chrono::milliseconds TEST_DURATION( 200 );
+    static const int TEST_RUNS = 37;
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
         static const int MAX_SIMULTANEOUS_CONNECTIONS = 100;
-        static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024*1024;
+        static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024;
 
         RandomDataTcpServer server( BYTES_TO_SEND_THROUGH_CONNECTION );
         ASSERT_TRUE( server.start() );
@@ -125,7 +128,7 @@ TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
             BYTES_TO_SEND_THROUGH_CONNECTION );
         ASSERT_TRUE( connectionsGenerator.start() );
 
-        QThread::sleep( TEST_DURATION_SECONDS );
+        std::this_thread::sleep_for(TEST_DURATION);
 
         connectionsGenerator.pleaseStop();
         connectionsGenerator.join();
@@ -155,6 +158,8 @@ TEST_F( SocketAsyncModeTest, ServerSocketAsyncCancellation )
     //waiting for some calls to deleted objects
     QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
 }
+
+#endif
 
 TEST_F( SocketAsyncModeTest, HostNameResolve1 )
 {
