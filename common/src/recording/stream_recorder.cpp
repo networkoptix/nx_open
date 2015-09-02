@@ -340,9 +340,9 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     if (vd && !m_gotKeyFrame[vd->channelNumber] && !(vd->flags & AV_PKT_FLAG_KEY))
         return true; // skip data
 
+    const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
     if (m_firstTime)
     {
-        const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
         if (vd == 0 &&  mediaDev->hasVideo(m_mediaProvider))
             return true; // skip audio packets before first video packet
         if (!initFfmpegContainer(md))
@@ -367,8 +367,9 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     int channel = md->channelNumber;
 
     if (md->flags & AV_PKT_FLAG_KEY)
-    {
         m_gotKeyFrame[channel] = true;
+    if ((md->flags & AV_PKT_FLAG_KEY) || !mediaDev->hasVideo(m_mediaProvider))
+    {
         if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > (m_truncateInterval+m_truncateIntervalEps))
         {
             m_endDateTime = md->timestamp;

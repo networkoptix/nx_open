@@ -21,27 +21,43 @@ TEST(AbstractStorageResourceTest, Init)
 
     tg.storages.push_back(fileStorage);
 
-    QnStorageResource *ftpStorage = 
-        QnStoragePluginFactory::instance()->createStorage(
-            tg.ftpStorageUrl,
-            false
-        );
-    EXPECT_TRUE(ftpStorage && ftpStorage->isAvailable());
-    if (ftpStorage && ftpStorage->isAvailable())
+    if (!tg.ftpStorageUrl.isEmpty())
     {
-        ftpStorage->setUrl(tg.ftpStorageUrl);
-        tg.storages.push_back(ftpStorage);
+        QnStorageResource *ftpStorage =
+            QnStoragePluginFactory::instance()->createStorage(
+                tg.ftpStorageUrl,
+                false
+            );
+        EXPECT_TRUE(ftpStorage && ftpStorage->isAvailable());
+        if (ftpStorage && ftpStorage->isAvailable())
+        {
+            ftpStorage->setUrl(tg.ftpStorageUrl);
+            tg.storages.push_back(ftpStorage);
+        }
+        else
+            std::cout
+                << "Ftp storage is unavailable. Check if server is online and url is correct."
+                << std::endl;
     }
-    else
-        std::cout
-            << "Ftp storage is unavailable. Check if server is online and url is correct."
-            << std::endl;
+
+    if (!tg.smbStorageUrl.isEmpty())
+    {
+        QnStorageResource *smbStorage =
+            QnStoragePluginFactory::instance()->createStorage(
+                tg.smbStorageUrl
+            );
+        EXPECT_TRUE(smbStorage);
+        smbStorage->setUrl(tg.smbStorageUrl);
+
+        tg.storages.push_back(smbStorage);
+    }
 }
 
 TEST(AbstractStorageResourceTest, Capabilities)
 {
     for (auto storage : tg.storages)
     {
+        std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
         // storage general functions
         int storageCapabilities = storage->getCapabilities();
         ASSERT_TRUE(storageCapabilities | QnAbstractStorageResource::cap::ListFile);
@@ -95,6 +111,8 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
 
     for (auto storage : tg.storages)
     {
+        std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
+
         fileNames.clear();
         // create many files
         for (size_t i = 0; i < fileCount; ++i)
@@ -180,6 +198,8 @@ TEST(AbstractStorageResourceTest, IODevice)
 {
     for (auto storage : tg.storages)
     {
+        std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
+
         // write, seek
         QString fileName = closeDirPath(storage->getUrl()) + lit("test.tmp");
         std::unique_ptr<QIODevice> ioDevice = std::unique_ptr<QIODevice>(

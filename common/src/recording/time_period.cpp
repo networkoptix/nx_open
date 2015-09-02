@@ -3,15 +3,19 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDateTime>
 
+#include <utils/common/model_functions.h>
+
 #include <utils/math/math.h>
 #include <utils/common/util.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
+#include "time_period_list.h"
 
 QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((QnTimePeriod), (ubjson)(xml)(csv_record))
 
 namespace detail {
-    QN_FUSION_DEFINE_FUNCTIONS(QnTimePeriod, (json), static)
+    QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((QnTimePeriod), (json))
 }
 
 namespace {
@@ -176,6 +180,14 @@ bool QnTimePeriod::isEmpty() const {
 
 bool QnTimePeriod::isValid() const {
     return durationMs == ::infiniteDuration || durationMs > 0;
+}
+
+qint64 QnTimePeriod::distanceToTime(qint64 timeMs) const
+{
+    if (timeMs >= startTimeMs) 
+        return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
+    else
+        return startTimeMs - timeMs;
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {

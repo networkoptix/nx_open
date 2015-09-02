@@ -13,7 +13,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "../resource/av_panoramic.h"
 
-//======================================================
+// ======================================================
 
 extern int create_sps_pps(
                    int frameWidth,
@@ -24,7 +24,7 @@ extern int create_sps_pps(
 extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 
-//=========================================================
+// =========================================================
 
 AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader(const QnResourcePtr& res):
 QnPlAVClinetPullStreamReader(res)
@@ -189,7 +189,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     m_videoFrameBuff.clear();
     QnByteArray& img = m_videoFrameBuff;
 
-    //==========================================
+    // ==========================================
     int expectable_header_size = 0;
     if (h264)
     {
@@ -217,7 +217,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         // we will write header based on last packet information
     }
 
-    //==========================================
+    // ==========================================
 
     int readed = m_tftp_client->read(QLatin1String(request), img);
 
@@ -286,7 +286,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         if (last_packet[iframe_index-1]==0)
             iFrame = false;
 
-        //==========================================
+        // ==========================================
         //put unit delimetr at the end of the frame
 
         char  c = 0;
@@ -299,7 +299,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         c = (iFrame) ? 0x10 : 0x30;
         img.write(&c,1); // 0x10
 
-        //==========================================
+        // ==========================================
         char* dst = img.data();
         //if (videoData->keyFrame) // only if I frame we need SPS&PPS
         {

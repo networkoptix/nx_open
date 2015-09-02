@@ -9,6 +9,7 @@
 #include <utils/common/singleton.h>
 #include <utils/common/connective.h>
 #include <utils/common/email_fwd.h>
+#include <utils/common/ldap_fwd.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -34,11 +35,17 @@ public:
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
+    bool isAuditTrailEnabled() const;
+    void setAuditTrailEnabled(bool value);
+
     bool isServerAutoDiscoveryEnabled() const;
     void setServerAutoDiscoveryEnabled(bool enabled);
 
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
+
+    QnLdapSettings ldapSettings() const;
+    void setLdapSettings(const QnLdapSettings &settings);
 
     void synchronizeNow();
     QnUserResourcePtr getAdminUser();
@@ -48,9 +55,11 @@ public:
 
 signals:
     void disabledVendorsChanged();
+    void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
     void serverAutoDiscoveryChanged();
     void emailSettingsChanged();
+    void ldapSettingsChanged();
 
 private:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -58,6 +67,7 @@ private:
 
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
@@ -74,6 +84,14 @@ private:
     QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
     /** Flag that we are using simple smtp settings set */
     QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;   //TODO: #GDM #Common think where else we can store it
+
+    // set of ldap settings adaptors
+    QnResourcePropertyAdaptor<QUrl> *m_ldapUriAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapAdminDnAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapAdminPasswordAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor;
+
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 

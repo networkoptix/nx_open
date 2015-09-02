@@ -10,6 +10,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <plugins/resource/desktop_win/desktop_resource.h>
+#include "client/client_runtime_settings.h"
 
 QnWorkbenchDesktopCameraWatcher::QnWorkbenchDesktopCameraWatcher(QObject *parent):
     QObject(parent),
@@ -39,9 +40,8 @@ void QnWorkbenchDesktopCameraWatcher::deinitialize() {
 }
 
 void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    if (m_desktop)
+    if (m_desktop || qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
-
     if (QnDesktopResourcePtr desktop = resource.dynamicCast<QnDesktopResource>()) {
         m_desktop = desktop;
         initialize();

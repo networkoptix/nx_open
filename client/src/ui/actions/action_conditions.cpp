@@ -155,6 +155,14 @@ Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetLi
 }
 
 Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetList &widgets) {
+    auto pureIoModule = [](const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::io_module))
+            return false; //quick check
+
+        QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+        return mediaResource && !mediaResource->hasVideo(0);
+    };
+
     foreach(QnResourceWidget *widget, widgets) {
         if(!widget)
             continue;
@@ -163,6 +171,9 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
             continue;
 
         if(!widget->zoomRect().isNull())
+            continue;
+
+        if (pureIoModule(widget->resource()))
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
@@ -446,6 +457,10 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
     if((widget->resource()->flags() & Qn::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         return Qn::InvisibleAction;
 
+    QnMediaResourcePtr mediaResource = widget->resource().dynamicCast<QnMediaResource>();
+        if (mediaResource && !mediaResource->hasVideo(0))
+            return Qn::InvisibleAction;
+
     Qn::RenderStatus renderStatus = widget->renderStatus();
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
         return Qn::DisabledAction;
@@ -673,16 +688,6 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
             return Qn::EnabledAction;
     }
     return Qn::InvisibleAction;
-}
-
-Qn::ActionVisibility QnOpenIOMonitorActionCondition::check(const QnResourceList &resources) {
-    foreach (const QnResourcePtr &resource, resources) 
-    {
-        QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
-        if (!camRes || !camRes->hasCameraCapabilities(Qn::IOModuleCapability))
-            return Qn::InvisibleAction;
-    }
-    return resources.isEmpty() ? Qn::InvisibleAction : Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
@@ -1084,6 +1089,17 @@ Qn::ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters
     return (m_count == MultipleItems && count > 1) || (m_count == count) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &resources) {
+    bool pureIoModules = boost::algorithm::all_of(resources, [](const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::io_module))
+            return false; //quick check
+
+        QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+        return mediaResource && !mediaResource->hasVideo(0);
+    });
+
+    return pureIoModules ? Qn::EnabledAction : Qn::InvisibleAction;
+}
 
 Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
     bool found = false;

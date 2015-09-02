@@ -2,8 +2,9 @@
 #include "ui_license_details_dialog.h"
 
 #include <licensing/license.h>
+#include <ui/style/warning_style.h>
 
-QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /*= NULL*/):
+QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /* = NULL*/):
     base_type(parent),
     ui(new Ui::LicenseDetailsDialog())
 {
@@ -28,6 +29,9 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWid
     } else {
         addFeature(tr("Archive Streams Allowed:"), license->cameraCount());
     }
+
+    setWarningStyle(ui->errorLabel);
+    ui->errorLabel->setVisible(license->type() == Qn::LC_Invalid);
 
     QString licenseText = licenseDescription(license);
 

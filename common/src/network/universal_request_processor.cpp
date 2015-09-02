@@ -6,12 +6,12 @@
 #include "utils/gzip/gzip_compressor.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "universal_request_processor_p.h"
-#include "authenticate_helper.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "http/custom_headers.h"
 #include "utils/network/flash_socket/types.h"
-
+#include "audit/audit_manager.h"
+#include <utils/common/model_functions.h>
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
@@ -48,10 +48,12 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 }
 
 static QByteArray m_unauthorizedPageBody = STATIC_UNAUTHORIZED_HTML;
+static AuthMethod::Values m_unauthorizedPageForMethods = AuthMethod::NotDefined;
 
-void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value)
+void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, AuthMethod::Values methods)
 {
     m_unauthorizedPageBody = value;
+    m_unauthorizedPageForMethods = methods;
 }
 
 QByteArray QnUniversalRequestProcessor::unauthorizedPageBody()
@@ -64,21 +66,47 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
     Q_D(QnUniversalRequestProcessor);
 
     int retryCount = 0;
+    bool logReported = false;
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        const bool isProxy = d->owner->isProxy(d->request);
+        //not asking Proxy authentication because we proxy requests in a custom way
+        const bool isProxy = false;
         QElapsedTimer t;
         t.restart();
-        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId))
+        AuthMethod::Value usedMethod = AuthMethod::noAuth;
+        Qn::AuthResult authResult;
+        while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &usedMethod)) != Qn::Auth_OK)
         {
+            nx_http::insertOrReplaceHeader(
+                &d->response.headers,
+                nx_http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
+
+            int retryThreshold = 0;
+            if (authResult == Qn::Auth_WrongDigest)
+                retryThreshold = MAX_AUTH_RETRY_COUNT;
+            else if (d->authenticatedOnce)
+                retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
+            if (retryCount >= retryThreshold && !logReported && authResult != Qn::Auth_WrongInternalLogin)
+            {   
+                logReported = true;
+                auto session = authSession();
+                session.id = QnUuid::createUuid();
+                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+            }
+
             if( !d->socket->isConnected() )
                 return false;   //connection has been closed
 
             if( d->request.requestLine.method == nx_http::Method::GET ||
                 d->request.requestLine.method == nx_http::Method::HEAD )
             {
-                d->response.messageBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
+                if (isProxy)
+                    d->response.messageBody = STATIC_PROXY_UNAUTHORIZED_HTML;
+                else if (usedMethod & m_unauthorizedPageForMethods)
+                    d->response.messageBody = unauthorizedPageBody();
+                else
+                    d->response.messageBody = STATIC_UNAUTHORIZED_HTML;
             }
             if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
                 d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
@@ -108,8 +136,9 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
                 d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
                 contentEncoding );
 
-            if (++retryCount > MAX_AUTH_RETRY_COUNT)
+            if (++retryCount > MAX_AUTH_RETRY_COUNT) {
                 return false;
+            }
             while (t.elapsed() < AUTH_TIMEOUT && d->socket->isConnected()) 
             {
                 if (readRequest()) {
@@ -120,8 +149,9 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if (t.elapsed() >= AUTH_TIMEOUT)
                 return false; // close connection
         }
+        if (usedMethod != AuthMethod::noAuth)
+            d->authenticatedOnce = true;
     }
-
     return true;
 }
 

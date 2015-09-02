@@ -56,7 +56,7 @@ namespace {
 
 QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(const QnUpdateTarget &target, QObject *parent) :
     QnNetworkPeerTask(parent),
-    m_updatesUrl(QUrl(qnSettings->updateFeedUrl())),
+    m_mainUpdateUrl(QUrl(qnSettings->updateFeedUrl())),
     m_target(target)
 {
 }
@@ -126,10 +126,13 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline() {
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString()), cl_logDEBUG2);
-    if (!httpClient->doGet(url))
-        finishTask(QnCheckForUpdateResult::InternetProblem);
-    else 
-        m_runningRequests.insert(reply);
+    if (!httpClient->doGet(url)) {
+        if (!tryNextServer())
+            finishTask(QnCheckForUpdateResult::InternetProblem);
+        return;
+    }
+
+    m_runningRequests.insert(reply);
 }
 
 void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
@@ -145,20 +148,18 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
     m_clientUpdateFile.clear();
     m_releaseNotesUrl.clear();
 
+    loadServersFromSettings();
+    UpdateServerInfo serverInfo;
+    serverInfo.url = m_mainUpdateUrl;
+    m_updateServers.prepend(serverInfo);
+
     m_targetMustBeNewer = m_target.version.isNull();
     m_checkLatestVersion = m_target.version.isNull();
 
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking online updates [%1]").arg(m_target.version.toString()), cl_logDEBUG1);
 
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
-    httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
-    connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(m_updatesUrl.toString()), cl_logDEBUG2);
-    if (!httpClient->doGet(m_updatesUrl))
+    if (!tryNextServer())
         finishTask(QnCheckForUpdateResult::InternetProblem);
-    else 
-        m_runningRequests.insert(reply);
 }
 
 void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
@@ -186,16 +187,28 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     reply->deleteLater();
 
     if (reply->isFailed()) {
-        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request failed."), cl_logDEBUG2);
-        finishTask(QnCheckForUpdateResult::InternetProblem);
+        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.").arg(reply->url().toString()), cl_logDEBUG2);
+
+        if (!tryNextServer())
+            finishTask(QnCheckForUpdateResult::InternetProblem);
+
         return;
     }
 
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request received."), cl_logDEBUG2);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.").arg(reply->url().toString()), cl_logDEBUG2);
 
     QByteArray data = reply->data();
     
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
+
+    if (m_currentUpdateUrl == m_mainUpdateUrl) {
+        auto infoIt = map.find(lit("__info"));
+        if (infoIt != map.end()) {
+            qnSettings->setAlternativeUpdateServers(infoIt->toList());
+            loadServersFromSettings();
+        }
+    }
+
     map = map.value(QnAppInfo::customizationName()).toMap();
     QVariantMap releasesMap = map.value(lit("releases")).toMap();
 
@@ -206,7 +219,8 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
     QString updatesPrefix = map.value(lit("updates_prefix")).toString();
     if (latestVersion.isNull() || updatesPrefix.isEmpty()) {
-        finishTask(QnCheckForUpdateResult::NoNewerVersion);
+        if (!tryNextServer())
+            finishTask(QnCheckForUpdateResult::NoSuchBuild);
         return;
     }
 
@@ -226,13 +240,16 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
 
     reply->deleteLater();
 
-    if (reply->isFailed()) {
-        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request failed."), cl_logDEBUG2);
-        finishTask(QnCheckForUpdateResult::NoSuchBuild);
+    if (reply->isFailed()  || (reply->response().statusLine.statusCode != nx_http::StatusCode::ok)) {
+        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.").arg(reply->url().toString()), cl_logDEBUG2);
+
+        if (!tryNextServer())
+            finishTask(QnCheckForUpdateResult::NoSuchBuild);
+
         return;
     }
 
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request received."), cl_logDEBUG2);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.").arg(reply->url().toString()), cl_logDEBUG2);
 
     QByteArray data = reply->data();
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
@@ -240,8 +257,10 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
     m_target.version = QnSoftwareVersion(map.value(lit("version")).toString());
 
     if (m_target.version.isNull()) {
-        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No such build."), cl_logDEBUG1);
-        finishTask(QnCheckForUpdateResult::NoSuchBuild);
+        if (!tryNextServer()) {
+            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No such build."), cl_logDEBUG1);
+            finishTask(QnCheckForUpdateResult::NoSuchBuild);
+        }
         return;
     }
 
@@ -388,6 +407,41 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) 
 
     emit checkFinished(result);
     finish(static_cast<int>(value));
+}
+
+void QnCheckForUpdatesPeerTask::loadServersFromSettings() {
+    m_updateServers.clear();
+
+    for (const QVariant &alternative : qnSettings->alternativeUpdateServers()) {
+        QVariantMap infoMap = alternative.toMap();
+
+        UpdateServerInfo serverInfo;
+        serverInfo.url = infoMap.value(lit("url")).toUrl();
+        if (!serverInfo.url.isValid())
+            continue;
+
+        m_updateServers.append(serverInfo);
+    }
+}
+
+bool QnCheckForUpdatesPeerTask::tryNextServer() {
+    if (m_updateServers.isEmpty())
+        return false;
+
+    UpdateServerInfo serverInfo = m_updateServers.takeFirst();
+    m_currentUpdateUrl = serverInfo.url;
+
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
+    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
+    connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(m_currentUpdateUrl.toString()), cl_logDEBUG2);
+    if (!httpClient->doGet(m_currentUpdateUrl))
+        return false;
+
+    m_runningRequests.insert(reply);
+
+    return true;
 }
 
 void QnCheckForUpdatesPeerTask::start() {

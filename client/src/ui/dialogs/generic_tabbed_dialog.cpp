@@ -6,7 +6,7 @@
 
 #include <utils/common/warnings.h>
 
-QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /*= 0*/) :
+QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */) :
     base_type(parent)
 {
 
@@ -43,12 +43,17 @@ void QnGenericTabbedDialog::reject() {
     base_type::reject();
 }
 
-void QnGenericTabbedDialog::accept() {
+bool QnGenericTabbedDialog::tryAccept() {
     if (!confirm())
-        return;
+        return false;
 
     submitData();
     base_type::accept();
+    return true;
+}
+
+void QnGenericTabbedDialog::accept() {
+    tryAccept();
 }
 
 void QnGenericTabbedDialog::loadData() {
@@ -65,6 +70,7 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
     if (!m_tabWidget)
         initializeTabWidget();
 
+    Q_ASSERT_X(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
     if (!m_tabWidget) 
         return;
 
@@ -83,6 +89,29 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
 
     m_tabWidget->addTab(page, title);
 }
+
+
+void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled) {
+    Q_ASSERT_X(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
+
+    if (!m_tabWidget) 
+        return;
+
+    foreach(const Page &page, m_pages) {
+        if (page.key != key)
+            continue;
+
+        int index = m_tabWidget->indexOf(page.widget);
+        if (index < 0)
+            return;
+
+        m_tabWidget->setTabEnabled(index, enabled);
+        return;
+    }
+
+    qnWarning("QnGenericTabbedDialog '%1' does not contain %2", metaObject()->className(), key);
+}
+
 
 void QnGenericTabbedDialog::setTabWidget(QTabWidget *tabWidget) {
     if(m_tabWidget.data() == tabWidget)
@@ -178,5 +207,11 @@ bool QnGenericTabbedDialog::tryClose(bool force) {
 }
 
 void QnGenericTabbedDialog::forcedUpdate() {
+    retranslateUi();
     loadData();
+}
+
+void QnGenericTabbedDialog::retranslateUi() {
+    for(const Page &page: m_pages)
+        page.widget->retranslateUi();
 }

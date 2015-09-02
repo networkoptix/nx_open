@@ -5,6 +5,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QKeyEvent>
 
+#include <core/resource/resource_name.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/event_processors.h>
@@ -26,10 +27,6 @@ namespace Qn {
     const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
 }
 
-namespace {
-    const QString defaultPlaceholder(6, L'*');
-}
-
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent): 
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
@@ -37,6 +34,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     m_user(0),
     m_hasChanges(false),
     m_inUpdateDependensies(false),
+    m_enabledModified(false),
     m_userNameModified(false),
     m_passwordModified(false),
     m_emailModified(false),
@@ -60,12 +58,14 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
     connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
     connect(ui->emailEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateEmail()));
+    connect(ui->enabledCheckBox,        SIGNAL(clicked(bool)),                  this,   SLOT(updateEnabled()));
     connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(updateAccessRights()));
 
     connect(ui->loginEdit,              &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_userNameModified = true; } );
     connect(ui->passwordEdit,           &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_passwordModified = true; } );
     connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged, this,   [this](){ setHasChanges(); } );
     connect(ui->emailEdit,              &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_emailModified = true; } );
+    connect(ui->enabledCheckBox,        &QCheckBox::clicked,     this,   [this](){ setHasChanges(); m_enabledModified = true; } );
     connect(ui->accessRightsComboBox,   static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this,   [this](){ setHasChanges(); m_accessRightsModified = true; } );
 
@@ -92,6 +92,7 @@ void QnUserSettingsDialog::setHasChanges(bool hasChanges) {
         m_userNameModified = false;
         m_passwordModified = false;
         m_emailModified = false;
+        m_enabledModified = false;
         m_accessRightsModified = false;
     }
 
@@ -146,6 +147,11 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         ui->emailEdit->setVisible(visible);
         ui->emailLabel->setVisible(visible);
         ui->emailEdit->setReadOnly(!editable);
+        break;
+    case Enabled:
+        ui->enabledCheckBox->setVisible(visible);
+        ui->enabledLabel->setVisible(visible);
+        setReadOnly(ui->enabledCheckBox, !editable);
         break;
     default:
         break;
@@ -212,15 +218,16 @@ void QnUserSettingsDialog::updateFromResource() {
     if(m_mode == Mode::NewUser) {
         ui->loginEdit->clear();
         ui->emailEdit->clear();
+        ui->enabledCheckBox->setChecked(true);
 
         loadAccessRightsToUi(Qn::GlobalLiveViewerPermissions);
     } else {
         ui->loginEdit->setText(m_user->getName());
         ui->emailEdit->setText(m_user->getEmail());
+        ui->enabledCheckBox->setChecked(m_user->isEnabled());
 
         loadAccessRightsToUi(accessController()->globalPermissions(m_user));
     }
-    updatePlaceholders();
     updateLogin();
     updatePassword();
 
@@ -250,6 +257,9 @@ void QnUserSettingsDialog::submitToResource() {
     }
     if( m_emailModified )
         m_user->setEmail(ui->emailEdit->text());
+
+    if (m_enabledModified)
+        m_user->setEnabled(ui->enabledCheckBox->isChecked());
 
     setHasChanges(false);
 }
@@ -327,7 +337,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
                 !ui->confirmPasswordEdit->text().isEmpty())
                 && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
                     if(ui->currentPasswordEdit->text().isEmpty()) {
-                        hint = tr("To change your password, please enter your current password.");
+                        hint = tr("To modify your password, please enter existing one.");
                         valid = false;
                     } else {
                         hint = tr("Invalid current password.");
@@ -341,7 +351,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         if (m_mode == Mode::OtherUser && ui->loginEdit->text().trimmed() != m_user->getName()) {
             /* ..and have not entered new password. */
             if (ui->passwordEdit->text().isEmpty()) {
-                hint = tr("User was renamed. Password must be updated.");
+                hint = tr("User has been renamed. Password must be updated.");
                 valid = false;
             }
         } 
@@ -376,6 +386,8 @@ void QnUserSettingsDialog::updateElement(Element element) {
             valid = false;
         }
         break;
+    case Enabled:
+        break;
     default:
         break;
     }
@@ -395,6 +407,7 @@ void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights) {
 }
 
 void QnUserSettingsDialog::updateAll() {
+    updateElement(Enabled);
     updateElement(Email);
     updateElement(AccessRights);
     updateElement(Password);
@@ -494,7 +507,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
         previous = createAccessRightCheckBox(tr("Administrator"),
                      Qn::ExcludingAdminPermission,
                      previous);
-    previous = createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission, previous);
+    previous = createAccessRightCheckBox(tr("Can adjust %1 settings").arg(getDefaultDevicesName(true, false)), Qn::GlobalEditCamerasPermission, previous);
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
@@ -569,21 +582,6 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
         widget = widget->parentWidget();
     }
     updateSizeLimits();
-}
-
-void QnUserSettingsDialog::updatePlaceholders() {
-
-    bool showPlaceholder = m_mode == Mode::OwnUser;
-
-    QString placeholder = showPlaceholder 
-        ? defaultPlaceholder 
-        : QString();
-
-    ui->currentPasswordEdit->clear();
-    ui->passwordEdit->clear();
-    ui->passwordEdit->setPlaceholderText(placeholder);
-    ui->confirmPasswordEdit->clear();
-    ui->confirmPasswordEdit->setPlaceholderText(placeholder);
 }
 
 // Utility functions

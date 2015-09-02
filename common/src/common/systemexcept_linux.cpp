@@ -1,7 +1,5 @@
 #include "systemexcept_linux.h"
 
-#include "version.h"
-
 #include <execinfo.h>
 #include <fcntl.h>
 #include <pwd.h>
@@ -19,6 +17,7 @@
 #include <pthread.h>
 
 #include <QDebug>
+#include "utils/common/app_info.h"
 
 static const int BUFFER_SIZE = 2048;
 static const int STACK_SHIFT = 2; // signalHandler and printThreadData
@@ -30,9 +29,7 @@ static const struct timespec WAIT_FOR_MUTEX     = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_THREADS   = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_MAIN      = { 1 /* sec */, 500000 /* nsec */ };
 
-static const bool isBeta = strcmp(QN_BETA, "true") == 0;
-static const std::string versionId = QN_ENGINE_VERSION "-" QN_APPLICATION_REVISION;
-static const std::string fullVersionId = versionId + (isBeta ? "-beta" : "");
+static const std::string fullVersionId = QnAppInfo::applicationFullVersion().toStdString();
 
 /** Thread Keeper without heap usage */
 class ThreadKeeper
@@ -75,6 +72,10 @@ static pthread_t mainThread(0);
 static ThreadKeeper allThreads;
 static struct sigaction originalHandlers[_NSIG] = {};
 
+static bool isLogFileOpened(false);
+static pthread_t problemThread(0);
+static int logFile(-1);
+
 static std::string getCrashPrefix()
 {
     const std::string program(program_invocation_name);
@@ -103,6 +104,8 @@ static int printFd(int fd, Args ... args)
 static int openLogFile()
 {
     int log = open(crashFile.c_str(), O_CREAT | O_WRONLY, 0666);
+    if (log < 0) return log;
+
     int status = open("/proc/self/status", O_RDONLY);
     if (status < 0) return log;
 
@@ -151,8 +154,12 @@ static void signalHandler(int signal, siginfo_t* info, void* data)
     }
 
     const auto thisThread = pthread_self();
-    static const auto problemThread = thisThread;
-    static const auto logFile = openLogFile();
+    if (!isLogFileOpened)
+    {
+        isLogFileOpened = true;
+        problemThread = thisThread;
+        logFile = openLogFile();
+    }
 
     if (logFile < 0)
     {

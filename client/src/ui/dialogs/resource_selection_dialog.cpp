@@ -9,6 +9,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -84,17 +85,17 @@ void QnResourceSelectionDialog::init() {
     switch (m_target) {
     case UserResourceTarget:
         scope = QnResourcePoolModel::UsersScope;
-        setWindowTitle(tr("Select users..."));
+        setWindowTitle(tr("Select Users..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;
     case CameraResourceTarget:
         scope = QnResourcePoolModel::CamerasScope;
-        setWindowTitle(tr("Select cameras..."));
+        setWindowTitle(tr("Select %1...").arg(getDefaultDevicesName()));
         break;
     default:
         scope = QnResourcePoolModel::FullScope;
-        setWindowTitle(tr("Select resources..."));
+        setWindowTitle(tr("Select Resources..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;

@@ -87,6 +87,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnBackgroundColors>();
     qRegisterMetaType<QnCalendarColors>();
     qRegisterMetaType<QnStatisticsColors>();
+    qRegisterMetaType<QnIoModuleColors>();
     qRegisterMetaType<QnScheduleGridColors>();
     qRegisterMetaType<QnGridColors>();
     qRegisterMetaType<QnHistogramColors>();
@@ -94,6 +95,9 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnPtzManageModelColors>();
     qRegisterMetaType<QnLicensesListModelColors>();
     qRegisterMetaType<QnRoutingManagementColors>();
+    qRegisterMetaType<QnAuditLogColors>();
+    qRegisterMetaType<QnRecordingStatsColors>();
+    qRegisterMetaType<QnUserManagementColors>();
     qRegisterMetaType<QnVideowallManageWidgetColors>();
     qRegisterMetaType<QnServerUpdatesColors>();
 
@@ -109,6 +113,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnBackgroundColors>();
     QnJsonSerializer::registerSerializer<QnCalendarColors>();
     QnJsonSerializer::registerSerializer<QnStatisticsColors>();
+    QnJsonSerializer::registerSerializer<QnIoModuleColors>();
     QnJsonSerializer::registerSerializer<QnScheduleGridColors>();
     QnJsonSerializer::registerSerializer<QnGridColors>();
     QnJsonSerializer::registerSerializer<QnHistogramColors>();
@@ -116,6 +121,9 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnPtzManageModelColors>();
     QnJsonSerializer::registerSerializer<QnLicensesListModelColors>();
     QnJsonSerializer::registerSerializer<QnRoutingManagementColors>();
+    QnJsonSerializer::registerSerializer<QnAuditLogColors>();
+    QnJsonSerializer::registerSerializer<QnRecordingStatsColors>();
+    QnJsonSerializer::registerSerializer<QnUserManagementColors>();
     QnJsonSerializer::registerSerializer<QnVideowallManageWidgetColors>();
     QnJsonSerializer::registerSerializer<QnServerUpdatesColors>();
 

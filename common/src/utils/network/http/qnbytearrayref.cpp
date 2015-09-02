@@ -87,12 +87,12 @@ float QnByteArrayConstRef::toFloat() const
 
 QnByteArrayConstRef::value_type QnByteArrayConstRef::front() const
 {
-    return m_src->at(m_offset);
+    return m_src->at(static_cast<int>(m_offset));
 }
 
 QnByteArrayConstRef::value_type QnByteArrayConstRef::back() const
 {
-    return m_src->at(m_offset+m_count-1);
+    return m_src->at(static_cast<int>(m_offset+m_count-1));
 }
 
 QList<QnByteArrayConstRef> QnByteArrayConstRef::split( char sep ) const
@@ -138,6 +138,14 @@ QnByteArrayConstRef QnByteArrayConstRef::trimmed( const value_type* charsToTrim 
     }
 
     return result;
+}
+
+void QnByteArrayConstRef::pop_front( size_type count )
+{
+    Q_ASSERT( count <= m_count );
+
+    m_offset += count;
+    m_count -= count;
 }
 
 bool QnByteArrayConstRef::isEqualCaseInsensitive( const char* str, size_t strLength ) const

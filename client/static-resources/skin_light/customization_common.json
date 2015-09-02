@@ -107,6 +107,35 @@
         }}
     },
 
+    "QnAuditLogModel": {
+        "colors": {
+			"_": "Audit trail colors.",
+		
+            "httpLink": "#000000",
+            "unsucessLoginAction": "#666666",
+            "loginAction": "#147700",
+            "updUsers": "#7d2f7c",
+            "watchingLive": "#007c8b",
+            "watchingArchive": "#007c8b",
+            "exportVideo": "#17437f",
+            "updCamera": "#ba5555",
+            "systemActions": "#bc290b",
+            "updServer": "#c5780a",
+            "eventRules": "#7c4b30",
+            "emailSettings": "#2b2b2b",
+            "chartColor": "#39b2ef"
+        }
+    },
+
+    "QnRecordingStatsModel": {
+        "colors": {
+            "_": "Recording statistics.",
+		
+            "chartMainColor": "#39b2ef",
+            "chartForecastColor": "#89d7ff"
+        }
+    },
+	
     "QnTimeSlider": {
         "colors": {
             "_": "Time slider colors.",
@@ -208,13 +237,26 @@
             "window": "#ffffff80",
             "windowText": "#801010c0"
         }},
-        "#diagnosticsButton": { 
+        "#statusOverlayButton": {
             "windowColor": "#801010c0",
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
         }
     },
     
+    "QnIoModuleOverlayWidget": {
+        "palette": {
+            "default": {
+                "window": "#d0d0d0d0",
+                "windowText": "#000000",
+                "buttonText": "#000000"
+            }
+        },
+        "colors": {
+            "idLabel": "#575757"
+        }
+    },
+
     "QnStyledTooltipWidget": {
         "windowColor": "QColor(255, 255, 255, 192)",
         "frameColor": "#808080",
@@ -359,6 +401,22 @@
             "recordAlways": "#00aa00",
             "recordNever": "#a0a0a0",
             "recordMotion": "#be3938"
+        }
+    },
+
+    "QnUserManagementWidget": {
+        "colors": {
+            "disabledSelectedText": "#b5d7ee",
+            "disabledButtonsText":  "#000000",
+            "selectionBackground": "#95bfe0"
+        }
+    },
+    
+    "QnUserListModel": {
+        "colors": {
+            "disabledSelectedText": "#b5d7ee",
+            "disabledButtonsText":  "#000000",
+            "selectionBackground": "#95bfe0"
         }
     }
 

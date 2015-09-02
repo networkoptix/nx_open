@@ -62,6 +62,7 @@ public:
         chunkedMode(false),
         clientRequestOffset(0),
         prevSocketError(SystemError::noError),
+        authenticatedOnce(false),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
     {
@@ -91,7 +92,7 @@ public:
     QDateTime lastModified;
     QnUuid authUserId;
     SystemError::ErrorCode prevSocketError;
-
+    bool authenticatedOnce;
 private:
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;

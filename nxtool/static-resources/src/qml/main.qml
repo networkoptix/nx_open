@@ -1,4 +1,4 @@
-import QtQuick 2.1;
+import QtQuick 2.3;
 import QtQuick.Window 2.0;
 import QtQuick.Controls 1.1;
 import QtQuick.Layouts 1.0;
@@ -81,12 +81,14 @@ Window
             
             enabled: (rtuContext.currentPage === NxRtu.Constants.SettingsPage);
             opacity: enabled ? 1 : 0.5;
+
+            activeFocusOnTab: false;
         }
         
         Item
         {
             id: holder;
-            
+
             Loader
             {
                 id: loader;
@@ -101,7 +103,11 @@ Window
                 {
                     target: rtuContext;
                     onCurrentPageChanged: { loader.reloadPage(); }
-                    onSelectionChanged: { loader.reloadPage(); }
+                    onSelectionChanged:
+                    {
+                        if (rtuContext.currentPage !== NxRtu.Constants.ProgressPage)
+                            loader.reloadPage();
+                    }
                 }
                 
                 function reloadPage()

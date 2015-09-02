@@ -75,11 +75,11 @@ void QnSignInfo::paintEvent(QPaintEvent *)
     {
         if (m_signFromFrame.isEmpty()) {
             p2.setPen(QColor(128,0,0));
-            text = tr("Watermark not found");
+            text = tr("Watermark Not Found");
         }
         else if (m_sign == m_signFromFrame) {
             p2.setPen(QColor(0,128,0));
-            text = tr("Watermark matched");
+            text = tr("Watermark Matched");
         }
         else {
             p2.setPen(QColor(128,0,0));

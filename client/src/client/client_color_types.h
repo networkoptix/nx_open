@@ -91,6 +91,14 @@ struct QnStatisticsColors {
 #define QnStatisticsColors_Fields (grid)(frame)(cpu)(ram)(hdds)(network)
 
 
+struct QnIoModuleColors {
+    QnIoModuleColors();
+
+    QColor idLabel;
+};
+#define QnIoModuleColors_Fields (idLabel)
+
+
 struct QnScheduleGridColors {
 public:
     QnScheduleGridColors();
@@ -177,6 +185,44 @@ struct QnRoutingManagementColors {
 };
 #define QnRoutingManagementColors_Fields (readOnly)
 
+struct QnAuditLogColors {
+    QnAuditLogColors();
+
+    QColor httpLink;
+    
+    QColor loginAction;
+    QColor unsucessLoginAction;
+    QColor updUsers;
+    QColor watchingLive;
+    QColor watchingArchive;
+    QColor exportVideo;
+    QColor updCamera;
+    QColor systemActions;
+    QColor updServer;
+    QColor eventRules;
+    QColor emailSettings;
+
+    QColor chartColor;
+};
+#define QnAuditLogColors_Fields (httpLink)(loginAction)(unsucessLoginAction)(updUsers)(watchingLive)(watchingArchive)(exportVideo)(updCamera)(systemActions)(updServer)(eventRules)(emailSettings)(chartColor)
+
+struct QnRecordingStatsColors {
+    QnRecordingStatsColors();
+
+    QColor chartMainColor;
+    QColor chartForecastColor;
+};
+#define QnRecordingStatsColors_Fields (chartMainColor)(chartForecastColor)
+
+struct QnUserManagementColors {
+    QnUserManagementColors();
+
+    QColor disabledSelectedText;
+    QColor disabledButtonsText;
+    QColor selectionBackground;
+};
+#define QnUserManagementColors_Fields (disabledSelectedText)(disabledButtonsText)(selectionBackground)
+
 struct QnServerUpdatesColors {
     QnServerUpdatesColors();
 
@@ -190,8 +236,9 @@ struct QnServerUpdatesColors {
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
-    (QnRoutingManagementColors)(QnVideowallManageWidgetColors) \
-    (QnServerUpdatesColors)
+    (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
+    (QnUserManagementColors) \
+    (QnServerUpdatesColors)(QnIoModuleColors)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

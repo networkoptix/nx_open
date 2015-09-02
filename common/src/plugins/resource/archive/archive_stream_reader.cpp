@@ -386,7 +386,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
             m_singleShowWaitCond.wait(&m_jumpMtx);
     }
 
-    //=================
+    // =================
     {
         QMutexLocker mutex(&m_jumpMtx);
         while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !needToStop())
@@ -970,6 +970,7 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
     }
 }
 
+/** Is not used and not implemented. */
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 {
     return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->channelCount() == 1;

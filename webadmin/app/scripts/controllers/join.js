@@ -55,6 +55,9 @@ angular.module('webadminApp')
                         case 'FAIL':
                             errorToShow = 'System is unreachable or doesn\'t exist.';
                             break;
+                        case 'currentPassword':
+                            errorToShow = 'Incorrect current password';
+                            break;
                         case 'UNAUTHORIZED':
                         case 'password':
                             errorToShow = 'Wrong password.';

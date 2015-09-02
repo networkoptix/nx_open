@@ -1,164 +1,674 @@
 'use strict';
 
-angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope,$location,$routeParams,mediaserver) {
+angular.module('webadminApp').controller('ViewCtrl',
+    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q,$sessionStorage,$localStorage) {
 
-    $scope.cameras = {};
-    $scope.activeCamera = null;
+        $scope.session = $sessionStorage;
+        $scope.storage = $localStorage;
+        $scope.storage.serverStates = $scope.storage.serverStates || {};
+        
+        $scope.playerApi = false;
+        $scope.cameras = {};
+        $scope.liveOnly = true;
+        $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
-    $scope.activeResolution = '320p';
-    $scope.availableResolutions = ['1080p', '720p', '640p', '320p', '240p'];
+        if(!$routeParams.cameraId &&  $scope.storage.cameraId){
+            $location.path('/view/' + $scope.storage.cameraId, false);
+        }
 
-    $scope.settings = {id:null};
-    mediaserver.getSettings().then(function (r) {
-        $scope.settings = {
-            id: r.data.reply.id
+        $scope.activeCamera = null;
+
+        var isAdmin = false;
+        var canViewLive = false;
+        var canViewArchive = false;
+        var availableCameras = null;
+
+        var timeCorrection = 0;
+        var minTimeLag = 2000;// Two seconds
+
+        $scope.activeResolution = 'Auto';
+        // TODO: detect better resolution here?
+        var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
+        var nativeResolutions = ['Auto', 'hi', 'lo'];
+        var reloadInterval = 5*1000;//30 seconds
+        var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
+        var mimeTypes = {
+            'hls': 'application/x-mpegURL',
+            'webm': 'video/webm',
+            'rtsp': 'application/x-rtsp',
+            'flv': 'video/x-flv',
+            'mp4': 'video/mp4',
+            'mjpeg':'video/x-motion-jpeg'
         };
-    });
 
-    function getCamerasServer(camera){
-        return _.find($scope.mediaServers,function(server){
-            return server.id === camera.parentId;
-        });
-    }
-    function getServerUrl(server){
-        if( $scope.settings.id === server.id.replace('{','').replace('}','')){
-            return '';
-        }
-        return server.apiUrl.replace('http://','').replace('https://','');
-    }
-
-    function updateVideoSource(){
-        var cameraId = $scope.activeCamera.physicalId;
-        var server = getCamerasServer ($scope.activeCamera);
-        var serverUrl = '';
-        if( $scope.settings.id !== server.id.replace('{','').replace('}','')){
-            serverUrl = '/proxy/' + getServerUrl(server);
-        }
-
-        $scope.acitveVideoSource = [
-            { src: serverUrl + '/media/' + cameraId + '.webm?resolution='   +  $scope.activeResolution, type:'video/webm' },
-            { src: serverUrl + '/media/' + cameraId + '.mp4?resolution='    +  $scope.activeResolution, type:'video/mp4' },
-            { src: serverUrl + '/hls/'   + cameraId + '.m3u?resolution='    +  $scope.activeResolution },
-            { src: serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   +  $scope.activeResolution },
-            { src: serverUrl + '/media/' + cameraId + '.mpegts?resolution=' +  $scope.activeResolution },
-            { src: serverUrl + '/media/' + cameraId + '.3gp?resolution='    +  $scope.activeResolution },
-            { src: serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' +  $scope.activeResolution }
+        $scope.activeFormat = 'Auto';
+        $scope.availableFormats = [
+            'Auto',
+            'video/webm',
+            'application/x-mpegURL',
+            'application/x-rtsp'
         ];
-    }
 
-    $scope.selectCameraById = function(cameraId){
+        $scope.settings = {id: ""};
 
-        $scope.cameraId = cameraId || $scope.cameraId;
-
-        $scope.activeCamera = _.find($scope.allcameras,function(camera){
-            return camera.id === $scope.cameraId;
+        mediaserver.getSettings().then(function (r) {
+            $scope.settings = {
+                id: r.data.reply.id
+            };
         });
-        if(!!$scope.activeCamera)
-            updateVideoSource();
-    };
 
-    $rootScope.$on('$routeChangeStart', function (event, next, current) {
+        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
+            if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
+                $scope.ieNoWebm = true;
+            }
+        }
 
-        $scope.selectCameraById(next.params.cameraId);
-    });
-
-    $scope.selectCamera = function(activeCamera){
-        $location.path('/view/' + activeCamera.id, false);
-        $scope.selectCameraById(activeCamera.id);
-    };
-
-    function extractDomain(url) {
-        url = url.split('/')[2] || url.split('/')[0];
-        return url.split(':')[0].split('?')[0];
-    }
-    function getCameras(){
-        mediaserver.getCameras().then(function(data){
-            var cameras = data.data;
-
-
-            function cameraSorter(camera){
-                camera.url = extractDomain(camera.url);
-
-                var num = 0;
-                try {
-                    var addrArray = camera.url.split('.');
-                    for (var i = 0; i < addrArray.length; i++) {
-                        var power = 3 - i;
-                        num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
-                    }
-                    if(isNaN(num)){
-                        throw num;
-                    }
-                    num = num.toString(16);
-                    if(num.length<8) {
-                        num = '0' + num;
-                    }
-                } catch (a) {
-                    num = camera.url;
+        if(window.jscd.mobile) {
+            $scope.mobileStore = window.jscd.os == "iOS"?"appstore":"googleplay";
+            var found = _.find(Config.helpLinks, function (links) {
+                if (!links.urls) {
+                    return false;
                 }
-                return camera.name + '__' + num;
+                var url = _.find(links.urls, function (url) {
+                    return url.class == $scope.mobileStore;
+                });
+                if (!url) {
+                    return false;
+                }
+                $scope.mobileAppLink = url.url;
+                return true;
+            });
+            $scope.hasMobileApp = !!found;
+        }
+
+
+        function browserSupports(type,maybe){
+            var v = document.createElement('video');
+            if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
+                return true;//Native support
+            }
+            if(maybe){
+                if(type=='hls' && window.jscd.os != "Android" ){
+                    return true; // Requires flash, but may be played
+                }
+                if(type=='webm' && window.jscd.browser == 'Microsoft Internet Explorer' ){
+                    return true; // Requires plugin, but may be played
+                }
+            }
+            if(type=='hls'){
+                return !!window.jscd.flashVersion ; // flash hls support
+            }
+            return false;
+        }
+        function cameraSupports(type){
+            if(!$scope.activeCamera){
+                return null;
+            }
+            return _.find($scope.activeCamera.mediaStreams,function(stream){
+                return stream.transports.indexOf(type)>0;
+            });
+        }
+
+        function formatSupported(type){
+            return cameraSupports(type) && browserSupports(type,true);
+        }
+        function updateAvailableResolutions() {
+            if(!$scope.activeCamera){
+                $scope.activeResolution = 'Auto';
+                $scope.availableResolutions = ['Auto'];
             }
 
-            //1. split cameras with groupId and without
-            var cams =_.partition (cameras,function(cam){
-                return cam.groupId==='';
+            //1. Does browser and server support webm?
+            if(formatSupported('webm')){
+                $scope.availableResolutions = transcodingResolutions;
+            }else{
+                $scope.availableResolutions = nativeResolutions;
+            }
+
+            if($scope.availableResolutions.indexOf($scope.activeResolution)<0){
+                $scope.activeResolution = $scope.availableResolutions[0];
+            }
+        }
+        updateAvailableResolutions();
+
+
+
+        function getServer(id) {
+            if(!$scope.mediaServers) {
+                return null;
+            }
+            return _.find($scope.mediaServers, function (server) {
+                return server.id === id;
             });
+        }
+        function getCamera(id){
+            if(!$scope.cameras) {
+                return null;
+            }
+            for(var serverId in $scope.cameras) {
+                var cam = _.find($scope.cameras[serverId], function (camera) {
+                    return camera.id === id;
+                });
+                if(cam){
+                    return cam;
+                }
+            }
+            return null;
+        }
 
-            //2. sort groupedCameras
-            cams[1] = _.sortBy(cams[1],cameraSorter);
+        $scope.playerReady = function(API){
+            $scope.playerAPI = API;
+            $scope.switchPlaying(true);
+        };
+        function updateVideoSource(playing) {
+            var live = !playing;
 
-            //3. group groupedCameras by groups ^_^
-            cams[1] = _.groupBy(cams[1],function(cam){
-                return cam.groupId;
+            $scope.positionSelected = !!playing;
+
+            if(!$scope.positionProvider){
+                return;
+            }
+
+            $scope.positionProvider.init(playing);
+            if(live){
+                playing = (new Date()).getTime();
+            }else{
+                playing = Math.round(playing);
+            }
+            var cameraId = $scope.activeCamera.physicalId;
+            var serverUrl = '';
+            var rtspUrl = 'rtsp://' + window.location.host;
+
+            var mediaDemo = mediaserver.mediaDemo();
+            if(mediaDemo){
+                serverUrl = mediaDemo;
+                rtspUrl = "rtsp:" + mediaDemo;
+            }
+            var authParam = "&auth=" + mediaserver.authForMedia();
+            var rstpAuthPararm = "&auth=" + mediaserver.authForRtsp();
+
+            var positionMedia = !live ? "&pos=" + (playing) : "";
+            var positionHls = !live ? "&startTimestamp=" + (playing) : "";
+
+            // TODO: check resolution ?
+            $scope.acitveVideoSource = _.filter([
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionHls   + authParam ), type: mimeTypes['hls'], transport:'hls'},
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
+
+                // Not supported:
+                // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes['mjpeg'] , transport:'mjpeg'},
+
+                // Require plugin
+                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution=='lo'?1:0)), type: mimeTypes['rtsp'], transport:'rtsp'}
+            ],function(src){
+                return formatSupported(src.transport) && $scope.activeFormat == 'Auto'|| $scope.activeFormat == src.type;
             });
+        }
 
-            //4. Translate into array
-            cams[1] = _.values(cams[1]);
+        $scope.activeVideoRecords = null;
+        $scope.positionProvider = null;
 
-            //5. Emulate cameras by groups
-            cams[1] = _.map(cams[1],function(group){
-                return {
-                    isGroup:true,
-                    collapsed:false,
-                    parentId: group[0].parentId,
-                    name: group[0].groupName,
-                    id: group[0].groupId,
-                    url:group[0].url,
-                    status: 'Online',
-                    cameras:group
+        $scope.updateTime = function(currentTime, duration){
+            currentTime = currentTime || 0;
+
+            $scope.positionProvider.setPlayingPosition(currentTime*1000);
+            /*if(!$scope.positionProvider.liveMode) {
+                $location.search('time', Math.round($scope.positionProvider.playedPosition));
+            }*/
+        };
+
+        $scope.selectCameraById = function (cameraId, position, silent) {
+            if($scope.activeCamera && $scope.activeCamera.id == cameraId){
+                return;
+            }
+            var oldTimePosition = null;
+            if($scope.positionProvider && !$scope.positionProvider.liveMode){
+                oldTimePosition = $scope.positionProvider.playedPosition;
+            }
+
+            $scope.storage.cameraId  = cameraId || $scope.storage.cameraId  ;
+
+            position = position?parseInt(position):oldTimePosition;
+
+            $scope.activeCamera = getCamera ($scope.storage.cameraId  );
+            if (!silent && $scope.activeCamera) {
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
+
+                $scope.liveOnly = true;
+                if(canViewArchive) {
+                    $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
+                        $scope.liveOnly = !hasArchive;
+                    });
+                }
+
+                updateVideoSource(position);
+                updateAvailableResolutions();
+                $scope.switchPlaying(true);
+            }
+        };
+        $scope.selectCamera = function (activeCamera) {
+            $location.path('/view/' + activeCamera.id, false);
+            $scope.selectCameraById(activeCamera.id,false);
+        };
+
+        $scope.toggleServerCollapsed = function(server){
+            server.collapsed = !server.collapsed;
+            $scope.storage.serverStates[server.id] = server.collapsed;
+        };
+
+        $scope.switchPlaying = function(play){
+            if($scope.playerAPI) {
+                if (play) {
+                    $scope.playerAPI.play();
+                } else {
+                    $scope.playerAPI.pause();
+                }
+                if ($scope.positionProvider) {
+                    $scope.positionProvider.playing = play;
+
+                    if(!play){
+                        $timeout(function(){
+                            $scope.positionProvider.liveMode = false; // Do it async
+                        });
+                    }
+                }
+            }
+        };
+
+        $scope.switchPosition = function( val ){
+
+            //var playing = $scope.positionProvider.checkPlayingDate(val);
+
+            //if(playing === false) {
+                updateVideoSource(val);//We have nothing more to do with it.
+            /*}else{
+                $scope.playerAPI.seekTime(playing); // Jump to buffered video
+            }*/
+        };
+
+        $scope.selectFormat = function(format){
+            $scope.activeFormat = format;
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+        };
+
+        $scope.selectResolution = function(resolution){
+            /*if(resolution == "auto" || resolution == "Auto" || resolution == "AUTO"){
+                resolution = "320p"; //TODO: detect better resolution here
+            }*/
+
+            if($scope.activeResolution == resolution){
+                return;
+            }
+            $scope.activeResolution = resolution;
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+        };
+
+        $scope.enableFullScreen = screenfull.enabled;
+        $scope.fullScreen = function(){
+            if (screenfull.enabled) {
+                screenfull.request($(".videowindow").get(0));
+            }
+        };
+
+
+
+
+
+        function extractDomain(url) {
+            url = url.split('/')[2] || url.split('/')[0];
+            return url.split(':')[0].split('?')[0];
+        }
+        function objectOrderName(object){
+            var num = 0;
+            if(object.url) {
+                var addrArray = object.url.split('.');
+                for (var i = 0; i < addrArray.length; i++) {
+                    var power = 3 - i;
+                    num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
+                }
+                if (isNaN(num)) {
+                    num = object.url;
+                } else {
+                    num = num.toString(16);
+                    if (num.length < 8) {
+                        num = '0' + num;
+                    }
+                }
+            }
+
+            return object.name + '__' + num;
+        }
+        function getCameras() {
+
+            var deferred = $q.defer();
+
+            mediaserver.getCameras().then(function (data) {
+                var cameras = data.data;
+                
+                var findMediaStream = function(param){
+                    return param.name == "mediaStreams";
                 };
+                
+                function cameraFilter(camera){
+                    // Filter desktop cameras here
+                    if(camera.typeId == desktopCameraTypeId){ // Hide desctop cameras
+                        return false;
+                    }
+
+                    if(isAdmin){
+                        return true;
+                    }
+
+                    if(availableCameras){
+                        return availableCameras.indexOf(camera.id)>=0;
+                    }
+                    return false;
+                }
+
+                function cameraSorter(camera) {
+                    camera.url = extractDomain(camera.url);
+                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
+                    camera.server = getServer(camera.parentId);
+                    if(camera.server && camera.server.status == 'Offline'){
+                        camera.status = 'Offline';
+                    }
+
+                    var mediaStreams = _.find(camera.addParams,findMediaStream);
+                    camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
+
+                    return objectOrderName(camera);
+                }
+
+                function newCamerasFilter(camera){
+                    var oldCamera = getCamera(camera.id);
+                    if(!oldCamera){
+                        return true;
+                    }
+
+                    $.extend(oldCamera,camera);
+                    return false;
+                }
+                /*
+
+                 // This is for encoders (group cameras):
+
+                 //1. split cameras with groupId and without
+                 var cams = _.partition(cameras, function (cam) {
+                 return cam.groupId === '';
+                 });
+
+                 //2. sort groupedCameras
+                 cams[1] = _.sortBy(cams[1], cameraSorter);
+
+                 //3. group groupedCameras by groups ^_^
+                 cams[1] = _.groupBy(cams[1], function (cam) {
+                 return cam.groupId;
+                 });
+
+                 //4. Translate into array
+                 cams[1] = _.values(cams[1]);
+
+                 //5. Emulate cameras by groups
+                 cams[1] = _.map(cams[1], function (group) {
+                 return {
+                 isGroup: true,
+                 collapsed: false,
+                 parentId: group[0].parentId,
+                 name: group[0].groupName,
+                 id: group[0].groupId,
+                 url: group[0].url,
+                 status: 'Online',
+                 cameras: group
+                 };
+                 });
+
+                 //6 union cameras back
+                 cameras = _.union(cams[0], cams[1]);
+                 */
+
+
+                cameras = _.filter(cameras, cameraFilter);
+                //7 sort again
+                cameras = _.sortBy(cameras, cameraSorter);
+
+                //8. Group by servers
+                var camerasByServers = _.groupBy(cameras, function (camera) {
+                    return camera.parentId;
+                });
+
+                if(!$scope.cameras) {
+                    $scope.cameras = camerasByServers;
+                }else{
+                    for(var serverId in $scope.cameras){
+                        var activeCameras = $scope.cameras[serverId];
+                        var newCameras = camerasByServers[serverId];
+
+                        for(var i = 0; i < activeCameras.length; i++) { // Remove old cameras
+                            if(!_.find(newCameras,function(camera){
+                                    return camera.id == activeCameras[i].id;
+                                }))
+                            {
+                                activeCameras.splice(i, 1);
+                                i--;
+                            }
+                        }
+
+
+
+                        // Merge actual cameras
+                        var newCameras = _.filter(newCameras,newCamerasFilter); //Process old cameras and get new
+
+                        // Add new cameras
+
+                        _.forEach(newCameras,function(camera){ // Add new camera
+                            activeCameras.push(camera);
+                        });
+                    }
+
+                    for(var serverId in camerasByServers){
+                        if(!$scope.cameras[serverId]){
+                            $scope.cameras[serverId] = camerasByServers[serverId];
+                        }
+                    }
+                }
+
+                deferred.resolve(cameras);
+            }, function (error) {
+                deferred.reject(error);
             });
 
-            //6 union cameras back
-            cameras = _.union(cams[0],cams[1]);
+            return deferred.promise;
+        }
 
-            //7 sort again
-            cameras = _.sortBy(cameras,cameraSorter);
+        function reloadTree(){
+            function serverSorter(server){
+                server.url = extractDomain(server.url);
+                server.collapsed = $scope.storage.serverStates[server.id];
+                return objectOrderName(server);
+            }
 
-            //8. Group by servers
-            $scope.cameras = _.groupBy(cameras, function(camera){ return camera.parentId; });
+            function newServerFilter(server){
+                var oldserver = getServer(server.id);
 
-            $scope.allcameras = cameras;
-        },function(){
+                server.collapsed = oldserver ? oldserver.collapsed :
+                    $scope.storage.serverStates[server.id] ||
+                    server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
 
-            alert('network problem');
+                if(oldserver){ // refresh old server
+                    $.extend(oldserver,server);
+                }
+
+                return !oldserver;
+            }
+
+            var deferred = $q.defer();
+
+            mediaserver.getMediaServers().then(function (data) {
+
+                if(!$scope.mediaServers) {
+                    $scope.mediaServers = _.sortBy(data.data,serverSorter);
+                }else{
+                    var servers = data.data;
+                    for(var i = 0; i < $scope.mediaServers.length; i++) { // Remove old servers
+                        if(!_.find(servers,function(server){
+                                return server.id == $scope.mediaServers[i].id;
+                            }))
+                        {
+                            $scope.mediaServers.splice(i, 1);
+                            i--;
+                        }
+                    }
+
+
+                    var newServers = _.filter(servers,newServerFilter); // Process all servers - refresh old and find new
+
+                    _.forEach(_.sortBy(newServers,serverSorter),function(server){ // Add new server
+                        $scope.mediaServers.push(server);
+                    });
+                }
+
+                getCameras().then(function(data){
+                        deferred.resolve(data);
+                    },
+                    function(error){
+                        deferred.reject(error);
+                    });
+
+            }, function (error) {
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        }
+
+        var firstTime = true;
+        var timer = false;
+        function reloader(){
+            reloadTree().then(function(){
+                $scope.selectCameraById($scope.storage.cameraId  , firstTime && $location.search().time || false, !firstTime);
+                firstTime = false;
+                timer = $timeout(reloader, reloadInterval);
+            },function(error){
+                console.error(error);
+                //timer = $timeout(reloader, quickReloadInterval);
+            });
+        }
+        var desktopCameraTypeId = null;
+        function requestResourses() {
+            mediaserver.getResourceTypes().then(function (result) {
+                desktopCameraTypeId = _.find(result.data, function (type) {
+                    return type.name == 'SERVER_DESKTOP_CAMERA';
+                });
+                desktopCameraTypeId = desktopCameraTypeId ? desktopCameraTypeId.id : null;
+                reloader();
+            });
+        }
+
+        $scope.$watch("positionProvider.liveMode",function(mode){
+            if(mode){
+                $scope.positionSelected = false;
+            }
         });
-    }
 
-    $scope.$watch("allcameras",function(){$scope.selectCameraById();});
-
-    mediaserver.getMediaServers().then(function(data){
-
-        _.each(data.data,function(server){
-            server.url = extractDomain(server.url);
-            server.collapsed = server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0);
+        mediaserver.getTime().then(function(result){
+            var serverTime = parseInt(result.data.reply.utcTime);
+            var clientTime = (new Date()).getTime();
+            if(Math.abs(clientTime - serverTime) > minTimeLag){
+                timeCorrection = clientTime - serverTime;
+            }
         });
-        $scope.mediaServers = data.data;
-        getCameras();
-        $scope.selectCameraById ( $routeParams.cameraId);
-    },function(){
-        alert('network problem');
+
+        mediaserver.getCurrentUser().then(function(result){
+            isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
+            canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);
+            canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewArchivePermission);
+
+            if(!canViewLive){
+                return;
+            }
+
+            var userId = result.data.reply.id;
+
+            if(isAdmin){
+                requestResourses(); //Show  whole tree
+                return;
+            }
+            mediaserver.getLayouts().then(function(data){
+
+                availableCameras = _.chain(data.data).
+                    filter(function(layout){
+                        return layout.parentId == userId;
+                    }).
+                    map(function(layout){
+                        return layout.items;
+                    }).
+                    flatten().
+                    map(function(item){
+                        return item.resourceId;
+                    }).uniq().value();
+
+                requestResourses();
+            });
+
+
+
+        });
+
+        $scope.$on(
+            '$destroy',
+            function( ) {
+                $timeout.cancel(timer);
+            }
+        );
+
+
+        $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
+            $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
+        });
+
+
+
+        // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
+        // But I kept it for all browsers to avoid future possible bugs in different browsers
+        // Now every browser behaves the same way
+
+        var $window = $(window);
+        var $top = $("#top");
+        var $viewPanel = $(".view-panel");
+        var $camerasPanel = $(".cameras-panel");
+        var updateHeights = function() {
+            var windowHeight = $window.height();
+            var topHeight = $top.height();
+
+            var topAlertHeight = 0;
+
+            var topAlert = $("td.alert");
+            if(topAlert.length){
+                topAlertHeight = topAlert.height();
+            }
+
+            var viewportHeight = (windowHeight - topHeight - topAlertHeight) + "px";
+
+            $camerasPanel.css("height",viewportHeight );
+            $viewPanel.css("height",viewportHeight );
+        };
+
+        updateHeights();
+        setTimeout(updateHeights,50);
+        $window.resize(updateHeights);
+
+
+
+
+        $scope.mobileAppAlertClose = function(){
+            $scope.session.mobileAppNotified  = true;
+            setTimeout(updateHeights,50);
+        };
+
+        $scope.ieNoWebmAlertClose = function(){
+            $scope.session.ieNoWebmNotified = true;
+            setTimeout(updateHeights,50);
+        };
+
     });
-
-
-});

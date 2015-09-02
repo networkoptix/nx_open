@@ -14,7 +14,6 @@
 #include "business/business_strings_helper.h"
 #include "client/client_globals.h"
 #include <utils/math/math.h>
-#include <plugins/resource/server_camera/server_camera.h>
 #include "client/client_settings.h"
 #include <ui/common/ui_resource_name.h>
 
@@ -370,7 +369,7 @@ QString QnEventLogModel::getResourceNameString(QnUuid id) {
 QString QnEventLogModel::getUserGroupString(QnBusinessActionParameters::UserGroup value) {
     switch (value) {
     case QnBusinessActionParameters::EveryOne:
-        return tr("All users");
+        return tr("All Users");
     case QnBusinessActionParameters::AdminOnly:
         return tr("Administrators Only");
     default:
@@ -468,13 +467,15 @@ bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const {
 }
 
 int QnEventLogModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent);
-    return m_columns.size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
+    if(!parent.isValid())
+        return m_columns.size();
+    return 0;
 }
 
 int QnEventLogModel::rowCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent);
-    return m_index->size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
+    if(!parent.isValid())
+        return m_index->size();
+    return 0;
 }
 
 QVariant QnEventLogModel::headerData(int section, Qt::Orientation orientation, int role) const {

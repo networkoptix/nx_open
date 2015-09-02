@@ -20,7 +20,10 @@
 
 #include "server_query_processor.h"
 #include "rest/server/json_rest_result.h"
-
+#include "rest/server/rest_connection_processor.h"
+#include "audit/audit_manager.h"
+#include "api/model/audit/auth_session.h"
+#include "audit/audit_manager.h"
 
 namespace ec2
 {
@@ -61,7 +64,7 @@ namespace ec2
             const QByteArray& srcBodyContentType,
             QByteArray& resultBody,
             QByteArray& contentType,
-            const QnRestConnectionProcessor*) override
+            const QnRestConnectionProcessor* owner) override
         {
             QnTransaction<RequestDataType> tran;
             bool success = false;
@@ -112,6 +115,7 @@ namespace ec2
 
             // replace client GUID to own GUID (take transaction ownership).
             tran.peerID = qnCommon->moduleGUID();
+            tran.deliveryInfo.originatorType = QnTranDeliveryInformation::client;
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
@@ -135,8 +139,10 @@ namespace ec2
                 m_customAction( tran );
 
              // update local data
-            if (errorCode == ErrorCode::ok)
+            if (errorCode == ErrorCode::ok) {
+                m_connection->auditManager()->addAuditRecord(tran.command, tran.params, owner->authSession()); // add audit record before notification to ensure removed resource still alive
                 m_connection->notificationManager()->triggerNotification(tran);
+            }
 
             return (errorCode == ErrorCode::ok)
                 ? nx_http::StatusCode::ok

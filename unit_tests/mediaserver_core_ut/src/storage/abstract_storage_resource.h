@@ -26,12 +26,15 @@
 
 namespace test
 {
-    const char *const defaultUrl = "ftp://127.0.0.1/tmp";
     struct StorageTestGlobals
     {
-        void prepare(const QString &ftpStorageUrl) 
+        void prepare(
+            const QString &ftpStorageUrl,
+            const QString &smbStorageUrl
+        )
         {
-            this->ftpStorageUrl = ftpStorageUrl.isEmpty() ? defaultUrl : ftpStorageUrl;
+            this->ftpStorageUrl = ftpStorageUrl;
+            this->smbStorageUrl = smbStorageUrl;
 
             runnablePool = std::unique_ptr<QnLongRunnablePool>(
                 new QnLongRunnablePool
@@ -86,6 +89,7 @@ namespace test
         }
 
         QString                             ftpStorageUrl;
+        QString                             smbStorageUrl;
         std::vector<QnStorageResource *>    storages;
         std::unique_ptr<QnStorageManager>   storageManager;
         std::unique_ptr<QnResourcePool>     resourcePool;

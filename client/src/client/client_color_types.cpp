@@ -80,6 +80,10 @@ QnStatisticsColors::QnStatisticsColors() {
         << QColor(255, 52, 132);
 }
 
+QnIoModuleColors::QnIoModuleColors() {
+    idLabel = QColor(0x57, 0x57, 0x57);
+}
+
 QnScheduleGridColors::QnScheduleGridColors() {
     normalLabel =   QColor(255, 255, 255, 255);
     weekendLabel =  QColor(255, 128, 128, 255);
@@ -126,6 +130,39 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
 
 QnRoutingManagementColors::QnRoutingManagementColors() {
     readOnly = Qt::lightGray;
+}
+
+QnAuditLogColors::QnAuditLogColors() {
+    httpLink = QColor(0xFF, 0xFF, 0xFF); // HTTP NavajoWhite
+
+    unsucessLoginAction = QColor(0x99, 0x99, 0x99);
+
+    loginAction = QColor(0x65, 0x99, 0x1c);
+    updUsers = QColor(0x99, 0x49, 0x98); // QColor(0x02, 0x9e, 0xb0);
+    watchingLive = QColor(0x02, 0x9e, 0xb0); //QColor(0xb1, 0x30, 0x16);
+    watchingArchive = watchingLive;
+    exportVideo = QColor(0x5d, 0x82, 0xbf);
+    updCamera = QColor(0xf3, 0x82, 0x82);
+    systemActions = QColor(0xb1, 0x30, 0x16); //QColor(0xdc, 0xb4, 0x28);
+    updServer = QColor(0xdc, 0xb4, 0x28); //QColor(0x99, 0x49, 0x98);
+    eventRules = QColor(0x9c, 0x6b, 0x50); //QColor(0x5d, 0x82, 0xbf);
+    emailSettings = QColor(0xcb, 0xcb, 0xcb); //QColor(0x9c, 0x6b, 0x50);
+    
+    chartColor = QColor(0x25, 0x92, 0xc3);
+}
+
+QnRecordingStatsColors::QnRecordingStatsColors()
+{
+    chartMainColor = QColor(0x25, 0x92, 0xc3);
+    chartForecastColor = QColor(0x0c, 0x51, 0x69);
+}
+
+
+QnUserManagementColors::QnUserManagementColors()
+{
+    disabledSelectedText = QColor(0xb5, 0xd7, 0xee);
+    disabledButtonsText = QColor(0xff, 0xff, 0xff);
+    selectionBackground = QColor(0x22, 0x53, 0x77);
 }
 
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {

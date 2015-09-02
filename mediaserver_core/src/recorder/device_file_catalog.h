@@ -92,6 +92,7 @@ public:
     Chunk chunkAt(int index) const;
     bool isLastChunk(qint64 startTimeMs) const;
     bool containTime(qint64 timeMs, qint64 eps = 5 * 1000) const;
+    bool containTime(const QnTimePeriod& period) const;
 
     qint64 minTime() const;
     qint64 maxTime() const;
@@ -152,6 +153,7 @@ private:
     Chunk chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName);
     void replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog);
+    void removeChunks(int storageIndex);
     void removeRecord(int idx);
     int detectTimeZone(qint64 startTimeMs, const QString& fileName);
 private:

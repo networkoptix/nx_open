@@ -50,7 +50,7 @@ static void down_mix_to_stereo(T *data, int channels, int len)
     }
 }
 
-//=======================================================================
+// =======================================================================
 int QnAudioProcessor::downmix(quint8* data, int size, AVCodecContext* ctx)
 {
     if (ctx->channels <= 2)

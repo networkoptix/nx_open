@@ -25,7 +25,9 @@ namespace nx_hls
         m_mediaSequence( 0 ),
         m_totalPlaylistDuration( 0 ),
         m_blockID( -1 ),
-        m_removedChunksToKeepCount( MSSettings::roSettings()->value( nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP, nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() ),
+        m_removedChunksToKeepCount( MSSettings::roSettings()->value(
+            nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
+            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() ),
         m_eventRegistrationID( 0 )
     {
         using namespace std::placeholders;
@@ -99,7 +101,7 @@ namespace nx_hls
             m_timestampToBlock.pop();
     }
 
-    size_t HLSLivePlaylistManager::inactivityPeriod() const
+    qint64 HLSLivePlaylistManager::inactivityPeriod() const
     {
         QMutexLocker lk( &m_mutex );
         return m_inactivityTimer.elapsed();
@@ -139,8 +141,9 @@ namespace nx_hls
                     //The server MUST NOT remove a media segment from the Playlist file if
                     //   the duration of the Playlist file minus the duration of the segment
                     //   is less than three times the target duration.
-                while( m_totalPlaylistDuration - m_chunks.front().duration > m_targetDurationUSec * CHUNKS_IN_PLAYLIST )
-                //while( m_chunks.size() > CHUNKS_IN_PLAYLIST )
+                while( (m_totalPlaylistDuration - m_chunks.front().duration > m_targetDurationUSec * CHUNKS_IN_PLAYLIST) &&
+                       (m_chunks.size() > CHUNKS_IN_PLAYLIST) ) //in case of a large GOP (it is common for second stream) 
+                                                                //first condition may produce 1 or 2 chunks per playlist which is bad for iOS
                 {
                     //When the server removes a media segment from the Playlist, the
                     //   corresponding media URI SHOULD remain available to clients for a

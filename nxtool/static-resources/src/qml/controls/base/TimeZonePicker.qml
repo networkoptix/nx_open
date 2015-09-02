@@ -13,6 +13,12 @@ ComboBox
 
     dontUseWheel: true;
 
+    activeFocusOnTab: pseudoEnabled;
+    activeFocusOnPress: true;
+
+    property bool pseudoEnabled: true;
+    property int lastSelectedIndex;
+
     onHoveredChanged:
     {
         if (hovered)
@@ -32,13 +38,13 @@ ComboBox
     property bool changed: (currentIndex !== initIndex);
 
     property int initIndex: init;
-    property int lastSelectedIndex;
+    property int innerLastSelectedIndex;
     property int fontSize: Common.SizeManager.fontSizes.base;
 
     height: Common.SizeManager.clickableSizes.medium;
     width: height * 5;
 
-    opacity: enabled ? 1.0 : 0.5;
+    opacity: pseudoEnabled ? 1.0 : 0.5;
 
     currentIndex: initIndex;
 
@@ -51,16 +57,18 @@ ComboBox
         if ((currentIndex == initIndex) && firstTimeChange)
         {
             firstTimeChange = false;
+            innerLastSelectedIndex = currentIndex;
             lastSelectedIndex = currentIndex;
         }
 
         if (!model.isValidValue(currentIndex))
             return;
 
-        if (currentIndex !== lastSelectedIndex)
-            timeZoneChanged(lastSelectedIndex, currentIndex);
+        if (currentIndex !== innerLastSelectedIndex)
+            timeZoneChanged(innerLastSelectedIndex, currentIndex);
 
-        lastSelectedIndex = currentIndex;
+        lastSelectedIndex = innerLastSelectedIndex;
+        innerLastSelectedIndex = currentIndex;
     }
 
     style: ComboBoxStyle
@@ -92,6 +100,14 @@ ComboBox
         y: thisComponent.height;
     }
 
+    MouseArea
+    {
+        visible: !pseudoEnabled;
+
+        anchors.fill: parent;
+        onEntered: { toolTip.show(); }
+        onExited: { toolTip.hide(); }
+    }
 }
 
 

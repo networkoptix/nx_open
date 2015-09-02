@@ -5,7 +5,6 @@
 
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/fill.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include <core/resource/resource.h>
@@ -42,8 +41,12 @@ struct LicenseCompatibility
     Qn::LicenseType child;
 };
 
-/* Compatibility tree: Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) */
-static std::array<LicenseCompatibility, 14> compatibleLicenseType =
+/* Compatibility tree: 
+ * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) 
+ * Trial -> IO
+ * Start -> Professional -> Analog -> (VMAX, AnalogEncoder)
+ */
+static std::array<LicenseCompatibility, 19> compatibleLicenseType =
 {
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_AnalogEncoder),
@@ -57,17 +60,23 @@ static std::array<LicenseCompatibility, 14> compatibleLicenseType =
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_AnalogEncoder),
 
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_Professional),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_AnalogEncoder),
+
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Edge),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Professional),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Analog),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_IO),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_AnalogEncoder)
 };
 
 /************************************************************************/
 /* QnLicenseUsageHelper                                                 */
 /************************************************************************/
-QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
 
@@ -184,7 +193,7 @@ void QnLicenseUsageHelper::updateCache() const {
         m_cache.total[lt] = m_cache.licenses.totalLicenseByType(lt);
 
     /* Calculate used licenses with and without proposed cameras (to get proposed value as difference). */
-    calculateUsedLicenses2(basicUsedLicenses, m_cache.used);
+    calculateUsedLicenses(basicUsedLicenses, m_cache.used);
 
     /* Borrow some licenses (if available). Also repeating with and without proposed cameras. */
     for(const LicenseCompatibility& c: compatibleLicenseType) {
@@ -260,16 +269,16 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
     QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
 
     if(messageId == lit("DatabaseError")) {
-        message = tr("There was a problem activating your license key. Database error has occurred.");  //TODO: Feature #3629 case J
+        message = tr("There was a problem activating your license key. A database error has occurred.");  //TODO: Feature #3629 case J
     } else if(messageId == lit("InvalidData")) {
         message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
     } else if(messageId == lit("InvalidKey")) {
         message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
-            "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
+            "If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.");
     } else if(messageId == lit("InvalidBrand")) {
-        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.");
     } else if(messageId == lit("AlreadyActivated")) {
-        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
+        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.");
     }
 
     return Mustache::renderTemplate(message, arguments);
@@ -279,9 +288,32 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
 /* QnCamLicenseUsageWatcher                                             */
 /************************************************************************/
 
-QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
+    init(QnVirtualCameraResourcePtr());
+}
+
+QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr &camera, QObject *parent)
+    : base_type(parent)
+{
+    init(camera);
+}
+
+void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera) {
+    /* Listening to all changes that can affect licenses usage. */
+    auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
+        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged,  this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,       this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::groupNameChanged,         this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::groupIdChanged,           this, &QnLicenseUsageWatcher::licenseUsageChanged);
+    };
+
+    if (camera) {
+        connectToCamera(camera);
+        return;
+    }
+
     /* Call update if camera was added or removed. */
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {
         if (resource.dynamicCast<QnVirtualCameraResource>())
@@ -290,13 +322,6 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
 
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
-
-    /* Listening to all changes that can affect licenses usage. */
-    auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
-        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged,  this, &QnLicenseUsageWatcher::licenseUsageChanged);
-        connect(camera, &QnVirtualCameraResource::groupNameChanged,         this, &QnLicenseUsageWatcher::licenseUsageChanged);
-        connect(camera, &QnVirtualCameraResource::groupIdChanged,           this, &QnLicenseUsageWatcher::licenseUsageChanged);
-    };
 
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   [this, connectToCamera](const QnResourcePtr &resource) {
         if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
@@ -329,9 +354,20 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceLi
     propose(proposedCameras, proposedEnable);
 }
 
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent):
+    base_type(parent)
+{
+    init();
+    propose(proposedCamera, proposedEnable);
+}
+
 void QnCamLicenseUsageHelper::init() {
     QnCamLicenseUsageWatcher* usageWatcher = new QnCamLicenseUsageWatcher(this);
     connect(usageWatcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);
+}
+
+void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable) {
+    return propose(QnVirtualCameraResourceList() << proposedCamera, proposedEnable);
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
@@ -346,7 +382,10 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
 }
 
 bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera) {
-    return !camera->isScheduleDisabled() && !isValid(camera->licenseType());
+    bool requiresLicense = camera->isLicenseUsed();
+    requiresLicense &= !m_proposedToDisable.contains(camera);
+    requiresLicense |= m_proposedToEnable.contains(camera);
+    return requiresLicense && !isValid(camera->licenseType());
 }
 
 QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
@@ -357,10 +396,12 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
         << Qn::LC_Edge
         << Qn::LC_VMAX  //only main page
         << Qn::LC_AnalogEncoder
+        << Qn::LC_IO
+        << Qn::LC_Start
         ;
 }
 
-void QnCamLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
+void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
@@ -372,7 +413,7 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLic
             continue;
         
         Qn::LicenseType lt = camera->licenseType();
-        bool requiresLicense = !camera->isScheduleDisabled();
+        bool requiresLicense = camera->isLicenseUsed();
         if (requiresLicense)
             basicUsedLicenses[lt]++;
 
@@ -386,7 +427,7 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLic
 /************************************************************************/
 /* QnVideoWallLicenseUsageWatcher                                       */
 /************************************************************************/
-QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {
@@ -430,7 +471,7 @@ QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::calculateLicenseTypes() co
 }
 
 
-void QnVideoWallLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
+void QnVideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);

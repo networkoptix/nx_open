@@ -20,9 +20,14 @@ public:
 
     void forcedUpdate();
     bool tryClose(bool force);
-protected:
-    void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
 
+protected:
+    void retranslateUi();
+
+    void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
+    void setPageEnabled(int key, bool enabled);
+
+    bool tryAccept();
     virtual void loadData();
     virtual void submitData();
 
@@ -40,6 +45,8 @@ private:
         int key;
         QString title;
         QnAbstractPreferencesWidget* widget;
+
+        Page(): key(-1), widget(nullptr){}
     };
 
     QList<Page> modifiedPages() const;

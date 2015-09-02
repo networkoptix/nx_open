@@ -9,6 +9,7 @@
 #include <nx_ec/ec_api.h>
 
 #include <client/client_settings.h>
+#include <ui/dialogs/dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "compatibility_version_installation_dialog.h"
@@ -27,10 +28,10 @@ namespace Ui {
     class LoginDialog;
 }
 
-class QnLoginDialog : public QDialog, public QnWorkbenchContextAware {
+class QnLoginDialog : public QnDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef QDialog base_type;
+    typedef QnDialog base_type;
 public:
     explicit QnLoginDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnLoginDialog();

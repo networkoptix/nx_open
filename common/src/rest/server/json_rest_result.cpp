@@ -2,41 +2,44 @@
 
 #include <utils/common/model_functions.h>
 
-QnJsonRestResult::QnJsonRestResult(): 
-    m_error(NoError) 
+QnRestResult::QnRestResult(): 
+    error(NoError) 
 {}
 
-const QString &QnJsonRestResult::errorString() const {
-    return m_errorString;
+void QnRestResult::setError(Error errorValue, const QString &errorStringValue) {
+    error = errorValue;
+    errorString = errorStringValue;
 }
 
-void QnJsonRestResult::setErrorString(const QString &errorText) {
-    m_errorString = errorText;
+QnJsonRestResult::QnJsonRestResult() :
+    QnRestResult()
+{}
+
+QnJsonRestResult::QnJsonRestResult(const QnRestResult& base) : 
+    QnRestResult(base)
+{}
+
+QnUbjsonRestResult::QnUbjsonRestResult() :
+    QnRestResult()
+{}
+
+QnUbjsonRestResult::QnUbjsonRestResult(const QnRestResult& base) :
+    QnRestResult(base)
+{}
+
+
+/* Dummy methods to make fusion macro compile for json and ubjson at once.  */
+void serialize(const QJsonValue &value, QnUbjsonWriter<QByteArray> *stream) {
+    Q_ASSERT_X(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
+    QN_UNUSED(value, stream);
+    return;
 }
 
-QnJsonRestResult::Error QnJsonRestResult::error() const {
-    return m_error;
+bool deserialize(QnUbjsonReader<QByteArray> *stream, QJsonValue *target) {
+    Q_ASSERT_X(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
+    QN_UNUSED(stream, target);
+    return true;
 }
 
-void QnJsonRestResult::setError(Error error) {
-    m_error = error;
-}
-
-void QnJsonRestResult::setError(Error error, const QString &errorText) {
-    m_error = error;
-    m_errorString = errorText;
-}
-
-const QJsonValue &QnJsonRestResult::reply() const {
-    return m_reply;
-}
-
-QN_FUSION_DEFINE_FUNCTIONS(QnJsonRestResult::Error, (numeric))
-
-QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnJsonRestResult, 
-    (json),
-    ((&QnJsonRestResult::m_error,       &QnJsonRestResult::m_error,         "error"))
-    ((&QnJsonRestResult::m_errorString, &QnJsonRestResult::m_errorString,   "errorString"))
-    ((&QnJsonRestResult::m_reply,       &QnJsonRestResult::m_reply,         "reply"))
-)
-
+QN_FUSION_DEFINE_FUNCTIONS(QnRestResult::Error, (numeric))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_REST_RESULT_TYPES, (ubjson)(json), _Fields, (optional, true))

@@ -16,22 +16,21 @@
     </message>
 </context>
 <context>
+    <name>QnActiResource</name>
+    <message>
+        <source>Output %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>Camera output</source>
-        <translation>Kamera Ausgabe</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>Kamera Ausgabe für 30 Sek</translation>
-    </message>
     <message>
         <source>Bookmark</source>
         <translation>Lesezeichen</translation>
-    </message>
-    <message>
-        <source>Camera recording</source>
-        <translation>Kamera Aufnahme</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -74,24 +73,12 @@
         <translation>Bewegung auf Kamera</translation>
     </message>
     <message>
-        <source>Input Signal on Camera</source>
-        <translation>Eingangssignal auf Kamera</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>Kamera abgeschaltet</translation>
-    </message>
-    <message>
         <source>Storage Failure</source>
         <translation>Speicherfehler</translation>
     </message>
     <message>
         <source>Network Issue</source>
         <translation>Netzwerkproblem</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>IP Konflikt bei Kamera</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -110,10 +97,6 @@
         <translation>Lizenzierungsproblem</translation>
     </message>
     <message>
-        <source>Any Camera Issue</source>
-        <translation>Allgemeiner Kamerafehler</translation>
-    </message>
-    <message>
         <source>Any Server Issue</source>
         <translation>Allgemeiner Serverfehler</translation>
     </message>
@@ -124,10 +107,6 @@
     <message>
         <source>Undefined event has occurred on %1</source>
         <translation>Ein undefiniertes Ereignis hat sich ereignet auf %1</translation>
-    </message>
-    <message>
-        <source>Camera %1 was disconnected</source>
-        <translation>Kamera %1 wurde abgeschaltet</translation>
     </message>
     <message>
         <source>Input on %1</source>
@@ -150,24 +129,12 @@
         <translation>Serverausfall bei &quot;%1&quot;</translation>
     </message>
     <message>
-        <source>Camera IP Conflict at %1</source>
-        <translation>IP Konflikt bei Kamera auf %1</translation>
-    </message>
-    <message>
         <source>Server &quot;%1&quot; Conflict</source>
         <translation>Server Konflikt bei &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Started</source>
         <translation>Server &quot;%1&quot; gestartet</translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>Server &quot;%1&quot; hat Lizenzprobleme</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>Unbekanntes Ereignis aufgetreten</translation>
     </message>
     <message>
         <source>Event: %1</source>
@@ -182,20 +149,8 @@
         <translation>Url: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Input port: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>Grund: %1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>Konflikt Adresse: %1</translation>
-    </message>
-    <message>
-        <source>Camera #%1 MAC: %2</source>
-        <translation>Kamera #%1 MAC: %2</translation>
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
@@ -227,21 +182,6 @@
             <numerusform>Zuerst aufgetreten: %1 am %2 (%n mal insgesamt)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>Kein Videobild empfangen während der letzten %n Sekunde.</numerusform>
-            <numerusform>Kein Videobild empfangen während der letzten %n Sekunden.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation>Verbindung mit Kamera (Primärer Stream) wurde unerwartet beendet.</translation>
-    </message>
-    <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation>Verbindung mit Kamera (Sekundärer Stream) wurde unerwartet beendet.</translation>
-    </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation>RTP-Paket-Verlust identifiziert, vorherige Sequ. = %1 nächste Sequ. = %2.</translation>
@@ -249,10 +189,6 @@
     <message>
         <source>RTP packet loss detected.</source>
         <translation>RTP-Paket-Verlust identifiziert.</translation>
-    </message>
-    <message>
-        <source>Server terminated.</source>
-        <translation>Server beendet.</translation>
     </message>
     <message>
         <source>Server started after crash.</source>
@@ -271,12 +207,110 @@
         <translation>HDD/SSD Speicher %1 ist voll. Festplatte enthält zu viele Daten, die nicht vom VMS verwaltet werden.</translation>
     </message>
     <message>
-        <source>Recording on %n camera(s) is disabled: </source>
-        <translation>Aufnahme ist bei %n Kamera(s) deaktiviert: </translation>
-    </message>
-    <message>
         <source>Conflicting Server: %1</source>
         <translation>Konflikt mit Server: %1</translation>
+    </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">Unbekanntes Ereignis aufgetreten</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">Input port: %1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">Konflikt Adresse: %1</translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 output for 30 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Signal on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any %1 Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2 was disconnected</source>
+        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict at %2</source>
+        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 #%2 MAC: %3</source>
+        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on %1 is disabled: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -286,28 +320,12 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Nicht authentifiziert. URL %1.</translation>
-    </message>
-    <message>
         <source>Server has been stopped.</source>
         <translation>Server wurde angehalten.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the camera: %1.</source>
-        <translation>Ungültige Daten wurden von der Kamera erhalten: %1.</translation>
-    </message>
-    <message>
-        <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation>Zu viele Media Fehler. Bitte öffnen Sie den Dialog für Kameraprobleme um mehr Details zu erfahren.</translation>
-    </message>
-    <message>
         <source>Media stream is opened but no media data was received.</source>
         <translation>Media Stream wurde geöffnet, aber es wurden keine Media-Daten empfangen.</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress</source>
-        <translation>Initialisierungsprozess der Kamera läuft</translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
@@ -338,32 +356,12 @@
         <translation>Verbindung mit http Port %1 nicht möglich.</translation>
     </message>
     <message>
-        <source>Make sure the camera is plugged into the network.</source>
-        <translation>Stellen Sie sicher, dass die Kamera mit dem Netzwerk verbunden ist.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
         <translation>Media URL %1 kann nicht geöffnet werden. Verbindung zu Media Port %2 gescheitert.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>Ist der Port %2 erreichbar (z.B. Firewall Forwarding). Starten Sie ggf. die Kamera neu und setzen Sie sie mittels des Webinterfaces auf die Grundeinstellungen zurück.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
         <translation>Media URL %1 kann nicht geöffnet werden. Verbindung zu Port %2 wurde unerwartet beendet.</translation>
-    </message>
-    <message>
-        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>Stellen Sie sicher, dass die Kamera mit dem Netzwerk verbunden ist. Versuchen Sie die Kamera neu zu starten.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>Kann die Antwort der Kamera nicht auswerten. URL %1, Anfragename %2.</translation>
-    </message>
-    <message>
-        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>Bitte starten Sie die Kamera neu, setzen Sie sie dann mittels Webinterface auf die Standardeinstellung zurück.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -382,22 +380,6 @@
         <translation>Konfiguration von Parameter %1 gescheitert.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>Aktivieren Sie die Aufnahme, falls diese deaktiviert ist und reduzieren Sie die fps Einstellung für diese Kamera.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>Hilft das nicht, setzen Sie die Kamera mittes des Webinterfaces auf die Standardeinstellungen zurück. Kontaktieren Sie den Support, falls diese Maßnahmen das Problem nicht beheben.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>Anfrage &quot;%1&quot; an Kamera gescheitert mit Fehler &quot;%2&quot;.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.</source>
-        <translation>Nicht identifizierte Kamerastörung.</translation>
-    </message>
-    <message>
         <source>Please contact support.</source>
         <translation>Bitte kontaktieren Sie den Support.</translation>
     </message>
@@ -408,6 +390,76 @@
     <message>
         <source>Parameters:</source>
         <translation>Parameter:</translation>
+    </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">Nicht authentifiziert. URL %1.</translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse %1 response. Url %2, request name %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown %1 Issue.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the %1: %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 initialization process in progress.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -425,12 +477,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>Der Start von Windows Explorer ist gescheitert</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>Konnte explorer.exe innerhalb des Suchpfades nicht finden, um Windows Explorer zu starten.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">Der Start von Windows Explorer ist gescheitert</translation>
     </message>
 </context>
 <context>
@@ -444,12 +496,12 @@
         <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>Initalisierung des Audio-Encoders gescheitert.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">Initalisierung des Audio-Encoders gescheitert.</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>Initalisierung des Audio-Decoders gescheitert.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">Initalisierung des Audio-Decoders gescheitert.</translation>
     </message>
 </context>
 <context>
@@ -486,8 +538,8 @@
         <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>Initalisierung des Video-Encoders gescheitert.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">Initalisierung des Video-Encoders gescheitert.</translation>
     </message>
 </context>
 <context>
@@ -514,60 +566,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>Analog Encoder</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>Video-Wand</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>Trial Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>Analog Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>Professional Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>Edge Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Vmax Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>Analog Encoder Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>Video-Wand Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>Ungültige Signatur</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>Server mit der benötigten Hardware-ID konnte nicht gefunden werden</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>Ungültige Anpassung</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>Abgelaufen</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>Ungültiger Typ</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -576,6 +580,82 @@
     <message>
         <source>Unknown error</source>
         <translation>Unbekannter Fehler</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">Analog Encoder</translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">Trial Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">Analog Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">Professional Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">Edge Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">Vmax Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">Analog Encoder Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">Video-Wand Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Signature</source>
+        <translation type="unfinished">Ungültige Signatur</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">Ungültige Anpassung</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">Ungültiger Typ</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -609,24 +689,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>Es gab ein Problem bei der Aktivierung Ihres Lizenzschlüssels. Ein Datenbankfehler trat auf.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>Es gab ein Problem bei der Aktivierung Ihres Lizenzschlüssels. Ungültige Daten wurden übertragen. Bitte kontaktieren Sie das Support Team und melden Sie das Problem.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. ihren Lizenzschlüssel zu prüfen.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">Es gab ein Problem bei der Aktivierung Ihres Lizenzschlüssels. Ein Datenbankfehler trat auf.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Sie versuchen einen mit der Software inkompatiblen Lizenzschlüssel zu aktivieren.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. ihren Lizenzschlüssel zu prüfen.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>Dieser Lizenzschlüssel wurde bereits am {{time}} für Hardware-ID {{hwid}} aktiviert.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Sie versuchen einen mit der Software inkompatiblen Lizenzschlüssel zu aktivieren.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Dieser Lizenzschlüssel wurde bereits am {{time}} für Hardware-ID {{hwid}} aktiviert.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
     </message>
 </context>
 <context>
@@ -644,10 +724,117 @@
     </message>
 </context>
 <context>
+    <name>QnPlAxisResource</name>
+    <message>
+        <source>Can&apos;t initialize IO port settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPlOnvifResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
         <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, vorausgesetzt &apos;%3&apos;.</translation>
+    </message>
+</context>
+<context>
+    <name>QnResourceNameStrings</name>
+    <message numerus="yes">
+        <source>%n Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>device</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -657,24 +844,24 @@
         <translation>Unbekannt</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>Trial Lizenz</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>Hardware-ID:</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>Lizensiert für: </translation>
     </message>
     <message>
         <source>Watermark: </source>
         <translation>Wasserzeichen: </translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>FREE Lizenz</translation>
+        <source>Trial License</source>
+        <translation type="unfinished">Trial Lizenz</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">Lizensiert für: </translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">FREE Lizenz</translation>
     </message>
 </context>
 <context>
@@ -801,20 +988,8 @@
         <translation>Fehler beim Emailversand</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>Speichermedien sind voll</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>Speichermedien sind nicht konfiguriert</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>Email Adresse für Benutzer %1 wurde nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>Die Zeiteinstellung zwischen einigen Servern weicht ab und die korrekte Zeit konnte nicht automatisch bestimmt werden.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -864,6 +1039,18 @@
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>Der Wiederaufbau des Archivindexes wurde auf folgenden Servern abgeschlossen:</translation>
     </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">Speichermedien sind voll</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">Speichermedien sind nicht konfiguriert</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -893,6 +1080,17 @@
     </message>
 </context>
 <context>
+    <name>QnThirdPartyResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -903,12 +1101,12 @@
         <translation>Unbekannte Transcoding Methode.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCLTranscode wurde nicht implementiert</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">OpenCLTranscode wurde nicht implementiert</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>Unbekannte Transcode Methode</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">Unbekannte Transcode Methode</translation>
     </message>
 </context>
 <context>

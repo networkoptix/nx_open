@@ -6,7 +6,7 @@ namespace Qn {
     enum CameraSettingsTab {
         GeneralSettingsTab,
         RecordingSettingsTab,
-        IOSettingsSettingsTab,
+        IOPortsSettingsTab,
         MotionSettingsTab,
         FisheyeCameraSettingsTab,
         AdvancedCameraSettingsTab,

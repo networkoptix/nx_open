@@ -5,6 +5,10 @@ class QnShowDialogHelper {
 public:
     static void show(QWidget* dialog, const QRect &targetGeometry);
 
+    static void showNonModalDialog(QWidget *dialog
+        , const QRect &targetGeometry = QRect()
+        , bool dontFocus = false);
+
     static QPoint calculatePosition(QWidget* dialog);
 };
 
@@ -45,12 +49,11 @@ private:
     int m_sourceCount;
 };
 
-
 /** Helper class to restore geometry of the persistent dialogs. */
 template<typename T>
 class QnNonModalDialogConstructor: public QnShowDialogHelper {
 public:
-    
+
     QnNonModalDialogConstructor<T>(QPointer<T> &dialog, QWidget* parent) :
         m_dontFocus(true)
     {
@@ -64,29 +67,7 @@ public:
     }
 
     ~QnNonModalDialogConstructor() {
-        QWidgetList modalWidgets;
-
-        /* Checking all top-level widgets. */
-        foreach (QWidget* tlw, qApp->topLevelWidgets()) {
-            if (!tlw->isHidden() && tlw->isModal())
-                modalWidgets << tlw;
-        }
-
-        /* Setup dialog to show after all modal windows are closed. */
-        if (!modalWidgets.isEmpty()) {
-            QnDelayedShowHelper* helper = new QnDelayedShowHelper(m_dialog, m_targetGeometry, modalWidgets.size(), m_dialog);
-            foreach (QWidget* modalWidget, modalWidgets)
-                modalWidget->installEventFilter(helper);
-            return;
-        }
-
-        /* Or show it immediately if no modal windows are visible. */
-        if (m_dialog->isVisible() && m_dontFocus) {
-            m_dialog->raise();
-            return;
-        }
-
-        show(m_dialog, m_targetGeometry);
+        showNonModalDialog(m_dialog, m_targetGeometry, m_dontFocus);
     }
 
     /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */

@@ -11,6 +11,7 @@
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <utils/common/log.h>
+#include <utils/common/singleton.h>
 
 
 namespace ec2
@@ -54,7 +55,8 @@ namespace ec2
     class QnDbManager
     :
         public QObject,
-        public QnDbHelper
+        public QnDbHelper,
+        public Singleton<QnDbManager>
     {
         Q_OBJECT
 
@@ -65,11 +67,12 @@ namespace ec2
         bool init(QnResourceFactory* factory, const QUrl& dbUrl);
         bool isInitialized() const;
 
-        static QnDbManager* instance();
-        
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            if (!isTranAllowed(tran))
+                return ErrorCode::forbidden;
+
             Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             if (!tran.isLocal) {
                 QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
@@ -88,12 +91,18 @@ namespace ec2
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
         {
+            if (!isTranAllowed(tran))
+                return ErrorCode::forbidden;
+
             return executeTransactionInternal(tran);
         }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            if (!isTranAllowed(tran.command))
+                return ErrorCode::forbidden;
+
             Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(getTransaction());
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
@@ -114,6 +123,7 @@ namespace ec2
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
+            QN_UNUSED(t1, t2);
             QWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
@@ -544,6 +554,8 @@ namespace ec2
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
+        bool isTranAllowed(const QnAbstractTransaction& tran) const;
+
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -571,6 +583,9 @@ namespace ec2
         bool m_isBackupRestore;
         bool m_needResyncLayout;
         bool m_needResyncbRules;
+        bool m_needResyncUsers;
+        bool m_needResyncStorages;
+        bool m_dbReadOnly;
     };
 };
 

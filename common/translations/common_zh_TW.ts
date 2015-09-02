@@ -15,6 +15,17 @@
     </message>
 </context>
 <context>
+    <name>QnActiResource</name>
+    <message>
+        <source>Output %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>
@@ -25,28 +36,12 @@
         <translation>攝影機位移</translation>
     </message>
     <message>
-        <source>Input Signal on Camera</source>
-        <translation>攝影機輸入信號</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>攝影機中斷連線</translation>
-    </message>
-    <message>
         <source>Storage Failure</source>
         <translation>儲存裝置故障</translation>
     </message>
     <message>
         <source>Network Issue</source>
         <translation>網路問題</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>攝影機 IP 衝突</translation>
-    </message>
-    <message>
-        <source>Camera %1 was disconnected</source>
-        <translation>攝影機 %1 中斷連線</translation>
     </message>
     <message>
         <source>Input on %1</source>
@@ -65,24 +60,8 @@
         <translation>%1 網路故障</translation>
     </message>
     <message>
-        <source>Camera IP Conflict at %1</source>
-        <translation>攝影機 %1 IP 位址衝突</translation>
-    </message>
-    <message>
-        <source>Camera output</source>
-        <translation>觸發攝影機 D/O</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>觸發攝影機D/O 30秒</translation>
-    </message>
-    <message>
         <source>Bookmark</source>
         <translation>書籤</translation>
-    </message>
-    <message>
-        <source>Camera recording</source>
-        <translation>攝影機錄影</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -115,10 +94,6 @@
     <message>
         <source>Unknown (%1)</source>
         <translation>未知 (%1)</translation>
-    </message>
-    <message>
-        <source>Any Camera Issue</source>
-        <translation>任何攝影機問題</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
@@ -161,14 +136,6 @@
         <translation>伺服器 &quot;%1&quot; 啟動</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>伺服器 &quot;%1&quot; 發生授權問題</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>發生未知事件</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>事件：%1</translation>
     </message>
@@ -181,36 +148,12 @@
         <translation>網址：%1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>輸入通訊埠：%1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>原因：%1</translation>
     </message>
     <message>
-        <source>Conflict address: %1</source>
-        <translation>衝突位址：%1</translation>
-    </message>
-    <message>
-        <source>Camera #%1 MAC: %2</source>
-        <translation>攝影機 #%1 MAC：%2</translation>
-    </message>
-    <message>
         <source>Conflicting Server #%1: %2</source>
         <translation>衝突伺服器 #%1: %2</translation>
-    </message>
-    <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation>攝影機 (主串流) 無預警斷線.</translation>
-    </message>
-    <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation>攝影機 (第二串流) 無預警斷線.</translation>
-    </message>
-    <message>
-        <source>Recording on %n camera(s) is disabled: </source>
-        <translation>%n 個攝影機的錄影已停止: </translation>
     </message>
     <message>
         <source>%2 %1</source>
@@ -236,12 +179,6 @@
             <numerusform>第一次出現: %1 在 %2 (共 %n 次)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>在過去的 %n 秒 無接收的影像.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation>RTP 封包遺失偵測，前一個序列.=%1 下一個序列.=%2.</translation>
@@ -249,10 +186,6 @@
     <message>
         <source>RTP packet loss detected.</source>
         <translation>RTP 封包遺失偵測.</translation>
-    </message>
-    <message>
-        <source>Server terminated.</source>
-        <translation>伺服器中斷.</translation>
     </message>
     <message>
         <source>Server started after crash.</source>
@@ -274,6 +207,107 @@
         <source>Conflicting Server: %1</source>
         <translation>衝突伺服器: %1</translation>
     </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">發生未知事件</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">輸入通訊埠：%1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">衝突位址：%1</translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 output for 30 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Signal on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any %1 Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2 was disconnected</source>
+        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict at %2</source>
+        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 #%2 MAC: %3</source>
+        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on %1 is disabled: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -282,24 +316,8 @@
         <translation>確定</translation>
     </message>
     <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>未經授權。網址 %1.</translation>
-    </message>
-    <message>
-        <source>Invalid data was received from the camera: %1.</source>
-        <translation>從攝影機：%1 端接收到無效資料.</translation>
-    </message>
-    <message>
-        <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation>過多媒體錯誤. 請開啟攝影機問題診斷功能查看詳細資訊。</translation>
-    </message>
-    <message>
         <source>Media stream is opened but no media data was received.</source>
         <translation>媒體串流已開啟但沒有接收到媒體資料。</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress</source>
-        <translation>攝影機正在進行初始化動作</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -334,32 +352,12 @@
         <translation>無法連線至 http port %1.</translation>
     </message>
     <message>
-        <source>Make sure the camera is plugged into the network.</source>
-        <translation>請確認攝影機是否上線.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
         <translation>無法開啟媒體 url %1. 連線至媒體 port %2 錯誤.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>請確認 port %2 可被存取 (是否有 port forward 問題). 請嘗試重啟並重置攝影機.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
         <translation>無法開啟媒體 url %1. 與 port %2 的連線被中斷.</translation>
-    </message>
-    <message>
-        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>請確認攝影機是否上線. 或試著重啟攝影機.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>無法解析攝影機的回應. Url %1, 要求名稱 %2.</translation>
-    </message>
-    <message>
-        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>請嘗試重啟並重置攝影機.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -378,22 +376,6 @@
         <translation>設定參數 %1 失敗.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>首先, 試著開啟錄影 (若目前為關閉) 並於攝影機設定中降低 fps.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>若無效, 請重置攝影機. 若問題持續發生, 請連繫技術支援部門.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>攝影機要求 &quot;%1&quot; 失敗 錯誤訊息為 &quot;%2&quot;.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.</source>
-        <translation>未知的攝影機問題.</translation>
-    </message>
-    <message>
         <source>Please contact support.</source>
         <translation>請連繫技術支援部門.</translation>
     </message>
@@ -404,6 +386,76 @@
     <message>
         <source>Parameters:</source>
         <translation>參數:</translation>
+    </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">未經授權。網址 %1.</translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse %1 response. Url %2, request name %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown %1 Issue.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the %1: %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 initialization process in progress.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -420,12 +472,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>執行 Windows Explorer 失敗</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>找不到執行 Windows Explorer 的 explorer.exe 路徑。</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">執行 Windows Explorer 失敗</translation>
     </message>
 </context>
 <context>
@@ -439,12 +491,12 @@
         <translation>找不到 %1 編碼的編碼器.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>無法初始化聲音編碼器。</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">無法初始化聲音編碼器。</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>無法初始化聲音解碼器。</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">無法初始化聲音解碼器。</translation>
     </message>
 </context>
 <context>
@@ -481,8 +533,8 @@
         <translation>找不到 %1 編碼的編碼器.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>無法初始化影像編碼器。</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">無法初始化影像編碼器。</translation>
     </message>
 </context>
 <context>
@@ -508,60 +560,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>類比編碼器</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>電視牆</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>測試用授權</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>類比授權</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>專業授權</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>Edge Camera 授權</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Vmax(DVR) 授權</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>類比編碼器授權</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>電視牆授權</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>無效的簽章</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>找不到特定硬體 ID 的伺服器</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>無效的自定義參數</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>逾期</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>無效的類型</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -570,6 +574,82 @@
     <message>
         <source>Unknown error</source>
         <translation>未知的錯誤</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">類比編碼器</translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">測試用授權</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">類比授權</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">專業授權</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">Edge Camera 授權</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">Vmax(DVR) 授權</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">類比編碼器授權</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">電視牆授權</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Signature</source>
+        <translation type="unfinished">無效的簽章</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">無效的自定義參數</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">無效的類型</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -599,24 +679,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>啟動授權時發生了問題. 資料庫發生錯誤.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>啟動授權時發生了問題. 接收到無效的資料. 請將問題回覆給您的廠商.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>您輸入的授權有誤. 請檢查您輸入的授權. 如果問題持續發生, 請聯繫您的廠商以確認授權是否有誤或是取得正確授權.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">啟動授權時發生了問題. 資料庫發生錯誤.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>您正嘗試啟動不相容於軟體的授權. 請聯繫您的廠商以取得有效授權.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">您輸入的授權有誤. 請檢查您輸入的授權. 如果問題持續發生, 請聯繫您的廠商以確認授權是否有誤或是取得正確授權.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>此授權在 {{time}} 已被硬體 ID {{hwid}} 啟動過. 請聯繫您的廠商以取得有效授權.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">您正嘗試啟動不相容於軟體的授權. 請聯繫您的廠商以取得有效授權.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">此授權在 {{time}} 已被硬體 ID {{hwid}} 啟動過. 請聯繫您的廠商以取得有效授權.</translation>
     </message>
 </context>
 <context>
@@ -634,10 +714,111 @@
     </message>
 </context>
 <context>
+    <name>QnPlAxisResource</name>
+    <message>
+        <source>Can&apos;t initialize IO port settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPlOnvifResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
         <translation>&apos;%1&apos; 參數值無效 - 預計 %2，提供&apos;%3&apos;。</translation>
+    </message>
+</context>
+<context>
+    <name>QnResourceNameStrings</name>
+    <message numerus="yes">
+        <source>%n Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>device</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -647,24 +828,24 @@
         <translation>未知</translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>免費授權</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>硬體 ID:</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>測試用授權</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>授權給:</translation>
-    </message>
-    <message>
         <source>Watermark: </source>
         <translation>浮水印:</translation>
+    </message>
+    <message>
+        <source>Trial License</source>
+        <translation type="unfinished">測試用授權</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">授權給:</translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">免費授權</translation>
     </message>
 </context>
 <context>
@@ -791,20 +972,8 @@
         <translation>寄送 Email 時發生錯誤</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>儲存裝置已滿</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>儲存裝置未被設定</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>使用者 %1 未設置 Email 地址</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>有些伺服器未校時且無法正確偵測到正確時間.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -854,6 +1023,18 @@
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>下列伺服器的錄影資料索引重建已完成:</translation>
     </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">儲存裝置已滿</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">儲存裝置未被設定</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -883,6 +1064,17 @@
     </message>
 </context>
 <context>
+    <name>QnThirdPartyResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -893,12 +1085,12 @@
         <translation>未知轉碼模式。</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCL 轉碼未執行</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">OpenCL 轉碼未執行</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>未知轉碼方式</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">未知轉碼方式</translation>
     </message>
 </context>
 <context>

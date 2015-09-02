@@ -62,6 +62,9 @@ QnSecurityCamResource::QnSecurityCamResource():
         &m_mutex ),
     m_motionType(
         std::bind( &QnSecurityCamResource::calculateMotionType, this ),
+        &m_mutex ),
+    m_cachedIsIOModule(
+        [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
         &m_mutex )
 
 {
@@ -256,6 +259,8 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int chan
 
     if (motionType != Qn::MT_SoftwareGrid)
         setMotionMaskPhysical(channel);
+
+    emit motionRegionChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList) {
@@ -273,6 +278,8 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
         for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
             setMotionMaskPhysical(i);
     }
+
+    emit motionRegionChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks) {
@@ -320,7 +327,10 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
     if (m_cachedLicenseType == Qn::LC_Count) 
     {
         QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
-        if (resType && resType->getManufacture() == lit("VMAX"))
+
+        if (isIOModule())
+            m_cachedLicenseType = Qn::LC_IO;
+        else if (resType && resType->getManufacture() == lit("VMAX"))
             m_cachedLicenseType =  Qn::LC_VMAX;
         else if (isAnalogEncoder())
             m_cachedLicenseType =  Qn::LC_AnalogEncoder; // AnalogEncoder should have priority over Analog type because of analog type is deprecated (DW-CP04 has both analog and analogEncoder params)
@@ -537,6 +547,7 @@ bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabil
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
     setProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+    m_cachedCameraCapabilities.reset();
 }
 
 void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability, bool value) {
@@ -692,6 +703,44 @@ void QnSecurityCamResource::setScheduleDisabled(bool value) {
 bool QnSecurityCamResource::isScheduleDisabled() const {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     return (*userAttributesLock)->scheduleDisabled;
+}
+
+void QnSecurityCamResource::setLicenseUsed(bool value) {
+
+    /// TODO: #gdm Refactor licence management
+    /*
+    switch (licenseType()) {
+    case Qn::LC_IO:
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+            if ((*userAttributesLock)->licenseUsed == value)
+                return;
+            (*userAttributesLock)->licenseUsed = value;
+        }
+    default:
+        break;
+    }
+    */
+    setScheduleDisabled(!value);  
+    emit licenseUsedChanged(::toSharedPointer(this));
+}
+
+
+bool QnSecurityCamResource::isLicenseUsed() const {
+    /// TODO: #gdm Refactor licence management
+    /*
+    switch (licenseType()) {
+    case Qn::LC_IO:
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+            return (*userAttributesLock)->licenseUsed;
+        }
+    default:
+        break;
+    }
+    */
+    /* By default camera requires license when recording is enabled. */
+    return !isScheduleDisabled();
 }
 
 void QnSecurityCamResource::setAudioEnabled(bool enabled) {
@@ -901,6 +950,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraCapabilities.reset();
     m_cachedIsDtsBased.reset();
     m_motionType.reset();
+    m_cachedIsIOModule.reset();
 }
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
@@ -913,4 +963,9 @@ Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
         return Qn::BPG_User;
 
     return Qn::BPG_None;
+}
+
+bool QnSecurityCamResource::isIOModule() const
+{
+    return m_cachedIsIOModule.get();
 }

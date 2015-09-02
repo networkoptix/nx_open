@@ -44,6 +44,7 @@
 #include "api_runtime_data.h"
 
 #include <utils/common/email.h>
+#include <utils/common/ldap.h>
 
 namespace ec2 {
 
@@ -228,6 +229,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
     dst->name = src.cameraName;
     dst->groupName = src.userDefinedGroupName;
     dst->scheduleDisabled = !src.scheduleEnabled;
+    dst->licenseUsed = src.licenseUsed;
     dst->motionType = src.motionType;
 
     QList<QnMotionRegion> regions;
@@ -258,6 +260,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.cameraName = src->name;
     dst.userDefinedGroupName = src->groupName;
     dst.scheduleEnabled = !src->scheduleDisabled;
+    dst.licenseUsed = src->licenseUsed;
     dst.motionType = src->motionType;
 
     QList<QnMotionRegion> regions;
@@ -311,7 +314,7 @@ void fromApiToResource(const ApiCameraDataEx& src, QnVirtualCameraResourcePtr& d
     fromApiToResource( static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock );
 
     for(const ApiResourceParamData &srcParam: src.addParams)
-        dst->setProperty(srcParam.name, srcParam.value, false);
+        dst->setProperty(srcParam.name, srcParam.value, QnResource::NO_MARK_DIRTY);
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& dst)
@@ -398,7 +401,6 @@ void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst) {
     dst.password = src.password;
     dst.connectionType = src.connectionType;
 }
-
 
 void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx) {
     fromApiToResourceList(src.resourceTypes, dst.resTypes);
@@ -772,12 +774,15 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
     fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     dst->setAdmin(src.isAdmin);
+	dst->setLdap(src.isLdap);
+	dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
     dst->setHash(src.hash);
 
     dst->setPermissions(src.permissions);
     dst->setDigest(src.digest);
     dst->setCryptSha512Hash(src.cryptSha512Hash);
+    dst->setRealm(src.realm);
 }
 
 void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
@@ -785,9 +790,12 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     dst.hash = src->getHash();
     dst.digest = src->getDigest();
     dst.isAdmin = src->isAdmin();
+	dst.isLdap = src->isLdap();
+	dst.isEnabled = src->isEnabled();
     dst.permissions = src->getPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
+    dst.realm = src->getRealm();
 }
 
 template<class List>

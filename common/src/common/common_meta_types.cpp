@@ -6,6 +6,7 @@
 #include <utils/network/socket_common.h>
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
+#include <utils/common/ldap.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
@@ -70,6 +71,7 @@
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
+#include "api/model/audit/audit_record.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -149,6 +151,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::TimePeriodContent>();
     qRegisterMetaType<QnTimePeriodList>();
+    qRegisterMetaType<MultiServerPeriodDataList>();
 
     qRegisterMetaType<QnSoftwareVersion>();
     qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
@@ -201,6 +204,8 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnIOPortData>();
     qRegisterMetaType<QnIOStateData>();
+    qRegisterMetaType<QnAuditRecord>();
+    qRegisterMetaType<QnAuditRecord*>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
@@ -221,6 +226,9 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
+
+    qRegisterMetaType<QnLdapUser>();
+    qRegisterMetaType<QnLdapUsers>();
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
@@ -243,6 +251,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnUuid>( "QnUuid" );
     qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
     qRegisterMetaType<QnRecordingStatsReply>();
+    qRegisterMetaType<QnAuditRecordList>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

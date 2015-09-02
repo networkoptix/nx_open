@@ -25,11 +25,15 @@ public:
 signals:
     void userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
 
+private:
+    bool isUserEmailValid(const QnUserResourcePtr &user) const;
+    void checkUser(const QnUserResourcePtr &user);
+
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
-    void at_user_emailChanged(const QnResourcePtr &resource);
+
 
 private:
     QHash<QnUserResourcePtr, bool> m_emailValidByUser;

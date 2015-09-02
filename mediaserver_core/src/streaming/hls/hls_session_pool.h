@@ -16,10 +16,11 @@
 #include <core/datapacket/media_data_packet.h>
 #include <utils/common/timermanager.h>
 
+#include "api/model/audit/auth_session.h"
+#include "audit/audit_manager_fwd.h"
+#include "camera/video_camera.h"
 #include "hls_playlist_manager.h"
 
-
-class QnVideoCamera;
 
 namespace nx_hls
 {
@@ -36,7 +37,8 @@ namespace nx_hls
             unsigned int targetDurationMS,
             bool _isLive,
             MediaQuality streamQuality,
-            QnVideoCamera* const videoCamera );
+            const QnVideoCameraPtr& videoCamera,
+            const QnAuthSession& authSession);
         ~HLSSession();
 
         const QString& id() const;
@@ -54,19 +56,22 @@ namespace nx_hls
         QPair<QString, QString> playlistAuthenticationQueryItem() const;
         void setChunkAuthenticationQueryItem( const QPair<QString, QString>& authenticationQueryItem );
         QPair<QString, QString> chunkAuthenticationQueryItem() const;
+        void updateAuditInfo(qint64 timeUsec);
 
     private:
         const QString m_id;
         const unsigned int m_targetDurationMS;
         const bool m_live;
         const MediaQuality m_streamQuality;
-        QnVideoCamera* const m_videoCamera;
+        const QnUuid m_cameraID;
         std::vector<AbstractPlaylistManagerPtr> m_playlistManagers;
         //!map<pair<quality, alias>, pair<start timestamp, duration> >
         std::map<std::pair<MediaQuality, QString>, std::pair<quint64, quint64> > m_chunksByAlias;
         QPair<QString, QString> m_playlistAuthenticationQueryItem;
         QPair<QString, QString> m_chunkAuthenticationQueryItem;
         mutable QMutex m_mutex;
+        AuditHandle m_auditHandle;
+        QnAuthSession m_authSession;
     };
 
     /*!

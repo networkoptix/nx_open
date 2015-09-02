@@ -9,10 +9,12 @@ angular.module('webadminApp')
 
         $scope.authorized = false;
         $scope.authorizing = false;
-        $scope.user = {
-            password: "",
-            username: ""
-        };
+        if(!$scope.user){
+            $scope.user = {
+                username:"",
+                password:""
+            }
+        }
 
         function reload(){
             $scope.authorized = true;
@@ -24,7 +26,6 @@ angular.module('webadminApp')
         }
 
         $scope.login = function () {
-            console.log($scope);
             if ($scope.loginForm.$valid) {
 
                 var lowercaseLogin = $scope.user.username.toLowerCase();
@@ -32,21 +33,39 @@ angular.module('webadminApp')
                 var realm = ipCookie('realm');
                 var nonce = ipCookie('nonce');
 
-                var hash1 = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
-                var cnonce = md5("GET:");
-                var response = md5(hash1 + ':' + nonce + ':' + cnonce);
+                var digest = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
+                var method = md5("GET:");
+                var auth_digest = md5(digest + ':' + nonce + ':' + method);
+                var auth = Base64.encode(lowercaseLogin + ':' + nonce + ':' + auth_digest);
 
-                //console.log("hash1 md5(", $scope.user.username + ':' + realm + ':' + $scope.user.password,')=', hash1);
-                //console.log("response  md5(", hash1 + ':' + nonce + ':'+ cnonce,')=', response);
+                /*
+                console.log("debug auth - realm:",realm);
+                console.log("debug auth - nonce:",nonce);
+                console.log("debug auth - login:",lowercaseLogin);
+                console.log("debug auth - password:",$scope.user.password);
+                console.log("debug auth - digest = md5(login:realm:password):",digest);
+                console.log("debug auth - method:","GET:");
+                console.log("debug auth - md5(method):",method);
+                console.log("debug auth -  auth_digest = md5(digest:nonce:md5(method)):",auth_digest);
+                console.log("debug auth -  auth = base64(login:nonce:auth_digest):",auth);
+                */
 
-                ipCookie('response',response, { path: '/' });
-                ipCookie('username',lowercaseLogin, { path: '/' });
+                ipCookie('auth',auth, { path: '/' });
+
+                var rtspmethod = md5("PLAY:");
+                var rtsp_digest = md5(digest + ':' + nonce + ':' + rtspmethod);
+                var auth_rtsp = Base64.encode(lowercaseLogin + ':' + nonce + ':' + rtsp_digest);
+                ipCookie('auth_rtsp',auth_rtsp, { path: '/' });
+
+                //Old cookies:  // TODO: REMOVE THIS SECTION
+                //ipCookie('response',auth_digest, { path: '/' });
+                //ipCookie('username',lowercaseLogin, { path: '/' });
 
                 // Check auth again
                 $scope.authorizing = true;
                 mediaserver.getCurrentUser(true).then(reload).catch(function(error){
                     $scope.authorizing = false;
-                    alert("not authorized ");
+                    alert("Login or password is incorrect");
                 });
             }
         };

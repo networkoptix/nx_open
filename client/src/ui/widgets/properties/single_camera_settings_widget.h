@@ -84,7 +84,6 @@ public:
 
 signals:
     void hasChangesChanged();
-    void moreLicensesRequested();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
@@ -105,13 +104,10 @@ private slots:
     void at_motionTypeChanged();
     void at_resetMotionRegionsButton_clicked();
     void at_motionRegionListChanged();
-    void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
-    void updateLicensesButtonVisible();
-    void updateLicenseText();
     void updateIpAddressText();
     void updateWebPageText();
 
@@ -130,6 +126,11 @@ private:
     void connectToMotionWidget();
 
     void showMaxFpsWarningIfNeeded();
+
+    int tabIndex(Qn::CameraSettingsTab tab) const;
+    void setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled);
+
+    void retranslateUi();
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)

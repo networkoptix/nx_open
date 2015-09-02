@@ -55,139 +55,15 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="imageControlGroupBox">
-         <property name="title">
-          <string>Image Control</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QComboBox" name="arComboBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="currentIndex">
-               <number>-1</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QComboBox" name="rotComboBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="arOverrideCheckBox">
-            <property name="text">
-             <string>Force aspect ratio to:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="rotCheckBox">
-            <property name="text">
-             <string>Default rotation:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="fisheyeCheckBox">
-            <property name="text">
-             <string>This is a fish-eye lens camera</string>
-            </property>
-            <property name="tristate">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+        <widget class="QnImageControlWidget" name="imageControlWidget" native="true"/>
        </item>
        <item>
-        <widget class="QGroupBox" name="analogGroupBox">
-         <property name="title">
-          <string>Licensing</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QCheckBox" name="analogViewCheckBox">
-              <property name="text">
-               <string>Use an analog license to view this camera</string>
-              </property>
-              <property name="tristate">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="moreLicensesButton">
-              <property name="text">
-               <string>Get More Licenses...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true"/>
-          </item>
-         </layout>
-        </widget>
+        <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
        </item>
        <item>
         <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
-          <string>Enable audio</string>
+          <string>Enable Audio</string>
          </property>
          <property name="tristate">
           <bool>true</bool>
@@ -213,7 +89,7 @@
       <attribute name="title">
        <string>Recording</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="recordingLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -259,21 +135,27 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnCameraScheduleWidget</class>
-   <extends>QWidget</extends>
-   <header>ui/widgets/properties/camera_schedule_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnCameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>ui/widgets/properties/expert_settings_widget.h</header>
+   <header location="global">ui/widgets/properties/expert_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnLicensesUsageWidget</class>
+   <class>QnImageControlWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/licenses_usage_widget.h</header>
+   <header location="global">ui/widgets/properties/image_control_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnLicensesProposeWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnCameraScheduleWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

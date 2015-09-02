@@ -47,35 +47,30 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
 
 
     if (dateTime < 1) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Invalid datetime format specified"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid datetime format specified"));
         return CODE_OK;
     }
 
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!mServer) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Internal server error"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;
     }
     if (!(mServer->getServerFlags() & Qn::SF_timeCtrl)) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("This server doesn't support time control"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("This server doesn't support time control"));
         return CODE_OK;
     }
     
 #ifdef Q_OS_LINUX
     if (!timezone.isEmpty()) {
         if (!setTimeZone(timezone)) {
-            result.setError(QnJsonRestResult::CantProcessRequest);
-            result.setErrorString(lit("Invalid timezone specified"));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid timezone specified"));
             return CODE_OK;
         }
     }
 
     if (!setDateTime(dateTime)) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't set new datetime value"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't set new datetime value"));
         return CODE_OK;
     }
 #endif

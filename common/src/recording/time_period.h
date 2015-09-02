@@ -11,6 +11,9 @@ class QnTimePeriod;
 
 class QN_EXPORT QnTimePeriod {
 public:
+
+    static const qint64 UnlimitedPeriod = -1;
+
     /**
      * Constructs a null time period.
      */
@@ -65,6 +68,11 @@ public:
     static qint64 infiniteDuration();
 
     /**
+     * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period
+     */
+    qint64 distanceToTime(qint64 timeMs) const;
+
+    /**
      * \return                          Type of this time period.
      */
     Qn::TimePeriodType type() const;
@@ -89,6 +97,7 @@ bool operator<(const QnTimePeriod &other, qint64 first);
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
-QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod, (json)(metatype));
+
+QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod, (json)(metatype)(ubjson)(xml)(csv_record));
 
 #endif // QN_TIME_PERIOD_H

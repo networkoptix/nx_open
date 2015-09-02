@@ -23,7 +23,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Please wait while connection is being restored...</string>
+      <string>Please wait while the connection is restored...</string>
      </property>
     </widget>
    </item>

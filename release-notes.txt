@@ -1,3 +1,37 @@
+-----------------------------------------------2.4.0.xxxx-----------------------------------------
+Features:
+VMS-333 - Audit trail for users and cameras.
+VMS-350 - Storage using information
+VMS-340 - ACTI encoder support 
+VMS-295- Added Axis IO module integration
+VMS-305 - LDAP integration
+VMS-328 - Added Storage SDK on web admin page
+
+Improvements:
+VMS-363 - Added Started licenses
+VMS-341 - Decrease CPU usage on Jaguar
+VMS-323 - Some improvements in statistics and crash reports
+VMS-277 -  Added warning if there's more than one server is recording on the same storage.
+VMS-339 - If there's 2 servers are recording on the same storage, archive data is cleaned in random for them.
+VMS-306 - Buffer secondary stream for better HLS performance
+VMS-310 - Added smb support for linux
+VMS-344(????) - Autoupdates: multiple servers support
+VMS-614 - Latest Arecont and Axis cameras are supported
+VMS-613 - DWC-BVI2IR camera is now supported
+VMS-520 - "Check for updates automatically" is on by default
+VMS-441 - Time synchronization improvements
+VMS-314 - Remove hardcoded realm from digest authentication
+
+Bug fixes:
+VMS-529 - Motion mask can't be changed for panoramic AV cameras in smart search mode
+VMS-332 - Small issues in server API
+VMS-625 - Sometimes traffic(videostreams, system info, etc.) couldn't be proxied correctly. It could lead to 'Loading' instead of the stream at some devices
+VMS-289 - When client is started the keyboard focus is not on the login box. Fixed.
+VMS-349 - It's impossible to take videostreams and different information with client from remote server if there's 2 public IP
+VMS-635 - Unrecorded cameras are shown as offline without autodiscovery. Fixed.
+VMS-610 - Sometime edge mediaserver cannot be stopped.
+VMS-342 - Couldn't do anything with storages while fast archive scan. Fixed.
+
 ----------------------------------------------2.3.2.xxxx------------------------------------------
 
 Features:

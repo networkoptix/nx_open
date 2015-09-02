@@ -59,7 +59,7 @@ qint64 QnAudioStreamDisplay::getCurrentTime() const
     else if (m_lastAudioTime == qint64(AV_NOPTS_VALUE))
         return qint64(AV_NOPTS_VALUE);
     else
-        return m_lastAudioTime - msInBuffer();
+        return m_lastAudioTime - msInBuffer() * 1000ll;
 }
 
 void QnAudioStreamDisplay::blockTimeValue(qint64 value)
@@ -138,12 +138,6 @@ void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 min
 
     //if (msInBuffer() >= m_bufferMs / 10)
     //    m_audioQueue.dequeue()->releaseRef();
-}
-
-qint64 QnAudioStreamDisplay::lastAudioTime() const
-{
-    QMutexLocker lock(&m_audioQueueMutex);
-    return m_lastAudioTime;
 }
 
 bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)

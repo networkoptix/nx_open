@@ -64,7 +64,7 @@
             <item>
              <widget class="QLabel" name="settingsWarningLabel">
               <property name="text">
-               <string>Warning! FPS and quality settings in Recording Schedule will not work!</string>
+               <string>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</string>
               </property>
              </widget>
             </item>
@@ -129,7 +129,7 @@
             <item>
              <widget class="QLabel" name="labelDontUseQuality">
               <property name="text">
-               <string>Don't use</string>
+               <string>Do not use</string>
               </property>
              </widget>
             </item>
@@ -230,7 +230,7 @@
             <item>
              <widget class="QLabel" name="highQualityWarningLabel">
               <property name="text">
-               <string>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</string>
+               <string>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</string>
               </property>
              </widget>
             </item>
@@ -382,7 +382,7 @@
         <item>
          <widget class="QLabel" name="generalWarningLabel">
           <property name="text">
-           <string>Warning! Please read documentation before changing these settings!</string>
+           <string>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</string>
           </property>
          </widget>
         </item>

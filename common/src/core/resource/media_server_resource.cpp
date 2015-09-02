@@ -82,6 +82,12 @@ void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
         m_firstCamera.clear();
 }
 
+void QnMediaServerResource::beforeDestroy()
+{
+    QMutexLocker lock(&m_mutex);
+    m_firstCamera.clear();
+}
+
 void QnMediaServerResource::atResourceChanged()
 {
     m_panicModeCache.update();
@@ -227,6 +233,11 @@ void QnMediaServerResource::setStorageDataToUpdate(const QnStorageResourceList& 
 {
     m_storagesToUpdate = storagesToUpdate;
     m_storagesToRemove = storagesToRemove;
+}
+
+bool QnMediaServerResource::hasUpdatedStorages() const
+{
+    return m_storagesToUpdate.size() + m_storagesToRemove.size() > 0;
 }
 
 QPair<int, int> QnMediaServerResource::saveUpdatedStorages()
@@ -509,5 +520,5 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 
 QString QnMediaServerResource::realm() const
 {
-    return QnAuthHelper::REALM;
+    return QnAppInfo::realm();
 }

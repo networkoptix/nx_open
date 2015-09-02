@@ -782,12 +782,15 @@ Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
     if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
         return Qn::VideowallWithoutLicenseOverlay;
 
-    if (m_resource->getStatus() == Qn::Offline)
+    auto status = m_resource->getStatus();
+
+    if (status == Qn::Offline)
         return Qn::ServerOfflineOverlay;
-    if (m_resource->getStatus() == Qn::Unauthorized)
+    if (status == Qn::Unauthorized)
        return Qn::ServerUnauthorizedOverlay;
 
-    return base_type::calculateStatusOverlay();
+    /* Suppress 'No video' overlay */
+    return base_type::calculateStatusOverlay(status, true);
 }
 
 void QnServerResourceWidget::updateCheckedHealthMonitoringButtons() {

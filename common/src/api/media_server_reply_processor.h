@@ -22,6 +22,8 @@
 
 #include "media_server_connection.h"
 #include "model/recording_stats_reply.h"
+#include "api/model/audit/audit_record.h"
+#include <utils/common/ldap_fwd.h>
 
 class QnTimePeriodList;
 
@@ -62,6 +64,8 @@ signals:
     void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
     void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
     void finished(int status, const QnRecordingStatsReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnAuditRecordList&reply, int handle, const QString &errorString);
+    void finished(int status, const QnLdapUsers &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

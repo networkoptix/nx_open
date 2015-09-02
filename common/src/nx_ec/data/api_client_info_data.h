@@ -13,16 +13,16 @@ namespace ec2 {
 		QnUuid parentId;
 
         QString skin;
+        QString fullVersion;
         QString systemInfo;
+        QString systemRuntime;
 
         QString cpuArchitecture, cpuModelName;
 		qint64 phisicalMemory;
         QString openGLVersion, openGLVendor, openGLRenderer;
-
-		bool operator == (const ApiClientInfoData& rhs) const;
     };
 #define ApiClientInfoData_Fields (id)(parentId) \
-    (skin)(systemInfo) \
+    (skin)(fullVersion)(systemInfo)(systemRuntime) \
     (cpuArchitecture)(cpuModelName)(phisicalMemory) \
     (openGLVersion)(openGLVendor)(openGLRenderer)
 

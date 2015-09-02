@@ -25,6 +25,8 @@ namespace rtu
         Q_PROPERTY(QString toolSupportMail READ toolSupportMail NOTIFY toolInfoChanged)
         Q_PROPERTY(QString toolCompanyUrl READ toolCompanyUrl NOTIFY toolInfoChanged)
 
+        Q_PROPERTY(bool showWarnings READ showWarnings WRITE setShowWarnings NOTIFY showWarningsChanged)
+
     public:
         RtuContext(QObject *parent = nullptr);
         
@@ -35,6 +37,10 @@ namespace rtu
         
         int currentPage() const;
         
+        bool showWarnings() const;
+
+        void setShowWarnings(bool show);
+
         ///
 
         QObject *selection() const;
@@ -48,6 +54,16 @@ namespace rtu
         
         QObject *changesManager();
         
+        bool isValidSubnetMask(const QString &mask) const;
+
+        bool isDiscoverableFromCurrentNetwork(const QString &ip
+            , const QString &mask) const;
+
+        bool isDiscoverableFromNetwork(const QString &ip
+            , const QString &mask
+            , const QString &subnet
+            , const QString &subnetMask) const;
+
         QDateTime applyTimeZone(const QDate &date
             , const QTime &time
             , const QByteArray &prevTimeZoneId
@@ -75,6 +91,8 @@ namespace rtu
         void currentPageChanged();
 
         void selectionChanged();
+
+        void showWarningsChanged();
 
         void loginOperationFailed(const QString &primarySystem);
         

@@ -22,6 +22,16 @@
 #undef verify
 #endif
 
+struct LicenseTypeInfo
+{
+    LicenseTypeInfo();
+    LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM);
+
+    Qn::LicenseType licenseType;
+    QnLatin1Array className;
+    bool allowedForARM;
+};
+
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
@@ -33,7 +43,8 @@ public:
         InvalidBrand,               /**< License belong to other customization */
         Expired,                    /**< Expired */
         InvalidType,                /**< Such license type isn't allowed for that device. */
-        TooManyLicensesPerDevice    /**< Too many licenses of this type per device */
+        TooManyLicensesPerDevice,   /**< Too many licenses of this type per device. */
+        FutureLicense               /**< License type is unknown, may be license from future version. */
     };
 
     enum ValidationMode {
@@ -94,6 +105,14 @@ public:
     /** Id of the server this license attached to (if it is present in the current system). */
     QnUuid serverId() const;
 
+    static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
+
+protected:
+    bool isValidEdgeLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    bool isValidStartLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    bool isAllowedForArm() const;
+
+    void setClass(const QString &xclass);
 private:
     void parseLicenseBlock(
         const QByteArray& licenseBlock,
@@ -143,7 +162,7 @@ public:
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-    int totalLicenseByType(Qn::LicenseType licenseType) const;
+    int totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity = false) const;
 
 private:
 
