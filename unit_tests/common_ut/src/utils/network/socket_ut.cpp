@@ -98,7 +98,7 @@ protected:
     }
 };
 
-#if 1
+#if 0
 
 /*!
     This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
