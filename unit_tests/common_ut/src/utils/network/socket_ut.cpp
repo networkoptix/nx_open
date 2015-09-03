@@ -213,7 +213,7 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
         lk.unlock();
         if( connectionToCancel )
         {
-            connectionToCancel->cancelAsyncIO();
+            connectionToCancel->terminateAsyncIO(true);
             connectionToCancel.reset();
             ++cancelledConnectionsCount;
         }
@@ -261,7 +261,7 @@ TEST( Socket, HostNameResolveCancellation )
                 done = true;
                 resolvedAddress = connection->getForeignAddress().address;
             } ) );
-        connection->cancelAsyncIO();
+        connection->terminateAsyncIO(true);
     }
 }
 
@@ -272,27 +272,15 @@ TEST( Socket, BadHostNameResolve )
     for( int i = 0; i < TEST_RUNS; ++i )
     {
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
-        //SystemError::ErrorCode connectErrorCode = SystemError::noError;
-        //std::condition_variable cond;
-        //std::mutex mutex;
-        //bool done = false;
-        //HostAddress resolvedAddress;
         int iBak = i;
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
         ASSERT_TRUE( connection->connectAsync(
             SocketAddress( QString::fromLatin1( "hx.hz" ), nx_http::DEFAULT_HTTP_PORT ),
-            [&i, iBak/*&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection*/]
+            [&i, iBak]
             ( SystemError::ErrorCode /*errorCode*/ ) mutable {
-                //std::unique_lock<std::mutex> lk( mutex );
-                //connectErrorCode = errorCode;
-                //cond.notify_all();
-                //done = true;
-                //resolvedAddress = connection->getForeignAddress().address;
                 ASSERT_EQ( i, iBak );
-                int x = 0;
-                static_cast< void >( x );
             } ) );
-        connection->cancelAsyncIO();
+        connection->terminateAsyncIO(true);
     }
 }
 
@@ -326,7 +314,7 @@ TEST( Socket, postCancellation )
                 } );
 
             for( const auto& sock : sockets )
-                sock->cancelAsyncIO();
+                sock->terminateAsyncIO(true);
 
             //QThread::usleep( 100 );
         }

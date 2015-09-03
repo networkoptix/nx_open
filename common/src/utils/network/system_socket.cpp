@@ -993,7 +993,10 @@ static int acceptWithTimeout( int m_fd, int timeoutMillis = DEFAULT_ACCEPT_TIMEO
         return -1;
     }
     if( sockPollfd.revents & POLLIN )
-        return ::accept( m_fd, NULL, NULL );
+    {
+        auto fd = ::accept( m_fd, NULL, NULL );
+        return fd;
+    }
     if( (sockPollfd.revents & POLLHUP)
 #ifdef _GNU_SOURCE
         || (sockPollfd.revents & POLLRDHUP)
@@ -1152,6 +1155,8 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
                     static_cast<Pollable*>(&m_implDelegate), true);
                 aio::AIOService::instance()->removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
+                aio::AIOService::instance()->removeFromWatch(
+                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
                 terminatedPromise.set_value();
             } );
 
@@ -1167,7 +1172,9 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
                     static_cast<Pollable*>(&m_implDelegate), true);
                 aio::AIOService::instance()->removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-            } );
+                aio::AIOService::instance()->removeFromWatch(
+                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
+        } );
     }
 }
 
