@@ -136,14 +136,6 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline() {
 }
 
 void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
-    if (m_target.denyMajorUpdates && !m_target.version.isNull()) {
-        QnSoftwareVersion currentVersion = qnCommon->engineVersion();
-        if (m_target.version.major() != currentVersion.major() || m_target.version.minor() != currentVersion.minor()) {
-            finishTask(QnCheckForUpdateResult::NoSuchBuild);
-            return;
-        }
-    }
-
     m_updateFiles.clear();
     m_clientUpdateFile.clear();
     m_releaseNotesUrl.clear();
@@ -213,7 +205,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     QVariantMap releasesMap = map.value(lit("releases")).toMap();
 
     QString currentRelease = map.value(lit("current_release")).toString();
-    if (m_target.denyMajorUpdates || QnSoftwareVersion(currentRelease) < qnCommon->engineVersion())
+    if (QnSoftwareVersion(currentRelease) < qnCommon->engineVersion())
         currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
 
     QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
@@ -227,6 +219,8 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
 
     if (m_target.version.isNull())
         m_target.version = latestVersion;
+    else if (m_target.version.build() == 0)
+        m_target.version = QnSoftwareVersion(releasesMap.value(m_target.version.toString(QnSoftwareVersion::MinorFormat)).toString());
 
     m_updateLocationPrefix = updatesPrefix;
     m_releaseNotesUrl = QUrl(map.value(lit("release_notes")).toString());
@@ -261,6 +255,14 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
             NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No such build."), cl_logDEBUG1);
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
         }
+        return;
+    }
+
+    QnSoftwareVersion currentVersion = qnCommon->engineVersion();
+    if (m_target.version.major() < currentVersion.major()
+        || (m_target.version.major() == currentVersion.major() && m_target.version.minor() < currentVersion.minor()))
+    {
+        finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
         return;
     }
 

@@ -1,5 +1,4 @@
-#ifndef SERVER_UPDATES_WIDGET_H
-#define SERVER_UPDATES_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -77,5 +76,3 @@ private:
 
     qint64 m_lastAutoUpdateCheck;
 };
-
-#endif // SERVER_UPDATES_WIDGET_H
