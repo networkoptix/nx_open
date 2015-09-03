@@ -1613,6 +1613,9 @@ void MediaServerProcess::run()
 #endif
     if (QnAppInfo::armBox() == "bpi" || compatibilityMode) // check compatibilityMode here for testing purpose
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+#ifdef __arm__
+    serverFlags |= Qn::SF_ArmServer;
+#endif
 
     if (!isLocal)
         serverFlags |= Qn::SF_RemoteEC;

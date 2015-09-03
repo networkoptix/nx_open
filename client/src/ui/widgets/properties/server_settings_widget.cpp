@@ -54,6 +54,7 @@ namespace {
     const qint64 bytesInMiB = 1024 * 1024;
 
     static const int PC_SERVER_MAX_CAMERAS = 128;
+    static const int ARM_SERVER_MAX_CAMERAS = 8;
     static const int EDGE_SERVER_MAX_CAMERAS = 1;
 
     const int ReservedSpaceRole = Qt::UserRole;
@@ -233,20 +234,21 @@ void QnServerSettingsWidget::updateFromSettings() {
 
     m_initServerName = m_server->getName();
     ui->nameLineEdit->setText(m_initServerName);
+    int maxCameras;
+    if (m_server->getServerFlags().testFlag(Qn::SF_Edge))
+        maxCameras = EDGE_SERVER_MAX_CAMERAS;   //edge server
+    else if (m_server->getServerFlags().testFlag(Qn::SF_ArmServer))
+        maxCameras = ARM_SERVER_MAX_CAMERAS;   //generic ARM based servre
+    else
+        maxCameras = PC_SERVER_MAX_CAMERAS;    //PC server
     int currentMaxCamerasValue = m_server->getMaxCameras();
     if( currentMaxCamerasValue == 0 )
-    {
-        if( !m_server->getServerFlags().testFlag(Qn::SF_Edge) )
-            currentMaxCamerasValue = PC_SERVER_MAX_CAMERAS; //not an edge server
-        else
-            currentMaxCamerasValue = EDGE_SERVER_MAX_CAMERAS;   //edge server
-    }
+        currentMaxCamerasValue = maxCameras;
 
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
     ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
 
-    const int maxCameras = (m_server->getServerFlags() & Qn::SF_Edge) ? EDGE_SERVER_MAX_CAMERAS : PC_SERVER_MAX_CAMERAS;
     ui->maxCamerasSpinBox->setMaximum(maxCameras);
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
