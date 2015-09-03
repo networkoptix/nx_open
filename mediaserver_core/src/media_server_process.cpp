@@ -997,6 +997,48 @@ void MediaServerProcess::updateAllowCameraCHangesIfNeed()
     }
 }
 
+template< typename Container>
+QString containerToQString( const Container& container )
+{
+    QStringList list;
+    for (const auto& it : container)
+        list << it.toString();
+
+    return list.join( lit(", ") );
+}
+
+void MediaServerProcess::updateAddressesList()
+{
+    QList<SocketAddress> serverAddresses;
+
+    const auto port = m_mediaServer->getPort();
+    for (const auto& host : m_localAddresses )
+        serverAddresses << SocketAddress(host.toString(), port);
+
+    for (const auto& host : m_forwardedAddresses )
+        serverAddresses << SocketAddress(host.first, host.second);
+
+    m_mediaServer->setNetAddrList(serverAddresses);
+    NX_LOG(lit("%1 Update mediaserver addresses: %2")
+           .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
+
+    const QUrl defaultUrl(m_mediaServer->getApiUrl());
+    const SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
+    if (std::find(serverAddresses.begin(), serverAddresses.end(),
+                  defaultAddress) == serverAddresses.end())
+    {
+        SocketAddress newAddress;
+        if (!serverAddresses.isEmpty())
+            newAddress = serverAddresses.front();
+
+        setServerNameAndUrls(m_mediaServer,
+                             newAddress.address.toString(), newAddress.port);
+    }
+
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()
+            ->save(m_mediaServer, this, &MediaServerProcess::at_serverSaved);
+}
+
 void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
@@ -1032,10 +1074,11 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for(const QnMediaServerResourcePtr &mediaServer: mediaServerList) {
-            QList<QHostAddress> addresses = mediaServer->getNetAddrList();
+            QList<SocketAddress> addresses = mediaServer->getNetAddrList();
             QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer->getId());
             for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
-                if (it->port() == -1 && addresses.contains(QHostAddress(it->host())))
+                const SocketAddress addr(it->host(), it->port());
+                if (it->port() == -1 && addresses.contains(addr))
                     it = additionalAddresses.erase(it);
                 else
                     ++it;
@@ -1253,29 +1296,38 @@ void MediaServerProcess::at_localInterfacesChanged()
 {
     if (isStopping())
         return;
-    auto intfList = allLocalAddresses();
-    if (!m_publicAddress.isNull())
-        intfList << m_publicAddress;
-    m_mediaServer->setNetAddrList(intfList);
 
-    QString defaultAddress = QUrl(m_mediaServer->getApiUrl()).host();
-    int port = m_mediaServer->getPort();
-    bool found = false;
-    for(const QHostAddress& addr: intfList) {
-        if (addr.toString() == defaultAddress) {
-            found = true;
-            break;
+    m_localAddresses = allLocalAddresses();
+    updateAddressesList();
+}
+
+void MediaServerProcess::at_portMappingChanged(QString address)
+{
+    if (isStopping())
+        return;
+
+    SocketAddress mappedAddress(address);
+    if (mappedAddress.port)
+    {
+        NX_LOG(lit("%1 New external address %2 has been mapped")
+               .arg(Q_FUNC_INFO).arg(address), cl_logALWAYS)
+
+        m_forwardedAddresses[mappedAddress.address] = mappedAddress.port;
+        updateAddressesList();
+    }
+    else
+    {
+        const auto oldIp = m_forwardedAddresses.find(mappedAddress.address);
+        if (oldIp != m_forwardedAddresses.end())
+        {
+            NX_LOG(lit("%1 External address %2:%3 has been unmapped")
+                   .arg(Q_FUNC_INFO).arg(oldIp->first.toString())
+                   .arg(oldIp->second), cl_logALWAYS)
+
+            m_forwardedAddresses.erase(oldIp);
+            updateAddressesList();
         }
     }
-    if (!found) {
-        QHostAddress newAddress;
-        if (!intfList.isEmpty())
-            newAddress = intfList.first();
-        setServerNameAndUrls(m_mediaServer, newAddress.toString(), port);
-    }
-
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->getMediaServerManager()->save(m_mediaServer, this, &MediaServerProcess::at_serverSaved);
 }
 
 void MediaServerProcess::at_serverSaved(int, ec2::ErrorCode err)
@@ -1839,21 +1891,17 @@ void MediaServerProcess::run()
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
 
-        QList<QHostAddress> serverIfaceList = allLocalAddresses();
-        if (!m_publicAddress.isNull()) {
-            bool isExists = false;
-            for (int i = 0; i < serverIfaceList.size(); ++i)
-            {
-                if (serverIfaceList[i] == m_publicAddress)
-                    isExists = true;
-            }
-            if (!isExists)
-                serverIfaceList << m_publicAddress;
-        }
+        QList<SocketAddress> serverAddresses;
+        const auto port = server->getPort();
+        m_localAddresses = allLocalAddresses();
+        for (const auto& host : m_localAddresses )
+            serverAddresses << SocketAddress(host.toString(), port);
 
-        if (server->getNetAddrList() != serverIfaceList) {
-            server->setNetAddrList(serverIfaceList);
+        if (server->getNetAddrList() != serverAddresses) {
+            server->setNetAddrList(serverAddresses);
             isModified = true;
+            NX_LOG(lit("%1 Update mediaserver addresses on startup: %2")
+                   .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
         }
 
         bool needUpdateAuthKey = false;
@@ -1984,6 +2032,18 @@ void MediaServerProcess::run()
     // ============================
     std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher());
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
+
+    nx_upnp::PortMapper upnpPortMapper;
+    upnpPortMapper.enableMapping(m_mediaServer->getPort(),
+                                 nx_upnp::PortMapper::Protocol::TCP,
+                                 [this](SocketAddress address)
+    {
+        const auto result = QMetaObject::invokeMethod(
+            this, "at_portMappingChanged", Qt::AutoConnection,
+            Q_ARG(QString, address.toString()));
+
+        Q_ASSERT_X(result, Q_FUNC_INFO, "Could not call at_portMappingChanged(...)");
+    });
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
@@ -2144,8 +2204,6 @@ void MediaServerProcess::run()
 
     QnResourceDiscoveryManager::instance()->setReady(true);
     QnResourceDiscoveryManager::instance()->start();
-
-
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();

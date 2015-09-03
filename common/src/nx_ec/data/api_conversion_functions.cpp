@@ -517,14 +517,19 @@ void fromApiToResourceList(const ApiLicenseDataList &src, QnLicenseList &dst) {
 }
 
 
-static void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& netAddrListString) {
+static void deserializeNetAddrList(QList<SocketAddress>& netAddrList,
+                                   const QString& netAddrListString) {
     QStringList addListStrings = netAddrListString.split(QLatin1Char(';'));
-    std::transform(addListStrings.begin(), addListStrings.end(), std::back_inserter(netAddrList), [](const QString &address) { return QHostAddress(address); });
+    std::transform(addListStrings.begin(), addListStrings.end(), \
+                   std::back_inserter(netAddrList),
+                   [](const QString &address) { return SocketAddress(address); });
 }
 
-static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList) {
+static QString serializeNetAddrList(const QList<SocketAddress>& netAddrList) {
     QStringList addListStrings;
-    std::transform(netAddrList.begin(), netAddrList.end(), std::back_inserter(addListStrings), std::mem_fun_ref(&QHostAddress::toString));
+    std::transform(netAddrList.begin(), netAddrList.end(),
+                   std::back_inserter(addListStrings),
+                   std::mem_fun_ref(&SocketAddress::toString));
     return addListStrings.join(QLatin1String(";"));
 }
 
@@ -569,7 +574,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
 void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst, const ResourceContext &/*ctx*/) {
     fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
-    QList<QHostAddress> resNetAddrList;
+    QList<SocketAddress> resNetAddrList;
     deserializeNetAddrList(resNetAddrList, src.networkAddresses);
 
     dst->setApiUrl(src.apiUrl);

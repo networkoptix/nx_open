@@ -35,10 +35,11 @@ namespace {
     };
 
     static void getAddresses(const QnMediaServerResourcePtr &server, QSet<QUrl> &autoUrls, QSet<QUrl> &additionalUrls, QSet<QUrl> &ignoredUrls) {
-        for (const QHostAddress &address: server->getNetAddrList()) {
+        for (const SocketAddress &address: server->getNetAddrList()) {
             QUrl url;
             url.setScheme(lit("http"));
-            url.setHost(address.toString());
+            url.setHost(address.address.toString());
+            url.setPort(address.port);
             autoUrls.insert(url);
         }
 
@@ -63,20 +64,20 @@ public:
     void simplify(const QSet<QUrl> &autoUrls, const QSet<QUrl> &additionalUrls, const QSet<QUrl> &ignoredUrls, int port) {
         for (auto it = addresses.begin(); it != addresses.end(); /* no inc */) {
             QUrl url = it.key();
-            QUrl explicitUrl = url;
-            explicitUrl.setPort(port);
+            QUrl defaultUrl = url;
+            defaultUrl.setPort(port);
 
-            if (autoUrls.contains(url) || it.value() == (additionalUrls.contains(url) || additionalUrls.contains(explicitUrl)))
+            if (autoUrls.contains(url) || it.value() == (additionalUrls.contains(url) || additionalUrls.contains(defaultUrl)))
                 it = addresses.erase(it);
             else
                 ++it;
         }
         for (auto it = ignoredAddresses.begin(); it != ignoredAddresses.end(); /* no inc */) {
             QUrl url = it.key();
-            QUrl explicitUrl = url;
-            explicitUrl.setPort(port);
+            QUrl defaultUrl = url;
+            defaultUrl.setPort(port);
 
-            if (it.value() == (ignoredUrls.contains(url) || ignoredUrls.contains(explicitUrl)))
+            if (it.value() == (ignoredUrls.contains(url) || ignoredUrls.contains(defaultUrl)))
                 it = ignoredAddresses.erase(it);
             else
                 ++it;
@@ -325,22 +326,21 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
     }
 
-//    if (url.port() == m_server->getPort())
-//        url.setPort(-1);
-    // TODO: #dklychkov fix it in 2.4
-    url.setPort(-1);
+    if (url.port() == -1)
+        url.setPort(m_server->getPort());
 
-    QUrl explicitUrl = url;
-    explicitUrl.setPort(m_server->getPort());
+    QUrl implicitUrl = url;
+    implicitUrl.setPort(-1);
     if (m_serverAddressesModel->addressList().contains(url) ||
+        m_serverAddressesModel->addressList().contains(implicitUrl) ||
         m_serverAddressesModel->manualAddressList().contains(url) ||
-        m_serverAddressesModel->manualAddressList().contains(explicitUrl))
+        m_serverAddressesModel->manualAddressList().contains(implicitUrl))
     {
         reportUrlEditingError(QnServerAddressesModel::ExistingUrl);
         return;
     }
 
-    m_serverAddressesModel->addAddress(explicitUrl);
+    m_serverAddressesModel->addAddress(url);
 }
 
 void QnRoutingManagementWidget::at_removeButton_clicked() {

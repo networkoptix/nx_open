@@ -13,6 +13,7 @@ class AsyncClient
 {   
 public:
     enum Protocol { TCP, UDP };
+
     virtual ~AsyncClient() {}
 
     //! Simple SOAP call
@@ -28,6 +29,8 @@ public:
 
         //! @returns value or empty string
         const QString& getParam( const QString& key ) const;
+
+        QString toString() const;
     };
 
     //! Creates request by @param message and calls @fn doPost
@@ -52,7 +55,7 @@ public:
     virtual
     bool addMapping( const QUrl& url, const HostAddress& internalIp,
                      quint16 internalPort, quint16 externalPort,
-                     Protocol protocol, const QString& description,
+                     Protocol protocol, const QString& description, quint64 duration,
                      std::function< void( bool ) > callback );
 
     //! Removes mapping of @param externalPort
@@ -67,11 +70,15 @@ public:
         quint16     externalPort;
         Protocol    protocol;
         QString     description;
+        quint64     duration;
 
         MappingInfo( const HostAddress& inIp = HostAddress(),
-                     quint16 inPort = 0, quint16 exPort = 0, Protocol prot = TCP,
-                     const QString& desc = QString() );
+                     quint16 inPort = 0, quint16 exPort = 0,
+                     Protocol prot = Protocol::TCP,
+                     const QString& desc = QString(), quint64 dur = 0);
+
         bool isValid() const;
+        QString toString() const;
     };
 
     //! Provides mapping info by @param index
@@ -95,7 +102,7 @@ private:
     std::set< nx_http::AsyncHttpClientPtr > m_httpClients;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS( AsyncClient::Protocol, ( lexical ) )
+QN_FUSION_DECLARE_FUNCTIONS( AsyncClient::Protocol, ( lexical ) );
 
 } // namespace nx_upnp
 

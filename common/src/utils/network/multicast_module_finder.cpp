@@ -77,6 +77,8 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
+bool QnMulticastModuleFinder::isDisabled(false);
+
 void QnMulticastModuleFinder::updateInterfaces() {
     QnMutexLocker lk( &m_mutex );
 
@@ -216,6 +218,9 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
 }
 
 void QnMulticastModuleFinder::run() {
+    if (isDisabled)
+        return;
+
     initSystemThreadId();
     NX_LOG(lit("QnMulticastModuleFinder started"), cl_logDEBUG1);
 

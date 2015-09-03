@@ -9,9 +9,9 @@
 namespace {
 
 void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformationWithAddresses &moduleInformation) {
-    QList<QHostAddress> addressList;
+    QList<SocketAddress> addressList;
     foreach (const QString &address, moduleInformation.remoteAddresses)
-        addressList.append(QHostAddress(address));
+        addressList.append(SocketAddress(address, moduleInformation.port));
     server->setNetAddrList(addressList);
 
     if (!addressList.isEmpty()) {

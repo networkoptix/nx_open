@@ -3,6 +3,7 @@
 #include "upnp_device_description.h"
 #include "utils/common/model_functions.h"
 #include "utils/serialization/lexical_functions.h"
+#include "utils/common/log.h"
 
 namespace nx_upnp {
 namespace /* noname */ {
@@ -133,6 +134,16 @@ const QString& AsyncClient::Message::getParam( const QString& key ) const
     return ( it == params.end() ) ? none : it->second;
 }
 
+QString AsyncClient::Message::toString() const
+{
+    QStringList paramList;
+    for( const auto& param : params)
+        paramList << lit("%1='%2'").arg( param.first ).arg( param.second );
+
+    return lit( "%1:%2(%3)" ).arg( service ).arg( action )
+            .arg( paramList.join( lit(", ") ) );
+}
+
 bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
                           std::function< void( const Message& )> callback )
 {
@@ -146,7 +157,7 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
     const auto request = SOAP_REQUEST.arg( message.action ).arg( service )
                                      .arg( params.join( lit("") ) );
 
-    auto complete = [ this, callback ]( const nx_http::AsyncHttpClientPtr& ptr )
+    auto complete = [ this, url, callback ]( const nx_http::AsyncHttpClientPtr& ptr )
     {
         {
             QnMutexLocker lk(&m_mutex);
@@ -175,6 +186,10 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
             }
         }
 
+        NX_LOG( lit( "%1 Could not parse message from %2" )
+                .arg( QLatin1String( Q_FUNC_INFO ) )
+                .arg( url.toString() ), cl_logERROR );
+
         callback( Message() );
     };
 
@@ -188,6 +203,10 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
     m_httpClients.insert( httpClient );
     if( !httpClient->doPost( url, "text/xml", request.toUtf8() ) )
     {
+        NX_LOG( lit( "%1 Could not send request to %2" )
+                .arg( QLatin1String( Q_FUNC_INFO ) )
+                .arg( url.toString() ), cl_logERROR );
+
         m_httpClients.erase( httpClient );
         return false;
     }
@@ -227,7 +246,7 @@ bool AsyncClient::externalIp( const QUrl& url,
 bool AsyncClient::addMapping(
         const QUrl& url, const HostAddress& internalIp, quint16 internalPort,
         quint16 externalPort, Protocol protocol, const QString& description,
-        std::function< void( bool ) > callback )
+        quint64 duration, std::function< void( bool ) > callback )
 {
     AsyncClient::Message request;
     request.action = ADD_PORT_MAPPING;
@@ -239,7 +258,7 @@ bool AsyncClient::addMapping(
     request.params[ INTERNAL_IP ]   = internalIp.toString();
     request.params[ ENABLED]        = QString::number( 1 );
     request.params[ DESCRIPTION ]   = description.isEmpty() ? CLIENT_ID : description;
-    request.params[ DURATION ]      = QString::number( 0 );
+    request.params[ DURATION ]      = QString::number( duration );
 
     return doUpnp( url, request, [ callback ]( const Message& response ) { 
         callback( response.isOk() );
@@ -263,15 +282,23 @@ bool AsyncClient::deleteMapping(
 
 AsyncClient::MappingInfo::MappingInfo(
         const HostAddress& inIp, quint16 inPort, quint16 exPort,
-        Protocol prot, const QString& desc )
+        Protocol prot, const QString& desc, quint64 dur )
     : internalIp( inIp ), internalPort( inPort ), externalPort( exPort )
-    , protocol( prot ), description( desc )
+    , protocol( prot ), description( desc ), duration( dur )
 {
 }
 
 bool AsyncClient::MappingInfo::isValid() const
 {
     return !( internalIp == HostAddress() ) && internalPort && externalPort;
+}
+
+QString AsyncClient::MappingInfo::toString() const
+{
+    return lit( "MappingInfo( %1:%2 -> %3 %4 : %5 for %6 )" )
+            .arg( internalIp.toString() ).arg( internalPort )
+            .arg( externalPort ).arg( QnLexical::serialized( protocol ) )
+            .arg( description ).arg(duration);
 }
 
 bool AsyncClient::getMapping(
@@ -315,7 +342,8 @@ bool AsyncClient::getMapping(
                 response.getParam( INTERNAL_IP ),
                 response.getParam( INTERNAL_PORT ).toUShort(),
                 externalPort, protocol,
-                response.getParam( DESCRIPTION ) ) );
+                response.getParam( DESCRIPTION ),
+                response.getParam( DURATION ).toULongLong() ) );
         else
             callback( MappingInfo() );
     } );
@@ -358,8 +386,8 @@ bool AsyncClient::getAllMappings(
 }
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( AsyncClient::Protocol,
-    ( AsyncClient::TCP, "tcp" )
-    ( AsyncClient::UDP, "udp" )
+    ( AsyncClient::Protocol::TCP, "tcp" )
+    ( AsyncClient::Protocol::UDP, "udp" )
 )
 
 } // namespace nx_upnp

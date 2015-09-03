@@ -20,6 +20,7 @@
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
 #include <utils/network/http/http_mod_manager.h>
+#include <utils/network/upnp/upnp_port_mapper.h>
 
 
 class QnAppserverResourceProcessor;
@@ -51,6 +52,7 @@ public slots:
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_localInterfacesChanged();
+    void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
@@ -70,6 +72,7 @@ private slots:
 private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
+    void updateAddressesList();
     bool initTcpListener();
     QHostAddress getPublicAddress();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
@@ -91,6 +94,8 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
+    QList<QHostAddress> m_localAddresses;
+    std::map<HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
