@@ -571,8 +571,13 @@ namespace ec2
         const auto timeDifference = remotePeerSyncTime - getSyncTimeNonSafe();
         const bool maxTimeDriftExceeded =
             (std::abs( timeDifference ) >= std::max<qint64>( timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS ));
-        const bool needAdjustClockDueToLargeDrift = maxTimeDriftExceeded && (remotePeerID > qnCommon->moduleGUID());
-        //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
+        const bool needAdjustClockDueToLargeDrift =
+            //taking drift into account if both servers have time with same key
+            (remotePeerTimePriorityKey == m_usedTimeSyncInfo.timePriorityKey) &&
+            maxTimeDriftExceeded &&
+            (remotePeerID > qnCommon->moduleGUID());
+
+        //if there is new maximum remotePeerTimePriorityKey then updating delta and emitting timeChanged
         if( (remotePeerTimePriorityKey <= m_usedTimeSyncInfo.timePriorityKey) &&
             !needAdjustClockDueToLargeDrift )
         {

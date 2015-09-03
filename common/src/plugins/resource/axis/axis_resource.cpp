@@ -1027,7 +1027,7 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const 
             if (newValue.outputName != currentValue.outputName)
                 changedParams.insert(paramNamePrefix + lit("Output.Name"), newValue.outputName);
             if (newValue.oDefaultState != currentValue.oDefaultState)
-                changedParams.insert(paramNamePrefix + lit("Output.Trig"), newValue.oDefaultState == Qn::IO_OpenCircuit ? lit("closed") : lit("open"));
+                changedParams.insert(paramNamePrefix + lit("Output.Active"), newValue.oDefaultState == Qn::IO_OpenCircuit ? lit("closed") : lit("open"));
 
             if (newValue.autoResetTimeoutMs != currentValue.autoResetTimeoutMs)
                 changedParams.insert(paramNamePrefix + lit("Output.PulseTime"), QString::number(newValue.autoResetTimeoutMs));
@@ -1214,6 +1214,20 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
         return; // skip unknown event
 
     bool isOnState = (eventType == '/') || (eventType == 'H');
+
+    // Axis camera sends inversed output port state for 'grounded circuit' ports (seems like it sends physical state instead of logical state)
+    {
+        QMutexLocker lock(&m_mutex);
+        for (auto& port: m_ioPorts) {
+            if (port.id == portId)
+            {
+                if (port.portType == Qn::PT_Output && port.oDefaultState == Qn::IO_GroundedCircuit)
+                    isOnState = !isOnState;
+                break;
+            }
+        }
+    }
+
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     updateIOState(portId, isOnState, timestamp, true);
 }

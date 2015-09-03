@@ -21,7 +21,8 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
 #include "core/resource/resource.h"
-
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 namespace {
 
@@ -280,8 +281,31 @@ void DeviceSoapWrapper::calcTimeDrift()
     }
 }
 
-bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
+QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer, const QString& model) const
 {
+    QAuthenticator result;
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, model);
+    QString credentials = resourceData.value<QString>(lit("defaultCredentials"));
+    QStringList parts = credentials.split(L':');
+    if (parts.size() == 2) {
+        result.setUser(parts[0]);
+        result.setPassword(parts[1]);
+    }
+    
+    return result;
+}
+
+bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
+{
+
+    QAuthenticator auth = getDefaultPassword(manufacturer, model);
+    if (!auth.isNull()) {
+        setLogin(auth.user());
+        setPassword(auth.password());
+        return true;
+    }
+
     calcTimeDrift();
 
     PasswordList passwords = m_passwordsData.getPasswordsByManufacturer(manufacturer);

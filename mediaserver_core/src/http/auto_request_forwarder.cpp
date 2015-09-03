@@ -10,6 +10,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 #include <utils/common/string.h>
@@ -115,8 +116,14 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
     if( resUniqueID.isEmpty() )
         return false;
 
-    *res = qnResPool->getResourceByUniqueId( resUniqueID );
-    return *res;
+    //resUniqueID could be physical id or mac address
+    //trying luck with physical id
+    *res = qnResPool->getResourceByUniqueId(resUniqueID);
+    if( *res )
+        return true;
+    //searching by mac
+    *res = qnResPool->getResourceByMacAddress(resUniqueID);
+    return *res != nullptr;
 }
 
 bool QnAutoRequestForwarder::findCameraUniqueIDInQuery(
