@@ -124,25 +124,25 @@ namespace
                     continue;
                 if (!newValue.ipAddr.isNull())
                 {
-                    modified = modified || (value.ipAddr != newValue.ipAddr);
+                    modified |= value.ipAddr != newValue.ipAddr;
                     value.ipAddr = newValue.ipAddr;
                 }
                 if (!newValue.netMask.isNull())
                 {
-                    modified = modified || (value.netMask != newValue.netMask);
+                    modified |= value.netMask != newValue.netMask;
                     value.netMask = newValue.netMask;
                 }
                 if (!newValue.gateway.isNull())
                 {
-                    modified = modified || (value.gateway != newValue.gateway);
+                    modified |= value.gateway != newValue.gateway;
                     value.gateway = newValue.gateway;
                 }
                 if (!newValue.dns_servers.isNull())
                 {
-                    modified = modified || (value.dns_servers != newValue.dns_servers);
+                    modified |= value.dns_servers != newValue.dns_servers;
                     value.dns_servers = newValue.dns_servers;
                 }
-                modified = modified || (value.dhcp != newValue.dhcp);
+                modified |= value.dhcp != newValue.dhcp;
                 value.dhcp = newValue.dhcp;
                 newSettings.erase(itr);
                 break;

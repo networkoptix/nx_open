@@ -2248,7 +2248,6 @@ void MediaServerProcess::run()
     QnBusinessEventConnector::initStaticInstance( NULL );
 
     QnBusinessRuleProcessor::fini();
-    QnEventsDB::fini();
 
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
@@ -2267,6 +2266,9 @@ void MediaServerProcess::run()
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
+    
+    // destroy events db
+    QnEventsDB::fini();
 
     mserverResourceDiscoveryManager.reset();
 
