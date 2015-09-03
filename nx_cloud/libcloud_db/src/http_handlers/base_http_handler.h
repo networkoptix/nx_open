@@ -67,7 +67,7 @@ protected:
 }   //detail
 
 
-nx_http::StatusCode::Value resultCodeToHttpStatusCode( ResultCode resultCode );
+nx_http::StatusCode::Value resultCodeToHttpStatusCode(api::ResultCode resultCode );
 
 
 //!Contains logic common for all cloud_db HTTP request handlers
@@ -80,7 +80,7 @@ public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
         Input inputData,
-        std::function<void( ResultCode resultCode, Output outData )>&& completionHandler )> ExecuteRequestFunc;
+        std::function<void( api::ResultCode resultCode, Output outData )>&& completionHandler )> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
@@ -110,7 +110,7 @@ public:
         m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
-            [this]( ResultCode resultCode, Output outData ) {
+            [this]( api::ResultCode resultCode, Output outData ) {
                 this->requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move(outData) );
             } );
     }
@@ -132,7 +132,7 @@ public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
         Input inputData,
-        std::function<void( ResultCode resultCode )>&& completionHandler )> ExecuteRequestFunc;
+        std::function<void( api::ResultCode resultCode )>&& completionHandler )> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
@@ -165,7 +165,7 @@ public:
         m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
-            [this]( ResultCode resultCode ) {
+            [this]( api::ResultCode resultCode ) {
                 this->requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
             } );
     }
@@ -186,7 +186,7 @@ class AbstractFiniteMsgBodyHttpHandler<void, Output>
 public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
-        std::function<void( ResultCode resultCode, Output outData )>&& completionHandler )> ExecuteRequestFunc;
+        std::function<void( api::ResultCode resultCode, Output outData )>&& completionHandler )> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
@@ -212,7 +212,7 @@ public:
 
         m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
-            [this]( ResultCode resultCode, Output outData ) {
+            [this]( api::ResultCode resultCode, Output outData ) {
                 this->requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move( outData ) );
             } );
     }
@@ -233,7 +233,7 @@ class AbstractFiniteMsgBodyHttpHandler<void, void>
 public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
-        std::function<void( ResultCode resultCode )>&& completionHandler )> ExecuteRequestFunc;
+        std::function<void( api::ResultCode resultCode )>&& completionHandler )> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
@@ -259,7 +259,7 @@ public:
 
         m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
-            [this]( ResultCode resultCode ) {
+            [this]( api::ResultCode resultCode ) {
                 this->requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
             } );
     }

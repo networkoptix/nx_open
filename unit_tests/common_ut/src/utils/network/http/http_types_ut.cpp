@@ -43,13 +43,13 @@ TEST( HttpHeaderTest, RangeHeader_parse )
     range.parse( "650-" );
     ASSERT_EQ( range.rangeSpecList.size(), 1 );
     ASSERT_EQ( range.rangeSpecList[0].start, 650 );
-    ASSERT_FALSE( range.rangeSpecList[0].end );
+    ASSERT_FALSE( static_cast< bool >(range.rangeSpecList[0].end ) );
 
     range.rangeSpecList.clear();
     range.parse( "100,200-230" );
     ASSERT_EQ( range.rangeSpecList.size(), 2 );
     ASSERT_EQ( range.rangeSpecList[0].start, 100 );
-    ASSERT_TRUE( range.rangeSpecList[0].end );
+    ASSERT_TRUE( static_cast< bool >( range.rangeSpecList[0].end ) );
     ASSERT_EQ( range.rangeSpecList[0].end.get(), 100 );
     ASSERT_EQ( range.rangeSpecList[1].start, 200 );
     ASSERT_EQ( range.rangeSpecList[1].end.get(), 230 );

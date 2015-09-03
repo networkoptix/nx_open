@@ -806,7 +806,7 @@ namespace aio
     }
 
     template<class SocketType>
-    bool AIOThread<SocketType>::post( SocketType* const sock, std::function<void()>&& functor )
+    void AIOThread<SocketType>::post( SocketType* const sock, std::function<void()>&& functor )
     {
         m_impl->pollSetModificationQueue.push_back(
             typename AIOThreadImplType::PostAsyncCallTask(
@@ -815,21 +815,20 @@ namespace aio
         //if eventTriggered is lower on stack, socket will be added to pollset before the next poll call
         if( currentThreadSystemId() != systemThreadId() )
             m_impl->pollSet.interrupt();
-        return true;
     }
 
     template<class SocketType>
-    bool AIOThread<SocketType>::dispatch( SocketType* const sock, std::function<void()>&& functor )
+    void AIOThread<SocketType>::dispatch( SocketType* const sock, std::function<void()>&& functor )
     {
         if( currentThreadSystemId() == systemThreadId() )  //if called from this aio thread
         {
             m_impl->aioServiceMutex->unlock();
             functor();
             m_impl->aioServiceMutex->lock();
-            return true;
+            return;
         }
         //otherwise posting functor
-        return post( sock, std::move(functor) );
+        post( sock, std::move(functor) );
     }
 
     template<class SocketType>

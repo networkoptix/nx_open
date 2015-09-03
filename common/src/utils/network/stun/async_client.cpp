@@ -59,7 +59,8 @@ bool AsyncClient::sendRequest( Message request, RequestHandler requestHandler )
             return true;
 
         case State::connected:
-            return dispatchRequestsInQueue( &lock );
+            dispatchRequestsInQueue( &lock );
+            return true;
 
         default:
             Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
@@ -79,7 +80,7 @@ void AsyncClient::closeConnection( BaseConnectionType* connection )
         QnMutexLocker lock( &m_mutex );
         std::swap( disconnectHandler, m_disconnectHandler );
 
-        closeConnectionImpl( &lock );
+        closeConnectionImpl( &lock, SystemError::getLastOSErrorCode() );
     }
 
     if( disconnectHandler )
@@ -97,17 +98,21 @@ bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
             m_connectingSocket = SocketFactory::createStreamSocket(
                         m_useSsl, SocketFactory::nttDisabled );
 
+            auto onComplete = [ this ]( SystemError::ErrorCode code )
+                { onConnectionComplete( code ); };
+
             if( !m_connectingSocket->setNonBlockingMode( true ) ||
                 !m_connectingSocket->setSendTimeout( m_timeouts.send ) ||
-                !m_connectingSocket->setRecvTimeout( m_timeouts.recv ) )
+                !m_connectingSocket->setRecvTimeout( m_timeouts.recv ) ||
+                !m_connectingSocket->connectAsync( m_endpoint,
+                                                   std::move(onComplete) ) )
             {
                 m_connectingSocket = nullptr;
                 return false;
             }
 
             m_state = State::connecting;
-            return m_connectingSocket->connectAsync( m_endpoint, std::bind(
-                &AsyncClient::onConnectionComplete, this, std::placeholders::_1 ) );
+            return true;
         }
 
         case State::connected:
@@ -128,30 +133,27 @@ bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
     }
 }
 
-void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock )
+void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
+                                       SystemError::ErrorCode code )
 {
     if( m_state != State::terminated )
         m_state = State::disconnected;
 
-    std::list< RequestHandler > droppedRequests;
-    {
-        for( auto& request : m_requestQueue )
-            droppedRequests.push_back( std::move(request.second) );
+    std::list< std::pair< Message, RequestHandler > > requestQueue;
+    std::swap( requestQueue, m_requestQueue );
 
-        for( auto& request : m_requestsInProgress )
-            droppedRequests.push_back( std::move(request.second) );
-
-        m_requestQueue.clear();
-        m_requestsInProgress.clear();
-    }
+    std::map< Buffer, RequestHandler > requestsInProgress;
+    std::swap( requestsInProgress, m_requestsInProgress );
 
     lock->unlock();
-    for( auto& handler : droppedRequests )
-        handler( SystemError::connectionReset, Message() );
+
+    for( auto& req : requestsInProgress )   req.second( code, Message() );
+    for( auto& req : requestQueue )         req.second( code, Message() );
 }
 
-bool AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
+void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
 {
+    static_cast< void >( lock );
     while( !m_requestQueue.empty() )
     {
         auto request = std::move( m_requestQueue.front().first );
@@ -159,7 +161,8 @@ bool AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
         auto transactionId = request.header.transactionId;
         m_requestQueue.pop_front();
 
-        const auto ret = m_baseConnection->sendMessage(
+        const bool ret = true;
+        m_baseConnection->sendMessage(
             std::move( request ),
             // TODO: #c++14 [ transactionId{ std::move( transactionId ) }, handler ]
             [ = ]( SystemError::ErrorCode code ) mutable
@@ -177,17 +180,14 @@ bool AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
                             .arg( QString::fromUtf8( transactionId.toHex() ) ),
                             cl_logERROR );
                 }
+
+                dispatchRequestsInQueue( &lock );
             } );
 
         if( !ret )
-        {
-            lock->unlock();
-            handler( SystemError::notConnected, Message() );
-            return false;
-        }
+            m_baseConnection->socket()->post(
+                [ = ] () { handler( SystemError::nomem, Message() ); } );
     }
-
-    return true;
 }
 
 void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
@@ -206,7 +206,7 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     std::swap( connectionHandler, m_connectHandler);
     if( code != SystemError::noError )
     {
-        closeConnectionImpl( &lock );
+        closeConnectionImpl( &lock, code );
         m_connectingSocket = nullptr;
         return;
     }

@@ -51,6 +51,7 @@ namespace nx_http
         bool m_isPersistent;
 
         void prepareAndSendResponse(
+            nx_http::MimeProtoVersion version,
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody );
         void responseSent();

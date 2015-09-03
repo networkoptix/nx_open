@@ -20,6 +20,8 @@ public:
     virtual void submitToSettings() override;
 
     virtual bool hasChanges() const override;
+
+    virtual void retranslateUi() override;
 protected:
     void resizeEvent(QResizeEvent *event) override;
 

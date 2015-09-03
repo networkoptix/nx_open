@@ -490,3 +490,16 @@ TEST( QnLicenseInfoTest, validateLicenseNames )
         ASSERT_FALSE(longName.isEmpty());
     }
 }
+
+/** Check if license names are filled for every license type. */
+TEST( QnLicenseInfoTest, validateFutureLicenses )
+{
+    QnLicensePoolScaffold licPoolScaffold;
+    licPoolScaffold.addFutureLicenses(1);
+
+    QnResourcePoolScaffold resPoolScaffold;
+    resPoolScaffold.addCameras(Qn::LC_Professional, 1, true);
+
+    QnCamLicenseUsageHelper helper;
+    ASSERT_FALSE( helper.isValid() );
+}

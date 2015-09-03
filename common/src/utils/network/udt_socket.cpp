@@ -814,14 +814,14 @@ void UdtStreamSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion ) {
     m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
 }
 
-bool UdtStreamSocket::postImpl( std::function<void()>&& handler )
+void UdtStreamSocket::postImpl( std::function<void()>&& handler )
 {
-    return aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
+    aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
-bool UdtStreamSocket::dispatchImpl( std::function<void()>&& handler )
+void UdtStreamSocket::dispatchImpl( std::function<void()>&& handler )
 {
-    return aio::AIOService::instance()->dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
+    aio::AIOService::instance()->dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 bool UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
@@ -962,14 +962,14 @@ bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) co
     return impl_->GetLastError(errorCode);
 }
 
-bool UdtStreamServerSocket::postImpl( std::function<void()>&& handler )
+void UdtStreamServerSocket::postImpl( std::function<void()>&& handler )
 {
-    return aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
+    aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
-bool UdtStreamServerSocket::dispatchImpl( std::function<void()>&& handler )
+void UdtStreamServerSocket::dispatchImpl( std::function<void()>&& handler )
 {
-    return aio::AIOService::instance()->dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
+    aio::AIOService::instance()->dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 bool UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {

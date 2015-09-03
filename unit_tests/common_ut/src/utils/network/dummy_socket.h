@@ -49,8 +49,8 @@ public:
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
 
 protected:
-    virtual bool postImpl( std::function<void()>&& handler ) override;
-    virtual bool dispatchImpl( std::function<void()>&& handler ) override;
+    virtual void postImpl( std::function<void()>&& handler ) override;
+    virtual void dispatchImpl( std::function<void()>&& handler ) override;
 
     virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
     virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;

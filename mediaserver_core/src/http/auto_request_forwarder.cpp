@@ -114,8 +114,14 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
     if( resUniqueID.isEmpty() )
         return false;
 
-    *res = qnResPool->getResourceByUniqueId( resUniqueID );
-    return *res;
+    //resUniqueID could be physical id or mac address
+    //trying luck with physical id
+    *res = qnResPool->getResourceByUniqueId(resUniqueID);
+    if( *res )
+        return true;
+    //searching by mac
+    *res = qnResPool->getResourceByMacAddress(resUniqueID);
+    return *res != nullptr;
 }
 
 bool QnAutoRequestForwarder::findCameraUniqueIDInQuery(

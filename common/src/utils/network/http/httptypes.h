@@ -482,6 +482,7 @@ namespace nx_http
             WWWAuthenticate();
 
             bool parse( const BufferType& str );
+            void serialize( BufferType* const dstBuffer ) const;
             BufferType serialized() const;
         };
 

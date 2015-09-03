@@ -11,58 +11,156 @@ ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher )
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
+            methods::bind,
+            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
+                { bind( connection, std::move( message ) ); } ) &&
+        dispatcher->registerRequestProcessor(
             methods::listen,
-            [this]( stun::ServerConnection* connection, stun::Message message ) {
-                listen( connection, std::move( message ) );
-            } ) &&
+            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
+                { listen( connection, std::move( message ) ); } ) &&
         dispatcher->registerRequestProcessor(
             methods::connect,
-            [this]( stun::ServerConnection* connection, stun::Message message ) {
-                connect( connection, std::move( message ) );
-            } );
+            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
+                { connect( connection, std::move( message ) ); } );
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register one of processors" );
 }
 
-void ListeningPeerPool::listen( stun::ServerConnection* connection,
-                                stun::Message message )
+void ListeningPeerPool::bind( const ConnectionSharedPtr& connection,
+                              stun::Message message )
 {
-    //retrieving requests parameters:
-        //peer id
-        //address to listen on. This address MUST have following format: {server_guid}.{system_name}
-        //registration_key. It is variable-length string
+    if( const auto mediaserver = getMediaserverData( connection, message ) )
+    {
+        QnMutexLocker lk( &m_mutex );
+        if( const auto peer = m_peers.peer( connection, *mediaserver, &m_mutex ) )
+        {
+            if( const auto attr = message.getAttribute< attrs::PublicEndpointList >() )
+                peer->endpoints = attr->get();
+            else
+                peer->endpoints.clear();
 
-    //checking that system_name has been registered previously with supplied registration_key by invoking RegisteredDomainsDataManager::getDomainData
-
-    //checking that address {server_guid}.{system_name} is not occupied already
-
-    //binding to address, sending success response
-        //NOTE single server is allowed to listen on multiple mediators
-
-    errorResponse( connection, message.header, stun::error::serverError,
-                   "Method is not implemented yet" );
+            successResponse( connection, message.header );
+        }
+        else
+        {
+            errorResponse( connection, message.header, stun::error::badRequest,
+                "This mediaserver is already bound from diferent connection" );
+        }
+    }
 }
 
-void ListeningPeerPool::connect( stun::ServerConnection* connection,
+void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
+                                stun::Message message )
+{
+    if( const auto mediaserver = getMediaserverData( connection, message ) )
+    {
+        QnMutexLocker lk( &m_mutex );
+        if( const auto peer = m_peers.peer( connection, *mediaserver, &m_mutex ) )
+        {
+            // TODO: configure StunEndpointList
+            peer->isListening = true;
+            successResponse( connection, message.header );
+        }
+        else
+        {
+            errorResponse( connection, message.header, stun::error::badRequest,
+                "This mediaserver is already bound from diferent connection" );
+        }
+    }
+}
+
+void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
                                  stun::Message message )
 {
-    //retrieving requests parameters:
-        //address to connect to. This address has following format: {server_guid}.{system_name} or just {system_name}. 
-            //At the latter case connecting to binded server, closest to the client
+    const auto userNameAttr = message.getAttribute< attrs::UserName >();
+    if( !userNameAttr || userNameAttr->value.isEmpty() )
+        return errorResponse( connection, message.header, stun::error::badRequest,
+            "Attribute UserName is required" );
 
-    //checking if requested address is bound to
+    const auto hostNameAttr = message.getAttribute< attrs::HostName >();
+    if( !hostNameAttr || hostNameAttr->value.isEmpty() )
+        return errorResponse( connection, message.header, stun::error::badRequest,
+            "Attribute HostName is required" );
 
-    //if just system name supplied and there are multiple servers with requested system_name listening, selecting server
+    QnMutexLocker lk( &m_mutex );
+    if( const auto peer = m_peers.search( hostNameAttr->value ) )
+    {
+        stun::Message response( stun::Header(
+            stun::MessageClass::successResponse, message.header.method,
+            std::move( message.header.transactionId ) ) );
 
-    //if selected server is listening on another mediator, re-routing client to that mediator
+        if( !peer->endpoints.empty() )
+            response.newAttribute< attrs::PublicEndpointList >( peer->endpoints );
 
-    //sending connection_requested indication containing client address to the selected server
+        if( !peer->isListening )
+            { /* TODO: StunEndpointList */ }
 
-    //sending success response with selected server address
+        connection->sendMessage( std::move( response ) );
+    }
+    else
+    {
+        errorResponse( connection, message.header, error::notFound,
+            "Can not find a server " + hostNameAttr->value );
+    }
+}
 
-    errorResponse( connection, message.header, stun::error::serverError,
-                   "Method is not implemented yet" );
+ListeningPeerPool::MediaserverPeer::MediaserverPeer( ConnectionWeakPtr connection_ )
+    : connection( std::move( connection_) )
+    , isListening( false )
+{
+}
+
+boost::optional< ListeningPeerPool::MediaserverPeer& >
+    ListeningPeerPool::SystemPeers::peer(
+        ConnectionWeakPtr connection,
+        const RequestProcessor::MediaserverData& mediaserver,
+        QnMutex* mutex )
+{
+    const auto systemInsert = m_peers.emplace(
+                mediaserver.systemId, std::map< String, MediaserverPeer >() );
+
+    const auto& systemIt = systemInsert.first;
+    const auto serverInsert = systemIt->second.emplace(
+                mediaserver.serverId, connection );
+
+    const auto& serverIt = serverInsert.first;
+    if( serverInsert.second )
+    {
+        connection->registerCloseHandler( [ = ]()
+        {
+            QnMutexLocker lk( mutex );
+            systemIt->second.erase( serverIt );
+            if( systemIt->second.empty() )
+                m_peers.erase( systemIt );
+        } );
+
+        return serverIt->second;
+    }
+
+    if( serverIt->second.connection != connection )
+        return boost::none;
+
+    return serverIt->second;
+}
+
+boost::optional< ListeningPeerPool::MediaserverPeer& >
+    ListeningPeerPool::SystemPeers::search( String hostName )
+{
+    const auto ids = hostName.split( '.' );
+    if( ids.size() > 2 )
+        return boost::none;
+
+    const auto systemIt = m_peers.find( ids.last() );
+    if( ids.size() == 2 )
+    {
+        const auto serverIt = systemIt->second.find( ids.first() );
+        if( serverIt == systemIt->second.end() )
+            return boost::none;
+    }
+
+    // TODO: select the best server, not the first one
+    return systemIt->second.begin()->second;
 }
 
 } // namespace hpm

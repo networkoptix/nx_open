@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<condition resName="operation">
+    <sequence value="authentication">
+    <!-- TODO cloud modules authentication rules should be added here -->
+    <!-- TODO this section should be suitable for authentication by ip address and for password check -->
+    </sequence>
+
+    <sequence value="authorization">
+        <set resName="authorized" resValue="false"/>
+
+        <condition resName="request.path">
+            <condition value="/share_system" resName="authAccountRightsOnSystem">
+                <set value="owner" resName="authorized" resValue="true"/>
+                <set value="editorWithSharing" resName="authorized" resValue="true"/>
+            </condition>
+            <condition value="/bind_system" resName="accountID" matchType="presence">
+                <set value="true" resName="authorized" resValue="true"/>
+            </condition>
+            <condition value="/unbind_system" resName="authAccountRightsOnSystem">
+                <set value="owner" resName="authorized" resValue="true"/>
+            </condition>
+        </condition>
+    </sequence>
+</condition>

@@ -13,8 +13,10 @@
 #include <camera/client_video_camera.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -313,21 +315,23 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
     
     QnImageFilterHelper imageParameters;
-    imageParameters.setSrcRect(itemData.zoomRect);
-    imageParameters.setContrastParams(itemData.contrastParams);
-    imageParameters.setDewarpingParams(resource->getDewarpingParams(), itemData.dewarpingParams);
-    imageParameters.setRotation(itemData.rotation);
-    imageParameters.setCustomAR(resource->customAspectRatio());
-    imageParameters.setTimeCorner(Qn::NoCorner, timeOffset, 0);
-    imageParameters.setVideoLayout(resource->getVideoLayout());
+   // imageParameters.setSrcRect(itemData.zoomRect);
+   // imageParameters.setContrastParams(itemData.contrastParams);
+   // imageParameters.setDewarpingParams(resource->getDewarpingParams(), itemData.dewarpingParams);
+   // imageParameters.setRotation(itemData.rotation);
+   // imageParameters.setCustomAR(resource->customAspectRatio());
+   // imageParameters.setTimeCorner(Qn::NoCorner, timeOffset, 0);
+   // imageParameters.setVideoLayout(resource->getVideoLayout());
 
     m_currentCamera->exportMediaPeriodToFile(m_period,
                                     uniqId,
                                     lit("mkv"),
                                     m_storage,
                                     role,
-                                    imageParameters,
-                                    serverTimeZone);
+                                    serverTimeZone,
+                                    imageParameters
+
+                                    );
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_targetFilename).fileName()));
     return true;
@@ -382,7 +386,9 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
     camera->deleteLater();
 
     if (error) {
-        m_errorMessage = tr("Could not export camera %1.").arg(camera->resource()->toResource()->getName());
+        QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        Q_ASSERT_X(camRes, Q_FUNC_INFO, "Make sure camera exists");
+        m_errorMessage = tr("Could not export %1 %2.").arg(getDefaultDeviceNameLower(camRes)).arg(getShortResourceName(camera->resource()->toResourcePtr()));
         finishExport(false);
     } else {
         exportNextCamera();

@@ -99,6 +99,20 @@ public:
         m_requestQueue.push( std::move( ctx ) );
     }
 
+    void executeUpdateWithoutTran(
+        std::function<DBResult( QSqlDatabase* )> dbUpdateFunc,
+        std::function<void( DBResult )> completionHandler )
+    {
+        openOneMoreConnectionIfNeeded();
+
+        auto ctx = std::make_unique<UpdateWithoutAnyDataExecutorNoTran>(
+            std::move( dbUpdateFunc ),
+            std::move( completionHandler ) );
+
+        QnMutexLocker lk( &m_mutex );
+        m_requestQueue.push( std::move( ctx ) );
+    }
+
     template<typename OutputData>
     void executeSelect(
         std::function<DBResult( QSqlDatabase*, OutputData* const )> dbSelectFunc,
@@ -113,6 +127,11 @@ public:
         QnMutexLocker lk( &m_mutex );
         m_requestQueue.push( std::move( ctx ) );
     }
+
+    const ConnectionOptions& connectionOptions() const
+    {
+        return m_connectionOptions;
+    } 
 
 private:
     const ConnectionOptions m_connectionOptions;

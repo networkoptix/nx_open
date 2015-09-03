@@ -100,7 +100,7 @@ TEST_F( StunClientServerTest, RequestResponse )
         ASSERT_TRUE( client.sendRequest( std::move( request ), waiter.pusher() ) );
 
         const auto result = waiter.pop();
-        ASSERT_EQ( result.first, SystemError::connectionReset );
+        ASSERT_EQ( result.first, SystemError::connectionRefused );
     }
 
     startServer();

@@ -12,8 +12,11 @@
 #include <thread>
 
 #include <QtCore/QDir>
+#include <QtSql/QSqlQuery>
 
 #include <api/global_settings.h>
+#include <network/auth_restriction_list.h>
+#include <utils/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
@@ -26,7 +29,9 @@
 #include "db/structure_update_statements.h"
 #include "http_handlers/add_account_handler.h"
 #include "http_handlers/bind_system_handler.h"
+#include "http_handlers/unbind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
+#include "http_handlers/get_systems_handler.h"
 #include "http_handlers/verify_email_address_handler.h"
 #include "managers/account_manager.h"
 #include "managers/email_manager.h"
@@ -65,98 +70,94 @@ void CloudDBProcess::pleaseStop()
 
 int CloudDBProcess::executeApplication()
 {
-    //reading settings
-    conf::Settings settings;
-    //parsing command line arguments
-    settings.load( m_argc, m_argv );
-    if( settings.showHelp() )
+    try
     {
-        settings.printCmdLineArgsHelp();
-        return 0;
+        //reading settings
+        conf::Settings settings;
+        //parsing command line arguments
+        settings.load( m_argc, m_argv );
+        if( settings.showHelp() )
+        {
+            settings.printCmdLineArgsHelp();
+            return 0;
+        }
+    
+        initializeLogging( settings );
+    
+        const auto& httpAddrToListenList = settings.endpointsToListen();
+        if( httpAddrToListenList.empty() )
+        {
+            NX_LOG( "No HTTP address to listen", cl_logALWAYS );
+            return 1;
+        }
+    
+        nx::db::DBManager dbManager(settings.dbConnectionOptions());
+        if( !initializeDB(&dbManager) )
+        {
+            NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
+            return 2;
+        }
+    
+        EMailManager emailManager( settings );
+    
+        //creating data managers
+        AccountManager accountManager(
+            settings,
+            &dbManager,
+            &emailManager );
+    
+        SystemManager systemManager( &dbManager );
+    
+        //contains singletones common for http server
+        nx_http::ServerManagers httpServerManagers;
+    
+        nx_http::MessageDispatcher httpMessageDispatcher;
+        httpServerManagers.setDispatcher( &httpMessageDispatcher );
+    
+        QnAuthMethodRestrictionList authRestrictionList;
+        authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
+        authRestrictionList.allow( VerifyEmailAddressHandler::HANDLER_PATH, AuthMethod::noAuth );
+        AuthenticationManager authenticationManager( 
+            accountManager,
+            systemManager,
+            authRestrictionList );
+        httpServerManagers.setAuthenticationManager( &authenticationManager );
+
+        AuthorizationManager authorizationManager;
+    
+        //registering HTTP handlers
+        registerApiHandlers(
+            &httpMessageDispatcher,
+            authorizationManager,
+            &accountManager,
+            &systemManager );
+    
+        MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+            httpAddrToListenList,
+            false,  //TODO #ak enable ssl when it works properly
+            SocketFactory::nttDisabled );
+
+        if( !multiAddressHttpServer.bind() )
+            return 3;
+    
+        //TODO: #ak process privilege reduction should be made here
+    
+        if( !multiAddressHttpServer.listen() )
+            return 5;
+    
+        NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );
+    
+        //TODO #ak remove qt event loop
+        //application's main loop
+        const int result = application()->exec();
+    
+        return result;
     }
-
-    initializeLogging( settings );
-
-    const auto& httpAddrToListenList = settings.endpointsToListen();
-    if( httpAddrToListenList.empty() )
+    catch( const std::exception& e )
     {
-        NX_LOG( "No HTTP address to listen", cl_logALWAYS );
-        return 1;
-    }
-
-    nx::db::DBManager dbManager( settings.dbConnectionOptions() );
-    for( ;; )
-    {
-        if( dbManager.init() )
-            break;
-        NX_LOG( lit("Cannot start application due to DB connect error"), cl_logALWAYS );
-        std::this_thread::sleep_for( std::chrono::seconds( DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC ) );
-    }
-
-    if( !updateDB( &dbManager ) )
-    {
-        NX_LOG( "Could not update DB to current vesion", cl_logALWAYS );
-        return 2;
-    }
-
-    AuthorizationManager authorizationManager;
-
-    EMailManager emailManager( settings );
-
-    //creating data managers
-    AccountManager accountManager(
-        settings,
-        &dbManager,
-        &emailManager );
-    if( !accountManager.init() )
-    {
-        NX_LOG( "Could not initialize account manager", cl_logALWAYS );
+        NX_LOG( lit("Failed to start application. %1").arg(e.what()), cl_logALWAYS );
         return 3;
     }
-
-    SystemManager systemManager( &dbManager );
-
-    //contains singletones common for http server
-    nx_http::ServerManagers httpServerManagers;
-
-    nx_http::MessageDispatcher httpMessageDispatcher;
-    httpServerManagers.setDispatcher( &httpMessageDispatcher );
-
-    AuthenticationManager authenticationManager;
-    httpServerManagers.setAuthenticationManager( &authenticationManager );
-
-    //registering HTTP handlers
-    registerApiHandlers(
-        &httpMessageDispatcher,
-        authorizationManager,
-        &accountManager,
-        &systemManager );
-
-    using namespace std::placeholders;
-
-    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>(
-        httpAddrToListenList,
-        true,
-        SocketFactory::nttDisabled ) );
-
-    if( !m_multiAddressHttpServer->bind() )
-        return 3;
-
-    //TODO: #ak process privilege reduction should be made here
-
-    if( !m_multiAddressHttpServer->listen() )
-        return 5;
-
-    NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );
-
-    //TODO #ak remove qt event loop
-    //application's main loop
-    const int result = application()->exec();
-
-    //stopping accepting incoming connections
-    m_multiAddressHttpServer.reset();
-
-    return result;
 }
 
 void CloudDBProcess::start()
@@ -202,6 +203,7 @@ void CloudDBProcess::registerApiHandlers(
     AccountManager* const accountManager,
     SystemManager* const systemManager )
 {
+    //accounts
     msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
         AddAccountHttpHandler::HANDLER_PATH,
         [accountManager, &authorizationManager]() -> std::unique_ptr<AddAccountHttpHandler> {
@@ -220,11 +222,91 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
+    //systems
     msgDispatcher->registerRequestProcessor<BindSystemHandler>(
         BindSystemHandler::HANDLER_PATH,
         [systemManager, &authorizationManager]() -> std::unique_ptr<BindSystemHandler> {
             return std::make_unique<BindSystemHandler>( systemManager, authorizationManager );
         } );
+
+    msgDispatcher->registerRequestProcessor<GetSystemsHandler>(
+        GetSystemsHandler::HANDLER_PATH,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<GetSystemsHandler> {
+            return std::make_unique<GetSystemsHandler>( systemManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<UnbindSystemHandler>(
+        UnbindSystemHandler::HANDLER_PATH,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<UnbindSystemHandler> {
+            return std::make_unique<UnbindSystemHandler>( systemManager, authorizationManager );
+        } );
+}
+
+bool CloudDBProcess::initializeDB( nx::db::DBManager* const dbManager )
+{
+    for (;;)
+    {
+        if (dbManager->init())
+            break;
+        NX_LOG(lit("Cannot start application due to DB connect error"), cl_logALWAYS);
+        std::this_thread::sleep_for(
+            std::chrono::seconds(DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC));
+    }
+
+    if (!configureDB(dbManager))
+    {
+        NX_LOG("Failed to tune DB", cl_logALWAYS);
+        return false;
+    }
+
+    if (!updateDB(dbManager))
+    {
+        NX_LOG("Could not update DB to current vesion", cl_logALWAYS);
+        return false;
+    }
+
+    return true;
+}
+
+bool CloudDBProcess::configureDB( nx::db::DBManager* const dbManager )
+{
+    if( dbManager->connectionOptions().driverName != lit("QSQLITE") )
+        return true;
+
+    std::promise<nx::db::DBResult> cacheFilledPromise;
+    auto future = cacheFilledPromise.get_future();
+
+    //starting async operation
+    using namespace std::placeholders;
+    dbManager->executeUpdateWithoutTran(
+        [](QSqlDatabase* connection) ->nx::db::DBResult {
+            QSqlQuery enableWalQuery(*connection);
+            enableWalQuery.prepare("PRAGMA journal_mode = WAL");
+            if (!enableWalQuery.exec())
+            {
+                NX_LOG(lit("sqlite configure. Failed to enable WAL mode. %1").
+                    arg(connection->lastError().text()), cl_logWARNING);
+                return nx::db::DBResult::ioError;
+            }
+
+            QSqlQuery enableFKQuery(*connection);
+            enableFKQuery.prepare("PRAGMA foreign_keys = ON");
+            if (!enableFKQuery.exec())
+            {
+                NX_LOG(lit("sqlite configure. Failed to enable foreign keys. %1").
+                    arg(connection->lastError().text()), cl_logWARNING);
+                return nx::db::DBResult::ioError;
+            }
+
+            return nx::db::DBResult::ok;
+        },
+        [&](nx::db::DBResult dbResult) {
+            cacheFilledPromise.set_value(dbResult);
+        });
+
+    //waiting for completion
+    future.wait();
+    return future.get() == nx::db::DBResult::ok;
 }
 
 bool CloudDBProcess::updateDB( nx::db::DBManager* const dbManager )
@@ -233,6 +315,7 @@ bool CloudDBProcess::updateDB( nx::db::DBManager* const dbManager )
     nx::db::DBStructureUpdater dbStructureUpdater( dbManager );
     dbStructureUpdater.addUpdateScript( db::createAccountData );
     dbStructureUpdater.addUpdateScript( db::createSystemData );
+    dbStructureUpdater.addUpdateScript( db::systemToAccountMapping );
     return dbStructureUpdater.updateStructSync();
 }
 

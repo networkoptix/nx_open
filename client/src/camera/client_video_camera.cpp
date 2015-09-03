@@ -134,12 +134,11 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
 }
 
 void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
-                                                  const QString& fileName, 
-                                                  const QString& format, 
-                                                  const QnStorageResourcePtr &storage, 
-                                                  QnStreamRecorder::Role role, 
-                                                  const QnImageFilterHelper &imageParameters,
-                                                  qint64 serverTimeZoneMs)
+												  const  QString& fileName, const QString& format, 
+                                            QnStorageResourcePtr storage, 
+                                            QnStreamRecorder::Role role,
+                                            qint64 serverTimeZoneMs,
+                                            QnImageFilterHelper transcodeParams)
 {
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
     Q_ASSERT_X(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
@@ -177,7 +176,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         if (storage)
             m_exportRecorder->setStorage(storage);
 
-        m_exportRecorder->setExtraTranscodeParams(imageParameters);
+        m_exportRecorder->setExtraTranscodeParams(transcodeParams);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);

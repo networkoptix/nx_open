@@ -31,8 +31,4 @@ namespace QnUnusedDetail {
  */
 #define QN_UNUSED(...) ::QnUnusedDetail::mark_unused(__VA_ARGS__)
 
-#ifndef QN_NO_KEYWORD_UNUSED
-#  define unused QN_UNUSED
-#endif
-
 #endif // QN_UNUSED_H

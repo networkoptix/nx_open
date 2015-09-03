@@ -60,9 +60,17 @@ namespace nx_http
         const StringType& userName,
         const boost::optional<StringType>& userPassword,
         const boost::optional<BufferType>& predefinedHA1,
-        const QUrl& url,
+        const StringType& uri,
         const header::WWWAuthenticate& wwwAuthenticateHeader,
         header::DigestAuthorization* const digestAuthorizationHeader );
+
+    //!To be used by server to validate recevied Authorization against known credentials
+    bool validateAuthorization(
+        const StringType& method,
+        const StringType& userName,
+        const boost::optional<StringType>& userPassword,
+        const boost::optional<BufferType>& predefinedHA1,
+        const header::DigestAuthorization& digestAuthorizationHeader );
 }
 
 #endif  //NX_AUTH_TOOLS_H

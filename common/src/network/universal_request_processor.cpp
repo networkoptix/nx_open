@@ -6,7 +6,6 @@
 #include "utils/gzip/gzip_compressor.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "universal_request_processor_p.h"
-#include "authenticate_helper.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "http/custom_headers.h"
@@ -49,10 +48,12 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 }
 
 static QByteArray m_unauthorizedPageBody = STATIC_UNAUTHORIZED_HTML;
+static AuthMethod::Values m_unauthorizedPageForMethods = AuthMethod::NotDefined;
 
-void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value)
+void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, AuthMethod::Values methods)
 {
     m_unauthorizedPageBody = value;
+    m_unauthorizedPageForMethods = methods;
 }
 
 QByteArray QnUniversalRequestProcessor::unauthorizedPageBody()
@@ -100,7 +101,12 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if( d->request.requestLine.method == nx_http::Method::GET ||
                 d->request.requestLine.method == nx_http::Method::HEAD )
             {
-                d->response.messageBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
+                if (isProxy)
+                    d->response.messageBody = STATIC_PROXY_UNAUTHORIZED_HTML;
+                else if (usedMethod & m_unauthorizedPageForMethods)
+                    d->response.messageBody = unauthorizedPageBody();
+                else
+                    d->response.messageBody = STATIC_UNAUTHORIZED_HTML;
             }
             if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
                 d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));

@@ -14,6 +14,7 @@
 
 #include <utils/common/event_processors.h>
 
+#include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -58,6 +59,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     m_advancedMode(false)
 {
     ui->setupUi(this);
+    retranslateUi();
 
     m_resetDefaultsButton = new QPushButton(tr("Reset Default Rules"));
     m_resetDefaultsButton->setEnabled(false);
@@ -439,6 +441,14 @@ void QnBusinessRulesDialog::updateFilter() {
         ui->tableView->setRowHidden(i, !isRuleVisible(ruleModel, filter, anyCameraPassFilter));
     }
 
+}
+
+void QnBusinessRulesDialog::retranslateUi()
+{
+    ui->retranslateUi(this);
+
+    const QString deviceName = getDefaultDevicesName(true, false);
+    ui->filterLineEdit->setPlaceholderText(tr("filter by %1...").arg(deviceName));
 }
 
 bool QnBusinessRulesDialog::advancedMode() const {

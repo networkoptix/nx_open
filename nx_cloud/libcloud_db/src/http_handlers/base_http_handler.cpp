@@ -15,23 +15,24 @@ namespace nx {
 namespace cdb {
 
 
-nx_http::StatusCode::Value resultCodeToHttpStatusCode( ResultCode resultCode )
+nx_http::StatusCode::Value resultCodeToHttpStatusCode(api::ResultCode resultCode)
 {
     switch( resultCode )
     {
-        case ResultCode::ok:
+        case api::ResultCode::ok:
             return nx_http::StatusCode::ok;
-        case ResultCode::notAuthorized:
+        case api::ResultCode::notAuthorized:
             return nx_http::StatusCode::unauthorized;
-        case ResultCode::notFound:
-            return nx_http::StatusCode::notFound;
-        case ResultCode::alreadyExists:
+        case api::ResultCode::forbidden:
             return nx_http::StatusCode::forbidden;
-        case ResultCode::dbError:
-            return nx_http::StatusCode::internalServerError;
-        default:
+        case api::ResultCode::notFound:
+            return nx_http::StatusCode::notFound;
+        case api::ResultCode::alreadyExists:
+            return nx_http::StatusCode::forbidden;
+        case api::ResultCode::dbError:
             return nx_http::StatusCode::internalServerError;
     }
+    return nx_http::StatusCode::internalServerError;
 }
 
 

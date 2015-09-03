@@ -65,8 +65,9 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value) {
 		return lit("Button");
 	case DataType::String:
 		return lit("String");
-	}
-	return QString();
+    default:
+        return QString();
+    }
 }
 
 QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(const QString &value) {
@@ -90,9 +91,10 @@ bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value) {
 	case DataType::String:
 		return true;
 	case DataType::Button:
-		return false;
-	}
-	return false;
+        return false;
+    default:
+        return false;
+    }
 }
 
 QStringList QnCameraAdvancedParameter::getRange() const {

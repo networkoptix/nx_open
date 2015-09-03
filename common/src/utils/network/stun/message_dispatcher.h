@@ -27,7 +27,9 @@ class MessageDispatcher
     public Singleton<MessageDispatcher>
 {
 public:
-    typedef std::function< void( ServerConnection*, stun::Message ) > MessageProcessor;
+    typedef std::function<
+        void( const std::shared_ptr< ServerConnection >&, stun::Message )
+    > MessageProcessor;
 
     /*!
         \param messageProcessor Ownership of this object is not passed
@@ -43,10 +45,11 @@ public:
         \param message This object is not moved in case of failure to find processor
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
-    bool dispatchRequest( ServerConnection* connection, stun::Message message );
+    bool dispatchRequest( const std::shared_ptr< ServerConnection >& connection,
+                          stun::Message message );
 
 private:
-    std::unordered_map<int, MessageProcessor> m_processors;
+    std::unordered_map< int, MessageProcessor > m_processors;
 };
 
 } // namespace stun

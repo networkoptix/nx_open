@@ -28,6 +28,7 @@ public:
     QnUuid( const char* text );
     QnUuid( const QString& text );
     QnUuid( const QByteArray& text );
+    QnUuid( const std::string& text );
     explicit QnUuid( const QUuid &uuid );
 
     const QUuid& getQUuid() const
@@ -39,6 +40,7 @@ public:
     const QByteArray& toByteArray() const;
     const QByteArray& toRfc4122() const;
     const QString& toString() const;
+    QString toSimpleString() const;
     std::string toStdString() const;
 
     bool operator!=( const QnUuid& other ) const
@@ -71,7 +73,8 @@ public:
     /*! Construct QnUuid from string representation.
      * If the string is not a valid UUID null QnUuid will be returned.
      */
-    static QnUuid fromStringSafe( const QString &uuid );
+    static QnUuid fromStringSafe( const QString& uuid );
+    static QnUuid fromStringSafe( const QByteArray& uuid );
 
 private:
     QUuid m_uuid;

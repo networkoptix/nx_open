@@ -9,37 +9,54 @@
 #include <QtCore/QUrlQuery>
 
 #include <string>
+#include <vector>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <utils/common/model_functions_fwd.h>
 #include <utils/common/uuid.h>
 #include <utils/fusion/fusion_fwd.h>
 
+#include <cdb/system_data.h>
+
 
 namespace nx {
 namespace cdb {
+
+namespace api
+{
+
+namespace SystemAccessRole
+{
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Value), (lexical))
+}
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemStatus)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))
+
+}   //api
+
 namespace data {
 
-
 class SubscriptionData
+:
+    public api::SubscriptionData
 {
 public:
-    std::string productID;
-    std::string systemID;
 };
 
 //!Information required to register system in cloud
 class SystemRegistrationData
 :
+    public api::SystemRegistrationData,
     public stree::AbstractResourceReader
 {
 public:
-    //!Not unique system name
-    std::string name;
-
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
+
+#define SystemRegistrationData_Fields (name)
 
 class SystemRegistrationDataWithAccountID
 :
@@ -48,9 +65,9 @@ class SystemRegistrationDataWithAccountID
 public:
     QnUuid accountID;
 
-    SystemRegistrationDataWithAccountID( SystemRegistrationData&& right )
+    SystemRegistrationDataWithAccountID(SystemRegistrationData&& right)
     :
-        SystemRegistrationData( std::move( right ) )
+        SystemRegistrationData(std::move(right))
     {
     }
 };
@@ -58,43 +75,13 @@ public:
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemRegistrationData* const systemData );
 
-#define SystemRegistrationData_Fields (name)
-
-
-enum SystemStatus
-{
-    ssInvalid = 0,
-    //!System has been bound but not a single request from that system has been received by cloud
-    ssNotActivated = 1,
-    ssActivated = 2
-};
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION( SystemStatus )
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (SystemStatus), (lexical) )
 
 class SystemData
 :
+    public api::SystemData,
     public stree::AbstractResourceReader
 {
 public:
-    //!Globally unique id assigned to the system. Usually, it is GUID
-    std::string id;
-    //!Not unique system name
-    std::string name;
-    //!Key, system uses to authenticate requests to any cloud module
-    std::string authKey;
-    std::string ownerAccountID;
-    SystemStatus status;
-    //!a true, if cloud connection is activated for this system
-    bool cloudConnectionSubscriptionStatus;
-
-    SystemData()
-    :
-        status( ssInvalid ),
-        cloudConnectionSubscriptionStatus( false )
-    {
-    }
-
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
@@ -105,9 +92,54 @@ public:
 #define SystemData_Fields (id)(name)(authKey)(ownerAccountID)(status)(cloudConnectionSubscriptionStatus)
 
 
+class SystemDataList
+{
+public:
+    std::vector<SystemData> systems;
+};
+
+#define SystemDataList_Fields (systems)
+
+
+class SystemSharing
+:
+    public api::SystemSharing,
+    public stree::AbstractResourceReader
+{
+public:
+    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    virtual bool getAsVariant( int resID, QVariant* const value ) const override;
+};
+
+bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSharing );
+
+#define SystemSharing_Fields (accountID)(systemID)(accessRole)
+
+
+//!for requests passing just system id
+class SystemID
+:
+    public stree::AbstractResourceReader
+{
+public:
+    QnUuid id;
+
+    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+};
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
+
+#define SystemID_Fields (id)
+
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
     (json)(sql_record) )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (SystemDataList),
+    (json))
 
 
 }   //data

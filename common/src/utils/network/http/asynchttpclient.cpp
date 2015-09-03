@@ -854,7 +854,7 @@ namespace nx_http
                     m_authType == authDigestWithPasswordHash
                         ? m_userPassword.toLatin1()
                         : boost::optional<nx_http::BufferType>(),
-                    m_url,
+                    m_url.path().toUtf8(),
                     wwwAuthenticateHeader,
                     &digestAuthorizationHeader ) )
             {

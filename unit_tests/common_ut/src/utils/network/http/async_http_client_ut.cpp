@@ -118,7 +118,7 @@ TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
         nx_http::MultipartContentParser multipartParser;
     };
 
-    std::atomic<size_t> bytesProcessed = 0;
+    std::atomic<size_t> bytesProcessed( 0 );
 
     auto checkReceivedContentFunc = [&]( const QnByteArrayConstRef& data ){
         ASSERT_EQ( data, frame1 );

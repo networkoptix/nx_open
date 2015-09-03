@@ -14,7 +14,7 @@
 #include <QtGui/QMouseEvent>
 
 #include <api/model/storage_space_reply.h>
-
+#include <core/resource/resource_name.h>
 #include <camera/camera_data_manager.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -190,6 +190,8 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
         m_initServerName = resource->getName();
         ui->nameLineEdit->setText(m_initServerName);
     });
+
+    retranslateUi();
 }
 
 QnServerSettingsWidget::~QnServerSettingsWidget()
@@ -212,6 +214,13 @@ bool QnServerSettingsWidget::hasChanges() const {
 
     return false;
 }
+
+void QnServerSettingsWidget::retranslateUi() {
+    ui->failoverCheckBox->setText(tr("Enable failover (server will take %1 automatically from offline servers)").arg(getDefaultDevicesName(true, false)));
+    ui->maxCamerasLabel->setText(tr("Max. %1 on this server:").arg(getDefaultDevicesName(true, false)));
+    updateFailoverLabel();
+}
+
 
 void QnServerSettingsWidget::updateFromSettings() {
     sendStorageSpaceRequest();
@@ -251,6 +260,7 @@ void QnServerSettingsWidget::updateFromSettings() {
 }
 
 void QnServerSettingsWidget::submitToSettings() {
+    m_server->setStorageDataToUpdate(QnStorageResourceList(), ec2::ApiIdDataList());
     if(m_hasStorageChanges) {
         QnStorageResourceList newStorages;
         foreach(const QnStorageSpaceData &item, tableItems()) 
@@ -593,10 +603,10 @@ void QnServerSettingsWidget::updateFailoverLabel() {
             return tr("At least two servers are required for this feature.");
 
         if (qnResPool->getAllCameras(m_server, true).size() > ui->maxCamerasSpinBox->value())
-            return tr("This server already has more than max cameras");
+            return tr("This server already has more than max %1").arg(getDefaultDeviceNameLower());
 
         if (!m_server->isRedundancy() && !m_maxCamerasAdjusted)
-            return tr("To avoid malfunction adjust max number of cameras");
+            return tr("To avoid malfunction adjust max number of %1").arg(getDefaultDeviceNameLower());
 
         return QString();
     };

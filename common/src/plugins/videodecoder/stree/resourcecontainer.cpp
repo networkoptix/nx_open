@@ -4,13 +4,91 @@
 
 #include "resourcecontainer.h"
 
+#include <utils/common/cpp14.h>
+
 
 namespace stree
 {
-    ResourceContainer::ResourceContainer()
-    :
-        m_first( false )
+    namespace detail
     {
+        class ResourceContainerConstIterator
+        :
+            public AbstractConstIterator
+        {
+        public:
+            ResourceContainerConstIterator(
+                const std::map<int, QVariant>& mediaStreamPameters);
+
+            virtual bool next() override;
+            virtual bool atEnd() const override;
+            virtual int resID() const override;
+            virtual QVariant value() const override;
+
+        private:
+            const std::map<int, QVariant>& m_mediaStreamPameters;
+            std::map<int, QVariant>::const_iterator m_curIter;
+        };
+
+
+        ResourceContainerConstIterator::ResourceContainerConstIterator(
+            const std::map<int, QVariant>& mediaStreamPameters)
+        :
+            m_mediaStreamPameters(mediaStreamPameters),
+            m_curIter( m_mediaStreamPameters.begin() )
+        {
+        }
+
+        bool ResourceContainerConstIterator::next()
+        {
+            if( m_curIter == m_mediaStreamPameters.end() )
+                return false;
+            ++m_curIter;
+            return m_curIter != m_mediaStreamPameters.end();
+        }
+
+        bool ResourceContainerConstIterator::atEnd() const
+        {
+            return m_curIter == m_mediaStreamPameters.end();
+        }
+
+        int ResourceContainerConstIterator::resID() const
+        {
+            return m_curIter->first;
+        }
+
+        QVariant ResourceContainerConstIterator::value() const
+        {
+            return m_curIter->second;
+        }
+    }
+
+
+    ResourceContainer::ResourceContainer()
+    {
+    }
+
+    ResourceContainer::ResourceContainer(ResourceContainer&& right)
+    :
+        m_mediaStreamPameters(std::move(right.m_mediaStreamPameters))
+    {
+    }
+
+    ResourceContainer::ResourceContainer(const ResourceContainer& right)
+    :
+        m_mediaStreamPameters(right.m_mediaStreamPameters)
+    {
+    }
+
+    ResourceContainer& ResourceContainer::operator=(ResourceContainer&& right)
+    {
+        m_mediaStreamPameters = std::move(right.m_mediaStreamPameters);
+        return *this;
+    }
+
+    ResourceContainer& ResourceContainer::operator=(const ResourceContainer& right)
+    {
+        m_mediaStreamPameters = right.m_mediaStreamPameters;
+        return *this;
     }
 
     bool ResourceContainer::getAsVariant( int resID, QVariant* const value ) const
@@ -28,31 +106,9 @@ namespace stree
         m_mediaStreamPameters[resID] = value;
     }
 
-    void ResourceContainer::goToBeginning() 
+    std::unique_ptr<AbstractConstIterator> ResourceContainer::begin() const
     {
-        m_curIter = m_mediaStreamPameters.begin();
-        m_first = true;
-    }
-
-    bool ResourceContainer::next()
-    {
-        if( m_curIter == m_mediaStreamPameters.end() )
-            return false;
-        if( m_first )
-            m_first = false;
-        else
-            ++m_curIter;
-        return m_curIter != m_mediaStreamPameters.end();
-    }
-
-    int ResourceContainer::resID() const
-    {
-        return m_curIter->first;
-    }
-
-    QVariant ResourceContainer::value() const
-    {
-        return m_curIter->second;
+        return std::make_unique<detail::ResourceContainerConstIterator>(m_mediaStreamPameters);
     }
 
     QString ResourceContainer::toString( const stree::ResourceNameSet& rns ) const
@@ -67,6 +123,10 @@ namespace stree
         return str;
     }
 
+
+    ////////////////////////////////////////////////////////////
+    //// class SingleResourceContainer
+    ////////////////////////////////////////////////////////////
 
     SingleResourceContainer::SingleResourceContainer()
     :
@@ -98,6 +158,10 @@ namespace stree
     }
 
 
+    ////////////////////////////////////////////////////////////
+    //// class MultiSourceResourceReader
+    ////////////////////////////////////////////////////////////
+
     MultiSourceResourceReader::MultiSourceResourceReader( const AbstractResourceReader& rc1, const AbstractResourceReader& rc2 )
     :
         m_rc1( rc1 ),
@@ -108,5 +172,77 @@ namespace stree
     bool MultiSourceResourceReader::getAsVariant( int resID, QVariant* const value ) const
     {
         return m_rc1.get( resID, value ) || m_rc2.get( resID, value );
+    }
+
+
+    ////////////////////////////////////////////////////////////
+    //// class MultiSourceResourceReader
+    ////////////////////////////////////////////////////////////
+
+    namespace detail
+    {
+        class MultiConstIterator
+        :
+            public AbstractConstIterator
+        {
+        public:
+            MultiConstIterator(
+                std::unique_ptr<stree::AbstractConstIterator> one,
+                std::unique_ptr<stree::AbstractConstIterator> two);
+
+            virtual bool next() override;
+            virtual bool atEnd() const override;
+            virtual int resID() const override;
+            virtual QVariant value() const override;
+
+        private:
+            std::unique_ptr<stree::AbstractConstIterator> m_one;
+            std::unique_ptr<stree::AbstractConstIterator> m_two;
+        };
+
+
+        MultiConstIterator::MultiConstIterator(
+            std::unique_ptr<stree::AbstractConstIterator> one,
+            std::unique_ptr<stree::AbstractConstIterator> two)
+        :
+            m_one(std::move(one)),
+            m_two(std::move(two))
+        {
+        }
+
+        bool MultiConstIterator::next()
+        {
+            return m_one->atEnd() ? m_two->next() : m_one->next();
+        }
+
+        bool MultiConstIterator::atEnd() const
+        {
+            return m_one->atEnd() && m_two->atEnd();
+        }
+
+        int MultiConstIterator::resID() const
+        {
+            return m_one->atEnd() ? m_two->resID() : m_one->resID();
+        }
+
+        QVariant MultiConstIterator::value() const
+        {
+            return m_one->atEnd() ? m_two->value() : m_one->value();
+        }
+    }
+
+
+    MultiIteratableResourceReader::MultiIteratableResourceReader(
+        const AbstractIteratableContainer& rc1,
+        const AbstractIteratableContainer& rc2)
+    :
+        m_rc1(rc1),
+        m_rc2(rc2)
+    {
+    }
+
+    std::unique_ptr<stree::AbstractConstIterator> MultiIteratableResourceReader::begin() const
+    {
+        return std::make_unique<detail::MultiConstIterator>(m_rc1.begin(), m_rc2.begin());
     }
 }

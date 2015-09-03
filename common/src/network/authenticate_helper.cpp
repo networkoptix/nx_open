@@ -23,51 +23,6 @@
 
 
 ////////////////////////////////////////////////////////////
-//// class QnAuthMethodRestrictionList
-////////////////////////////////////////////////////////////
-QnAuthMethodRestrictionList::QnAuthMethodRestrictionList()
-{
-}
-
-unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods( const nx_http::Request& request ) const
-{
-    QString path = request.requestLine.url.path();
-    //TODO #ak replace mid and chop with single midRef call
-    while (path.startsWith(lit("//")))
-        path = path.mid(1);
-    while (path.endsWith(L'/'))
-        path.chop(1);
-    unsigned int allowed = AuthMethod::cookie | AuthMethod::http | AuthMethod::videowall | AuthMethod::urlQueryParam;   //by default
-    for( std::pair<QString, unsigned int> allowRule: m_allowed )
-    {
-        if( !wildcardMatch( allowRule.first, path ) )
-            continue;
-        allowed |= allowRule.second;
-    }
-
-    for( std::pair<QString, unsigned int> denyRule: m_denied )
-    {
-        if( !wildcardMatch( denyRule.first, path ) )
-            continue;
-        allowed &= ~denyRule.second;
-    }
-
-    return allowed;
-}
-
-void QnAuthMethodRestrictionList::allow( const QString& pathMask, AuthMethod::Value method )
-{
-    m_allowed[pathMask] = method;
-}
-
-void QnAuthMethodRestrictionList::deny( const QString& pathMask, AuthMethod::Value method )
-{
-    m_denied[pathMask] = method;
-}
-
-
-
-////////////////////////////////////////////////////////////
 //// class QnAuthHelper
 ////////////////////////////////////////////////////////////
 
@@ -201,6 +156,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
         if( authorization.isEmpty() )
         {
             Qn::AuthResult authResult = Qn::Auth_WrongDigest;
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::httpDigest;
             QnUserResourcePtr userResource;
             if( !nxUserName.isEmpty() )
             {
@@ -276,7 +233,14 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             }
 
             if( userResource->getDigest().isEmpty() )
+            {
+                if (userResource->isLdap())
+                    nx_http::insertOrReplaceHeader(
+                        &response.headers,
+                        nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
+
                 return Qn::Auth_WrongDigest;   //user has no password yet
+            }
         }
 
         nx_http::StringType authType;
@@ -318,7 +282,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             //saving new user's digest
             applyClientCalculatedPasswordHashToResource( userResource, userDigestData );
         }
-        else if( userResource && userResource->isLdap() )
+        else if(  userResource && userResource->isLdap() )
         {
             //password has been changed in active directory? Requesting new digest...
             nx_http::insertOrReplaceHeader(

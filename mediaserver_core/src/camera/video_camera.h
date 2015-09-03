@@ -96,6 +96,7 @@ private:
     const qint64 m_hiStreamHlsInactivityPeriodMS;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
+    void startLiveCacheIfNeeded();
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
         const QnLiveStreamProviderPtr& primaryReader,

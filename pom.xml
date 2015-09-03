@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -30,7 +30,7 @@
         <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
-        <ftpstorageplugin.name>${company.name} Ftp storage plugin</ftpstorageplugin.name>
+        <!--ftpstorageplugin.name>${company.name} Ftp storage plugin</ftpstorageplugin.name-->
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
         <mediaserver_core.name>${company.name} Media Server Core</mediaserver_core.name>
@@ -79,7 +79,7 @@
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
-        <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
+        <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.1-SNAPSHOT</festival.version>
@@ -333,7 +333,7 @@
                 <module>nx_sdk</module>
                 <module>nx_storage_sdk</module>
                 <module>plugins/genericrtspplugin</module>
-                <module>storage_plugins/ftpstorageplugin</module>
+                <!--module>storage_plugins/ftpstorageplugin</module-->
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>

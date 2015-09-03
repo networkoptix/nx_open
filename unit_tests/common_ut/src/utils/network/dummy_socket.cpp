@@ -151,17 +151,13 @@ bool DummySocket::getConnectionStatistics( StreamSocketInfo* /*info*/ )
     return false;
 }
 
-
-bool DummySocket::postImpl( std::function<void()>&& /*handler*/ )
+void DummySocket::postImpl( std::function<void()>&& /*handler*/ )
 {
-    return false;
 }
 
-bool DummySocket::dispatchImpl( std::function<void()>&& /*handler*/ )
+void DummySocket::dispatchImpl( std::function<void()>&& /*handler*/ )
 {
-    return false;
 }
-
 
 bool DummySocket::connectAsyncImpl( const SocketAddress& /*addr*/,
                                     std::function<void( SystemError::ErrorCode )>&& /*handler*/ )

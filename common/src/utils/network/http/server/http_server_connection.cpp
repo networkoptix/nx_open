@@ -47,7 +47,7 @@ namespace nx_http
         stree::ResourceContainer authInfo;
         if( const auto auth = nx_http::ServerManagers::instance()->authenticationManager() )
         {
-            header::WWWAuthenticate wwwAuthenticate;
+            boost::optional<header::WWWAuthenticate> wwwAuthenticate;
             if( !auth->authenticate(
                     *this,
                     *request.request,
@@ -56,17 +56,24 @@ namespace nx_http
             {
                 nx_http::Message response( nx_http::MessageType::response );
                 response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
-                response.response->headers.emplace(
-                    header::WWWAuthenticate::NAME,
-                    wwwAuthenticate.serialized() );
-                return prepareAndSendResponse( std::move( response ), nullptr );
+                if( wwwAuthenticate )
+                {
+                    response.response->headers.emplace(
+                        header::WWWAuthenticate::NAME,
+                        wwwAuthenticate.get().serialized() );
+                }
+                return prepareAndSendResponse(
+                    request.request->requestLine.version,
+                    std::move( response ),
+                    nullptr );
             }
         }
 
         auto strongRef = shared_from_this();
         std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
-        auto sendResponseFunc = [this, weakThis](
+        nx_http::MimeProtoVersion version = request.request->requestLine.version;
+        auto sendResponseFunc = [this, weakThis, version](
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
         {
@@ -74,6 +81,7 @@ namespace nx_http
             if( !strongThis )
                 return; //connection has been removed while request has been processed
             strongThis->prepareAndSendResponse(
+                version,
                 std::move(response),
                 std::move(responseMsgBody) );
         };
@@ -89,15 +97,19 @@ namespace nx_http
             //creating and sending error response
             nx_http::Message response( nx_http::MessageType::response );
             response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
-            return prepareAndSendResponse( std::move( response ), nullptr );
+            return prepareAndSendResponse(
+                request.request->requestLine.version,
+                std::move( response ),
+                nullptr );
         }
     }
 
     void HttpServerConnection::prepareAndSendResponse(
+        nx_http::MimeProtoVersion version,
         nx_http::Message&& msg,
         std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
     {
-        //msg.response->statusLine.version = request.request->requestLine.version;
+        msg.response->statusLine.version = std::move( version );
         msg.response->statusLine.reasonPhrase =
             nx_http::StatusCode::toString( msg.response->statusLine.statusCode );
 
@@ -111,13 +123,29 @@ namespace nx_http
 
         //TODO #ak connection persistency
 
-        if( !responseMsgBody )
+        if( responseMsgBody )
+        {
+            nx_http::insertOrReplaceHeader(
+                &msg.response->headers,
+                nx_http::HttpHeader( "Content-Type", responseMsgBody->mimeType() ) );
+
+            const auto contentLength = responseMsgBody->contentLength();
+            if( contentLength )
+                nx_http::insertOrReplaceHeader(
+                    &msg.response->headers,
+                    nx_http::HttpHeader(
+                        "Content-Length",
+                        nx_http::StringType::number(
+                            static_cast<qulonglong>( contentLength.get() ) ) ) );
+        }
+        else
+        {
             nx_http::insertOrReplaceHeader(
                 &msg.response->headers,
                 nx_http::HttpHeader( "Content-Length", "0" ) );
+        }
 
         m_currentMsgBody = std::move(responseMsgBody);
-        //TODO #ak check sendMessage error code
         sendMessage(
             std::move( msg ),
             std::bind( &HttpServerConnection::responseSent, this ) );
@@ -161,13 +189,9 @@ namespace nx_http
         //TODO #ak read and send message body async
         //    move async reading/writing to some separate class (async pipe) to enable reusage
 
-        if( !sendData(
-                std::move( buf ),
-                std::bind( &HttpServerConnection::someMessageBodySent, this ) ) )
-        {
-            closeConnection();
-            return;
-        }
+        sendData(
+            std::move( buf ),
+            std::bind( &HttpServerConnection::someMessageBodySent, this ) );
     }
 
     void HttpServerConnection::someMessageBodySent()

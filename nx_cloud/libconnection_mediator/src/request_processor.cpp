@@ -9,39 +9,21 @@ RequestProcessor::~RequestProcessor()
 
 boost::optional< RequestProcessor::MediaserverData >
     RequestProcessor::getMediaserverData(
-        stun::ServerConnection* connection, stun::Message& request)
+        ConnectionSharedPtr connection, stun::Message& request)
 {
-    // TODO: verify paramiters and authorization in CloudDb
-
-    const auto systemAttr = request.getAttribute< attrs::SystemId >();
-    if( !systemAttr )
+    const auto hostNameAttr = request.getAttribute< attrs::HostName >();
+    if( !hostNameAttr )
     {
         errorResponse( connection, request.header, stun::error::badRequest,
-                       "Attribute SystemId is required" );
+                       "Attribute HostName is required" );
         return boost::none;
     }
 
-    auto systemId = systemAttr->get();
-    if( systemId.isNull() )
+    const auto hostNameParts = hostNameAttr->value.split( '.' );
+    if( hostNameParts.size() != 2 )
     {
         errorResponse( connection, request.header, stun::error::badRequest,
-                       "Attribute SystemId is not a valid UUID" );
-        return boost::none;
-    }
-
-    const auto serverAttr = request.getAttribute< attrs::ServerId >();
-    if( !serverAttr )
-    {
-        errorResponse( connection, request.header, stun::error::badRequest,
-                       "Attribute ServerId is required" );
-        return boost::none;
-    }
-
-    auto serverId = serverAttr->get();
-    if( serverId.isNull() )
-    {
-        errorResponse( connection, request.header, stun::error::badRequest,
-                       "Attribute ServerId is not a valid UUID" );
+                       "Attribute HostName should be <ServerId>.<SystemId>" );
         return boost::none;
     }
 
@@ -53,12 +35,24 @@ boost::optional< RequestProcessor::MediaserverData >
         return boost::none;
     }
 
-    MediaserverData data = { std::move( systemId ), std::move( serverId ) };
+    MediaserverData data = { hostNameParts[1], hostNameParts[0] };
+
+    // TODO: verify paramiters and authorization in CloudDb
     return data;
 }
 
-bool RequestProcessor::errorResponse(
-        stun::ServerConnection* connection, stun::Header& request,
+void RequestProcessor::successResponse(
+        const ConnectionSharedPtr& connection, stun::Header& request )
+{
+    stun::Message response( stun::Header(
+        stun::MessageClass::successResponse, request.method,
+        std::move( request.transactionId ) ) );
+
+    connection->sendMessage( std::move( response ) );
+}
+
+void RequestProcessor::errorResponse(
+        const ConnectionSharedPtr& connection, stun::Header& request,
         int code, String reason )
 {
     stun::Message response( stun::Header(
@@ -66,7 +60,7 @@ bool RequestProcessor::errorResponse(
         std::move( request.transactionId ) ) );
 
     response.newAttribute< stun::attrs::ErrorDescription >( code, std::move(reason) );
-    return connection->sendMessage( std::move( response ) );
+    connection->sendMessage( std::move( response ) );
 }
 
 } // namespace hpm

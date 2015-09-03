@@ -73,8 +73,8 @@ private:
     };
 
     bool openConnectionImpl( QnMutexLockerBase* lock );
-    void closeConnectionImpl( QnMutexLockerBase* lock );
-    bool dispatchRequestsInQueue( QnMutexLockerBase* lock );
+    void closeConnectionImpl( QnMutexLockerBase* lock, SystemError::ErrorCode code );
+    void dispatchRequestsInQueue( QnMutexLockerBase* lock );
     void onConnectionComplete( SystemError::ErrorCode code );
     void processMessage( Message message );
 

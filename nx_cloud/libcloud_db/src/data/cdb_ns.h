@@ -9,7 +9,8 @@ namespace cdb {
 
 enum param
 {
-    accountID
+    accountID = 1,
+    systemID
 };
 
 }   //cdb

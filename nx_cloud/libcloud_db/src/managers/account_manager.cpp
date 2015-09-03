@@ -35,23 +35,20 @@ static const int UNCONFIRMED_ACCOUNT_EXPIRATION_SEC = 3*24*60*60;
 AccountManager::AccountManager(
     const conf::Settings& settings,
     nx::db::DBManager* const dbManager,
-    EMailManager* const emailManager )
+    EMailManager* const emailManager ) throw( std::runtime_error )
 :
     m_settings( settings ),
     m_dbManager( dbManager ),
     m_emailManager( emailManager )
 {
-}
-
-bool AccountManager::init()
-{
-    return fillCache() == db::DBResult::ok;
+    if( fillCache() != db::DBResult::ok )
+        throw std::runtime_error( "Failed to fill account cache" );
 }
 
 void AccountManager::addAccount(
     const AuthorizationInfo& /*authzInfo*/,
     data::AccountData accountData,
-    std::function<void(ResultCode)> completionHandler )
+    std::function<void(api::ResultCode)> completionHandler )
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountData, data::EmailVerificationCode>(
@@ -63,7 +60,7 @@ void AccountManager::addAccount(
 void AccountManager::verifyAccountEmailAddress(
     const AuthorizationInfo& /*authzInfo*/,
     data::EmailVerificationCode emailVerificationCode,
-    std::function<void(ResultCode)> completionHandler )
+    std::function<void(api::ResultCode)> completionHandler )
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::EmailVerificationCode, QnUuid>(
@@ -74,26 +71,34 @@ void AccountManager::verifyAccountEmailAddress(
 
 void AccountManager::getAccount(
     const AuthorizationInfo& authzInfo,
-    std::function<void(ResultCode, data::AccountData)> completionHandler )
+    std::function<void(api::ResultCode, data::AccountData)> completionHandler )
 {
     QnUuid accountID;
     if( !authzInfo.get( param::accountID, &accountID ) )
     {
-        completionHandler( ResultCode::notAuthorized, data::AccountData() );
+        completionHandler(api::ResultCode::forbidden, data::AccountData());
         return;
     }
 
-    data::AccountData resultData;
-    if( !m_cache.get( accountID, &resultData ) )
+    if( auto accountData = m_cache.find( accountID ) )
     {
-        //very strange: account has been authenticated, but not found in the database
-        completionHandler( ResultCode::notFound, data::AccountData() );
+        accountData.get().passwordHa1.clear();
+        completionHandler(api::ResultCode::ok, std::move(accountData.get()));
         return;
     }
 
-    //not returning password digest due to security reason
-    resultData.passwordHa1.clear();
-    completionHandler( ResultCode::ok, std::move(resultData) );
+    //very strange: account has been authenticated, but not found in the database
+    completionHandler(api::ResultCode::notFound, data::AccountData());
+}
+
+boost::optional<data::AccountData> AccountManager::findAccountByUserName(
+    const nx::String& userName ) const
+{
+    //TODO #ak improve search
+    return m_cache.findIf(
+        [&]( const std::pair<const QnUuid, data::AccountData>& val ) {
+            return val.second.login == userName;
+        } );
 }
 
 db::DBResult AccountManager::fillCache()
@@ -118,7 +123,7 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
 {
     QSqlQuery readAccountsQuery( *connection );
     readAccountsQuery.prepare(
-        "SELECT id, email, password_ha1 as passwordHa1, "
+        "SELECT id, login, email, password_ha1 as passwordHa1, "
                "full_name as fullName, status_code as statusCode "
         "FROM account" );
     if( !readAccountsQuery.exec() )
@@ -134,9 +139,9 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
     for( auto& account: accounts )
     {
         auto idCopy = account.id;
-        if( !m_cache.add( std::move(idCopy), std::move(account) ) )
+        if( !m_cache.insert( std::move(idCopy), std::move(account) ) )
         {
-            Q_ASSERT( false );
+            assert( false );
         }
     }
 
@@ -154,11 +159,11 @@ db::DBResult AccountManager::insertAccount(
     const QnUuid accountID = QnUuid::createUuid();
     QSqlQuery insertAccountQuery( *connection );
     insertAccountQuery.prepare( 
-        "INSERT INTO account (id, email, password_ha1, full_name, status_code) "
-                    "VALUES  (:id, :email, :passwordHa1, :fullName, :statusCode)");
+        "INSERT INTO account (id, login, email, password_ha1, full_name, status_code) "
+                    "VALUES  (:id, :login, :email, :passwordHa1, :fullName, :statusCode)");
     QnSql::bind( accountData, &insertAccountQuery );
     insertAccountQuery.bindValue( ":id", QnSql::serialized_field(accountID) );
-    insertAccountQuery.bindValue( ":statusCode", data::asAwaitingEmailConfirmation );
+    insertAccountQuery.bindValue( ":statusCode", api::asAwaitingEmailConfirmation );
     if( !insertAccountQuery.exec() )
     {
         NX_LOG( lit( "Could not insert account into DB. %1" ).
@@ -207,15 +212,18 @@ void AccountManager::accountAdded(
     db::DBResult resultCode,
     data::AccountData accountData,
     data::EmailVerificationCode /*resultData*/,
-    std::function<void(ResultCode)> completionHandler )
+    std::function<void(api::ResultCode)> completionHandler )
 {
     if( resultCode == db::DBResult::ok )
     {
         //updating cache
-        m_cache.add( accountData.id, std::move(accountData) );
+        m_cache.insert( accountData.id, std::move(accountData) );
     }
     
-    completionHandler( resultCode == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError );
+    completionHandler(
+        resultCode == db::DBResult::ok
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError );
 }
 
 nx::db::DBResult AccountManager::verifyAccount(
@@ -252,7 +260,7 @@ nx::db::DBResult AccountManager::verifyAccount(
     QSqlQuery updateAccountStatus( *connection );
     updateAccountStatus.prepare( 
         "UPDATE account SET status_code = ? WHERE id = ?" );
-    updateAccountStatus.bindValue( 0, data::asActivated );
+    updateAccountStatus.bindValue( 0, api::asActivated );
     updateAccountStatus.bindValue( 1, QnSql::serialized_field(accountID) );
     if( !updateAccountStatus.exec() )
     {
@@ -271,13 +279,13 @@ void AccountManager::accountVerified(
     nx::db::DBResult resultCode,
     data::EmailVerificationCode /*verificationCode*/,
     const QnUuid accountID,
-    std::function<void( ResultCode )> completionHandler )
+    std::function<void(api::ResultCode)> completionHandler )
 {
     if( resultCode == db::DBResult::ok )
     {
         m_cache.atomicUpdate(
             accountID, 
-            []( data::AccountData& account ){ account.statusCode = data::AccountStatus::asActivated; } );
+            []( api::AccountData& account ){ account.statusCode = api::AccountStatus::asActivated; } );
     }
 
     completionHandler( fromDbResultCode( resultCode ) );

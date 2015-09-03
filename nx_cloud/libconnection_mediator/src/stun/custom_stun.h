@@ -47,37 +47,23 @@ namespace attrs
 {
     enum Value
     {
-        systemId = stun::attrs::userDefined,
-        serverId,
-        clientId,
+        hostName = stun::attrs::userDefined,
+        userName,
 
         publicEndpointList = stun::attrs::userDefined + 0x200,
         authorization,
-
     };
 
-    struct Id : stun::attrs::Unknown
+    struct HostName : stun::attrs::Unknown
     {
-        Id( int type, QnUuid value ) : stun::attrs::Unknown( type, value.toRfc4122() ) {}
-        QnUuid get() const { return QnUuid::fromRfc4122( value ); }
+        static const int TYPE = hostName;
+        HostName( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
     };
 
-    struct SystemId : Id
+    struct UserName : stun::attrs::Unknown
     {
-        static const int TYPE = systemId;
-        SystemId( QnUuid value ) : Id( TYPE, std::move(value) ) {}
-    };
-
-    struct ServerId : Id
-    {
-        static const int TYPE = serverId;
-        ServerId( QnUuid value ) : Id( TYPE, std::move(value) ) {}
-    };
-
-    struct ClientId : Id
-    {
-        static const int TYPE = clientId;
-        ClientId( QnUuid value ) : Id( TYPE, std::move(value) ) {}
+        static const int TYPE = hostName;
+        UserName( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
     };
 
     struct PublicEndpointList : stun::attrs::Unknown

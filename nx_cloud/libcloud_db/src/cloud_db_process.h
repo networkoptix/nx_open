@@ -52,7 +52,6 @@ protected:
 private:
     int m_argc;
     char** m_argv;
-    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(
@@ -60,6 +59,8 @@ private:
         const AuthorizationManager& authorizationManager,
         AccountManager* const accountManager,
         SystemManager* const systemManager );
+    bool initializeDB( nx::db::DBManager* const dbManager );
+    bool configureDB( nx::db::DBManager* const dbManager );
     bool updateDB( nx::db::DBManager* const dbManager );
 };
 

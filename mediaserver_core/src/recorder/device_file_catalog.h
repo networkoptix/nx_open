@@ -153,6 +153,7 @@ private:
     Chunk chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName);
     void replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog);
+    void removeChunks(int storageIndex);
     void removeRecord(int idx);
     int detectTimeZone(qint64 startTimeMs, const QString& fileName);
 private:

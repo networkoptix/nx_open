@@ -80,7 +80,9 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
     for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
         bool hasStorage = false;
         for(const QString &storagePath: storagePaths) {
-            if(closeDirPath(storagePath).startsWith(partition.path)) {
+            if (closeDirPath(storagePath).startsWith(partition.path) ||
+                partition.path.indexOf(NX_TEMP_FOLDER_NAME) != -1)
+            {
                 hasStorage = true;
                 break;
             }

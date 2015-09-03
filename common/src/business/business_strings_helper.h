@@ -73,7 +73,7 @@ private:
         const QList<QnInfoDetail>& aggregationDetailList,
         bool useIp );
 
-    static QString eventSource(const QnBusinessEventParameters &params, bool useIp);
+    static QnResourcePtr eventSource(const QnBusinessEventParameters &params);
 
     static QString eventReason(const QnBusinessEventParameters& params);
 

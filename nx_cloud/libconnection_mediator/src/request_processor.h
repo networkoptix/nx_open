@@ -21,17 +21,24 @@ public:
 
     virtual ~RequestProcessor() = 0;
 
+    typedef std::shared_ptr< stun::ServerConnection > ConnectionSharedPtr;
+    typedef std::shared_ptr< stun::ServerConnection > ConnectionWeakPtr;
+
 protected:
-    struct MediaserverData { QnUuid systemId, serverId; };
+    struct MediaserverData { String systemId, serverId; };
 
     /** Returns mediaserver data from \a request,
      *  sends \fn errorResponse in case of failure */
     boost::optional< MediaserverData > getMediaserverData(
-            stun::ServerConnection* connection, stun::Message& request );
+            ConnectionSharedPtr connection, stun::Message& request );
 
-    /** Send error responce with error code and description */
-    static bool errorResponse(
-            stun::ServerConnection* connection, stun::Header& request,
+    /** Send success responce without attributes */
+    static void successResponse(
+            const ConnectionSharedPtr& connection, stun::Header& request );
+
+    /** Send error responce with error code and description as attribute */
+    static void errorResponse(
+            const ConnectionSharedPtr& connection, stun::Header& request,
             int code, String reason );
 };
 

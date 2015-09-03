@@ -1325,23 +1325,25 @@ bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<voi
 bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    return d->wrappedSocket->post(
+    d->wrappedSocket->post(
         [this,buffer,handler]() mutable {
             Q_D(QnSSLSocket);
             d->readMode.store(QnSSLSocket::ASYNC,std::memory_order_release);
             d->async_ssl_ptr->AsyncRecv( buffer, std::move(handler) );
         });
+    return true;
 }
 
 bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    return d->wrappedSocket->post(
+    d->wrappedSocket->post(
         [this,&buffer,handler]() mutable {
             Q_D(QnSSLSocket);
             d->writeMode.store(QnSSLSocket::ASYNC,std::memory_order_release);
             d->async_ssl_ptr->AsyncSend( buffer, std::move(handler) );
     });
+    return true;
 }
 
 int QnSSLSocket::asyncRecvInternal( void* buffer , unsigned int bufferLen ) {
@@ -1486,7 +1488,7 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
         if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() )
             return d->wrappedSocket->readSomeAsync(buffer,std::move(handler));
 
-        return d->wrappedSocket->post(
+        d->wrappedSocket->post(
             [this,buffer,handler]() mutable {
                 Q_D(QnMixedSSLSocket);
                 MixedAsyncSSL* ssl_ptr = 
@@ -1503,6 +1505,7 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
                     ssl_ptr->AsyncRecv(buffer, std::move(handler));
                 }
         });
+        return true;
     }
 }
 
@@ -1519,7 +1522,7 @@ bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<vo
         if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() )
             return d->wrappedSocket->sendAsync(buffer,std::move(handler));
 
-        return d->wrappedSocket->post(
+        d->wrappedSocket->post(
             [this,&buffer,handler]() mutable {
                 Q_D(QnMixedSSLSocket);
                 MixedAsyncSSL* ssl_ptr = 
@@ -1536,6 +1539,7 @@ bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<vo
                     ssl_ptr->AsyncSend( buffer, std::move(handler) );
                 }
         });
+        return true;
     }
 }
 
