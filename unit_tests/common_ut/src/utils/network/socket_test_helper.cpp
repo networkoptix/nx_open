@@ -58,8 +58,8 @@ TestConnection::TestConnection(
     m_outData.resize( READ_BUF_SIZE );
 }
 
-//static std::mutex mtx1;
-//static std::vector<std::pair<int, bool>> terminatedSocketsIDs;
+static std::mutex mtx1;
+static std::map<int, bool> terminatedSocketsIDs;
 
 
 TestConnection::~TestConnection()
@@ -74,8 +74,8 @@ TestConnection::~TestConnection()
         _socket->terminateAsyncIO( true );
 
     {
-        //std::unique_lock<std::mutex> lk(mtx1);
-        //terminatedSocketsIDs.emplace_back(m_id, _socket ? true : false);
+        std::unique_lock<std::mutex> lk(mtx1);
+        assert(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
     }
 #ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::~TestConnection. "<<m_id<<std::endl;
@@ -380,11 +380,10 @@ bool ConnectionsGenerator::start()
         m_connections.back().swap( connection );
         if( !m_connections.back()->start() )
         {
-            m_terminated = true;
-            ConnectionsContainer connections;
-            m_connections.swap( connections );
-            lk.unlock();
-            connections.clear();
+            const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
+            std::cerr << "Failure initially starting test connection. " 
+                << SystemError::toString(osErrorCode).toStdString() << std::endl;
+            m_connections.pop_back();
             return false;
         }
         ++m_totalConnectionsEstablished;
@@ -411,6 +410,12 @@ size_t ConnectionsGenerator::totalBytesReceived() const
 void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::iterator connectionIter)
 {
     std::unique_lock<std::mutex> lk( m_mutex );
+
+    {
+        std::unique_lock<std::mutex> lk(mtx1);
+        assert(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
+    }
+
     //if( !m_finishedConnectionsIDs.insert( id ).second )
     //    int x = 0;
     if( *connectionIter )
@@ -433,7 +438,7 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
         m_connections.back().swap( connection );
         if( !m_connections.back()->start() )
         {
-            SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
+            const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
             std::cerr<<"Failed to start test connection. "<<SystemError::toString(osErrorCode).toStdString()<<std::endl;
             //if (!m_finishedConnectionsIDs.insert(m_connections.back()->id()).second)
             //    int x = 0;
