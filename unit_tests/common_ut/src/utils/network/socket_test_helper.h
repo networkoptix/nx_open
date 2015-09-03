@@ -91,7 +91,7 @@ private:
     const size_t m_bytesToSendThrough;
 
     void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
-    void onConnectionDone( TestConnection* /*connection*/ );
+    void onConnectionDone( TestConnection* connection );
 };
 
 //!Establishes numerous connections to specified address, reads all connections (ignoring data) and sends random data back
