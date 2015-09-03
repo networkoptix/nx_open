@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>189</height>
+    <height>195</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -90,6 +90,13 @@
        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
       </property>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="errorLabel">
+     <property name="text">
+      <string>This license type requires higher software version.</string>
+     </property>
     </widget>
    </item>
    <item>

@@ -124,8 +124,10 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_duration(AV_NOPTS_VALUE),
     m_ioContext(0),
     m_eofReached(false),
+    m_openMutex(QnMutex::Recursive),
     m_fastStreamFind(false),
-    m_hasVideo(true)
+    m_hasVideo(true),
+    m_lastSeekTime(AV_NOPTS_VALUE)
 {
     close();
     m_audioLayout.reset( new QnAviAudioLayout(this) );
@@ -220,14 +222,16 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     av_free_packet(&packet);
                     continue;
                 }
-
+                qint64 timestamp = packetTimestamp(packet);
+                if (!hasVideo() && m_lastSeekTime != AV_NOPTS_VALUE && timestamp < m_lastSeekTime)
+                    continue; // seek is broken for audio only media streams
                 QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);
                 data = QnAbstractMediaDataPtr(audioData);
                 audioData->channelNumber = m_indexToChannel[packet.stream_index];
-                packetTimestamp(audioData, packet);
+                audioData->timestamp = timestamp;
                 audioData->m_data.write((const char*) packet.data, packet.size);
                 break;
             }
@@ -275,8 +279,28 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
         return time;
 
     qint64 relTime = qMax(time-m_startTime, 0ll);
-    avformat_seek_file(m_formatContext, -1, 0, relTime + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
+    if (m_hasVideo)
+        avformat_seek_file(m_formatContext, -1, 0, relTime + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
+    else {
+        // mp3 seek is bugged in current ffmpeg version
+        if (!reopen())
+            return -1;
+    }
+    m_lastSeekTime = relTime + m_startMksec + m_startTime; // file physical time to UTC time
     return time;
+}
+
+bool QnAviArchiveDelegate::reopen()
+{
+    auto storage = m_storage;
+    close();
+    m_storage = storage;
+    if (!open(m_resource))
+        return false;
+    if (!findStreams())
+        return false;
+
+    return true;
 }
 
 bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
@@ -346,6 +370,7 @@ void QnAviArchiveDelegate::close()
     m_startMksec = 0;
     m_storage.clear();
     m_lastPacketTimes.clear();
+    m_lastSeekTime = AV_NOPTS_VALUE;
 }
 
 const char* QnAviArchiveDelegate::getTagValue(QnAviArchiveDelegate::Tag tag)
@@ -545,7 +570,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
     }
 }
 
-void QnAviArchiveDelegate::packetTimestamp(QnCompressedAudioData* audio, const AVPacket& packet)
+qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
 {
     AVStream* stream = m_formatContext->streams[packet.stream_index];
     double timeBase = av_q2d(stream->time_base) * 1000000;
@@ -555,9 +580,9 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedAudioData* audio, const A
     qint64 packetTime = packet.dts != qint64(AV_NOPTS_VALUE) ? packet.dts : packet.pts;
     //qint64 packetTime = qMax(packet.dts, packet.pts);
     if (packetTime == qint64(AV_NOPTS_VALUE))
-        audio->timestamp = AV_NOPTS_VALUE;
+        return AV_NOPTS_VALUE;
     else
-        audio->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
+        return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
 }
 
 void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet)

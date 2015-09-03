@@ -211,6 +211,11 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     return rez;
 }
 
+void DeviceFileCatalog::removeChunks(int storageIndex)
+{
+    replaceChunks(storageIndex, std::deque<Chunk>());
+}
+
 void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog)
 {
     QnMutexLocker lock( &m_mutex );

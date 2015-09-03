@@ -61,12 +61,10 @@ public:
 
     //TODO: #GDM Refactor parameter set to the structure
     void exportMediaPeriodToFile(const QnTimePeriod &timePeriod, 
-                                 const QString& fileName,
-                                 const QString& format, 
-                                 const QnStorageResourcePtr &storage,
-                                 QnStreamRecorder::Role role, 
-                                 const QnImageFilterHelper &imageParameters,
-                                 qint64 serverTimeZoneMs = Qn::InvalidUtcOffset);
+								 const QString& fileName, const QString& format, 
+                                 QnStorageResourcePtr storage, QnStreamRecorder::Role role,
+                                 qint64 serverTimeZoneMs,
+                                 QnImageFilterHelper transcodeParams);
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;

@@ -684,6 +684,11 @@ public:
          */
         LC_Start,
 
+        /** 
+         * Invalid license. Required when the correct license type is not known in current version.
+         */
+        LC_Invalid,
+
         LC_Count
     };
 

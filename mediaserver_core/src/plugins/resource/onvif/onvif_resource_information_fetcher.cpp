@@ -171,7 +171,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         soapWrapper.setPassword(info.defaultPassword);
     }
     else if (discoveryMode != DiscoveryMode::partiallyEnabled)
-        soapWrapper.fetchLoginPassword(info.manufacturer);
+        soapWrapper.fetchLoginPassword(info.manufacturer, info.name);
 
     if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
         return; //ignoring unknown cameras

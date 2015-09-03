@@ -37,7 +37,6 @@ public:
     // how many ms is buffered in audio buffers at this moment(!)
     int msInBuffer() const;
     qint64 getCurrentTime() const;
-    qint64 lastAudioTime() const;
     void blockTimeValue(qint64 value);
     void unblockTimeValue();
 

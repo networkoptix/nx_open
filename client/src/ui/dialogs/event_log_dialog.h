@@ -33,7 +33,7 @@ public:
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(const QDate& from, const QDate& to);
-    void setCameraList(const QnResourceList &cameras);
+    void setCameraList(const QnVirtualCameraResourceList &cameras);
     void setActionType(QnBusiness::ActionType value);
     void setEventType(QnBusiness::EventType value);
 
@@ -53,7 +53,6 @@ private slots:
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 
 private:
-    QString getTextForNCameras(int n) const;
     QStandardItem* createEventTree(QStandardItem* rootItem, QnBusiness::EventType value);
 
     void updateHeaderWidth();
@@ -70,6 +69,8 @@ private:
      */
     void query(qint64 fromMsec, qint64 toMsec, QnBusiness::EventType eventType, QnBusiness::ActionType actionType);
 
+    void retranslateUi();
+
 private:
     QScopedPointer<Ui::EventLogDialog> ui;
 
@@ -80,7 +81,7 @@ private:
     QSet<int> m_requests;
 
     QVector <QnBusinessActionDataListPtr> m_allEvents;
-    QnResourceList m_filterCameraList;
+    QnVirtualCameraResourceList m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;
 

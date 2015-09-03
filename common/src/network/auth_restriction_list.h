@@ -17,6 +17,7 @@ namespace AuthMethod
 {
     enum Value
     {
+        NotDefined      = 0x00,
         noAuth          = 0x01,
         //!authentication method described in rfc2617
         httpBasic       = 0x02,
@@ -35,6 +36,8 @@ namespace AuthMethod
         urlQueryParam   = 0x20,
         tempUrlQueryParam   = 0x40
     };
+    Q_DECLARE_FLAGS(Values, Value);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
 }
 
 /*!

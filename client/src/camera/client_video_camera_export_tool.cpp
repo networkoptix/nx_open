@@ -1,4 +1,5 @@
 #include "client_video_camera_export_tool.h"
+#include <core/resource/media_resource.h>
 
 #include <QtCore/QFileInfo>
 
@@ -34,7 +35,9 @@ void QnClientVideoCameraExportTool::start() {
                 QFileInfo(m_fileName).suffix(),
                 QnStorageResourcePtr(),
                 QnStreamRecorder::Role_FileExport,
-                m_parameters);
+                m_serverTimeZoneMs,
+                m_parameters
+                );
 }
 
 int QnClientVideoCameraExportTool::status() const {

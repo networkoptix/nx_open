@@ -20,7 +20,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
-
+#include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 
@@ -106,7 +106,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
         QMessageBox::critical(
             mainWindow(),
             tr("Unable to get position from camera."),
-            tr("An error has occurred while trying to get current position from camera %1.").arg(resource->getName()) + L'\n' 
+            tr("An error has occurred while trying to get current position from camera %1.").arg(getResourceName(resource))
+          + L'\n' 
           + tr("Please wait for the camera to go online.")
         );
         return;
@@ -148,7 +149,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Unable to set position for camera."),
-                tr("An error has occurred while trying to set current position for camera %1.").arg(resource->getName()) + L'\n' 
+                tr("An error has occurred while trying to set current position for camera %1.").arg(getResourceName(resource)) + L'\n' 
               + tr("Please wait for the camera to go online.")
             );
             return;
@@ -201,7 +202,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Unable to set position of camera."),
-                tr("An error has occurred while trying to set current position for camera %1.").arg(resource->getName()) + L'\n' 
+                tr("An error has occurred while trying to set current position for camera %1.").arg(getResourceName(resource)) + L'\n' 
               + tr("Please wait for the camera to go online.")
             );
             return;

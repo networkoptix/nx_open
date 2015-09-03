@@ -980,8 +980,6 @@ namespace Qn {
 
         /* Playback actions. */
         PlayPauseAction,
-        SpeedDownAction,
-        SpeedUpAction,
         PreviousFrameAction,
         NextFrameAction,
         JumpToStartAction,

@@ -12,6 +12,7 @@
 #include <camera/single_thumbnail_loader.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -269,6 +270,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
 
     QnMediaServerResourcePtr source = qnResPool->getResourceById(params.sourceServerId).dynamicCast<QnMediaServerResource>();
 
@@ -315,7 +317,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             : qnSkin->icon("events/camera.png");
         item->addActionButton(
             icon,
-            tr("Open Camera"),
+            tr("Open %1").arg(getDefaultDeviceNameUpper(camera)),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
         );
@@ -325,7 +327,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case QnBusiness::CameraDisconnectEvent: {
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
-            tr("Camera Settings"),
+            tr("%1 Settings").arg(getDefaultDeviceNameUpper(camera)),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
@@ -335,7 +337,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case QnBusiness::StorageFailureEvent: {
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
-            tr("Server settings"),
+            tr("Server Settings"),
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
@@ -344,7 +346,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case QnBusiness::NetworkIssueEvent:{
         item->addActionButton(
             qnSkin->icon("events/server.png"),
-            tr("Camera Settings"),
+            tr("%1 Settings").arg(getDefaultDeviceNameUpper(camera)),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
@@ -356,7 +358,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
-            tr("Open camera web page..."),
+            tr("Open %1 Web Page...").arg(getDefaultDeviceNameUpper(camera)),
             Qn::BrowseUrlAction,
             QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
         );

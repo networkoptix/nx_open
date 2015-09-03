@@ -970,6 +970,7 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
     }
 }
 
+/** Is not used and not implemented. */
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 {
     return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->channelCount() == 1;

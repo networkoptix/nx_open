@@ -185,5 +185,5 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(const Q
 
     /* Warn that some of the licenses will be deactivated. */
     QnLicenseListHelper remoteHelper(remoteLicensesList);
-    return remoteHelper.totalLicenseByType(Qn::LC_Start) > 0;
+    return remoteHelper.totalLicenseByType(Qn::LC_Start, true) > 0;
 }

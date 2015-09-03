@@ -34,10 +34,10 @@ public:
     void stop();
 
 private:
-    static QString diagnosticsStepText(int stepType);
+    QString diagnosticsStepText(int stepType);
 
 private slots:
-    void updateTitleText();
+    void retranslateUi();
     void updateOkButtonEnabled();
     void clearLog();
 

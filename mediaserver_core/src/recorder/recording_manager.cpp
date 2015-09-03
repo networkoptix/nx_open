@@ -91,16 +91,16 @@ void QnRecordingManager::stopRecorder(const Recorders& recorders)
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
 {
-	QnVideoCameraPtr camera;
+    QnVideoCameraPtr camera;
     if (recorders.recorderHiRes) {
         recorders.recorderHiRes->stop();
-		camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
-	}
+        camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+    }
     if (recorders.recorderLowRes) {
         recorders.recorderLowRes->stop();
         if (!camera)
             camera = qnCameraPool->getVideoCamera(recorders.recorderLowRes->getResource());
-	}
+    }
     if (camera)
     {
         if (recorders.recorderHiRes) {
@@ -577,7 +577,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 {
     QnCamLicenseUsageHelper helper;
 
-    QString disabledCameras;
+    QStringList disabledCameras;
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
     const QnVirtualCameraResourceList& ownCameras = getLocalControlledCameras();
@@ -599,7 +599,7 @@ void QnRecordingManager::at_licenseMutexLocked()
                 continue;
             }
             propertyDictionary->saveParams( camera->getId() );
-            disabledCameras += QString(lit("%1 (%2)")).arg(camera->getName()).arg(camera->getHostAddress());
+            disabledCameras << camera->getId().toString();
             helper.invalidate();
         }
     }
@@ -609,7 +609,8 @@ void QnRecordingManager::at_licenseMutexLocked()
 
     if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
-        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras);
+        //TODO: #gdm move (de)serializing of encoded reason params to common place
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras.join(L';')); 
     }
 }
 

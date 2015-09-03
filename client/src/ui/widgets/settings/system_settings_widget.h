@@ -18,7 +18,7 @@ public:
     virtual void submitToSettings() override;
 
     virtual bool hasChanges() const override;
-
+    virtual void retranslateUi() override;
 private:
     QScopedPointer<Ui::SystemSettingsWidget> ui;
 };

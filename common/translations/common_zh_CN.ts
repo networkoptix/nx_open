@@ -36,28 +36,12 @@
         <translation>摄像机移动侦测</translation>
     </message>
     <message>
-        <source>Input Signal on Camera</source>
-        <translation>摄像机报警信号输入</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>摄像机无法连接</translation>
-    </message>
-    <message>
         <source>Storage Failure</source>
         <translation>存储故障</translation>
     </message>
     <message>
         <source>Network Issue</source>
         <translation>网络问题</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>摄像机IP冲突</translation>
-    </message>
-    <message>
-        <source>Camera %1 was disconnected</source>
-        <translation>摄像机%1无法连接</translation>
     </message>
     <message>
         <source>Input on %1</source>
@@ -76,24 +60,8 @@
         <translation>%1网络问题</translation>
     </message>
     <message>
-        <source>Camera IP Conflict at %1</source>
-        <translation>%1摄像机IP冲突</translation>
-    </message>
-    <message>
-        <source>Camera output</source>
-        <translation>摄像机报警输出</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>摄相机报警输出30秒</translation>
-    </message>
-    <message>
         <source>Bookmark</source>
         <translation>标记</translation>
-    </message>
-    <message>
-        <source>Camera recording</source>
-        <translation>摄像机录像</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -126,10 +94,6 @@
     <message>
         <source>Unknown (%1)</source>
         <translation>未知 (%1)</translation>
-    </message>
-    <message>
-        <source>Any Camera Issue</source>
-        <translation>任何摄像机问题</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
@@ -188,24 +152,8 @@
         <translation>原因: %1</translation>
     </message>
     <message>
-        <source>Camera #%1 MAC: %2</source>
-        <translation>摄像机#%1 MAC: %2</translation>
-    </message>
-    <message>
         <source>Conflicting Server #%1: %2</source>
         <translation>服务器冲突 #%1: %2</translation>
-    </message>
-    <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation>无法连接摄像机(主码流)</translation>
-    </message>
-    <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation>无法连接摄像机(次码流)</translation>
-    </message>
-    <message>
-        <source>Recording on %n camera(s) is disabled: </source>
-        <translation>在 %n 摄像机录像被禁用</translation>
     </message>
     <message>
         <source>%2 %1</source>
@@ -233,12 +181,6 @@
         <translatorcomment>%1 是时间, %2 是日期</translatorcomment>
         <translation>
             <numerusform>第一次出现: %1 在 %2 (%n 总次数）</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>在过去的 %n 秒中没有接收到视频帧.</numerusform>
         </translation>
     </message>
     <message>
@@ -309,6 +251,67 @@
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 output for 30 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Signal on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any %1 Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2 was disconnected</source>
+        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict at %2</source>
+        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 #%2 MAC: %3</source>
+        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on %1 is disabled: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -321,20 +324,8 @@
         <translation>确定</translation>
     </message>
     <message>
-        <source>Invalid data was received from the camera: %1.</source>
-        <translation>从摄像机获取到无效数据：%1</translation>
-    </message>
-    <message>
-        <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation>视频数据错误，请打开摄像机检测窗口获取更多细节信息。</translation>
-    </message>
-    <message>
         <source>Media stream is opened but no media data was received.</source>
         <translation>媒体流被打开，但没有收到媒体数据。</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress</source>
-        <translation>摄像机正在进行初始化</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -365,32 +356,12 @@
         <translation>无法连接到Http接口 %1.</translation>
     </message>
     <message>
-        <source>Make sure the camera is plugged into the network.</source>
-        <translation>请确认摄像机在线.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
         <translation>无法打开媒体流URL%1.未连接到流媒体端口 %2.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>请确保端口 %2可用,.尝试重启启动摄像机,并恢复出厂默认设置.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
         <translation>无法打开媒体流 %1连接到端口 %2被意外关闭.</translation>
-    </message>
-    <message>
-        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>请确保摄像机上线,若问题还在,请尝试重启摄像机.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>向摄像机请求无响应,URL %1,请求名称: %2.</translation>
-    </message>
-    <message>
-        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>请尝试重新启动摄像机并恢复出厂设置.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -409,22 +380,6 @@
         <translation>配置参数 %1.失败.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>请尝试启用录像并且通过摄像机设置降低帧率.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>若问题仍存在，请联系技术支持.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>摄像机请求&quot;%1&quot;发生错误: &quot;%2&quot;.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.</source>
-        <translation>未知的摄像机问题.</translation>
-    </message>
-    <message>
         <source>Please contact support.</source>
         <translation>请联系技术支持.</translation>
     </message>
@@ -439,6 +394,72 @@
     <message>
         <source>Not authorised. Url %1.</source>
         <translation type="unfinished">未经授权。Url %1.</translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse %1 response. Url %2, request name %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown %1 Issue.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the %1: %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 initialization process in progress.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -607,7 +628,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalide Signature</source>
+        <source>Invalid Signature</source>
         <translation type="unfinished">无效签名</translation>
     </message>
     <message>
@@ -621,6 +642,18 @@
     <message>
         <source>Invalid Type</source>
         <translation type="unfinished">无效类型</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -704,6 +737,93 @@
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
         <translation>&apos;%1&apos;无效数值－期望%2, 提供%3。</translation>
+    </message>
+</context>
+<context>
+    <name>QnResourceNameStrings</name>
+    <message numerus="yes">
+        <source>%n Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>device</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -918,7 +1038,7 @@
         <translation type="unfinished">未设置存储空间</translation>
     </message>
     <message>
-        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
