@@ -12,8 +12,6 @@
 #include <helpers/http_client.h>
 #include <helpers/time_helper.h>
 
-#include <QDebug>
-
 namespace 
 {
     const QString kApiNamespaceTag = "/api/";

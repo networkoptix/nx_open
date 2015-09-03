@@ -47,6 +47,9 @@ namespace rtu
 
         QObject *selection() const;
 
+    public:
+        void applyTaskCompleted(ApplyChangesTask *task);
+
     public slots:
         QObject *selectionModel();
         
@@ -56,11 +59,21 @@ namespace rtu
         
         QObject *changesManager();
 
+        void removeChangeProgress(QObject *task);
+
+        void showDetailsForTask(QObject *task);
+
+        void closeDetails();
+
+        void changeOtherSettings();
+
         QObject *currentProgressTask();
 
+        /*
         void setCurrentProgressTask(QObject *task);
 
         void currentProgressTaskComplete();
+        */
 
         bool isValidSubnetMask(const QString &mask) const;
 

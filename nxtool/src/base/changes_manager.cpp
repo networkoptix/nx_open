@@ -16,12 +16,7 @@ namespace
         rtu::ApplyChangesTask *task = result.get();
 
         QObject::connect(task, &rtu::ApplyChangesTask::changesApplied
-            , [context, changesManager, task]()
-        {
-            const QObject * const currentTask = context->currentProgressTask();
-            if (currentTask == task)    /// Task was not minimized or was shown
-                context->currentProgressTaskComplete();
-        });
+            , [context, task]() { context->applyTaskCompleted(task); });
 
         return std::move(result);
     }
@@ -45,9 +40,14 @@ rtu::ChangesManager::~ChangesManager()
 {
 }
 
-QObject *rtu::ChangesManager::changesProgressModel()
+rtu::ChangesProgressModel *rtu::ChangesManager::changesProgressModel()
 {
     return m_changesModel.get();
+}
+
+QObject *rtu::ChangesManager::changesProgressModelObject()
+{
+    return changesProgressModel();
 }
 
 rtu::ApplyChangesTask *rtu::ChangesManager::notMinimizedTask()
@@ -55,9 +55,10 @@ rtu::ApplyChangesTask *rtu::ChangesManager::notMinimizedTask()
     return m_currentTask.get();
 }
 
-void rtu::ChangesManager::removeChangeProgress(QObject *task)
+void rtu::ChangesManager::releaseNotMinimizedTaskOwning()
 {
-    m_changesModel->removeChangeProgress(task);
+    if (m_currentTask)
+        m_currentTask.release();
 }
 
 void rtu::ChangesManager::addSystemChange(const QString &systemName)
@@ -121,7 +122,8 @@ void rtu::ChangesManager::applyChanges()
 {
     const ApplyChangesTaskPtr &task = changeTask();
     task->applyChanges();
-    m_context->setCurrentProgressTask(task.get());
+
+    m_context->showDetailsForTask(task.get());
 }
 
 void rtu::ChangesManager::minimizeProgress()

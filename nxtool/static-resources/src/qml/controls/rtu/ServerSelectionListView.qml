@@ -201,7 +201,7 @@ ListView
             else
             {
                 changeFunc();
-                console.log("-------------------")
+                rtuContext.closeDetails();
                 rtuContext.changesManager().clearChanges();
                 rtuContext.currentPage = NxRtu.Constants.SettingsPage;
             }

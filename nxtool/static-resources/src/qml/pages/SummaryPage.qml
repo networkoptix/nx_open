@@ -125,10 +125,7 @@ Item
             text: qsTr("Ok");
             onClicked:
             {
-                var task = rtuContext.currentProgressTask;
-                rtuContext.setCurrentProgressTask(null);
-                rtuContext.changesManager().removeChangeProgress(task);
-                rtuContext.changesManager().clearChanges();
+                rtuContext.closeDetails();
             }
         }
     }

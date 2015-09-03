@@ -31,6 +31,8 @@ namespace rtu
 
         void removeChangeProgress(QObject *object);
 
+        bool releaseOwning(QObject *object);
+
     public slots:
 
         QObject *taskAtIndex(int index);

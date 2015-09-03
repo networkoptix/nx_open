@@ -143,7 +143,7 @@ Item
             id: minimizeButton;
 
             height: Common.SizeManager.clickableSizes.medium;
-            width: height * 3;
+            width: height * 6;
             anchors
             {
                 right: parent.right;
@@ -152,11 +152,11 @@ Item
                 rightMargin: Common.SizeManager.spacing.medium;
             }
 
-            text: qsTr("Minimize");
+            text: qsTr("Change other settings");
 
             onClicked:
             {
-                rtuContext.setCurrentProgressTask(null);
+                rtuContext.changeOtherSettings();
             }
         }
     }

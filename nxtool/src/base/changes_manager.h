@@ -26,12 +26,16 @@ namespace rtu
         
         virtual ~ChangesManager();
         
-    public slots:
-        QObject *changesProgressModel();
+        ChangesProgressModel *changesProgressModel();
 
         ApplyChangesTask *notMinimizedTask();
 
-        void removeChangeProgress(QObject *task);
+        void releaseNotMinimizedTaskOwning();
+
+        void minimizeProgress();
+
+    public slots:
+        QObject *changesProgressModelObject();
 
     public slots:
         void addSystemChange(const QString &systemName);
@@ -62,8 +66,6 @@ namespace rtu
         void turnOnDhcp();
         
         void applyChanges();
-        
-        void minimizeProgress();
 
         void clearChanges();
         

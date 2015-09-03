@@ -123,9 +123,6 @@ FocusScope
         {
             rtuContext.changesManager().clearChanges();
         }
-
-        //rtuContext.changesManager().minimizeProgress();
-        //rtuContext.changesManager().changesProgressModel().removeChangeProgress(0);
     }
     
     Rtu.OutdatedWarningPanel

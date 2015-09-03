@@ -166,6 +166,7 @@ rtu::ApplyChangesTask::ApplyChangesTask(rtu::RtuContext *context
 
 rtu::ApplyChangesTask::~ApplyChangesTask()
 {
+    qDebug() << "-------------------- " << "deleting ";
 }
 
 void rtu::ApplyChangesTask::setAutoremoveOnComplete()

@@ -96,7 +96,7 @@ Window
             {
                 id: progressListView;
 
-                model: rtuContext.changesManager().changesProgressModel();
+                model: rtuContext.changesManager().changesProgressModelObject();
             }
         }
 
@@ -127,8 +127,6 @@ Window
                 
                 function reloadPage()
                 {
-                    console.log("---- Reloading page to ", rtuContext.currentPage);
-
                     loader.sourceComponent = undefined;
                     switch(rtuContext.currentPage)
                     {

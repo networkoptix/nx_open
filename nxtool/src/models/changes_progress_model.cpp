@@ -51,7 +51,7 @@ void rtu::ChangesProgressModel::taskStateChanged(const ApplyChangesTask *task
 
     const int row = (it - m_tasks.begin());
     const auto ind = index(row);
-    dataChanged(ind, ind, QVector<int>(1, role));
+    dataChanged(ind, ind);
 }
 
 void rtu::ChangesProgressModel::addChangeProgress(ApplyChangesTaskPtr &&task)
@@ -89,6 +89,22 @@ void rtu::ChangesProgressModel::removeChangeProgress(QObject *object)
         task->setAutoremoveOnComplete();
     }
     m_tasks.erase(it);
+}
+
+bool rtu::ChangesProgressModel::releaseOwning(QObject *object)
+{
+    const auto it = std::find_if(m_tasks.begin(), m_tasks.end()
+        , [object](const ApplyChangesTaskPtr &item) { return (item.get() == object);});
+    if (it == m_tasks.end())
+        return false;
+
+    const int index = (it - m_tasks.begin());
+    const auto removeGuard = m_changeHelper->removeRowsGuard(index, index);
+    Q_UNUSED(removeGuard);
+    
+    it->release();
+    m_tasks.erase(it);
+    return true;
 }
 
 QObject *rtu::ChangesProgressModel::taskAtIndex(int index)

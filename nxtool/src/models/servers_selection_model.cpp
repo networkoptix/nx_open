@@ -1157,8 +1157,6 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
         /// TODO: #ynikitenkov change for QElapsedTimer implementation
         systemModelInfo->servers.push_back(ServerModelInfo(QDateTime::currentMSecsSinceEpoch(), selected
             , loginState, isBusy, info));
-        qDebug() << "Add server with " << isBusy;
-
     }
 
     systemModelInfo->loggedServers += (loginState == kServerLoggedInState ? 1 : 0);
@@ -1208,7 +1206,6 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
         removeServerImpl(baseInfo.id, targetSystemExists);
         foundServer.setBaseInfo(baseInfo);
         addServer(foundServer, selected, searchInfo.serverInfoIterator->isBusy);
-        qDebug() << "change server isBusy is " << searchInfo.serverInfoIterator->isBusy;
     }
     else
     {
@@ -1249,7 +1246,6 @@ void rtu::ServersSelectionModel::Impl::setBusyState(const IDsVector &ids
             continue;
 
         ServerModelInfo &modelInfo = *searchInfo.serverInfoIterator;
-        qDebug() << "set is busy from " << modelInfo.isBusy << " to " << isBusy;
         if (modelInfo.isBusy == isBusy)
             continue;
 
