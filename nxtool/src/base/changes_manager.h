@@ -12,13 +12,11 @@ namespace rtu
     class RtuContext;
     class HttpClient;
     class ServersSelectionModel;
-    
+    class ApplyChangesTask;
+
     class ChangesManager : public QObject
     {
         Q_OBJECT
-        
-        Q_PROPERTY(int totalChangesCount READ totalChangesCount NOTIFY totalChangesCountChanged)
-        Q_PROPERTY(int appliedChangesCount READ appliedChangesCount NOTIFY appliedChangesCountChanged)
 
     public:
         ChangesManager(RtuContext *context
@@ -29,10 +27,13 @@ namespace rtu
         virtual ~ChangesManager();
         
     public slots:
-        QObject *successfulResultsModel();
-        
-        QObject *failedResultsModel();
-        
+        QObject *changesProgressModel();
+
+        ApplyChangesTask *notMinimizedTask();
+
+        void removeChangeProgress(QObject *task);
+
+    public slots:
         void addSystemChange(const QString &systemName);
         
         void addPasswordChange(const QString &password);
@@ -62,27 +63,26 @@ namespace rtu
         
         void applyChanges();
         
+        void minimizeProgress();
+
         void clearChanges();
         
     public slots:
-        int totalChangesCount() const;
-        
-        int appliedChangesCount() const;
-        
         void serverDiscovered(const rtu::BaseServerInfo &info);
         
         void serversDisappeared(const IDsVector &ids);
 
         void unknownAdded(const QString &ip);
 
-    signals:
-        void totalChangesCountChanged();
-        
-        void appliedChangesCountChanged();
-        
     private:
-        class Impl;
-        
-        Impl * const m_impl;
+        ApplyChangesTaskPtr &changeTask();
+
+    private:
+        RtuContext * const m_context;
+        HttpClient * const m_httpClient;
+        ServersSelectionModel * const m_selectionModel;
+
+        const ChangesProgressModelPtr m_changesModel;
+        ApplyChangesTaskPtr m_currentTask;
     };
 }

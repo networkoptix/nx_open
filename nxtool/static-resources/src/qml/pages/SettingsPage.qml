@@ -78,6 +78,7 @@ FocusScope
 
     function applyChanges()
     {
+        console.log("n\n\n\n\n\n\n")
         var children = settingsColumn.children;
         var childrenCount = children.length;
         var changesCount = 0;
@@ -114,12 +115,17 @@ FocusScope
                     , finishCallback, cancelCallback);
             }
             else
+            {
                 rtuContext.changesManager().applyChanges();
+            }
         }
         else
         {
             rtuContext.changesManager().clearChanges();
         }
+
+        //rtuContext.changesManager().minimizeProgress();
+        //rtuContext.changesManager().changesProgressModel().removeChangeProgress(0);
     }
     
     Rtu.OutdatedWarningPanel
@@ -250,7 +256,11 @@ FocusScope
                 width: height * 3;
                 
                 enabled: applyButton.enabled;
-                onClicked: rtuContext.selectionChanged();
+                onClicked:
+                {
+                    rtuContext.selectionChanged();
+                    rtuContext.changesManager().clearChanges();
+                }
             }
         }
     }

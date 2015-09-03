@@ -9,6 +9,8 @@
 
 namespace rtu
 {
+    class ApplyChangesTask;
+
     class RtuContext : public QObject
     {
         Q_OBJECT
@@ -16,7 +18,7 @@ namespace rtu
         Q_PROPERTY(int currentPage READ currentPage
             WRITE setCurrentPage NOTIFY currentPageChanged)
         Q_PROPERTY(QObject* selection READ selection NOTIFY selectionChanged)
-
+        Q_PROPERTY(QObject* currentProgressTask READ currentProgressTask NOTIFY currentProgressTaskChanged)
         Q_PROPERTY(QString toolDisplayName READ toolDisplayName NOTIFY toolInfoChanged)
 
         Q_PROPERTY(bool isBeta READ isBeta NOTIFY toolInfoChanged)
@@ -53,7 +55,13 @@ namespace rtu
         QObject *timeZonesModel(QObject *parent);
         
         QObject *changesManager();
-        
+
+        QObject *currentProgressTask();
+
+        void setCurrentProgressTask(QObject *task);
+
+        void currentProgressTaskComplete();
+
         bool isValidSubnetMask(const QString &mask) const;
 
         bool isDiscoverableFromCurrentNetwork(const QString &ip
@@ -71,7 +79,7 @@ namespace rtu
         
         void tryLoginWith(const QString &primarySystem
             , const QString &password);
-        
+
     public:
         QString toolDisplayName() const;
 
@@ -95,6 +103,8 @@ namespace rtu
         void showWarningsChanged();
 
         void loginOperationFailed(const QString &primarySystem);
+
+        void currentProgressTaskChanged();
         
     private:
         class Impl;

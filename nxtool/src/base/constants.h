@@ -30,6 +30,7 @@ namespace rtu
             SettingsPage
             , ProgressPage
             , SummaryPage
+            ,  EmptyPage
         };
         Q_ENUMS(Pages)
         

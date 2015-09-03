@@ -63,7 +63,7 @@ Item
                         right: parent.right;
                     }
 
-                    model: rtuContext.changesManager().successfulResultsModel();
+                    model: rtuContext.currentProgressTask.successfulResultsModel();
                 }
                 
                 Rtu.ChangesSummary
@@ -78,7 +78,7 @@ Item
                     successfulSummary: false;
                     visible: model.changesCount;
                     caption: qsTr("%1 errors").arg(model.changesCount);
-                    model: rtuContext.changesManager().failedResultsModel();
+                    model: rtuContext.currentProgressTask.failedResultsModel();
                 }
             }
         }
@@ -125,8 +125,10 @@ Item
             text: qsTr("Ok");
             onClicked:
             {
-                rtuContext.selectionModel().selectionChanged();
-                rtuContext.currentPage = NxRtu.Constants.SettingsPage;
+                var task = rtuContext.currentProgressTask;
+                rtuContext.setCurrentProgressTask(null);
+                rtuContext.changesManager().removeChangeProgress(task);
+                rtuContext.changesManager().clearChanges();
             }
         }
     }

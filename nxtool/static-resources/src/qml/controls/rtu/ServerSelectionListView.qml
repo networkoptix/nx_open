@@ -58,6 +58,7 @@ ListView
                 
                 systemName: model.systemName;
                 loggedState: model.loggedState;
+
                 selectedState: model.selectedState;
 
                 onSelectionStateShouldBeChanged:
@@ -78,7 +79,7 @@ ListView
             
             Rtu.ServerItemDelegate
             {
-                loggedIn: model.loggedIn;
+                loggedIn: model.loggedIn && !model.isBusy;
                 serverName: model.name;
                 macAddress: model.macAddress;
                 selectedState: model.selectedState;
@@ -200,6 +201,9 @@ ListView
             else
             {
                 changeFunc();
+                console.log("-------------------")
+                rtuContext.changesManager().clearChanges();
+                rtuContext.currentPage = NxRtu.Constants.SettingsPage;
             }
         }
     }

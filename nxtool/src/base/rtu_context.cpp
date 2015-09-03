@@ -6,6 +6,7 @@
 #include <base/selection.h>
 #include <base/servers_finder.h>
 #include <base/changes_manager.h>
+#include <base/apply_changes_task.h>
 #include <models/time_zones_model.h>
 #include <models/ip_settings_model.h>
 #include <models/servers_selection_model.h>
@@ -28,6 +29,12 @@ public:
     
     rtu::ChangesManager *changesManager();
     
+    QObject *currentProgressTask();
+
+    void setCurrentProgressTask(ApplyChangesTask *task);
+
+    void currentProgressTaskComplete();
+
     rtu::HttpClient *httpClient();
 
     ///
@@ -52,7 +59,7 @@ private:
     SelectionPointer m_selection;
     rtu::ChangesManager * const m_changesManager;
     const rtu::ServersFinder::Holder m_serversFinder;
-    
+    ApplyChangesTask *m_currentProgressTask;
     rtu::Constants::Pages m_currentPageIndex;
     bool m_showWarnings;
 };
@@ -68,6 +75,7 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
         parent, m_httpClient, m_selectionModel, this))
     , m_serversFinder(ServersFinder::create())
 
+    , m_currentProgressTask(nullptr)
     , m_currentPageIndex(rtu::Constants::SettingsPage)
     , m_showWarnings(true)
 {
@@ -126,12 +134,74 @@ rtu::ChangesManager *rtu::RtuContext::Impl::changesManager()
     return m_changesManager;
 }
 
+QObject *rtu::RtuContext::Impl::currentProgressTask()
+{
+    return m_currentProgressTask;
+}
+
+void rtu::RtuContext::Impl::setCurrentProgressTask(ApplyChangesTask *task)
+{
+    if (task == m_currentProgressTask)
+        return;
+    
+    if (m_currentProgressTask)
+    {
+        /// Minimize current showing task
+        ApplyChangesTask *notMinimizedTask = m_changesManager->notMinimizedTask();
+        if (notMinimizedTask == m_currentProgressTask)
+        {
+            if (notMinimizedTask->inProgress())
+                m_changesManager->minimizeProgress();
+            else
+                m_changesManager->removeChangeProgress(notMinimizedTask);
+        }
+//        else
+//        {
+//            m_changesManager->removeChangeProgress(m_currentProgressTask);
+//        }
+    }
+
+    m_currentProgressTask = task;
+
+    if (m_currentProgressTask)
+    {
+        if (m_currentProgressTask->inProgress())
+        {
+            m_selectionModel->setAllItemSelected(false);
+            setCurrentPage(Constants::ProgressPage);
+        }
+        else
+            currentProgressTaskComplete();
+    }
+    else
+    {
+        setCurrentPage(Constants::SettingsPage);
+        emit m_selectionModel->selectionChanged();
+    }
+
+    m_owner->currentProgressTaskChanged();
+}
+
+void rtu::RtuContext::Impl::currentProgressTaskComplete()
+{
+    if (!m_currentProgressTask)
+        return;
+
+    setCurrentPage(Constants::SummaryPage);
+
+    m_selectionModel->setSelectedItems(m_currentProgressTask->targetServerIds());
+}
+
+
 void rtu::RtuContext::Impl::setCurrentPage(rtu::Constants::Pages pageId)
 {
+    qDebug() << "++++ " << m_currentPageIndex << " " << pageId;
     if (m_currentPageIndex == pageId)
         return;
     
     m_currentPageIndex = pageId;
+    if (m_currentPageIndex == Constants::SettingsPage)
+        setCurrentProgressTask(nullptr);
     emit m_owner->currentPageChanged();
 }
 
@@ -186,6 +256,22 @@ QObject *rtu::RtuContext::timeZonesModel(QObject *parent)
 QObject *rtu::RtuContext::changesManager()
 {
     return m_impl->changesManager();
+}
+
+QObject *rtu::RtuContext::currentProgressTask()
+{
+    return m_impl->currentProgressTask();
+}
+
+void rtu::RtuContext::setCurrentProgressTask(QObject *task)
+{
+    ApplyChangesTask * const taskPtr = dynamic_cast<ApplyChangesTask *>(task);
+    m_impl->setCurrentProgressTask(taskPtr);
+}
+
+void rtu::RtuContext::currentProgressTaskComplete()
+{
+    m_impl->currentProgressTaskComplete();
 }
 
 bool isValidIpV4Address(const QString &address)

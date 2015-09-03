@@ -7,6 +7,7 @@
 #include <QString>
 #include <QScopedPointer>
 
+#include <memory>
 #include <functional>
 
 namespace rtu
@@ -26,4 +27,10 @@ namespace rtu
     typedef QSharedPointer<bool> BoolPointer;
 
     typedef std::function<void ()> Callback;
+
+    class ApplyChangesTask;
+    typedef std::unique_ptr<ApplyChangesTask> ApplyChangesTaskPtr;
+
+    class ChangesProgressModel;
+    typedef std::unique_ptr<ChangesProgressModel> ChangesProgressModelPtr;
 }
