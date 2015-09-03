@@ -30,12 +30,12 @@ SystemManager::SystemManager(nx::db::DBManager* const dbManager) throw(std::runt
 void SystemManager::bindSystemToAccount(
     const AuthorizationInfo& authzInfo,
     data::SystemRegistrationData registrationData,
-    std::function<void(ResultCode, data::SystemData)> completionHandler)
+    std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
     QnUuid accountID;
     if (!authzInfo.get(cdb::param::accountID, &accountID))
     {
-        completionHandler(ResultCode::notAuthorized, data::SystemData());
+        completionHandler(api::ResultCode::notAuthorized, data::SystemData());
         return;
     }
 
@@ -53,7 +53,7 @@ void SystemManager::bindSystemToAccount(
 void SystemManager::unbindSystem(
     const AuthorizationInfo& authzInfo,
     data::SystemID systemID,
-    std::function<void(ResultCode)> completionHandler)
+    std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::SystemID>(
@@ -83,7 +83,7 @@ bool applyFilter(
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
     DataFilter filter,
-    std::function<void(ResultCode, data::SystemDataList)> completionHandler )
+    std::function<void(api::ResultCode, data::SystemDataList)> completionHandler )
 {
     stree::MultiIteratableResourceReader wholeFilter(filter, authzInfo);
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
@@ -94,7 +94,7 @@ void SystemManager::getSystems(
         //selecting system by id
         auto system = m_cache.find(systemID.get().value<QnUuid>());
         if (!system || !applyFilter(system.get(), wholeFilter))
-            return completionHandler(ResultCode::notFound, resultData);
+            return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
     }
     //    else if(auto accountID = wholeFilterMap.get<QnUuid>(cdb::param::accountID)) 
@@ -110,14 +110,14 @@ void SystemManager::getSystems(
     }
 
     completionHandler(
-        ResultCode::ok,
+        api::ResultCode::ok,
         resultData);
 }
 
 void SystemManager::shareSystem(
     const AuthorizationInfo& authzInfo,
     data::SystemSharing sharingData,
-    std::function<void(ResultCode)> completionHandler)
+    std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::SystemSharing>(
@@ -131,11 +131,11 @@ boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id
     return m_cache.find(id);
 }
 
-data::SystemAccessRole::Value SystemManager::getAccountRightsForSystem(
+api::SystemAccessRole::Value SystemManager::getAccountRightsForSystem(
     const QnUuid& accountID, const QnUuid& systemID) const
 {
     //TODO #ak
-    return data::SystemAccessRole::none;
+    return api::SystemAccessRole::none;
 }
 
 nx::db::DBResult SystemManager::insertSystemToDB(
@@ -151,7 +151,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     systemData->name = newSystem.name;
     systemData->authKey = QnUuid::createUuid().toStdString();
     systemData->ownerAccountID = newSystem.accountID;
-    systemData->status = data::SystemStatus::ssNotActivated;
+    systemData->status = api::SystemStatus::ssNotActivated;
     QnSql::bind(*systemData, &insertSystemQuery);
     if (!insertSystemQuery.exec())
     {
@@ -167,7 +167,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
         " VALUES( :accountID, :systemID, :accessRole )");
     insertSystemToAccountBinding.bindValue(":accountID", QnSql::serialized_field(newSystem.accountID));
     insertSystemToAccountBinding.bindValue(":systemID", QnSql::serialized_field(systemData->id));
-    insertSystemToAccountBinding.bindValue(":accessRole", data::SystemAccessRole::owner);
+    insertSystemToAccountBinding.bindValue(":accessRole", api::SystemAccessRole::owner);
     if (!insertSystemToAccountBinding.exec())
     {
         NX_LOG(lit("Could not insert system %1 to account %2 binding into DB. %3").
@@ -183,7 +183,7 @@ void SystemManager::systemAdded(
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccountID systemRegistrationData,
     data::SystemData systemData,
-    std::function<void(ResultCode, data::SystemData)> completionHandler)
+    std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
     {
@@ -193,8 +193,8 @@ void SystemManager::systemAdded(
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
-        ? ResultCode::ok
-        : ResultCode::dbError,
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError,
         std::move(systemData));
 }
 
@@ -222,7 +222,7 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
 void SystemManager::systemSharingAdded(
     nx::db::DBResult dbResult,
     data::SystemSharing sytemSharing,
-    std::function<void(ResultCode)> completionHandler)
+    std::function<void(api::ResultCode)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
     {
@@ -230,8 +230,8 @@ void SystemManager::systemSharingAdded(
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
-        ? ResultCode::ok
-        : ResultCode::dbError);
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError);
 }
 
 nx::db::DBResult SystemManager::deleteSystemFromDB(
@@ -266,7 +266,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 void SystemManager::systemDeleted(
     nx::db::DBResult dbResult,
     data::SystemID systemID,
-    std::function<void(ResultCode)> completionHandler)
+    std::function<void(api::ResultCode)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
     {
@@ -275,8 +275,8 @@ void SystemManager::systemDeleted(
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
-        ? ResultCode::ok
-        : ResultCode::dbError);
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError);
 }
 
 nx::db::DBResult SystemManager::fillCache()

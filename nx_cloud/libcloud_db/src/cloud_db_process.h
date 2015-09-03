@@ -52,7 +52,6 @@ protected:
 private:
     int m_argc;
     char** m_argv;
-    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(

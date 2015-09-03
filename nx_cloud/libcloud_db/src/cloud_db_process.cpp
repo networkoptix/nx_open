@@ -132,17 +132,17 @@ int CloudDBProcess::executeApplication()
             &accountManager,
             &systemManager );
     
-        m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>(
+        MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             httpAddrToListenList,
             false,  //TODO #ak enable ssl when it works properly
-            SocketFactory::nttDisabled ) );
-    
-        if( !m_multiAddressHttpServer->bind() )
+            SocketFactory::nttDisabled );
+
+        if( !multiAddressHttpServer.bind() )
             return 3;
     
         //TODO: #ak process privilege reduction should be made here
     
-        if( !m_multiAddressHttpServer->listen() )
+        if( !multiAddressHttpServer.listen() )
             return 5;
     
         NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );

@@ -12,21 +12,21 @@ namespace nx {
 namespace cdb {
 
 
-ResultCode fromDbResultCode( nx::db::DBResult dbResult )
+api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
 {
     switch( dbResult )
     {
         case nx::db::DBResult::ok:
-            return ResultCode::ok;
+            return api::ResultCode::ok;
 
         case nx::db::DBResult::notFound:
-            return ResultCode::notFound;
+            return api::ResultCode::notFound;
 
         case nx::db::DBResult::ioError:
-            return ResultCode::dbError;
+            return api::ResultCode::dbError;
     }
 
-    return ResultCode::dbError;
+    return api::ResultCode::dbError;
 }
 
 

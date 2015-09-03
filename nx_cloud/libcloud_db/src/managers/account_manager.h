@@ -47,17 +47,17 @@ public:
     void addAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountData accountData,
-        std::function<void(ResultCode)> completionHandler );
+        std::function<void(api::ResultCode)> completionHandler );
     //!On success, account moved to "activated" state
     void verifyAccountEmailAddress(
         const AuthorizationInfo& authzInfo,
         data::EmailVerificationCode emailVerificationCode,
-        std::function<void(ResultCode)> completionHandler );
+        std::function<void(api::ResultCode)> completionHandler );
     
     //!Retrieves account corresponding to authorization data \a authzInfo
     void getAccount(
         const AuthorizationInfo& authzInfo,
-        std::function<void(ResultCode, data::AccountData)> completionHandler );
+        std::function<void(api::ResultCode, data::AccountData)> completionHandler );
 
     boost::optional<data::AccountData> findAccountByUserName(
         const nx::String& userName ) const;
@@ -80,7 +80,7 @@ private:
         nx::db::DBResult resultCode,
         data::AccountData accountData,
         data::EmailVerificationCode resultData,
-        std::function<void(ResultCode)> completionHandler );
+        std::function<void(api::ResultCode)> completionHandler );
 
     //verify_account DB operations
     nx::db::DBResult verifyAccount(
@@ -91,7 +91,7 @@ private:
         nx::db::DBResult resultCode,
         data::EmailVerificationCode verificationCode,
         const QnUuid accountID,
-        std::function<void( ResultCode )> completionHandler );
+        std::function<void(api::ResultCode)> completionHandler );
 };
 
 }   //cdb

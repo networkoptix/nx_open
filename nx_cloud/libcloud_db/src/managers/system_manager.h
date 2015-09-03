@@ -62,12 +62,12 @@ public:
     void bindSystemToAccount(
         const AuthorizationInfo& authzInfo,
         data::SystemRegistrationData registrationData,
-        std::function<void(ResultCode, data::SystemData)> completionHandler);
+        std::function<void(api::ResultCode, data::SystemData)> completionHandler);
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemID systemID,
-        std::function<void(ResultCode)> completionHandler);
-    //!Fetches systems sutisfying specified \a filter
+        std::function<void(api::ResultCode)> completionHandler);
+    //!Fetches systems satisfying specified \a filter
     /*!
         \param eventReceiver Events related to returned data are reported to this functor
         \note It is garanteed that events are delivered after \a completionHandler has returned and only if request was a success
@@ -77,33 +77,33 @@ public:
     void getSystems(
         const AuthorizationInfo& authzInfo,
         DataFilter filter,
-        std::function<void(ResultCode, data::SystemDataList)> completionHandler );
+        std::function<void(api::ResultCode, data::SystemDataList)> completionHandler );
     //!Share system with specified account. Operation allowed for system owner and editor_with_sharing only
     void shareSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
-        std::function<void(ResultCode)> completionHandler);
+        std::function<void(api::ResultCode)> completionHandler);
 
     void addSubscription(
         const AuthorizationInfo& authzInfo,
         const QnUuid& systemID,
         const QnUuid& productID,
-        std::function<void(ResultCode)> completionHandler);
+        std::function<void(api::ResultCode)> completionHandler);
     /*!
         \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
     */
     void getActiveSubscriptions(
         const AuthorizationInfo& authzInfo,
         const QnUuid& systemID,
-        std::function<void(ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
+        std::function<void(api::ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
 
     boost::optional<data::SystemData> findSystemByID(const QnUuid& id) const;
     /*!
-        \return \a data::SystemAccessRole::none is returned if\n
+        \return \a api::SystemAccessRole::none is returned if\n
         - \a accountID has no rights for \a systemID
         - \a accountID or \a systemID is unknown
     */
-    data::SystemAccessRole::Value getAccountRightsForSystem(
+    api::SystemAccessRole::Value getAccountRightsForSystem(
         const QnUuid& accountID, const QnUuid& systemID) const;
 
     /*!
@@ -129,7 +129,7 @@ private:
         nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccountID systemRegistrationData,
         data::SystemData systemData,
-        std::function<void(ResultCode, data::SystemData)> completionHandler);
+        std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
     nx::db::DBResult insertSystemSharingToDB(
         QSqlDatabase* const connection,
@@ -137,7 +137,7 @@ private:
     void systemSharingAdded(
         nx::db::DBResult dbResult,
         data::SystemSharing sytemSharing,
-        std::function<void(ResultCode)> completionHandler);
+        std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult deleteSystemFromDB(
         QSqlDatabase* const connection,
@@ -145,7 +145,7 @@ private:
     void systemDeleted(
         nx::db::DBResult dbResult,
         data::SystemID systemID,
-        std::function<void(ResultCode)> completionHandler);
+        std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchSystems(QSqlDatabase* connection, int* const /*dummy*/);

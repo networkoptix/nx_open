@@ -13,15 +13,19 @@
 
 namespace nx {
 namespace cdb {
-namespace data {
+
+namespace api {
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
-    (asInvalid,  "invalid")
+    (asInvalid, "invalid")
     (asAwaitingEmailConfirmation, "awaitingEmailConfirmation")
-    (asActivated,    "activated")
-    (asBlocked,   "blocked")
-)
+    (asActivated, "activated")
+    (asBlocked, "blocked")
+    )
+}   //api
 
+
+namespace data {
 
 bool AccountData::getAsVariant( int resID, QVariant* const value ) const
 {
@@ -45,9 +49,9 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData
     accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toStdString();
     bool success = true;
     accountData->statusCode = urlQuery.hasQueryItem( lit( "statusCode" ) )
-        ? QnLexical::deserialized<AccountStatus>(
-            urlQuery.queryItemValue( lit( "statusCode" ) ), asInvalid, &success )
-        : asInvalid;
+        ? QnLexical::deserialized<api::AccountStatus>(
+            urlQuery.queryItemValue( lit( "statusCode" ) ), api::asInvalid, &success )
+        : api::asInvalid;
     return success;
 }
 

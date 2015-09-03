@@ -1,0 +1,31 @@
+/**********************************************************
+* Sep 3, 2015
+* akolesnikov
+***********************************************************/
+
+#ifndef NX_CDB_API_ACCOUNT_MANAGER_H
+#define NX_CDB_API_ACCOUNT_MANAGER_H
+
+#include <functional>
+
+#include "account_data.h"
+#include "result_code.h"
+
+
+namespace nx {
+namespace cdb {
+namespace api {
+
+class AccountManager
+{
+public:
+    //!Fetches account info if credentails are account credentials
+    virtual void getAccount(
+        std::function<void(ResultCode, AccountData)> completionHandler) = 0;
+};
+
+}   //api
+}   //cdb
+}   //nx
+
+#endif  //NX_CDB_API_ACCOUNT_MANAGER_H

@@ -17,21 +17,13 @@
 #include <utils/db/types.h>
 #include <utils/fusion/fusion_fwd.h>
 
+#include <cdb/result_code.h>
+
 
 namespace nx {
 namespace cdb {
 
-enum class ResultCode
-{
-    ok,
-    notAuthorized,
-    notFound,
-    alreadyExists,
-    dbError,
-    notImplemented
-};
-
-ResultCode fromDbResultCode( nx::db::DBResult );
+api::ResultCode fromDbResultCode( nx::db::DBResult );
 
 enum class EntityType
 {

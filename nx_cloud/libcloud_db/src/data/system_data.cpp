@@ -12,10 +12,9 @@
 
 namespace nx {
 namespace cdb {
-namespace data {
 
-namespace SystemAccessRole
-{
+namespace api {
+namespace SystemAccessRole {
     QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( Value,
         (SystemAccessRole::none, "none")
         (SystemAccessRole::owner, "owner")
@@ -31,23 +30,14 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( SystemStatus,
     (ssNotActivated, "notActivated")
     (ssActivated, "activated")
 )
+}   //api
+
+namespace data {
 
 
 ////////////////////////////////////////////////////////////
 //// class SystemRegistrationData
 ////////////////////////////////////////////////////////////
-
-SystemRegistrationData::SystemRegistrationData(SystemRegistrationData&& right)
-:
-    name(std::move(right.name))
-{
-}
-
-SystemRegistrationData::SystemRegistrationData(const SystemRegistrationData& right)
-:
-    name(right.name)
-{
-}
 
 bool SystemRegistrationData::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
 {
@@ -64,50 +54,8 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemRegistrationData* const 
 
 
 ////////////////////////////////////////////////////////////
-//// class SystemRegistrationDataWithAccountID
-////////////////////////////////////////////////////////////
-
-SystemRegistrationDataWithAccountID::SystemRegistrationDataWithAccountID(
-    SystemRegistrationDataWithAccountID&& right)
-:
-    SystemRegistrationData(std::move(right)),
-    accountID(std::move(right.accountID))
-{
-}
-
-SystemRegistrationDataWithAccountID::SystemRegistrationDataWithAccountID(
-    const SystemRegistrationDataWithAccountID& right)
-:
-    SystemRegistrationData(right),
-    accountID(right.accountID)
-{
-}
-
-////////////////////////////////////////////////////////////
 //// class SystemData
 ////////////////////////////////////////////////////////////
-
-SystemData::SystemData(SystemData&& right)
-:
-    id(std::move(right.id)),
-    name(std::move(right.name)),
-    authKey(std::move(right.authKey)),
-    ownerAccountID(std::move(right.ownerAccountID)),
-    status(std::move(right.status)),
-    cloudConnectionSubscriptionStatus(std::move(right.cloudConnectionSubscriptionStatus))
-{
-}
-
-SystemData::SystemData(const SystemData& right)
-:
-    id(right.id),
-    name(right.name),
-    authKey(right.authKey),
-    ownerAccountID(right.ownerAccountID),
-    status(right.status),
-    cloudConnectionSubscriptionStatus(right.cloudConnectionSubscriptionStatus)
-{
-}
 
 bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 {
@@ -127,41 +75,8 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 
 
 ////////////////////////////////////////////////////////////
-//// class SystemDataList
-////////////////////////////////////////////////////////////
-
-SystemDataList::SystemDataList(const SystemDataList& right)
-:
-    systems(right.systems)
-{
-}
-
-SystemDataList::SystemDataList(SystemDataList&& right)
-:
-    systems(std::move(right.systems))
-{
-}
-
-
-////////////////////////////////////////////////////////////
 //// class SystemSharing
 ////////////////////////////////////////////////////////////
-
-SystemSharing::SystemSharing(const SystemSharing& right)
-:
-    accountID(right.accountID),
-    systemID(right.systemID),
-    accessRole(right.accessRole)
-{
-}
-
-SystemSharing::SystemSharing(SystemSharing&& right)
-:
-    accountID(std::move(right.accountID)),
-    systemID(std::move(right.systemID)),
-    accessRole(std::move(right.accessRole))
-{
-}
 
 bool SystemSharing::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
 {
@@ -177,8 +92,8 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSha
     systemSharing->systemID = QnUuid::fromStringSafe(urlQuery.queryItemValue("systemID"));
     systemSharing->accountID = QnUuid::fromStringSafe(urlQuery.queryItemValue("accountID"));
     bool success = false;
-    systemSharing->accessRole = QnLexical::deserialized<SystemAccessRole::Value>(
-        urlQuery.queryItemValue(lit("accessRole")), SystemAccessRole::none, &success );
+    systemSharing->accessRole = QnLexical::deserialized<api::SystemAccessRole::Value>(
+        urlQuery.queryItemValue(lit("accessRole")), api::SystemAccessRole::none, &success );
     return success;
 }
 
@@ -186,18 +101,6 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSha
 ////////////////////////////////////////////////////////////
 //// class SystemID
 ////////////////////////////////////////////////////////////
-
-SystemID::SystemID(const SystemID& right)
-:
-    id(right.id)
-{
-}
-
-SystemID::SystemID(SystemID&& right)
-:
-    id(std::move(right.id))
-{
-}
 
 bool SystemID::getAsVariant(int resID, QVariant* const value) const
 {
