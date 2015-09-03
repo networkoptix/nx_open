@@ -22,8 +22,38 @@ class ListeningPeerPool
 public:
     ListeningPeerPool( stun::MessageDispatcher* dispatcher );
 
+    void bind( const ConnectionSharedPtr& connection, stun::Message message );
     void listen( const ConnectionSharedPtr& connection, stun::Message message );
     void connect( const ConnectionSharedPtr& connection, stun::Message message );
+
+protected:
+    struct MediaserverPeer
+    {
+        ConnectionWeakPtr connection;
+        std::list< SocketAddress > endpoints;
+        bool isListening;
+
+        MediaserverPeer( ConnectionWeakPtr connection_ );
+    };
+
+    struct SystemPeers
+    {
+    public:
+        boost::optional< MediaserverPeer& > peer(
+                ConnectionWeakPtr connection,
+                const RequestProcessor::MediaserverData& mediaserver,
+                QnMutex* mutex );
+
+        boost::optional< MediaserverPeer& > search( String hostName );
+
+    private:
+        std::map< String,              // System Id
+            std::map< String,          // Server Id
+                      MediaserverPeer > > m_peers;
+    };
+
+    QnMutex m_mutex;
+    SystemPeers m_peers;
 };
 
 } // namespace hpm

@@ -25,7 +25,7 @@ public:
     MediaserverApiMock( stun::MessageDispatcher* dispatcher )
         : MediaserverApiIf( dispatcher ) {}
 
-    MOCK_METHOD2( pingServer, bool( const SocketAddress&, const QnUuid& ) );
+    MOCK_METHOD2( pingServer, bool( const SocketAddress&, const String& ) );
 };
 
 class StunCustomTest : public testing::Test
@@ -53,15 +53,15 @@ protected:
 
 TEST_F( StunCustomTest, Ping )
 {
-    static const auto SYSTEM_ID = QnUuid::createUuid();
-    static const auto SERVER_ID = QnUuid::createUuid();
+    static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
+    static const auto SERVER_ID = QnUuid::createUuid().toSimpleString().toUtf8();
+    static const auto HOST_NAME = SERVER_ID + QByteArray(".") + SYSTEM_ID;
 
     static const SocketAddress GOOD_ADDRESS( lit( "hello.world:123" ) );
     static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
 
     Message request( Header( MessageClass::request, methods::ping ) );
-    request.newAttribute< hpm::attrs::SystemId >( SYSTEM_ID );
-    request.newAttribute< hpm::attrs::ServerId >( SERVER_ID );
+    request.newAttribute< hpm::attrs::HostName >( HOST_NAME );
     request.newAttribute< hpm::attrs::Authorization >( "some_auth_data" );
 
     std::list< SocketAddress > allEndpoints;

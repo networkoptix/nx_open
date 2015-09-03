@@ -84,6 +84,12 @@ const QString& QnUuid::toString() const
     return m_stringRepresentation.get();
 }
 
+QString QnUuid::toSimpleString() const
+{
+    const auto& s = toString();
+    return s.mid( 1, s.length() - 2 );
+}
+
 std::string QnUuid::toStdString() const
 {
     const auto& byteArray = toByteArray();

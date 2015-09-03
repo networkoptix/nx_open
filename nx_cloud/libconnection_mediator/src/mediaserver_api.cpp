@@ -55,7 +55,7 @@ MediaserverApi::MediaserverApi( stun::MessageDispatcher* dispatcher )
 {
 }
 
-bool MediaserverApi::pingServer( const SocketAddress& address, const QnUuid& expectedId )
+bool MediaserverApi::pingServer( const SocketAddress& address, const String& expectedId )
 {
     QUrl url( address.address.toString() );
     url.setPort( address.port );
@@ -89,11 +89,11 @@ bool MediaserverApi::pingServer( const SocketAddress& address, const QnUuid& exp
         return false;
     }
 
-    if( reply.moduleGuid != expectedId) {
-        NX_LOG( lit("%1 Url %2 moduleGuid %3 doesnt match expectedId %4")
+    if( reply.moduleGuid.toSimpleString().toUtf8() != expectedId ) {
+        NX_LOG( lit("%1 Url %2 moduleGuid '%3' doesnt match expectedId '%4'")
                 .arg( Q_FUNC_INFO ).arg( url.toString() )
                 .arg( reply.moduleGuid.toString() )
-                .arg( expectedId.toString() ), cl_logDEBUG1 );
+                .arg( QString::fromUtf8( expectedId ) ), cl_logDEBUG1 );
         return false;
     }
 

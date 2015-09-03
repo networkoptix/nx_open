@@ -25,16 +25,20 @@ public:
     typedef std::shared_ptr< stun::ServerConnection > ConnectionWeakPtr;
 
 protected:
-    struct MediaserverData { QnUuid systemId, serverId; };
+    struct MediaserverData { String systemId, serverId; };
 
     /** Returns mediaserver data from \a request,
      *  sends \fn errorResponse in case of failure */
     boost::optional< MediaserverData > getMediaserverData(
             ConnectionSharedPtr connection, stun::Message& request );
 
-    /** Send error responce with error code and description */
+    /** Send success responce without attributes */
+    static void successResponse(
+            const ConnectionSharedPtr& connection, stun::Header& request );
+
+    /** Send error responce with error code and description as attribute */
     static void errorResponse(
-            ConnectionSharedPtr connection, stun::Header& request,
+            const ConnectionSharedPtr& connection, stun::Header& request,
             int code, String reason );
 };
 

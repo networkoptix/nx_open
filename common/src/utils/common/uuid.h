@@ -40,6 +40,7 @@ public:
     const QByteArray& toByteArray() const;
     const QByteArray& toRfc4122() const;
     const QString& toString() const;
+    QString toSimpleString() const;
     std::string toStdString() const;
 
     bool operator!=( const QnUuid& other ) const
