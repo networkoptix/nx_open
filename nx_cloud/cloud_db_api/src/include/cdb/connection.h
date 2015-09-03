@@ -22,6 +22,8 @@ namespace cdb {
     Many methods accept \a completionHandler a an argument. 
     This is functor that is called on operation completion/failure 
     and reports \a ResultCode and output data (if applicable).
+    \warning Implementation is allowed to invoke \a completionHandler directly within calling function.
+        This allows all this methods to return \a void
 
     Generally, some methods can be forbidden for credentials.
     E.g., if credentials are system credentials, \a api::AccountManager::getAccount is forbidden
@@ -31,8 +33,8 @@ namespace api {
 class Connection
 {
 public:
-    virtual const std::unique_ptr<AccountManager>& getAccountManager() const = 0;
-    virtual const std::unique_ptr<SystemManager>& getSystemManager() const = 0;
+    virtual api::AccountManager* getAccountManager() = 0;
+    virtual api::SystemManager* getSystemManager() = 0;
 
     //!Set other credentials if they were changed
     /*!
@@ -42,7 +44,7 @@ public:
         const std::string& login,
         const std::string& password) = 0;
     //!Pings cloud_db with current creentials
-    virtual void ping(std::function<void(ResultCode)> completionHandler) = 0;
+    virtual void ping(std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 //!
@@ -51,13 +53,18 @@ class ConnectionFactory
 public:
     //!Connects to cloud_db to check user credentials
     virtual void connect(
+        const std::string& host,
+        unsigned short port,
         const std::string& login,
         const std::string& password,
-        std::function<void(ResultCode, std::unique_ptr<Connection>)> completionHandler) = 0;
+        std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) = 0;
 };
 
-ConnectionFactory* createConnectionFactory();
-void destroyConnectionFactory(ConnectionFactory* factory);
+extern "C"
+{
+    ConnectionFactory* createConnectionFactory();
+    void destroyConnectionFactory(ConnectionFactory* factory);
+}
 
 }   //api
 }   //cdb

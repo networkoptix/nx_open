@@ -21,7 +21,7 @@ class AccountManager
 public:
     //!Fetches account info if credentails are account credentials
     virtual void getAccount(
-        std::function<void(ResultCode, AccountData)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::AccountData)> completionHandler) = 0;
 };
 
 }   //api
