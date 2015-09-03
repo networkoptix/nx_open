@@ -311,9 +311,9 @@ void RandomDataTcpServer::onNewConnection( SystemError::ErrorCode errorCode, Abs
         std::placeholders::_1, std::placeholders::_2 ) );
 }
 
-void RandomDataTcpServer::onConnectionDone( TestConnection* /*connection*/ )
+void RandomDataTcpServer::onConnectionDone( TestConnection* connection )
 {
-    //TODO
+    delete connection;
 }
 
 
@@ -381,7 +381,7 @@ bool ConnectionsGenerator::start()
         if( !m_connections.back()->start() )
         {
             const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
-            std::cerr << "Failure initially starting test connection. " 
+            std::cerr << "Failure initially starting test connection "<<i<<". " 
                 << SystemError::toString(osErrorCode).toStdString() << std::endl;
             m_connections.pop_back();
             return false;
@@ -443,7 +443,9 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
             //if (!m_finishedConnectionsIDs.insert(m_connections.back()->id()).second)
             //    int x = 0;
             //ignoring error for now
+            auto connection = std::move(m_connections.back());
             m_connections.pop_back();
+            lk.unlock();
             return;
         }
 
