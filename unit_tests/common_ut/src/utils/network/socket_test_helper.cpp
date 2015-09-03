@@ -129,6 +129,7 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
 
     if( errorCode != SystemError::noError )
     {
+        m_socket->terminateAsyncIO(true);
         auto handler = std::move( m_handler );
         lk.unlock();
         return handler( id, this, errorCode );
@@ -136,6 +137,7 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
 
     if( !startIO() )
     {
+        m_socket->terminateAsyncIO(true);
         auto handler = std::move( m_handler );
         lk.unlock();
         return handler( id, this, SystemError::getLastOSErrorCode() );
@@ -177,6 +179,7 @@ void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, s
         return;
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
+        m_socket->terminateAsyncIO(true);
         auto handler = std::move(m_handler);
         lk.unlock();
         return handler( id, this, errorCode );
@@ -191,6 +194,7 @@ void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, s
             &m_readBuffer,
             std::bind(&TestConnection::onDataReceived, this, m_id,  _1, _2) ) )
     {
+        m_socket->terminateAsyncIO(true);
         auto handler = std::move( m_handler );
         lk.unlock();
         handler( id, this, SystemError::getLastOSErrorCode() );
@@ -208,6 +212,7 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
         return;
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
+        m_socket->terminateAsyncIO(true);
         auto handler = std::move( m_handler );
         lk.unlock();
         return handler( id, this, errorCode );
@@ -216,6 +221,7 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     m_totalBytesSent += bytesWritten;
     if( m_totalBytesSent >= m_bytesToSendThrough )
     {
+        m_socket->terminateAsyncIO(true);
         auto handler = std::move( m_handler );
         lk.unlock();
         handler( id, this, SystemError::getLastOSErrorCode() );
@@ -227,6 +233,7 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
             m_outData,
             std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) ) )
     {
+        m_socket->terminateAsyncIO(true);
         auto handler = std::move( m_handler );
         lk.unlock();
         handler( id, this, SystemError::getLastOSErrorCode() );
