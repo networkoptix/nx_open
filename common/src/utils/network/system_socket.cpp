@@ -1152,6 +1152,8 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
                     static_cast<Pollable*>(&m_implDelegate), true);
                 aio::AIOService::instance()->removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
+                aio::AIOService::instance()->removeFromWatch(
+                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
                 terminatedPromise.set_value();
             } );
 
@@ -1167,7 +1169,9 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
                     static_cast<Pollable*>(&m_implDelegate), true);
                 aio::AIOService::instance()->removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-            } );
+                aio::AIOService::instance()->removeFromWatch(
+                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
+        } );
     }
 }
 

@@ -213,7 +213,7 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
         lk.unlock();
         if( connectionToCancel )
         {
-            connectionToCancel->cancelAsyncIO();
+            connectionToCancel->terminateAsyncIO(true);
             connectionToCancel.reset();
             ++cancelledConnectionsCount;
         }
@@ -261,7 +261,7 @@ TEST( Socket, HostNameResolveCancellation )
                 done = true;
                 resolvedAddress = connection->getForeignAddress().address;
             } ) );
-        connection->cancelAsyncIO();
+        connection->terminateAsyncIO(true);
     }
 }
 
@@ -292,7 +292,7 @@ TEST( Socket, BadHostNameResolve )
                 int x = 0;
                 static_cast< void >( x );
             } ) );
-        connection->cancelAsyncIO();
+        connection->terminateAsyncIO(true);
     }
 }
 
@@ -326,7 +326,7 @@ TEST( Socket, postCancellation )
                 } );
 
             for( const auto& sock : sockets )
-                sock->cancelAsyncIO();
+                sock->terminateAsyncIO(true);
 
             //QThread::usleep( 100 );
         }
