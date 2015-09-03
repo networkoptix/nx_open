@@ -258,10 +258,9 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
         return;
     }
 
-    QnSoftwareVersion currentVersion = qnCommon->engineVersion();
-    if (m_target.version.major() < currentVersion.major()
-        || (m_target.version.major() == currentVersion.major() && m_target.version.minor() < currentVersion.minor()))
-    {
+    QnSoftwareVersion currentRelease = qnCommon->engineVersion();
+    currentRelease = QnSoftwareVersion(currentRelease.major(), currentRelease.minor(), currentRelease.bugfix());
+    if (m_target.version < currentRelease) {
         finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
         return;
     }
