@@ -1126,6 +1126,13 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
+    //saving credentials we used to authorize request
+    if (client->request().headers.find(nx_http::header::Authorization::NAME) !=
+        client->request().headers.end())
+    {
+        m_httpAuthCacheItem = client->authCacheItem();
+    }
+
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::EC2_GUID_HEADER_NAME);
     nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
     nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
@@ -1265,7 +1272,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
             setExtraDataBuffer(data);
             m_peerRole = prOriginating;
-            m_httpAuthCacheItem = client->authCacheItem();
             setState(QnTransactionTransport::Connected);
         }
         else {
