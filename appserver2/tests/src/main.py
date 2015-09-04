@@ -111,6 +111,7 @@ class JsonDiff:
         self._hasDiff = False
         self._errorInfo=""
 
+
 def _compareJsonObject(lhs,rhs,result):
     assert isinstance(lhs,dict),"The lhs object _MUST_ be an object"
     assert isinstance(rhs,dict),"The rhs object _MUST_ be an object"
@@ -128,6 +129,7 @@ def _compareJsonObject(lhs,rhs,result):
             result.leave()
 
     return result
+
 
 def _compareJsonList(lhs,rhs,result):
     assert isinstance(lhs,list),"The lhs object _MUST_ be a list"
@@ -158,6 +160,7 @@ def _compareJsonList(lhs,rhs,result):
 
     return result
 
+
 def _compareJsonLeaf(lhs,rhs,result):
     lhs_type = type(lhs)
     if isinstance(rhs,type(lhs)):
@@ -167,6 +170,7 @@ def _compareJsonLeaf(lhs,rhs,result):
             return result
     else:
         return result.typeNotSame(lhs,rhs)
+
 
 def _compareJson(lhs,rhs,result):
     lhs_type = type(lhs)
@@ -181,6 +185,7 @@ def _compareJson(lhs,rhs,result):
             return _compareJsonList(lhs,rhs,result)
         else:
             return _compareJsonLeaf(lhs,rhs,result)
+
 
 def compareJson(lhs,rhs):
     result = JsonDiff()
@@ -204,6 +209,7 @@ def compareJson(lhs,rhs):
             return result.typeNotSame(lhs,rhs)
 
     return result
+
 
 # Rollback support
 class UnitTestRollback:
@@ -297,6 +303,14 @@ class UnitTestRollback:
     def removeRollbackDB(self):
         self._rollbackFile.close()
         os.remove(".rollback")
+
+
+#class AuthH(urllib2.HTTPDigestAuthHandler):
+#    def http_error_401(self, req, fp, code, msg, hdrs):
+#        print "[DEBUG] Code 401"
+#        print "Req: %s" % req
+#        return urllib2.HTTPDigestAuthHandler.http_error_401(self, req, fp, code, msg, hdrs)
+
 
 class ClusterTest():
     clusterTestServerList = []
@@ -437,12 +451,17 @@ class ClusterTest():
         print "==================================================\n"
         print "Test connection on each server in the server list "
         for s in self.clusterTestServerList:
-            print "Try to connect to server:%s" % (s)
+            print "Try to connect to server: %s" % (s)
+            request = urllib2.Request("http://%s/ec2/testConnection" % (s))
             try:
-                response = urllib2.urlopen("http://%s/ec2/testConnection" % (s),timeout=5)
+                #response = urllib2.urlopen("http://%s/ec2/testConnection" % (s), timeout=5)
+                response = urllib2.urlopen(request, timeout=5)
             except urllib2.URLError , e:
-                print "The connection will be issued with a 5 seconds timeout"
-                print "However connection failed with error:%r" % (e)
+                print "The connection has been issued with a 5 seconds timeout"
+                if isinstance(e, urllib2.HTTPError):
+                    print "However connection failed with HTTP error: (%s) %s" % (e.code, e.reason)
+                else:
+                    print "However connection failed with error: %s" % (e.reason)
                 print "Connection test failed"
                 return False
 
@@ -655,10 +674,11 @@ class ClusterTest():
         # configure different domain password strategy
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         for s in self.clusterTestServerList:
-            passman.add_password("NetworkOptix","http://%s/ec2/" % (s), un, pwd)
-            passman.add_password("NetworkOptix","http://%s/api/" % (s), un, pwd)
+            passman.add_password(None,"http://%s/ec2/" % (s), un, pwd)
+            passman.add_password(None,"http://%s/api/" % (s), un, pwd)
 
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+#        urllib2.install_opener(urllib2.build_opener(AuthH(passman)))
 
     def init(self):
         self._setUpPassword()
@@ -1618,7 +1638,7 @@ class ClusterTestBase(unittest.TestCase):
             except KeyboardInterrupt:
                 raise
             except:
-                result.addError(self, self._exc_info())
+                result.addError(self, sys.exc_info())
                 return
 
             ok = False
@@ -1626,12 +1646,12 @@ class ClusterTestBase(unittest.TestCase):
                 testMethod()
                 ok = True
             except self.failureException:
-                result.addFailure(self, self._exc_info())
+                result.addFailure(self, sys.exc_info())
                 result.stop()
             except KeyboardInterrupt:
                 raise
             except:
-                result.addError(self, self._exc_info())
+                result.addError(self, sys.exc_info())
                 result.stop()
 
             try:
@@ -1639,7 +1659,7 @@ class ClusterTestBase(unittest.TestCase):
             except KeyboardInterrupt:
                 raise
             except:
-                result.addError(self, self._exc_info())
+                result.addError(self, sys.exc_info())
                 ok = False
             if ok: result.addSuccess(self)
         finally:
@@ -4254,8 +4274,9 @@ def showHelp():
 
         print helpStrHeader
 
+        maxitemlen = max(len(s) for s in helpMenu.iterkeys())+1
         for k,v in helpMenu.iteritems():
-            print "%s:\t%s"%(k,v[0])
+            print "%s   %s" % ( (k+':').ljust(maxitemlen), v[0])
 
         helpStrFooter = ("\n\nTo see detail help information,please run command:\n"
                "python main.py --help Entry\n\n"
@@ -4286,7 +4307,8 @@ def doCleanUp():
         print "++++++++++++++++++ROLLBACK DONE+++++++++++++++++++++++"
     else:
         print "Skip ROLLBACK,you could use --recover to perform manually rollback"
-            
+
+
 if __name__ == '__main__':
 
     if len(sys.argv) >= 2 and sys.argv[1] == '--help':
