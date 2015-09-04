@@ -21,8 +21,7 @@ QUuid HTTPClient::doPost(const Request& request, ResponseCallback callback, int 
 
 QUuid HTTPClient::execRequest(const QString& method, const Request& request, ResponseCallback callback, int timeoutMs)
 {
-    QUuid requestId = m_transport.addRequest(method, request);
-    return requestId;
+    return m_transport.addRequest(method, request, callback, timeoutMs);
 }
 
 }

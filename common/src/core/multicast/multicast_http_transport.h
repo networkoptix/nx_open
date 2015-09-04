@@ -1,6 +1,7 @@
 #ifndef __MULTICAST_HTTP_TRANSPORT_H_
 #define __MULTICAST_HTTP_TRANSPORT_H_
 
+#include <QElapsedTimer>
 #include <QUdpSocket>
 #include <QUuid>
 #include "multicast_http_fwd.h"
@@ -19,6 +20,7 @@ namespace QnMulticast
         Packet();
 
         static const int MAX_DATAGRAM_SIZE = 1412;
+        static const int MAX_PAYLOAD_SIZE = MAX_DATAGRAM_SIZE - 167;
 
         QUuid magic;
         int version;
@@ -32,7 +34,6 @@ namespace QnMulticast
 
         QByteArray serialize() const;
         static Packet deserialize(const QByteArray& deserialize, bool* ok);
-        int maxPayloadSize() const;
     };
 
 
@@ -43,39 +44,41 @@ namespace QnMulticast
 
         Transport(const QUuid& localGuid);
 
-        QUuid addRequest(const QString& method, const Request& request);
-
+        QUuid addRequest(const QString& method, const Request& request, ResponseCallback callback, int timeoutMs);
+        void addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
     private slots:
         void sendNextData();
         void at_socketReadyRead();
+        void at_dataSent(qint64 bytes);
+        void at_timer();
     private:
-        struct TransportRequest
+        struct TransportConnection
         {
-            TransportRequest(): receivedDataSize(0) {}
+            TransportConnection(): receivedDataSize(0), timeoutMs(0) { timer.restart(); }
+            bool hasExpired() const { return timeoutMs > 0 && timer.hasExpired(timeoutMs); }
 
             QUuid requestId;
-            QUuid serverId;
             QQueue<QByteArray> dataToSend;
             QByteArray receivedData;
             int receivedDataSize;
-            ResponseCallback callback;
+            ResponseCallback responseCallback;
+            int timeoutMs;
+            QElapsedTimer timer;
         };
         
-        QMap<QUuid, TransportRequest> m_requests;
-
-        //QMap<QUuid, ResponseCallback> m_awaitingRequests;
-        //QQueue<SendingRequest> m_sendingData;
-        //QMap<QUuid, QByteArray> m_receivedData;
-
+        QMap<QUuid, TransportConnection> m_requests;
         QUuid m_localGuid;
         qint64 m_bytesWritten;
 
         QUdpSocket m_socket;
+        RequestCallback m_requestCallback;
+        QTimer m_timer;
     private:
         QByteArray encodeMessage(const QString& method, const Request& request) const;
-        QnMulticast::Response decodeMessage(const TransportRequest& transportData, bool* ok) const;
-        TransportRequest encodeRequest(const QString& method, const Request& request);
-
+        Response decodeResponse(const TransportConnection& transportData, bool* ok) const;
+        Request decodeRequest(const TransportConnection& transportData, bool* ok) const;
+        TransportConnection encodeRequest(const QString& method, const Request& request);
+        TransportConnection encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
     };
 
 }

@@ -1,5 +1,6 @@
 #include "multicast_http_transport.h"
 
+
 namespace QnMulticast
 {
 
@@ -61,7 +62,7 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
     result.offset      = fields[7].toInt();
     result.payloadData = fields[8];
 
-    if (result.offset + result.payloadData.size() > result.maxPayloadSize())
+    if (result.offset + result.payloadData.size() > result.messageSize)
         return result; // error
 
     *ok = true;
@@ -75,19 +76,53 @@ Transport::Transport(const QUuid& localGuid):
     m_localGuid(localGuid),
     m_bytesWritten(0)
 {
-    connect(&m_socket, &QUdpSocket::bytesWritten, this, [this] (qint64 bytes) {
-        m_bytesWritten -= bytes; 
-        sendNextData();
-    });
+    m_socket.bind(MULTICAST_PORT, QAbstractSocket::ReuseAddressHint);
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &iface: interfaces)
+    {
+        if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
+            continue;
+        m_socket.joinMulticastGroup(MULTICAST_GROUP, iface);
+    }
+
+    connect(&m_socket, &QUdpSocket::bytesWritten, this, &Transport::at_dataSent, Qt::QueuedConnection);
     connect(&m_socket, &QUdpSocket::bytesAvailable, this, &Transport::at_socketReadyRead);
+    connect(&m_timer, &QTimer::timeout, this, &Transport::at_timer);
+    m_timer.start(1000);
 }
 
-QUuid Transport::addRequest(const QString& method, const Request& request)
+void Transport::at_dataSent(qint64 bytes)
 {
-    TransportRequest transportRequest = encodeRequest(method, request);
-    m_requests[transportRequest.requestId] = std::move(transportRequest);
-    QMetaObject::invokeMethod(this, "sendNextData", Qt::QueuedConnection);
-    return transportRequest.requestId;
+    m_bytesWritten = qMax(0ll, m_bytesWritten - bytes);
+    if (m_bytesWritten == 0) 
+    {
+        // cleanup if all data are sent and response isn't expected (for server side)
+        for (auto itr = m_requests.begin(); itr != m_requests.end();)
+        {
+            TransportConnection& request = *itr;
+            if (request.dataToSend.isEmpty() && !request.responseCallback)
+                itr = m_requests.erase(itr);
+            else
+                ++itr;
+        }
+
+        sendNextData();
+    }
+}
+
+void Transport::at_timer()
+{
+    for (auto itr = m_requests.begin(); itr != m_requests.end();)
+    {
+        TransportConnection& request = *itr;
+        if (request.hasExpired()) {
+            if (request.responseCallback)
+                request.responseCallback(request.requestId, ErrCode::timeout, Response());
+            itr = m_requests.erase(itr);
+        }
+        else
+            ++itr;
+    }
 }
 
 QByteArray Transport::encodeMessage(const QString& method, const Request& request) const
@@ -105,11 +140,10 @@ QByteArray Transport::encodeMessage(const QString& method, const Request& reques
     return result.toUtf8().append(request.messageBody);
 }
 
-QnMulticast::Response Transport::decodeMessage(const TransportRequest& transportData, bool* ok) const
+QnMulticast::Response Transport::decodeResponse(const TransportConnection& transportData, bool* ok) const
 {
     *ok = false;
     Response response;
-    response.serverId = transportData.serverId;
 
     QByteArray message = QByteArray::fromBase64(transportData.receivedData);
     // extract http result
@@ -142,9 +176,19 @@ QnMulticast::Response Transport::decodeMessage(const TransportRequest& transport
     return response;
 }
 
-Transport::TransportRequest Transport::encodeRequest(const QString& method, const Request& request)
+QUuid Transport::addRequest(const QString& method, const Request& request, ResponseCallback callback, int timeoutMs)
 {
-    TransportRequest transportRequest;
+    TransportConnection transportRequest = encodeRequest(method, request);
+    transportRequest.responseCallback = callback;
+    transportRequest.timeoutMs = timeoutMs;
+    m_requests[transportRequest.requestId] = std::move(transportRequest);
+    QMetaObject::invokeMethod(this, "sendNextData", Qt::QueuedConnection);
+    return transportRequest.requestId;
+}
+
+Transport::TransportConnection Transport::encodeRequest(const QString& method, const Request& request)
+{
+    TransportConnection transportRequest;
     QByteArray message = encodeMessage(method, request).toBase64();
 
     QUuid requestId = QUuid::createUuid();
@@ -157,7 +201,7 @@ Transport::TransportRequest Transport::encodeRequest(const QString& method, cons
         packet.messageType = MessageType::request;
         packet.messageSize = message.size();
         packet.offset = offset;
-        int payloadSize = qMin(packet.maxPayloadSize(), message.size() - offset);
+        int payloadSize = qMin(Packet::MAX_PAYLOAD_SIZE, message.size() - offset);
         packet.payloadData = message.mid(offset, payloadSize);
         transportRequest.dataToSend << packet.serialize();
         offset += payloadSize;
@@ -166,44 +210,34 @@ Transport::TransportRequest Transport::encodeRequest(const QString& method, cons
     return transportRequest;
 }
 
-/*
-QUuid Transport::encodeMessage(const QByteArray& _message, QQueue<QByteArray>& result)
+void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
-    QUuid requestId = QUuid::createUuid();
-    QByteArray message = _message.toBase64();
+    m_requests[requestId] = encodeResponse(requestId, clientId, httpResponse);
+    QMetaObject::invokeMethod(this, "sendNextData", Qt::QueuedConnection);
+}
+
+Transport::TransportConnection Transport::encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
+{
+    TransportConnection transportResponse;
+    QByteArray message = httpResponse.toBase64();
+
     for (int offset = 0; offset < message.size();)
     {
         Packet packet;
         packet.requestId = requestId;
-        packet.clientId = m_localGuid;
-        packet.serverId = Request.serverId;
-        packet.messageType = MessageType::request;
+        packet.serverId = m_localGuid;
+        packet.clientId = clientId;
+        packet.messageType = MessageType::response;
         packet.messageSize = message.size();
         packet.offset = offset;
-        int payloadSize = qMin(packet.maxPayloadSize(), message.size() - offset);
+        int payloadSize = qMin(Packet::MAX_PAYLOAD_SIZE, message.size() - offset);
         packet.payloadData = message.mid(offset, payloadSize);
-        result << packet.serialize();
-
-        QByteArray packet;
-        int payloadSize = qMin(MTU_SIZE - packet.size(), message.size() - offset);
-
-
-        packet.append(requestId.toString()).append(CSV_DELIMITER);          // request ID CSV columnn
-        packet.append(m_localGuid.toString()).append(CSV_DELIMITER);               // client ID CSV columnn
-        packet.append(request.serverId.toString()).append(CSV_DELIMITER);          // server ID CSV columnn
-        packet.append(QByteArray::number((int)MessageType::request)).append(CSV_DELIMITER); // message type CSV columnn
-        packet.append(QByteArray::number(message.size())).append(CSV_DELIMITER); // message size CSV columnn
-        packet.append(QByteArray::number(offset)).append(CSV_DELIMITER); // packet payload offset CSV columnn
-        int payloadSize = qMin(MTU_SIZE - packet.size(), message.size() - offset);
-        packet.append(message.mid(offset, payloadSize)).append(CSV_DELIMITER); // message body block CSV columnn
-        result << packet;
-
+        transportResponse.dataToSend << packet.serialize();
         offset += payloadSize;
     }
 
-    return requestId;
+    return transportResponse;
 }
-*/
 
 void Transport::at_socketReadyRead()
 {
@@ -215,41 +249,54 @@ void Transport::at_socketReadyRead()
     datagram.resize(readed);
     bool ok;
     Packet packet = Packet::deserialize(datagram, &ok);
-    if (ok && packet.messageType == MessageType::response)
+    if (ok)
     {
-        TransportRequest& transportData = m_requests[packet.requestId];
+        if (packet.messageType == MessageType::response && !m_requests.contains(packet.requestId))
+            return; // ignore response without request (probably request already removed because of timeout or other reason)
+
+        TransportConnection& transportData = m_requests[packet.requestId];
+
         transportData.receivedData.resize(packet.messageSize);
         memcpy(transportData.receivedData.data() + packet.offset, packet.payloadData.data(), packet.payloadData.size());
         transportData.receivedDataSize += packet.payloadData.size();
         if (transportData.receivedDataSize == packet.messageSize) 
         {
-            bool ok;
-            Response response = decodeMessage(transportData, &ok);
-            transportData.callback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
+            if (packet.messageType == MessageType::response) {
+                bool ok;
+                Response response = decodeResponse(transportData, &ok);
+                response.serverId = packet.serverId;
+                transportData.responseCallback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
+                m_requests.remove(packet.requestId);
+            }
+            else if (packet.messageType == MessageType::request) {
+                m_requestCallback(transportData.requestId, packet.clientId, transportData.receivedData);
+            }
         }
     }
 }
 
 void Transport::sendNextData()
 {
-    if (m_bytesWritten > MAX_SEND_BUFFER_SIZE)
-        return;
+    int prevBytesWritten = -1;
     for (auto itr = m_requests.begin(); itr != m_requests.end(); ++itr)
     {
-        TransportRequest& request = *itr;
-        if (request.dataToSend.isEmpty())
-            continue;
-
-        QByteArray data = request.dataToSend.dequeue();
-        int bytesWriten = m_socket.writeDatagram(data, MULTICAST_GROUP, MULTICAST_PORT);
-        if (bytesWriten == -1) {
-            request.callback(request.requestId, ErrCode::networkIssue, Response());
-            m_requests.erase(itr);
-        }
-        else {
-            m_bytesWritten += bytesWriten;
+        TransportConnection& request = *itr;
+        while (m_bytesWritten < MAX_SEND_BUFFER_SIZE && prevBytesWritten != m_bytesWritten && !request.dataToSend.isEmpty())
+        {
+            prevBytesWritten = m_bytesWritten;
+            QByteArray data = request.dataToSend.dequeue();
+            int bytesWriten = m_socket.writeDatagram(data, MULTICAST_GROUP, MULTICAST_PORT);
+            if (bytesWriten == -1) {
+                if (request.responseCallback)
+                    request.responseCallback(request.requestId, ErrCode::networkIssue, Response());
+                request.dataToSend.clear();
+            }
+            else {
+                m_bytesWritten += bytesWriten;
+            }
         }
     }
+
 }
 
 }

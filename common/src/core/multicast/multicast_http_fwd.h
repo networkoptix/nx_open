@@ -40,6 +40,7 @@ namespace QnMulticast
         QByteArray messageBody;
     };
     typedef std::function<void(const QUuid& requestId, ErrCode errCode, const Response& response)> ResponseCallback;
+    typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpData)> RequestCallback;
 }
 
 #endif // __MULTICAST_HTTP_FWD_H__
