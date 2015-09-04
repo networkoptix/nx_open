@@ -10,6 +10,12 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
+SystemManager::SystemManager(QUrl url)
+:
+    m_url(std::move(url))
+{
+}
+
 void SystemManager::bindSystem(
     api::SystemRegistrationData registrationData,
     std::function<void(api::ResultCode, api::SystemData)> completionHandler)

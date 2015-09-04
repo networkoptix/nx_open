@@ -23,7 +23,8 @@ enum class ResultCode
     dbError,
     //!Network operation failed
     networkError,
-    notImplemented
+    notImplemented,
+    unknownError
 };
 
 }   //api

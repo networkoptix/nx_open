@@ -13,12 +13,17 @@ namespace cdb {
 namespace cl {
 
 
+AccountManager::AccountManager(QUrl url)
+:
+    m_url(std::move(url))
+{
+}
+
 void AccountManager::getAccount(
     std::function<void(api::ResultCode, api::AccountData)> completionHandler)
 {
-    doRequest<api::AccountData, api::AccountData>(
+    doRequest(
         QUrl(),
-        api::AccountData(),
         std::move(completionHandler));
 }
 

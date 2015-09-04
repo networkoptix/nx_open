@@ -6,6 +6,8 @@
 #ifndef NX_CDB_CL_SYSTEM_MANAGER_H
 #define NX_CDB_CL_SYSTEM_MANAGER_H
 
+#include <QtCore/QUrl>
+
 #include "include/cdb/system_manager.h"
 
 
@@ -18,6 +20,8 @@ class SystemManager
     public api::SystemManager
 {
 public:
+    SystemManager(QUrl url);
+
     //!Implementation of \a SystemManager::bindSystem
     void bindSystem(
         api::SystemRegistrationData registrationData,
@@ -33,6 +37,9 @@ public:
     void shareSystem(
         api::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler) override;
+
+private:
+    QUrl m_url;
 };
 
 

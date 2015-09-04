@@ -12,6 +12,8 @@
 #include <utils/network/http/server/abstract_http_request_handler.h>
 #include <utils/network/http/server/http_server_connection.h>
 
+#include <cloud_db_client/src/data/types.h>
+
 #include "access_control/authorization_manager.h"
 #include "access_control/auth_types.h"
 #include "managers/managers_types.h"
@@ -65,9 +67,6 @@ protected:
 };
 
 }   //detail
-
-
-nx_http::StatusCode::Value resultCodeToHttpStatusCode(api::ResultCode resultCode );
 
 
 //!Contains logic common for all cloud_db HTTP request handlers
