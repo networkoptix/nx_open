@@ -1,7 +1,6 @@
 #include "system_socket.h"
 
 #include <atomic>
-#include <future>
 #include <memory>
 
 #include <boost/type_traits/is_same.hpp>
@@ -20,10 +19,21 @@
 #endif
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
 #include "utils/common/log.h"
+
+
+#ifndef ATOMIC_INT_LOCK_FREE
+#error "ATOMIC_INT_LOCK_FREE not defined"
+#elif ATOMIC_INT_LOCK_FREE == 0
+#error "ATOMIC_INT_LOCK_FREE 0"
+#elif ATOMIC_INT_LOCK_FREE == 1
+#error "ATOMIC_INT_LOCK_FREE 1"
+#endif
 
 
 #ifdef Q_OS_WIN
@@ -1143,19 +1153,26 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
     //TODO #ak add general implementation to Socket class and remove this method
     if (waitForRunningHandlerCompletion)
     {
-        std::promise<void> terminatedPromise;
-        std::future<void> teminatedFuture = terminatedPromise.get_future();
+        QWaitCondition cond;
+        QMutex mtx;
+        bool cancelled = false;
+
         m_implDelegate.dispatchImpl(
-            [this, &terminatedPromise]()
+            [this, &cond, &mtx, &cancelled]()
             {
                 aio::AIOService::instance()->cancelPostedCalls(
                     static_cast<Pollable*>(&m_implDelegate), true);
                 aio::AIOService::instance()->removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                terminatedPromise.set_value();
+                
+                QMutexLocker lk(&mtx);
+                cancelled = true;
+                cond.wakeAll();
             } );
 
-        teminatedFuture.wait();
+        QMutexLocker lk(&mtx);
+        while(!cancelled)
+            cond.wait(lk.mutex());
     }
     else
     {
