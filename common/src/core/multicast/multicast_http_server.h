@@ -1,0 +1,4 @@
+#ifndef __MULTICAST_HTTP_SERVER_H__
+#define __MULTICAST_HTTP_SERVER_H__
+
+#endif // __MULTICAST_HTTP_SERVER_H__
