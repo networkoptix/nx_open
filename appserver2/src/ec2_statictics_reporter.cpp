@@ -16,9 +16,6 @@ static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
 static const uint TIMER_CYCLE = 60000; /* msecs, update state every minute */
 static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
-static const QString ALREADY_IN_PROGRESS = lit("already in progress");
-static const QString JUST_INITIATED = lit("just initiated");
-
 namespace ec2
 {
     const QString Ec2StaticticsReporter::SR_LAST_TIME = lit("statisticsReportLastTime");
@@ -113,18 +110,9 @@ namespace ec2
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
-        outData->systemId = getOrCreateSystemId();
-        {
-            QMutexLocker lk(&m_mutex);
-            if (m_timerDisabled)
-            {
-                outData->status = ALREADY_IN_PROGRESS;
-                return ErrorCode::ok;
-            }
-        }
-
         removeTimer();
-        outData->status = JUST_INITIATED;
+        outData->systemId = getOrCreateSystemId();
+        outData->status = lit("initiated");
         return initiateReport(&outData->url);
     }
 
@@ -260,14 +248,12 @@ namespace ec2
                    .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
         }
 
-        if (*m_plannedReportTime > now)
-        {
-            // Let's try a little later
-            setupTimer();
-            return;
-        }
-        
-        initiateReport();
+        if (*m_plannedReportTime <= now)
+            if( initiateReport() == ErrorCode::ok )
+                return;
+
+        // let's retry a little later
+        setupTimer();
     }
 
     ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
