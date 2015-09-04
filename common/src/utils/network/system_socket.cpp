@@ -27,15 +27,6 @@
 #include "utils/common/log.h"
 
 
-#ifndef ATOMIC_INT_LOCK_FREE
-#error "ATOMIC_INT_LOCK_FREE not defined"
-#elif ATOMIC_INT_LOCK_FREE == 0
-#error "ATOMIC_INT_LOCK_FREE 0"
-#elif ATOMIC_INT_LOCK_FREE == 1
-#error "ATOMIC_INT_LOCK_FREE 1"
-#endif
-
-
 #ifdef Q_OS_WIN
 /* Check that the typedef in AbstractSocket is correct. */
 static_assert(boost::is_same<AbstractSocket::SOCKET_HANDLE, SOCKET>::value, "Invalid socket type is used in AbstractSocket.");
