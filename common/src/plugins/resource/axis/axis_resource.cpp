@@ -1321,9 +1321,9 @@ void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
         setStatus(Qn::Offline); // reinit
 }
 
-void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QString & key)
 {
-    if (key == Qn::IO_SETTINGS_PARAM_NAME)
+    if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
         QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
 }
 
