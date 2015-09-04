@@ -414,6 +414,9 @@ namespace ec2
                         WhileExecutingDirectCall callGuard( this );
                         emit timeChanged( curSyncTime );
                     }
+
+                    //reporting new sync time to everyone we know
+                    syncTimeWithAllKnownServers(&lk);
                 }
             }
             else
@@ -626,24 +629,35 @@ namespace ec2
         lock->relock();
 
         //informing all servers we can about time change as soon as possible
-        for( std::pair<const QnUuid, PeerContext>& peerCtx: m_peersToSendTimeSyncTo )
-        {
-            TimerManager::instance()->modifyTimerDelay(
-                peerCtx.second.syncTimerID.get(),
-                0 );
-        }
+        syncTimeWithAllKnownServers(lock);
     }
 
     void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransport* transport )
     {
-        if( !transport->isIncoming() )      //we can connect to the peer
+        using namespace std::placeholders;
+
+        if( transport->isIncoming() )
         {
+            //peer connected to us
+            //using transactions to signal remote peer that it needs to fetch time from us
+            transport->setBeforeSendingChunkHandler(
+                std::bind(&TimeSynchronizationManager::onBeforeSendingTransaction, this, _1, _2));
+        }
+        else
+        {
+            //listening time change signals fom remote peer which cannot connect to us
+            transport->setHttpChunkExtensonHandler(
+                std::bind(&TimeSynchronizationManager::onTransactionReceived, this, _1, _2));
+
+            //we can connect to the peer
             const QUrl remoteAddr = transport->remoteAddr();
             //saving credentials has been used to establish connection
             startSynchronizingTimeWithPeer( //starting sending time sync info to peer
                 transport->remotePeer().id,
                 SocketAddress( remoteAddr.host(), remoteAddr.port() ),
                 transport->authData() );
+
+            using namespace std::placeholders;
         }
     }
 
@@ -1078,5 +1092,45 @@ namespace ec2
             elapsed,
             m_usedTimeSyncInfo.syncTime + elapsed - m_usedTimeSyncInfo.monotonicClockValue,
             m_usedTimeSyncInfo.timePriorityKey );
+    }
+
+    void TimeSynchronizationManager::syncTimeWithAllKnownServers(QMutexLocker* const /*lock*/)
+    {
+        for (std::pair<const QnUuid, PeerContext>& peerCtx : m_peersToSendTimeSyncTo)
+        {
+            TimerManager::instance()->modifyTimerDelay(
+                peerCtx.second.syncTimerID.get(),
+                0);
+        }
+    }
+
+    void TimeSynchronizationManager::onBeforeSendingTransaction(
+        QnTransactionTransport* transport,
+        nx_http::HttpHeaders* const headers)
+    {
+        headers->emplace(
+            QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME,
+            getTimeSyncInfo().toString());
+    }
+
+    void TimeSynchronizationManager::onTransactionReceived(
+        QnTransactionTransport* transport,
+        const nx_http::HttpHeaders& headers)
+    {
+        for (auto header : headers)
+        {
+            if (header.first != QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME)
+                continue;
+
+            const nx_http::StringType& serializedTimeSync = header.second;
+            TimeSyncInfo remotePeerTimeSyncInfo;
+            if (!remotePeerTimeSyncInfo.fromString(serializedTimeSync))
+                continue;
+
+            QMutexLocker lk(&m_mutex);
+            if (remotePeerTimeSyncInfo.timePriorityKey > m_usedTimeSyncInfo.timePriorityKey)
+                syncTimeWithAllKnownServers(&lk);
+            return;
+        }
     }
 }
