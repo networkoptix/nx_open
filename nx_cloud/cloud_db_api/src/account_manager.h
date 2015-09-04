@@ -8,6 +8,8 @@
 
 #include "include/cdb/account_manager.h"
 
+#include "data/account_data.h"
+
 
 namespace nx {
 namespace cdb {

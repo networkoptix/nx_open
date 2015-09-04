@@ -53,8 +53,6 @@ class ConnectionFactory
 public:
     //!Connects to cloud_db to check user credentials
     virtual void connect(
-        const std::string& host,
-        unsigned short port,
         const std::string& login,
         const std::string& password,
         std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) = 0;

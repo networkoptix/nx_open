@@ -16,26 +16,11 @@
 #include <utils/common/uuid.h>
 #include <utils/fusion/fusion_fwd.h>
 
-#include <cdb/system_data.h>
+#include <cloud_db_api/src/data/system_data.h>
 
 
 namespace nx {
 namespace cdb {
-
-namespace api
-{
-
-namespace SystemAccessRole
-{
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Value), (lexical))
-}
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemStatus)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))
-
-}   //api
-
 namespace data {
 
 class SubscriptionData
@@ -56,8 +41,6 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
-#define SystemRegistrationData_Fields (name)
-
 class SystemRegistrationDataWithAccountID
 :
     public SystemRegistrationData
@@ -72,10 +55,6 @@ public:
     }
 };
 
-//TODO #ak add corresponding parser/serializer to fusion and remove this function
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemRegistrationData* const systemData );
-
-
 class SystemData
 :
     public api::SystemData,
@@ -86,20 +65,13 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
-//TODO #ak add corresponding parser/serializer to fusion and remove this function
-//bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
-
-#define SystemData_Fields (id)(name)(authKey)(ownerAccountID)(status)(cloudConnectionSubscriptionStatus)
-
 
 class SystemDataList
+:
+    public api::SystemDataList
 {
 public:
-    std::vector<SystemData> systems;
 };
-
-#define SystemDataList_Fields (systems)
-
 
 class SystemSharing
 :
@@ -110,11 +82,6 @@ public:
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
-
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSharing );
-
-#define SystemSharing_Fields (accountID)(systemID)(accessRole)
-
 
 //!for requests passing just system id
 class SystemID
@@ -134,13 +101,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemID),
     (json)(sql_record) )
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemDataList),
-    (json))
-
 
 }   //data
 }   //cdb

@@ -13,18 +13,6 @@
 
 namespace nx {
 namespace cdb {
-
-namespace api {
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
-    (asInvalid, "invalid")
-    (asAwaitingEmailConfirmation, "awaitingEmailConfirmation")
-    (asActivated, "activated")
-    (asBlocked, "blocked")
-    )
-}   //api
-
-
 namespace data {
 
 bool AccountData::getAsVariant( int resID, QVariant* const value ) const
@@ -39,28 +27,6 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
             return false;
     }
 }
-
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
-{
-    accountData->id = QnUuid(urlQuery.queryItemValue( lit("id") ));
-    accountData->login = urlQuery.queryItemValue( lit("login") ).toStdString();
-    accountData->email = urlQuery.queryItemValue( lit("email") ).toStdString();
-    accountData->passwordHa1 = urlQuery.queryItemValue( lit("passwordHa1") ).toStdString();
-    accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toStdString();
-    bool success = true;
-    accountData->statusCode = urlQuery.hasQueryItem( lit( "statusCode" ) )
-        ? QnLexical::deserialized<api::AccountStatus>(
-            urlQuery.queryItemValue( lit( "statusCode" ) ), api::asInvalid, &success )
-        : api::asInvalid;
-    return success;
-}
-
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccountData),
-    (json)(sql_record),
-    _Fields )
-
 
 }   //data
 }   //cdb

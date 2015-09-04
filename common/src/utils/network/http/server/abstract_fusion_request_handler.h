@@ -11,8 +11,9 @@
 
 namespace nx_http {
 
-//!Reads "format" parameter from incoming request and deserializes request/serializes response accordingly
+//!HTTP server request handler which deserializes input/serializes output data using fusion
 /*!
+    Reads \a format query parameter from incoming request and deserializes request/serializes response accordingly.
     \note \a Input or \a Output can be void. If \a Input is void, 
         \a AbstractFusionRequestHandler::processRequest does not have \a inputData argument.
         If \a Output is void, \a AbstractFusionRequestHandler::requestCompleted does not have \a outputData argument

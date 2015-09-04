@@ -12,26 +12,6 @@
 
 namespace nx {
 namespace cdb {
-
-namespace api {
-namespace SystemAccessRole {
-    QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( Value,
-        (SystemAccessRole::none, "none")
-        (SystemAccessRole::owner, "owner")
-        (SystemAccessRole::maintenance, "maintenance")
-        (SystemAccessRole::viewer, "viewer")
-        (SystemAccessRole::editor, "editor")
-        (SystemAccessRole::editorWithSharing, "editorWithSharing")
-    )
-}
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( SystemStatus,
-    (ssInvalid, "invalid")
-    (ssNotActivated, "notActivated")
-    (ssActivated, "activated")
-)
-}   //api
-
 namespace data {
 
 
@@ -42,14 +22,6 @@ namespace data {
 bool SystemRegistrationData::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
 {
     return false;
-}
-
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemRegistrationData* const systemData )
-{
-    if( !urlQuery.hasQueryItem("name") )
-        return false;
-    systemData->name = urlQuery.queryItemValue("name").toStdString();
-    return true;
 }
 
 
@@ -84,19 +56,6 @@ bool SystemSharing::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) con
     return false;
 }
 
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSharing )
-{
-    if (!urlQuery.hasQueryItem("systemID") || !urlQuery.hasQueryItem("accountID"))
-        return false;
-
-    systemSharing->systemID = QnUuid::fromStringSafe(urlQuery.queryItemValue("systemID"));
-    systemSharing->accountID = QnUuid::fromStringSafe(urlQuery.queryItemValue("accountID"));
-    bool success = false;
-    systemSharing->accessRole = QnLexical::deserialized<api::SystemAccessRole::Value>(
-        urlQuery.queryItemValue(lit("accessRole")), api::SystemAccessRole::none, &success );
-    return success;
-}
-
 
 ////////////////////////////////////////////////////////////
 //// class SystemID
@@ -124,13 +83,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID)
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemID),
     (json)(sql_record),
-    _Fields )
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemDataList),
-    (json),
     _Fields )
 
 }   //data

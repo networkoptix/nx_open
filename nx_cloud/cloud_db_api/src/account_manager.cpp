@@ -5,6 +5,8 @@
 
 #include "account_manager.h"
 
+#include "generic_fixed_cdb_request.h"
+
 
 namespace nx {
 namespace cdb {
@@ -14,8 +16,10 @@ namespace cl {
 void AccountManager::getAccount(
     std::function<void(api::ResultCode, api::AccountData)> completionHandler)
 {
-    //TODO #ak
-    completionHandler(api::ResultCode::notImplemented, api::AccountData());
+    doRequest<api::AccountData, api::AccountData>(
+        QUrl(),
+        api::AccountData(),
+        std::move(completionHandler));
 }
 
 

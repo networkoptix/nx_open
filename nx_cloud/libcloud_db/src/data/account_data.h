@@ -16,17 +16,11 @@
 #include <utils/common/uuid.h>
 #include <utils/fusion/fusion_fwd.h>
 
-#include <cdb/account_data.h>
+#include <cloud_db_api/src/data/account_data.h>
 
 
 namespace nx {
 namespace cdb {
-
-namespace api {
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AccountStatus)
-    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((AccountStatus), (lexical))
-}
-
 namespace data {
 
 class AccountData
@@ -38,17 +32,6 @@ public:
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
-
-//TODO #ak add corresponding parser/serializer to fusion and remove this function
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData );
-
-#define AccountData_Fields (id)(login)(email)(passwordHa1)(fullName)(statusCode)
-
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (AccountData),
-    (json)(sql_record) )
-
 
 }   //data
 }   //cdb
