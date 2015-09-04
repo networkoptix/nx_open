@@ -16,7 +16,7 @@
 #include <utils/common/uuid.h>
 #include <utils/fusion/fusion_fwd.h>
 
-#include <cloud_db_api/src/data/system_data.h>
+#include <cloud_db_client/src/data/system_data.h>
 
 
 namespace nx {
