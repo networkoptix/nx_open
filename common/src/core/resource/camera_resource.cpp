@@ -288,6 +288,7 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
         ++it;
     }
 
+         //TODO: #GDM change to bool transcodingAvailable variable check
 #ifdef TRANSCODING_AVAILABLE
     static const char* WEBM_TRANSPORT_NAME = "webm";
 

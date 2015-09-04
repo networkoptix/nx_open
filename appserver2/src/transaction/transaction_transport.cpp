@@ -1434,6 +1434,7 @@ bool QnTransactionTransport::skipTransactionForMobileClient(ApiCommand::Value co
     case ApiCommand::saveUser:
     case ApiCommand::saveLayout:
     case ApiCommand::setResourceStatus:
+    case ApiCommand::setResourceParam:
     case ApiCommand::setResourceParams:
     case ApiCommand::saveCameraUserAttributes:
     case ApiCommand::saveServerUserAttributes:
