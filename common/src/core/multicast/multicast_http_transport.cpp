@@ -13,6 +13,7 @@ static const QHostAddress MULTICAST_GROUP(QLatin1String("239.57.43.102"));
 static const int MULTICAST_PORT = 7001;
 static const int MAX_SEND_BUFFER_SIZE = 1024 * 64;
 static const int PROCESSED_REQUESTS_CACHE_SZE = 512;
+static const int SEND_RETRY_COUNT = 2;
 
 // ----------- Packet ------------------
 
@@ -78,17 +79,23 @@ Transport::Transport(const QUuid& localGuid):
     m_bytesWritten(0),
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE)
 {
-    m_socket.bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint);
+    m_recvSocket.reset(new QUdpSocket());
+    m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint);
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
         if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
             continue;
-        m_socket.joinMulticastGroup(MULTICAST_GROUP, iface);
+        m_recvSocket->joinMulticastGroup(MULTICAST_GROUP, iface);
+
+        auto sendSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
+        sendSocket->bind(QHostAddress::AnyIPv4);
+        sendSocket->setMulticastInterface(iface);
+        m_sendSockets.push_back(std::move(sendSocket));
+        connect(sendSocket.get(), &QUdpSocket::bytesWritten, this, &Transport::at_dataSent, Qt::QueuedConnection);
     }
 
-    connect(&m_socket, &QUdpSocket::bytesWritten, this, &Transport::at_dataSent, Qt::QueuedConnection);
-    connect(&m_socket, &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
+    connect(m_recvSocket.get(), &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
 
     m_timer.reset(new QTimer());
     connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
@@ -233,6 +240,16 @@ QUuid Transport::addRequest(const Request& request, ResponseCallback callback, i
     return transportRequest.requestId;
 }
 
+void Transport::putPacketToTransport(TransportConnection& transportConnection, const Packet& packet)
+{
+    QByteArray encodedData = packet.serialize();
+    for (int i = 0; i < SEND_RETRY_COUNT; ++i) 
+    {
+        for (auto& socket: m_sendSockets)
+            transportConnection.dataToSend << TransportPacket(socket.get(), encodedData);
+    }
+}
+
 Transport::TransportConnection Transport::encodeRequest(const Request& request)
 {
     TransportConnection transportRequest;
@@ -249,7 +266,7 @@ Transport::TransportConnection Transport::encodeRequest(const Request& request)
         packet.offset = offset;
         int payloadSize = qMin(Packet::MAX_PAYLOAD_SIZE, message.size() - offset);
         packet.payloadData = message.mid(offset, payloadSize);
-        transportRequest.dataToSend << packet.serialize();
+        putPacketToTransport(transportRequest, packet);
         offset += payloadSize;
     }
 
@@ -265,8 +282,8 @@ void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const
 
 Transport::TransportConnection Transport::encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
-    TransportConnection transportResponse;
-    transportResponse.requestId = requestId;
+    TransportConnection transportConnection;
+    transportConnection.requestId = requestId;
     QByteArray message = httpResponse.toBase64();
 
     for (int offset = 0; offset < message.size();)
@@ -280,21 +297,21 @@ Transport::TransportConnection Transport::encodeResponse(const QUuid& requestId,
         packet.offset = offset;
         int payloadSize = qMin(Packet::MAX_PAYLOAD_SIZE, message.size() - offset);
         packet.payloadData = message.mid(offset, payloadSize);
-        transportResponse.dataToSend << packet.serialize();
+        putPacketToTransport(transportConnection, packet);
         offset += payloadSize;
     }
 
-    return transportResponse;
+    return transportConnection;
 }
 
 void Transport::at_socketReadyRead()
 {
     QMutexLocker lock(&m_mutex);
-    while (m_socket.hasPendingDatagrams())
+    while (m_recvSocket->hasPendingDatagrams())
     {
         QByteArray datagram;
-        datagram.resize(m_socket.pendingDatagramSize());
-        int readed = m_socket.readDatagram(datagram.data(), datagram.size());
+        datagram.resize(m_recvSocket->pendingDatagramSize());
+        int readed = m_recvSocket->readDatagram(datagram.data(), datagram.size());
         if (readed <= 0)
             return;
         bool ok;
@@ -351,8 +368,8 @@ void Transport::sendNextData()
         while (m_bytesWritten < MAX_SEND_BUFFER_SIZE && prevBytesWritten != m_bytesWritten && !request.dataToSend.isEmpty())
         {
             prevBytesWritten = m_bytesWritten;
-            QByteArray data = request.dataToSend.dequeue();
-            int bytesWriten = m_socket.writeDatagram(data, MULTICAST_GROUP, MULTICAST_PORT);
+            TransportPacket data = request.dataToSend.dequeue();
+            int bytesWriten = data.socket->writeDatagram(data.data, MULTICAST_GROUP, MULTICAST_PORT);
             if (bytesWriten == -1) {
                 if (request.responseCallback)
                     request.responseCallback(request.requestId, ErrCode::networkIssue, Response());

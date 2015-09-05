@@ -55,13 +55,22 @@ namespace QnMulticast
         void at_dataSent(qint64 bytes);
         void at_timer();
     private:
+
+        struct TransportPacket
+        {
+            TransportPacket(): socket(0) {}
+            TransportPacket(QUdpSocket* socket, const QByteArray& data): socket(socket), data(data) {}
+            QUdpSocket* socket;
+            QByteArray data;
+        };
+
         struct TransportConnection
         {
             TransportConnection(): timeoutMs(0) { timer.restart(); }
             bool hasExpired() const { return timeoutMs > 0 && timer.hasExpired(timeoutMs); }
 
             QUuid requestId;
-            QQueue<QByteArray> dataToSend;
+            QQueue<TransportPacket> dataToSend;
             QByteArray receivedData;
             ResponseCallback responseCallback;
             int timeoutMs;
@@ -72,7 +81,8 @@ namespace QnMulticast
         QUuid m_localGuid;
         qint64 m_bytesWritten;
 
-        QUdpSocket m_socket;
+        std::unique_ptr<QUdpSocket> m_recvSocket;
+        std::vector<std::unique_ptr<QUdpSocket>> m_sendSockets;
         RequestCallback m_requestCallback;
         std::unique_ptr<QTimer> m_timer;
         QCache<QUuid, void> m_processedRequests;
@@ -83,6 +93,7 @@ namespace QnMulticast
         Request decodeRequest(const TransportConnection& transportData, bool* ok) const;
         TransportConnection encodeRequest(const Request& request);
         TransportConnection encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
+        void putPacketToTransport(TransportConnection& transportConnection, const Packet& packet);
     };
 
 }
