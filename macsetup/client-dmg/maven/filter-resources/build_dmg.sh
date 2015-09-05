@@ -7,6 +7,7 @@ TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
 DMG_FILE="${finalName}.dmg"
 HELP=${ClientHelpSourceDir}
+RELEASE_VERSION=${release.version}
 
 AS_SRC=app-store
 PKG_FILE="${finalName}.pkg"
@@ -14,7 +15,33 @@ PKG_FILE="${finalName}.pkg"
 ln -s /Applications $SRC/Applications
 
 mv $SRC/client.app "$SRC/${display.product.name}.app"
-mv "$SRC/DS_Store" "$SRC/.DS_Store"
+
+function hexify
+{
+    hexdump -ve '1/1 "%.2X"'
+}
+
+function dehexify
+{
+    xxd -r -p
+}
+
+function patch_dsstore
+{
+    local xfrom="$1"
+    local xto="$2"
+    local version=$3
+    local proshita=2.3.2
+
+    local from_ver_hex=$(echo -ne $proshita | hexify)
+    local to_ver_hex=$(echo -ne $version | hexify)
+
+    cat $xfrom | hexify | sed "s/$from_ver_hex/$to_ver_hex/g" | dehexify > $xto
+}
+
+patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
+rm "$SRC/DS_Store"
+
 python macdeployqt.py "$SRC/${display.product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP"
 security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 
