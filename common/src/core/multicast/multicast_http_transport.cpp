@@ -80,7 +80,8 @@ Transport::Transport(const QUuid& localGuid):
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE)
 {
     m_recvSocket.reset(new QUdpSocket());
-    m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint);
+    if (!m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint))
+        qWarning() << "Failed to open Multicast Http receive socket";
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
@@ -89,10 +90,13 @@ Transport::Transport(const QUuid& localGuid):
         m_recvSocket->joinMulticastGroup(MULTICAST_GROUP, iface);
 
         auto sendSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
-        sendSocket->bind(QHostAddress::AnyIPv4);
-        sendSocket->setMulticastInterface(iface);
-        m_sendSockets.push_back(std::move(sendSocket));
+        if (sendSocket->bind())
+            sendSocket->setMulticastInterface(iface);
+        else
+            qWarning() << "Failed to open Multicast Http send socket";
+
         connect(sendSocket.get(), &QUdpSocket::bytesWritten, this, &Transport::at_dataSent, Qt::QueuedConnection);
+        m_sendSockets.push_back(std::move(sendSocket));
     }
 
     connect(m_recvSocket.get(), &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
