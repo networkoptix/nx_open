@@ -12,6 +12,7 @@ static const int PROTO_VERSION = 1;
 static const QHostAddress MULTICAST_GROUP(QLatin1String("239.57.43.102"));
 static const int MULTICAST_PORT = 7001;
 static const int MAX_SEND_BUFFER_SIZE = 1024 * 64;
+static const int PROCESSED_REQUESTS_CACHE_SZE = 512;
 
 // ----------- Packet ------------------
 
@@ -74,7 +75,8 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
 
 Transport::Transport(const QUuid& localGuid, QThread* parentThread):
     m_localGuid(localGuid),
-    m_bytesWritten(0)
+    m_bytesWritten(0),
+    m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE)
 {
     if (parentThread)
         moveToThread(parentThread);
@@ -89,7 +91,7 @@ Transport::Transport(const QUuid& localGuid, QThread* parentThread):
     }
 
     connect(&m_socket, &QUdpSocket::bytesWritten, this, &Transport::at_dataSent, Qt::QueuedConnection);
-    connect(&m_socket, &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
+    connect(&m_socket, &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead, Qt::QueuedConnection);
 
     m_timer.reset(new QTimer());
     connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
@@ -235,12 +237,11 @@ Transport::TransportConnection Transport::encodeRequest(const Request& request)
 {
     TransportConnection transportRequest;
     QByteArray message = encodeMessage(request).toBase64();
-
-    QUuid requestId = QUuid::createUuid();
+    transportRequest.requestId = QUuid::createUuid();
     for (int offset = 0; offset < message.size();)
     {
         Packet packet;
-        packet.requestId = requestId;
+        packet.requestId = transportRequest.requestId;
         packet.clientId = m_localGuid;
         packet.serverId = request.serverId;
         packet.messageType = MessageType::request;
@@ -264,6 +265,7 @@ void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const
 Transport::TransportConnection Transport::encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
     TransportConnection transportResponse;
+    transportResponse.requestId = requestId;
     QByteArray message = httpResponse.toBase64();
 
     for (int offset = 0; offset < message.size();)
@@ -305,15 +307,20 @@ void Transport::at_socketReadyRead()
                 continue; // foreign packet
             if (packet.messageType == MessageType::response && packet.clientId != m_localGuid)
                 continue; // foreign packet
+            if (m_processedRequests.contains(packet.requestId))
+                continue; // request already processed
 
             TransportConnection& transportData = m_requests[packet.requestId];
             transportData.requestId = packet.requestId;
-
-            transportData.receivedData.resize(packet.messageSize);
+            if (transportData.receivedData.isEmpty()) {
+                transportData.receivedData.resize(packet.messageSize);
+                transportData.receivedData.fill('\x0');
+            }
             memcpy(transportData.receivedData.data() + packet.offset, packet.payloadData.data(), packet.payloadData.size());
-            transportData.receivedDataSize += packet.payloadData.size();
-            if (transportData.receivedDataSize == packet.messageSize) 
+            if (!transportData.receivedData.contains('\x0'))
             {
+                m_processedRequests.insert(packet.requestId, 0);
+                // all data has been received
                 bool ok;
                 if (packet.messageType == MessageType::response) 
                 {

@@ -31,17 +31,15 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         httpClient->addAdditionalHeader(header.first.toUtf8(), header.second.toUtf8());
     httpClient->addAdditionalHeader("Connection", "Close");
 
-    connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, [requestId, clientId, this](nx_http::AsyncHttpClientPtr reply)
+    connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, [httpClient, requestId, clientId, this](nx_http::AsyncHttpClientPtr)  mutable 
     {
-        QnMulticast::Response response;
-        response.serverId = qnCommon->moduleGUID().toQUuid();
-        //response.messageBody = reply->fetchMessageBodyBuffer();
-        //response.httpResult = reply->response()->statusLine.statusCode;
-        //m_transport->addResponse(requestId, clientId, response);
-        if (reply->response())
-            m_transport->addResponse(requestId, clientId, reply->response()->toString());
+        if (httpClient->response())
+            m_transport->addResponse(requestId, clientId, httpClient->response()->toString() + httpClient->fetchMessageBodyBuffer());
+        httpClient->disconnect( nullptr, (const char*)nullptr );
+        httpClient.reset();
     }, Qt::DirectConnection);
 
+    /*
     connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, ec2::DummyHandler::instance(), [httpClient, requestId, clientId, this](nx_http::AsyncHttpClientPtr)  mutable 
     {
         httpClient->disconnect( nullptr, (const char*)nullptr );
@@ -55,7 +53,7 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         if (httpClient->response())
             m_transport->addResponse(requestId, clientId, httpClient->response()->toString());
     }, Qt::DirectConnection);
-
+    */
 
 
     bool result = false;
@@ -63,6 +61,8 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         result = httpClient->doGet(url);
     else if (request.method == "POST")
         result = httpClient->doPost(url, request.contentType, request.messageBody);
+    if (!result)
+        disconnect( httpClient.get(), nullptr, this, nullptr );
 }
 
 

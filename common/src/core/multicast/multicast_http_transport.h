@@ -6,6 +6,7 @@
 #include <QTimer>
 #include "multicast_http_fwd.h"
 #include <memory>
+#include <QCache>
 
 namespace QnMulticast
 {
@@ -56,13 +57,12 @@ namespace QnMulticast
     private:
         struct TransportConnection
         {
-            TransportConnection(): receivedDataSize(0), timeoutMs(0) { timer.restart(); }
+            TransportConnection(): timeoutMs(0) { timer.restart(); }
             bool hasExpired() const { return timeoutMs > 0 && timer.hasExpired(timeoutMs); }
 
             QUuid requestId;
             QQueue<QByteArray> dataToSend;
             QByteArray receivedData;
-            int receivedDataSize;
             ResponseCallback responseCallback;
             int timeoutMs;
             QElapsedTimer timer;
@@ -75,6 +75,7 @@ namespace QnMulticast
         QUdpSocket m_socket;
         RequestCallback m_requestCallback;
         std::unique_ptr<QTimer> m_timer;
+        QCache<QUuid, void> m_processedRequests;
     private:
         QByteArray encodeMessage(const Request& request) const;
         Response decodeResponse(const TransportConnection& transportData, bool* ok) const;
