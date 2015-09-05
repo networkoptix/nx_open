@@ -12,13 +12,8 @@ HttpServer::HttpServer(const QUuid& localGuid)
 {
     using namespace std::placeholders;
 
-    m_thread.reset(new QThread());
-    m_thread->setObjectName("QnMulticast::HttpServer");
-
-    m_transport.reset(new Transport(localGuid, m_thread.get()));
+    m_transport.reset(new Transport(localGuid));
     m_transport->setRequestCallback(std::bind(&HttpServer::at_gotRequest, this, _1, _2, _3));
-
-    m_thread->start();
 }
 
 void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, const Request& request)

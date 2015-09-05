@@ -44,7 +44,7 @@ namespace QnMulticast
         Q_OBJECT
     public:
 
-        Transport(const QUuid& localGuid, QThread* parentThread = 0);
+        Transport(const QUuid& localGuid);
 
         QUuid addRequest(const Request& request, ResponseCallback callback, int timeoutMs);
         void addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
@@ -76,6 +76,7 @@ namespace QnMulticast
         RequestCallback m_requestCallback;
         std::unique_ptr<QTimer> m_timer;
         QCache<QUuid, void> m_processedRequests;
+        mutable QMutex m_mutex;
     private:
         QByteArray encodeMessage(const Request& request) const;
         Response decodeResponse(const TransportConnection& transportData, bool* ok) const;

@@ -23,7 +23,6 @@ namespace QnMulticast
     private:
         void at_gotRequest(const QUuid& requestId, const QUuid& clientId, const Request& request);
     private:
-        std::unique_ptr<QThread> m_thread;
         std::unique_ptr<Transport> m_transport;
         QSet<nx_http::AsyncHttpClientPtr> m_requests;
     };

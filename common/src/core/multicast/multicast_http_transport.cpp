@@ -73,14 +73,11 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
 
 // ----------------- Transport -----------------
 
-Transport::Transport(const QUuid& localGuid, QThread* parentThread):
+Transport::Transport(const QUuid& localGuid):
     m_localGuid(localGuid),
     m_bytesWritten(0),
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE)
 {
-    if (parentThread)
-        moveToThread(parentThread);
-
     m_socket.bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint);
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
@@ -91,7 +88,7 @@ Transport::Transport(const QUuid& localGuid, QThread* parentThread):
     }
 
     connect(&m_socket, &QUdpSocket::bytesWritten, this, &Transport::at_dataSent, Qt::QueuedConnection);
-    connect(&m_socket, &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead, Qt::QueuedConnection);
+    connect(&m_socket, &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
 
     m_timer.reset(new QTimer());
     connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
@@ -103,7 +100,8 @@ void Transport::at_dataSent(qint64 bytes)
     m_bytesWritten = qMax(0ll, m_bytesWritten - bytes);
     if (m_bytesWritten == 0) 
     {
-        // cleanup if all data are sent and response isn't expected (for server side)
+        // cleanup request if all data are sent and response isn't expected (for server side)
+        QMutexLocker lock(&m_mutex);
         for (auto itr = m_requests.begin(); itr != m_requests.end();)
         {
             TransportConnection& request = *itr;
@@ -112,13 +110,14 @@ void Transport::at_dataSent(qint64 bytes)
             else
                 ++itr;
         }
-
-        sendNextData();
     }
+    if (m_bytesWritten == 0) 
+        sendNextData();
 }
 
 void Transport::at_timer()
 {
+    QMutexLocker lock(&m_mutex);
     for (auto itr = m_requests.begin(); itr != m_requests.end();)
     {
         TransportConnection& request = *itr;
@@ -225,6 +224,7 @@ QnMulticast::Request Transport::decodeRequest(const TransportConnection& transpo
 
 QUuid Transport::addRequest(const Request& request, ResponseCallback callback, int timeoutMs)
 {
+    QMutexLocker lock(&m_mutex);
     TransportConnection transportRequest = encodeRequest(request);
     transportRequest.responseCallback = callback;
     transportRequest.timeoutMs = timeoutMs;
@@ -258,6 +258,7 @@ Transport::TransportConnection Transport::encodeRequest(const Request& request)
 
 void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
+    QMutexLocker lock(&m_mutex);
     m_requests[requestId] = encodeResponse(requestId, clientId, httpResponse);
     QMetaObject::invokeMethod(this, "sendNextData", Qt::QueuedConnection);
 }
@@ -288,14 +289,14 @@ Transport::TransportConnection Transport::encodeResponse(const QUuid& requestId,
 
 void Transport::at_socketReadyRead()
 {
+    QMutexLocker lock(&m_mutex);
     while (m_socket.hasPendingDatagrams())
     {
         QByteArray datagram;
-        datagram.resize(Packet::MAX_DATAGRAM_SIZE);
+        datagram.resize(m_socket.pendingDatagramSize());
         int readed = m_socket.readDatagram(datagram.data(), datagram.size());
         if (readed <= 0)
             return;
-        datagram.resize(readed);
         bool ok;
         Packet packet = Packet::deserialize(datagram, &ok);
         if (ok)
@@ -342,6 +343,7 @@ void Transport::at_socketReadyRead()
 
 void Transport::sendNextData()
 {
+    QMutexLocker lock(&m_mutex);
     int prevBytesWritten = -1;
     for (auto itr = m_requests.begin(); itr != m_requests.end(); ++itr)
     {
