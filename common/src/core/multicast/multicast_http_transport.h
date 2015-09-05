@@ -3,8 +3,9 @@
 
 #include <QElapsedTimer>
 #include <QUdpSocket>
-#include <QUuid>
+#include <QTimer>
 #include "multicast_http_fwd.h"
+#include <memory>
 
 namespace QnMulticast
 {
@@ -42,10 +43,11 @@ namespace QnMulticast
         Q_OBJECT
     public:
 
-        Transport(const QUuid& localGuid);
+        Transport(const QUuid& localGuid, QThread* parentThread = 0);
 
-        QUuid addRequest(const QString& method, const Request& request, ResponseCallback callback, int timeoutMs);
+        QUuid addRequest(const Request& request, ResponseCallback callback, int timeoutMs);
         void addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
+        void setRequestCallback(RequestCallback value) { m_requestCallback = value; }
     private slots:
         void sendNextData();
         void at_socketReadyRead();
@@ -72,12 +74,12 @@ namespace QnMulticast
 
         QUdpSocket m_socket;
         RequestCallback m_requestCallback;
-        QTimer m_timer;
+        std::unique_ptr<QTimer> m_timer;
     private:
-        QByteArray encodeMessage(const QString& method, const Request& request) const;
+        QByteArray encodeMessage(const Request& request) const;
         Response decodeResponse(const TransportConnection& transportData, bool* ok) const;
         Request decodeRequest(const TransportConnection& transportData, bool* ok) const;
-        TransportConnection encodeRequest(const QString& method, const Request& request);
+        TransportConnection encodeRequest(const Request& request);
         TransportConnection encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
     };
 

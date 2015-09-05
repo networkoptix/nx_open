@@ -203,6 +203,7 @@
 #include "rest/handlers/merge_ldap_users_rest_handler.h"
 #include "audit/mserver_audit_manager.h"
 #include "utils/common/waiting_for_qthread_to_empty_event_queue.h"
+#include "core/multicast/multicast_http_server.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1807,6 +1808,8 @@ void MediaServerProcess::run()
         QCoreApplication::quit();
         return;
     }
+    
+    std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(qnCommon->moduleGUID().toQUuid()));
 
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
@@ -1925,7 +1928,7 @@ void MediaServerProcess::run()
     MSSettings::roSettings()->sync();
     Q_ASSERT_X(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
-
+    
     if (needToStop()) {
         stopObjects();
         return;
@@ -2205,6 +2208,7 @@ void MediaServerProcess::run()
 
     QnResourceDiscoveryManager::instance()->pleaseStop();
     QnResource::pleaseStopAsyncTasks();
+    multicastHttp.reset();
     stopObjects();
 
     QnResource::stopCommandProc();

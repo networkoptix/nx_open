@@ -1,6 +1,12 @@
 #ifndef __MULTICAST_HTTP_FWD_H__
 #define __MULTICAST_HTTP_FWD_H__
 
+#include <QUuid>
+#include <QUrl>
+#include <QAuthenticator>
+#include <QQueue>
+#include <functional>
+
 namespace QnMulticast
 {
     enum class ErrCode
@@ -12,6 +18,8 @@ namespace QnMulticast
     };
     struct Request
     {
+        QString method;
+
         /** Server GUID */
         QUuid serverId;
         /** HTTP request. Only URL path and query params are used.*/
@@ -21,6 +29,8 @@ namespace QnMulticast
 
         /** Extra http headers. user-agent for example */
         QList<QPair<QString, QString>> extraHttpHeaders;
+
+        QByteArray contentType;
 
         /** request message body. Usually It stay empty for GET requests */
         QByteArray messageBody;
@@ -40,7 +50,8 @@ namespace QnMulticast
         QByteArray messageBody;
     };
     typedef std::function<void(const QUuid& requestId, ErrCode errCode, const Response& response)> ResponseCallback;
-    typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpData)> RequestCallback;
+    //typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpData)> RequestCallback;
+    typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const Request& request)> RequestCallback;
 }
 
 #endif // __MULTICAST_HTTP_FWD_H__

@@ -18,17 +18,18 @@ namespace QnMulticast
         /** Execute HTTP get request over multicast transport
         * !Returns request handle
         */
-        QUuid doGet(const Request& request, ResponseCallback callback, int timeoutMs = -1);
+        //QUuid doGet(const Request& request, ResponseCallback callback, int timeoutMs = -1);
         /** Execute HTTP post request over multicast transport
         * !Returns request handle
         */
-        QUuid doPost(const Request& request, ResponseCallback callback, int timeoutMs = -1);
+        //QUuid doPost(const Request& request, ResponseCallback callback, int timeoutMs = -1);
         /** Cancel previously started request.  callback function will not called. */
         void cancelRequest(const QUuid& handle);
         /** Set default timeout for requests */
         void setDefaultTimeout(int timeoutMs);
+        QUuid execRequest(const Request& request, ResponseCallback callback, int timeoutMs = -1);
     private:
-        QUuid execRequest(const QString& method, const Request& request, ResponseCallback callback, int timeoutMs);
+        
     private:
         Transport m_transport;
         QMap<QUuid, QByteArray> m_awaitingResponses;

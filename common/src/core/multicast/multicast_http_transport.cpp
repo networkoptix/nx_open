@@ -9,7 +9,7 @@ static char MESSAGE_BODY_DELIMITER = '$';
 static const int MTU_SIZE = 1412;
 static const QUuid PROTO_MAGIC("422DEA47-0B0C-439A-B1FA-19644CCBC0BD");
 static const int PROTO_VERSION = 1;
-static const QHostAddress MULTICAST_GROUP(QLatin1String("224.57.43.102"));
+static const QHostAddress MULTICAST_GROUP(QLatin1String("239.57.43.102"));
 static const int MULTICAST_PORT = 7001;
 static const int MAX_SEND_BUFFER_SIZE = 1024 * 64;
 
@@ -72,11 +72,14 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
 
 // ----------------- Transport -----------------
 
-Transport::Transport(const QUuid& localGuid):
+Transport::Transport(const QUuid& localGuid, QThread* parentThread):
     m_localGuid(localGuid),
     m_bytesWritten(0)
 {
-    m_socket.bind(MULTICAST_PORT, QAbstractSocket::ReuseAddressHint);
+    if (parentThread)
+        moveToThread(parentThread);
+
+    m_socket.bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint);
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
@@ -86,9 +89,11 @@ Transport::Transport(const QUuid& localGuid):
     }
 
     connect(&m_socket, &QUdpSocket::bytesWritten, this, &Transport::at_dataSent, Qt::QueuedConnection);
-    connect(&m_socket, &QUdpSocket::bytesAvailable, this, &Transport::at_socketReadyRead);
-    connect(&m_timer, &QTimer::timeout, this, &Transport::at_timer);
-    m_timer.start(1000);
+    connect(&m_socket, &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
+
+    m_timer.reset(new QTimer());
+    connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
+    m_timer->start(1000);
 }
 
 void Transport::at_dataSent(qint64 bytes)
@@ -125,17 +130,17 @@ void Transport::at_timer()
     }
 }
 
-QByteArray Transport::encodeMessage(const QString& method, const Request& request) const
+QByteArray Transport::encodeMessage(const Request& request) const
 {
     QString result;
 
     QString encodedPath = request.url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters | QUrl::RemoveScheme | QUrl::RemoveAuthority);
 
-    result.append(lit("%1 %2 HTTP/1.1\r\n").arg(method).arg(encodedPath));
+    result.append(lit("%1 %2 HTTP/1.1\r\n").arg(request.method).arg(encodedPath));
     for (const auto& header: request.extraHttpHeaders)
         result.append(lit("%1: %2\r\n").arg(header.first).arg(header.second));
-    if (!request.messageBody.isEmpty())
-        result.append(lit("Content-Length: %1\r\n").arg(request.messageBody.size()));
+    if (!request.contentType.isEmpty())
+        result.append(lit("%1: %2\r\n").arg(lit("Content-Type")).arg(QLatin1String(request.contentType)));
     result.append(lit("\r\n"));
     return result.toUtf8().append(request.messageBody);
 }
@@ -176,9 +181,49 @@ QnMulticast::Response Transport::decodeResponse(const TransportConnection& trans
     return response;
 }
 
-QUuid Transport::addRequest(const QString& method, const Request& request, ResponseCallback callback, int timeoutMs)
+QnMulticast::Request Transport::decodeRequest(const TransportConnection& transportData, bool* ok) const
 {
-    TransportConnection transportRequest = encodeRequest(method, request);
+    *ok = false;
+    QnMulticast::Request request;
+    request.serverId = m_localGuid;
+    QByteArray message = QByteArray::fromBase64(transportData.receivedData);
+    // extract http result
+    int requestLineEnd = message.indexOf("\r\n");
+    if (requestLineEnd == -1)
+        return request; // error
+    QByteArray requestLine = message.mid(0, requestLineEnd);
+    QList<QByteArray> parts = requestLine.split(' ');
+    if (parts.size() < 3)
+        return request; // error
+    request.method = QString::fromLatin1(parts[0]);
+    request.url = QLatin1String(parts[1]);
+    int msgBodyPos = message.indexOf("\r\n\r\n");
+    if (msgBodyPos == -1)
+        msgBodyPos = message.size();
+    // parse headers
+    int headersStart = requestLineEnd + 2;
+    QByteArray headers = QByteArray::fromRawData(message.data() + headersStart, msgBodyPos - headersStart);
+    for (const auto& header: headers.split('\n'))
+    {
+        int delimiterPos = header.indexOf(':');
+        if (delimiterPos != -1) {
+            QPair<QString,QString> h;
+            h.first = QLatin1String(header.left(delimiterPos).trimmed());
+            h.second = QLatin1String(header.right(delimiterPos+1).trimmed());
+            if (h.first.toLower() == lit("content-type"))
+                request.contentType = h.second.toUtf8();
+            else
+                request.extraHttpHeaders << h;
+        }
+    }
+    request.messageBody = message.mid(msgBodyPos + 4);
+    *ok = true;
+    return request;
+}
+
+QUuid Transport::addRequest(const Request& request, ResponseCallback callback, int timeoutMs)
+{
+    TransportConnection transportRequest = encodeRequest(request);
     transportRequest.responseCallback = callback;
     transportRequest.timeoutMs = timeoutMs;
     m_requests[transportRequest.requestId] = std::move(transportRequest);
@@ -186,10 +231,10 @@ QUuid Transport::addRequest(const QString& method, const Request& request, Respo
     return transportRequest.requestId;
 }
 
-Transport::TransportConnection Transport::encodeRequest(const QString& method, const Request& request)
+Transport::TransportConnection Transport::encodeRequest(const Request& request)
 {
     TransportConnection transportRequest;
-    QByteArray message = encodeMessage(method, request).toBase64();
+    QByteArray message = encodeMessage(request).toBase64();
 
     QUuid requestId = QUuid::createUuid();
     for (int offset = 0; offset < message.size();)
@@ -241,35 +286,48 @@ Transport::TransportConnection Transport::encodeResponse(const QUuid& requestId,
 
 void Transport::at_socketReadyRead()
 {
-    QByteArray datagram;
-    datagram.resize(Packet::MAX_DATAGRAM_SIZE);
-    int readed = m_socket.readDatagram(datagram.data(), datagram.size());
-    if (readed <= 0)
-        return;
-    datagram.resize(readed);
-    bool ok;
-    Packet packet = Packet::deserialize(datagram, &ok);
-    if (ok)
+    while (m_socket.hasPendingDatagrams())
     {
-        if (packet.messageType == MessageType::response && !m_requests.contains(packet.requestId))
-            return; // ignore response without request (probably request already removed because of timeout or other reason)
-
-        TransportConnection& transportData = m_requests[packet.requestId];
-
-        transportData.receivedData.resize(packet.messageSize);
-        memcpy(transportData.receivedData.data() + packet.offset, packet.payloadData.data(), packet.payloadData.size());
-        transportData.receivedDataSize += packet.payloadData.size();
-        if (transportData.receivedDataSize == packet.messageSize) 
+        QByteArray datagram;
+        datagram.resize(Packet::MAX_DATAGRAM_SIZE);
+        int readed = m_socket.readDatagram(datagram.data(), datagram.size());
+        if (readed <= 0)
+            return;
+        datagram.resize(readed);
+        bool ok;
+        Packet packet = Packet::deserialize(datagram, &ok);
+        if (ok)
         {
-            if (packet.messageType == MessageType::response) {
+            if (packet.messageType == MessageType::response && !m_requests.contains(packet.requestId))
+                continue; // ignore response without request (probably request already removed because of timeout or other reason)
+
+            if (packet.messageType == MessageType::request && packet.serverId != m_localGuid)
+                continue; // foreign packet
+            if (packet.messageType == MessageType::response && packet.clientId != m_localGuid)
+                continue; // foreign packet
+
+            TransportConnection& transportData = m_requests[packet.requestId];
+            transportData.requestId = packet.requestId;
+
+            transportData.receivedData.resize(packet.messageSize);
+            memcpy(transportData.receivedData.data() + packet.offset, packet.payloadData.data(), packet.payloadData.size());
+            transportData.receivedDataSize += packet.payloadData.size();
+            if (transportData.receivedDataSize == packet.messageSize) 
+            {
                 bool ok;
-                Response response = decodeResponse(transportData, &ok);
-                response.serverId = packet.serverId;
-                transportData.responseCallback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
-                m_requests.remove(packet.requestId);
-            }
-            else if (packet.messageType == MessageType::request) {
-                m_requestCallback(transportData.requestId, packet.clientId, transportData.receivedData);
+                if (packet.messageType == MessageType::response) 
+                {
+                    Response response = decodeResponse(transportData, &ok);
+                    response.serverId = packet.serverId;
+                    transportData.responseCallback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
+                    m_requests.remove(packet.requestId);
+                }
+                else if (packet.messageType == MessageType::request) 
+                {
+                    Request request = decodeRequest(transportData, &ok);
+                    if (ok)
+                        m_requestCallback(transportData.requestId, packet.clientId, request);
+                }
             }
         }
     }
