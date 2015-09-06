@@ -61,7 +61,7 @@ void processHttpResponse(
         return;
     }
 
-    handler(api::ResultCode::ok, outputData);
+    handler(api::ResultCode::ok, std::move(outputData));
 }
 
 //!Overload for void output data
@@ -154,6 +154,174 @@ void doRequest(
         handler(api::ResultCode::networkError);
     }
 }
+
+
+namespace detail {
+
+class BaseFusionDataHttpClient
+:
+    public QnStoppableAsync
+{
+public:
+    BaseFusionDataHttpClient(QUrl url)
+    :
+        m_url(std::move(url)),
+        m_httpClient(nx_http::AsyncHttpClient::create())
+    {
+        QObject::connect(
+            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client){ requestDone(client); },
+            Qt::DirectConnection);
+    }
+    
+    virtual ~BaseFusionDataHttpClient() {}
+
+    //!Implementation of QnStoppableAsync::pleaseStopAsync
+    virtual void pleaseStop( std::function<void()> handler ) override
+    {
+        m_httpClient->terminate();
+        handler();
+    }
+
+    /*!
+        \return \a false if failed to initiate async request
+    */
+    bool get()
+    {
+        return m_httpClient->doGet(m_url);
+    }
+    
+protected:
+    QUrl m_url;
+
+    virtual void requestDone(nx_http::AsyncHttpClientPtr client) = 0;
+
+private:
+    nx_http::AsyncHttpClientPtr m_httpClient;
+};
+
+}
+
+
+//!HTTP client that uses \a fusion to serialize/deserialize
+template<typename InputData, typename OutputData>
+class FusionDataHttpClient
+:
+    public detail::BaseFusionDataHttpClient
+{
+public:
+    /*!
+        TODO #ak if response Content-Type is multipart, then \a handler is invoked for every body part
+    */
+    FusionDataHttpClient(
+        QUrl url,
+        const InputData& input,
+        std::function<void(api::ResultCode, OutputData)> handler)
+    :
+        detail::BaseFusionDataHttpClient(std::move(url)),
+        m_handler(std::move(handler))
+    {
+        serializeToUrl(input, &m_url);
+    }
+    
+private:
+    std::function<void(api::ResultCode, OutputData)> m_handler;
+    
+    virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
+    {
+        processHttpResponse(
+            std::move(m_handler),
+            client->response() ? SystemError::noError : SystemError::connectionReset,
+            client->response() ? client->response()->statusList.statusCode : 0,
+            client->fetchMessageBodyBuffer());
+    }
+};
+
+template<typename OutputData>
+class FusionDataHttpClient<void, OutputData>
+:
+    public detail::BaseFusionDataHttpClient
+{
+public:
+    FusionDataHttpClient(
+        QUrl url,
+        std::function<void(api::ResultCode, OutputData)> handler)
+    :
+        detail::BaseFusionDataHttpClient(std::move(url)),
+        m_handler(std::move(handler))
+    {
+    }
+    
+private:
+    std::function<void(api::ResultCode, OutputData)> m_handler;
+    
+    virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
+    {
+        processHttpResponse(
+            std::move(m_handler),
+            client->response() ? SystemError::noError : SystemError::connectionReset,
+            client->response() ? client->response()->statusList.statusCode : 0,
+            client->fetchMessageBodyBuffer());
+    }
+};
+
+template<typename InputData>
+class FusionDataHttpClient<InputData, void>
+:
+    public detail::BaseFusionDataHttpClient
+{
+public:
+    FusionDataHttpClient(
+        QUrl url,
+        const InputData& input,
+        std::function<void(api::ResultCode)> handler)
+    :
+        detail::BaseFusionDataHttpClient(std::move(url)),
+        m_handler(std::move(handler))
+    {
+        serializeToUrl(input, &m_url);
+    }
+    
+private:
+    std::function<void(api::ResultCode)> m_handler;
+    
+    virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
+    {
+        m_handler(
+            client->response()
+            ? api::httpStatusCodeToResultCode(
+                static_cast<nx_http::StatusCode::Value>(client->response()->statusList.statusCode))
+            : api::ResultCode::networkError);
+    }
+};
+
+template<>
+class FusionDataHttpClient<void, void>
+:
+    public detail::BaseFusionDataHttpClient
+{
+public:
+    FusionDataHttpClient(
+        QUrl url,
+        std::function<void(api::ResultCode)> handler)
+    :
+        detail::BaseFusionDataHttpClient(std::move(url)),
+        m_handler(std::move(handler))
+    {
+    }
+    
+private:
+    std::function<void(api::ResultCode)> m_handler;
+    
+    virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
+    {
+        m_handler(
+            client->response()
+            ? api::httpStatusCodeToResultCode(
+                static_cast<nx_http::StatusCode::Value>(client->response()->statusList.statusCode))
+            : api::ResultCode::networkError);
+    }
+};
 
 }   //cl
 }   //cdb

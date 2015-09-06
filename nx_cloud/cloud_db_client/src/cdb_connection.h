@@ -22,8 +22,9 @@ class Connection
 {
 public:
     Connection(
+        const SocketAddress& endpoint,
         const std::string& login,
-        const std::string& password );
+        const std::string& password);
 
     //!Implemetation of api::Connection::getAccountManager
     virtual api::AccountManager* getAccountManager() override;

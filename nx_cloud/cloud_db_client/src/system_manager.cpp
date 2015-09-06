@@ -49,6 +49,21 @@ void SystemManager::shareSystem(
     completionHandler(api::ResultCode::notImplemented);
 }
 
+void SystemManager::setCredentials(
+    const std::string& login,
+    const std::string& password)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_url.setUsername(login);
+    m_url.setPassword(password);
+}
+
+QUrl SystemManager::getUrl() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_url;
+}
+
 }   //cl
 }   //cdb
 }   //nx

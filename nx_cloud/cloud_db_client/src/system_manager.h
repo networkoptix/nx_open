@@ -17,29 +17,37 @@ namespace cl {
 
 class SystemManager
 :
-    public api::SystemManager
+    public api::SystemManager,
+    public AsyncRequestsExecutor
 {
 public:
     SystemManager(QUrl url);
 
     //!Implementation of \a SystemManager::bindSystem
-    void bindSystem(
+    virtual void bindSystem(
         api::SystemRegistrationData registrationData,
         std::function<void(api::ResultCode, api::SystemData)> completionHandler) override;
     //!Implementation of \a SystemManager::unbindSystem
-    void unbindSystem(
+    virtual void unbindSystem(
         const std::string& systemID,
         std::function<void(api::ResultCode)> completionHandler) override;
     //!Implementation of \a SystemManager::getSystems
-    void getSystems(
+    virtual void getSystems(
         std::function<void(api::ResultCode, std::vector<api::SystemData>)> completionHandler ) override;
     //!Implementation of \a SystemManager::shareSystem
-    void shareSystem(
+    virtual void shareSystem(
         api::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler) override;
 
+    void setCredentials(
+        const std::string& login,
+        const std::string& password);
+
 private:
+    QnMutex m_mutex;
     QUrl m_url;
+
+    QUrl getUrl() const;
 };
 
 

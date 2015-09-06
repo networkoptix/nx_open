@@ -33,10 +33,12 @@ namespace api {
 class Connection
 {
 public:
+    virtual ~Connection() {}
+
     virtual api::AccountManager* getAccountManager() = 0;
     virtual api::SystemManager* getSystemManager() = 0;
 
-    //!Set other credentials if they were changed
+    //!Set credentials to use
     /*!
         This method does not try to connect to cloud_db check credentials
     */
@@ -51,11 +53,17 @@ public:
 class ConnectionFactory
 {
 public:
+    virtual ~ConnectionFactory() {}
+
     //!Connects to cloud_db to check user credentials
     virtual void connect(
         const std::string& login,
         const std::string& password,
         std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) = 0;
+    //!Creates connection object without checking credentials provided
+    virtual std::unique_ptr<api::Connection> createConnection(
+        const std::string& login,
+        const std::string& password) = 0;
 };
 
 extern "C"

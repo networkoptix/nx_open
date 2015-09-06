@@ -20,6 +20,8 @@ namespace api {
 class SystemManager
 {
 public:
+    virtual ~SystemManager() {}
+
     //!Binds system to an account associated with \a authzInfo
     virtual void bindSystem(
         SystemRegistrationData registrationData,
