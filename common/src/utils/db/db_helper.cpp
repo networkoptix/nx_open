@@ -5,6 +5,7 @@
 #include <QSqlRecord>
 #include <QFile>
 #include <QSqlError>
+#include "qcoreapplication.h"
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 
     //and no concurrent transactions supported. Maybe QnDbConnection?

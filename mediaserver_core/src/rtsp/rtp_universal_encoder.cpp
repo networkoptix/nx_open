@@ -762,3 +762,8 @@ bool QnUniversalRtpEncoder::isOpened() const
 {
     return m_isOpened;
 }
+
+void QnUniversalRtpEncoder::setUseRealTimeOptimization(bool value)
+{
+    m_transcoder.setUseRealTimeOptimization(value);
+}

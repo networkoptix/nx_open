@@ -46,6 +46,7 @@
 #include "audit/audit_manager.h"
 #include "media_server/settings.h"
 #include "streaming/streaming_params.h"
+#include "media_server/settings.h"
 
 class QnTcpListener;
 
@@ -584,6 +585,8 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
             universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, extraTranscodeParams)); // transcode src codec to MPEG4/AAC
+            if (MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
+                universalEncoder->setUseRealTimeOptimization(true);
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else

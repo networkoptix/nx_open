@@ -288,6 +288,13 @@ namespace ec2
             const QnUuid& peerID,
             nx_http::AsyncHttpClientPtr clientPtr );
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
+        void syncTimeWithAllKnownServers(QMutexLocker* const lock);
+        void onBeforeSendingTransaction(
+            QnTransactionTransport* transport,
+            nx_http::HttpHeaders* const headers);
+        void onTransactionReceived(
+            QnTransactionTransport* transport,
+            const nx_http::HttpHeaders& headers);
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );

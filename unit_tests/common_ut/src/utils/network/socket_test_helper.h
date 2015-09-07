@@ -9,6 +9,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <set>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
@@ -27,18 +28,19 @@ public:
     TestConnection(
         std::unique_ptr<AbstractStreamSocket> connection,
         size_t bytesToSendThrough,
-        std::function<void(TestConnection*, SystemError::ErrorCode)> handler );
+        std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler );
     /*!
         \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
     */
     TestConnection(
         const SocketAddress& remoteAddress,
         size_t bytesToSendThrough,
-        std::function<void(TestConnection*, SystemError::ErrorCode)> handler );
+        std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler );
     virtual ~TestConnection();
 
     virtual void pleaseStop() override;
 
+    int id() const;
     bool start();
 
     size_t totalBytesSent() const;
@@ -49,7 +51,7 @@ private:
     const size_t m_bytesToSendThrough;
     bool m_connected;
     SocketAddress m_remoteAddress;
-    const std::function<void(TestConnection*, SystemError::ErrorCode)> m_handler;
+    const std::function<void(int, TestConnection*, SystemError::ErrorCode)> m_handler;
     nx::Buffer m_readBuffer;
     nx::Buffer m_outData;
     bool m_terminated;
@@ -89,7 +91,7 @@ private:
     const size_t m_bytesToSendThrough;
 
     void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
-    void onConnectionDone( TestConnection* /*connection*/ );
+    void onConnectionDone( TestConnection* connection );
 };
 
 //!Establishes numerous connections to specified address, reads all connections (ignoring data) and sends random data back
@@ -129,8 +131,9 @@ private:
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     size_t m_totalConnectionsEstablished;
+    std::set<int> m_finishedConnectionsIDs;
 
-    void onConnectionFinished( ConnectionsContainer::iterator connectionIter );
+    void onConnectionFinished( int id, ConnectionsContainer::iterator connectionIter );
 };
 
 #endif  //SOCKET_TEST_HELPER_H

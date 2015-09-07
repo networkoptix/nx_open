@@ -275,28 +275,6 @@ QnStorageManager::QnStorageManager():
     m_removeEmtyDirTimer.restart();
 }
 
-
-void QnStorageManager::getCurrentlyUsedLocalPathes(QList<QString> *pathList) const
-{
-    assert(pathList);
-    QnMutexLocker lock(&m_localPatches);
-    for (const auto &entry: m_localPathsInUse)
-        pathList->append(entry);
-}
-
-
-void QnStorageManager::addLocalPathInUse(const QString &path)
-{
-    QnMutexLocker lock(&m_localPatches);
-    m_localPathsInUse.append(path);
-}
-
-void QnStorageManager::removeFromLocalPathInUse(const QString &path)
-{
-    QnMutexLocker lock(&m_localPatches);
-    m_localPathsInUse.removeAll(path);
-}
-
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
 void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter)
 {

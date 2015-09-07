@@ -142,6 +142,7 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
 }
 
 void QnSingleCameraSettingsWidget::retranslateUi() {
+    //: "Camera Settings" or "IO Module settings", etc
     setWindowTitle(tr("%1 Settings").arg(getDefaultDeviceNameUpper(m_camera)));
 }
 

@@ -156,7 +156,7 @@ void QnAvigilonResource::onCheckPortRequestDone( nx_http::AsyncHttpClientPtr htt
                     toSharedPointer(),
                     QString::number(i),
                     isPortClosed,
-                    qnSyncTime->currentMSecsSinceEpoch() );
+                    qnSyncTime->currentUSecsSinceEpoch() );
             }
         }
     }

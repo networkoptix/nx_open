@@ -10,6 +10,7 @@
 #include <business/business_fwd.h>
 #include <business/business_action_parameters.h>
 #include <business/business_event_parameters.h>
+#include <utils/common/model_functions_fwd.h>
 
 namespace QnBusiness
 {
@@ -91,42 +92,21 @@ public:
         MotionExists = 1
     };
 
-    QnBusinessActionData(): m_actionType(QnBusiness::UndefinedAction), m_flags(0) {}
+    QnBusinessActionData(): actionType(QnBusiness::UndefinedAction), flags(0) {}
+    bool hasFlags(int flags) const { return flags & flags; }
 
-    QnBusiness::ActionType actionType() const { return m_actionType; }
-    void setActionType(QnBusiness::ActionType type) { m_actionType = type; }
+    QnBusiness::ActionType actionType;
+    QnBusinessActionParameters actionParams;
+    QnBusinessEventParameters eventParams;
+    QnUuid businessRuleId; 
+    int aggregationCount;
 
-    void setParams(const QnBusinessActionParameters& params) { m_params = params;}
-    const QnBusinessActionParameters& getParams() const { return m_params; }
-
-    void setRuntimeParams(const QnBusinessEventParameters& params) {m_runtimeParams = params;}
-    const QnBusinessEventParameters& getRuntimeParams() const {return m_runtimeParams; }
-
-    void setBusinessRuleId(const QnUuid& value) {m_businessRuleId = value; }
-    QnUuid getBusinessRuleId() const { return m_businessRuleId; }
-
-    void setAggregationCount(int value) { m_aggregationCount = value; }
-    int getAggregationCount() const { return m_aggregationCount; }
-
-    qint64 timestamp() const { return m_runtimeParams.eventTimestampUsec; }
-    QnBusiness::EventType eventType() const { return m_runtimeParams.eventType; }
-
-    void setCompareString(const QString& value) { m_compareString = value; }
-    const QString& compareString() const { return m_compareString; }
-
-    void setFlags(int value) { m_flags = value; }
-    int flags() const { return m_flags; }
-    bool hasFlags(int flags) const { return m_flags & flags; }
-
-protected:
-    QnBusiness::ActionType m_actionType;
-    QnBusinessActionParameters m_params;
-    QnBusinessEventParameters m_runtimeParams;
-    QnUuid m_businessRuleId; 
-    int m_aggregationCount;
-    QString m_compareString;
-    int m_flags;
+    int flags;
+    QString compareString; // todo: this string is used on a client side for internal purpose. Need to move it to separate class
 };
+
+#define QnBusinessActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
+QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionData, (ubjson)(json)(xml)(csv_record));
 
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionList)

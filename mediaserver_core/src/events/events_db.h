@@ -24,7 +24,7 @@ public:
     bool saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes);
     bool removeLogForRes(QnUuid resId);
 
-    QList<QnAbstractBusinessActionPtr> getActions(
+    QnBusinessActionDataList getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,
         const QnBusiness::EventType& eventType = QnBusiness::UndefinedEvent, 
@@ -59,6 +59,7 @@ private:
     bool cleanupEvents();
     bool migrateBusinessParams();
     bool cleanupAuditLog();
+    bool migrateBusinessParams();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
