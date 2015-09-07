@@ -58,7 +58,7 @@ def prepare(binary, sbindir, tlibdir):
     yield binary
 
     ignore = shutil.ignore_patterns('*debug*', '.*')
-    for subfolder in 'platforms', 'styles', 'imageformats', 'vox':
+    for subfolder in 'platforms', 'styles', 'imageformats':
         tfolder = join(tbindir, subfolder)
         shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore)
         for f in os.listdir(tfolder):

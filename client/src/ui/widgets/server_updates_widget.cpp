@@ -83,7 +83,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
         if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
             return;
-        m_updateTool->startUpdate(m_targetVersion, !m_targetVersion.isNull());
+        m_updateTool->startUpdate(m_targetVersion);
     });
     ui->internetUpdateButton->setEnabled(false);
     ui->internetDetailLabel->setVisible(false);
@@ -446,7 +446,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
 
     QnSoftwareVersion targetVersion = m_targetVersion;
 
-    m_updateTool->checkForUpdates(m_targetVersion, !m_targetVersion.isNull(), [this, autoSwitch, autoStart, targetVersion](const QnCheckForUpdateResult &result) {
+    m_updateTool->checkForUpdates(m_targetVersion, [this, autoSwitch, autoStart, targetVersion](const QnCheckForUpdateResult &result) {
         QPalette detailPalette = this->palette();
         QPalette statusPalette = this->palette();
         QString detail;
@@ -486,6 +486,12 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
             detail = tr("Unable to begin update. An update for the client was not found.");
             setWarningStyle(&detailPalette);
             break;
+        case QnCheckForUpdateResult::DowngradeIsProhibited:
+            status = displayVersion.toString();
+            detail = tr("Unable to begin update. Downgrade to the previous release is prohibited.");
+            setWarningStyle(&statusPalette);
+            setWarningStyle(&detailPalette);
+            break;
         default:
             Q_ASSERT(false);    //should never get here
         }
@@ -513,7 +519,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
         m_updatesModel->setCheckResult(result);
 
         if (autoStart && result.result == QnCheckForUpdateResult::UpdateFound)
-            m_updateTool->startUpdate(result.version, !result.version.isNull());
+            m_updateTool->startUpdate(result.version);
     });
 
 }

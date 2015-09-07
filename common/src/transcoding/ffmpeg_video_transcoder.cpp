@@ -25,8 +25,6 @@ static qint64& movigAverage(qint64& accumulator, qint64 value)
     return accumulator = accumulator * movingAvg + value * (1.0 - movingAvg);
 }
 
-bool QnFfmpegVideoTranscoder::isOptimizationDisabled(false);
-
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
@@ -37,7 +35,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     m_averageCodingTimePerFrame(0),
     m_averageVideoTimePerFrame(0),
     m_encodedFrames(0),
-    m_droppedFrames(0)
+    m_droppedFrames(0),
+    m_useRealTimeOptimization(false)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -181,7 +180,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
         // Improve performance by omitting frames to encode in case if encoding goes way too slow..
         // TODO: #mu make mediaserver's config option and HTTP query option to disable feature
-        if (!isOptimizationDisabled && m_encodedFrames > OPTIMIZATION_BEGIN_FRAME)
+        if (m_useRealTimeOptimization && m_encodedFrames > OPTIMIZATION_BEGIN_FRAME)
         {   
             // the more frames are dropped the lower limit is gonna be set
             // (x + (x >> k)) is faster and more precise then (x * (1 + 0.5^k))
@@ -230,6 +229,11 @@ void QnFfmpegVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filt
 {
     QnVideoTranscoder::setFilterList(filters);
     m_decodedVideoFrame->setUseExternalData(false); // do not modify ffmpeg frame buffer
+}
+
+void QnFfmpegVideoTranscoder::setUseRealTimeOptimization(bool value)
+{
+    m_useRealTimeOptimization = value;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

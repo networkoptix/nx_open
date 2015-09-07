@@ -219,7 +219,6 @@ static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
 static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
-static const QByteArray DISABLE_FFMPEG_OPTIMIZATION("disableFfmpegOptimization");
 
 class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
@@ -398,9 +397,6 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 void ffmpegInit()
 {
-    if (MSSettings::roSettings()->value(DISABLE_FFMPEG_OPTIMIZATION, false).toBool())
-        QnFfmpegVideoTranscoder::isOptimizationDisabled = true;
-
     //avcodec_init();
     av_register_all();
 
@@ -1423,7 +1419,7 @@ bool MediaServerProcess::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
-    AuthMethod::Values methods = AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam;
+    AuthMethod::Values methods = (AuthMethod::Values)(AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
@@ -1477,6 +1473,9 @@ QHostAddress MediaServerProcess::getPublicAddress()
 
 void MediaServerProcess::run()
 {
+
+    QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
+
 #ifdef _WIN32
     win32_exception::setCreateFullCrashDump( MSSettings::roSettings()->value(
         nx_ms_conf::CREATE_FULL_CRASH_DUMP,
@@ -1715,19 +1714,6 @@ void MediaServerProcess::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    if (!m_publicAddress.isNull())
-    {
-        if (!m_ipDiscovery->publicIP().isNull()) {
-            m_updatePiblicIpTimer.reset(new QTimer());
-            connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
-            connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
-            m_updatePiblicIpTimer->start(60 * 1000 * 2);
-        }
-
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-        localInfo.data.publicIP = m_publicAddress.toString();
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
-    }
     connect( ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
@@ -1912,6 +1898,20 @@ void MediaServerProcess::run()
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
+    }
+
+    if (!m_publicAddress.isNull())
+    {
+        if (!m_ipDiscovery->publicIP().isNull()) {
+            m_updatePiblicIpTimer.reset(new QTimer());
+            connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
+            connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+            m_updatePiblicIpTimer->start(60 * 1000 * 2);
+        }
+
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        localInfo.data.publicIP = m_publicAddress.toString();
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
 
     /* This key means that password should be forcibly changed in the database. */
@@ -2241,7 +2241,6 @@ void MediaServerProcess::run()
     QnBusinessEventConnector::initStaticInstance( NULL );
 
     QnBusinessRuleProcessor::fini();
-    QnEventsDB::fini();
 
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
@@ -2260,6 +2259,9 @@ void MediaServerProcess::run()
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
+    
+    // destroy events db
+    QnEventsDB::fini();
 
     mserverResourceDiscoveryManager.reset();
 

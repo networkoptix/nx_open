@@ -197,7 +197,6 @@ private:
 
     mutable QMutex m_resourcesMtx;
     bool m_tranInProgress;
-    mutable bool m_containsIoModules;
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
     QHash<QnUuid, QnResourcePtr> m_incompatibleResources;

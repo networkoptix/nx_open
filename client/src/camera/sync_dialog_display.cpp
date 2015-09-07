@@ -15,6 +15,7 @@ QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource):
     m_reader = 0;
 
     m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
+    m_hasProcessedMedia = false;
 }
 
 QnSignDialogDisplay::~QnSignDialogDisplay()
@@ -85,8 +86,8 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         m_eofProcessed = true;
 
         if (m_lastKeyFrame)
-        {
             m_display[0]->display(m_lastKeyFrame, true, QnFrameScaler::factor_any); // repeat last frame on the screen (may be skipped because of time check)
+        if (m_hasProcessedMedia) {
             finilizeSign();
         }
         else {
@@ -96,6 +97,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
     }
     else if (video || audio)
     {
+        m_hasProcessedMedia = true;
 #ifndef SIGN_FRAME_ENABLED
         // update digest from current frame
         if (media && media->dataSize() > 4) {
