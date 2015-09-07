@@ -110,8 +110,10 @@ namespace
         return true;
     }
 
-    void updateSettings(QnNetworkAddressEntryList& currentSettings, QnNetworkAddressEntryList& newSettings)
+    //!Returns \a true, if \a newSettings modify something in \a currentSettings
+    bool updateSettings(QnNetworkAddressEntryList& currentSettings, QnNetworkAddressEntryList& newSettings)
     {
+        bool modified = false;
         // merge existing data
         for(auto& value :currentSettings) 
         {
@@ -121,13 +123,26 @@ namespace
                 if (newValue.name != value.name)
                     continue;
                 if (!newValue.ipAddr.isNull())
+                {
+                    modified |= value.ipAddr != newValue.ipAddr;
                     value.ipAddr = newValue.ipAddr;
+                }
                 if (!newValue.netMask.isNull())
+                {
+                    modified |= value.netMask != newValue.netMask;
                     value.netMask = newValue.netMask;
+                }
                 if (!newValue.gateway.isNull())
+                {
+                    modified |= value.gateway != newValue.gateway;
                     value.gateway = newValue.gateway;
+                }
                 if (!newValue.dns_servers.isNull())
+                {
+                    modified |= value.dns_servers != newValue.dns_servers;
                     value.dns_servers = newValue.dns_servers;
+                }
+                modified |= value.dhcp != newValue.dhcp;
                 value.dhcp = newValue.dhcp;
                 newSettings.erase(itr);
                 break;
@@ -138,6 +153,8 @@ namespace
         for (const auto& newValue :newSettings)
             currentSettings.push_back(newValue);
     #endif
+        
+        return modified;
     }
 
 
@@ -162,6 +179,12 @@ namespace
 
         return addr & mask;
     }
+}
+
+QnIfConfigRestHandler::QnIfConfigRestHandler()
+:
+    m_modified(false)
+{
 }
 
 bool QnIfConfigRestHandler::checkData(const QnNetworkAddressEntryList& newSettings, QString* errString)
@@ -241,7 +264,7 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
         return CODE_OK;
     }
 
-    updateSettings(currentSettings, newSettings);
+    m_modified = updateSettings(currentSettings, newSettings);
 
     QString errString;
     if (!checkData(currentSettings, &errString)) {
@@ -268,6 +291,9 @@ void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestPar
     bool ok = false;
     QnNetworkAddressEntryList currentSettings = readNetworSettings(&ok);
     if (!ok)
+        return;
+
+    if (!m_modified)
         return;
     
 #ifndef Q_OS_WIN

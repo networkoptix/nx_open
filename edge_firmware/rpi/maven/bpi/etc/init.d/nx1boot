@@ -1,0 +1,297 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          nx1boot
+# Required-Start:    $remote_fs loadcpufreq
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# X-Start-Before:    hddbootflush
+# Short-Description: nx1 boot sequence
+# Description:       Provides the ability to boot up automatically depending on available 
+#                    boot devices and ability to override boot using the boot menu.
+### END INIT INFO
+# VERSION: ${release.version}.${buildNumber}
+
+export CUSTOMIZATION=${deb.customization.company.name}
+/etc/init.d/cron stop
+/etc/init.d/$CUSTOMIZATION-mediaserver stop
+export CHECKBOOTHDDPART=
+export CHECKDATAHDDPART=
+export DISK=
+export DISK=`fdisk -l | grep "Disk" | grep "dev/sd" | awk '{print substr ($2, 0, length($2))}'`
+if [ ! -z $DISK ]; then 
+    export CHECKBOOTHDDPART=`fdisk -l | grep "$DISK"1 | awk '{print $1}'`
+    export CHECKDATAHDDPART=`fdisk -l | grep "$DISK"2 | awk '{print $1}'`    
+fi
+
+if [[ ! -z $( cat /proc/cmdline | grep mmc ) ]]; then export BOOTDEVICE=mmc; else export BOOTDEVICE=ata; fi
+
+export BOOTPART=/dev/mmcblk0p1
+export UBOOTENVPART=/dev/mmcblk0p3
+export DATAPART=/dev/mmcblk0p2
+export MNTBOOTPART=/mnt/boot
+export MNTUBOOTENVPART=/mnt/ubootenv
+export MNTDATAPART=/mnt/data
+export MNTBOOTHDDPART=/mnt/hdd/boot
+export MNTDATAHDDPART=/mnt/hdd/data
+export HDDBOOTFLUSHSCRIPT=hddbootflush.sh
+export HDDBOOTFLUSH=/etc/init.d/$HDDBOOTFLUSHSCRIPT
+export HDDBOOT_INDICATOR=$MNTUBOOTENVPART/hddboot
+export NX1LOG=/var/log/nx1.log
+export BOOTHDDPART="$DISK"1
+export DATAHDDPART="$DISK"2
+export MAC=`ifconfig | grep eth0 | grep -v avahi | awk {'print $5'}`
+export MOUNTBOOT=
+export MOUNTDATA=
+export HDDNX1=
+
+if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then 
+    mkdir -p $MNTDATAHDDPART
+    mkdir -p $MNTBOOTHDDPART
+    mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
+    mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
+    if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ]; then HDDNX1=true; else HDDNX1=false; fi
+    ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
+    ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
+    if [ ! -z $ARCHIVE_FILES ] && [ ! -z $ARCHIVE_DB ]; then ARCHIVE=true; else ARCHIVE=false; fi
+    for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
+    sleep 2
+    umount $BOOTHDDPART
+    for p in $( lsof | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
+    sleep 2
+    umount $DATAHDDPART
+    rm -Rf $MNTBOOTHDDPART
+else 
+    HDDNX1=false
+    ARCHIVE=false
+fi
+
+mkdir -p $MNTUBOOTENVPART
+mount $UBOOTENVPART $MNTUBOOTENVPART
+if [ -f $HDDBOOT_INDICATOR ]; then HDDBOOTFAIL=true; else HDDBOOTFAIL=false; fi
+umount $UBOOTENVPART
+rm -Rf $MNTUBOOTENVPART
+
+#tweak to enable battery charge function for AXP209
+i2cset -f -y 0 0x34 0x35 0xa2
+
+hddboot_indicator_flush() {
+    mkdir -p $MNTUBOOTENVPART
+    mount $UBOOTENVPART $MNTUBOOTENVPART
+    if [ -f $HDDBOOT_INDICATOR ]; then rm $HDDBOOT_INDICATOR; fi
+    umount $UBOOTENVPART
+    rm -Rf $MNTUBOOTENVPART
+}
+
+#tweak to reanimate network interface after MAC change
+ethtweak () {
+    ETH=`ifconfig | grep eth0 | awk {'print $1'}`
+    if [ -z "$ETH" ]; then
+        echo "++++++++++++++ NETWORK INTERFACE ERROR. REBOOTING TO FIX ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ NETWORK INTERFACE ERROR. REBOOTING TO FIX ++++++++++++++" >> $NX1LOG
+        rm /etc/udev/rules.d/70-persistent-net.rules    
+        reboot
+    fi
+}
+
+hddboot_indicator_create() {
+    mkdir -p $MNTUBOOTENVPART
+    mount $UBOOTENVPART $MNTUBOOTENVPART
+    if [ ! -f $HDDBOOT_INDICATOR ]; then touch $HDDBOOT_INDICATOR; fi
+    umount $UBOOTENVPART
+    rm -Rf $MNTUBOOTENVPART
+}
+
+reboot_from_hdd () {
+    if [ -z $DISK ]; then 
+        echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
+        exit 1 
+    else
+        echo "++++++++++++++ REBOOTING FROM HDD... ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ REBOOTING FROM HDD... ++++++++++++++" >> $NX1LOG
+        hddboot_indicator_flush
+        reboot
+        exit 0
+    fi
+}
+
+reboot_from_sd () {
+    echo "++++++++++++++ REBOOTING FROM SD CARD... ++++++++++++++" >&2 >/dev/kmsg
+    echo `date` "++++++++++++++ REBOOTING FROM SD CARD... ++++++++++++++" >> $NX1LOG
+    hddboot_indicator_create
+    reboot
+    sleep 1
+    exit 0
+}
+
+system_restore () {
+    rm $MNTBOOTHDDPART/restored
+    if [ -z $DISK ]; then 
+        echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
+        exit 0
+    fi
+    
+    if [ "$BOOTDEVICE" = "ata" ]; then
+        fsck.ext4 /dev/mmcblk0p2 -fy
+        mkdir -p $MNTBOOTPART
+        mount -t ext4 $BOOTPART $MNTBOOTPART
+        if [ ! -f $MNTBOOTPART/restore ]; then touch $MNTBOOTPART/restore; fi
+        umount $BOOTPART
+        rm -Rf $MNTBOOTPART
+        echo "++++++++++++++ REBOOTING TO SD CARD FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ REBOOTING TO SD CARD FOR RESTORE ++++++++++++++" >> $NX1LOG           
+        reboot_from_sd
+        exit 0
+    fi    
+
+    if [ "$BOOTDEVICE" = "mmc" ] && [ ! -f /restore ]; then 
+        echo "++++++++++++++ REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ REBOOTING FOR RESTORE ++++++++++++++" >> $NX1LOG        
+        touch /restore
+        hddboot_indicator_create
+        shutdown -rF now
+        exit 0
+    fi
+    
+    if [ -f /restore ]; then
+        /etc/init.d/nx1led restore
+        rm /etc/udev/rules.d/70-persistent-net.rules
+        for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
+        sleep 2
+        umount $BOOTHDDPART
+        for p in $( lsof | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
+        sleep 2
+        umount $DATAHDDPART        
+        if [ "$ARCHIVE" = "false" ]; then 
+            echo "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >&2 >/dev/kmsg
+            echo `date` "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >> $NX1LOG
+            dd if=/dev/zero of=$DISK bs=512 count=1 conv=notrunc
+            (echo x; echo z; echo y; echo y) | gdisk $DISK
+            #for v_partition in $(parted -s $DISK print|awk '/^ / {print $1}')
+            #do
+            #   parted -s $DISK rm ${v_partition}
+            #done            
+            (echo y) | parted -a optimal $DISK mklabel msdos
+            #(echo w) | fdisk $DISK
+            #parted -a optimal $DISK mkpart primary ext4 0G 8G
+            (echo n; echo p; echo 1; echo ; echo +7600MB; echo w) | fdisk $DISK
+            #parted -a optimal $DISK mkpart primary ext4 8G 100%
+            (echo n; echo p; echo 2; echo ; echo ; echo w) | fdisk $DISK
+            partprobe $DISK
+            mkfs.ext4 $DATAHDDPART
+            mkdir -p $MNTDATAHDDPART
+            mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
+            MOUNTDATA=`df -h | grep "$DATAHDDPART"`
+            sleep 2
+            if [ -z "$MOUNTDATA" ]; then 
+                echo "++++++++++++++ CANNOT MOUNT FILESYSTEM "$DATAHDDPART" - REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
+                echo `date` "++++++++++++++ CANNOT MOUNT FILESYSTEM "$DATAHDDPART" - REBOOTING FOR RESTORE  ++++++++++++++" >> $NX1LOG        
+                touch /restore
+                hddboot_indicator_create
+                shutdown -rF now
+                exit 0
+            fi
+            for p in $( lsof | grep $MNTDATAHDDPART | awk {'print $2'} ); do print $p; done            
+            sleep 2
+            umount $DATAHDDPART
+        else    
+            echo "++++++++++++++ ARCHIVE FOUND ON HDD. RESTORING ONLY SYSTEM PARTITION... ++++++++++++++" >&2 >/dev/kmsg
+            echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD. RESTORING ONLY SYSTEM PARTITION... ++++++++++++++" >> $NX1LOG
+        fi 
+        echo "++++++++++++++ RESTORING SYSTEM PARTITION... ++++++++++++++"  >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ RESTORING SYSTEM PARTITION... ++++++++++++++" >> $NX1LOG
+        mkfs.ext4 $BOOTHDDPART
+        mkdir -p $MNTBOOTHDDPART
+        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
+        MOUNTBOOT=`df -h | grep "$BOOTHDDPART"`
+        sleep 2
+        if [ -z "$MOUNTBOOT" ]; then 
+            echo "++++++++++++++ CANNOT MOUNT FILESYSTEM "$BOOTHDDPART" - REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
+            echo `date` "++++++++++++++ CANNOT MOUNT FILESYSTEM "$BOOTHDDPART" - REBOOTING FOR RESTORE  ++++++++++++++" >> $NX1LOG        
+            touch /restore
+            hddboot_indicator_create
+            shutdown -rF now
+            exit 0
+        fi        
+        rsync -arx --progress  --delete / $MNTBOOTHDDPART --exclude 'mnt' >&2 >/dev/kmsg
+        sync
+        echo "/dev/sda2    /mnt/hdd/data    ext4    defaults        0       0" >> $MNTBOOTHDDPART/etc/fstab
+        rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
+        rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
+        mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
+        mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var/
+        cp -f /root/tools/nx/mediaserver.conf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc
+        cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
+        rm $MNTBOOTHDDPART/restore
+        touch $MNTBOOTHDDPART/restored
+        hddboot_indicator_flush
+        umount $BOOTHDDPART
+        /etc/init.d/nx1led stop
+        shutdown -rF now
+        exit 0
+    fi    
+}
+
+default_sequence () {
+    echo "++++++++++++++ BOOTED FROM "$BOOTDEVICE" ++++++++++++++" >&2 >/dev/kmsg
+    echo `date` "++++++++++++++ BOOTED FROM "$BOOTDEVICE" ++++++++++++++" >> $NX1LOG
+    ethtweak
+    if [[ -z $(cat /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf | grep systemName) ]]; then echo "systemName=__auto__system_"$MAC >> /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf; else echo true; fi
+    if [[ -z $(cat /root/tools/nx/mediaserver.conf | grep systemName) ]]; then echo "systemName=__auto__system_"$MAC >> /root/tools/nx/mediaserver.conf; else echo true; fi
+    if [ "$BOOTDEVICE" = "mmc" ]; then    
+        if [ -z $DISK ]; then 
+            echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
+            echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
+            hddboot_indicator_create
+        else
+            if [ "$HDDNX1" = "false" ]; then 
+                echo "++++++++++++++ FOREIGN HDD FOUND. LAUNCHING SYSTEM RESTORE... ++++++++++++++" >&2 >/dev/kmsg
+                echo `date` "++++++++++++++ FOREIGN HDD FOUND. LAUNCHING SYSTEM RESTORE... ++++++++++++++" >> $NX1LOG
+                system_restore
+            else
+                echo "++++++++++++++ NX1 HDD FOUND. NEXT TIME WILL TRY TO BOOT ONE MORE TIME... ++++++++++++++" >&2 >/dev/kmsg
+                echo `date` "++++++++++++++ NX1 HDD FOUND. NEXT TIME WILL TRY TO BOOT ONE MORE TIME... ++++++++++++++" >> $NX1LOG
+                hddboot_indicator_flush
+            fi    
+        fi
+        /etc/init.d/nx1led boot_sd
+    fi
+    if [ "$BOOTDEVICE" = "ata" ]; then
+        echo "++++++++++++++ MOUNTING DATA HDD PARTITION... ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ MOUNTING DATA HDD PARTITION... ++++++++++++++" >> $NX1LOG
+        mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
+        /etc/init.d/nx1led boot_hdd
+    fi    
+}
+
+case "$1" in
+  start)
+    touch /forcefsck
+    default_sequence
+    /etc/init.d/cron start
+    /etc/init.d/$CUSTOMIZATION-mediaserver start
+    exit 0
+	;;
+  restart|reload|force-reload)
+	echo "Error: argument '$1' not supported" >&2
+	exit 3
+	;;
+  stop)
+	# No-op
+	;;
+  boot_sd)
+	reboot_from_sd 
+	;;    
+  boot_hdd)
+	reboot_from_hdd
+	;;        
+  restore)
+	system_restore
+	;;        
+  *)
+	echo "Usage: nx1boot [start|stop|boot_sd|boot_hdd|restore]" >&2
+	exit 3
+	;;
+esac

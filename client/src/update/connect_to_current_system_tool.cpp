@@ -129,7 +129,8 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     connect(m_updateTool,   &QnMediaServerUpdateTool::stageProgressChanged,     this,   &QnConnectToCurrentSystemTool::at_updateTool_stageProgressChanged);
 
     m_updateTool->setTargets(m_updateTargets);
-    m_updateTool->startUpdate(QnSoftwareVersion(), true);
+    QnSoftwareVersion currentVersion(qnCommon->engineVersion().major(), qnCommon->engineVersion().minor());
+    m_updateTool->startUpdate(currentVersion);
 }
 
 void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QnUuid> &failedPeers) {

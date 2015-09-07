@@ -220,7 +220,7 @@
      <item row="1" column="2">
       <widget class="QCheckBox" name="checkBoxCameras">
        <property name="text">
-        <string>Camera actions</string>
+        <string notr="true">Camera/Devices actions</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -417,7 +417,7 @@
              </sizepolicy>
             </property>
             <attribute name="title">
-             <string>Cameras</string>
+             <string notr="true">Cameras/Devices</string>
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <property name="spacing">

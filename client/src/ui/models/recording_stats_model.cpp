@@ -1,6 +1,8 @@
 #include "recording_stats_model.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_name.h>
+#include <core/resource/camera_resource.h>
 
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
@@ -95,7 +97,14 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
     switch(index.column())
     {
     case CameraNameColumn:
-        return tr("Total %1 camera(s)").arg(internalModelData().size());
+        {
+            QnVirtualCameraResourceList cameras;
+            for (const QnCamRecordingStatsData &data: internalModelData())
+                if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId(data.uniqueId).dynamicCast<QnVirtualCameraResource>())
+                    cameras << camera;
+            Q_ASSERT_X(cameras.size() == internalModelData().size(), Q_FUNC_INFO, "Make sure all cameras exist");
+            return tr("Total %1").arg(getNumericDevicesName(cameras, false));
+        }
     case BytesColumn:
         return formatBytesString(footer.recordedBytes);
     case DurationColumn:
@@ -178,9 +187,9 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
     switch (column)
     {
         case CameraNameColumn:
-            return tr("Cameras with non-empty archive");
+            return tr("%1 with non-empty archive").arg(getDefaultDevicesName());
         case BytesColumn:
-            return tr("Storage space occupied by camera");
+            return tr("Storage space occupied by %1").arg(getDefaultDevicesName());
         case DurationColumn:
             return tr("Archived duration in calendar days between the first record and the current moment");
         case BitrateColumn:
@@ -233,7 +242,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
 
     if (role == Qt::DisplayRole) {
         switch(section) {
-        case CameraNameColumn: return tr("Camera");
+        case CameraNameColumn: return getDefaultDeviceNameUpper();
         case BytesColumn:      return tr("Space");
         case DurationColumn:   return tr("Calendar Days");
         case BitrateColumn:    return QVariant(); //return tr("Bitrate");

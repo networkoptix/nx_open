@@ -129,6 +129,8 @@ private:
 
     int tabIndex(Qn::CameraSettingsTab tab) const;
     void setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled);
+
+    void retranslateUi();
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)

@@ -7,6 +7,7 @@ class QnAction;
 class QnActionCondition;
 class QnActionManager;
 class QnActionTargetProvider;
+class QnActionParameters;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnServerResourceWidget;

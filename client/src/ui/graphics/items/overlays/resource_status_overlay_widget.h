@@ -6,6 +6,8 @@
 
 #include <client/client_globals.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/common/geometry.h>
 #include <memory>
@@ -26,7 +28,7 @@ public:
         MoreLicensesButton
     };
 
-    QnStatusOverlayWidget(QGraphicsWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnStatusOverlayWidget(const QnResourcePtr &resource,  QGraphicsWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnStatusOverlayWidget();
 
     Qn::ResourceStatusOverlay statusOverlay() const;
@@ -74,6 +76,7 @@ private:
         , bool animate);
 
 private:
+    const QnResourcePtr m_resource;
     QSharedPointer<QnPausedPainter> m_pausedPainter;
     QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
     Qn::ResourceStatusOverlay m_statusOverlay;

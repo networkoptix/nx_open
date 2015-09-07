@@ -36,6 +36,11 @@ public:
      * @return                                  True if something is changed, false otherwise.
      */
     virtual bool hasChanges() const {return false; }
+
+    /**
+     * @brief retranslateUi                     Update UI strings (if required).
+     */
+    virtual void retranslateUi() {}
 };
 
 #endif // ABSTRACT_PREFERENCES_WIDGET_H

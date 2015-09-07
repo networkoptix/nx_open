@@ -165,6 +165,9 @@ public:
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
+    /** Check if there is at least one IO Module in the system. */
+    bool containsIoModules() const;
+
     /** Check if layout was created automatically, e.g. by 'Push my screen' action.
      *  //TODO: #GDM replace this method by corresponding boolean flag in 2.4
      */
@@ -183,14 +186,22 @@ private:
         \note MUST be called with \a m_resourcesMtx locked
     */
     void invalidateCache();
+    void ensureCache() const;
+
 private:
+    mutable struct Cache {
+        bool valid;
+        bool containsIoModules;
+        QnMediaServerResourceList serversList;
+    } m_cache;
+
     mutable QMutex m_resourcesMtx;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
     QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
-    mutable QnMediaServerResourceList m_cachedServerList;
     mutable QnUserResourcePtr m_adminResource;
+
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */
