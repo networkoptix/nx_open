@@ -787,7 +787,7 @@ QnUuid QnTransactionTransport::connectionGuid() const
 }
 
 void QnTransactionTransport::setIncomingTransactionChannelSocket(
-    const QSharedPointer<AbstractStreamSocket>& socket,
+    QSharedPointer<AbstractStreamSocket> socket,
     const nx_http::Request& /*request*/,
     const QByteArray& requestBuf )
 {
@@ -796,7 +796,7 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     assert( m_peerRole == prAccepting );
     assert( m_connectionType != ConnectionType::bidirectional );
     
-    m_incomingDataSocket = socket;
+    m_incomingDataSocket = std::move(socket);
 
     //checking transactions format
     if( !m_incomingTransactionStreamParser->processData( requestBuf ) )
