@@ -1719,19 +1719,6 @@ void MediaServerProcess::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    if (!m_publicAddress.isNull())
-    {
-        if (!m_ipDiscovery->publicIP().isNull()) {
-            m_updatePiblicIpTimer.reset(new QTimer());
-            connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
-            connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
-            m_updatePiblicIpTimer->start(60 * 1000 * 2);
-        }
-
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-        localInfo.data.publicIP = m_publicAddress.toString();
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
-    }
     connect( ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
@@ -1916,6 +1903,20 @@ void MediaServerProcess::run()
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
+    }
+
+    if (!m_publicAddress.isNull())
+    {
+        if (!m_ipDiscovery->publicIP().isNull()) {
+            m_updatePiblicIpTimer.reset(new QTimer());
+            connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
+            connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+            m_updatePiblicIpTimer->start(60 * 1000 * 2);
+        }
+
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        localInfo.data.publicIP = m_publicAddress.toString();
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
 
     /* This key means that password should be forcibly changed in the database. */

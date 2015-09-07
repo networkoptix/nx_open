@@ -40,6 +40,11 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return nx_http::StatusCode::forbidden;
     }
 
+    if (ec2::Settings::instance()->dbReadOnly()) {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
+        return nx_http::StatusCode::forbidden;
+    }
+
     QUrl url = params.value(lit("url"));
     QString user = params.value(lit("user"), lit("admin"));
     QString password = params.value(lit("password"));

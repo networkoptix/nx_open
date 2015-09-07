@@ -1875,7 +1875,6 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return; /* Nothing to delete. */
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    Q_ASSERT_X(cameras.size() == resources.size(), Q_FUNC_INFO, "Only cameras must stay here.");
 
     /* Check that we are deleting online auto-found cameras */ 
     QnVirtualCameraResourceList onlineAutoDiscoveredCameras;
