@@ -309,7 +309,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource).withArgument(Qn::ItemTimeRole, timestampMs)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), source, timestampMs);
+        loadThumbnailForItem(item, camera, source, timestampMs);
         break;
     }
     case QnBusiness::CameraInputEvent: {
@@ -322,23 +322,25 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), source);
+        loadThumbnailForItem(item, camera, source);
         break;
     }
     case QnBusiness::CameraDisconnectEvent: {
         item->addActionButton(
+            //TODO: #GDM #design #2.6 change icon if the device was IO Module
             qnSkin->icon("events/camera.png"),
-            tr("%1 Settings").arg(getDefaultDeviceNameUpper(camera)),
+            //: "Camera Settings..." or "Device Settings..."
+            tr("%1 Settings...").arg(getDefaultDeviceNameUpper(camera)),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), source);
+        loadThumbnailForItem(item, camera, source);
         break;
     }
     case QnBusiness::StorageFailureEvent: {
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
-            tr("Server Settings"),
+            tr("Server Settings..."),
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
@@ -346,12 +348,13 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case QnBusiness::NetworkIssueEvent:{
         item->addActionButton(
-            qnSkin->icon("events/server.png"),
-            tr("%1 Settings").arg(getDefaultDeviceNameUpper(camera)),
+            //TODO: #GDM #design #2.6 change icon if the device was IO Module
+            qnSkin->icon("events/camera.png"),
+            tr("%1 Settings...").arg(getDefaultDeviceNameUpper(camera)),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), source);
+        loadThumbnailForItem(item, camera, source);
         break;
     }
     case QnBusiness::CameraIpConflictEvent: {
@@ -368,7 +371,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case QnBusiness::ServerFailureEvent: {
         item->addActionButton(
             qnSkin->icon("events/server.png"),
-            tr("Settings"),
+            tr("Server Settings..."),
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
@@ -378,19 +381,20 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     case QnBusiness::ServerStartEvent: {
         item->addActionButton(
             qnSkin->icon("events/server.png"),
-            QString(),
-            Qn::NoAction
+            tr("Server Settings..."),
+            Qn::ServerSettingsAction,
+            QnActionParameters(resource)
         );
         break;
     }
     case QnBusiness::LicenseIssueEvent: {
         item->addActionButton(
             qnSkin->icon("events/license.png"),
-            QString(),
+            tr("Licenses..."),
             Qn::PreferencesLicensesTabAction
             );
         break;
-                                       }
+    }
 
     default:
         break;
@@ -451,7 +455,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::EmailIsEmpty:
         item->addActionButton(
             qnSkin->icon("events/email.png"),
-            tr("User Settings"),
+            tr("User Settings..."),
             Qn::UserSettingsAction,
             QnActionParameters(context()->user()).withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
         );
@@ -459,21 +463,21 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::NoLicenses:
         item->addActionButton(
             qnSkin->icon("events/license.png"),
-            tr("Licenses"),
+            tr("Licenses..."),
             Qn::PreferencesLicensesTabAction
         );
         break;
     case QnSystemHealth::SmtpIsNotSet:
         item->addActionButton(
             qnSkin->icon("events/smtp.png"),
-            tr("SMTP Settin gs"),
+            tr("SMTP Settings..."),
             Qn::PreferencesSmtpTabAction
         );
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
         item->addActionButton(
             qnSkin->icon("events/email.png"),
-            tr("User Settings"),
+            tr("User Settings..."),
             Qn::UserSettingsAction,
             QnActionParameters(resource).withArgument(Qn::FocusElementRole, QString(QLatin1String("email")))
         );
@@ -481,7 +485,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::ConnectionLost:
         item->addActionButton(
             qnSkin->icon("events/connection.png"),
-            tr("Connect to server"),
+            tr("Connect to server..."),
             Qn::OpenLoginDialogAction
         );
         break;
@@ -492,8 +496,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
             actionParams = params.value<QnActionParameters>();
         item->addActionButton(
             qnSkin->icon( "events/settings.png" ),
-            QnSystemHealthStringsHelper::messageTitle( QnSystemHealth::NoPrimaryTimeServer ),
-            //tr( "Connect to server" ),
+            tr("Time Synchronization..."),
             Qn::SelectTimeServerAction,
             actionParams
         );
@@ -502,7 +505,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::EmailSendError:
         item->addActionButton(
             qnSkin->icon("events/email.png"),
-            tr("SMTP Settings"),
+            tr("SMTP Settings..."),
             Qn::PreferencesSmtpTabAction
         );
         break;
@@ -511,7 +514,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::ArchiveRebuildFinished:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
-            tr("Server settings"),
+            tr("Server settings..."),
             Qn::ServerSettingsAction,
             QnActionParameters(resource)
         );
@@ -570,11 +573,16 @@ void QnNotificationsCollectionWidget::updateBlinker() {
 
 void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 #ifdef _DEBUG
-    QnResourceList servers = qnResPool->getResources<QnMediaServerResource>();
-    QnResourcePtr sampleServer = servers.isEmpty() ? QnResourcePtr() : servers.first();
+    QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+    QnMediaServerResourcePtr sampleServer = servers.isEmpty() ? QnMediaServerResourcePtr() : servers.first();
 
-    QnResourceList cameras = qnResPool->getResources<QnVirtualCameraResource>();
-    QnResourcePtr sampleCamera = cameras.isEmpty() ? QnResourcePtr() : cameras.first();
+    QnVirtualCameraResourceList cameras = qnResPool->getResources<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr sampleCamera = cameras.isEmpty() ? QnVirtualCameraResourcePtr() : cameras.first();
+    QnMediaServerResourcePtr sourceServer = sampleCamera ? sampleCamera->getParentServer() : sampleServer;
+
+    QnUuid sampleCameraId = sampleCamera ? sampleCamera->getId() : QnUuid();
+    QnUuid sampleServerId = sampleServer ? sampleServer->getId() : QnUuid();
+    QnUuid sourceServerId = sourceServer ? sourceServer->getId() : QnUuid();
 
     //TODO: #GDM #Business REMOVE DEBUG
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
@@ -609,29 +617,33 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         case QnBusiness::CameraMotionEvent: {
                 if (!sampleCamera)
                     continue;
-                params.eventResourceId = sampleCamera->getId();
+                params.eventResourceId = sampleCameraId;
+                params.sourceServerId = sourceServerId;
                 break;
             }
 
         case QnBusiness::CameraInputEvent: {
                 if (!sampleCamera)
                     continue;
-               params.eventResourceId = sampleCamera->getId();
-                params.inputPortId = lit("01");
-                break;
+               params.eventResourceId = sampleCameraId;
+               params.sourceServerId = sourceServerId;
+               params.inputPortId = lit("01");
+               break;
             }
 
         case QnBusiness::CameraDisconnectEvent: {
                 if (!sampleCamera)
                     continue;
-                params.eventResourceId = sampleCamera->getId();
+                params.eventResourceId = sampleCameraId;
+                params.sourceServerId = sourceServerId;
                 break;
             }
 
         case QnBusiness::NetworkIssueEvent: {
                 if (!sampleCamera)
                     continue;
-                params.eventResourceId = sampleCamera->getId();
+                params.eventResourceId = sampleCameraId;
+                params.sourceServerId = sourceServerId;
                 params.reasonCode = QnBusiness::NetworkNoFrameReason;
                 params.description = lit("15000");
                 break;
@@ -640,7 +652,8 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         case QnBusiness::StorageFailureEvent: {
                 if (!sampleServer)
                     continue;
-                params.eventResourceId = sampleCamera->getId();
+                params.eventResourceId = sampleServerId;
+                params.sourceServerId = sourceServerId;
                 params.reasonCode = QnBusiness::StorageTooSlowReason;
                 params.description = lit("C: E:");
                 break;
@@ -649,7 +662,8 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         case QnBusiness::CameraIpConflictEvent: {
                 if (!sampleServer)
                     continue;
-                params.eventResourceId = sampleCamera->getId();
+                params.eventResourceId = sampleCameraId;
+                params.sourceServerId = sourceServerId;
                 params.caption = lit("192.168.0.5");
 
                 QStringList conflicts;
@@ -665,7 +679,8 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         case QnBusiness::ServerFailureEvent: {
                 if (!sampleServer)
                     continue;
-                params.eventResourceId = sampleCamera->getId();
+                params.eventResourceId = sampleServerId;
+                params.sourceServerId = sampleServerId;
                 params.reasonCode = QnBusiness::ServerTerminatedReason;
                 break;
             }
@@ -673,7 +688,8 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         case QnBusiness::ServerConflictEvent: {
                 if (!sampleServer)
                     continue;
-                params.eventResourceId = sampleServer->getId();
+                params.eventResourceId = sampleServerId;
+                params.sourceServerId = sampleServerId;
                 params.caption = lit("10.0.2.187");
 
                 QStringList conflicts;
