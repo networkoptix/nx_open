@@ -186,22 +186,12 @@ void QnMjpegPlayer::play() {
     if (d->state == Playing)
         return;
 
-    PlaybackState state = playbackState();
-
-    if (state == Stopped) {
-        d->position = 0;
-        emit positionChanged();
-    }
-
-    if (state == Paused && d->reconnectOnPlay) {
-        d->position = 0;
-        d->session->stop();
-    }
+    QnMjpegSession::State sessionState = d->session->state();
 
     d->setState(Playing);
     d->session->play();
 
-    if (state == Paused)
+    if (sessionState == QnMjpegSession::Playing)
         d->processFrame();
 }
 
@@ -213,6 +203,12 @@ void QnMjpegPlayer::pause() {
 
     d->setState(Paused);
     d->displayTimer.invalidate();
+
+    if (d->reconnectOnPlay) {
+        d->session->stop();
+        d->position = 0;
+        emit positionChanged();
+    }
 }
 
 void QnMjpegPlayer::stop() {
@@ -221,6 +217,9 @@ void QnMjpegPlayer::stop() {
     d->session->stop();
     d->setState(Stopped);
     d->displayTimer.invalidate();
+
+    d->position = 0;
+    emit positionChanged();
 }
 
 void QnMjpegPlayer::setSource(const QUrl &url) {

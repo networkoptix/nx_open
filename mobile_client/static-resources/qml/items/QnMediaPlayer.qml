@@ -29,6 +29,8 @@ QnObject {
     QtObject {
         id: d
 
+        readonly property int liveBound: 60000
+
         property bool paused: false
         property real position: -1
         property real chunkEnd: -1
@@ -64,6 +66,7 @@ QnObject {
 
             onPositionChanged: updatePosition()
             onSourceChanged: console.log(source)
+            reconnectOnPlay: atLive
         }
     }
 
@@ -108,7 +111,13 @@ QnObject {
             return
         }
 
-        var aligned = alignedPosition(pos)
+        var live = (new Date()).getTime()
+        var aligned = -1
+        if (live - pos > d.liveBound) {
+            aligned = alignedPosition(pos)
+            if (live - aligned <= d.liveBound)
+                aligned = -1
+        }
         if (d.position == -1 && aligned == -1) {
             timelinePositionRequest(d.position)
             if (!playing)

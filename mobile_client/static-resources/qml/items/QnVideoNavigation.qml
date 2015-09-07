@@ -179,8 +179,8 @@ Item {
                     flat: true
                     iconic: true
                     onClicked: {
-                        mediaPlayer.playLive()
                         playbackController.paused = false
+                        mediaPlayer.playLive()
                     }
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }

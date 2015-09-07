@@ -129,6 +129,7 @@ void QnMjpegSessionPrivate::connect() {
 
 void QnMjpegSessionPrivate::disconnect() {
     if (reply) {
+        QObject::disconnect(reply, nullptr, this, nullptr);
         reply->abort();
         reply->deleteLater();
         reply = nullptr;
