@@ -56,11 +56,17 @@ public:
     virtual ~ConnectionFactory() {}
 
     //!Connects to cloud_db to check user credentials
+    /*!
+        \note Instanciates connection only if connection to cloud is available and provided credentials are valid
+    */
     virtual void connect(
         const std::string& login,
         const std::string& password,
         std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) = 0;
     //!Creates connection object without checking credentials provided
+    /*!
+        \note No connection to cloud is performed in this method!
+    */
     virtual std::unique_ptr<api::Connection> createConnection(
         const std::string& login,
         const std::string& password) = 0;
