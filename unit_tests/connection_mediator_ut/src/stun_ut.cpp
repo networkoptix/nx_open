@@ -8,7 +8,7 @@
 #include <utils/network/stun/server_connection.h>
 #include <utils/network/stun/stream_socket_server.h>
 #include <utils/network/stun/message_dispatcher.h>
-#include <stun/custom_stun.h>
+#include <utils/network/stun/cc/custom_stun.h>
 #include <listening_peer_pool.h>
 #include <mediaserver_api.h>
 
@@ -35,10 +35,9 @@ protected:
         : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
         , mediaserverApi( &stunMessageDispatcher )
         , listeningPeerPool( &stunMessageDispatcher )
-        , client( address )
-        , server( std::list< SocketAddress >( 1, address ), false, SocketFactory::nttDisabled )
+        , server( false, SocketFactory::nttDisabled )
     {
-        EXPECT_TRUE( server.bind(std::list< SocketAddress >(1, address)) );
+        EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
         EXPECT_TRUE( server.listen() );
     }
 

@@ -16,8 +16,6 @@
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/network/aio/aioservice.h>
-#include <utils/network/http/server/http_message_dispatcher.h>
-#include <utils/network/http/server/server_managers.h>
 
 #include "listening_peer_pool.h"
 #include "mediaserver_api.h"
@@ -117,10 +115,10 @@ int MediatorProcess::executeApplication()
     ListeningPeerPool listeningPeerPool( &stunMessageDispatcher );
 
     //accepting STUN requests by both tcp and udt
-    m_multiAddressStunServer.reset( new MultiAddressServer<stun::SocketServer>(
-        stunAddrToListenList, true, SocketFactory::nttAuto ) );
+    m_multiAddressStunServer.reset(
+        new MultiAddressServer<stun::SocketServer>( true, SocketFactory::nttAuto ) );
 
-    if( !m_multiAddressStunServer->bind() )
+    if( !m_multiAddressStunServer->bind( stunAddrToListenList ) )
         return 2;
 
     //TODO: #ak process privilege reduction should be made here
