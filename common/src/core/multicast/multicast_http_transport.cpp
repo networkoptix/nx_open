@@ -87,6 +87,7 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
 Transport::Transport(const QUuid& localGuid):
     m_localGuid(localGuid),
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE),
+    m_mutex(QMutex::Recursive),
     m_nextSendQueued(0)
 {
     m_recvSocket.reset(new QUdpSocket());
@@ -180,10 +181,13 @@ QnMulticast::Response Transport::decodeResponse(const TransportConnection& trans
     {
         int delimiterPos = header.indexOf(':');
         if (delimiterPos != -1) {
-            QByteArray headerName = header.left(delimiterPos).trimmed();
-            if (headerName.toLower() == "content-type") {
+            QPair<QString,QString> h;
+            h.first = QLatin1String(header.left(delimiterPos).trimmed());
+            h.second = QLatin1String(header.mid(delimiterPos+1).trimmed());
+            if (h.first.toLower() == lit("content-type"))
                 response.contentType = header.mid(delimiterPos+1).trimmed();
-            }
+            else
+                response.httpHeaders << h;
         }
     }
     response.messageBody = message.mid(msgBodyPos + 4);
@@ -219,7 +223,7 @@ QnMulticast::Request Transport::decodeRequest(const TransportConnection& transpo
         if (delimiterPos != -1) {
             QPair<QString,QString> h;
             h.first = QLatin1String(header.left(delimiterPos).trimmed());
-            h.second = QLatin1String(header.right(delimiterPos+1).trimmed());
+            h.second = QLatin1String(header.mid(delimiterPos+1).trimmed());
             if (h.first.toLower() == lit("content-type"))
                 request.contentType = h.second.toUtf8();
             else

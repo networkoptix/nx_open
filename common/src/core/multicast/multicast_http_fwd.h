@@ -42,10 +42,15 @@ namespace QnMulticast
         QUuid serverId;
 
         Response(): httpResult(0) {}
+
         /** HTTP result code received from server( code 200 means 'no error'). */
         int httpResult;
         /** Response content type */
+
         QByteArray contentType;
+
+        QList<QPair<QString, QString>> httpHeaders;
+
         /** Result data */
         QByteArray messageBody;
     };

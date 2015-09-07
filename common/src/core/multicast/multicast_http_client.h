@@ -15,24 +15,37 @@ namespace QnMulticast
     public:
   
         HTTPClient(const QUuid& localGuid);
-        /** Execute HTTP get request over multicast transport
-        * !Returns request handle
-        */
-        //QUuid doGet(const Request& request, ResponseCallback callback, int timeoutMs = -1);
-        /** Execute HTTP post request over multicast transport
-        * !Returns request handle
-        */
-        //QUuid doPost(const Request& request, ResponseCallback callback, int timeoutMs = -1);
         /** Cancel previously started request.  callback function will not called. */
         void cancelRequest(const QUuid& requestId);
+
         /** Set default timeout for requests */
         void setDefaultTimeout(int timeoutMs);
+
+        /** Execute HTTP request over multicast transport
+        * !Returns request handle
+        */
         QUuid execRequest(const Request& request, ResponseCallback callback, int timeoutMs = -1);
     private:
-        
-    private:
+        struct AuthInfo
+        {
+            QString realm;
+            qint64 nonce;
+            QElapsedTimer timer;
+        };
+
         Transport m_transport;
-        QMap<QUuid, QByteArray> m_awaitingResponses;
+        int m_defaultTimeoutMs;
+        QMap<QUuid, AuthInfo> m_authByServer;
+        QMap<QUuid, QUuid> m_requestsPairs; // map first and second requests ID's
+    private:
+        Request addAuthHeader(const Request& srcRequest);
+        QByteArray createHttpQueryAuthParam(const QString& userName,
+            const QString& password,
+            const QString& realm,
+            const QByteArray& method,
+            QByteArray nonce);
+        QByteArray createUserPasswordDigest(const QString& userName, const QString& password, const QString& realm);
+        void updateAuthParams(const QUuid& serverId, const Response& response);
     };
 }
 

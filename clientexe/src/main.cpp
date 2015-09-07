@@ -618,13 +618,17 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnMulticast::HTTPClient multicastClient(qnCommon->moduleGUID().toString());
     QnMulticast::Request request;
     request.method = lit("GET");
-    request.serverId = QUuid("c650ddbe-68c2-d88b-5444-e6408275b84b");
-    request.url = QUrl(lit("api/gettime"));
+    request.serverId = QUuid("7652739a-3b48-d370-ed02-40bbffb091cc");
+    request.url = QUrl(lit("api/showLog"));
     request.messageBody.resize(1500);
+    request.auth.setUser(lit("admin"));
+    request.auth.setPassword(lit("admin"));
     multicastClient.execRequest(request, [](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
     {
+        qDebug() << "-----------------";
         qDebug() << response.messageBody;
-    }, 3000);
+        qDebug() << "-----------------";
+    }, 300000);
 
     result = application->exec();
 
