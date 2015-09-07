@@ -22,7 +22,7 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
     QString url(lit("http://%1:%2/%3").arg("127.0.0.1").arg(port).arg(request.url.toString()));
 
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
-    for (const auto& header: request.extraHttpHeaders)
+    for (const auto& header: request.headers)
         httpClient->addAdditionalHeader(header.first.toUtf8(), header.second.toUtf8());
     httpClient->addAdditionalHeader("Connection", "Close");
 
@@ -39,6 +39,8 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         result = httpClient->doGet(url);
     else if (request.method == "POST")
         result = httpClient->doPost(url, request.contentType, request.messageBody);
+    else
+        qWarning() << "Got unknown HTTP method" << request.method << "over HTTP multicast transport";
     if (!result)
         disconnect( httpClient.get(), nullptr, this, nullptr );
 }

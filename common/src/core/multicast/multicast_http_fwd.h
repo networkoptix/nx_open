@@ -16,19 +16,15 @@ namespace QnMulticast
         networkIssue = 2,
         unknown
     };
-    struct Request
-    {
-        QString method;
 
+    typedef QPair<QString, QString> Header;
+    struct Message
+    {
         /** Server GUID */
         QUuid serverId;
-        /** HTTP request. Only URL path and query params are used.*/
-        QUrl url;
-        /** Credentials - login and password */
-        QAuthenticator auth;
 
         /** Extra http headers. user-agent for example */
-        QList<QPair<QString, QString>> extraHttpHeaders;
+        QList<Header> headers;
 
         QByteArray contentType;
 
@@ -36,23 +32,24 @@ namespace QnMulticast
         QByteArray messageBody;
     };
 
-    struct Response
+    struct Request: public Message
     {
-        /** Server GUID */
-        QUuid serverId;
+        /** HTTP method (GET, POST, e.t.c) */
+        QString method;
 
-        Response(): httpResult(0) {}
+        /** HTTP request. Only URL path and query params are used.*/
+        QUrl url;
+
+        /** Credentials - login and password */
+        QAuthenticator auth;
+    };
+
+    struct Response: public Message
+    {
+        Response(): Message(), httpResult(0) {}
 
         /** HTTP result code received from server( code 200 means 'no error'). */
         int httpResult;
-        /** Response content type */
-
-        QByteArray contentType;
-
-        QList<QPair<QString, QString>> httpHeaders;
-
-        /** Result data */
-        QByteArray messageBody;
     };
     typedef std::function<void(const QUuid& requestId, ErrCode errCode, const Response& response)> ResponseCallback;
     //typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpData)> RequestCallback;

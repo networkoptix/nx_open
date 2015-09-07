@@ -7,9 +7,10 @@ namespace QnMulticast
 
 static const int HTTP_NOT_AUTHORIZED = 401;
 
-HTTPClient::HTTPClient(const QUuid& localGuid):
-    m_transport(localGuid),
-    m_defaultTimeoutMs(-1)
+HTTPClient::HTTPClient(const QString& userAgent, const QUuid& localGuid):
+    m_transport(localGuid.isNull() ? QUuid::createUuid() : localGuid),
+    m_defaultTimeoutMs(-1),
+    m_userAgent(userAgent)
 {
 
 }
@@ -53,13 +54,23 @@ QByteArray HTTPClient::createHttpQueryAuthParam(
 }
 
 
-Request HTTPClient::addAuthHeader(const Request& srcRequest)
+Request HTTPClient::updateRequest(const Request& srcRequest)
 {
+    Request request(srcRequest);
+
+    // add user agent header
+
+    Header header;
+    header.first = lit("User-Agent");
+    header.second = m_userAgent;
+    request.headers << header;
+
+    // add auth params to url query
+
     AuthInfo& authInfo = m_authByServer[srcRequest.serverId];
     if (authInfo.realm.isEmpty())
-        return srcRequest; // realm isn't known yet.
+        return request; // realm isn't known yet.
 
-    Request request(srcRequest);
     QByteArray nonce = QByteArray::number(authInfo.nonce + authInfo.timer.elapsed() * 1000ll, 16);
     QString auth = QLatin1String(createHttpQueryAuthParam(request.auth.user(), request.auth.password(), authInfo.realm, srcRequest.method.toUtf8(), nonce));
     QUrlQuery query(request.url.query());
@@ -71,7 +82,7 @@ Request HTTPClient::addAuthHeader(const Request& srcRequest)
 
 void HTTPClient::updateAuthParams(const QUuid& serverId, const Response& response)
 {
-    for (const auto& header: response.httpHeaders)
+    for (const auto& header: response.headers)
     {
         if (header.first == lit("WWW-Authenticate"))
         {
@@ -88,11 +99,11 @@ QUuid HTTPClient::execRequest(const Request& request, ResponseCallback callback,
 {
     if (timeoutMs == -1)
         timeoutMs = m_defaultTimeoutMs;
-    auto requestId = m_transport.addRequest(addAuthHeader(request), [request, callback, timeoutMs, this](const QUuid& requestId, ErrCode errCode, const Response& response) 
+    auto requestId = m_transport.addRequest(updateRequest(request), [request, callback, timeoutMs, this](const QUuid& requestId, ErrCode errCode, const Response& response) 
     {
         if (response.httpResult == HTTP_NOT_AUTHORIZED) {
             updateAuthParams(request.serverId, response);
-            auto requestId2 = m_transport.addRequest(addAuthHeader(request), [request, callback, timeoutMs, this](const QUuid& requestId2, ErrCode errCode, const Response& response)
+            auto requestId2 = m_transport.addRequest(updateRequest(request), [request, callback, timeoutMs, this](const QUuid& requestId2, ErrCode errCode, const Response& response)
             {
                 QUuid primaryRequestId = requestId2;
                 for (auto itr = m_requestsPairs.begin(); itr != m_requestsPairs.end(); ++itr) {

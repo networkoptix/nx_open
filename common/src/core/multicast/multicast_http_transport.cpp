@@ -129,7 +129,7 @@ Transport::Transport(const QUuid& localGuid):
     m_localGuid(localGuid),
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE),
     m_mutex(QMutex::Recursive),
-    m_nextSendQueued(0)
+    m_nextSendQueued(false)
 {
     m_recvSocket.reset(new QUdpSocket());
     if (!m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint))
@@ -188,14 +188,14 @@ void Transport::cancelRequest(const QUuid& requestId)
     m_processedRequests.insert(requestId, 0);
 }
 
-QByteArray Transport::encodeMessage(const Request& request) const
+QByteArray Transport::serializeMessage(const Request& request) const
 {
     QString result;
 
     QString encodedPath = request.url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters | QUrl::RemoveScheme | QUrl::RemoveAuthority);
 
     result.append(lit("%1 %2 HTTP/1.1\r\n").arg(request.method).arg(encodedPath));
-    for (const auto& header: request.extraHttpHeaders)
+    for (const auto& header: request.headers)
         result.append(lit("%1: %2\r\n").arg(header.first).arg(header.second));
     if (!request.contentType.isEmpty())
         result.append(lit("%1: %2\r\n").arg(lit("Content-Type")).arg(QLatin1String(request.contentType)));
@@ -203,81 +203,70 @@ QByteArray Transport::encodeMessage(const Request& request) const
     return result.toUtf8().append(request.messageBody);
 }
 
-QnMulticast::Response Transport::decodeResponse(const TransportConnection& transportData, bool* ok) const
+bool Transport::parseHttpMessage(Message& result, const QByteArray& message) const
+{
+    // extract http result
+    int requestLineEnd = message.indexOf("\r\n");
+    if (requestLineEnd == -1)
+        return false; // error
+    int msgBodyPos = message.indexOf("\r\n\r\n");
+    if (msgBodyPos == -1)
+        msgBodyPos = message.size();
+    // parse headers
+    int headersStart = requestLineEnd + 2;
+    QByteArray headers = QByteArray::fromRawData(message.data() + headersStart, msgBodyPos - headersStart);
+    for (const auto& header: headers.split('\n'))
+    {
+        int delimiterPos = header.indexOf(':');
+        if (delimiterPos != -1) {
+            Header h;
+            h.first = QLatin1String(header.left(delimiterPos).trimmed());
+            h.second = QLatin1String(header.mid(delimiterPos+1).trimmed());
+            if (h.first.toLower() == lit("content-type"))
+                result.contentType = header.mid(delimiterPos+1).trimmed();
+            else
+                result.headers << h;
+        }
+    }
+    result.messageBody = message.mid(msgBodyPos + 4);
+    return true;
+}
+
+QnMulticast::Response Transport::parseResponse(const TransportConnection& transportData, bool* ok) const
 {
     *ok = false;
     Response response;
 
     QByteArray message = QByteArray::fromBase64(transportData.receivedData);
+    if (!parseHttpMessage(response, message))
+        return response;
+
     // extract http result
-    int requestLineEnd = message.indexOf("\r\n");
-    if (requestLineEnd == -1)
-        return response; // error
-    QByteArray requestLine = message.mid(0, requestLineEnd);
+    QByteArray requestLine = message.left(message.indexOf("\r\n"));
     QList<QByteArray> parts = requestLine.split(' ');
     if (parts.size() < 3)
         return response; // error
     response.httpResult = parts[1].toInt();
-    int msgBodyPos = message.indexOf("\r\n\r\n");
-    if (msgBodyPos == -1)
-        msgBodyPos = message.size();
-    // parse headers
-    int headersStart = requestLineEnd + 2;
-    QByteArray headers = QByteArray::fromRawData(message.data() + headersStart, msgBodyPos - headersStart);
-    for (const auto& header: headers.split('\n'))
-    {
-        int delimiterPos = header.indexOf(':');
-        if (delimiterPos != -1) {
-            QPair<QString,QString> h;
-            h.first = QLatin1String(header.left(delimiterPos).trimmed());
-            h.second = QLatin1String(header.mid(delimiterPos+1).trimmed());
-            if (h.first.toLower() == lit("content-type"))
-                response.contentType = header.mid(delimiterPos+1).trimmed();
-            else
-                response.httpHeaders << h;
-        }
-    }
-    response.messageBody = message.mid(msgBodyPos + 4);
-    
+    *ok = true;
     return response;
 }
 
-QnMulticast::Request Transport::decodeRequest(const TransportConnection& transportData, bool* ok) const
+QnMulticast::Request Transport::parseRequest(const TransportConnection& transportData, bool* ok) const
 {
     *ok = false;
     QnMulticast::Request request;
     request.serverId = m_localGuid;
     QByteArray message = QByteArray::fromBase64(transportData.receivedData);
+    if (!parseHttpMessage(request, message))
+        return request;
+
     // extract http result
-    int requestLineEnd = message.indexOf("\r\n");
-    if (requestLineEnd == -1)
-        return request; // error
-    QByteArray requestLine = message.mid(0, requestLineEnd);
+    QByteArray requestLine = message.left(message.indexOf("\r\n"));
     QList<QByteArray> parts = requestLine.split(' ');
     if (parts.size() < 3)
         return request; // error
-    request.method = QString::fromLatin1(parts[0]);
+    request.method = QLatin1String(parts[0]);
     request.url = QLatin1String(parts[1]);
-    int msgBodyPos = message.indexOf("\r\n\r\n");
-    if (msgBodyPos == -1)
-        msgBodyPos = message.size();
-    // parse headers
-    int headersStart = requestLineEnd + 2;
-    QByteArray headers = QByteArray::fromRawData(message.data() + headersStart, msgBodyPos - headersStart);
-    for (const auto& header: headers.split('\n'))
-    {
-        int delimiterPos = header.indexOf(':');
-        if (delimiterPos != -1) {
-            QPair<QString,QString> h;
-            h.first = QLatin1String(header.left(delimiterPos).trimmed());
-            h.second = QLatin1String(header.mid(delimiterPos+1).trimmed());
-            if (h.first.toLower() == lit("content-type"))
-                request.contentType = h.second.toUtf8();
-            else
-                request.extraHttpHeaders << h;
-        }
-    }
-    request.messageBody = message.mid(msgBodyPos + 4);
     *ok = true;
     return request;
 }
@@ -285,7 +274,7 @@ QnMulticast::Request Transport::decodeRequest(const TransportConnection& transpo
 QUuid Transport::addRequest(const Request& request, ResponseCallback callback, int timeoutMs)
 {
     QMutexLocker lock(&m_mutex);
-    TransportConnection transportRequest = encodeRequest(request);
+    TransportConnection transportRequest = serializeRequest(request);
     transportRequest.responseCallback = callback;
     transportRequest.timeoutMs = timeoutMs;
     m_requests.push_back(std::move(transportRequest));
@@ -304,10 +293,10 @@ void Transport::putPacketToTransport(TransportConnection& transportConnection, c
     }
 }
 
-Transport::TransportConnection Transport::encodeRequest(const Request& request)
+Transport::TransportConnection Transport::serializeRequest(const Request& request)
 {
     TransportConnection transportRequest;
-    QByteArray message = encodeMessage(request).toBase64();
+    QByteArray message = serializeMessage(request).toBase64();
     transportRequest.requestId = QUuid::createUuid();
     for (int offset = 0; offset < message.size();)
     {
@@ -330,12 +319,12 @@ Transport::TransportConnection Transport::encodeRequest(const Request& request)
 void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
     QMutexLocker lock(&m_mutex);
-    m_requests.push_back(encodeResponse(requestId, clientId, httpResponse));
+    m_requests.push_back(serializeResponse(requestId, clientId, httpResponse));
     if (!m_nextSendQueued)
         QMetaObject::invokeMethod(this, "sendNextData", Qt::QueuedConnection);
 }
 
-Transport::TransportConnection Transport::encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
+Transport::TransportConnection Transport::serializeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
     TransportConnection transportConnection;
     transportConnection.requestId = requestId;
@@ -412,14 +401,14 @@ void Transport::at_socketReadyRead()
                 bool ok;
                 if (packet.messageType == MessageType::response) 
                 {
-                    Response response = decodeResponse(transportData, &ok);
+                    Response response = parseResponse(transportData, &ok);
                     response.serverId = packet.serverId;
                     if (transportData.responseCallback)
                         transportData.responseCallback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
                 }
                 else if (packet.messageType == MessageType::request) 
                 {
-                    Request request = decodeRequest(transportData, &ok);
+                    Request request = parseRequest(transportData, &ok);
                     if (ok && m_requestCallback)
                         m_requestCallback(transportData.requestId, packet.clientId, request);
                 }

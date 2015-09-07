@@ -88,11 +88,12 @@ namespace QnMulticast
         mutable QMutex m_mutex;
         bool m_nextSendQueued;
     private:
-        QByteArray encodeMessage(const Request& request) const;
-        Response decodeResponse(const TransportConnection& transportData, bool* ok) const;
-        Request decodeRequest(const TransportConnection& transportData, bool* ok) const;
-        TransportConnection encodeRequest(const Request& request);
-        TransportConnection encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
+        QByteArray serializeMessage(const Request& request) const;
+        TransportConnection serializeRequest(const Request& request);
+        TransportConnection serializeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
+        bool parseHttpMessage(Message& result, const QByteArray& message) const;
+        Response parseResponse(const TransportConnection& transportData, bool* ok) const;
+        Request parseRequest(const TransportConnection& transportData, bool* ok) const;
         void putPacketToTransport(TransportConnection& transportConnection, const Packet& packet);
         void eraseRequest(const QUuid& id);
     };
