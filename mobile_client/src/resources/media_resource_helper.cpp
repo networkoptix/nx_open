@@ -24,7 +24,7 @@ namespace {
     QString httpFormat = lit("mpjpeg");
 #else
     QString nativeStreamProtocol = lit("rtsp");
-    QString httpFormat = lit("mpjpeg");
+    QString httpFormat = lit("webm");
 #endif
 
     QString getAuth(const QnUserResourcePtr &user) {
