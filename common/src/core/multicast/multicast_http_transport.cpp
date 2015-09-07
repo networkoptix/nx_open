@@ -20,9 +20,50 @@ static const int PROCESSED_REQUESTS_CACHE_SZE = 512;  // keep last sessions to i
 static const int CSV_COLUMNS = 9;
 static char CSV_DELIMITER = ';';
 
+// --------- UDP / Multicast routines -----------------
+
 bool setRecvBufferSize(int fd, unsigned int buff_size )
 {
     return ::setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) == 0;
+}
+
+static bool joinMulticastGroup(int fd, const QString &multicastGroup, const QString& multicastIF)  
+{
+    struct ip_mreq multicastRequest;
+
+    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
+    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
+    if( setsockopt( fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+        (const char *) &multicastRequest,
+        sizeof(multicastRequest)) < 0) {
+            qWarning() << "failed to join multicast group" << multicastGroup << "from IF" << multicastIF;
+            return false;
+    }
+    return true;
+}
+
+QString getIfaceIPv4Addr(const QNetworkInterface& iface)
+{
+    for (const auto& adrentr: iface.addressEntries())
+    {
+        if (QAbstractSocket::IPv4Protocol == adrentr.ip().protocol() && // if it has IPV4
+            adrentr.ip()!=QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
+            adrentr.netmask().toIPv4Address()!=0) // and mask !=0
+            return adrentr.ip().toString();
+    }
+    return QString();
+}
+
+bool setMulticastIF(int fd, const QString& multicastIF)
+{
+    struct in_addr localInterface;
+    localInterface.s_addr = inet_addr(multicastIF.toLatin1().data());
+    if( setsockopt( fd, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&localInterface, sizeof( localInterface ) ) < 0 )
+    {
+        qWarning() << "IP_MULTICAST_IF set failed for iface " << multicastIF;
+        return false;
+    }
+    return true;
 }
 
 // ----------- Packet ------------------
@@ -98,15 +139,21 @@ Transport::Transport(const QUuid& localGuid):
     {
         if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
             continue;
-        m_recvSocket->joinMulticastGroup(MULTICAST_GROUP, iface);
+        // QT joinMulticastGroup has a bug: it takes first address from the interface. It fail if the first addr is a IPv6 addr
+        //m_recvSocket->joinMulticastGroup(MULTICAST_GROUP, iface);
+
+        QString ipv4Addr = getIfaceIPv4Addr(iface);
+        if (ipv4Addr.isEmpty())
+            continue; // no IPv4 address found
+        
+        joinMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr);
 
         auto sendSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
-        if (sendSocket->bind())
-            sendSocket->setMulticastInterface(iface);
+        if (sendSocket->bind(QHostAddress(ipv4Addr)))
+            setMulticastIF(sendSocket->socketDescriptor(), ipv4Addr); //sendSocket->setMulticastInterface(iface);
         else
             qWarning() << "Failed to open Multicast Http send socket";
 
-        //connect(sendSocket.get(), &QUdpSocket::bytesWritten, this, &Transport::at_dataSent);
         m_sendSockets.push_back(std::move(sendSocket));
     }
     setRecvBufferSize(m_recvSocket->socketDescriptor(), SOCKET_RECV_BUFFER_SIZE);
