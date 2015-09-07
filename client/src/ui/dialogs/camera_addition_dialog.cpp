@@ -682,9 +682,13 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         break;
     case QnManualCameraSearchStatus::CheckingHost:
         if (m_state == Searching) {
-            const int hostNum = m_subnetMode ? 2 : 1;
             const QString found = tr("%n devices found", "", result.cameras.size());
-            ui->progressBar->setFormat(tr("Scanning hosts... (%1)", "", hostNum).arg(found));
+            if (m_subnetMode)
+                //: Scanning hosts... (5 devices found)
+                ui->progressBar->setFormat(tr("Scanning hosts... (%1)").arg(found));
+            else
+                //: Scanning host... (0 devices found)
+                ui->progressBar->setFormat(tr("Scanning host... (%1)").arg(found));
         }
         break;
     case QnManualCameraSearchStatus::Finished:

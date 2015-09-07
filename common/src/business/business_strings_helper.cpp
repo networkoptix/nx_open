@@ -123,7 +123,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Server \"%1\" Failure").arg(resourceName);
 
     case CameraIpConflictEvent:
-        //: Camera IP Conflict at <camera_name>
+        //: Camera IP Conflict at <server_name>
         return tr("%1 IP Conflict at %2")
             .arg(getDefaultDeviceNameUpper(camera))
             .arg(resourceName);
@@ -402,12 +402,15 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         break;
     }
     case NetworkConnectionClosedReason: {
-        QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
         bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
-        if (isPrimaryStream)
-            result = tr("Connection to %1 (primary stream) was unexpectedly closed.").arg(getDefaultDeviceNameLower(camera));
+
+        QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
+        if (!camera->hasVideo(nullptr))
+            result = tr("Connection to %1 was unexpectedly closed.").arg(getDefaultDeviceNameLower(camera));
+        else if (isPrimaryStream)
+            result = tr("Connection to camera (primary stream) was unexpectedly closed.");
         else
-            result = tr("Connection to %1 (secondary stream) was unexpectedly closed.").arg(getDefaultDeviceNameLower(camera));
+            result = tr("Connection to camera (secondary stream) was unexpectedly closed.");
         break;
     }
     case NetworkRtpPacketLossReason: {

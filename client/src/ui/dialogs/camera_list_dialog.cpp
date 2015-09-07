@@ -98,10 +98,12 @@ void QnCameraListDialog::updateWindowTitle() {
     Q_ASSERT_X(cameras.size() == m_resourceSearch->rowCount(), Q_FUNC_INFO, "Make sure all found resources are cameras");
 
     const QString title = m_model->server()
+        //: "Cameras List for Server (192.168.0.1) - 5 Cameras found
         ? tr("%1 List for '%2' - %3 found")
             .arg(getDefaultDevicesName())
             .arg(getFullResourceName(m_model->server(), true))
             .arg(getNumericDevicesName(cameras))
+        //: "Cameras List for Server (192.168.0.1) - 5 Cameras found
         : tr("%1 List - %2 found")
             .arg(getDefaultDevicesName())
             .arg(getNumericDevicesName(cameras))

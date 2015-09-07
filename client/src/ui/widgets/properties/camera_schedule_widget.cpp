@@ -258,7 +258,10 @@ QnCameraScheduleWidget::~QnCameraScheduleWidget() {
 }
 
 void QnCameraScheduleWidget::retranslateUi() {
-    ui->minArchiveDaysWarningLabel->setText(tr("Warning! High minimum value could decrease other %1' recording durations.").arg(getDefaultDevicesName(true, false)));
+    QString warnText = (qnResPool && qnResPool->containsIoModules())
+        ? tr("Warning! High minimum value could decrease other devices' recording durations.")
+        : tr("Warning! High minimum value could decrease other cameras' recording durations.");
+    ui->minArchiveDaysWarningLabel->setText(warnText);
 }
 
 void QnCameraScheduleWidget::afterContextInitialized() {
