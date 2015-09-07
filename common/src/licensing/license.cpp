@@ -575,6 +575,8 @@ Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 QnLicensePool::QnLicensePool(): 
     m_mutex(QMutex::Recursive)
 {
+    if (!qApp)
+        return;
     connect(&m_timer, &QTimer::timeout, this, &QnLicensePool::at_timer);
     m_timer.start(1000 * 60);
 }
