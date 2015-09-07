@@ -72,14 +72,14 @@ public:
         const std::string& password) = 0;
 };
 
-extern "C"
-{
-    ConnectionFactory* createConnectionFactory();
-    void destroyConnectionFactory(ConnectionFactory* factory);
-}
-
 }   //api
 }   //cdb
 }   //nx
+
+extern "C"
+{
+    nx::cdb::api::ConnectionFactory* createConnectionFactory();
+    void destroyConnectionFactory(nx::cdb::api::ConnectionFactory* factory);
+}
 
 #endif  //NX_CDB_API_CONNECTION_H

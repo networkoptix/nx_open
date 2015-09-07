@@ -10,12 +10,12 @@
 
 extern "C"
 {
-    nx::cdb::cl::ConnectionFactory* createConnectionFactory()
+    nx::cdb::api::ConnectionFactory* createConnectionFactory()
     {
         return new nx::cdb::cl::ConnectionFactory();
     }
 
-    void destroyConnectionFactory(nx::cdb::cl::ConnectionFactory* factory)
+    void destroyConnectionFactory(nx::cdb::api::ConnectionFactory* factory)
     {
         delete factory;
     }

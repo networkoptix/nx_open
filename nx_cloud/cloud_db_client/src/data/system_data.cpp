@@ -5,6 +5,7 @@
 
 #include "system_data.h"
 
+#include <common/common_globals.h>
 #include <utils/common/model_functions.h>
 
 
@@ -63,7 +64,7 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSha
     systemSharing->accountID = QnUuid::fromStringSafe(urlQuery.queryItemValue("accountID"));
     bool success = false;
     systemSharing->accessRole = QnLexical::deserialized<api::SystemAccessRole::Value>(
-        urlQuery.queryItemValue(lit("accessRole")), api::SystemAccessRole::none, &success );
+        urlQuery.queryItemValue("accessRole"), api::SystemAccessRole::none, &success );
     return success;
 }
 

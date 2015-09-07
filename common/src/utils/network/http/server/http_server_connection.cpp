@@ -22,9 +22,9 @@ namespace nx_http
         nx_http::MessageDispatcher* const httpMessageDispatcher )
     :
         BaseType( socketServer, std::move(sock) ),
-        m_isPersistent( false ),
         m_authenticationManager( authenticationManager ),
-        m_httpMessageDispatcher( httpMessageDispatcher )
+        m_httpMessageDispatcher( httpMessageDispatcher ),
+        m_isPersistent( false )
     {
     }
 

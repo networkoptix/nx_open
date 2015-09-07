@@ -33,7 +33,6 @@ namespace cl {
 class AsyncRequestsExecutor
 {
 public:
-    AsyncRequestsExecutor();
     virtual ~AsyncRequestsExecutor()
     {
         QnMutexLocker lk(&m_mutex);

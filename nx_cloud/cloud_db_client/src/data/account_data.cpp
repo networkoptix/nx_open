@@ -5,6 +5,7 @@
 
 #include "account_data.h"
 
+#include <common/common_globals.h>
 #include <utils/common/model_functions.h>
 #include <utils/network/buffer.h>
 
@@ -23,27 +24,27 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
 
 bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
 {
-    accountData->id = QnUuid(urlQuery.queryItemValue( lit("id") ));
-    accountData->login = urlQuery.queryItemValue( lit("login") ).toStdString();
-    accountData->email = urlQuery.queryItemValue( lit("email") ).toStdString();
-    accountData->passwordHa1 = urlQuery.queryItemValue( lit("passwordHa1") ).toStdString();
-    accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toStdString();
+    accountData->id = QnUuid(urlQuery.queryItemValue("id"));
+    accountData->login = urlQuery.queryItemValue("login").toStdString();
+    accountData->email = urlQuery.queryItemValue("email").toStdString();
+    accountData->passwordHa1 = urlQuery.queryItemValue("passwordHa1").toStdString();
+    accountData->fullName = urlQuery.queryItemValue("fullName").toStdString();
     bool success = true;
-    accountData->statusCode = urlQuery.hasQueryItem( lit( "statusCode" ) )
+    accountData->statusCode = urlQuery.hasQueryItem("statusCode")
         ? QnLexical::deserialized<api::AccountStatus>(
-            urlQuery.queryItemValue( lit( "statusCode" ) ), api::asInvalid, &success )
+            urlQuery.queryItemValue("statusCode"), api::asInvalid, &success )
         : api::asInvalid;
     return success;
 }
 
 void serializeToUrlQuery(const AccountData& data, QUrlQuery* const urlQuery)
 {
-    urlQuery->addQueryItem(lit("id"), data.id.toString());
-    urlQuery->addQueryItem(lit("login"), QString::fromStdString(data.login));
-    urlQuery->addQueryItem(lit("email"), QString::fromStdString(data.email));
-    urlQuery->addQueryItem(lit("passwordHa1"), QString::fromStdString(data.passwordHa1));
-    urlQuery->addQueryItem(lit("fullName"), QString::fromStdString(data.fullName));
-    urlQuery->addQueryItem(lit("statusCode"), QnLexical::serialized(data.statusCode));
+    urlQuery->addQueryItem("id", data.id.toString());
+    urlQuery->addQueryItem("login", QString::fromStdString(data.login));
+    urlQuery->addQueryItem("email", QString::fromStdString(data.email));
+    urlQuery->addQueryItem("passwordHa1", QString::fromStdString(data.passwordHa1));
+    urlQuery->addQueryItem("fullName", QString::fromStdString(data.fullName));
+    urlQuery->addQueryItem("statusCode", QnLexical::serialized(data.statusCode));
 }
 
 

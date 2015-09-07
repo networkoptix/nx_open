@@ -133,14 +133,14 @@ public:
     :
         ParentType(std::move(url))
     {
-        detail::serializeToUrl(input, &m_url);
+        detail::serializeToUrl(input, &this->m_url);
     }
     
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
         detail::processHttpResponse(
-            std::move(m_handler),
+            std::move(this->m_handler),
             client->response() ? SystemError::noError : SystemError::connectionReset,
             client->response() ? client->response()->statusLine.statusCode : 0,
             client->fetchMessageBodyBuffer());
@@ -168,7 +168,7 @@ private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
         detail::processHttpResponse(
-            std::move(m_handler),
+            std::move(this->m_handler),
             client->response() ? SystemError::noError : SystemError::connectionReset,
             client->response() ? client->response()->statusLine.statusCode : 0,
             client->fetchMessageBodyBuffer());
@@ -199,12 +199,12 @@ private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
         if (client->response())
-            m_handler(
+            this->m_handler(
                 SystemError::noError,
                 static_cast<nx_http::StatusCode::Value>(
                     client->response()->statusLine.statusCode));
         else
-            m_handler(
+            this->m_handler(
                 SystemError::connectionReset,   //TODO #ak take error code from client
                 nx_http::StatusCode::internalServerError);
     }
@@ -231,12 +231,12 @@ private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
         if (client->response())
-            m_handler(
+            this->m_handler(
                 SystemError::noError,
                 static_cast<nx_http::StatusCode::Value>(
                     client->response()->statusLine.statusCode));
         else
-            m_handler(
+            this->m_handler(
                 SystemError::connectionReset,   //TODO #ak take error code from client
                 nx_http::StatusCode::internalServerError);
     }
