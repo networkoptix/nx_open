@@ -22,7 +22,17 @@ class AccountManager
 public:
     virtual ~AccountManager() {}
 
+    /*!
+        \param accountData. \a id and \a statusCode fields are ignored (assigned by server when creating account)
+        \note Required access role: cloud module (e.g., user portal)
+    */
+    virtual void registerNewAccount(
+        const api::AccountData& accountData,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
     //!Fetches account info if credentails are account credentials
+    /*!
+        \note Required access role: account
+    */
     virtual void getAccount(
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) = 0;
 };

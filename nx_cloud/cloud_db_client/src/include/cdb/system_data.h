@@ -76,6 +76,13 @@ public:
 };
 
 
+class SystemDataList
+{
+public:
+    std::vector<SystemData> systems;
+};
+
+
 class SystemSharing
 {
 public:

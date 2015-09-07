@@ -34,7 +34,7 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
     //!Implementation of \a SystemManager::getSystems
     virtual void getSystems(
-        std::function<void(api::ResultCode, std::vector<api::SystemData>)> completionHandler ) override;
+        std::function<void(api::ResultCode, api::SystemDataList)> completionHandler ) override;
     //!Implementation of \a SystemManager::shareSystem
     virtual void shareSystem(
         api::SystemSharing sharingData,
@@ -48,7 +48,7 @@ private:
     mutable QnMutex m_mutex;
     QUrl m_url;
 
-    QUrl getUrl() const;
+    QUrl url() const;
 };
 
 

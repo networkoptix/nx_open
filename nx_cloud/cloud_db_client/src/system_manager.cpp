@@ -5,6 +5,9 @@
 
 #include "system_manager.h"
 
+#include "data/system_data.h"
+
+
 
 namespace nx {
 namespace cdb {
@@ -20,33 +23,46 @@ void SystemManager::bindSystem(
     api::SystemRegistrationData registrationData,
     std::function<void(api::ResultCode, api::SystemData)> completionHandler)
 {
-    //TODO #ak
-    completionHandler(api::ResultCode::notImplemented, api::SystemData());
+    QUrl urlToExecute = url();
+    urlToExecute.setPath(urlToExecute.path() + "/system/bind");
+    execute(
+        urlToExecute,
+        registrationData,
+        std::move(completionHandler));
 }
 
 void SystemManager::unbindSystem(
     const std::string& systemID,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    //TODO #ak
-    completionHandler(api::ResultCode::notImplemented);
+    QUrl urlToExecute = url();
+    urlToExecute.setPath(urlToExecute.path() + "/system/unbind");
+    execute(
+        urlToExecute,
+        api::SystemID(systemID),
+        std::move(completionHandler));
 }
 
 void SystemManager::getSystems(
-    std::function<void(api::ResultCode, std::vector<api::SystemData>)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemDataList)> completionHandler)
 {
-    //TODO #ak
-    completionHandler(
-        api::ResultCode::notImplemented,
-        std::vector<api::SystemData>());
+    QUrl urlToExecute = url();
+    urlToExecute.setPath(urlToExecute.path() + "/system/get");
+    execute(
+        urlToExecute,
+        std::move(completionHandler));
 }
 
 void SystemManager::shareSystem(
     api::SystemSharing sharingData,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    //TODO #ak
-    completionHandler(api::ResultCode::notImplemented);
+    QUrl urlToExecute = url();
+    urlToExecute.setPath(urlToExecute.path() + "/system/share");
+    execute(
+        urlToExecute,
+        sharingData,
+        std::move(completionHandler));
 }
 
 void SystemManager::setCredentials(
@@ -58,7 +74,7 @@ void SystemManager::setCredentials(
     m_url.setPassword(QString::fromStdString(password));
 }
 
-QUrl SystemManager::getUrl() const
+QUrl SystemManager::url() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_url;

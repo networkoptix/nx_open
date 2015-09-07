@@ -17,6 +17,18 @@ AccountManager::AccountManager(QUrl url)
 {
 }
 
+void AccountManager::registerNewAccount(
+    const api::AccountData& accountData,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    QUrl urlToExecute = url();
+    urlToExecute.setPath(urlToExecute.path() + "/account/register");
+    execute(
+        urlToExecute,
+        accountData,
+        std::move(completionHandler));
+}
+
 void AccountManager::getAccount(
     std::function<void(api::ResultCode, api::AccountData)> completionHandler)
 {

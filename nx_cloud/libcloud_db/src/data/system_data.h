@@ -86,23 +86,13 @@ public:
 //!for requests passing just system id
 class SystemID
 :
+    public api::SystemID,
     public stree::AbstractResourceReader
 {
 public:
-    QnUuid id;
-
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
-
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
-
-#define SystemID_Fields (id)
-
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemID),
-    (json)(sql_record) )
 
 }   //data
 }   //cdb

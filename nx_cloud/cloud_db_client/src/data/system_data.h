@@ -34,7 +34,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))
 #define SystemRegistrationData_Fields (name)
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemRegistrationData* const systemData );
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
+void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery);
 
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
@@ -43,28 +44,42 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemRegistrationData* const 
 #define SystemData_Fields (id)(name)(authKey)(ownerAccountID)(status)(cloudConnectionSubscriptionStatus)
 
 
-class SystemDataList
-{
-public:
-    std::vector<SystemData> systems;
-};
-
 #define SystemDataList_Fields (systems)
 
 
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemSharing* const systemSharing );
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
+void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 
 #define SystemSharing_Fields (accountID)(systemID)(accessRole)
 
 
+//!for requests passing just system id
+class SystemID
+{
+public:
+    QnUuid id;
+
+    SystemID() {}
+    SystemID(std::string systemIDStr)
+    :
+        id(systemIDStr)
+    {
+    }
+};
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
+void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
+
+#define SystemID_Fields (id)
+
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing),
-    (json)(sql_record) )
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (json)(sql_record));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemDataList),
-    (json))
+    (json));
 
 
 }   //api

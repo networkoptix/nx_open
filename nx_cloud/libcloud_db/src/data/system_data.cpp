@@ -73,20 +73,6 @@ bool SystemID::getAsVariant(int resID, QVariant* const value) const
     }
 }
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID)
-{
-    if (!urlQuery.hasQueryItem("id"))
-        return false;
-    systemID->id = urlQuery.queryItemValue("id");
-    return true;
-}
-
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemID),
-    (json)(sql_record),
-    _Fields )
-
 }   //data
 }   //cdb
 }   //nx

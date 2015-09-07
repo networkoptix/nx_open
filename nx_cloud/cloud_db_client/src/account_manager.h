@@ -27,6 +27,10 @@ class AccountManager
 public:
     AccountManager(QUrl url);
 
+    //!Implementation of api::AccountManager::registerNewAccount
+    virtual void registerNewAccount(
+        const api::AccountData& accountData,
+        std::function<void(api::ResultCode)> completionHandler) override;
     //!Implementation of api::AccountManager::getAccount
     virtual void getAccount(
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) override;
