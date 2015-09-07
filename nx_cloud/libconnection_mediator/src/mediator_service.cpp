@@ -19,11 +19,9 @@
 #include <utils/network/http/server/http_message_dispatcher.h>
 #include <utils/network/http/server/server_managers.h>
 
-#include "stun/custom_stun.h"
 #include "listening_peer_pool.h"
 #include "mediaserver_api.h"
 #include "version.h"
-
 
 namespace nx {
 namespace hpm {
@@ -120,9 +118,9 @@ int MediatorProcess::executeApplication()
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset( new MultiAddressServer<stun::SocketServer>(
-        true, SocketFactory::nttAuto ) );
+        stunAddrToListenList, true, SocketFactory::nttAuto ) );
 
-    if( !m_multiAddressStunServer->bind(stunAddrToListenList) )
+    if( !m_multiAddressStunServer->bind() )
         return 2;
 
     //TODO: #ak process privilege reduction should be made here

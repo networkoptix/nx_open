@@ -3,8 +3,7 @@
 
 #include <utils/network/stun/server_connection.h>
 #include <utils/network/stun/message_dispatcher.h>
-
-#include "stun/custom_stun.h"
+#include <utils/network/stun/cc/custom_stun.h>
 
 namespace nx {
 namespace hpm {
@@ -22,7 +21,7 @@ public:
     virtual ~RequestProcessor() = 0;
 
     typedef std::shared_ptr< stun::ServerConnection > ConnectionSharedPtr;
-    typedef std::shared_ptr< stun::ServerConnection > ConnectionWeakPtr;
+    typedef std::weak_ptr< stun::ServerConnection > ConnectionWeakPtr;
 
 protected:
     struct MediaserverData { String systemId, serverId; };

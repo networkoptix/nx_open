@@ -1,9 +1,9 @@
-#include "custom_stun.h"
-
 #include <common/common_globals.h>
+#include <utils/network/stun/cc/custom_stun.h>
 
 namespace nx {
-namespace hpm {
+namespace stun {
+namespace cc {
 namespace attrs {
 
 PublicEndpointList::PublicEndpointList( const std::list< SocketAddress >& endpoints )
@@ -25,5 +25,6 @@ std::list< SocketAddress > PublicEndpointList::get() const
 }
 
 } // namespace attrs
-} // namespace hpm
+} // namespace cc
+} // namespace stun
 } // namespace nx

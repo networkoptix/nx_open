@@ -11,7 +11,7 @@ boost::optional< RequestProcessor::MediaserverData >
     RequestProcessor::getMediaserverData(
         ConnectionSharedPtr connection, stun::Message& request)
 {
-    const auto hostNameAttr = request.getAttribute< attrs::HostName >();
+    const auto hostNameAttr = request.getAttribute< stun::cc::attrs::HostName >();
     if( !hostNameAttr )
     {
         errorResponse( connection, request.header, stun::error::badRequest,
@@ -27,7 +27,7 @@ boost::optional< RequestProcessor::MediaserverData >
         return boost::none;
     }
 
-    const auto authAttr = request.getAttribute< attrs::Authorization >();
+    const auto authAttr = request.getAttribute< stun::cc::attrs::Authorization >();
     if( !authAttr )
     {
         errorResponse( connection, request.header, stun::error::badRequest,

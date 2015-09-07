@@ -152,13 +152,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_sensStaticText()
     , m_ptzController(nullptr)
     , m_homePtzController(nullptr)
-    , m_ioModuleOverlayWidget(nullptr)
-    , m_ioCouldBeShown(false)
     , m_dewarpingParams()
     , m_currentTime(kInvalidTime)
     , m_bookmarks()
     , m_bookmarksBeginPosition(m_bookmarks.cbegin())
     , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource))
+    , m_ioModuleOverlayWidget(nullptr)
+    , m_ioCouldBeShown(false)
 {
     updateBookmarks();
 /*

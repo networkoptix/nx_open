@@ -1,7 +1,6 @@
 #include "listening_peer_pool.h"
 
-#include "stun/custom_stun.h"
-#include "mediaserver_api.h"
+#include <utils/network/stun/cc/custom_stun.h>
 
 namespace nx {
 namespace hpm {
@@ -11,15 +10,15 @@ ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher )
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            methods::bind,
+            stun::cc::methods::bind,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
                 { bind( connection, std::move( message ) ); } ) &&
         dispatcher->registerRequestProcessor(
-            methods::listen,
+            stun::cc::methods::listen,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
                 { listen( connection, std::move( message ) ); } ) &&
         dispatcher->registerRequestProcessor(
-            methods::connect,
+            stun::cc::methods::connect,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
                 { connect( connection, std::move( message ) ); } );
 
@@ -35,7 +34,8 @@ void ListeningPeerPool::bind( const ConnectionSharedPtr& connection,
         QnMutexLocker lk( &m_mutex );
         if( const auto peer = m_peers.peer( connection, *mediaserver, &m_mutex ) )
         {
-            if( const auto attr = message.getAttribute< attrs::PublicEndpointList >() )
+            if( const auto attr =
+                    message.getAttribute< stun::cc::attrs::PublicEndpointList >() )
                 peer->endpoints = attr->get();
             else
                 peer->endpoints.clear();
@@ -73,12 +73,12 @@ void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
 void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
                                  stun::Message message )
 {
-    const auto userNameAttr = message.getAttribute< attrs::UserName >();
+    const auto userNameAttr = message.getAttribute< stun::cc::attrs::UserName >();
     if( !userNameAttr || userNameAttr->value.isEmpty() )
         return errorResponse( connection, message.header, stun::error::badRequest,
             "Attribute UserName is required" );
 
-    const auto hostNameAttr = message.getAttribute< attrs::HostName >();
+    const auto hostNameAttr = message.getAttribute< stun::cc::attrs::HostName >();
     if( !hostNameAttr || hostNameAttr->value.isEmpty() )
         return errorResponse( connection, message.header, stun::error::badRequest,
             "Attribute HostName is required" );
@@ -91,7 +91,7 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
             std::move( message.header.transactionId ) ) );
 
         if( !peer->endpoints.empty() )
-            response.newAttribute< attrs::PublicEndpointList >( peer->endpoints );
+            response.newAttribute< stun::cc::attrs::PublicEndpointList >( peer->endpoints );
 
         if( !peer->isListening )
             { /* TODO: StunEndpointList */ }
@@ -100,14 +100,20 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
     }
     else
     {
-        errorResponse( connection, message.header, error::notFound,
+        errorResponse( connection, message.header, stun::cc::error::notFound,
             "Can not find a server " + hostNameAttr->value );
     }
 }
 
 ListeningPeerPool::MediaserverPeer::MediaserverPeer( ConnectionWeakPtr connection_ )
-    : connection( std::move( connection_) )
+    : connection( std::move( connection_ ) )
     , isListening( false )
+{
+}
+
+ListeningPeerPool::MediaserverPeer::MediaserverPeer( MediaserverPeer&& peer )
+    : connection( std::move( peer.connection ) )
+    , isListening( peer.isListening )
 {
 }
 
@@ -127,7 +133,7 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
     const auto& serverIt = serverInsert.first;
     if( serverInsert.second )
     {
-        connection->registerCloseHandler( [ = ]()
+        connection.lock()->registerCloseHandler( [ = ]()
         {
             QnMutexLocker lk( mutex );
             systemIt->second.erase( serverIt );
@@ -137,9 +143,6 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
 
         return serverIt->second;
     }
-
-    if( serverIt->second.connection != connection )
-        return boost::none;
 
     return serverIt->second;
 }
@@ -152,6 +155,9 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
         return boost::none;
 
     const auto systemIt = m_peers.find( ids.last() );
+    if( systemIt == m_peers.end() )
+        return boost::none;
+
     if( ids.size() == 2 )
     {
         const auto serverIt = systemIt->second.find( ids.first() );

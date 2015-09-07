@@ -34,6 +34,7 @@ protected:
         bool isListening;
 
         MediaserverPeer( ConnectionWeakPtr connection_ );
+        MediaserverPeer( MediaserverPeer&& peer );
     };
 
     struct SystemPeers
@@ -45,6 +46,8 @@ protected:
                 QnMutex* mutex );
 
         boost::optional< MediaserverPeer& > search( String hostName );
+
+        void clear() { m_peers.clear(); }
 
     private:
         std::map< String,              // System Id

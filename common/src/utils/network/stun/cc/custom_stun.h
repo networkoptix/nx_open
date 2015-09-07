@@ -11,7 +11,8 @@
 #include <utils/common/uuid.h>
 
 namespace nx {
-namespace hpm { // hpm stands for "Hole Punching Mediator"
+namespace stun {
+namespace cc {
 
 namespace methods
 {
@@ -62,7 +63,7 @@ namespace attrs
 
     struct UserName : stun::attrs::Unknown
     {
-        static const int TYPE = hostName;
+        static const int TYPE = userName;
         UserName( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
     };
 
@@ -82,7 +83,8 @@ namespace attrs
     };
 }
 
-} // namespace hpm
+} // namespace cc
+} // namespace stun
 } // namespace nx
 
 #endif  //NX_CUSTOM_STUN_H

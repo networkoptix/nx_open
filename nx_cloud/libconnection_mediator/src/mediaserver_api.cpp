@@ -15,7 +15,7 @@ MediaserverApiIf::MediaserverApiIf( stun::MessageDispatcher* dispatcher )
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            methods::ping, 
+            stun::cc::methods::ping,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
                 { ping( connection, std::move( message ) ); } );
 
@@ -23,11 +23,13 @@ MediaserverApiIf::MediaserverApiIf( stun::MessageDispatcher* dispatcher )
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
 }
 
-void MediaserverApiIf::ping( const ConnectionSharedPtr& connection, stun::Message message )
+void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
+                             stun::Message message )
 {
     if( const auto mediaserver = getMediaserverData( connection, message ) )
     {
-        const auto endpointsAttr = message.getAttribute< attrs::PublicEndpointList >();
+        const auto endpointsAttr =
+                message.getAttribute< stun::cc::attrs::PublicEndpointList >();
         if( !endpointsAttr )
         {
             errorResponse( connection, message.header, stun::error::badRequest,
@@ -37,13 +39,13 @@ void MediaserverApiIf::ping( const ConnectionSharedPtr& connection, stun::Messag
 
         std::list< SocketAddress > endpoints = endpointsAttr->get();
         endpoints.remove_if( [ & ]( const SocketAddress& addr )
-                             { return !pingServer( addr, mediaserver->serverId ); } );
+            { return !pingServer( addr, mediaserver->serverId ); } );
 
         stun::Message response( stun::Header(
             stun::MessageClass::successResponse, message.header.method,
             std::move( message.header.transactionId ) ) );
 
-        response.newAttribute< attrs::PublicEndpointList >( endpoints );
+        response.newAttribute< stun::cc::attrs::PublicEndpointList >( endpoints );
         connection->sendMessage( std::move( response ) );
     }
 }
