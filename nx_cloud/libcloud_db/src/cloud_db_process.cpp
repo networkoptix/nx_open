@@ -23,7 +23,6 @@
 #include <utils/db/db_structure_updater.h>
 #include <utils/network/aio/aioservice.h>
 #include <utils/network/http/server/http_message_dispatcher.h>
-#include <utils/network/http/server/server_managers.h>
 
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
@@ -108,12 +107,6 @@ int CloudDBProcess::executeApplication()
     
         SystemManager systemManager( &dbManager );
     
-        //contains singletones common for http server
-        nx_http::ServerManagers httpServerManagers;
-    
-        nx_http::MessageDispatcher httpMessageDispatcher;
-        httpServerManagers.setDispatcher( &httpMessageDispatcher );
-    
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( VerifyEmailAddressHandler::HANDLER_PATH, AuthMethod::noAuth );
@@ -121,10 +114,10 @@ int CloudDBProcess::executeApplication()
             accountManager,
             systemManager,
             authRestrictionList );
-        httpServerManagers.setAuthenticationManager( &authenticationManager );
 
         AuthorizationManager authorizationManager;
     
+        nx_http::MessageDispatcher httpMessageDispatcher;
         //registering HTTP handlers
         registerApiHandlers(
             &httpMessageDispatcher,
@@ -133,11 +126,12 @@ int CloudDBProcess::executeApplication()
             &systemManager );
     
         MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
-            httpAddrToListenList,
+            &authenticationManager,
+            &httpMessageDispatcher,
             false,  //TODO #ak enable ssl when it works properly
             SocketFactory::nttDisabled );
 
-        if( !multiAddressHttpServer.bind() )
+        if( !multiAddressHttpServer.bind(httpAddrToListenList) )
             return 3;
     
         //TODO: #ak process privilege reduction should be made here

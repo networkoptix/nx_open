@@ -27,6 +27,15 @@ public:
         base_type( sslRequired, natTraversalRequired )
     {
     }
+
+protected:
+    virtual std::shared_ptr<ServerConnection> createConnection(
+        std::unique_ptr<AbstractStreamSocket> _socket) override
+    {
+        return std::make_shared<ServerConnection>(
+            this,
+            std::move(_socket) );
+    }
 };
 
 } // namespace stun

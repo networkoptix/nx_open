@@ -127,9 +127,7 @@ public:
 
         if( newConnection )
         {
-            auto conn = std::make_shared<ConnectionType>(
-                static_cast<CustomServerType*>(this),
-                std::unique_ptr<AbstractStreamSocket>(newConnection) );
+            auto conn = createConnection( std::unique_ptr<AbstractStreamSocket>(newConnection) );
             if( conn->startReadingConnection() )
                 this->saveConnection( std::move( conn ) );
         }
@@ -138,6 +136,10 @@ public:
             //TODO #ak
         }
     }
+
+protected:
+    virtual std::shared_ptr<ConnectionType> createConnection(
+        std::unique_ptr<AbstractStreamSocket> _socket) = 0;
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_socket;

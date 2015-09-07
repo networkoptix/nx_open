@@ -11,17 +11,20 @@
 
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
-#include "server_managers.h"
 
 
 namespace nx_http
 {
     HttpServerConnection::HttpServerConnection(
         nx_http::HttpStreamSocketServer* socketServer,
-        std::unique_ptr<AbstractCommunicatingSocket> sock )
+        std::unique_ptr<AbstractCommunicatingSocket> sock,
+        nx_http::AbstractAuthenticationManager* const authenticationManager,
+        nx_http::MessageDispatcher* const httpMessageDispatcher )
     :
         BaseType( socketServer, std::move(sock) ),
-        m_isPersistent( false )
+        m_isPersistent( false ),
+        m_authenticationManager( authenticationManager ),
+        m_httpMessageDispatcher( httpMessageDispatcher )
     {
     }
 
@@ -45,10 +48,10 @@ namespace nx_http
         //    which will be forwarded to the request handler.
         //    Should this data be template parameter?
         stree::ResourceContainer authInfo;
-        if( const auto auth = nx_http::ServerManagers::instance()->authenticationManager() )
+        if( m_authenticationManager )
         {
             boost::optional<header::WWWAuthenticate> wwwAuthenticate;
-            if( !auth->authenticate(
+            if( !m_authenticationManager->authenticate(
                     *this,
                     *request.request,
                     &wwwAuthenticate,
@@ -86,9 +89,8 @@ namespace nx_http
                 std::move(responseMsgBody) );
         };
 
-        MessageDispatcher* const dispatcher = nx_http::ServerManagers::instance()->dispatcher();
-        if( !dispatcher ||
-            !dispatcher->dispatchRequest(
+        if( !m_httpMessageDispatcher ||
+            !m_httpMessageDispatcher->dispatchRequest(
                 *this,
                 std::move(request),
                 std::move(authInfo),

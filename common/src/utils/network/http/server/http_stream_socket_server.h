@@ -8,7 +8,10 @@
 
 #include <utils/network/connection_server/stream_socket_server.h>
 
+#include "abstract_authentication_manager.h"
+#include "http_message_dispatcher.h"
 #include "http_server_connection.h"
+
 
 namespace nx_http
 {
@@ -21,11 +24,19 @@ namespace nx_http
     public:
         typedef HttpServerConnection ConnectionType;
 
-        HttpStreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
-        :
-            base_type( sslRequired, natTraversalRequired )
-        {
-        }
+        HttpStreamSocketServer(
+            nx_http::AbstractAuthenticationManager* const authenticationManager,
+            nx_http::MessageDispatcher* const httpMessageDispatcher,
+            bool sslRequired,
+            SocketFactory::NatTraversalType natTraversalRequired );
+
+    protected:
+        virtual std::shared_ptr<HttpServerConnection> createConnection(
+            std::unique_ptr<AbstractStreamSocket> _socket) override;
+
+    private:
+        nx_http::AbstractAuthenticationManager* const m_authenticationManager;
+        nx_http::MessageDispatcher* const m_httpMessageDispatcher;
     };
 }
 

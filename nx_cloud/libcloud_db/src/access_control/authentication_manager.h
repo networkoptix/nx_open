@@ -30,8 +30,7 @@ class SystemManager;
  */
 class AuthenticationManager
 :
-    public nx_http::AbstractAuthenticationManager,
-    public Singleton<AuthenticationManager>
+    public nx_http::AbstractAuthenticationManager
 {
 public:
     AuthenticationManager(

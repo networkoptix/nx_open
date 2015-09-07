@@ -19,6 +19,8 @@
 namespace nx_http
 {
     class HttpStreamSocketServer;
+    class AbstractAuthenticationManager;
+    class MessageDispatcher;
 
     class HttpServerConnection
     :
@@ -41,12 +43,16 @@ namespace nx_http
 
         HttpServerConnection(
             nx_http::HttpStreamSocketServer* socketServer,
-            std::unique_ptr<AbstractCommunicatingSocket> sock );
+            std::unique_ptr<AbstractCommunicatingSocket> sock,
+            nx_http::AbstractAuthenticationManager* const authenticationManager,
+            nx_http::MessageDispatcher* const httpMessageDispatcher );
         ~HttpServerConnection();
 
         void processMessage( nx_http::Message&& request );
 
     private:
+        nx_http::AbstractAuthenticationManager* const m_authenticationManager;
+        nx_http::MessageDispatcher* const m_httpMessageDispatcher;
         std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
         bool m_isPersistent;
 
