@@ -197,8 +197,7 @@ namespace ec2
     static const size_t MILLIS_PER_SEC = 1000;
     static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 0;
     static const size_t MIN_INTERNET_SYNC_TIME_PERIOD_SEC = 60;
-    static const char* NIST_RFC868_SERVER = "time.nist.gov";
-    static const char* UCLA_RFC868_SERVER = "time1.ucla.edu";
+    static const char* RFC868_SERVERS[] = { "time.nist.gov", "time.ien.it"/*, "time1.ucla.edu"*/ };
 #ifdef _DEBUG
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*MILLIS_PER_SEC;
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*MILLIS_PER_SEC;
@@ -334,10 +333,10 @@ namespace ec2
                     std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                     0 );
                 std::unique_ptr<MultipleInternetTimeFetcher> multiFetcher( new MultipleInternetTimeFetcher() );
-                multiFetcher->addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher>(
-                    new TimeProtocolClient(QLatin1String(NIST_RFC868_SERVER))) );
-                multiFetcher->addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher>(
-                    new TimeProtocolClient(QLatin1String(UCLA_RFC868_SERVER))) );
+
+                for(const char* timeServer: RFC868_SERVERS)
+                    multiFetcher->addTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher>(
+                        new TimeProtocolClient(QLatin1String(timeServer))));
                 m_timeSynchronizer = std::move( multiFetcher );
                 addInternetTimeSynchronizationTask();
             }
