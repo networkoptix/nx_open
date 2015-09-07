@@ -296,7 +296,7 @@
                 </property>
             </activation>
             <modules>
-                <!--<module>build_variables</module>-->
+                <module>build_variables</module>
                 <module>common</module>
                 <!-- <module>hole_punching_mediator</module> -->
                 <module>appserver2</module>
