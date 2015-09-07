@@ -348,14 +348,15 @@ void QnTransactionTransport::startListening()
 
 void QnTransactionTransport::setStateNoLock(State state)
 {
-    if (state == Connected) {
+    if (state == Connected)
         m_connected = true;
+    
+    if (m_state == Error && state != Closed)
+    {
+        ; // only Error -> Closed setState is allowed
     }
-    else if (state == Error) {
-    }
-    else if (state == ReadyForStreaming) {
-    }
-    if (this->m_state != state) {
+    else if (this->m_state != state) 
+    {
         this->m_state = state;
         emit stateChanged(state);
     }

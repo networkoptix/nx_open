@@ -110,12 +110,6 @@ public:
     */
     QStringList getAllStoragePathes() const;
 
-    // Manage local paths list used as smb mount points
-    // in order not to autodiscover them
-    void removeFromLocalPathInUse(const QString &path);
-    void addLocalPathInUse(const QString &path);
-    void getCurrentlyUsedLocalPathes(QList<QString> *pathList) const;
-
     bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
@@ -206,8 +200,6 @@ private:
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
     QElapsedTimer m_removeEmtyDirTimer;
-
-    QStringList m_localPathsInUse;
 };
 
 #define qnStorageMan QnStorageManager::instance()
