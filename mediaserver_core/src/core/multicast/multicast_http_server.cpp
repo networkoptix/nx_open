@@ -34,23 +34,6 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         httpClient.reset();
     }, Qt::DirectConnection);
 
-    /*
-    connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, ec2::DummyHandler::instance(), [httpClient, requestId, clientId, this](nx_http::AsyncHttpClientPtr)  mutable 
-    {
-        httpClient->disconnect( nullptr, (const char*)nullptr );
-        httpClient.reset();
-
-        QnMulticast::Response response;
-        response.serverId = qnCommon->moduleGUID().toQUuid();
-        //response.messageBody = reply->fetchMessageBodyBuffer();
-        //response.httpResult = reply->response()->statusLine.statusCode;
-        //m_transport->addResponse(requestId, clientId, response);
-        if (httpClient->response())
-            m_transport->addResponse(requestId, clientId, httpClient->response()->toString());
-    }, Qt::DirectConnection);
-    */
-
-
     bool result = false;
     if (request.method == "GET")
         result = httpClient->doGet(url);

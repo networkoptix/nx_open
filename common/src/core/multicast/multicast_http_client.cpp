@@ -14,4 +14,9 @@ QUuid HTTPClient::execRequest(const Request& request, ResponseCallback callback,
     return m_transport.addRequest(request, callback, timeoutMs);
 }
 
+void HTTPClient::cancelRequest(const QUuid& requestId)
+{
+    m_transport.cancelRequest(requestId);
+}
+
 }

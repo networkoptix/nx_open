@@ -49,10 +49,10 @@ namespace QnMulticast
         QUuid addRequest(const Request& request, ResponseCallback callback, int timeoutMs);
         void addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
         void setRequestCallback(RequestCallback value) { m_requestCallback = value; }
+        void cancelRequest(const QUuid& requestId);
     private slots:
         void sendNextData();
         void at_socketReadyRead();
-        void at_dataSent(qint64 bytes);
         void at_timer();
     private:
 
@@ -77,9 +77,8 @@ namespace QnMulticast
             QElapsedTimer timer;
         };
         
-        QMap<QUuid, TransportConnection> m_requests;
+        QQueue<TransportConnection> m_requests;
         QUuid m_localGuid;
-        qint64 m_bytesWritten;
 
         std::unique_ptr<QUdpSocket> m_recvSocket;
         std::vector<std::unique_ptr<QUdpSocket>> m_sendSockets;
@@ -87,6 +86,7 @@ namespace QnMulticast
         std::unique_ptr<QTimer> m_timer;
         QCache<QUuid, void> m_processedRequests;
         mutable QMutex m_mutex;
+        bool m_nextSendQueued;
     private:
         QByteArray encodeMessage(const Request& request) const;
         Response decodeResponse(const TransportConnection& transportData, bool* ok) const;
@@ -94,6 +94,7 @@ namespace QnMulticast
         TransportConnection encodeRequest(const Request& request);
         TransportConnection encodeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
         void putPacketToTransport(TransportConnection& transportConnection, const Packet& packet);
+        void eraseRequest(const QUuid& id);
     };
 
 }

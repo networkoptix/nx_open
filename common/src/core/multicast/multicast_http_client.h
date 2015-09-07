@@ -24,7 +24,7 @@ namespace QnMulticast
         */
         //QUuid doPost(const Request& request, ResponseCallback callback, int timeoutMs = -1);
         /** Cancel previously started request.  callback function will not called. */
-        void cancelRequest(const QUuid& handle);
+        void cancelRequest(const QUuid& requestId);
         /** Set default timeout for requests */
         void setDefaultTimeout(int timeoutMs);
         QUuid execRequest(const Request& request, ResponseCallback callback, int timeoutMs = -1);
