@@ -21,6 +21,9 @@ public:
     }
 
     QnLdapFilter operator &(const QnLdapFilter& arg) {
+        if (isEmpty())
+            return arg;
+
         if (arg.isEmpty())
             return *this;
 

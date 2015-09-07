@@ -35,6 +35,10 @@ namespace {
 int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
 {
     Q_UNUSED(path)
+    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
+        return nx_http::StatusCode::forbidden;
+    }
 
     if (ec2::Settings::instance()->dbReadOnly()) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
