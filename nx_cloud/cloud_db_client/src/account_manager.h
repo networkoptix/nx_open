@@ -36,11 +36,11 @@ public:
         const std::string& password);
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QUrl m_url;
-    std::deque<std::unique_ptr<Qn::StoppableAsync>> m_runningRequests;
+    std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
         
-    QUrl getUrl() const;
+    QUrl url() const;
 };
 
 

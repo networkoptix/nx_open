@@ -10,7 +10,7 @@ namespace nx {
 namespace cdb {
 
 
-const QString GetSystemsHandler::HANDLER_PATH = QLatin1String("/get_systems");
+const QString GetSystemsHandler::HANDLER_PATH = QLatin1String("/system/get");
 
 
 }   //cdb

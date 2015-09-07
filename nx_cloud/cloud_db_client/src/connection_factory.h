@@ -24,6 +24,10 @@ public:
         const std::string& login,
         const std::string& password,
         std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) override;
+    //!Implementation of \a api::ConnectionFactory::createConnection
+    virtual std::unique_ptr<api::Connection> createConnection(
+        const std::string& login,
+        const std::string& password) override;
 };
 
 }   //cl

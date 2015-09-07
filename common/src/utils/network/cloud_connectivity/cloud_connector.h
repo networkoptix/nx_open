@@ -32,7 +32,7 @@ namespace nx_cc
         virtual ~CloudConnector();
 
         //!Implementation of QnStoppableAsync::pleaseStop
-        virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
+        virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
         //!Establishes connection to \a targetHost
         /*!

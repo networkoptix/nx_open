@@ -8,6 +8,7 @@
 
 #include <QtCore/QUrl>
 
+#include "async_http_requests_executor.h"
 #include "include/cdb/system_manager.h"
 
 
@@ -44,7 +45,7 @@ public:
         const std::string& password);
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QUrl m_url;
 
     QUrl getUrl() const;

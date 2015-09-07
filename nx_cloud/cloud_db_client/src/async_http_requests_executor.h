@@ -7,12 +7,19 @@
 #define NX_CDB_CL_ASYNC_REQUESTS_EXECUTOR_H
 
 #include <deque>
+#include <functional>
 
 #include <QtCore/QUrl>
 
+#include <utils/common/cpp14.h>
+#include <utils/common/stoppable.h>
+#include <utils/network/http/fusion_data_http_client.h>
+#include <utils/thread/mutex.h>
+
 #include "data/account_data.h"
+#include "data/types.h"
 #include "include/cdb/account_manager.h"
-#include "utils/thread/mutex.h"
+#include "include/cdb/result_code.h"
 
 
 namespace nx {
@@ -50,20 +57,36 @@ protected:
         const InputData& input,
         std::function<void(api::ResultCode, OutputData)> completionHandler)
     {
-        const auto result = execute(
-            std::make_unique<FusionDataHttpClient<InputData, OutputData>>(
-                std::move(url),
-                input,
-                [completionHandler, requestIter, this](api::ResultCode result, OutputData data)
+        //TODO #ak introduce generic implementation with variadic templates available
+
+        QnMutexLocker lk(&m_mutex);
+        auto client = std::make_unique<
+            nx_http::FusionDataHttpClient<InputData, OutputData>>(std::move(url), input);
+        m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
+        auto requestIter = std::prev(m_runningRequests.end());
+        const bool result = client->get(
+            [completionHandler, requestIter, this](
+                SystemError::ErrorCode errCode,
+                nx_http::StatusCode::Value statusCode,
+                OutputData data)
+            {
                 {
-                    {
-                        QnMutexLocker lk(&m_mutex);
-                        m_runningRequests.erase(requestIter);
-                    }
-                    completionHandler(result, std::move(data));
-                }));
-        if (!result)
+                    QnMutexLocker lk(&m_mutex);
+                    m_runningRequests.erase(requestIter);
+                }
+                if (errCode != SystemError::noError)
+                    return completionHandler(api::ResultCode::networkError, OutputData());
+                completionHandler(api::httpStatusCodeToResultCode(statusCode), std::move(data));
+            });
+        if (result)
+        {
+            m_runningRequests.back() = std::move(client);
+        }
+        else
+        {
+            m_runningRequests.pop_back();
             completionHandler(api::ResultCode::networkError, OutputData());
+        }
     }
 
     template<typename InputData>
@@ -72,20 +95,33 @@ protected:
         const InputData& input,
         std::function<void(api::ResultCode)> completionHandler)
     {
-        const auto result = execute(
-            std::make_unique<FusionDataHttpClient<InputData, void>>(
-                std::move(url),
-                input,
-                [completionHandler, requestIter, this](api::ResultCode result)
+        QnMutexLocker lk(&m_mutex);
+        auto client = std::make_unique<
+            nx_http::FusionDataHttpClient<InputData, void>>(std::move(url), input);
+        m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
+        auto requestIter = std::prev(m_runningRequests.end());
+        const bool result = client->get(
+            [completionHandler, requestIter, this](
+                SystemError::ErrorCode errCode,
+                nx_http::StatusCode::Value statusCode)
+            {
                 {
-                    {
-                        QnMutexLocker lk(&m_mutex);
-                        m_runningRequests.erase(requestIter);
-                    }
-                    completionHandler(result);
-                }));
-        if (!result)
+                    QnMutexLocker lk(&m_mutex);
+                    m_runningRequests.erase(requestIter);
+                }
+                if (errCode != SystemError::noError)
+                    return completionHandler(api::ResultCode::networkError);
+                completionHandler(api::httpStatusCodeToResultCode(statusCode));
+            });
+        if (result)
+        {
+            m_runningRequests.back() = std::move(client);
+        }
+        else
+        {
+            m_runningRequests.pop_back();
             completionHandler(api::ResultCode::networkError);
+        }
     }
 
     template<typename OutputData>
@@ -93,57 +129,72 @@ protected:
         QUrl url,
         std::function<void(api::ResultCode, OutputData)> completionHandler)
     {
-        const auto result = execute(
-            std::make_unique<FusionDataHttpClient<void, OutputData>>(
-                std::move(url),
-                [completionHandler, requestIter, this](api::ResultCode result, OutputData data)
+        QnMutexLocker lk(&m_mutex);
+        auto client = std::make_unique<
+            nx_http::FusionDataHttpClient<void, OutputData>>(std::move(url));
+        m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
+        auto requestIter = std::prev(m_runningRequests.end());
+        const bool result = client->get(
+            [completionHandler, requestIter, this](
+                SystemError::ErrorCode errCode,
+                nx_http::StatusCode::Value statusCode,
+                OutputData data)
+            {
                 {
-                    {
-                        QnMutexLocker lk(&m_mutex);
-                        m_runningRequests.erase(requestIter);
-                    }
-                    completionHandler(result, std::move(data));
-                }));
-        if (!result)
+                    QnMutexLocker lk(&m_mutex);
+                    m_runningRequests.erase(requestIter);
+                }
+                if (errCode != SystemError::noError)
+                    return completionHandler(api::ResultCode::networkError, OutputData());
+                completionHandler(api::httpStatusCodeToResultCode(statusCode), std::move(data));
+            });
+        if (result)
+        {
+            m_runningRequests.back() = std::move(client);
+        }
+        else
+        {
+            m_runningRequests.pop_back();
             completionHandler(api::ResultCode::networkError, OutputData());
+        }
     }
 
     void execute(
         QUrl url,
         std::function<void(api::ResultCode)> completionHandler)
     {
-        const auto result = execute(
-            std::make_unique<FusionDataHttpClient<void, void>>(
-                std::move(url),
-                [completionHandler, requestIter, this](api::ResultCode result)
+        QnMutexLocker lk(&m_mutex);
+        auto client = std::make_unique<
+            nx_http::FusionDataHttpClient<void, void>>(std::move(url));
+        m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
+        auto requestIter = std::prev(m_runningRequests.end());
+        const bool result = client->get(
+            [completionHandler, requestIter, this](
+                SystemError::ErrorCode errCode,
+                nx_http::StatusCode::Value statusCode)
+            {
                 {
-                    {
-                        QnMutexLocker lk(&m_mutex);
-                        m_runningRequests.erase(requestIter);
-                    }
-                    completionHandler(result);
-                }));
-        if (!result)
+                    QnMutexLocker lk(&m_mutex);
+                    m_runningRequests.erase(requestIter);
+                }
+                if (errCode != SystemError::noError)
+                    return completionHandler(api::ResultCode::networkError);
+                completionHandler(api::httpStatusCodeToResultCode(statusCode));
+            });
+        if (result)
+        {
+            m_runningRequests.back() = std::move(client);
+        }
+        else
+        {
+            m_runningRequests.pop_back();
             completionHandler(api::ResultCode::networkError);
+        }
     }
 
 private:
     QnMutex m_mutex;
     std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
-
-    //!Returns \a false if failed to start async request
-    template<typename HttpClientType>
-    bool execute(std::unique_ptr<HttpClientType> client)
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_runningRequests.push_back(std::unique_ptr<Qn::StoppableAsync>());
-        auto requestIter = std::prev(m_runningRequests.end());
-        m_runningRequests.back() = std::move(client);
-        if (m_runningRequests.back()->get())
-            return true;
-        m_runningRequests.pop_back();
-        return false;
-    }
 };
 
 

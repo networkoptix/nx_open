@@ -20,21 +20,21 @@ Connection::Connection(
 {
     QUrl url;
     url.setScheme("http");
-    url.setHost(endpoint.address);
+    url.setHost(endpoint.address.toString());
     url.setPort(endpoint.port);
-    url.setUsername(login);
-    url.setPassword(password);
+    url.setUserName(QString::fromStdString(login));
+    url.setPassword(QString::fromStdString(password));
     
     m_accountManager = std::make_unique<AccountManager>(url);
     m_systemManager = std::make_unique<SystemManager>(url);
 }
 
-api::AccountManager* Connection::getAccountManager()
+api::AccountManager* Connection::accountManager()
 {
     return m_accountManager.get();
 }
 
-api::SystemManager* Connection::getSystemManager()
+api::SystemManager* Connection::systemManager()
 {
     return m_systemManager.get();
 }

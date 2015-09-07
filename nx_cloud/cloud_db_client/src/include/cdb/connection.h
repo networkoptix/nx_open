@@ -35,8 +35,8 @@ class Connection
 public:
     virtual ~Connection() {}
 
-    virtual api::AccountManager* getAccountManager() = 0;
-    virtual api::SystemManager* getSystemManager() = 0;
+    virtual api::AccountManager* accountManager() = 0;
+    virtual api::SystemManager* systemManager() = 0;
 
     //!Set credentials to use
     /*!

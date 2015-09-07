@@ -3,8 +3,8 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_CDB_RESULT_CODE_H
-#define NX_CDB_RESULT_CODE_H
+#ifndef NX_CDB_API_RESULT_CODE_H
+#define NX_CDB_API_RESULT_CODE_H
 
 
 namespace nx {
@@ -31,4 +31,4 @@ enum class ResultCode
 }   //cdb
 }   //nx
 
-#endif  //NX_CDB_RESULT_CODE_H
+#endif  //NX_CDB_API_RESULT_CODE_H

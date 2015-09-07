@@ -27,9 +27,9 @@ public:
         const std::string& password);
 
     //!Implemetation of api::Connection::getAccountManager
-    virtual api::AccountManager* getAccountManager() override;
+    virtual api::AccountManager* accountManager() override;
     //!Implemetation of api::Connection::getAccountManager
-    virtual api::SystemManager* getSystemManager() override;
+    virtual api::SystemManager* systemManager() override;
 
     //!Implemetation of api::Connection::setCredentials
     virtual void setCredentials(

@@ -10,7 +10,7 @@ namespace nx {
 namespace cdb {
 
 
-const QString UnbindSystemHandler::HANDLER_PATH( "/unbind_system" );
+const QString UnbindSystemHandler::HANDLER_PATH( "/system/unbind" );
 
 
 }   //cdb

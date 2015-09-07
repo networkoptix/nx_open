@@ -5,8 +5,6 @@
 
 #include "account_manager.h"
 
-#include "generic_fixed_cdb_request.h"
-
 
 namespace nx {
 namespace cdb {
@@ -22,8 +20,10 @@ AccountManager::AccountManager(QUrl url)
 void AccountManager::getAccount(
     std::function<void(api::ResultCode, api::AccountData)> completionHandler)
 {
+    QUrl urlToExecute = url();
+    urlToExecute.setPath(urlToExecute.path()+"/account/get");
     execute(
-        getUrl()+"/get_account",
+        urlToExecute,
         std::move(completionHandler));
 }
 
@@ -32,11 +32,11 @@ void AccountManager::setCredentials(
     const std::string& password)
 {
     QnMutexLocker lk(&m_mutex);
-    m_url.setUsername(login);
-    m_url.setPassword(password);
+    m_url.setUserName(QString::fromStdString(login));
+    m_url.setPassword(QString::fromStdString(password));
 }
 
-QUrl AccountManager::getUrl() const
+QUrl AccountManager::url() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_url;

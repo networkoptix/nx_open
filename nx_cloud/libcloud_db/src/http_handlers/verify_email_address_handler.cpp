@@ -10,7 +10,7 @@ namespace nx {
 namespace cdb {
 
 
-const QString VerifyEmailAddressHandler::HANDLER_PATH( "/verify_email" );
+const QString VerifyEmailAddressHandler::HANDLER_PATH( "/account/verify_email" );
 
 
 }   //cdb

@@ -31,7 +31,7 @@ public:
             Allowed to be \a null
         \note If operation is already stopped it is allowed for \a completionHandler to be executed directly in \a QnStoppableAsync::pleaseStop
     */
-    virtual void pleaseStop( std::function<void()>&& completionHandler ) = 0;
+    virtual void pleaseStop( std::function<void()> completionHandler ) = 0;
 
     //!Cals \a QnStoppableAsync::pleaseStop and waits for completion
     void join()

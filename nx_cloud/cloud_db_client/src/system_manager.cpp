@@ -54,8 +54,8 @@ void SystemManager::setCredentials(
     const std::string& password)
 {
     QnMutexLocker lk(&m_mutex);
-    m_url.setUsername(login);
-    m_url.setPassword(password);
+    m_url.setUserName(QString::fromStdString(login));
+    m_url.setPassword(QString::fromStdString(password));
 }
 
 QUrl SystemManager::getUrl() const

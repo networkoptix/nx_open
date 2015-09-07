@@ -10,7 +10,7 @@ namespace nx {
 namespace cdb {
 
 
-const QString AddAccountHttpHandler::HANDLER_PATH = QLatin1String("/add_account");
+const QString AddAccountHttpHandler::HANDLER_PATH = QLatin1String("/account/add");
 
 
 }   //cdb

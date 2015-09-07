@@ -5,6 +5,9 @@
 
 #include "connection_factory.h"
 
+#include <utils/common/cpp14.h>
+
+#include "cdb_connection.h"
 #include "version.h"
 
 
@@ -24,6 +27,17 @@ void ConnectionFactory::connect(
     completionHandler(
         api::ResultCode::notImplemented,
         std::unique_ptr<api::Connection>());
+}
+
+std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
+    const std::string& login,
+    const std::string& password)
+{
+    //TODO #ak
+    return std::make_unique<Connection>(
+        SocketAddress(),
+        login,
+        password);
 }
 
 }   //cl

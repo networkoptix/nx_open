@@ -104,7 +104,7 @@ namespace nx_cc
         }
 
         //!Implementation of QnStoppableAsync::pleaseStop
-        virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
+        virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
         /*!
             MUST call this method after creating object. This method is required because we do not use exceptions
