@@ -84,7 +84,7 @@ protected:
 };
 
 
-struct QnBusinessActionData
+class QnBusinessActionData
 {
 public:
     // TODO: #EC2 Add comments. Maybe remove the flag altogether. What is it for? Which actions?
