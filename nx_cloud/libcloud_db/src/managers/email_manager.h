@@ -39,14 +39,14 @@ public:
         \return true If started asynchronous email send operation
     */
     bool sendEmailAsync(
-        const QString& to,
-        const QString& subject,
-        const QString& body,
+        QString to,
+        QString subject,
+        QString body,
         std::function<void(bool)> completionHandler );
     //!Renders email using \a templateFileName and \a emailParams and calls \a EMailManager::sendEmailAsync
     bool renderAndSendEmailAsync(
-        const QString& to,
-        const QString& templateFileName,
+        QString to,
+        QString templateFileName,
         const QVariantHash& emailParams,
         std::function<void(bool)> completionHandler );
 

@@ -38,9 +38,9 @@ EMailManager::~EMailManager()
 }
 
 bool EMailManager::sendEmailAsync(
-    const QString& to,
-    const QString& subject,
-    const QString& body,
+    QString to,
+    QString subject,
+    QString body,
     std::function<void( bool )> completionHandler )
 {
     Q_ASSERT( !to.isEmpty() );
@@ -48,17 +48,17 @@ bool EMailManager::sendEmailAsync(
         return false;   //bad email address
 
     SendEmailTask task;
-    task.email.to.push_back( to );
-    task.email.subject = subject;
-    task.email.body = body;
+    task.email.to.push_back( std::move( to ) );
+    task.email.subject = std::move( subject );
+    task.email.body = std::move( body );
     task.completionHandler = std::move( completionHandler );
     m_taskQueue.push( std::move( task ) );
     return true;
 }
 
 bool EMailManager::renderAndSendEmailAsync(
-    const QString& to,
-    const QString& templateFileName,
+    QString to,
+    QString templateFileName,
     const QVariantHash& emailParams,
     std::function<void( bool )> completionHandler )
 {
@@ -73,8 +73,8 @@ bool EMailManager::renderAndSendEmailAsync(
         return false;
     }
     return sendEmailAsync(
-        std::move(to),
-        templateFileName, //TODO #ak correct (and customizable) subject
+        std::move( to ),
+        std::move( templateFileName ), //TODO #ak correct (and customizable) subject
         std::move( emailToSend ),
         std::move( completionHandler ) );
 }
