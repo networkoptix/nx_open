@@ -12,18 +12,16 @@ QnObject {
 
     property string resourceId
 
-    readonly property bool playing: mediaPlayer.playbackState === MediaPlayer.PlayingState && mediaPlayer.position > 0
+    readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position > 0 : false
     readonly property bool atLive: d.position < 0
 
     readonly property alias position: d.position
 
-    readonly property var mediaPlayer: mediaPlayer
+    readonly property var mediaPlayer: d.mediaPlayer
     readonly property var chunkProvider: chunkProvider
     readonly property var resourceHelper: resourceHelper
 
     readonly property alias resourceName: resourceHelper.resourceName
-    readonly property int videoWidth: mediaPlayer.metaData.resolution ? mediaPlayer.metaData.resolution.width : 0
-    readonly property int videoHeight: mediaPlayer.metaData.resolution ? mediaPlayer.metaData.resolution.height : 0
 
     signal timelineCorrectionRequest(real position)
     signal timelinePositionRequest(real position)
@@ -37,16 +35,36 @@ QnObject {
         property int prevPlayerPosition: 0
         property bool updateTimeline: false
         property bool dirty: true
+        property alias mediaPlayer: playerLoader.item
     }
 
-    MediaPlayer {
-        id: mediaPlayer
-        source: resourceHelper.mediaUrl
+    Loader {
+        id: playerLoader
+        sourceComponent: resourceHelper.protocol != "mpjpeg" ? qtPlayer : mjpegPlayer
+    }
 
-        autoPlay: !d.paused
+    Component {
+        id: qtPlayer
 
-        onPositionChanged: updatePosition()
-        onSourceChanged: console.log(source)
+        MediaPlayer {
+            source: resourceHelper.mediaUrl
+
+            autoPlay: !d.paused
+
+            onPositionChanged: updatePosition()
+            onSourceChanged: console.log(source)
+        }
+    }
+
+    Component {
+        id: mjpegPlayer
+
+        QnMjpegPlayer {
+            source: resourceHelper.mediaUrl
+
+            onPositionChanged: updatePosition()
+            onSourceChanged: console.log(source)
+        }
     }
 
     QnMediaResourceHelper {
@@ -86,7 +104,7 @@ QnObject {
     function play(pos) {
         if (!d.dirty) {
             if (!playing)
-                mediaPlayer.play()
+                d.mediaPlayer.play()
             return
         }
 
@@ -94,11 +112,11 @@ QnObject {
         if (d.position == -1 && aligned == -1) {
             timelinePositionRequest(d.position)
             if (!playing)
-                mediaPlayer.play()
+                d.mediaPlayer.play()
             return
         }
 
-        mediaPlayer.stop()
+        d.mediaPlayer.stop()
 
         d.position = aligned >= 0 ? Math.max(aligned, pos) : -1
         d.chunkEnd = (d.position >= 0) ? chunkProvider.closestChunkEndMs(pos, true) : -1
@@ -108,14 +126,14 @@ QnObject {
         resourceHelper.setPosition(d.position)
 
         d.prevPlayerPosition = 0
-        mediaPlayer.play()
+        d.mediaPlayer.play()
         d.paused = false
 
         d.dirty = false
     }
 
     function pause() {
-        mediaPlayer.pause()
+        d.mediaPlayer.pause()
         d.paused = true
     }
 
@@ -135,8 +153,8 @@ QnObject {
         if (d.position < 0)
             return
 
-        d.position += mediaPlayer.position - d.prevPlayerPosition
-        d.prevPlayerPosition = mediaPlayer.position
+        d.position += d.mediaPlayer.position - d.prevPlayerPosition
+        d.prevPlayerPosition = d.mediaPlayer.position
 
         if (d.chunkEnd >= 0 && d.position >= d.chunkEnd) {
             seek(d.chunkEnd + 1)

@@ -24,7 +24,7 @@ namespace {
     QString httpFormat = lit("mpjpeg");
 #else
     QString nativeStreamProtocol = lit("rtsp");
-    QString httpFormat = lit("webm");
+    QString httpFormat = lit("mpjpeg");
 #endif
 
     QString getAuth(const QnUserResourcePtr &user) {
@@ -254,6 +254,13 @@ QString QnMediaResourceHelper::optimalResolution() const {
     return lit("%1p").arg(resolution);
 }
 
+QString QnMediaResourceHelper::protocol() const {
+    if (m_transcodingSupported)
+        return httpFormat;
+    else
+        return nativeStreamProtocol;
+}
+
 void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key) {
     Q_ASSERT(m_resource == resource);
     if (m_resource != resource)
@@ -294,6 +301,7 @@ void QnMediaResourceHelper::at_resource_parentIdChanged(const QnResourcePtr &res
         m_transcodingSupported = transcodingSupported;
         emit resolutionChanged();
         emit resolutionsChanged();
+        emit protocolChanged();
     }
 
     updateUrl();

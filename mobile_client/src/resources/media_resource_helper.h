@@ -15,6 +15,7 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
     Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
+    Q_PROPERTY(QString protocol READ protocol NOTIFY protocolChanged)
 
 public:
     explicit QnMediaResourceHelper(QObject *parent = 0);
@@ -37,6 +38,8 @@ public:
 
     QString optimalResolution() const;
 
+    QString protocol() const;
+
 signals:
     void resourceIdChanged();
     void mediaUrlChanged();
@@ -44,6 +47,7 @@ signals:
     void resolutionsChanged();
     void resolutionChanged();
     void screenSizeChanged();
+    void protocolChanged();
 
 private:
     void at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key);
