@@ -81,8 +81,13 @@ QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 void QnCameraSettingsDialog::retranslateUi() {
     auto cameras = m_settingsWidget->cameras();
 
+    //: "Cameras settings" or "Devices settings" or "IO Module Settings", etc
     setWindowTitle(tr("%1 Settings").arg(getDefaultDevicesName(cameras)));
+
+    //: "Cameras Diagnostics" or "Devices Diagnostics" or "IO Module Diagnostics", etc
     m_diagnoseButton->setText(tr("%1 Diagnostics").arg(getDefaultDevicesName(cameras)));
+
+    //: "Cameras Rules" or "Devices Rules" or "IO Module Rules", etc
     m_rulesButton->setText(tr("%1 Rules").arg(getDefaultDevicesName(cameras)));
 }
 
@@ -168,7 +173,8 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
             this,
             notSavedCameras,
             tr("%1 not saved.").arg(getDefaultDevicesName(notSavedCameras)),
-            tr("Save changes to the following %1?").arg(getDefaultDevicesName(notSavedCameras, false)),
+            //: "Apply changes to the following 5 cameras?" or "Apply changes to the following IO module?", etc
+            tr("Apply changes to the following %1?").arg(getNumericDevicesName(notSavedCameras, false)),
             QDialogButtonBox::Yes | QDialogButtonBox::No
             );
         if(button == QDialogButtonBox::Yes)
@@ -245,7 +251,8 @@ void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const Qn
 
     QnResourceListDialog::exec(this, cameras,
         tr("Error"),
-        tr("Could not save the following %1 to Server.").arg(getDefaultDevicesName(cameras, false)),
+        //: "Could not apply changes for the following 5 cameras." or "Could not apply changes for the following IO Module.", etc
+        tr("Could not apply changes for the following %1.").arg(getNumericDevicesName(cameras, false)),
         QDialogButtonBox::Ok);
 }
 
