@@ -328,7 +328,7 @@ void Transport::at_socketReadyRead()
         datagram.resize(m_recvSocket->pendingDatagramSize());
         int readed = m_recvSocket->readDatagram(datagram.data(), datagram.size());
         if (readed <= 0)
-            return;
+            continue;
         bool ok;
         Packet packet = Packet::deserialize(datagram, &ok);
         if (ok)
