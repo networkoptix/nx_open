@@ -89,7 +89,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
-    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      0),
+    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1),
     LicenseTypeInfo(Qn::LC_Start,           "starter",       0),
     LicenseTypeInfo(Qn::LC_Invalid,         "",              1),
 };
@@ -575,6 +575,8 @@ Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 QnLicensePool::QnLicensePool(): 
     m_mutex(QMutex::Recursive)
 {
+    if (!qApp)
+        return;
     connect(&m_timer, &QTimer::timeout, this, &QnLicensePool::at_timer);
     m_timer.start(1000 * 60);
 }
