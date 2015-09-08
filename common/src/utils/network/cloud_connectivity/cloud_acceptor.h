@@ -1,10 +1,5 @@
-/**********************************************************
-* 29 aug 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_ACCEPTOR_H
-#define NX_CLOUD_ACCEPTOR_H
+#ifndef NX_CC_CLOUD_ACCEPTOR_H
+#define NX_CC_CLOUD_ACCEPTOR_H
 
 #include <functional>
 
@@ -13,27 +8,29 @@
 #include "cc_common.h"
 #include "../abstract_socket.h"
 
+namespace nx {
+namespace cc {
 
-namespace nx_cc
+//!Accepts connections made through mediator
+/*!
+    Implements server-side nat traversal logic
+    Receives incoming \a connection_requested indications and creates cloud tunnel
+    \note Uses MediatorConnection to talk to the mediator
+*/
+class CloudAcceptor
+:
+    public QnStoppableAsync
 {
-    //!Accepts connections made through mediator
-    /*!
-        Implements server-side nat traversal logic
-        Receives incoming \a connection_requested indications and creates cloud tunnel
-        \note Uses MediatorConnection to talk to the mediator
-    */
-    class CloudAcceptor
-    :
-        public QnStoppableAsync
-    {
-    public:
-        virtual ~CloudAcceptor();
+public:
+    virtual ~CloudAcceptor();
 
-        //!Implementation of QnStoppableAsync::pleaseStop
-        virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
+    //!Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
 
-        bool acceptAsync( std::function<void(const ErrorDescription&, AbstractStreamSocket*)>&& completionHandler );
-    };
-}
+    bool acceptAsync( std::function<void(const ErrorDescription&, AbstractStreamSocket*)>&& completionHandler );
+};
 
-#endif  //NX_CLOUD_ACCEPTOR_H
+} // namespace cc
+} // namespace nx
+
+#endif // NX_CC_CLOUD_ACCEPTOR_H
