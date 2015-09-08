@@ -11,22 +11,14 @@ namespace cdb {
 namespace cl {
 
 Connection::Connection(
-    const SocketAddress& endpoint,
+    CloudModuleEndPointFetcher* const endPointFetcher,
     const std::string& login,
     const std::string& password)
-:
-    m_login(login),
-    m_password(password)
 {
-    QUrl url;
-    url.setScheme("http");
-    url.setHost(endpoint.address.toString());
-    url.setPort(endpoint.port);
-    url.setUserName(QString::fromStdString(login));
-    url.setPassword(QString::fromStdString(password));
-    
-    m_accountManager = std::make_unique<AccountManager>(url);
-    m_systemManager = std::make_unique<SystemManager>(url);
+    m_accountManager = std::make_unique<AccountManager>(endPointFetcher);
+    m_systemManager = std::make_unique<SystemManager>(endPointFetcher);
+
+    setCredentials(login, password);
 }
 
 api::AccountManager* Connection::accountManager()

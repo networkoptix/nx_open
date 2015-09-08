@@ -14,10 +14,12 @@
 #include "data/account_data.h"
 #include "include/cdb/account_manager.h"
 
+
 namespace nx {
 namespace cdb {
 namespace cl {
 
+class CloudModuleEndPointFetcher;
 
 class AccountManager
 :
@@ -25,7 +27,7 @@ class AccountManager
     public AsyncRequestsExecutor
 {
 public:
-    AccountManager(QUrl url);
+    AccountManager(CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
 
     //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(
@@ -34,17 +36,6 @@ public:
     //!Implementation of api::AccountManager::getAccount
     virtual void getAccount(
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) override;
-
-    void setCredentials(
-        const std::string& login,
-        const std::string& password);
-
-private:
-    mutable QnMutex m_mutex;
-    QUrl m_url;
-    std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
-        
-    QUrl url() const;
 };
 
 

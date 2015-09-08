@@ -33,9 +33,8 @@ std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
     const std::string& login,
     const std::string& password)
 {
-    //TODO #ak
     return std::make_unique<Connection>(
-        SocketAddress(),
+        &m_endPointFetcher,
         login,
         password);
 }

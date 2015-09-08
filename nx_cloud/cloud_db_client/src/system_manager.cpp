@@ -8,14 +8,13 @@
 #include "data/system_data.h"
 
 
-
 namespace nx {
 namespace cdb {
 namespace cl {
 
-SystemManager::SystemManager(QUrl url)
+SystemManager::SystemManager(CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
 :
-    m_url(std::move(url))
+    AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
 }
 
@@ -23,61 +22,42 @@ void SystemManager::bindSystem(
     api::SystemRegistrationData registrationData,
     std::function<void(api::ResultCode, api::SystemData)> completionHandler)
 {
-    QUrl urlToExecute = url();
-    urlToExecute.setPath(urlToExecute.path() + "/system/bind");
-    execute(
-        urlToExecute,
+    executeRequest(
+        "/system/bind",
         registrationData,
-        std::move(completionHandler));
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemData()));
 }
 
 void SystemManager::unbindSystem(
     const std::string& systemID,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    QUrl urlToExecute = url();
-    urlToExecute.setPath(urlToExecute.path() + "/system/unbind");
-    execute(
-        urlToExecute,
+    executeRequest(
+        "/system/unbind",
         api::SystemID(systemID),
-        std::move(completionHandler));
+        completionHandler,
+        completionHandler);
 }
 
 void SystemManager::getSystems(
     std::function<void(api::ResultCode, api::SystemDataList)> completionHandler)
 {
-    QUrl urlToExecute = url();
-    urlToExecute.setPath(urlToExecute.path() + "/system/get");
-    execute(
-        urlToExecute,
-        std::move(completionHandler));
+    executeRequest(
+        "/system/get",
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemDataList()));
 }
 
 void SystemManager::shareSystem(
     api::SystemSharing sharingData,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    QUrl urlToExecute = url();
-    urlToExecute.setPath(urlToExecute.path() + "/system/share");
-    execute(
-        urlToExecute,
+    executeRequest(
+        "/system/share",
         sharingData,
-        std::move(completionHandler));
-}
-
-void SystemManager::setCredentials(
-    const std::string& login,
-    const std::string& password)
-{
-    QnMutexLocker lk(&m_mutex);
-    m_url.setUserName(QString::fromStdString(login));
-    m_url.setPassword(QString::fromStdString(password));
-}
-
-QUrl SystemManager::url() const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_url;
+        completionHandler,
+        completionHandler);
 }
 
 }   //cl

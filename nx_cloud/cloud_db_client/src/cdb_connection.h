@@ -16,13 +16,15 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
+class CloudModuleEndPointFetcher;
+
 class Connection
 :
     public api::Connection
 {
 public:
     Connection(
-        const SocketAddress& endpoint,
+        CloudModuleEndPointFetcher* const endPointFetcher,
         const std::string& login,
         const std::string& password);
 
@@ -39,8 +41,6 @@ public:
     virtual void ping(std::function<void(api::ResultCode)> completionHandler) override;
 
 private:
-    std::string m_login;
-    std::string m_password;
     std::unique_ptr<AccountManager> m_accountManager;
     std::unique_ptr<SystemManager> m_systemManager;
 };

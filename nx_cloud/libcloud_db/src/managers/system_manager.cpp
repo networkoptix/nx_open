@@ -51,7 +51,7 @@ void SystemManager::bindSystemToAccount(
 }
 
 void SystemManager::unbindSystem(
-    const AuthorizationInfo& authzInfo,
+    const AuthorizationInfo& /*authzInfo*/,
     data::SystemID systemID,
     std::function<void(api::ResultCode)> completionHandler)
 {
@@ -115,7 +115,7 @@ void SystemManager::getSystems(
 }
 
 void SystemManager::shareSystem(
-    const AuthorizationInfo& authzInfo,
+    const AuthorizationInfo& /*authzInfo*/,
     data::SystemSharing sharingData,
     std::function<void(api::ResultCode)> completionHandler)
 {
@@ -132,7 +132,7 @@ boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id
 }
 
 api::SystemAccessRole::Value SystemManager::getAccountRightsForSystem(
-    const QnUuid& accountID, const QnUuid& systemID) const
+    const QnUuid& /*accountID*/, const QnUuid& /*systemID*/) const
 {
     //TODO #ak
     return api::SystemAccessRole::none;
@@ -181,7 +181,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 
 void SystemManager::systemAdded(
     nx::db::DBResult dbResult,
-    data::SystemRegistrationDataWithAccountID systemRegistrationData,
+    data::SystemRegistrationDataWithAccountID /*systemRegistrationData*/,
     data::SystemData systemData,
     std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
@@ -221,7 +221,7 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
 
 void SystemManager::systemSharingAdded(
     nx::db::DBResult dbResult,
-    data::SystemSharing sytemSharing,
+    data::SystemSharing /*sytemSharing*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)

@@ -22,7 +22,7 @@ class SystemManager
     public AsyncRequestsExecutor
 {
 public:
-    SystemManager(QUrl url);
+    SystemManager(CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
 
     //!Implementation of \a SystemManager::bindSystem
     virtual void bindSystem(
@@ -39,18 +39,7 @@ public:
     virtual void shareSystem(
         api::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler) override;
-
-    void setCredentials(
-        const std::string& login,
-        const std::string& password);
-
-private:
-    mutable QnMutex m_mutex;
-    QUrl m_url;
-
-    QUrl url() const;
 };
-
 
 }   //cl
 }   //cdb

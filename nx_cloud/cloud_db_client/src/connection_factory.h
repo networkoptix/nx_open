@@ -8,6 +8,8 @@
 
 #include "include/cdb/connection.h"
 
+#include "cdb_endpoint_fetcher.h"
+
 
 namespace nx {
 namespace cdb {
@@ -28,6 +30,9 @@ public:
     virtual std::unique_ptr<api::Connection> createConnection(
         const std::string& login,
         const std::string& password) override;
+
+private:
+    CloudModuleEndPointFetcher m_endPointFetcher;
 };
 
 }   //cl

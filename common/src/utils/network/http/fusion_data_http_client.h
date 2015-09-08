@@ -198,13 +198,14 @@ public:
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
+        auto handler = std::move(this->m_handler);
         if (client->response())
-            this->m_handler(
+            handler(
                 SystemError::noError,
                 static_cast<nx_http::StatusCode::Value>(
                     client->response()->statusLine.statusCode));
         else
-            this->m_handler(
+            handler(
                 SystemError::connectionReset,   //TODO #ak take error code from client
                 nx_http::StatusCode::internalServerError);
     }
@@ -230,13 +231,14 @@ public:
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
+        auto handler = std::move(this->m_handler);
         if (client->response())
-            this->m_handler(
+            handler(
                 SystemError::noError,
                 static_cast<nx_http::StatusCode::Value>(
                     client->response()->statusLine.statusCode));
         else
-            this->m_handler(
+            handler(
                 SystemError::connectionReset,   //TODO #ak take error code from client
                 nx_http::StatusCode::internalServerError);
     }
