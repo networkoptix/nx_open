@@ -460,14 +460,6 @@ void QnProxyConnectionProcessor::doSmartProxy()
         //{
         //    if( it.eventType() != aio::etRead )
         //        return;
-            //if( it.socket() == d->socket )
-            if( fds[0].revents & (POLLERR | POLLHUP | POLLNVAL) )
-            {
-                //error while polling
-                NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
-                return;
-            }
-
 
             if( fds[0].revents & POLLIN )    //if polled returned connection closed or error state, recv will fail and we will process error
             {
@@ -517,9 +509,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     d->clientRequest.clear();
                 }
             }
-
-            //else if( it.socket() == d->dstSocket )
-            if( fds[1].revents & (POLLERR | POLLHUP | POLLNVAL) )
+            else if( fds[0].revents & (POLLERR | POLLHUP | POLLNVAL) )
             {
                 //error while polling
                 NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
@@ -531,6 +521,13 @@ void QnProxyConnectionProcessor::doSmartProxy()
                 if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.get(), READ_BUFFER_SIZE))
                     return;
             }
+            else if( fds[1].revents & (POLLERR | POLLHUP | POLLNVAL) )
+            {
+                //error while polling
+                NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
+                return;
+            }
+
         //}
     }
 }
