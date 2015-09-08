@@ -89,8 +89,8 @@ void AsyncClient::closeConnection( BaseConnectionType* connection )
     m_baseConnection = nullptr;
 }
 
-static boost::optional< QString >
-    hasError( SystemError::ErrorCode code, const Message& message )
+boost::optional< QString >
+    AsyncClient::hasError( SystemError::ErrorCode code, const Message& message )
 {
     if( code != SystemError::noError )
         return lit( "System error %1: %2" )

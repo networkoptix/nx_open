@@ -11,19 +11,19 @@ boost::optional< RequestProcessor::MediaserverData >
     RequestProcessor::getMediaserverData(
         ConnectionSharedPtr connection, stun::Message& request)
 {
-    const auto hostNameAttr = request.getAttribute< stun::cc::attrs::HostName >();
-    if( !hostNameAttr )
+    const auto systemAttr = request.getAttribute< stun::cc::attrs::SystemId >();
+    if( !systemAttr )
     {
         errorResponse( connection, request.header, stun::error::badRequest,
-                       "Attribute HostName is required" );
+                       "Attribute SystemId is required" );
         return boost::none;
     }
 
-    const auto hostNameParts = hostNameAttr->value.split( '.' );
-    if( hostNameParts.size() != 2 )
+    const auto serverAttr = request.getAttribute< stun::cc::attrs::ServerId >();
+    if( !serverAttr )
     {
         errorResponse( connection, request.header, stun::error::badRequest,
-                       "Attribute HostName should be <ServerId>.<SystemId>" );
+                       "Attribute ServerId is required" );
         return boost::none;
     }
 
@@ -35,7 +35,7 @@ boost::optional< RequestProcessor::MediaserverData >
         return boost::none;
     }
 
-    MediaserverData data = { hostNameParts[1], hostNameParts[0] };
+    MediaserverData data = { systemAttr->value, serverAttr->value };
 
     // TODO: verify paramiters and authorization in CloudDb
     return data;

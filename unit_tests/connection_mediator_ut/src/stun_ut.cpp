@@ -50,7 +50,6 @@ protected:
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
 static const auto SERVER_ID = QnUuid::createUuid().toSimpleString().toUtf8();
-static const auto HOST_NAME = SERVER_ID + QByteArray(".") + SYSTEM_ID;
 
 static const SocketAddress GOOD_ADDRESS( lit( "hello.world:123" ) );
 static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
@@ -60,7 +59,8 @@ TEST_F( StunCustomTest, Ping )
     AsyncClient client( address );
 
     Message request( Header( MessageClass::request, cc::methods::ping ) );
-    request.newAttribute< cc::attrs::HostName >( HOST_NAME );
+    request.newAttribute< cc::attrs::SystemId >( SYSTEM_ID );
+    request.newAttribute< cc::attrs::ServerId >( SERVER_ID );
     request.newAttribute< cc::attrs::Authorization >( "some_auth_data" );
 
     std::list< SocketAddress > allEndpoints;
@@ -96,7 +96,8 @@ TEST_F( StunCustomTest, BindConnect )
     AsyncClient msClient( address );
     {
         Message request( Header( MessageClass::request, cc::methods::bind ) );
-        request.newAttribute< cc::attrs::HostName >( HOST_NAME );
+        request.newAttribute< cc::attrs::SystemId >( SYSTEM_ID );
+        request.newAttribute< cc::attrs::ServerId >( SERVER_ID );
         request.newAttribute< cc::attrs::Authorization >( "some_auth_data" );
         request.newAttribute< cc::attrs::PublicEndpointList >(
                     std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
@@ -112,8 +113,8 @@ TEST_F( StunCustomTest, BindConnect )
     AsyncClient connectClient( address );
     {
         Message request( Header( MessageClass::request, cc::methods::connect ) );
-        request.newAttribute< cc::attrs::UserName >( "SomeClient" );
-        request.newAttribute< cc::attrs::HostName >( HOST_NAME );
+        request.newAttribute< cc::attrs::ClientId >( "SomeClient" );
+        request.newAttribute< cc::attrs::HostName >( SYSTEM_ID );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         ASSERT_TRUE( msClient.sendRequest( std::move( request ), waiter.pusher() ) );
@@ -128,7 +129,7 @@ TEST_F( StunCustomTest, BindConnect )
     }
     {
         Message request( Header( MessageClass::request, cc::methods::connect ) );
-        request.newAttribute< cc::attrs::UserName >( "SomeClient" );
+        request.newAttribute< cc::attrs::ClientId >( "SomeClient" );
         request.newAttribute< cc::attrs::HostName >( "WrongHost" );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;

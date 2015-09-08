@@ -73,10 +73,10 @@ void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
 void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
                                  stun::Message message )
 {
-    const auto userNameAttr = message.getAttribute< stun::cc::attrs::UserName >();
+    const auto userNameAttr = message.getAttribute< stun::cc::attrs::ClientId >();
     if( !userNameAttr || userNameAttr->value.isEmpty() )
         return errorResponse( connection, message.header, stun::error::badRequest,
-            "Attribute UserName is required" );
+            "Attribute ClientId is required" );
 
     const auto hostNameAttr = message.getAttribute< stun::cc::attrs::HostName >();
     if( !hostNameAttr || hostNameAttr->value.isEmpty() )
@@ -148,8 +148,10 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
 }
 
 boost::optional< ListeningPeerPool::MediaserverPeer& >
-    ListeningPeerPool::SystemPeers::search( String hostName )
+    ListeningPeerPool::SystemPeers::search( const String& hostName )
 {
+    // TODO: hostName alias resolution in cloud_db
+
     const auto ids = hostName.split( '.' );
     if( ids.size() > 2 )
         return boost::none;

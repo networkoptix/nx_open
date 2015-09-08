@@ -45,7 +45,7 @@ protected:
                 const RequestProcessor::MediaserverData& mediaserver,
                 QnMutex* mutex );
 
-        boost::optional< MediaserverPeer& > search( String hostName );
+        boost::optional< MediaserverPeer& > search( const String& hostName );
 
         void clear() { m_peers.clear(); }
 

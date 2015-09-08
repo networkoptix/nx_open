@@ -10,10 +10,12 @@ namespace stun {
 namespace cc {
 
 MediatorConnection::MediatorConnection( const SocketAddress& address,
-                                        const String& hostName,
+                                        const String& systemId,
+                                        const String& serverId,
                                         const String& authorizationKey )
     : m_stunClient( address )
-    , m_hostName( hostName )
+    , m_systemId( systemId )
+    , m_serverId( serverId )
     , m_authorizationKey( authorizationKey )
     , m_isExternalChanged( false )
     , m_isExternalUpdateInProgress( false )
@@ -51,7 +53,8 @@ void MediatorConnection::updateExternalAddresses()
         return;
 
     Message request( Header( MessageClass::request, cc::methods::bind ) );
-    request.newAttribute< cc::attrs::HostName >( m_hostName );
+    request.newAttribute< cc::attrs::SystemId >( m_systemId );
+    request.newAttribute< cc::attrs::ServerId >( m_serverId );
     request.newAttribute< cc::attrs::Authorization >( m_authorizationKey );
     request.newAttribute< cc::attrs::PublicEndpointList >(
         std::list< SocketAddress >( m_external.begin(), m_external.end() ) );
@@ -84,7 +87,8 @@ void MediatorConnection::updateExternalAddresses()
 void MediatorConnection::checkAddresses( const std::list< SocketAddress >& addresses )
 {
     Message request( Header( MessageClass::request, cc::methods::ping ) );
-    request.newAttribute< cc::attrs::HostName >( m_hostName );
+    request.newAttribute< cc::attrs::SystemId >( m_systemId );
+    request.newAttribute< cc::attrs::ServerId >( m_serverId );
     request.newAttribute< cc::attrs::Authorization >( m_authorizationKey );
     request.newAttribute< cc::attrs::PublicEndpointList >( addresses );
 

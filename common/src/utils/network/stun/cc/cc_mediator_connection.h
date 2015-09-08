@@ -11,7 +11,8 @@ class MediatorConnection
 {
 public:
     MediatorConnection( const SocketAddress& address,
-                        const String& hostName,
+                        const String& systemId,
+                        const String& serverId,
                         const String& authorizationKey );
 
     void updateAddresses( const std::list< SocketAddress >& addresses );
@@ -22,7 +23,8 @@ private:
 
 private:
     stun::AsyncClient m_stunClient;
-    const String m_hostName;
+    const String m_systemId;
+    const String m_serverId;
     const String m_authorizationKey;
 
     QnMutex m_mutex;

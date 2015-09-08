@@ -48,23 +48,37 @@ namespace attrs
 {
     enum Value
     {
-        hostName = stun::attrs::userDefined,
-        userName,
+        systemId = stun::attrs::userDefined,
+        serverId,
+        clientId,
 
-        publicEndpointList = stun::attrs::userDefined + 0x200,
+        hostName = stun::attrs::userDefined + 0x200,
+        publicEndpointList,
         authorization,
+    };
+
+    struct SystemId : stun::attrs::Unknown
+    {
+        static const int TYPE = systemId;
+        SystemId( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
+    };
+
+    struct ServerId : stun::attrs::Unknown
+    {
+        static const int TYPE = serverId;
+        ServerId( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
+    };
+
+    struct ClientId : stun::attrs::Unknown
+    {
+        static const int TYPE = clientId;
+        ClientId( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
     };
 
     struct HostName : stun::attrs::Unknown
     {
         static const int TYPE = hostName;
         HostName( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
-    };
-
-    struct UserName : stun::attrs::Unknown
-    {
-        static const int TYPE = userName;
-        UserName( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
     };
 
     struct PublicEndpointList : stun::attrs::Unknown
