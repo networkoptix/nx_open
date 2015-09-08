@@ -129,12 +129,15 @@ Transport::Transport(const QUuid& localGuid):
     m_localGuid(localGuid),
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE),
     m_mutex(QMutex::Recursive),
-    m_nextSendQueued(false)
+    m_nextSendQueued(false),
+    m_initialized(false)
 {
     m_recvSocket.reset(new QUdpSocket());
     if (!m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint))
         qWarning() << "Failed to open Multicast Http receive socket";
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    bool hasRecvIface = false;
+    bool hasSendIface = false;
     for (const QNetworkInterface &iface: interfaces)
     {
         if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
@@ -146,19 +149,22 @@ Transport::Transport(const QUuid& localGuid):
         if (ipv4Addr.isEmpty())
             continue; // no IPv4 address found
         
-        joinMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr);
+        if (joinMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr))
+            hasRecvIface = true;
 
         auto sendSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
-        if (sendSocket->bind(QHostAddress(ipv4Addr)))
+        if (sendSocket->bind(QHostAddress(ipv4Addr))) 
+        {
             setMulticastIF(sendSocket->socketDescriptor(), ipv4Addr); //sendSocket->setMulticastInterface(iface);
+            m_sendSockets.push_back(std::move(sendSocket));
+            hasSendIface = true;
+        }
         else
             qWarning() << "Failed to open Multicast Http send socket";
-
-        m_sendSockets.push_back(std::move(sendSocket));
     }
     setRecvBufferSize(m_recvSocket->socketDescriptor(), SOCKET_RECV_BUFFER_SIZE);
     connect(m_recvSocket.get(), &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
-
+    m_initialized = hasSendIface && hasRecvIface;
     m_timer.reset(new QTimer());
     connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
     m_timer->start(1000);
@@ -426,6 +432,14 @@ void Transport::sendNextData()
     for (auto itr = m_requests.begin(); itr != m_requests.end();)
     {
         TransportConnection& request = *itr;
+
+        if (!m_initialized) {
+            if (request.responseCallback)
+                request.responseCallback(request.requestId, ErrCode::networkIssue, Response());
+            itr = m_requests.erase(itr);
+            continue;
+        }
+
         while (sentBytes < MAX_SEND_BUFFER_SIZE && !request.dataToSend.isEmpty())
         {
             TransportPacket data = request.dataToSend.dequeue();

@@ -87,6 +87,7 @@ namespace QnMulticast
         QCache<QUuid, void> m_processedRequests;
         mutable QMutex m_mutex;
         bool m_nextSendQueued;
+        bool m_initialized;
     private:
         QByteArray serializeMessage(const Request& request) const;
         TransportConnection serializeRequest(const Request& request);
