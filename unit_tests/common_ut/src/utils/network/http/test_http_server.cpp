@@ -8,9 +8,10 @@
 
 TestHttpServer::TestHttpServer()
 {
-    m_httpServerManagers.setDispatcher( &m_httpMessageDispatcher );
     m_httpServer.reset(
         new nx_http::HttpStreamSocketServer(
+            nullptr,
+            &m_httpMessageDispatcher,
             false,
             SocketFactory::nttDisabled ) );
 }
