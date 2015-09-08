@@ -12,6 +12,8 @@ Item {
     property alias mondayIsFirstDay: calendarModel.mondayIsFirstDay
     property alias chunkProvider: calendarModel.chunkProvider
 
+    property alias dayHeight: calendarGrid.cellHeight
+
     property date _today: new Date()
 
     signal datePicked(date date)
@@ -20,6 +22,7 @@ Item {
         id: calendarGrid
 
         property real cellWidth: width / columns
+        property real cellHeight: cellWidth
 
         width: parent.width - dp(32)
         x: dp(16)
@@ -42,22 +45,24 @@ Item {
                                        currentDate.getDate() === model.date.getDate()
 
                 width: calendarGrid.cellWidth
-                height: width
+                height: calendarGrid.cellHeight
 
                 Rectangle {
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: dp(8)
-                    width: parent.width
+                    anchors.bottomMargin: dp(3)
+                    width: parent.width + dp(3)
                     height: dp(3)
+                    radius: dp(1.5)
                     color: QnTheme.calendarArchiveIndicator
                     visible: model.hasArchive
                 }
 
                 Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: dp(8)
-                    visible: calendarDay.current
+                    anchors.centerIn: parent
+                    width: dp(40)
+                    height: dp(40)
                     radius: width / 2
+                    visible: calendarDay.current
                     color: QnTheme.calendarSelectedBackground
                 }
 
@@ -66,8 +71,7 @@ Item {
                     text: model.display
                     color: calendarDay.current ? QnTheme.calendarSelectedText
                                                : model.date > _today ? QnTheme.calendarDisabledText : QnTheme.calendarText
-                    font.pixelSize: sp(14)
-                    font.weight: Font.Light
+                    font.pixelSize: sp(16)
                 }
 
                 MouseArea {

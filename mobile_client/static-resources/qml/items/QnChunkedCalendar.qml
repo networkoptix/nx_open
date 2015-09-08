@@ -1,8 +1,10 @@
 import QtQuick 2.4
+import QtQuick.Window 2.2
 
 import com.networkoptix.qml 1.0
 
 import "../controls"
+import "../main.js" as Main
 
 Item {
     id: calendar
@@ -11,233 +13,191 @@ Item {
     property int month: (new Date()).getMonth() + 1
     property date date: new Date()
     property bool mondayIsFirstDay: true
+    property bool horizontal: Main.isMobile() ? !isPhone || Screen.primaryOrientation == Qt.LandscapeOrientation
+                                              : mainWindow.width > dp(540)
     property var chunkProvider
 
     signal datePicked(date date)
 
-    height: content.height
+    height: d.ui.height
+    width: horizontal ? d.ui.width : parent.width
 
-    property var _locale: Qt.locale()
+    QtObject {
+        id: d
 
-    Column {
-        id: content
-        width: parent.width
+        readonly property var locale: Qt.locale()
+        readonly property alias ui: uiLoader.item
 
-        Item {
-            id: header
 
-            height: dp(48)
-            width: parent.width
-
-            Text {
-                id: monthYearLabel
-                anchors.centerIn: parent
-                color: QnTheme.calendarText
-                font.pixelSize: sp(16)
-                font.weight: Font.DemiBold
-
-                function update() {
-                    if (_locale)
-                        text = _locale.monthName(month - 1) + " " + year
-                }
-            }
-
-            QnIconButton {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                icon: "image://icon/arrow_left.png"
-                explicitRadius: dp(24)
-                onClicked: {
-                    contentYAnimation.complete()
-                    contentYAnimation.from = calendarsList.contentY
-                    calendarsList.positionViewAtBeginning()
-                    contentYAnimation.to = calendarsList.contentY
-                    contentYAnimation.start()
-                }
-            }
-
-            QnIconButton {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                icon: "image://icon/arrow_right.png"
-                explicitRadius: dp(24)
-                onClicked: {
-                    contentYAnimation.complete()
-                    contentYAnimation.from = calendarsList.contentY
-                    calendarsList.positionViewAtEnd()
-                    contentYAnimation.to = calendarsList.contentY
-                    contentYAnimation.start()
-                }
-            }
+        function monthDiff(date) {
+            return (year - date.getFullYear()) * 12 + month - date.getMonth() - 1
         }
 
-        Row {
-            id: dayNames
+        function previousMonthClicked() {
+            contentYAnimation.complete()
+            contentYAnimation.from = ui.monthsList.contentY
+            ui.monthsList.positionViewAtBeginning()
+            contentYAnimation.to = ui.monthsList.contentY
+            contentYAnimation.start()
+        }
 
-            height: dp(56)
-            width: parent.width
+        function nextMonthClicked() {
+            contentYAnimation.complete()
+            contentYAnimation.from = ui.monthsList.contentY
+            ui.monthsList.positionViewAtEnd()
+            contentYAnimation.to = ui.monthsList.contentY
+            contentYAnimation.start()
+        }
 
-            Repeater {
-                model: ListModel {
-                    id: dayNamesModel
-                }
-
-                Item {
-                    width: calendarsList.width / 7
-                    height: parent.height
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: model.dayName
-                        color: model.holiday ? QnTheme.calendarHolidayName : QnTheme.calendarDayName
-                        font.pixelSize: sp(13)
-                        font.weight: Font.Light
-                    }
-                }
-            }
-
-            function updateDayNames() {
-                dayNamesModel.clear()
-
-                dayNamesModel.append({ "dayName" : qsTr("Tue"), "holiday" : false })
-                dayNamesModel.append({ "dayName" : qsTr("Wed"), "holiday" : false })
-                dayNamesModel.append({ "dayName" : qsTr("Thu"), "holiday" : false })
-                dayNamesModel.append({ "dayName" : qsTr("Fri"), "holiday" : false })
-                dayNamesModel.append({ "dayName" : qsTr("Sat"), "holiday" : true })
-
-                if (mondayIsFirstDay) {
-                    dayNamesModel.append({ "dayName" : qsTr("Sun"), "holiday" : true })
-                    dayNamesModel.insert(0, { "dayName" : qsTr("Mon"), "holiday" : false })
+        function shiftToNeighbourMonth() {
+            if (ui.monthsList.atYBeginning) {
+                if (month > 1) {
+                    --month
                 } else {
-                    dayNamesModel.append({ "dayName" : qsTr("Mon"), "holiday" : false })
-                    dayNamesModel.insert(0, { "dayName" : qsTr("Sun"), "holiday" : true })
+                    month = 12
+                    --year
                 }
+                monthsModel.remove(2, 1)
+                monthsModel.insert(0, { "year" : month > 1 ? year : year - 1, "month" : month > 1 ? month - 1 : 12 })
+                ui.monthsList.positionViewAtIndex(1, ListView.Beginning)
+            } else if (ui.monthsList.atYEnd) {
+                if (month < 12) {
+                    ++month
+                } else {
+                    month = 1
+                    ++year
+                }
+                monthsModel.remove(0, 1)
+                monthsModel.append({ "year" : month < 12 ? year : year + 1, "month" : month < 12 ? month + 1 : 1 })
             }
         }
 
-        QnListView {
-            id: calendarsList
+        function populate() {
+            monthsModel.clear()
+            monthsModel.append({ "year" : month > 1 ? year : year - 1, "month" : month > 1 ? month - 1 : 12 })
+            monthsModel.append({ "year" : year, "month" : month })
+            monthsModel.append({ "year" : month < 12 ? year : year + 1, "month" : month < 12 ? month + 1 : 1 })
+        }
+    }
 
-            width: parent.width
-            height: width / 7 * 6
-            clip: true
+    Loader {
+        id: uiLoader
+        sourceComponent: horizontal ? horizontalLayoutComponent : verticalLayoutComponent
+    }
 
-            flickableDirection: Flickable.VerticalFlick
-            boundsBehavior: Flickable.StopAtBounds
-            snapMode: ListView.SnapOneItem
+    Component {
+        id: horizontalLayoutComponent
 
-            model: ListModel {
-                id: calendarsModel
-            }
+        QnHorizontalCalendarLayout {
+            monthsList.model: monthsModel
+            monthsList.delegate: monthDelegate
+            monthLabel.text: d.locale.monthName(month - 1)
+            yearLabel.text: year
+            dayNamesRow.mondayIsFirstDay: mondayIsFirstDay
 
-            delegate: QnCalendarMonth {
-                id: calendarMonth
+            previousMonthButton.onClicked: d.previousMonthClicked()
+            nextMonthButton.onClicked: d.nextMonthClicked()
 
-                width: calendarsList.width
-                height: calendarsList.height
-                year: model.year
-                month: model.month
-                onCurrentDateChanged: calendar.date = currentDate
-                onDatePicked: calendar.datePicked(date)
-                mondayIsFirstDay: calendar.mondayIsFirstDay
-                chunkProvider: calendar.chunkProvider
-
-                Binding {
-                    target: calendarMonth
-                    property: "currentDate"
-                    value: calendar.date
-                }
-            }
-
-            onMovingChanged: {
-                if (moving)
+            monthsList.onMovingChanged: {
+                if (monthsList.moving)
                     return
 
-                shiftToNeighbourMonth()
+                d.shiftToNeighbourMonth()
             }
-
-            onContentWidthChanged: {
-                positionViewAtIndex(1, ListView.Beginning)
-            }
-
-            NumberAnimation on contentY {
-                id: contentYAnimation
-                duration: 500
-                easing.type: Easing.OutCubic
-                running: false
-
-                onStopped: calendarsList.shiftToNeighbourMonth()
-            }
-
-            function shiftToNeighbourMonth() {
-                if (atYBeginning) {
-                    if (month > 1) {
-                        --month
-                    } else {
-                        month = 12
-                        --year
-                    }
-                    calendarsModel.remove(2, 1)
-                    calendarsModel.insert(0, { "year" : month > 1 ? year : year - 1, "month" : month > 1 ? month - 1 : 12 })
-                    positionViewAtIndex(1, ListView.Beginning)
-                } else if (atYEnd) {
-                    if (month < 12) {
-                        ++month
-                    } else {
-                        month = 1
-                        ++year
-                    }
-                    calendarsModel.remove(0, 1)
-                    calendarsModel.append({ "year" : month < 12 ? year : year + 1, "month" : month < 12 ? month + 1 : 1 })
-                }
+            monthsList.onContentWidthChanged: {
+                monthsList.positionViewAtIndex(1, ListView.Beginning)
             }
         }
     }
 
-    function monthDiff(date) {
-        return (year - date.getFullYear()) * 12 + month - date.getMonth() - 1
+    Component {
+        id: verticalLayoutComponent
+
+        QnVerticalCalendarLayout {
+            width: calendar.width
+            monthsList.model: monthsModel
+            monthsList.delegate: monthDelegate
+            monthLabel.text: d.locale.monthName(month - 1)
+            yearLabel.text: year
+            dayNamesRow.mondayIsFirstDay: mondayIsFirstDay
+
+            previousMonthButton.onClicked: d.previousMonthClicked()
+            nextMonthButton.onClicked: d.nextMonthClicked()
+
+            monthsList.onMovingChanged: {
+                if (monthsList.moving)
+                    return
+
+                d.shiftToNeighbourMonth()
+            }
+            monthsList.onContentWidthChanged: {
+                monthsList.positionViewAtIndex(1, ListView.Beginning)
+            }
+        }
     }
 
-    onYearChanged: {
-        monthYearLabel.update()
+    ListModel {
+        id: monthsModel
     }
 
-    onMonthChanged: {
-        monthYearLabel.update()
+    Component {
+        id: monthDelegate
+
+        QnCalendarMonth {
+            id: calendarMonth
+
+            width: d.ui.monthsList.width
+            height: d.ui.monthsList.height
+            year: model.year
+            month: model.month
+            onCurrentDateChanged: calendar.date = currentDate
+            onDatePicked: calendar.datePicked(date)
+            mondayIsFirstDay: calendar.mondayIsFirstDay
+            chunkProvider: calendar.chunkProvider
+            dayHeight: horizontal ? dp(40) : dp(48)
+
+            Binding {
+                target: calendarMonth
+                property: "currentDate"
+                value: calendar.date
+            }
+        }
+    }
+
+    NumberAnimation {
+        id: contentYAnimation
+
+        target: d.ui.monthsList
+        property: "contentY"
+
+        duration: 500
+        easing.type: Easing.OutCubic
+        running: false
+
+        onStopped: d.shiftToNeighbourMonth()
     }
 
     onDateChanged: {
-        var dm = monthDiff(date)
+        var dm = d.monthDiff(date)
 
         if (dm === 0)
             return
 
         if (dm === -1) {
-            calendarsList.positionViewAtEnd()
-            calendarsList.shiftToNeighbourMonth()
+            d.ui.monthsList.positionViewAtEnd()
+            d.shiftToNeighbourMonth()
         } else if (dm === 1) {
-            calendarsList.positionViewAtBeginning()
-            calendarsList.shiftToNeighbourMonth()
+            d.ui.monthsList.positionViewAtBeginning()
+            d.shiftToNeighbourMonth()
         } else {
             year = date.getFullYear()
             month = date.getMonth() + 1
 
-            populate()
-            calendarsList.positionViewAtIndex(1, ListView.Beginning)
+            d.populate()
+            d.ui.monthsList.positionViewAtIndex(1, ListView.Beginning)
         }
     }
 
-    Component.onCompleted: {
-        dayNames.updateDayNames()
-        populate()
-        monthYearLabel.update()
-    }
-
-    function populate() {
-        calendarsModel.clear()
-        calendarsModel.append({ "year" : month > 1 ? year : year - 1, "month" : month > 1 ? month - 1 : 12 })
-        calendarsModel.append({ "year" : year, "month" : month })
-        calendarsModel.append({ "year" : month < 12 ? year : year + 1, "month" : month < 12 ? month + 1 : 1 })
-    }
+    Component.onCompleted: d.populate()
 }
 

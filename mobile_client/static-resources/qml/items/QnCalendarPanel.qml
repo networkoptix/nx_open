@@ -18,7 +18,7 @@ QnPopup {
 
     padding: 0
     width: parent.width
-    height: calendarContent.height
+    height: calendar.height
 
     visible: opacity > 0.0
     opacity: 0.0
@@ -26,7 +26,7 @@ QnPopup {
     readonly property real _yAnimationShift: dp(56)
 
     Rectangle {
-        anchors.fill: calendarContent
+        anchors.fill: calendar
         color: QnTheme.calendarBackground
 
         QnSideShadow {
@@ -41,23 +41,10 @@ QnPopup {
         }
     }
 
-    Column {
-        id: calendarContent
+    QnChunkedCalendar {
+        id: calendar
         width: parent.width
-
-        QnChunkedCalendar {
-            id: calendar
-            width: parent.width
-            onDatePicked: calendarPanel.datePicked(date)
-        }
-
-        QnButton {
-            anchors.left: parent.left
-            text: qsTr("Close")
-            icon: "image://icon/close.png"
-            flat: true
-            onClicked: calendarPanel.hide()
-        }
+        onDatePicked: calendarPanel.datePicked(date)
     }
 
     SequentialAnimation {
@@ -73,7 +60,7 @@ QnPopup {
             }
 
             NumberAnimation {
-                target: calendarContent
+                target: calendar
                 property: "y"
                 duration: 150
                 easing.type: Easing.OutCubic
@@ -96,7 +83,7 @@ QnPopup {
             }
 
             NumberAnimation {
-                target: calendarContent
+                target: calendar
                 property: "y"
                 duration: 150
                 easing.type: Easing.OutCubic
