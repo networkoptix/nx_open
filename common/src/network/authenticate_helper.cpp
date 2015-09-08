@@ -20,6 +20,7 @@
 #include "network/authutil.h"
 #include <nx_ec/dummy_handler.h>
 #include <ldap/ldap_manager.h>
+#include <utils/network/rtsp/rtsp_types.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -171,7 +172,14 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             isProxy ? lit( "proxy_auth" ) : QString::fromLatin1(URL_QUERY_AUTH_KEY_NAME) ).toLatin1();
         if( !authQueryParam.isEmpty() )
         {
-            auto authResult = authenticateByUrl( authQueryParam, request.requestLine.method, authUserId, std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
+            auto authResult = authenticateByUrl(
+                authQueryParam,
+                request.requestLine.version.protocol == nx_rtsp::rtsp_1_0.protocol
+                    ? "PLAY"    //for rtsp always using PLAY since client software does not know 
+                                //which request underlying player will issue first
+                    : request.requestLine.method,
+                authUserId,
+                std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
             if(authResult == Qn::Auth_OK)
             {
                 if (usedAuthMethod)
