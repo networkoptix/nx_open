@@ -1,11 +1,7 @@
-/**********************************************************
-* 22 jun 2015
-* a.kolesnikov@networkoptix.com
-***********************************************************/
-
 #include "cloud_server_socket.h"
 
-namespace nx_cc {
+namespace nx {
+namespace cc {
 
 bool CloudServerSocket::listen( int /*queueLen*/ )
 {
@@ -33,4 +29,5 @@ bool CloudServerSocket::acceptAsyncImpl(
     return false;
 }
 
-} // namespace nx_cc
+} // namespace cc
+} // namespace nx
