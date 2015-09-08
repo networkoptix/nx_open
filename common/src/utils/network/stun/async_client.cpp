@@ -89,6 +89,25 @@ void AsyncClient::closeConnection( BaseConnectionType* connection )
     m_baseConnection = nullptr;
 }
 
+static boost::optional< QString >
+    hasError( SystemError::ErrorCode code, const Message& message )
+{
+    if( code != SystemError::noError )
+        return lit( "System error %1: %2" )
+            .arg( code ).arg( SystemError::toString( code ) );
+
+    if( message.header.messageClass != MessageClass::successResponse )
+    {
+        if( const auto err = message.getAttribute< attrs::ErrorDescription >() )
+            return lit( "STUN error %1: %2" )
+                .arg( err->code ).arg( QString::fromUtf8( err->reason ) );
+        else
+            return lit( "STUN error without ErrorDescription" );
+    }
+
+    return boost::none;
+}
+
 bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
 {
     switch( m_state )

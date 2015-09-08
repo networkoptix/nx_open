@@ -63,6 +63,9 @@ public:
     //! \note Required by \a nx_api::BaseServerConnection
     void closeConnection( BaseConnectionType* );
 
+    static boost::optional< QString >
+        hasError( SystemError::ErrorCode code, const Message& message );
+
 private:
     enum class State
     {
