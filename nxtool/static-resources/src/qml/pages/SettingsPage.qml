@@ -78,7 +78,6 @@ FocusScope
 
     function applyChanges()
     {
-        console.log("n\n\n\n\n\n\n")
         var children = settingsColumn.children;
         var childrenCount = children.length;
         var changesCount = 0;

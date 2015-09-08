@@ -54,89 +54,84 @@ void rtu::ChangesProgressModel::taskStateChanged(const ApplyChangesTask *task
     dataChanged(ind, ind);
 }
 
-void rtu::ChangesProgressModel::addChangeProgress(ApplyChangesTaskPtr &&task)
+bool rtu::ChangesProgressModel::addChangeProgress(const ApplyChangesTaskPtr &task)
 {
+    const auto it = std::find_if(m_tasks.begin(), m_tasks.end()
+        , [task](const ApplyChangesTaskPtr &item)
+    {
+        return (item == task);
+    });
+
+    if (it != m_tasks.end())
+        return false;
+
     const int insertIndex = m_tasks.size();
     const auto insertGuard = m_changeHelper->insertRowsGuard(insertIndex, insertIndex);
     Q_UNUSED(insertGuard);
 
-    const ApplyChangesTask * const taskPtr = task.get();
-    QObject::connect(taskPtr, &ApplyChangesTask::totalChangesCountChanged
-        , this, [this, taskPtr]() { taskStateChanged(taskPtr, kTotalChangesCount); });
+    ApplyChangesTask * const taskPointer = task.get();
+    QObject::connect(taskPointer, &ApplyChangesTask::totalChangesCountChanged
+        , this, [this, taskPointer]() { taskStateChanged(taskPointer, kTotalChangesCount); });
 
-    QObject::connect(taskPtr, &ApplyChangesTask::appliedChangesCountChanged
-        , this, [this, taskPtr]() { taskStateChanged(taskPtr, kAppliedChagnesCount); });
+    QObject::connect(taskPointer, &ApplyChangesTask::appliedChangesCountChanged
+        , this, [this, taskPointer]() { taskStateChanged(taskPointer, kAppliedChagnesCount); });
 
-    m_tasks.push_back(std::move(task));
-}
-
-void rtu::ChangesProgressModel::removeChangeProgress(QObject *object)
-{
-    const auto it = std::find_if(m_tasks.begin(), m_tasks.end()
-        , [object](const ApplyChangesTaskPtr &item) { return (item.get() == object);});
-    if (it == m_tasks.end())
-        return;
-
-    const int index = (it - m_tasks.begin());
-    const auto removeGuard = m_changeHelper->removeRowsGuard(index, index);
-    Q_UNUSED(removeGuard);
-    
-    ApplyChangesTask *task = it->get();
-    QObject::disconnect(task, nullptr, this, nullptr);
-    if (task->inProgress())
-    {
-        it->release();
-        task->setAutoremoveOnComplete();
-    }
-    m_tasks.erase(it);
-}
-
-bool rtu::ChangesProgressModel::releaseOwning(QObject *object)
-{
-    const auto it = std::find_if(m_tasks.begin(), m_tasks.end()
-        , [object](const ApplyChangesTaskPtr &item) { return (item.get() == object);});
-    if (it == m_tasks.end())
-        return false;
-
-    const int index = (it - m_tasks.begin());
-    const auto removeGuard = m_changeHelper->removeRowsGuard(index, index);
-    Q_UNUSED(removeGuard);
-    
-    it->release();
-    m_tasks.erase(it);
+    m_tasks.push_back(task);
     return true;
 }
 
-QObject *rtu::ChangesProgressModel::taskAtIndex(int index)
+void rtu::ChangesProgressModel::removeChangeProgress(int index)
 {
-    if ((index < 0) || (index >= rowCount()))
-        return nullptr;
+    if ((index < 0) || (index >= m_tasks.size()))
+        return;
 
-    return m_tasks.at(index).get();
+    const auto removeGuard = m_changeHelper->removeRowsGuard(index, index);
+    Q_UNUSED(removeGuard);
+    
+    const auto it = (m_tasks.begin() + index);
+    QObject::disconnect(it->get(), nullptr, this, nullptr);
+    m_tasks.erase(it);
 }
+
+void rtu::ChangesProgressModel::remove(ApplyChangesTask *task)
+{
+    const auto it = std::find_if(m_tasks.begin(), m_tasks.end()
+        , [task](const ApplyChangesTaskPtr &item)
+    {
+        return (item.get() == task);
+    });
+
+    if (it == m_tasks.end())
+        return;
+
+    removeChangeProgress(it - m_tasks.begin());
+}
+
+rtu::ApplyChangesTaskPtr rtu::ChangesProgressModel::atIndex(int index)
+{
+    if ((index < 0) || (index >= m_tasks.size()))
+        return ApplyChangesTaskPtr();
+
+    return m_tasks.at(index);
+}
+
 
 void rtu::ChangesProgressModel::serverDiscovered(const rtu::BaseServerInfo &info)
 {
     for (const auto &task: m_tasks)
-    {
         task->serverDiscovered(info);
-    }
 }
         
 void rtu::ChangesProgressModel::serversDisappeared(const IDsVector &ids)
 {
     for (const auto &task: m_tasks)
-    {
         task->serversDisappeared(ids);
-    }
 }
 
 void rtu::ChangesProgressModel::unknownAdded(const QString &ip)
 {
     for (const auto &task: m_tasks)
-    {
         task->unknownAdded(ip);
-    }
 }
 
 int rtu::ChangesProgressModel::rowCount(const QModelIndex &parent) const

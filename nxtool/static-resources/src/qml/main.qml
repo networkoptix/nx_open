@@ -54,7 +54,7 @@ Window
         
         Pages.ProgressPage 
         {
-            property var currentTask: rtuContext.currentProgressTask;
+            property var currentTask: rtuContext.progressTask;
 
             caption: (!changesCount ? qsTr("Applying changes...")
                 : qsTr("Applying changes (%1/%2)").arg(currentCount.toString()).arg(changesCount.toString()));
@@ -86,7 +86,6 @@ Window
                 askForSelectionChange: (loader.item && loader.item.hasOwnProperty("parametersChanged")
                     ? loader.item.parametersChanged : false);
 
-    //            enabled: (rtuContext.currentPage === NxRtu.Constants.SettingsPage);
                 opacity: enabled ? 1 : 0.5;
 
                 activeFocusOnTab: false;
@@ -97,6 +96,14 @@ Window
                 id: progressListView;
 
                 model: rtuContext.changesManager().changesProgressModelObject();
+
+                onShowDetails:
+                {
+                    selectionPage.tryChangeSelection(function()
+                    {
+                        rtuContext.showProgressTaskFromList(index);
+                    });
+                }
             }
         }
 

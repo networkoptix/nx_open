@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QVariant>
 
+#include <base/types.h>
 #include <base/constants.h>
 
 namespace rtu
@@ -15,10 +16,9 @@ namespace rtu
     {
         Q_OBJECT
         
-        Q_PROPERTY(int currentPage READ currentPage
-            WRITE setCurrentPage NOTIFY currentPageChanged)
+        Q_PROPERTY(int currentPage READ currentPage NOTIFY currentPageChanged)
         Q_PROPERTY(QObject* selection READ selection NOTIFY selectionChanged)
-        Q_PROPERTY(QObject* currentProgressTask READ currentProgressTask NOTIFY currentProgressTaskChanged)
+        Q_PROPERTY(QObject* progressTask READ progressTask NOTIFY progressTaskChanged)
         Q_PROPERTY(QString toolDisplayName READ toolDisplayName NOTIFY toolInfoChanged)
 
         Q_PROPERTY(bool isBeta READ isBeta NOTIFY toolInfoChanged)
@@ -35,8 +35,6 @@ namespace rtu
         virtual ~RtuContext();
         
     public:
-        void setCurrentPage(int pageId);
-        
         int currentPage() const;
         
         bool showWarnings() const;
@@ -47,8 +45,22 @@ namespace rtu
 
         QObject *selection() const;
 
-    public:
-        void applyTaskCompleted(ApplyChangesTask *task);
+    public slots:
+        /// Changes management
+
+        QObject *changesManager();
+
+        QObject *progressTask();
+
+        void showProgressTask(const ApplyChangesTaskPtr &task);
+
+        void showProgressTaskFromList(int index);
+
+        void hideProgressTask();
+
+        void removeProgressTask(int index);
+
+        void applyTaskCompleted(const ApplyChangesTaskPtr &task);
 
     public slots:
         QObject *selectionModel();
@@ -57,24 +69,6 @@ namespace rtu
         
         QObject *timeZonesModel(QObject *parent);
         
-        QObject *changesManager();
-
-        void removeChangeProgress(QObject *task);
-
-        void showDetailsForTask(QObject *task);
-
-        void closeDetails();
-
-        void changeOtherSettings();
-
-        QObject *currentProgressTask();
-
-        /*
-        void setCurrentProgressTask(QObject *task);
-
-        void currentProgressTaskComplete();
-        */
-
         bool isValidSubnetMask(const QString &mask) const;
 
         bool isDiscoverableFromCurrentNetwork(const QString &ip
@@ -117,7 +111,7 @@ namespace rtu
 
         void loginOperationFailed(const QString &primarySystem);
 
-        void currentProgressTaskChanged();
+        void progressTaskChanged();
         
     private:
         class Impl;

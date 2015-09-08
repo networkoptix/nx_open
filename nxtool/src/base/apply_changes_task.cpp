@@ -5,12 +5,14 @@
 
 #include <base/types.h>
 #include <base/requests.h>
+#include <base/changeset.h>
 #include <base/rtu_context.h>
 #include <base/server_info.h>
 #include <base/changes_manager.h>
 
 #include <helpers/http_client.h>
 #include <helpers/time_helper.h>
+#include <helpers/qml_helpers.h>
 
 #include <models/changes_summary_model.h>
 #include <models/servers_selection_model.h>
@@ -26,17 +28,6 @@ namespace
 
         /// Accepted wait time is 120 seconds due to restart on network interface parameters change
         , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
-    };
-
-    struct DateTime
-    {
-        qint64 utcDateTimeMs;
-        QByteArray timeZoneId;
-
-        DateTime(qint64 utcDateTimeMs, const QByteArray &timeZoneId)
-            : utcDateTimeMs(utcDateTimeMs)
-            , timeZoneId(timeZoneId)
-            {}
     };
 
     int changesFromUpdateInfos(const rtu::ItfUpdateInfoContainer &itfUpdateInfos)
@@ -86,6 +77,41 @@ namespace
         }
         return true;
     }
+
+    rtu::ServerInfoContainer makeServerValuesContainer(const rtu::ServerInfoPtrContainer &pointers)
+    {
+        rtu::ServerInfoContainer result;
+        result.reserve(pointers.size());
+
+        for(const rtu::ServerInfo *info: pointers)
+        {
+            if (info->hasExtraInfo())
+                result.push_back(*info);
+        }
+        return result;
+    }
+
+    rtu::ServerInfoPtrContainer makeServerPtrsContainer(rtu::ServerInfoContainer &values)
+    {
+        rtu::ServerInfoPtrContainer result;
+        result.reserve(values.size());
+
+        for(rtu::ServerInfo &info: values)
+            result.push_back(&info);
+
+        return result;
+    }
+
+    rtu::IDsVector extractIds(const rtu::ServerInfoContainer &values)
+    {
+        rtu::IDsVector result;
+
+        for(const rtu::ServerInfo &info: values)
+            result.push_back(info.baseInfo().id);
+
+        return result;
+    };
+
 }
 
 namespace
@@ -95,63 +121,135 @@ namespace
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct rtu::ApplyChangesTask::ItfChangeRequest
-{
-    bool inProgress;
-    int tries;
-    qint64 timestamp;
-    rtu::ServerInfo *info;
-    rtu::ItfUpdateInfoContainer itfUpdateInfo;
 
-    ItfChangeRequest(rtu::ServerInfo *info
-        , const rtu::ItfUpdateInfoContainer &initItfUpdateInfo);
-    int changesCount;
-};
-
-rtu::ApplyChangesTask::ItfChangeRequest::ItfChangeRequest(rtu::ServerInfo *initInfo
-    , const rtu::ItfUpdateInfoContainer &initItfUpdateInfo)
-    : inProgress(false)
-    , tries(0)
-    , timestamp(QDateTime::currentMSecsSinceEpoch())
-    , info(initInfo)
-    , itfUpdateInfo(initItfUpdateInfo)
-    , changesCount(changesFromUpdateInfos(initItfUpdateInfo))
+namespace
 {
+    struct ItfChangeRequest
+    {
+        bool inProgress;
+        int tries;
+        qint64 timestamp;
+        rtu::ServerInfo *info;
+        rtu::ItfUpdateInfoContainer itfUpdateInfo;
+        int changesCount;
+
+        ItfChangeRequest(rtu::ServerInfo *initInfo
+            , const rtu::ItfUpdateInfoContainer &initItfUpdateInfo)
+            : inProgress(false)
+            , tries(0)
+            , timestamp(QDateTime::currentMSecsSinceEpoch())
+            , info(initInfo)
+            , itfUpdateInfo(initItfUpdateInfo)
+            , changesCount(changesFromUpdateInfos(initItfUpdateInfo))
+        {}
+    };
+
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-struct rtu::ApplyChangesTask::Changeset
+class rtu::ApplyChangesTask::Impl : public std::enable_shared_from_this<rtu::ApplyChangesTask::Impl>
+    , public QObject
 {
-    typedef QScopedPointer<DateTime> DateTimePointer;
+public:
+    Impl(const ChangesetPointer &changeset
+        , const ServerInfoPtrContainer &targets
+        , rtu::HttpClient *httpClient);
 
-    rtu::IntPointer port;
-    rtu::StringPointer password;
-    rtu::StringPointer systemName;
-    rtu::ItfUpdateInfoContainer itfUpdateInfo;
-    DateTimePointer dateTime;
+    ~Impl();
+
+    void apply(const ApplyChangesTaskPtr &owner);
+
+    rtu::IDsVector targetServerIds() const;
+
+    ChangesSummaryModel *successfulModel();
+
+    ChangesSummaryModel *failedModel();
+
+    int totalChangesCount() const;
+        
+    int appliedChangesCount() const;
+
+    void serverDiscovered(const rtu::BaseServerInfo &baseInfo);
+
+    void serversDisappeared(const rtu::IDsVector &ids);
+
+    bool unknownAdded(const QString &ip);
+
+private:
+    void onChangesetApplied(int changesCount);
+
+    void sendRequests();
+
+    void addDateTimeChangeRequests();
+
+    void addSystemNameChangeRequests();
+    
+    void addPortChangeRequests();
+    
+    void addIpChangeRequests();
+
+    void addPasswordChangeRequests();    
+
+    bool addSummaryItem(const rtu::ServerInfo &info
+        , const QString &description
+        , const QString &value
+        , const QString &error
+        , Constants::AffectedEntities checkFlags
+        , Constants::AffectedEntities affected);
+
+    bool addUpdateInfoSummaryItem(const rtu::ServerInfo &info
+        , const QString &error
+        , const ItfUpdateInfo &change
+        , Constants::AffectedEntities affected);
+
+    typedef QHash<QUuid, ItfChangeRequest> ItfChangesContainer;
+    void itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it);
+
+private:
+    typedef std::function<void ()> Request;
+    typedef QPair<bool, Request> RequestData;
+    typedef QVector<RequestData>  RequestContainer;
+    typedef std::weak_ptr<Impl> ThisWeakPtr;
+
+    const ChangesetPointer m_changeset;
+    ApplyChangesTaskPtr m_owner;
+    HttpClient * const m_client;
+
+
+    ServerInfoContainer m_serverValues;
+    ServerInfoPtrContainer m_serverPointers;
+    const IDsVector m_targetServerIds;
+
+    ChangesSummaryModel m_succesfulChangesModel;
+    ChangesSummaryModel m_failedChangesModel;
+    
+    RequestContainer m_requests;
+    ItfChangesContainer m_itfChanges;
+
+    int m_appliedChangesIndex;
+    int m_lastChangesetIndex;
+
+    int m_totalChangesCount;
+    int m_appliedChangesCount;
 };
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+rtu::ApplyChangesTask::Impl::Impl(const ChangesetPointer &changeset
+    , const ServerInfoPtrContainer &targets
+    , rtu::HttpClient *httpClient)
+    
+    : std::enable_shared_from_this<ApplyChangesTask::Impl>()
+    , QObject()
 
-rtu::ApplyChangesTask::ApplyChangesTask(rtu::RtuContext *context
-    , rtu::HttpClient *httpClient
-    , rtu::ServersSelectionModel *selectionModel
-    , ChangesManager *changesManager)
-    
-    : QObject(changesManager)
-    , m_changesManager(changesManager)
-    , m_changeset(new Changeset())
-    , m_context(context)
+    , m_changeset(changeset)
+    , m_owner()
     , m_client(httpClient)
-    , m_model(selectionModel)
+
+    , m_serverValues(makeServerValuesContainer(targets))
+    , m_serverPointers(makeServerPtrsContainer(m_serverValues))
+    , m_targetServerIds(extractIds(m_serverValues))
     
-    , m_succesfulChangesModel(nullptr)
-    , m_failedChangesModel(nullptr)
+    , m_succesfulChangesModel(true, this)
+    , m_failedChangesModel(false, this)
     
-    , m_serverValues()
-    , m_targetServers()
-    , m_lockedItems()
     , m_requests()
     , m_itfChanges()
     
@@ -160,130 +258,18 @@ rtu::ApplyChangesTask::ApplyChangesTask(rtu::RtuContext *context
 
     , m_totalChangesCount(0)
     , m_appliedChangesCount(0)
-    , m_autoremoveOnComplete(false)
+
 {
 }
 
-rtu::ApplyChangesTask::~ApplyChangesTask()
+rtu::ApplyChangesTask::Impl::~Impl()
 {
-    qDebug() << "-------------------- " << "deleting ";
+    qDebug() << "----- ~Impl";
 }
 
-void rtu::ApplyChangesTask::setAutoremoveOnComplete()
+void rtu::ApplyChangesTask::Impl::apply(const ApplyChangesTaskPtr &owner)
 {
-    m_autoremoveOnComplete = true;
-}
-
-void rtu::ApplyChangesTask::addSystemChange(const QString &systemName)
-{
-    m_changeset->systemName.reset(new QString(systemName));
-}
-        
-void rtu::ApplyChangesTask::addPasswordChange(const QString &password)
-{
-    m_changeset->password.reset(new QString(password));
-}
-        
-void rtu::ApplyChangesTask::addPortChange(int port)
-{
-    m_changeset->port.reset(new int(port));
-}
-        
-void rtu::ApplyChangesTask::addDHCPChange(const QString &name
-    , bool useDHCP)
-{
-    getItfUpdateInfo(name).useDHCP.reset(new bool(useDHCP));
-}
-        
-void rtu::ApplyChangesTask::addAddressChange(const QString &name
-    , const QString &address)
-{
-    getItfUpdateInfo(name).ip.reset(new QString(address));
-}
-        
-void rtu::ApplyChangesTask::addMaskChange(const QString &name
-    , const QString &mask)
-{
-    getItfUpdateInfo(name).mask.reset(new QString(mask));
-}
-        
-void rtu::ApplyChangesTask::addDNSChange(const QString &name
-    , const QString &dns)
-{
-    getItfUpdateInfo(name).dns.reset(new QString(dns));
-}
-        
-void rtu::ApplyChangesTask::addGatewayChange(const QString &name
-    , const QString &gateway)
-{
-    getItfUpdateInfo(name).gateway.reset(new QString(gateway));
-}
-        
-void rtu::ApplyChangesTask::addDateTimeChange(const QDate &date
-    , const QTime &time
-    , const QByteArray &timeZoneId)
-{
-    qint64 utcTimeMs = msecondsFromEpoch(date, time, QTimeZone(timeZoneId));
-    m_changeset->dateTime.reset(new DateTime(utcTimeMs, timeZoneId));
-}
-
-void rtu::ApplyChangesTask::turnOnDhcp()
-{
-    static const QString &kAnyName = "turnOnDhcp";
-    /// In this case it is multiple selection. Just add empty interface
-    /// change information to indicate that we should force dhcp on
-    getItfUpdateInfo(kAnyName);
-}
-        
-rtu::IDsVector rtu::ApplyChangesTask::targetServerIds() const
-{
-    return m_lockedItems;
-}
-
-void rtu::ApplyChangesTask::applyChanges()
-{
-    if (!m_model->selectedCount())
-        return;
-
-    m_serverValues = [](const ServerInfoPtrContainer &infos) -> ServerInfoValueContainer 
-    {
-        ServerInfoValueContainer result;
-        result.reserve(infos.size());
-
-        for(const ServerInfo *info: infos)
-        {
-            if (info->hasExtraInfo())
-                result.push_back(*info);
-        }
-        return result;
-    }(m_model->selectedServers());
-    
-    m_targetServers = [](ServerInfoValueContainer &values)
-    {
-        ServerInfoPtrContainer result;
-        result.reserve(values.size());
-        for(ServerInfo &info: values)
-        {
-            result.push_back(&info);
-        }
-        return result;
-    }(m_serverValues);
-
-    m_lockedItems = [this]() ->IDsVector
-    {
-        IDsVector result;
-        for(const ServerInfo &info: m_serverValues)
-            result.push_back(info.baseInfo().id);
-
-        return result;
-    }();
-
-    m_model->setBusyState(m_lockedItems, true);
-
-    m_requests.clear();
-
-    m_totalChangesCount = 0;
-    m_appliedChangesCount = 0;
+    m_owner = owner;
 
     addDateTimeChangeRequests();
     addSystemNameChangeRequests();
@@ -291,69 +277,36 @@ void rtu::ApplyChangesTask::applyChanges()
     addPortChangeRequests();
     addIpChangeRequests();
     
-    emit totalChangesCountChanged();
-    emit appliedChangesCountChanged();
-
-    if (m_succesfulChangesModel)
-        m_succesfulChangesModel->deleteLater();
-    if (m_failedChangesModel)
-        m_failedChangesModel->deleteLater();
-    
-    m_succesfulChangesModel = new ChangesSummaryModel(true, this);
-    m_failedChangesModel = new ChangesSummaryModel(false, this);
-    
-    m_lastChangesetIndex = 0;
-    m_appliedChangesIndex = 0;
-    
-    m_context->setCurrentPage(Constants::ProgressPage);
-    
     sendRequests();
 }
 
-
-QObject *rtu::ApplyChangesTask::successfulResultsModel()
+rtu::IDsVector rtu::ApplyChangesTask::Impl::targetServerIds() const
 {
-    return m_succesfulChangesModel;
+    return m_targetServerIds;
 }
 
-QObject *rtu::ApplyChangesTask::failedResultsModel()
+
+rtu::ChangesSummaryModel *rtu::ApplyChangesTask::Impl::successfulModel()
 {
-    return m_failedChangesModel;
+    return &m_succesfulChangesModel;
 }
 
-bool rtu::ApplyChangesTask::inProgress() const
+rtu::ChangesSummaryModel *rtu::ApplyChangesTask::Impl::failedModel()
 {
-    return (m_totalChangesCount && (m_totalChangesCount != m_appliedChangesCount));
+    return &m_failedChangesModel;
 }
 
-int rtu::ApplyChangesTask::totalChangesCount() const
+int rtu::ApplyChangesTask::Impl::totalChangesCount() const
 {
     return m_totalChangesCount;
 }
-
-int rtu::ApplyChangesTask::appliedChangesCount() const
+        
+int rtu::ApplyChangesTask::Impl::appliedChangesCount() const
 {
     return m_appliedChangesCount;
 }
 
-rtu::ItfUpdateInfo &rtu::ApplyChangesTask::getItfUpdateInfo(const QString &name)
-{
-    ItfUpdateInfoContainer &itfUpdate = m_changeset->itfUpdateInfo;
-    auto it = std::find_if(itfUpdate.begin(), itfUpdate.end()
-        , [&name](const ItfUpdateInfo &itf)
-    {
-        return (itf.name == name);
-    });
-    
-    if (it == itfUpdate.end())
-    {
-        itfUpdate.push_back(ItfUpdateInfo(name));
-        return itfUpdate.back();
-    }
-    return *it;
-}
-
-void rtu::ApplyChangesTask::serverDiscovered(const rtu::BaseServerInfo &baseInfo)
+void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &baseInfo)
 {
     if (unknownAdded(baseInfo.hostAddress))
         return;
@@ -370,11 +323,17 @@ void rtu::ApplyChangesTask::serverDiscovered(const rtu::BaseServerInfo &baseInfo
     if ((current - request.timestamp) < kIfListRequestsPeriod)
         return;
     
+    const ThisWeakPtr &weak = shared_from_this();
+
     const auto processCallback =
-         [this, baseInfo](bool successful, const QUuid &id, const ExtraServerInfo &extraInfo)
+        [weak, baseInfo](bool successful, const QUuid &id, const ExtraServerInfo &extraInfo)
     {
-        const auto &it = m_itfChanges.find(id);
-        if (it == m_itfChanges.end())
+        if (weak.expired())
+            return;
+
+        const auto shared = weak.lock();
+        const auto &it = shared->m_itfChanges.find(id);
+        if (it == shared->m_itfChanges.end())
             return;
         
         ItfChangeRequest &request = it.value();
@@ -394,24 +353,24 @@ void rtu::ApplyChangesTask::serverDiscovered(const rtu::BaseServerInfo &baseInfo
             const bool applied = (it != extraInfo.interfaces.end());
             const QString errorReason = (applied ? QString() : QString("Can't apply this parameter"));
 
-            //TODO: #ynikitenkov I do not understand this strange logic
-            //const AffectedEntities affected = (applied ? kNoEntitiesAffected : kAllEntitiesAffected);
-            const AffectedEntities affected = (applied ? kAllEntitiesAffected : kNoEntitiesAffected);
-            addUpdateInfoSummaryItem(info, errorReason, change, affected);
+            const Constants::AffectedEntities affected = 
+                (applied ? Constants::kAllEntitiesAffected : Constants::kNoEntitiesAffected);
+            shared->addUpdateInfoSummaryItem(info, errorReason, change, affected);
             
             if (applied)
                 newInterfaces.push_back(*it);
         }
+
         if (successful && totalApplied)
         {
             request.info->writableBaseInfo().hostAddress = baseInfo.hostAddress;
-            m_model->updateInterfacesInfo(info.baseInfo().id
+            emit shared->m_owner->itfUpdated(info.baseInfo().id
                 , baseInfo.hostAddress, newInterfaces);
         }
         
         const int changesCount = request.changesCount;
-        m_itfChanges.erase(it);
-        onChangesetApplied(changesCount);
+        shared->m_itfChanges.erase(it);
+        shared->onChangesetApplied(changesCount);
     };
     
     const auto &successful =
@@ -432,8 +391,7 @@ void rtu::ApplyChangesTask::serverDiscovered(const rtu::BaseServerInfo &baseInfo
         , request.info->extraInfo().password, successful, failed, kIfListRequestsPeriod);
 }
 
-
-void rtu::ApplyChangesTask::serversDisappeared(const rtu::IDsVector &ids)
+void rtu::ApplyChangesTask::Impl::serversDisappeared(const rtu::IDsVector &ids)
 {
     for (const QUuid &id: ids)
     {
@@ -462,7 +420,7 @@ void rtu::ApplyChangesTask::serversDisappeared(const rtu::IDsVector &ids)
     }
 }
 
-bool rtu::ApplyChangesTask::unknownAdded(const QString &ip)
+bool rtu::ApplyChangesTask::Impl::unknownAdded(const QString &ip)
 {
     /// Searches for the change request
     const auto &it = std::find_if(m_itfChanges.begin(), m_itfChanges.end()
@@ -487,22 +445,22 @@ bool rtu::ApplyChangesTask::unknownAdded(const QString &ip)
         return false;
     }
 
-    /// We've found change request with dhcp "off" state, ip that is 
-    /// equals to ip of found unknown entity and ip is from another network.
-    /// So, we suppose that request to change ip is successfully aplied
+    /// We've found change request with dhcp "off" state and ip that is 
+    /// equals to ip of found unknown entity.
+    /// So, we suppose that request to change ip is successfully applied
 
     itfRequestSuccessfullyApplied(it);
     return true;
 }
 
-void rtu::ApplyChangesTask::itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it)
+void rtu::ApplyChangesTask::Impl::itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it)
 {
     const ItfChangeRequest &request = *it;
     for(const auto &change: request.itfUpdateInfo)
     {
         static const QString kSuccessfulReason = QString();
         addUpdateInfoSummaryItem(*request.info
-            , kSuccessfulReason, change, kAllEntitiesAffected);
+            , kSuccessfulReason, change, Constants::kAllEntitiesAffected);
     }
 
     const int changesCount = request.changesCount;
@@ -510,10 +468,10 @@ void rtu::ApplyChangesTask::itfRequestSuccessfullyApplied(const ItfChangesContai
     onChangesetApplied(changesCount);
 }
 
-void rtu::ApplyChangesTask::onChangesetApplied(int changesCount)
+void rtu::ApplyChangesTask::Impl::onChangesetApplied(int changesCount)
 {
     m_appliedChangesCount += changesCount;
-    emit appliedChangesCountChanged();
+    emit m_owner->appliedChangesCountChanged();
 
     ++m_appliedChangesIndex;
     
@@ -523,15 +481,11 @@ void rtu::ApplyChangesTask::onChangesetApplied(int changesCount)
         return;
     }
 
-    m_model->setBusyState(m_lockedItems, false);
-
-    emit changesApplied();
-
-    if (m_autoremoveOnComplete)
-        deleteLater();
+    emit m_owner->changesApplied();
+    m_owner.reset(); /// Destructs this apply task if there are no other links to it
 }
 
-void rtu::ApplyChangesTask::sendRequests()
+void rtu::ApplyChangesTask::Impl::sendRequests()
 {
     while(true)
     {
@@ -548,38 +502,46 @@ void rtu::ApplyChangesTask::sendRequests()
 }
 
 
-void rtu::ApplyChangesTask::addDateTimeChangeRequests()
+void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
 {
-    if (!m_changeset->dateTime)
+    if (!m_changeset->dateTime())
         return;
 
     const qint64 timestampMs = QDateTime::currentMSecsSinceEpoch();
-    const DateTime &change = *m_changeset->dateTime;
-    for (ServerInfo *info: m_targetServers)
+    const DateTime &change = *m_changeset->dateTime();
+    const ThisWeakPtr weak = shared_from_this();
+
+    for (ServerInfo *info: m_serverPointers)
     {
         enum { kDateTimeChangesetSize = 2};
-        const auto request = [this, info, change, timestampMs]()
+        const auto request = [weak, info, change, timestampMs]()
         {
-            const auto &callback = 
-                [this, info, change, timestampMs](const int, const QString &errorReason, AffectedEntities affected)
+            if (weak.expired())
+                return;
+
+            const auto &callback = [weak, info, change, timestampMs]
+                (const int, const QString &errorReason, Constants::AffectedEntities affected)
             {
                 static const QString kDateTimeDescription = "date / time";
                 static const QString kTimeZoneDescription = "time zone";
-                
 
+                if (weak.expired())
+                    return;
+
+                const auto shared = weak.lock();
                 QString timeZoneName = timeZoneNameWithOffset(QTimeZone(change.timeZoneId), QDateTime::currentDateTime());
 
                 QDateTime timeValue = convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId));
                 const QString &value = timeValue.toString(Qt::SystemLocaleLongDate);
-                const bool dateTimeOk = addSummaryItem(*info, kDateTimeDescription
-                    , value, errorReason, kDateTimeAffected, affected);
-                const bool timeZoneOk = addSummaryItem(*info, kTimeZoneDescription
-                    , timeZoneName, errorReason, kTimeZoneAffected, affected);
+                const bool dateTimeOk = shared->addSummaryItem(*info, kDateTimeDescription
+                    , value, errorReason, Constants::kDateTimeAffected, affected);
+                const bool timeZoneOk = shared->addSummaryItem(*info, kTimeZoneDescription
+                    , timeZoneName, errorReason, Constants::kTimeZoneAffected, affected);
                 
                 if (dateTimeOk && timeZoneOk)
                 {
-                    m_model->updateTimeDateInfo(info->baseInfo().id, change.utcDateTimeMs
-                        , change.timeZoneId, timestampMs);
+                    emit shared->m_owner->dateTimeUpdated(info->baseInfo().id
+                        , change.utcDateTimeMs, change.timeZoneId, timestampMs);
                     
                     ExtraServerInfo &extraInfo = info->writableExtraInfo();
                     extraInfo.timestampMs = timestampMs;
@@ -587,10 +549,11 @@ void rtu::ApplyChangesTask::addDateTimeChangeRequests()
                     extraInfo.utcDateTimeMs = change.utcDateTimeMs;
                 }
                 
-                onChangesetApplied(kDateTimeChangesetSize);
+                shared->onChangesetApplied(kDateTimeChangesetSize);
             };
 
-            sendSetTimeRequest(m_client, *info, change.utcDateTimeMs, change.timeZoneId, callback);
+            const auto shared = weak.lock();
+            sendSetTimeRequest(shared->m_client, *info, change.utcDateTimeMs, change.timeZoneId, callback);
         };
 
         m_totalChangesCount += kDateTimeChangesetSize;
@@ -598,33 +561,42 @@ void rtu::ApplyChangesTask::addDateTimeChangeRequests()
     }
 }
 
-void rtu::ApplyChangesTask::addSystemNameChangeRequests()
+void rtu::ApplyChangesTask::Impl::addSystemNameChangeRequests()
 {
-    if (!m_changeset->systemName)
+    if (!m_changeset->systemName())
         return;
 
-    const QString &systemName = *m_changeset->systemName;
-    for (ServerInfo *info: m_targetServers)
+    const QString &systemName = *m_changeset->systemName();
+    const ThisWeakPtr weak = shared_from_this();
+    for (ServerInfo *info: m_serverPointers)
     {
         enum { kSystemNameChangesetSize = 1 };
-        const auto request = [this, info, systemName]()
+        const auto request = [weak, info, systemName]()
         {
-            const auto &callback = 
-                [this, info, systemName](const int, const QString &errorReason, AffectedEntities affected)
+            if (weak.expired())
+                return;
+
+            const auto &callback = [weak, info, systemName]
+                (const int, const QString &errorReason, Constants::AffectedEntities affected)
             {
                 static const QString &kSystemNameDescription = "system name";
 
-                if(addSummaryItem(*info, kSystemNameDescription, systemName
-                    , errorReason, kSystemNameAffected, affected))
+                if (weak.expired())
+                    return;
+
+                const auto shared = weak.lock();
+                if(shared->addSummaryItem(*info, kSystemNameDescription, systemName
+                    , errorReason, Constants::kSystemNameAffected, affected))
                 {
-                    m_model->updateSystemNameInfo(info->baseInfo().id, systemName);
+                    emit shared->m_owner->systemNameUpdated(info->baseInfo().id, systemName);
                     info->writableBaseInfo().systemName = systemName;
                 }
                 
-                onChangesetApplied(kSystemNameChangesetSize);
+                shared->onChangesetApplied(kSystemNameChangesetSize);
             };
 
-            sendSetSystemNameRequest(m_client, *info, systemName, callback);
+            const auto shared = weak.lock();
+            sendSetSystemNameRequest(shared->m_client, *info, systemName, callback);
         };
 
         m_totalChangesCount += kSystemNameChangesetSize;
@@ -632,34 +604,45 @@ void rtu::ApplyChangesTask::addSystemNameChangeRequests()
     }
 }
 
-void rtu::ApplyChangesTask::addPortChangeRequests()
+void rtu::ApplyChangesTask::Impl::addPortChangeRequests()
 {
-    if (!m_changeset->port)
+    if (!m_changeset->port())
         return;
 
-    const int port = *m_changeset->port;
-    for (ServerInfo *info: m_targetServers)
+    const int port = *m_changeset->port();
+    const ThisWeakPtr weak = shared_from_this();
+
+    for (ServerInfo *info: m_serverPointers)
     {
         enum { kPortChangesetCapacity = 1 };
-        const auto request = [this, info, port]()
+        const auto request = [weak, info, port]()
         {
-            const auto &callback = 
-                [this, info, port](const int, const QString &errorReason, AffectedEntities affected)
+            if (weak.expired())
+                return;
+
+
+            const auto &callback = [weak, info, port]
+                (const int, const QString &errorReason, Constants::AffectedEntities affected)
             {
                 static const QString kPortDescription = "port";
-                
-                
-                if (addSummaryItem(*info, kPortDescription, QString::number(port)
-                    , errorReason, kPortAffected, affected))
+
+                if (weak.expired())
+                    return;
+
+                const auto shared = weak.lock();
+                if (shared->addSummaryItem(*info, kPortDescription, QString::number(port)
+                    , errorReason, Constants::kPortAffected, affected))
                 {
-                    m_model->updatePortInfo(info->baseInfo().id, port);
+                    emit shared->m_owner->portUpdated(info->baseInfo().id, port);
                     info->writableBaseInfo().port = port;
                 }
 
-                onChangesetApplied(kPortChangesetCapacity);
+                shared->onChangesetApplied(kPortChangesetCapacity);
             };
 
-            sendSetPortRequest(m_client, *info, port, callback);
+
+            const auto shared = weak.lock();
+            sendSetPortRequest(shared->m_client, *info, port, callback);
         };
 
         m_totalChangesCount += kPortChangesetCapacity;
@@ -667,36 +650,48 @@ void rtu::ApplyChangesTask::addPortChangeRequests()
     }
 }
 
-void rtu::ApplyChangesTask::addIpChangeRequests()
+void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
 {
-    if (m_changeset->itfUpdateInfo.empty())
+    if (!m_changeset->itfUpdateInfo() || m_changeset->itfUpdateInfo()->empty())
         return;
     
+    const ThisWeakPtr weak = shared_from_this();
+
     const auto &addRequest = 
-        [this](ServerInfo *info, const ItfUpdateInfoContainer &changes)
+        [weak](ServerInfo *info, const ItfUpdateInfoContainer &changes)
     {
+        if (weak.expired())
+            return;
+
         const ItfChangeRequest changeRequest(info, changes);
             
         const auto &request = 
-            [this, info, changes, changeRequest]()
+            [weak, info, changes, changeRequest]()
         {
-            const auto &failedCallback = 
-                [this, info, changes](const int, const QString &errorReason, AffectedEntities affected)
+            if (weak.expired())
+                return;
+
+            const auto &failedCallback =
+                [weak, info, changes](const int, const QString &errorReason, Constants::AffectedEntities affected)
             {
-                const auto &it = m_itfChanges.find(info->baseInfo().id);
-                if (it == m_itfChanges.end())
+                if (weak.expired())
+                    return;
+
+                const auto shared = weak.lock();
+                const auto &it = shared->m_itfChanges.find(info->baseInfo().id);
+                if (it == shared->m_itfChanges.end())
                     return;
 
                 for (const auto &change: changes)
-                    addUpdateInfoSummaryItem(*info, errorReason, change, affected);
+                    shared->addUpdateInfoSummaryItem(*info, errorReason, change, affected);
 
                 const int changesCount = it.value().changesCount;
-                m_itfChanges.erase(it);
-                onChangesetApplied(changesCount);
+                shared->m_itfChanges.erase(it);
+                shared->onChangesetApplied(changesCount);
             };
 
             const auto &callback = 
-                [this, failedCallback](const int errorCode, const QString &errorReason, AffectedEntities affected)
+                [failedCallback](const int errorCode, const QString &errorReason, Constants::AffectedEntities affected)
             {
                 if (!errorReason.isEmpty())
                 {
@@ -705,8 +700,7 @@ void rtu::ApplyChangesTask::addIpChangeRequests()
                 else
                 {
                     /* In case of success we need to wait more until server is rediscovered. */
-                    QTimer::singleShot(kTotalIfConfigTimeout
-                        , [this, failedCallback, affected]() 
+                    QTimer::singleShot(kTotalIfConfigTimeout, [failedCallback, affected]() 
                     {
                         failedCallback(kUnspecifiedError, ("Request timeout"), affected);
                     });
@@ -714,26 +708,32 @@ void rtu::ApplyChangesTask::addIpChangeRequests()
                 
             };
 
-            m_itfChanges.insert(info->baseInfo().id, changeRequest);
-            sendChangeItfRequest(m_client, *info, changes, callback);
+            const auto shared = weak.lock();
+            shared->m_itfChanges.insert(info->baseInfo().id, changeRequest);
+            sendChangeItfRequest(shared->m_client, *info, changes, callback);
         };
         
-        m_totalChangesCount += changeRequest.changesCount;
+        const auto shared = weak.lock();
+        shared->m_totalChangesCount += changeRequest.changesCount;
 
         /// Request is non blocking due to restart on interface parameters change. 
         // I.e. we send multiple unqued requests and not wait until they complete before next send.
-        m_requests.push_back(RequestData(kNonBlockingRequest, request));
+        shared->m_requests.push_back(RequestData(kNonBlockingRequest, request));
     };
 
     enum { kSingleSelection = 1 };
-    if (m_targetServers.size() == 1)
+    if (m_serverPointers.size() == 1)
     {
-        addRequest(m_targetServers.first(), m_changeset->itfUpdateInfo);
+        const ItfUpdateInfoContainerPointer &itf = m_changeset->itfUpdateInfo();
+        if (!itf)
+            return;
+
+        addRequest(m_serverPointers.first(), *itf);
         return;
     }
 
     /// In case of multiple selection, it is allowed to turn on DHCP only
-    for (ServerInfo *info: m_targetServers)
+    for (ServerInfo *info: m_serverPointers)
     {
         ItfUpdateInfoContainer changes;
         for (const InterfaceInfo &itfInfo: info->extraInfo().interfaces)
@@ -751,47 +751,61 @@ void rtu::ApplyChangesTask::addIpChangeRequests()
     }
 }
 
-void rtu::ApplyChangesTask::addPasswordChangeRequests()
+void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
 {
-    if (!m_changeset->password)
+    if (!m_changeset->password())
         return;
     
-    const QString &password = *m_changeset->password;
-    for (ServerInfo *info: m_targetServers)
+    const QString &password = *m_changeset->password();
+    const ThisWeakPtr weak = shared_from_this();
+
+    for (ServerInfo *info: m_serverPointers)
     {
         enum { kPasswordChangesetSize = 1 };
-        const auto request = [this, info, password]()
+        const auto request = [weak, info, password]()
         {
-            const auto finalCallback = 
-                [this, info, password](const int, const QString &errorReason, AffectedEntities affected)
+            if (weak.expired())
+                return;
+
+            const auto finalCallback =
+                [weak, info, password](const int, const QString &errorReason, Constants::AffectedEntities affected)
             {
                 static const QString kPasswordDescription = "password";
 
-                if (addSummaryItem(*info, kPasswordDescription, password
-                    , errorReason, kPasswordAffected, affected))
+                if (weak.expired())
+                    return;
+
+                const auto shared = weak.lock();
+                if (shared->addSummaryItem(*info, kPasswordDescription, password
+                    , errorReason, Constants::kPasswordAffected, affected))
                 {
                     info->writableExtraInfo().password = password;
-                    m_model->updatePasswordInfo(info->baseInfo().id, password);
+                    emit shared->m_owner->passwordUpdated(info->baseInfo().id, password);
                 }
                 
-                onChangesetApplied(kPasswordChangesetSize);
+                shared->onChangesetApplied(kPasswordChangesetSize);
             };
             
             const auto &callback = 
-                [this, info, password, finalCallback](const int errorCode
-                    , const QString &errorReason, AffectedEntities affected)
+                [weak, info, password, finalCallback](const int errorCode
+                    , const QString &errorReason, Constants::AffectedEntities affected)
             {
+                if (weak.expired())
+                    return;
+
                 if (errorReason.isEmpty())
                 {
                     finalCallback(errorCode, errorReason, affected);
                 }
                 else
                 {
-                    sendSetPasswordRequest(m_client, *info, password, true, finalCallback);
+                    const auto shared = weak.lock();
+                    sendSetPasswordRequest(shared->m_client, *info, password, true, finalCallback);
                 }
             };
 
-            sendSetPasswordRequest(m_client, *info, password, false, callback );
+            const auto shared = weak.lock();
+            sendSetPasswordRequest(shared->m_client, *info, password, false, callback );
         };
 
         m_totalChangesCount += kPasswordChangesetSize;
@@ -799,26 +813,25 @@ void rtu::ApplyChangesTask::addPasswordChangeRequests()
     }
 }
 
-bool rtu::ApplyChangesTask::addSummaryItem(const rtu::ServerInfo &info
+bool rtu::ApplyChangesTask::Impl::addSummaryItem(const rtu::ServerInfo &info
     , const QString &description
     , const QString &value
     , const QString &error
-    , AffectedEntities checkFlags
-    , AffectedEntities affected)
+    , Constants::AffectedEntities checkFlags
+    , Constants::AffectedEntities affected)
 {
     const bool successResult = error.isEmpty() && 
         ((affected & checkFlags) == checkFlags);
-    ChangesSummaryModel * const model = (successResult ?
-        m_succesfulChangesModel : m_failedChangesModel);
+    ChangesSummaryModel * const model = (successResult ? &m_succesfulChangesModel : &m_failedChangesModel);
 
     model->addRequestResult(info, description, value, error);
     return successResult;
 }
 
-bool rtu::ApplyChangesTask::addUpdateInfoSummaryItem(const rtu::ServerInfo &info
+bool rtu::ApplyChangesTask::Impl::addUpdateInfoSummaryItem(const rtu::ServerInfo &info
     , const QString &error
     , const ItfUpdateInfo &change
-    , AffectedEntities affected)
+    , Constants::AffectedEntities affected)
 {
     bool success = error.isEmpty();
 
@@ -829,35 +842,35 @@ bool rtu::ApplyChangesTask::addUpdateInfoSummaryItem(const rtu::ServerInfo &info
         static const QString &kNo = "off";
         const QString useDHCPValue = (*change.useDHCP? kYes : kNo);
         success &= addSummaryItem(info, kDHCPDescription, useDHCPValue, error
-            , kDHCPUsageAffected, affected);
+            , Constants::kDHCPUsageAffected, affected);
     }
 
     if (change.ip)
     {
         static const QString &kIpDescription = "ip";
         success &= addSummaryItem(info, kIpDescription, *change.ip, error
-            , kIpAddressAffected, affected);
+            , Constants::kIpAddressAffected, affected);
     }
 
     if (change.mask)
     {
         static const QString &kMaskDescription = "mask";
         success &= addSummaryItem(info, kMaskDescription, *change.mask, error
-            , kMaskAffected, affected);
+            , Constants::kMaskAffected, affected);
     }
 
     if (change.dns)
     {
         static const QString &kDnsDescription = "dns";
         success &= addSummaryItem(info, kDnsDescription, *change.dns, error
-            , kDNSAffected, affected);
+            , Constants::kDNSAffected, affected);
     }
 
     if (change.gateway)
     {
         static const QString &kGatewayDescription = "gateway";
         success &= addSummaryItem(info, kGatewayDescription, *change.gateway, error
-            , kGatewayAffected, affected);
+            , Constants::kGatewayAffected, affected);
     }
 
     return success;
@@ -865,3 +878,75 @@ bool rtu::ApplyChangesTask::addUpdateInfoSummaryItem(const rtu::ServerInfo &info
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+rtu::ApplyChangesTaskPtr rtu::ApplyChangesTask::create(const ChangesetPointer &changeset
+    , const ServerInfoPtrContainer &target
+    , rtu::HttpClient *httpClient)
+{
+    const ApplyChangesTaskPtr result(new ApplyChangesTask(changeset, target, httpClient));
+
+    /// we have to use this function because std::shared_from_this cannot be called from 
+    /// constructor (when there is no one shared pointer exists)
+    result->m_impl->apply(result);
+    return result;
+}
+
+rtu::ApplyChangesTask::ApplyChangesTask(const ChangesetPointer &changeset
+    , const ServerInfoPtrContainer &targets
+    , rtu::HttpClient *httpClient)
+    
+    : QObject(helpers::qml_objects_parent())
+    , m_impl(new Impl(changeset, targets, httpClient))
+{
+}
+
+rtu::ApplyChangesTask::~ApplyChangesTask()
+{
+    qDebug() <<" --------------destroying";
+}
+
+rtu::IDsVector rtu::ApplyChangesTask::targetServerIds() const
+{
+    return m_impl->targetServerIds();
+}
+
+QObject *rtu::ApplyChangesTask::successfulModel()
+{
+    return m_impl->successfulModel();
+}
+
+QObject *rtu::ApplyChangesTask::failedModel()
+{
+    return m_impl->failedModel();
+}
+
+bool rtu::ApplyChangesTask::inProgress() const
+{
+    const int totalChanges = totalChangesCount();
+    return (totalChanges && (totalChanges != appliedChangesCount()));
+}
+
+int rtu::ApplyChangesTask::totalChangesCount() const
+{
+    return m_impl->totalChangesCount();
+}
+
+int rtu::ApplyChangesTask::appliedChangesCount() const
+{
+    return m_impl->appliedChangesCount();
+}
+
+void rtu::ApplyChangesTask::serverDiscovered(const rtu::BaseServerInfo &baseInfo)
+{
+    m_impl->serverDiscovered(baseInfo);
+}
+
+void rtu::ApplyChangesTask::serversDisappeared(const rtu::IDsVector &ids)
+{
+    m_impl->serversDisappeared(ids);
+}
+
+void rtu::ApplyChangesTask::unknownAdded(const QString &ip)
+{
+    m_impl->unknownAdded(ip);
+}

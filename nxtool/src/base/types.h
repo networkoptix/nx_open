@@ -5,10 +5,11 @@
 #include <QObject>
 #include <QVector>
 #include <QString>
-#include <QScopedPointer>
 
 #include <memory>
 #include <functional>
+
+class QDateTime;
 
 namespace rtu
 {
@@ -20,16 +21,21 @@ namespace rtu
 
     typedef QVector<QUuid> IDsVector;
 
-    ///
+    class Changeset;
+    typedef std::shared_ptr<Changeset> ChangesetPointer;
 
-    typedef QSharedPointer<QString> StringPointer;
-    typedef QSharedPointer<int> IntPointer;
-    typedef QSharedPointer<bool> BoolPointer;
+    ///
+    struct DateTime;
+
+    typedef std::shared_ptr<DateTime> DateTimePointer;
+    typedef std::shared_ptr<QString> StringPointer;
+    typedef std::shared_ptr<int> IntPointer;
+    typedef std::shared_ptr<bool> BoolPointer;
 
     typedef std::function<void ()> Callback;
 
     class ApplyChangesTask;
-    typedef std::unique_ptr<ApplyChangesTask> ApplyChangesTaskPtr;
+    typedef std::shared_ptr<ApplyChangesTask> ApplyChangesTaskPtr;
 
     class ChangesProgressModel;
     typedef std::unique_ptr<ChangesProgressModel> ChangesProgressModelPtr;

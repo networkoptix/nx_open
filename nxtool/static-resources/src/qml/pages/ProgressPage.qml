@@ -156,7 +156,7 @@ Item
 
             onClicked:
             {
-                rtuContext.changeOtherSettings();
+                rtuContext.hideProgressTask();
             }
         }
     }

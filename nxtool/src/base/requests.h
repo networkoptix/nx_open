@@ -23,31 +23,6 @@ namespace rtu
     void parseModuleInformationReply(const QJsonObject &reply
         , rtu::BaseServerInfo &baseInfo);
 
-    /// TODO: #ynikitenkov think about usage and rename if necessary to "invalid entity"
-    enum AffectedEntity
-    {
-        kNoEntitiesAffected         = 0x0
-        , kPortAffected             = 0x1
-        , kPasswordAffected         = 0x2
-        , kSystemNameAffected       = 0x4
-
-        , kIpAddressAffected        = 0x10
-        , kMaskAffected             = 0x20
-        , kDHCPUsageAffected        = 0x30
-        , kDNSAffected              = 0x40
-        , kGatewayAffected          = 0x80
-        , kAllAddressFlagsAffected  = kIpAddressAffected | kMaskAffected | kDHCPUsageAffected
-            | kDNSAffected | kGatewayAffected
-
-        , kDateTimeAffected         = 0x100
-        , kTimeZoneAffected         = 0x200
-        
-        , kAllEntitiesAffected      = 0xFFF
-    };
-    
-    Q_DECLARE_FLAGS(AffectedEntities, AffectedEntity)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(AffectedEntities)
-
     ///
 
     struct ItfUpdateInfo
@@ -70,10 +45,11 @@ namespace rtu
     };
 
     typedef QVector<ItfUpdateInfo> ItfUpdateInfoContainer;
+    typedef std::shared_ptr<ItfUpdateInfoContainer> ItfUpdateInfoContainerPointer;
     
     typedef std::function<void (const int errorCode
         , const QString &errorReason
-        , AffectedEntities affectedEntities)> OperationCallback; 
+        , Constants::AffectedEntities affectedEntities)> OperationCallback; 
     
     typedef std::function<void (const QUuid &serverId
         , const QDateTime &utcServerTime

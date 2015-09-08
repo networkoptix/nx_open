@@ -30,23 +30,16 @@ public:
     
     rtu::ChangesManager *changesManager();
     
-    ApplyChangesTask *currentProgressTask();
+    ApplyChangesTask *progressTask();
 
-    void showDetailsForTask(QObject *task);
+    void showProgressTask(const ApplyChangesTaskPtr &task);
 
-    void removeChangeProgress(QObject *task);
+    void applyTaskCompleted(const ApplyChangesTaskPtr &task);
 
-    void changeOtherSettings();
+    void showProgressTaskFromList(int index);
 
-    void closeDetails();
+    void removeProgressTask(int index);
 
-    void applyTaskCompleted(ApplyChangesTask *task);
-
-    void setCurrentProgressTask(ApplyChangesTask *task);
-
-    /*
-    void currentProgressTaskComplete();
-    */
     rtu::HttpClient *httpClient();
 
     ///
@@ -69,9 +62,9 @@ private:
     rtu::ServersSelectionModel * const m_selectionModel;
     
     SelectionPointer m_selection;
-    rtu::ChangesManager * const m_changesManager;
     const rtu::ServersFinder::Holder m_serversFinder;
-    ApplyChangesTask *m_currentProgressTask;
+    rtu::ChangesManager * const m_changesManager;
+    ApplyChangesTaskPtr m_progressTask;
     rtu::Constants::Pages m_currentPageIndex;
     bool m_showWarnings;
 };
@@ -83,11 +76,11 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
     , m_selectionModel(new ServersSelectionModel(this))
 
     , m_selection()
-    , m_changesManager(new ChangesManager(
-        parent, m_httpClient, m_selectionModel, this))
     , m_serversFinder(ServersFinder::create())
+    , m_changesManager(new ChangesManager(
+        parent, m_httpClient, m_selectionModel, m_serversFinder.data(), this))
 
-    , m_currentProgressTask(nullptr)
+    , m_progressTask()
     , m_currentPageIndex(rtu::Constants::SettingsPage)
     , m_showWarnings(true)
 {
@@ -104,22 +97,12 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
         , m_selectionModel, &ServersSelectionModel::changeServer);
     QObject::connect(m_serversFinder.data(), &ServersFinder::serversRemoved
         , m_selectionModel, &ServersSelectionModel::removeServers);
-
     QObject::connect(m_serversFinder.data(), &ServersFinder::unknownAdded
         , m_selectionModel, &ServersSelectionModel::unknownAdded);
     QObject::connect(m_serversFinder.data(), &ServersFinder::unknownRemoved
         , m_selectionModel, &ServersSelectionModel::unknownRemoved);
-
-    QObject::connect(m_serversFinder.data(), &ServersFinder::serversRemoved
-        , m_changesManager, &ChangesManager::serversDisappeared);
-    QObject::connect(m_serversFinder.data(), &ServersFinder::unknownAdded
-        , m_changesManager, &ChangesManager::unknownAdded);
-    QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
-        , m_changesManager, &ChangesManager::serverDiscovered);
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_selectionModel, &ServersSelectionModel::serverDiscovered);
-
-
 }
 
 rtu::RtuContext::Impl::~Impl()
@@ -146,87 +129,76 @@ rtu::ChangesManager *rtu::RtuContext::Impl::changesManager()
     return m_changesManager;
 }
 
-
-rtu::ApplyChangesTask *rtu::RtuContext::Impl::currentProgressTask()
+rtu::ApplyChangesTask *rtu::RtuContext::Impl::progressTask()
 {
-    return m_currentProgressTask;
+    return m_progressTask.get();
 }
 
-void rtu::RtuContext::Impl::showDetailsForTask(QObject *taskObject)
+void rtu::RtuContext::Impl::showProgressTask(const ApplyChangesTaskPtr &task)
 {
-    ApplyChangesTask *task = dynamic_cast<ApplyChangesTask *>(taskObject);
+    changesManager()->clearChanges();
+    if (m_progressTask == task)
+        return;
+
+    if (m_progressTask)
+    {
+        if (m_progressTask->inProgress())
+        {
+            /// if it is not minimized - minimize;
+            changesManager()->changesProgressModel()->addChangeProgress(m_progressTask);
+        }
+        else
+        {
+            /// removes task
+            changesManager()->changesProgressModel()->remove(m_progressTask.get());
+        }
+    }
+
+    m_progressTask = task;
+    emit m_owner->progressTaskChanged();
+
+    if (!task)
+    {
+        setCurrentPage(Constants::SettingsPage);
+    }
+    else if (task->inProgress())
+    {
+        setCurrentPage(Constants::ProgressPage);
+    }
+    else
+    {
+        selectionModel()->setSelectedItems(task->targetServerIds());
+        setCurrentPage(Constants::SummaryPage);
+
+        changesManager()->changesProgressModel()->remove(task.get()); /// remove from list if task complete
+    }
+}
+
+void rtu::RtuContext::Impl::applyTaskCompleted(const ApplyChangesTaskPtr &task)
+{
+    if (task.get() != progressTask())
+        return;
+
+    m_selectionModel->setSelectedItems(m_progressTask->targetServerIds());
+    setCurrentPage(Constants::SummaryPage);
+}
+
+void rtu::RtuContext::Impl::showProgressTaskFromList(int index)
+{
+    const auto &task = changesManager()->changesProgressModel()->atIndex(index);
+    showProgressTask(task);
+}
+
+void rtu::RtuContext::Impl::removeProgressTask(int index)
+{
+    const ApplyChangesTaskPtr &task = changesManager()->changesProgressModel()->atIndex(index);
     if (!task)
         return;
 
-    const bool inProgress = task->inProgress();
-    if (!inProgress)
-    {
-        /// Task is complete, remove it from queue, if any
-        m_changesManager->changesProgressModel()->releaseOwning(taskObject);
-        m_selectionModel->setSelectedItems(task->targetServerIds());
-    }
+    if (task.get() == progressTask())
+        m_owner->hideProgressTask();
 
-    setCurrentProgressTask(task);
-    setCurrentPage(inProgress ? Constants::ProgressPage : Constants::SummaryPage);
-}
-
-void rtu::RtuContext::Impl::removeChangeProgress(QObject *task)
-{
-    if (currentProgressTask() == task)
-    {
-        setCurrentPage(Constants::SummaryPage);
-        setCurrentProgressTask(nullptr);
-    }
-
-    m_changesManager->changesProgressModel()->removeChangeProgress(task);
-}
-
-void rtu::RtuContext::Impl::changeOtherSettings()
-{
-    ApplyChangesTask * const currentTask = currentProgressTask();
-    if (!currentTask)
-        return;
-
-    if (m_changesManager->notMinimizedTask() == currentTask)
-    {
-        m_changesManager->minimizeProgress();
-    }
-
-    setCurrentPage(Constants::SettingsPage);
-    setCurrentProgressTask(nullptr);
-}
-
-void rtu::RtuContext::Impl::closeDetails()
-{
-    ApplyChangesTask * const currentTask = currentProgressTask();
-    if (!currentTask)
-        return;
-    
-    if (m_changesManager->notMinimizedTask() == currentTask)
-        m_changesManager->releaseNotMinimizedTaskOwning();
-
-    delete currentTask;
-    setCurrentPage(Constants::SettingsPage);
-    setCurrentProgressTask(nullptr);
-}
-
-void rtu::RtuContext::Impl::applyTaskCompleted(ApplyChangesTask *task)
-{
-    if (task != currentProgressTask())
-        return;
-
-
-    setCurrentPage(Constants::SummaryPage);
-    m_selectionModel->setSelectedItems(m_currentProgressTask->targetServerIds());
-}
-
-void rtu::RtuContext::Impl::setCurrentProgressTask(ApplyChangesTask *task)
-{
-    if (task == m_currentProgressTask)
-        return;
-
-    m_currentProgressTask = task;
-    m_owner->currentProgressTaskChanged();
+    changesManager()->changesProgressModel()->removeChangeProgress(index);
 }
 
 void rtu::RtuContext::Impl::setCurrentPage(rtu::Constants::Pages pageId)
@@ -292,47 +264,36 @@ QObject *rtu::RtuContext::changesManager()
     return m_impl->changesManager();
 }
 
-void rtu::RtuContext::showDetailsForTask(QObject *task)
+QObject *rtu::RtuContext::progressTask()
 {
-    m_impl->showDetailsForTask(task);
+    return m_impl->progressTask();
 }
 
-void rtu::RtuContext::closeDetails()
+void rtu::RtuContext::showProgressTask(const ApplyChangesTaskPtr &task)
 {
-    m_impl->closeDetails();
+    m_impl->showProgressTask(task);
 }
 
-void rtu::RtuContext::applyTaskCompleted(ApplyChangesTask *task)
+void rtu::RtuContext::showProgressTaskFromList(int index)
+{
+    m_impl->showProgressTaskFromList(index);
+}
+
+void rtu::RtuContext::hideProgressTask()
+{
+    m_impl->showProgressTask(ApplyChangesTaskPtr());
+}
+
+void rtu::RtuContext::removeProgressTask(int index)
+{
+    m_impl->removeProgressTask(index);
+}
+
+void rtu::RtuContext::applyTaskCompleted(const ApplyChangesTaskPtr &task)
 {
     m_impl->applyTaskCompleted(task);
 }
 
-void rtu::RtuContext::removeChangeProgress(QObject *task)
-{
-    m_impl->removeChangeProgress(task);
-}
-
-void rtu::RtuContext::changeOtherSettings()
-{
-    m_impl->changeOtherSettings();
-}
-
-QObject *rtu::RtuContext::currentProgressTask()
-{
-    return m_impl->currentProgressTask();
-}
-/*
-void rtu::RtuContext::setCurrentProgressTask(QObject *task)
-{
-    ApplyChangesTask * const taskPtr = dynamic_cast<ApplyChangesTask *>(task);
-    m_impl->setCurrentProgressTask(taskPtr);
-}
-
-void rtu::RtuContext::currentProgressTaskComplete()
-{
-    m_impl->currentProgressTaskComplete();
-}
-*/
 bool isValidIpV4Address(const QString &address)
 {
     const QHostAddress &ipHostAddress = QHostAddress(address);
@@ -462,11 +423,6 @@ QString rtu::RtuContext::toolSupportMail() const
 QString rtu::RtuContext::toolCompanyUrl() const
 {
     return QString(QN_COMPANY_URL);
-}
-
-void rtu::RtuContext::setCurrentPage(int pageId)
-{
-    m_impl->setCurrentPage(static_cast<Constants::Pages>(pageId));
 }
 
 int rtu::RtuContext::currentPage() const

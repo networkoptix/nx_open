@@ -12,6 +12,8 @@ ListView
 {
     id: thisComponent;
 
+    signal showDetails(int index);
+
     delegate: Column
     {
         width: parent.width;
@@ -41,8 +43,7 @@ ListView
 
                 onClicked:
                 {
-                    var task = thisComponent.model.taskAtIndex(model.index);
-                    rtuContext.removeChangeProgress(task);
+                    rtuContext.removeProgressTask(model.index);
                 }
             }
 
@@ -52,8 +53,8 @@ ListView
 
                 Item
                 {
-                    width: parent.width;
-                    height: parent.height;
+                    width: (parent ? parent.width : 0);
+                    height: (parent ? parent.height : 0);
 
                     Base.Text
                     {
@@ -126,8 +127,7 @@ ListView
 
                         onClicked:
                         {
-                            var task = thisComponent.model.taskAtIndex(model.index);
-                            rtuContext.showDetailsForTask(task);
+                            thisComponent.showDetails(model.index);
                         }
                     }
                 }

@@ -128,7 +128,7 @@ namespace /// Parsers stuff
         , const rtu::OperationCallback &failed
         , const QUuid &id
         , const QString &password
-        , rtu::AffectedEntities affected
+        , rtu::Constants::AffectedEntities affected
         , const ParseFunction &parser)
     {
         const auto &result = [successful, failed, id, password, affected, parser](const QByteArray &data)
@@ -154,7 +154,7 @@ namespace /// Parsers stuff
     }
 
     rtu::HttpClient::ReplyCallback makeReplyCallback(const rtu::OperationCallback &callback
-        , rtu::AffectedEntities affected)
+        , rtu::Constants::AffectedEntities affected)
     {
         const auto &result = [callback, affected](const QByteArray &data)
         {
@@ -179,7 +179,7 @@ namespace /// Parsers stuff
     ///
 
     rtu::HttpClient::ErrorCallback makeErrorCallback(const rtu::OperationCallback &callback
-        , rtu::AffectedEntities affected)
+        , rtu::Constants::AffectedEntities affected)
     {
         const auto result = [callback, affected](const QString &reason, int code)
         {
@@ -289,7 +289,7 @@ namespace /// Parsers stuff
         , int timeout = rtu::HttpClient::kUseDefaultTimeout)
     {
 
-        static const rtu::AffectedEntities affected = rtu::kNoEntitiesAffected;
+        static const rtu::Constants::AffectedEntities affected = rtu::Constants::kNoEntitiesAffected;
         if (!client)
         {
             if (callback)
@@ -350,7 +350,8 @@ void rtu::getTime(HttpClient *client
     , const OperationCallback &failed
     , int timeout)
 {
-    static const AffectedEntities affected = (kTimeZoneAffected | kDateTimeAffected);
+    static const Constants::AffectedEntities affected = 
+        (Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
 
     if (!client)
     {
@@ -389,7 +390,7 @@ void rtu::getIfList(HttpClient *client
     , const OperationCallback &failed
     , int timeout)
 {
-    static const AffectedEntities affected = kAllAddressFlagsAffected;
+    static const Constants::AffectedEntities affected = Constants::kAllAddressFlagsAffected;
     if (!client)
     {
         if (failed)
@@ -418,8 +419,8 @@ void rtu::getServerExtraInfo(HttpClient *client
     , const OperationCallback &failed
     , int timeout)
 {
-    static const AffectedEntities affected = (kAllAddressFlagsAffected 
-        | kTimeZoneAffected | kDateTimeAffected);
+    static const Constants::AffectedEntities affected = (Constants::kAllAddressFlagsAffected 
+        | Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
 
     if (!client)
     {
@@ -429,7 +430,7 @@ void rtu::getServerExtraInfo(HttpClient *client
     }
 
     const auto &getTimeFailed = [failed](const int errorCode 
-        , const QString &reason, AffectedEntities /* affectedEntities */)
+        , const QString &reason, Constants::AffectedEntities /* affectedEntities */)
     {
         if (failed)
             failed(errorCode, reason, affected);
@@ -439,7 +440,8 @@ void rtu::getServerExtraInfo(HttpClient *client
         (const QUuid &id, const rtu::ExtraServerInfo &extraInfo) 
     {
         /// getTime command is successfully executed up to now
-        const auto &ifListFailed = [successful, id, extraInfo](const int, const QString &, AffectedEntities)
+        const auto &ifListFailed = [successful, id, extraInfo](const int, const QString & /* errorReason */
+            , Constants::AffectedEntities  /* affectedEntities */)
         {
             if (successful)
                 successful(id, extraInfo);
@@ -458,7 +460,7 @@ void rtu::getServerExtraInfo(HttpClient *client
     };
 
     const auto &callback = [failed, client, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout]
-        (const int errorCode, const QString &errorReason, AffectedEntities /* affectedEntities */)
+        (const int errorCode, const QString &errorReason, Constants::AffectedEntities /* affectedEntities */)
     {
         if (errorCode != kNoErrorReponse)
         {
@@ -485,7 +487,7 @@ void rtu::sendIfListRequest(HttpClient *client
     if (!client || !(info.flags & Constants::AllowIfConfigFlag))
     {
         if (failed)
-            failed(kUnspecifiedError, kInvalidRequest, kAllEntitiesAffected);
+            failed(kUnspecifiedError, kInvalidRequest, Constants::kAllEntitiesAffected);
         return;
     }
     
@@ -502,7 +504,7 @@ void rtu::sendIfListRequest(HttpClient *client
         if (!parseIfListCmd(object, extraInfo))
         {
             if (failed)
-                failed(kUnspecifiedError, kErrorDesc, kAllAddressFlagsAffected);
+                failed(kUnspecifiedError, kErrorDesc, Constants::kAllAddressFlagsAffected);
         }
         else if (successful)
         {
@@ -511,7 +513,7 @@ void rtu::sendIfListRequest(HttpClient *client
     };
 
    client->sendGet(url, successfullCallback
-        , makeErrorCallback(failed, kAllAddressFlagsAffected), timeout);
+        , makeErrorCallback(failed, Constants::kAllAddressFlagsAffected), timeout);
 }
 
 ///
@@ -526,7 +528,7 @@ void rtu::sendSetTimeRequest(HttpClient *client
         || !QTimeZone(timeZoneId).isValid() || !client)
     {
         if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, kDateTimeAffected | kTimeZoneAffected);
+            callback(kUnspecifiedError, kInvalidRequest, Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
         return;
     }
     
@@ -540,7 +542,7 @@ void rtu::sendSetTimeRequest(HttpClient *client
     query.addQueryItem(kTimeZoneTag, timeZoneId);
     url.setQuery(query);
     
-    const AffectedEntities affected = (kDateTimeAffected | kTimeZoneAffected);
+    const Constants::AffectedEntities affected = (Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
     
     client->sendGet(url, makeReplyCallback(callback, affected)
         , makeErrorCallback(callback, affected));
@@ -556,7 +558,7 @@ void rtu::sendSetSystemNameRequest(HttpClient *client
     if (!client || !info.hasExtraInfo() || systemName.isEmpty())
     {
         if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, kSystemNameAffected);
+            callback(kUnspecifiedError, kInvalidRequest, Constants::kSystemNameAffected);
         return;
     }
 
@@ -570,8 +572,8 @@ void rtu::sendSetSystemNameRequest(HttpClient *client
     QUrl url = makeUrl(info, kConfigureCommand);
     url.setQuery(query);
 
-    client->sendGet(url, makeReplyCallback(callback, kSystemNameAffected)
-        , makeErrorCallback(callback, kSystemNameAffected));
+    client->sendGet(url, makeReplyCallback(callback, Constants::kSystemNameAffected)
+        , makeErrorCallback(callback, Constants::kSystemNameAffected));
 }
 
 ///
@@ -585,7 +587,7 @@ void rtu::sendSetPasswordRequest(HttpClient *client
     if (!client || !info.hasExtraInfo() || password.isEmpty())
     {
         if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, kPasswordAffected);
+            callback(kUnspecifiedError, kInvalidRequest, Constants::kPasswordAffected);
 
         return;
     }
@@ -601,8 +603,8 @@ void rtu::sendSetPasswordRequest(HttpClient *client
     QUrl url = makeUrl(info.baseInfo().hostAddress, info.baseInfo().port, authPass, kConfigureCommand);
     url.setQuery(query);
     
-    client->sendGet(url, makeReplyCallback(callback, kPasswordAffected)
-        , makeErrorCallback(callback, kPasswordAffected));
+    client->sendGet(url, makeReplyCallback(callback, Constants::kPasswordAffected)
+        , makeErrorCallback(callback, Constants::kPasswordAffected));
 }
 
 ///
@@ -615,7 +617,7 @@ void rtu::sendSetPortRequest(HttpClient *client
     if (!client || !info.hasExtraInfo() || !port)
     {
         if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, kPortAffected);
+            callback(kUnspecifiedError, kInvalidRequest, Constants::kPortAffected);
        return;
     }
 
@@ -628,8 +630,8 @@ void rtu::sendSetPortRequest(HttpClient *client
     QUrl url = makeUrl(info, kConfigureCommand);
     url.setQuery(query);
 
-    client->sendGet(url, makeReplyCallback(callback, kPortAffected)
-        , makeErrorCallback(callback, kPortAffected));
+    client->sendGet(url, makeReplyCallback(callback, Constants::kPortAffected)
+        , makeErrorCallback(callback, Constants::kPortAffected));
 }
 
 ///
@@ -640,7 +642,7 @@ void rtu::sendChangeItfRequest(HttpClient *client
     , const OperationCallback &callback)
 {
     QJsonArray jsonInfoChanges;
-    AffectedEntities affected = 0;
+    Constants::AffectedEntities affected = 0;
     for (const ItfUpdateInfo &change: updateInfos)
     {   
         static const QString kIpTag = "ipAddr";
@@ -657,31 +659,31 @@ void rtu::sendChangeItfRequest(HttpClient *client
         if (change.useDHCP)
         {
             jsonInfoChange.insert(kDHCPFlagTag, *change.useDHCP);
-            affected |= rtu::kDHCPUsageAffected;
+            affected |= rtu::Constants::kDHCPUsageAffected;
         }
         
         if (change.ip && !change.ip->isEmpty())
         {
             jsonInfoChange.insert(kIpTag, *change.ip);
-            affected |= rtu::kIpAddressAffected;
+            affected |= rtu::Constants::kIpAddressAffected;
         }
         
         if (change.mask && !change.mask->isEmpty())
         {
             jsonInfoChange.insert(kMaskTag, *change.mask);
-            affected |= rtu::kMaskAffected;
+            affected |= rtu::Constants::kMaskAffected;
         }
         
         if (change.dns)
         {
             jsonInfoChange.insert(kDnsTag, *change.dns);
-            affected |= rtu::kDNSAffected;
+            affected |= rtu::Constants::kDNSAffected;
         }
         
         if (change.gateway)
         {
             jsonInfoChange.insert(kGatewayTag, *change.gateway);
-            affected |= rtu::kGatewayAffected;
+            affected |= rtu::Constants::kGatewayAffected;
         }
         
         jsonInfoChanges.append(jsonInfoChange);   

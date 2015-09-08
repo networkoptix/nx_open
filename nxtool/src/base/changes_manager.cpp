@@ -1,30 +1,66 @@
 
 #include "changes_manager.h"
 
+#include <base/changeset.h>
 #include <base/rtu_context.h>
+#include <base/servers_finder.h>
 #include <base/apply_changes_task.h>
 #include <models/changes_progress_model.h>
+#include <models/servers_selection_model.h>
+
 
 namespace
 {
     rtu::ApplyChangesTaskPtr createTask(rtu::RtuContext *context
+        , const rtu::ChangesetPointer &changeset
         , rtu::HttpClient *httpClient
         , rtu::ServersSelectionModel *selectionModel
+        , rtu::ServersFinder *serversFinder
         , rtu::ChangesManager *changesManager)
     {
-        rtu::ApplyChangesTaskPtr result(new rtu::ApplyChangesTask(context, httpClient, selectionModel, changesManager));
-        rtu::ApplyChangesTask *task = result.get();
+        const rtu::ApplyChangesTaskPtr task = 
+            rtu::ApplyChangesTask::create(changeset, selectionModel->selectedServers(), httpClient);
 
-        QObject::connect(task, &rtu::ApplyChangesTask::changesApplied
-            , [context, task]() { context->applyTaskCompleted(task); });
+        selectionModel->setBusyState(task->targetServerIds(), true);
 
-        return std::move(result);
+        typedef std::weak_ptr<rtu::ApplyChangesTask> TaskWeak;
+        const TaskWeak weak = task;
+        QObject::connect(task.get(), &rtu::ApplyChangesTask::changesApplied
+            , context, [context, weak, selectionModel]() 
+        {
+            if (weak.expired())
+                return;
+
+            const rtu::ApplyChangesTaskPtr task = weak.lock();
+            selectionModel->setBusyState(task->targetServerIds(), false);
+            context->applyTaskCompleted(task); 
+        });
+
+        QObject::connect(task.get(), &rtu::ApplyChangesTask::systemNameUpdated
+            , selectionModel, &rtu::ServersSelectionModel::updateSystemNameInfo);
+        QObject::connect(task.get(), &rtu::ApplyChangesTask::portUpdated
+            , selectionModel, &rtu::ServersSelectionModel::updatePortInfo);
+        QObject::connect(task.get(), &rtu::ApplyChangesTask::passwordUpdated
+            , selectionModel, &rtu::ServersSelectionModel::updatePasswordInfo);
+        QObject::connect(task.get(), &rtu::ApplyChangesTask::dateTimeUpdated
+            , selectionModel, &rtu::ServersSelectionModel::updateTimeDateInfo);
+        QObject::connect(task.get(), &rtu::ApplyChangesTask::itfUpdated
+            , selectionModel, &rtu::ServersSelectionModel::updateInterfacesInfo);
+
+        QObject::connect(serversFinder, &rtu::ServersFinder::serverDiscovered
+            , task.get(), &rtu::ApplyChangesTask::serverDiscovered);
+        QObject::connect(serversFinder, &rtu::ServersFinder::serversRemoved
+            , task.get(), &rtu::ApplyChangesTask::serversDisappeared);
+        QObject::connect(serversFinder, &rtu::ServersFinder::unknownAdded
+            , task.get(), &rtu::ApplyChangesTask::unknownAdded);
+        return task;
     }
 }
 
 rtu::ChangesManager::ChangesManager(RtuContext *context
     , HttpClient *httpClient
     , ServersSelectionModel *selectionModel
+    , ServersFinder *serversFinder
     , QObject *parent)
     : QObject(parent)
 
@@ -32,7 +68,8 @@ rtu::ChangesManager::ChangesManager(RtuContext *context
     , m_httpClient(httpClient)
     , m_selectionModel(selectionModel)
     , m_changesModel(new ChangesProgressModel(this))
-    , m_currentTask()
+    , m_serversFinder(serversFinder)
+    , m_changeset()
 {
 }
 
@@ -50,120 +87,29 @@ QObject *rtu::ChangesManager::changesProgressModelObject()
     return changesProgressModel();
 }
 
-rtu::ApplyChangesTask *rtu::ChangesManager::notMinimizedTask()
+QObject *rtu::ChangesManager::changeset()
 {
-    return m_currentTask.get();
-}
-
-void rtu::ChangesManager::releaseNotMinimizedTaskOwning()
-{
-    if (m_currentTask)
-        m_currentTask.release();
-}
-
-void rtu::ChangesManager::addSystemChange(const QString &systemName)
-{
-    changeTask()->addSystemChange(systemName);
-}
-
-void rtu::ChangesManager::addPasswordChange(const QString &password)
-{
-    changeTask()->addPasswordChange(password);
-}
-
-void rtu::ChangesManager::addPortChange(int port)
-{
-    changeTask()->addPortChange(port);
-}
-
-void rtu::ChangesManager::addDHCPChange(const QString &name
-    , bool useDHCP)
-{
-    changeTask()->addDHCPChange(name, useDHCP);
-}
-
-void rtu::ChangesManager::addAddressChange(const QString &name
-    , const QString &address)
-{
-    changeTask()->addAddressChange(name, address);
-}
-
-void rtu::ChangesManager::addMaskChange(const QString &name
-    , const QString &mask)
-{
-    changeTask()->addMaskChange(name, mask);
-}
-
-void rtu::ChangesManager::addDNSChange(const QString &name
-    , const QString &dns)
-{
-    changeTask()->addDNSChange(name, dns);
-}
-
-void rtu::ChangesManager::addGatewayChange(const QString &name
-    , const QString &gateway)
-{
-    changeTask()->addGatewayChange(name, gateway);
-}
-
-void rtu::ChangesManager::addDateTimeChange(const QDate &date
-    , const QTime &time
-    , const QByteArray &timeZoneId)
-{
-    changeTask()->addDateTimeChange(date, time, timeZoneId);
-}
-
-void rtu::ChangesManager::turnOnDhcp()
-{
-    changeTask()->turnOnDhcp();
+    return getChangeset().get();
 }
 
 void rtu::ChangesManager::applyChanges()
 {
-    const ApplyChangesTaskPtr &task = changeTask();
-    task->applyChanges();
-
-    m_context->showDetailsForTask(task.get());
-}
-
-void rtu::ChangesManager::minimizeProgress()
-{
-    if (m_currentTask)
-        m_changesModel->addChangeProgress(std::move(m_currentTask));
+    const ApplyChangesTaskPtr &task = 
+        createTask(m_context, m_changeset, m_httpClient, m_selectionModel, m_serversFinder, this);
+    m_context->showProgressTask(task);
+    clearChanges();
 }
 
 void rtu::ChangesManager::clearChanges()
 {
-    m_currentTask.reset();
+    m_changeset.reset();
 }
 
-void rtu::ChangesManager::serverDiscovered(const rtu::BaseServerInfo &info)
+rtu::ChangesetPointer &rtu::ChangesManager::getChangeset()
 {
-    if (m_currentTask)
-        m_currentTask->serverDiscovered(info);
-    m_changesModel->serverDiscovered(info);
-}
+    if (!m_changeset)
+        m_changeset = Changeset::create();
 
-void rtu::ChangesManager::serversDisappeared(const IDsVector &ids)
-{
-    if (m_currentTask)
-        m_currentTask->serversDisappeared(ids);
-    m_changesModel->serversDisappeared(ids);
-}
-
-void rtu::ChangesManager::unknownAdded(const QString &ip)
-{
-    if (m_currentTask)
-        m_currentTask->unknownAdded(ip);
-
-    m_changesModel->unknownAdded(ip);
-}
-
-rtu::ApplyChangesTaskPtr &rtu::ChangesManager::changeTask()
-{
-    if (!m_currentTask)
-        m_currentTask = createTask(m_context, m_httpClient, m_selectionModel, this);
-
-    return m_currentTask;
+    return m_changeset;
 }
 

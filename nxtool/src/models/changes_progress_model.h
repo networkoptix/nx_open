@@ -20,8 +20,8 @@ namespace rtu
         virtual ~ChangesProgressModel();
 
         ///
-
-        void addChangeProgress(ApplyChangesTaskPtr &&task);
+        
+        bool addChangeProgress(const ApplyChangesTaskPtr &task);
 
         void serverDiscovered(const rtu::BaseServerInfo &info);
         
@@ -29,13 +29,11 @@ namespace rtu
 
         void unknownAdded(const QString &ip);
 
-        void removeChangeProgress(QObject *object);
+        void removeChangeProgress(int index);
 
-        bool releaseOwning(QObject *object);
+        void remove(ApplyChangesTask *task);
 
-    public slots:
-
-        QObject *taskAtIndex(int index);
+        ApplyChangesTaskPtr atIndex(int index);
 
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;

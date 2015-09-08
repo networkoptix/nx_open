@@ -50,7 +50,30 @@ namespace rtu
             , UnknownEntityType
         };
         Q_ENUMS(ItemType)
+
+        enum AffectedEntity
+        {
+            kNoEntitiesAffected         = 0x0
+            , kPortAffected             = 0x1
+            , kPasswordAffected         = 0x2
+            , kSystemNameAffected       = 0x4
+
+            , kIpAddressAffected        = 0x10
+            , kMaskAffected             = 0x20
+            , kDHCPUsageAffected        = 0x30
+            , kDNSAffected              = 0x40
+            , kGatewayAffected          = 0x80
+            , kAllAddressFlagsAffected  = kIpAddressAffected | kMaskAffected | kDHCPUsageAffected
+                | kDNSAffected | kGatewayAffected
+
+            , kDateTimeAffected         = 0x100
+            , kTimeZoneAffected         = 0x200
+        
+            , kAllEntitiesAffected      = 0xFFF
+        };
+        Q_DECLARE_FLAGS(AffectedEntities, AffectedEntity)
     };
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Constants::AffectedEntities)
 }
 
 
