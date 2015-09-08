@@ -18,11 +18,11 @@
     <name>QnActiResource</name>
     <message>
         <source>Output %1</source>
-        <translation type="unfinished"></translation>
+        <translation>เอาท์พุท %1</translation>
     </message>
     <message>
         <source>Input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>อินพุท %1</translation>
     </message>
 </context>
 <context>
@@ -209,104 +209,104 @@
     </message>
     <message>
         <source>start</source>
-        <translation type="unfinished"></translation>
+        <translation>เริ่มต้น</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation type="unfinished"></translation>
+        <translation>หยุด</translation>
     </message>
     <message>
         <source>While %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ในขณะที่ %1</translation>
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>บน %1 %2</translation>
     </message>
     <message>
         <source>%1 --&gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 --&gt; %2</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has a license problem</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ &apos;%1&apos; มีปัญหาเรื่องใบอนุญาต</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished">เหตุการณ์ที่ไม่รู้จักได้เกิดขึ้น</translation>
+        <translation>เหตุการณ์ที่ไม่รู้จักได้เกิดขึ้น</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished">พอร์ตเข้า: %1</translation>
+        <translation>พอร์ตเข้า: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished">ที่อยู่ขัดข้อง: %1</translation>
+        <translation>ที่อยู่ขัดข้อง: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>เชื่อมต่อกับเซิร์ฟเวอร์ขาดหายไป.</translation>
     </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>ไม่มีข้อมูลที่ได้รับในช่วงที่ผ่านมา %n วินาที.</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 output</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 การส่งออก</translation>
     </message>
     <message>
         <source>%1 output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 การส่งออกเป็นเวลา 30 วินาที</translation>
     </message>
     <message>
         <source>%1 recording</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 กำลังบันทึก</translation>
     </message>
     <message>
         <source>Input Signal on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>สัญญาณการป้อนข้อมูลบน %1</translation>
     </message>
     <message>
         <source>%1 Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ตัดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>%1 IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 IP ขัดแย้ง</translation>
     </message>
     <message>
         <source>Any %1 Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>ใด ๆ %1 ฉบับ</translation>
     </message>
     <message>
         <source>%1 %2 was disconnected</source>
         <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2 ถูกตัด</translation>
     </message>
     <message>
         <source>%1 IP Conflict at %2</source>
         <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 ความขัดแย้ง IP ที่ %2</translation>
     </message>
     <message>
         <source>%1 #%2 MAC: %3</source>
         <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 #%2 MAC: %3</translation>
     </message>
     <message>
         <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>การเชื่อมต่อกับ %1 (กระแสหลัก) ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
         <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>การเชื่อมต่อกับ %1 (กระแสรอง) ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
         <source>Recording on %1 is disabled: </source>
-        <translation type="unfinished"></translation>
+        <translation>บันทึกเมื่อวันที่ %1 ถูกปิดใช้งาน:</translation>
     </message>
 </context>
 <context>
@@ -389,27 +389,27 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished">ไม่ได้รับอนุญาต. Url %1.</translation>
+        <translation>ไม่ได้รับอนุญาต. Url %1.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจ%1 ต่อเข้ากับเครือข่าย.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ทำให้พอร์ต %2 สามารถเข้าถึงได้ (เช่น การส่งต่อ) กรุณาพยายามที่จะเริ่มต้นใหม่ %1 แล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 - ตรวจสอบให้แน่ใจเสียบเข้ากับเครือข่าย ลองเริ่มต้นใหม่%1.</translation>
     </message>
     <message>
         <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถแยก %1 การตอบสนอง url %2 ขอชื่อ %3.</translation>
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
@@ -420,42 +420,42 @@
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาพยายามที่จะเริ่มต้นใหม่ %1 แล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ครั้งแรกที่พยายามที่จะเปิดการบันทึกภาพ (ถ้าปิดอยู่) และลดการตั้งค่าเฟรมต่อวินาที %1.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ถ้ามันไม่ได้ช่วย ให้ตั้งค่าเริ่มต้นจากโรงงาน %1 หน้าเว็บ หากปัญหายังคงกรุณาติดต่อฝ่ายสนับสนุน.</translation>
     </message>
     <message>
         <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 คำขอ &quot;%2&quot; ล้มเหลวด้วยข้อผิดพลาด &quot;%3&quot;.</translation>
     </message>
     <message>
         <source>Unknown %1 Issue.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ไม่ระบุ%1 ฉบับ.</translation>
     </message>
     <message>
         <source>Invalid data was received from the %1: %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ข้อมูลที่ไม่ถูกต้องที่ได้รับจาก %1: %2.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open %1 issues dialog for more details.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาดมากเกินไปสื่อ โปรดประเด็นที่ 1 เปิด% โต้ตอบสำหรับรายละเอียดเพิ่มเติม.</translation>
     </message>
     <message>
         <source>%1 initialization process in progress.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 กระบวนการเริ่มต้นในความคืบหน้า ..</translation>
     </message>
 </context>
 <context>
@@ -477,7 +477,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished">การเปิดตัว Windows Explorer ล้มเหลว</translation>
+        <translation>การเปิดตัว Windows Explorer ล้มเหลว.</translation>
     </message>
 </context>
 <context>
@@ -492,11 +492,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished">ไม่สามารถเริ่มต้นเข้ารหัสเสียง.</translation>
+        <translation>ไม่สามารถเริ่มต้นการเข้ารหัสเสียง.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished">ไม่สามารถเริ่มต้นการถอดรหัสเสียง.</translation>
+        <translation>ไม่สามารถเริ่มต้นการถอดรหัสเสียง.</translation>
     </message>
 </context>
 <context>
@@ -534,7 +534,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished">ไม่สามารถเริ่มต้นการเข้ารหัสวิดีโอ.</translation>
+        <translation>ไม่สามารถเริ่มต้นการเข้ารหัสวิดีโอ.</translation>
     </message>
 </context>
 <context>
@@ -577,79 +577,79 @@
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>I / O โมดูล</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>เริ่มต้น</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished">เข้ารหัสอนาล็อก</translation>
+        <translation>เข้ารหัสอนาล็อก</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished">ใบอนุญาตทดลอง</translation>
+        <translation>ใบอนุญาตทดลอง</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished">ใบอนุญาตอนาล๊อก</translation>
+        <translation>ใบอนุญาตอนาล๊อก</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished">ใบอนุญาตมืออาชีพ</translation>
+        <translation>ใบอนุญาตมืออาชีพ</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished">ใบอนุญาตทั่วไป</translation>
+        <translation>ใบอนุญาตทั่วไป</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished">ใบอนุญาต Vmax</translation>
+        <translation>ใบอนุญาต Vmax</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished">ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</translation>
+        <translation>ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished">ใบอนุญาต วีดีโอ กำแพง</translation>
+        <translation>ใบอนุญาตวีดีโอวอร์ วีดีโอ </translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O ใบอนุญาตโมดูล</translation>
     </message>
     <message>
         <source>Start Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>เริ่มต้นใบอนุญาต</translation>
     </message>
     <message>
         <source>Invalid Signature</source>
-        <translation type="unfinished">ลายเซ็นไม่ถูกต้อง</translation>
+        <translation>ลายเซ็นไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์กับฮาร์ดแวร์ที่ตรงกับ ไอดี ไม่พบ</translation>
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished">การปรับแต่งไม่ถูกต้อง</translation>
+        <translation>การปรับแต่งไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished">ชนิดไม่ถูกต้อง</translation>
+        <translation>ชนิดไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Invalid Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>ประเภทใบอนุญาตนี้ต้องใช้ซอฟต์แวร์รุ่นที่สูงขึ้น.</translation>
     </message>
 </context>
 <context>
@@ -684,19 +684,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished">มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ฐานข้อมูลเกิดข้อผิดพลาดขึ้น.</translation>
+        <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ฐานข้อมูลเกิดข้อผิดพลาดขึ้น.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished">คีย์ใบอนุญาตคุณป้อนไม่ถูกต้อง กรุณาตรวจสอบคีย์ใบอนุญาตที่ถูกต้อง หากปัญหายังคงอยู่โปรดติดต่อทีมสนับสนุนเพื่อยืนยันว่าคีย์ใบอนุญาตถูกต้องหรือที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
+        <translation>คีย์ใบอนุญาตคุณป้อนไม่ถูกต้อง กรุณาตรวจสอบคีย์ใบอนุญาตที่ถูกต้อง หากปัญหายังคงอยู่โปรดติดต่อทีมสนับสนุนเพื่อยืนยันว่าคีย์ใบอนุญาตถูกต้องหรือที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">คุณพยายามที่จะเปิดใช้งานใบอนุญาตเข้ากันไม่ได้กับซอฟต์แวร์ของคุณ กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
+        <translation>คุณพยายามที่จะเปิดใช้งานใบอนุญาตเข้ากันไม่ได้กับซอฟต์แวร์ของคุณ กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">คีย์ใบอนุญาตนี้ได้รับการเปิดใช้งานก่อนหน้านี้ฮาร์ดแวร์ id {{hwid}} บน {{time}}.กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
+        <translation>คีย์ใบอนุญาตนี้ได้รับการเปิดใช้งานก่อนหน้านี้ฮาร์ดแวร์ id {{hwid}} บน {{time}}.กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
     </message>
 </context>
 <context>
@@ -717,14 +717,14 @@
     <name>QnPlAxisResource</name>
     <message>
         <source>Can&apos;t initialize IO port settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเริ่มต้นการตั้งค่าพอร์ต IO</translation>
     </message>
 </context>
 <context>
     <name>QnPlOnvifResource</name>
     <message>
         <source>Otput %1</source>
-        <translation type="unfinished"></translation>
+        <translation>เอาท์พุท %1</translation>
     </message>
 </context>
 <context>
@@ -738,87 +738,87 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n กล้อง (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n กล้อง(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n IO โมดูล(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n IO โมดูล(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n อุปกรณ์ (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n อุปกรณ์ (s)</numerusform>
         </translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง</translation>
     </message>
     <message>
         <source>cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง</translation>
     </message>
     <message>
         <source>camera</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง</translation>
     </message>
     <message>
         <source>IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO โมดูล</translation>
     </message>
     <message>
         <source>IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO โมดูล</translation>
     </message>
     <message>
         <source>IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO โมดูล</translation>
     </message>
     <message>
         <source>IO module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO โมดูล</translation>
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>อุุปกรณ์</translation>
     </message>
     <message>
         <source>devices</source>
-        <translation type="unfinished"></translation>
+        <translation>อุุปกรณ์</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>อุุปกรณ์</translation>
     </message>
     <message>
         <source>device</source>
-        <translation type="unfinished"></translation>
+        <translation>อุุปกรณ์</translation>
     </message>
 </context>
 <context>
@@ -837,15 +837,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished">ใบอนุญาตทดลอง</translation>
+        <translation>ใบอนุญาตทดลอง</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished">ได้รับใบอนุญาตไปที่:</translation>
+        <translation>ได้รับใบอนุญาตไปที่:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished">ใบอนุญาตฟรี</translation>
+        <translation>ใบอนุญาตฟรี</translation>
     </message>
 </context>
 <context>
@@ -1025,15 +1025,15 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished">หน่วยความจำเต็ม</translation>
+        <translation>หน่วยความจำเต็ม</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished">หน่วยความจำไม่ได้กำหนดค่า</translation>
+        <translation>หน่วยความจำไม่ได้กำหนดค่า</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>เวลาเซิร์ฟเวอร์ไม่ตรงกันและเวลาที่พบไม่สามารถตรวจพบโดยอัตโนมัติได้.</translation>
     </message>
 </context>
 <context>
@@ -1067,11 +1067,11 @@
     <name>QnThirdPartyResource</name>
     <message>
         <source>Otput %1</source>
-        <translation type="unfinished"></translation>
+        <translation>เอาท์พุท %1</translation>
     </message>
     <message>
         <source>Input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>อินพุท %1</translation>
     </message>
 </context>
 <context>
@@ -1086,11 +1086,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished">เปิด CL แปลงไม่ได้ดำเนินการ</translation>
+        <translation>เปิด CL แปลงไม่ได้ดำเนินการ.</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished">ไม่รู้จัก การแปลง </translation>
+        <translation>ไม่รู้จัก การแปลง </translation>
     </message>
 </context>
 <context>
