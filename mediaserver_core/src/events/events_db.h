@@ -59,7 +59,6 @@ private:
     bool cleanupEvents();
     bool migrateBusinessParams();
     bool cleanupAuditLog();
-    bool migrateBusinessParams();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,

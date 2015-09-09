@@ -1217,7 +1217,7 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
 
     // Axis camera sends inversed output port state for 'grounded circuit' ports (seems like it sends physical state instead of logical state)
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         for (auto& port: m_ioPorts) {
             if (port.id == portId)
             {

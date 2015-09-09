@@ -64,7 +64,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi() {
     };
 
     ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management...")));
-    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log...")));
+    ui->eventLogLabel->setText(shortcutString(Qn::OpenBusinessLogAction, tr("Open Event Log...")));
 
     //: "Open Cameras List..." or "Open Devices List...", etc
     ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open %1 List...").arg(getDefaultDevicesName())));

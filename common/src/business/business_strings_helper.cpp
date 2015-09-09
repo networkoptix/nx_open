@@ -249,7 +249,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
                 int m = 0;
                 for (const QString &camera: conflicts.camerasByServer[server]) {
                     result += delimiter;
-                    result += tr("MAC #%1: %2 ").arg(++n).arg(camera);
+                    result += tr("MAC #%1: %2 ").arg(++m).arg(camera);
                 }
 
             }
@@ -404,7 +404,6 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
         bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
 
-        QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
         if (!camera->hasVideo(nullptr))
             result = tr("Connection to %1 was unexpectedly closed.").arg(getDefaultDeviceNameLower(camera));
         else if (isPrimaryStream)

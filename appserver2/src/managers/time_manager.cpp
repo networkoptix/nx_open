@@ -1093,7 +1093,7 @@ namespace ec2
             m_usedTimeSyncInfo.timePriorityKey );
     }
 
-    void TimeSynchronizationManager::syncTimeWithAllKnownServers(QMutexLocker* const /*lock*/)
+    void TimeSynchronizationManager::syncTimeWithAllKnownServers(QnMutexLocker* const /*lock*/)
     {
         for (std::pair<const QnUuid, PeerContext>& peerCtx : m_peersToSendTimeSyncTo)
         {
@@ -1126,7 +1126,7 @@ namespace ec2
             if (!remotePeerTimeSyncInfo.fromString(serializedTimeSync))
                 continue;
 
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             if (remotePeerTimeSyncInfo.timePriorityKey > m_usedTimeSyncInfo.timePriorityKey)
                 syncTimeWithAllKnownServers(&lk);
             return;

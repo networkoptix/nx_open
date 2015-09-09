@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <functional>
+#include <future>
 
 #include <QtCore/QThread>
 

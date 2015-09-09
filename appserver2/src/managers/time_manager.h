@@ -27,6 +27,7 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_transport.h"
 
+#include <utils/thread/mutex.h>
 
 /*! \page time_sync Time synchronization in cluster
     Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time. 
@@ -288,7 +289,7 @@ namespace ec2
             const QnUuid& peerID,
             nx_http::AsyncHttpClientPtr clientPtr );
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
-        void syncTimeWithAllKnownServers(QMutexLocker* const lock);
+        void syncTimeWithAllKnownServers(QnMutexLocker* const lock);
         void onBeforeSendingTransaction(
             QnTransactionTransport* transport,
             nx_http::HttpHeaders* const headers);
