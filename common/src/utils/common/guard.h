@@ -66,7 +66,7 @@ private:
 typedef ScopedGuard<std::function<void()>> Guard;
 
 template<class Func>
-ScopedGuard<Func> make_scoped_guard(Func func)
+ScopedGuard<Func> makeScopedGuard(Func func)
 {
     return ScopedGuard<Func>(std::move(func));
 }
