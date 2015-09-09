@@ -170,12 +170,11 @@ table.webclient-window>tbody>tr>td.alert{
   cursor:pointer;
 }
 
-
-.webclient-button.dropdown{
+.dropdown > .webclient-button{
   width:90px;
 }
 
-.webclient-button.dropdown.open{
+.dropdown.open > .webclient-button{
   background-color: rgba(0,0,0,0.1);
 }
 

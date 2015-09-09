@@ -211,7 +211,7 @@ public:
 
     QnUuid connectionGuid() const;
     void setIncomingTransactionChannelSocket(
-        const QSharedPointer<AbstractStreamSocket>& socket,
+        QSharedPointer<AbstractStreamSocket> socket,
         const nx_http::Request& request,
         const QByteArray& requestBuf );
     //!Blocks till connection is ready to accept new transactions

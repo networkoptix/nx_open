@@ -89,7 +89,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
-    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      0),
+    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1),
     LicenseTypeInfo(Qn::LC_Start,           "starter",       0),
     LicenseTypeInfo(Qn::LC_Invalid,         "",              1),
 };

@@ -19,13 +19,15 @@ public:
     ~QnVideowallSettingsDialog();
 
     void loadFromResource(const QnVideoWallResourcePtr &videowall);
-    void submitToResource(const QnVideoWallResourcePtr &videowall) const;
+    void submitToResource(const QnVideoWallResourcePtr &videowall);
 
-    bool isShortcutsSupported() const;
-    void setShortcutsSupported(bool value);
+private:
+    static QString shortcutPath();
+    bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
+    bool createShortcut(const QnVideoWallResourcePtr &videowall);
+    bool deleteShortcut(const QnVideoWallResourcePtr &videowall);
 
-    bool isCreateShortcut() const;
-    void setCreateShortcut(bool value);
+    bool canStartVideowall(const QnVideoWallResourcePtr &videowall) const;
 private:
     QScopedPointer<Ui::QnVideowallSettingsDialog> ui;
 };
