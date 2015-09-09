@@ -23,7 +23,7 @@ angular.module('webadminApp')
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
                     stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
-                    lastMinuteInterval:1 * 60 * 1000,
+                    lastMinuteDuration: 1.5 * 60 * 1000, // 1.5 minutes
                     minMsPerPixel: 10, // Minimum level for zooming:
                     lastMinuteAnimationMs:100,
                     lastMinuteTextureSize:10,
@@ -282,7 +282,7 @@ angular.module('webadminApp')
                     100,
                     timelineConfig.stickToLiveMs,
                     timelineConfig.zoomAccuracy,
-                    timelineConfig.lastMinuteInterval); //Init boundariesProvider
+                    timelineConfig.lastMinuteDuration); //Init boundariesProvider
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
