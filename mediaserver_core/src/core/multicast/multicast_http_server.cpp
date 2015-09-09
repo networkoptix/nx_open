@@ -4,11 +4,13 @@
 #include "utils/network/simple_http_client.h"
 #include "common/common_module.h"
 #include "nx_ec/dummy_handler.h"
+#include "utils/network/tcp_listener.h"
 
 namespace QnMulticast
 {
 
-HttpServer::HttpServer(const QUuid& localGuid)
+HttpServer::HttpServer(const QUuid& localGuid, QnTcpListener* tcpListener):
+    m_tcpListener(tcpListener)
 {
     using namespace std::placeholders;
 
@@ -18,8 +20,8 @@ HttpServer::HttpServer(const QUuid& localGuid)
 
 void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, const Request& request)
 {
-    int port = MSSettings::roSettings()->value("port", 7001).toInt();
-    QString url(lit("http://%1:%2/%3").arg("127.0.0.1").arg(port).arg(request.url.toString()));
+    //int port = MSSettings::roSettings()->value("port", 7001).toInt();
+    QString url(lit("http://%1:%2/%3").arg("127.0.0.1").arg(m_tcpListener->getPort()).arg(request.url.toString()));
 
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     for (const auto& header: request.headers)

@@ -134,6 +134,7 @@ extern "C"
 #endif
 #include "api/runtime_info_manager.h"
 #include <utils/common/timermanager.h>
+#include "core/multicast/multicast_http_client.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -613,6 +614,19 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
 
+
+    QnMulticast::HTTPClient multicastClient(QLatin1String("HD witness client"));
+    QnMulticast::Request request;
+    request.method = lit("GET");
+    request.serverId = QUuid("c650ddbe-68c2-d88b-5444-e6408275b84b");
+    request.url = QUrl(lit("api/moduleInformation"));
+    request.messageBody.resize(1500);
+    request.auth.setUser(lit("admin"));
+    request.auth.setPassword(lit("123"));
+    multicastClient.execRequest(request, [](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
+    {
+        qDebug() << response.messageBody;
+    }, 6000);
 
     result = application->exec();
 
