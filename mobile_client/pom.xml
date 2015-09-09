@@ -20,7 +20,7 @@
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
         <global.libs>-lappserver2 -lcommon -lclient.core -lssl -lcrypto</global.libs>
         <!--Specific os libs used-->
-        <linux.oslibs>${ffmpeg.libs} -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac</linux.oslibs>
+        <linux.oslibs>${ffmpeg.libs} -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
         <android.oslibs/>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
