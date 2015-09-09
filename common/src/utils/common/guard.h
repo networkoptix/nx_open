@@ -5,7 +5,7 @@
 
 
 /** RAII wrapper for @class std::function<void()> */
-template<typename Callback = T>
+template<typename Callback>
 class ScopedGuard
 {
 public:
