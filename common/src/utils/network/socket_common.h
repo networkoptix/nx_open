@@ -79,6 +79,8 @@ private:
     //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
     bool m_addressResolved;
 
+    void initializeFromString(const char* addrStr);
+
     friend class HostAddressResolver;
 };
 

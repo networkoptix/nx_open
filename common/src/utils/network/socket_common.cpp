@@ -81,21 +81,7 @@ HostAddress::HostAddress( const QString& addrStr )
     m_addrStr( addrStr ),
     m_addressResolved(false)
 {
-    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
-    //if addrStr is an ip address
-
-    if( addrStr == lit("255.255.255.255") )
-    {
-        m_sinAddr.s_addr = 0xffffffffU;
-        m_addressResolved = true;
-        return;
-    }
-
-    if( !addrStr.isEmpty() )
-        m_sinAddr.s_addr = inet_addr( addrStr.toLatin1().constData() );
-    //otherwise considering 0.0.0.0
-    if( m_sinAddr.s_addr != INADDR_NONE )
-        m_addressResolved = true;   //addrStr contains valid ip address
+    initializeFromString(addrStr.toLatin1().constData());
 }
 
 HostAddress::HostAddress( const char* addrStr )
@@ -103,19 +89,7 @@ HostAddress::HostAddress( const char* addrStr )
     m_addrStr( QLatin1String(addrStr) ),
     m_addressResolved(false)
 {
-    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
-    //if addrStr is an ip address
-
-    if( strcmp( addrStr, "255.255.255.255" ) == 0 )
-    {
-        m_sinAddr.s_addr = 0xffffffffU;
-        m_addressResolved = true;
-        return;
-    }
-
-    m_sinAddr.s_addr = inet_addr( addrStr );
-    if( m_sinAddr.s_addr != INADDR_NONE )
-        m_addressResolved = true;   //addrStr contains valid ip address
+    initializeFromString(addrStr);
 }
 
 uint32_t HostAddress::ipv4() const
@@ -207,6 +181,23 @@ struct in_addr HostAddress::inAddr(bool* ok) const
     if( ok )
         *ok = m_addressResolved;
     return m_sinAddr;
+}
+
+void HostAddress::initializeFromString(const char* addrStr)
+{
+    memset(&m_sinAddr, 0, sizeof(m_sinAddr));
+    //if addrStr is an ip address
+
+    if (strcmp(addrStr, "255.255.255.255") == 0)
+    {
+        m_sinAddr.s_addr = 0xffffffffU;
+        m_addressResolved = true;
+        return;
+    }
+
+    m_sinAddr.s_addr = inet_addr(addrStr);
+    if (m_sinAddr.s_addr != INADDR_NONE)
+        m_addressResolved = true;   //addrStr contains valid ip address
 }
 
 
