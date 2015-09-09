@@ -892,6 +892,9 @@ angular.module('webadminApp')
                 }
 
                 function drawPointerMarker(context){
+                    if(window.jscd.mobile){
+                        return;
+                    }
                     if(!mouseCoordinate || !mouseInEvents){
                         return;
                     }
