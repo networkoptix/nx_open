@@ -31,7 +31,7 @@ void QnServerConnector::at_moduleFinder_moduleAddressFound(const QnModuleInforma
         bool used;
         {
             QMutexLocker lock(&m_mutex);
-            used = m_usedAddresses.contains(address);
+            used = m_usedAddresses.contains(address.toString());
         }
         if (used) {
             NX_LOG(lit("QnServerConnector: Module %1 has become incompatible. Url = %2, System name = %3, version = %4")
@@ -68,7 +68,9 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
     {
         QMutexLocker lock(&m_mutex);
 
-        if (m_usedAddresses.contains(address)) {
+        QString addressString = address.toString();
+
+        if (m_usedAddresses.contains(addressString)) {
             NX_LOG(lit("QnServerConnector: Address %1 is already used.").arg(address.toString()), cl_logINFO);
             return;
         }
@@ -79,7 +81,7 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
         moduleUrl.setPort(address.port);
         urlInfo.urlString = moduleUrl.toString();
         urlInfo.peerId = moduleInformation.id;
-        m_usedAddresses.insert(address, urlInfo);
+        m_usedAddresses.insert(addressString, urlInfo);
     }
 
     NX_LOG(lit("QnServerConnector: Adding connection to module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlInfo.urlString), cl_logINFO);
@@ -90,7 +92,7 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
 
 void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     QMutexLocker lock(&m_mutex);
-    AddressInfo urlInfo = m_usedAddresses.take(address);
+    AddressInfo urlInfo = m_usedAddresses.take(address.toString());
     lock.unlock();
     if (urlInfo.peerId.isNull())
         return;
@@ -122,7 +124,7 @@ void QnServerConnector::start() {
 void QnServerConnector::stop() {
     m_moduleFinder->disconnect(this);
 
-    QHash<SocketAddress, AddressInfo> usedUrls;
+    QHash<QString, AddressInfo> usedUrls;
     {
         QMutexLocker lock(&m_mutex);
         usedUrls = m_usedAddresses;
