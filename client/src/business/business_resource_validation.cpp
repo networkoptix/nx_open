@@ -12,10 +12,17 @@ namespace {
     class QnBusinessResourceValidationStrings {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
     public:
-        static QString anyCamera() { return tr("<Any Camera>"); }
-        static QString selectCamera() { return tr("Select at least one camera"); }
-        static QString multipleCameras(int total) { return tr("%n Camera(s)", "", total); }
-        static QString subsetCameras(int count, int total) { return tr("%n of %1 cameras", "", count).arg(total); } 
+        static QString subsetCameras(int count, const QnVirtualCameraResourceList &total) { 
+            return tr("%n of %1", "", count).arg(getNumericDevicesName(total, false)); 
+        } 
+
+        static QString anyCamera() {
+            return tr("<Any %1>").arg(getDefaultDeviceNameUpper());
+        }
+
+        static QString selectCamera() {
+            return tr("Select at least one %1.").arg(getDefaultDeviceNameLower());
+        }
     };
 
     template <typename CheckingPolicy>
@@ -41,11 +48,11 @@ namespace {
             return baseText.arg(
                         (cameras.size() == 1)
                          ? getShortResourceName(cameras.first())
-                         : QnBusinessResourceValidationStrings::subsetCameras(invalid, cameras.size())
+                         : QnBusinessResourceValidationStrings::subsetCameras(invalid, cameras)
                            );
         if (cameras.size() == 1)
             return getShortResourceName(cameras.first());
-        return QnBusinessResourceValidationStrings::multipleCameras(cameras.size());
+        return getNumericDevicesName(cameras);
 
     }
 

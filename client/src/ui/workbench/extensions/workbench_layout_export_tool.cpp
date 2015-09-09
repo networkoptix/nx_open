@@ -12,8 +12,10 @@
 #include <camera/client_video_camera.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -90,7 +92,7 @@ bool QnLayoutExportTool::start() {
 
     QScopedPointer<QIODevice> itemNamesIO(m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly));
     if (itemNamesIO.isNull()) {
-        m_errorMessage = tr("Could not create output file %1").arg(m_targetFilename);
+        m_errorMessage = tr("Could not create output file %1.").arg(m_targetFilename);
         emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
         return false;
     }
@@ -318,13 +320,9 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     lit("mkv"),
                                     m_storage,
                                     role,
-                                    Qn::NoCorner,
-                                    timeOffset, serverTimeZone,
-                                    itemData.zoomRect,
-                                    itemData.contrastParams,
-                                    itemData.dewarpingParams,
-                                    itemData.rotation,
-                                    customAr);
+                                    serverTimeZone,
+                                    QnImageFilterHelper() // no transcode params
+                                    );
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_targetFilename).fileName()));
     return true;
@@ -379,7 +377,9 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
     camera->deleteLater();
 
     if (error) {
-        m_errorMessage = tr("Could not export camera %1").arg(camera->resource()->toResource()->getName());
+        QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        Q_ASSERT_X(camRes, Q_FUNC_INFO, "Make sure camera exists");
+        m_errorMessage = tr("Could not export %1 %2.").arg(getDefaultDeviceNameLower(camRes)).arg(getShortResourceName(camera->resource()->toResourcePtr()));
         finishExport(false);
     } else {
         exportNextCamera();

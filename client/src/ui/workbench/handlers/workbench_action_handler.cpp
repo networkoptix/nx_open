@@ -29,6 +29,7 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/layout_resource.h>
@@ -590,7 +591,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
                 resourcePool()->removeResource(layout);
     }
 
-    /* Sometimes we get here when 'New layout' has already been added. But all user's layouts must be created AFTER this method.
+    /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
     * Otherwise the user will see uncreated layouts in layout selection menu.
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
@@ -814,7 +815,7 @@ void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
 
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
+    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
@@ -838,7 +839,9 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Can't move camera(s) to other server. Server %1 doesn't answer to request.", NULL, modifiedResources.size()).arg(server->getName()),
+            tr("Cannot move %1 to server %2. Server is unresponsive.")
+                .arg(getNumericDevicesName(modifiedResources))
+                .arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -861,7 +864,9 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 errorResources,
                 Qn::MainWindow_Tree_DragCameras_Help,
                 tr("Error"),
-                tr("Server %1 cannot discover these cameras so far. Are you sure you want to move them?", NULL, errorResources.size()).arg(server->getName()),
+                tr("Server %1 is unable to find and access these %2. Are you sure you would like to move them?")
+                    .arg(server->getName())
+                    .arg(getNumericDevicesName(errorResources, false)),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
                 );
         /* If user is sure, return invalid cameras back to list. */
@@ -1021,7 +1026,7 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     filters << tr("All files (*.*)");
 
     QStringList files = QnFileDialog::getOpenFileNames(mainWindow(),
-                                                       tr("Open file"),
+                                                       tr("Open File"),
                                                        QString(),
                                                        filters.join(lit(";;")),
                                                        0,
@@ -1038,7 +1043,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     filters << tr("All files (*.*)");
 
     QString fileName = QnFileDialog::getOpenFileName(mainWindow(),
-                                                     tr("Open file"),
+                                                     tr("Open File"),
                                                      QString(),
                                                      filters.join(lit(";;")),
                                                      0,
@@ -1283,7 +1288,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(mainWindow(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -1478,8 +1483,8 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
             int result = QMessageBox::warning(
                         mainWindow(),
-                        tr("Process is in progress"),
-                        tr("Camera addition is already in progress."\
+                        tr("Process in progress..."),
+                        tr("Device addition is already in progress."\
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
@@ -1504,18 +1509,21 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QnMediaServerResourcePtr server = servers.first();
-
-    const auto acceptCallback = [this, server]()
+    QnMediaServerUserAttributes oldAttrValue = *QnMediaServerUserAttributesPool::instance()->get(server->getId());
+    const auto acceptCallback = [this, server, oldAttrValue]()
     {
         if (!server->resourcePool())    /// Wrong server status - it could be deleted from the system, for example
             return;
 
         // TODO: #Elric move submitToResources here.
-        const auto serverAttrs = (QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()));
-        const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
-            { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };
+        QnMediaServerUserAttributesPtr newAttrValue = QnMediaServerUserAttributesPool::instance()->get(server->getId());
+        if (!(*newAttrValue == oldAttrValue) || server->hasUpdatedStorages()) {
+            const auto serverAttrs = QnMediaServerUserAttributesList() << newAttrValue;
+            const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
+                { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };
 
-        connection2()->getMediaServerManager()->saveUserAttributes(serverAttrs, this, handler);
+            connection2()->getMediaServerManager()->saveUserAttributes(serverAttrs, this, handler);
+        }
         server->saveUpdatedStorages();
     };
 
@@ -1667,7 +1675,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
 
         QString message = checkedFlags == Qn::user 
             ? tr("User with the same name already exists")
-            : tr("Video Wall with the same name already exists");
+            : tr("Video Wall with the same name already exists.");
 
         QMessageBox::warning(
             mainWindow(),
@@ -1864,10 +1872,11 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if(resources.isEmpty())
         return; /* Nothing to delete. */
 
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+
     /* Check that we are deleting online auto-found cameras */ 
-    QnResourceList onlineAutoDiscoveredCameras;
-    foreach(const QnResourcePtr &resource, resources) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourceList onlineAutoDiscoveredCameras;
+    for (const QnVirtualCameraResourcePtr &camera: cameras) {
         if (!camera ||
             camera->getStatus() == Qn::Offline || 
             camera->isManuallyAdded()) 
@@ -1877,9 +1886,9 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     QString question;
     /* First version of the dialog if all cameras are auto-discovered. */
-    if (resources.size() == onlineAutoDiscoveredCameras.size()) {
+    if (cameras.size() == onlineAutoDiscoveredCameras.size()) {
         question =
-            tr("These %n cameras are auto-discovered.", "", resources.size()) + L'\n' 
+            tr("These %1 are auto-discovered.").arg(getNumericDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
@@ -1887,12 +1896,17 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* Second version - some cameras are auto-discovered, some not. */
     if (!onlineAutoDiscoveredCameras.isEmpty()) {
         question = 
-            tr("%n of these %1 cameras are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(resources.size()) + L'\n' 
+            tr("%n of these %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getNumericDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
+    else if (cameras.size() == resources.size()) {
+        /* Third version - no auto-discovered cameras in the list. */
+        question =
+            tr("Do you really want to delete the following %1?").arg(getNumericDevicesName(cameras, false));
+    }
     else {
-    /* Third version - no auto-discovered cameras in the list. */
+        /* Forth version - cameras and other items. */
         question =
             tr("Do you really want to delete the following %n item(s)?", "", resources.size());
     }
@@ -2165,8 +2179,8 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
         return;
 
     QnProgressDialog *progressDialog = new QnProgressDialog(mainWindow());
-    progressDialog->setWindowTitle(tr("Updating background"));
-    progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
+    progressDialog->setWindowTitle(tr("Updating Background..."));
+    progressDialog->setLabelText(tr("Image processing may take a few moments. Please be patient."));
     progressDialog->setRange(0, 0);
     progressDialog->setCancelButton(NULL);
     connect(progressDialog, &QnProgressDialog::canceled, progressDialog,     &QObject::deleteLater);
@@ -2481,7 +2495,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-                         tr("You are running beta version of %1.")
+                         tr("This is a beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
 }
 
@@ -2537,7 +2551,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     if (!success) {
         QMessageBox::critical(
                     mainWindow(),
-                    tr("Launcher process is not found"),
+                    tr("Launcher process not found."),
                     tr("Cannot restart the client.") + L'\n' 
                   + tr("Please close the application and start it again using the shortcut in the start menu.")
                     );

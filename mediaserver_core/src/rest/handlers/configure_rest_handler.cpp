@@ -80,6 +80,14 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
     }
+    else {
+        auto adminUser = qnResPool->getAdministrator();
+        if (adminUser) {
+            QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_UserUpdate);
+            auditRecord.resources.push_back(adminUser->getId());
+            qnAuditManager->addAuditRecord(auditRecord);
+        }
+    }
 
     QnConfigureReply reply;
     reply.restartNeeded = false;

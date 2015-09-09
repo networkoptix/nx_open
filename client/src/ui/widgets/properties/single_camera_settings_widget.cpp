@@ -13,6 +13,7 @@
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -130,13 +131,19 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->imageControlWidget,     &QnImageControlWidget::fisheyeChanged,  this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
     connect(ui->imageControlWidget,     &QnImageControlWidget::changed,         this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->ioPortSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->ioPortSettingsWidget,   &QnIOPortSettingsWidget::dataChanged,   this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
     updateFromResource(true);
+    retranslateUi();
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
 }
+
+void QnSingleCameraSettingsWidget::retranslateUi() {
+    setWindowTitle(tr("%1 Settings").arg(getDefaultDeviceNameUpper(m_camera)));
+}
+
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
     return m_camera;
@@ -170,6 +177,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     updateFromResource(!isVisible());
     if (currentTab() == Qn::AdvancedCameraSettingsTab)
         ui->advancedSettingsWidget->reloadData();
+    retranslateUi();
 }
 
 Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
@@ -182,7 +190,7 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
     } else if(tab == ui->recordingTab) {
         return Qn::RecordingSettingsTab;
     } else if(tab == ui->ioSettingsTab) {
-        return Qn::IOSettingsSettingsTab;
+        return Qn::IOPortsSettingsTab;
     } else if(tab == ui->motionTab) {
         return Qn::MotionSettingsTab;
     } else if(tab == ui->advancedTab) {
@@ -200,6 +208,11 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
 void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     /* Using field names here so that changes in UI file will lead to compilation errors. */
 
+    if (!ui->tabWidget->isTabEnabled(tabIndex(tab))) {
+        ui->tabWidget->setCurrentWidget(ui->generalTab);
+        return;
+    }
+
     switch(tab) {
     case Qn::GeneralSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->generalTab);
@@ -216,7 +229,7 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     case Qn::AdvancedCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->advancedTab);
         break;
-    case Qn::IOSettingsSettingsTab:
+    case Qn::IOPortsSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->ioSettingsTab);
         break;
     case Qn::ExpertCameraSettingsTab:
@@ -312,6 +325,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
     if (m_camera)
         cameras << m_camera;
     ui->licensingWidget->setCameras(cameras);
+    ui->imageControlWidget->updateFromResources(cameras);
 
     if(!m_camera) {
         ui->nameEdit->clear();
@@ -336,8 +350,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-
-        ui->imageControlWidget->updateFromResources(QnVirtualCameraResourceList());
     } else {
         bool hasVideo = m_camera->hasVideo(0);
         ui->nameEdit->setText(m_camera->getName());
@@ -353,20 +365,18 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->passwordEdit->setText(m_camera->getAuth().password());
 
         bool dtsBased = m_camera->isDtsBased();
-        ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased && hasVideo);
-        ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
-        ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
-        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->hasCameraCapabilities(Qn::IOModuleCapability));
-
-        ui->imageControlWidget->updateFromResources(cameras);
+        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased);
+        setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo);
+        setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
+        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
+        setTabEnabledSafe(Qn::IOPortsSettingsTab, camera()->isIOModule());
 
         if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
             if (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow))
-                ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
+                ui->cameraMotionButton->setText(tr("Hardware (camera built-in)"));
             else
-                ui->cameraMotionButton->setText(tr("Do not record motion"));
+                ui->cameraMotionButton->setText(tr("Do Not Record Motion"));
 
             QnVirtualCameraResourceList cameras;
             cameras.push_back(m_camera);
@@ -405,7 +415,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         }
     }
 
-    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
+    setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
     
     updateMotionWidgetFromResource();
     updateMotionAvailability();
@@ -659,10 +669,40 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
     
 }
 
-
 void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
     ui->cameraScheduleWidget->setExportScheduleButtonEnabled(enabled);
 }
+
+
+int QnSingleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
+    switch (tab) {
+    case Qn::GeneralSettingsTab:
+        return ui->tabWidget->indexOf(ui->generalTab);
+    case Qn::RecordingSettingsTab:
+        return ui->tabWidget->indexOf(ui->recordingTab);
+    case Qn::IOPortsSettingsTab:
+        return ui->tabWidget->indexOf(ui->ioSettingsTab);
+    case Qn::MotionSettingsTab:
+        return ui->tabWidget->indexOf(ui->motionTab);
+    case Qn::FisheyeCameraSettingsTab:
+        return ui->tabWidget->indexOf(ui->fisheyeTab);
+    case Qn::AdvancedCameraSettingsTab:
+        return ui->tabWidget->indexOf(ui->advancedTab);
+    case Qn::ExpertCameraSettingsTab:
+        return ui->tabWidget->indexOf(ui->expertTab);
+    default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        break;
+    }
+    return -1;
+}
+
+void QnSingleCameraSettingsWidget::setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled) {
+    if (!enabled && currentTab() == tab)
+        setCurrentTab(Qn::GeneralSettingsTab);
+    ui->tabWidget->setTabEnabled(tabIndex(tab), enabled);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -830,7 +870,7 @@ void QnSingleCameraSettingsWidget::at_dbDataChanged() {
     if (m_updating)
         return;
 
-    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
+    setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
     setHasDbChanges(true);
 }
 

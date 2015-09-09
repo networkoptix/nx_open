@@ -36,12 +36,13 @@ public:
 private:
     void paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const;
     QSize defaultSizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const;
-    QSize sizeHintForText(const QStyleOptionViewItem & option, const QString& textData) const;
+    QSize sizeHintForText(const QStyleOptionViewItem & option, const QString& textData, bool isBold = false) const;
 private:
     int m_defaultSectionHeight;
     QSize m_playBottonSize;
     mutable int m_widthHint;
     mutable QHash<QString, int> m_sizeHintHash;
+    mutable QHash<QString, int> m_boldSizeHintHash;
 };
 
 
@@ -70,8 +71,8 @@ private slots:
     void at_exportAction_triggered();
     void at_selectAllAction_triggered();
     void at_masterItemPressed(const QModelIndex& index);
-    void at_ItemPressed(const QModelIndex& index);
-    void at_ItemEntered(const QModelIndex& index);
+    void at_itemPressed(const QModelIndex& index);
+    void at_itemEntered(const QModelIndex& index);
     void at_eventsGrid_clicked(const QModelIndex& idx);
     void at_headerCheckStateChanged(Qt::CheckState state);
     void at_updateDetailModel();
@@ -106,6 +107,9 @@ private:
     void makeCameraData();
     void setupContextMenu(QTableView* gridMaster);
     QTableView* currentGridView() const;
+
+    void retranslateUi();
+
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 

@@ -6,6 +6,7 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
+#include <atomic>
 #include <memory>
 
 #include <QtCore/QMutex>
@@ -72,6 +73,7 @@ private:
     QWaitCondition m_cond;
     QMutex m_mutex;
     CyclicAllocator m_allocator;
+    std::atomic<int> m_isInGetNextData;
  
     int doRequest( nx_http::HttpClient* const httpClient );
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );

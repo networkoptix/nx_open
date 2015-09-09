@@ -24,6 +24,7 @@ namespace AuthMethod
 {
     enum Value
     {
+        NotDefined      = 0x00,
         noAuth          = 0x01,
         //!authentication method described in rfc2617
         httpBasic       = 0x02,
@@ -42,6 +43,8 @@ namespace AuthMethod
         urlQueryParam   = 0x20,
         tempUrlQueryParam   = 0x40
     };
+    Q_DECLARE_FLAGS(Values, Value);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
 }
 
 /*!
@@ -92,17 +95,6 @@ public:
     }
 };
 
-enum AuthResult
-{
-    Auth_OK,            // OK
-    Auth_WrongLogin,    // invalid login
-    Auth_WrongInternalLogin, // invalid login used for internal auth scheme
-    Auth_WrongDigest,   // invalid or empty digest
-    Auth_WrongPassword, // invalid password
-    Auth_Forbidden      // no auth mehod found or custom auth scheme without login/password is failed
-};
-
-
 class QnAuthHelper: public QObject
 {
     Q_OBJECT
@@ -117,7 +109,7 @@ public:
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
-    AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
+    Qn::AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
     //!Authenticates request on client side
     /*!
         Usage:\n
@@ -126,17 +118,17 @@ public:
         - client calls this method supplying received response. This method adds necessary headers to request
         - client sends request to server
     */
-    AuthResult authenticate(
+    Qn::AuthResult authenticate(
         const QAuthenticator& auth,
         const nx_http::Response& response,
         nx_http::Request* const request,
         HttpAuthenticationClientContext* const authenticationCtx );
     //!Same as above, but uses cached authentication info
-    AuthResult authenticate(
+    Qn::AuthResult authenticate(
         const QAuthenticator& auth,
         nx_http::Request* const request,
         const HttpAuthenticationClientContext* const authenticationCtx );
-    AuthResult authenticate(const QString& login, const QByteArray& digest) const;
+    Qn::AuthResult authenticate(const QString& login, const QByteArray& digest) const;
 
     QnAuthMethodRestrictionList* restrictionList();
 
@@ -221,10 +213,10 @@ private:
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
     bool isCookieNonceValid(const QByteArray& nonce);
-    AuthResult doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
+    Qn::AuthResult doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
                       std::function<bool(const QByteArray&)> checkNonceFunc, QnUserResourcePtr* const outUserResource = nullptr);
-    AuthResult doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
-    AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+    Qn::AuthResult doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
     mutable QMutex m_mutex;
     static QnAuthHelper* m_instance;
@@ -245,7 +237,7 @@ private:
     /*!
         \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
     */
-    AuthResult authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId, std::function<bool(const QByteArray&)> checkNonceFunc) const;
+    Qn::AuthResult authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId, std::function<bool(const QByteArray&)> checkNonceFunc) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
     void applyClientCalculatedPasswordHashToResource(
         const QnUserResourcePtr& userResource,

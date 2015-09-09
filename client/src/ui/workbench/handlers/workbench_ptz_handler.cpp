@@ -20,7 +20,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
-
+#include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 
@@ -105,8 +105,9 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
     if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             mainWindow(),
-            tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.").arg(resource->getName()) + L'\n' 
+            tr("Unable to get position from camera."),
+            tr("An error has occurred while trying to get current position from camera %1.").arg(getResourceName(resource))
+          + L'\n' 
           + tr("Please wait for the camera to go online.")
         );
         return;
@@ -147,8 +148,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
         if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
             QMessageBox::critical(
                 mainWindow(),
-                tr("Could not set position for camera"),
-                tr("An error has occurred while trying to set current position for camera %1.").arg(resource->getName()) + L'\n' 
+                tr("Unable to set position for camera."),
+                tr("An error has occurred while trying to set current position for camera %1.").arg(getResourceName(resource)) + L'\n' 
               + tr("Please wait for the camera to go online.")
             );
             return;
@@ -200,8 +201,8 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
         if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
             QMessageBox::critical(
                 mainWindow(),
-                tr("Could not set position to camera"),
-                tr("An error has occurred while trying to set current position for camera %1.").arg(resource->getName()) + L'\n' 
+                tr("Unable to set position of camera."),
+                tr("An error has occurred while trying to set current position for camera %1.").arg(getResourceName(resource)) + L'\n' 
               + tr("Please wait for the camera to go online.")
             );
             return;

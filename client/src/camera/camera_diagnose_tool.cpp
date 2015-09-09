@@ -10,7 +10,7 @@
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <utils/network/http/httptypes.h>
 
 
@@ -24,15 +24,14 @@ namespace CameraDiagnostics
         m_step( Step::mediaServerAvailability ),
         m_result( false )
     {
-        QnSecurityCamResourcePtr secCamRes = qnResPool->getResourceById<QnSecurityCamResource>( cameraID );
-        if( !secCamRes )
+        m_camera = qnResPool->getResourceById<QnVirtualCameraResource>( cameraID );
+        if( !m_camera )
             return;
 
-        QnMediaServerResourcePtr serverResource = secCamRes->getParentServer();
-        if( !serverResource )
+        m_server = m_camera->getParentServer();
+        if( !m_server )
             return;
-        m_server = serverResource;
-        m_serverHostAddress = QUrl(serverResource->getApiUrl()).host();
+        m_serverHostAddress = QUrl(m_server->getApiUrl()).host();
     }
 
     DiagnoseTool::~DiagnoseTool()
@@ -89,7 +88,8 @@ namespace CameraDiagnostics
         }
 
         m_result = true;
-        m_errorMessage = ErrorCode::toString(ErrorCode::noError, QList<QString>());
+        m_errorMessage = ErrorCode::toString(ErrorCode::noError, m_camera, QList<QString>());
+
         emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
 
         emit diagnosticsStepStarted( static_cast<Step::Value>(m_step+1) );
@@ -140,7 +140,7 @@ namespace CameraDiagnostics
         }
 
         m_result = reply.errorCode == ErrorCode::noError;
-        m_errorMessage = ErrorCode::toString(reply.errorCode, reply.errorParams);
+        m_errorMessage = ErrorCode::toString(reply.errorCode, m_camera, reply.errorParams);
         emit diagnosticsStepResult( static_cast<Step::Value>(reply.performedStep), m_result, m_errorMessage );
 
         const Step::Value nextStep = static_cast<Step::Value>(reply.performedStep+1);

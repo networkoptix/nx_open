@@ -96,11 +96,14 @@ private:
     const qint64 m_hiStreamHlsInactivityPeriodMS;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
+    void startLiveCacheIfNeeded();
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
         const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
     QElapsedTimer m_lastActivityTimer;
 };
+
+typedef std::shared_ptr<QnVideoCamera> QnVideoCameraPtr;
 
 #endif // __VIDEO_CAMERA_H__

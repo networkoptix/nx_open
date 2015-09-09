@@ -20,6 +20,7 @@ namespace Qn
     static const QByteArray AUTH_SESSION_HEADER_NAME = "X-Auth-Session";
     static const QByteArray CAMERA_UNIQUE_ID_HEADER_NAME = "physicalId";
     static const QByteArray REALM_HEADER_NAME = "X-Nx-Realm";
+    static const QByteArray AUTH_RESULT_HEADER_NAME = "X-Auth-Result";
     static const QByteArray HA1_DIGEST_HEADER_NAME = "X-Nx-Digest";
     static const QByteArray CRYPT_SHA512_HASH_HEADER_NAME = "X-Nx-Crypt-Sha512";
     //!Guid of peer which initiated request

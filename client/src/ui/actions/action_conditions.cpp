@@ -155,6 +155,14 @@ Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetLi
 }
 
 Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetList &widgets) {
+    auto pureIoModule = [](const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::io_module))
+            return false; //quick check
+
+        QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+        return mediaResource && !mediaResource->hasVideo(0);
+    };
+
     foreach(QnResourceWidget *widget, widgets) {
         if(!widget)
             continue;
@@ -163,6 +171,9 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
             continue;
 
         if(!widget->zoomRect().isNull())
+            continue;
+
+        if (pureIoModule(widget->resource()))
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
@@ -445,6 +456,10 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
     QString url = widget->resource()->getUrl().toLower();
     if((widget->resource()->flags() & Qn::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         return Qn::InvisibleAction;
+
+    QnMediaResourcePtr mediaResource = widget->resource().dynamicCast<QnMediaResource>();
+        if (mediaResource && !mediaResource->hasVideo(0))
+            return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)

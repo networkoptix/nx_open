@@ -24,6 +24,7 @@ extern "C"
 #include <client/client_runtime_settings.h>
 
 #include <camera/resource_display.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -112,6 +113,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     discardCacheTimer->setInterval(discardCacheIntervalMs);
     discardCacheTimer->setSingleShot(false);
     connect(discardCacheTimer, &QTimer::timeout, this, &QnWorkbenchNavigator::clearLoaderCache);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
+    {
+        if (res.dynamicCast<QnStorageResource>())
+            clearLoaderCache();
+    });
     discardCacheTimer->start();
 
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
@@ -417,7 +423,7 @@ bool QnWorkbenchNavigator::setLive(bool live) {
 
 bool QnWorkbenchNavigator::isPlayingSupported() const {
     if (m_currentMediaWidget) 
-        return m_currentMediaWidget->display()->archiveReader();
+        return m_currentMediaWidget->display()->archiveReader() && !m_currentMediaWidget->display()->isStillImage();
     return false;
 }
 
@@ -472,7 +478,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
 }
 
 qreal QnWorkbenchNavigator::speed() const {
-    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
+    if(!isPlayingSupported())
         return 0.0;
 
     if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
@@ -498,24 +504,39 @@ void QnWorkbenchNavigator::setSpeed(qreal speed) {
     }
 }
 
+bool QnWorkbenchNavigator::hasVideo() const {
+    if (!m_currentMediaWidget)
+        return false;
+
+    auto reader = m_currentMediaWidget->display()->archiveReader();
+    if (!reader)
+        return false;
+
+    //TODO: #GDM archiveReader()->hasVideo() cannot be used because always returns true for online sources
+    return m_currentMediaWidget->resource()->hasVideo(reader);
+}
+
+
 qreal QnWorkbenchNavigator::minimalSpeed() const {
-    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
+    if (!isPlayingSupported())
         return 0.0;
 
-    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
-        return reader->isNegativeSpeedSupported() ? -16.0 : 0.0;
+    if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
+        if (!reader->isNegativeSpeedSupported())
+            return 0.0;
 
-    return 1.0;
+    return hasVideo()
+        ? -16.0 
+        : 0.0;
 }
 
 qreal QnWorkbenchNavigator::maximalSpeed() const {
-    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
+    if (!isPlayingSupported())
         return 0.0;
 
-    if(m_currentMediaWidget->display()->archiveReader() != NULL)
-        return 16.0;
-
-    return 1.0;
+    return hasVideo() 
+        ? 16.0 
+        : 1.0;
 }
 
 qint64 QnWorkbenchNavigator::position() const {
@@ -1229,12 +1250,25 @@ void QnWorkbenchNavigator::updateLines() {
 
     bool isZoomed = display()->widget(Qn::ZoomedRole) != NULL;
 
+    auto syncedCameras = [this]() {
+        QnVirtualCameraResourceList result;
+        for(const QnResourceWidget *widget: m_syncedWidgets) {
+            if (!widget->resource())
+                continue;
+            if (QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
+                result << camera;
+        }
+        if (QnVirtualCameraResourcePtr camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>())
+            result << camera;
+        return result;
+    };
+
     if(m_currentWidgetFlags & WidgetSupportsPeriods) {
         m_timeSlider->setLineVisible(CurrentLine, true);
         m_timeSlider->setLineVisible(SyncedLine, !isZoomed);
 
         m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
-        m_timeSlider->setLineComment(SyncedLine, tr("All Cameras"));
+        m_timeSlider->setLineComment(SyncedLine, tr("All %1").arg(getDefaultDevicesName(syncedCameras())));
     } else {
         m_timeSlider->setLineVisible(CurrentLine, false);
         m_timeSlider->setLineVisible(SyncedLine, false);

@@ -24,17 +24,15 @@ int QnTimeSyncRestHandler::executeGet(
     QByteArray& /*contentType*/,
     const QnRestConnectionProcessor* connection )
 {
-    auto timeSyncHeaderIter = connection->request().headers.find( TIME_SYNC_HEADER_NAME );
-    if( timeSyncHeaderIter == connection->request().headers.end() )
-        return nx_http::StatusCode::badRequest;
     auto peerGuid = connection->request().headers.find( Qn::PEER_GUID_HEADER_NAME );
     if( peerGuid == connection->request().headers.end() )
         return nx_http::StatusCode::badRequest;
-
-    TimeSynchronizationManager::instance()->processTimeSyncInfoHeader(
-        peerGuid->second,
-        timeSyncHeaderIter->second,
-        connection->socket().data() );
+    auto timeSyncHeaderIter = connection->request().headers.find( TIME_SYNC_HEADER_NAME );
+    if( timeSyncHeaderIter != connection->request().headers.end() )
+        TimeSynchronizationManager::instance()->processTimeSyncInfoHeader(
+            peerGuid->second,
+            timeSyncHeaderIter->second,
+            connection->socket().data() );
 
     //sending our time synchronization information to remote peer
     connection->response()->headers.emplace(

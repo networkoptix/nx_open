@@ -36,7 +36,7 @@ private slots:
 private:
     QMutex m_mutex;
     const QnModuleFinder *m_moduleFinder;
-    QHash<SocketAddress, AddressInfo> m_usedAddresses;
+    QHash<QString, AddressInfo> m_usedAddresses;
 };
 
 #endif // SERVER_CONNECTOR_H

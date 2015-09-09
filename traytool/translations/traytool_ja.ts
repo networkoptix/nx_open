@@ -19,12 +19,12 @@
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient privileges to manage services</source>
-        <translation>サービスを管理するための権限が不十分です</translation>
+        <source>Insufficient rights to manage services.</source>
+        <translation type="unfinished">サービスを管理するための権限が不十分です</translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>UAC・管理者以外のユーザーの権限を有効にする必要があります</translation>
+        <source>UAC must be enabled to request privileges for non-admin users.</source>
+        <translation type="unfinished">UAC・管理者以外のユーザーの権限を有効にする必要があります</translation>
     </message>
 </context>
 <context>
@@ -94,10 +94,6 @@
         <translation>メディアアーバーウェブページ</translation>
     </message>
     <message>
-        <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>メディアサーバーが停止しますが、本当に停止して良いですか？</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>終了(&amp;Q)</translation>
     </message>
@@ -112,6 +108,10 @@
     <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>インストールされたサービスへのアクセスエラー:</translation>
+    </message>
+    <message>
+        <source>Media server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

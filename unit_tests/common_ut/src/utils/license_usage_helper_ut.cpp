@@ -441,7 +441,7 @@ TEST( QnCamLicenseUsageHelperTest, checkStartLicenseOverlapping )
 }
 
 /** Test for start licenses on the arm servers. */
-TEST( QnCamLicenseUsageHelperTest, checkLicensesArmActivating )
+TEST( QnCamLicenseUsageHelperTest, checkStartLicensesArmActivating )
 {
     /* Nor professional nor starter licenses should not be active on arm server. */
     QnLicensePoolScaffold licPoolScaffold(true);
@@ -455,6 +455,19 @@ TEST( QnCamLicenseUsageHelperTest, checkLicensesArmActivating )
     ASSERT_FALSE( helper.isValid() );
 
     licPoolScaffold.addLicenses(Qn::LC_Edge, 1);
+    ASSERT_TRUE( helper.isValid() );
+}
+
+/** Test for io licenses on the arm servers. */
+TEST( QnCamLicenseUsageHelperTest, checkIoLicensesArmActivating )
+{
+    QnLicensePoolScaffold licPoolScaffold(true);
+    licPoolScaffold.addLicenses(Qn::LC_IO, 8);
+
+    QnResourcePoolScaffold resPoolScaffold;
+    resPoolScaffold.addCameras(Qn::LC_IO, 8, true);
+
+    QnCamLicenseUsageHelper helper;
     ASSERT_TRUE( helper.isValid() );
 }
 
@@ -489,4 +502,17 @@ TEST( QnLicenseInfoTest, validateLicenseNames )
         auto longName = QnLicense::longDisplayName(licenseType);
         ASSERT_FALSE(longName.isEmpty());
     }
+}
+
+/** Check if license names are filled for every license type. */
+TEST( QnLicenseInfoTest, validateFutureLicenses )
+{
+    QnLicensePoolScaffold licPoolScaffold;
+    licPoolScaffold.addFutureLicenses(1);
+
+    QnResourcePoolScaffold resPoolScaffold;
+    resPoolScaffold.addCameras(Qn::LC_Professional, 1, true);
+
+    QnCamLicenseUsageHelper helper;
+    ASSERT_FALSE( helper.isValid() );
 }

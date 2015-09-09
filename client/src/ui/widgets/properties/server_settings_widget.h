@@ -31,6 +31,7 @@ public:
     virtual bool hasChanges() const override;
     virtual void updateFromSettings() override;
     virtual void submitToSettings() override;
+    virtual void retranslateUi() override;
 
 private:
     void addTableItem(const QnStorageSpaceData &item);

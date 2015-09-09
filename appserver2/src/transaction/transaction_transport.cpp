@@ -348,14 +348,15 @@ void QnTransactionTransport::startListening()
 
 void QnTransactionTransport::setStateNoLock(State state)
 {
-    if (state == Connected) {
+    if (state == Connected)
         m_connected = true;
+    
+    if (m_state == Error && state != Closed)
+    {
+        ; // only Error -> Closed setState is allowed
     }
-    else if (state == Error) {
-    }
-    else if (state == ReadyForStreaming) {
-    }
-    if (this->m_state != state) {
+    else if (this->m_state != state) 
+    {
         this->m_state = state;
         emit stateChanged(state);
     }
@@ -380,6 +381,12 @@ SocketAddress QnTransactionTransport::remoteSocketAddr() const
     );
 
     return addr;
+}
+
+nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransport::authData() const
+{
+    QMutexLocker lock( &m_mutex );
+    return m_httpAuthCacheItem;
 }
 
 QnTransactionTransport::State QnTransactionTransport::getState() const
@@ -780,7 +787,7 @@ QnUuid QnTransactionTransport::connectionGuid() const
 }
 
 void QnTransactionTransport::setIncomingTransactionChannelSocket(
-    const QSharedPointer<AbstractStreamSocket>& socket,
+    QSharedPointer<AbstractStreamSocket> socket,
     const nx_http::Request& /*request*/,
     const QByteArray& requestBuf )
 {
@@ -789,7 +796,7 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     assert( m_peerRole == prAccepting );
     assert( m_connectionType != ConnectionType::bidirectional );
     
-    m_incomingDataSocket = socket;
+    m_incomingDataSocket = std::move(socket);
 
     //checking transactions format
     if( !m_incomingTransactionStreamParser->processData( requestBuf ) )
@@ -1127,6 +1134,13 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
+    //saving credentials we used to authorize request
+    if (client->request().headers.find(nx_http::header::Authorization::NAME) !=
+        client->request().headers.end())
+    {
+        m_httpAuthCacheItem = client->authCacheItem();
+    }
+
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::EC2_GUID_HEADER_NAME);
     nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
     nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
@@ -1235,7 +1249,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 m_httpClient->response()->headers,
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
-
             //inserting base64 decoder before the last filter
             m_incomingTransactionStreamParser = nx_bsf::insert(
                 m_incomingTransactionStreamParser,
@@ -1428,6 +1441,7 @@ bool QnTransactionTransport::skipTransactionForMobileClient(ApiCommand::Value co
     case ApiCommand::saveUser:
     case ApiCommand::saveLayout:
     case ApiCommand::setResourceStatus:
+    case ApiCommand::setResourceParam:
     case ApiCommand::setResourceParams:
     case ApiCommand::saveCameraUserAttributes:
     case ApiCommand::saveServerUserAttributes:

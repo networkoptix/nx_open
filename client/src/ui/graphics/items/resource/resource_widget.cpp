@@ -113,6 +113,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
 
+    /* Initialize resource. */
+    m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
+
     /* Set up frame. */
     setFrameWidth(0.0);
 
@@ -230,13 +234,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
 
     /* Status overlay. */
-    m_statusOverlayWidget = new QnStatusOverlayWidget(this);
+    m_statusOverlayWidget = new QnStatusOverlayWidget(m_resource, this);
     addOverlayWidget(m_statusOverlayWidget, UserVisible, true, false, StatusLayer);
 
-
-    /* Initialize resource. */
-    m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
-    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
     m_aspectRatio = defaultAspectRatio();

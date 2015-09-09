@@ -32,6 +32,7 @@ private:
     QSize m_prevImageSize;
     bool m_firstFrameDisplayed;
     QnArchiveStreamReader* m_reader;
+    bool m_hasProcessedMedia;
 };
 
 #endif //  __SIGN_DIALOG_DISPLAY_H__

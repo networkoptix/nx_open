@@ -58,10 +58,10 @@ QnImageControlWidget::~QnImageControlWidget()
 }
 
 void QnImageControlWidget::updateFromResources(const QnVirtualCameraResourceList &cameras) {
-    bool hasVideo = std::any_of(cameras.cbegin(), cameras.cend(), [](const QnVirtualCameraResourcePtr &camera) {
+    bool allCamerasHasVideo = boost::algorithm::all_of(cameras, [](const QnVirtualCameraResourcePtr &camera) {
         return camera->hasVideo(0); 
     });
-    setEnabled(hasVideo);
+    setVisible(allCamerasHasVideo);
 
     updateAspectRatioFromResources(cameras);
     updateRotationFromResources(cameras);
@@ -69,6 +69,12 @@ void QnImageControlWidget::updateFromResources(const QnVirtualCameraResourceList
 }
 
 void QnImageControlWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
+    bool allCamerasHasVideo = boost::algorithm::all_of(cameras, [](const QnVirtualCameraResourcePtr &camera) {
+        return camera->hasVideo(0); 
+    });
+    if (!allCamerasHasVideo)
+        return;
+
     bool overrideAr = ui->forceArCheckBox->checkState() == Qt::Checked;
     bool clearAr = ui->forceArCheckBox->checkState() == Qt::Unchecked;
     bool overrideRotation = ui->forceRotationCheckBox->checkState() == Qt::Checked;

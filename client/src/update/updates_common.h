@@ -1,5 +1,4 @@
-#ifndef UPDATES_COMMON_H
-#define UPDATES_COMMON_H
+#pragma once
 
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
@@ -8,14 +7,15 @@
 
 struct QnCheckForUpdateResult {
     enum Value {
-        UpdateFound,
-        InternetProblem,
-        NoNewerVersion,
-        NoSuchBuild,
-        ServerUpdateImpossible,
-        ClientUpdateImpossible,
-        BadUpdateFile,
-        NoFreeSpace
+        UpdateFound
+        , InternetProblem
+        , NoNewerVersion
+        , NoSuchBuild
+        , ServerUpdateImpossible
+        , ClientUpdateImpossible
+        , BadUpdateFile
+        , NoFreeSpace
+        , DowngradeIsProhibited
     };
 
     QnCheckForUpdateResult():
@@ -108,25 +108,20 @@ typedef QSharedPointer<QnUpdateFileInformation> QnUpdateFileInformationPtr;
 
 struct QnUpdateTarget {
 
-    QnUpdateTarget(QSet<QnUuid> targets, const QnSoftwareVersion &version, bool denyClientUpdates = false, bool denyMajorUpdates = false) :
+    QnUpdateTarget(QSet<QnUuid> targets, const QnSoftwareVersion &version, bool denyClientUpdates = false) :
         targets(targets),
         version(version),
-        denyClientUpdates(denyClientUpdates),
-        denyMajorUpdates(denyMajorUpdates)
+        denyClientUpdates(denyClientUpdates)
     {}
 
-    QnUpdateTarget(QSet<QnUuid> targets, const QString &fileName, bool denyClientUpdates = false, bool denyMajorUpdates = false) :
+    QnUpdateTarget(QSet<QnUuid> targets, const QString &fileName, bool denyClientUpdates = false) :
         targets(targets),
         fileName(fileName),
-        denyClientUpdates(denyClientUpdates),
-        denyMajorUpdates(denyMajorUpdates)
+        denyClientUpdates(denyClientUpdates)
     {}
 
     QSet<QnUuid> targets;
     QnSoftwareVersion version;
     QString fileName;
     bool denyClientUpdates;
-    bool denyMajorUpdates;
 };
-
-#endif // UPDATES_COMMON_H

@@ -16,9 +16,6 @@
     <height>600</height>
    </size>
   </property>
-  <property name="windowTitle">
-   <string>Camera Schedule Editor</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,1,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -60,7 +57,7 @@
    <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
      <property name="title">
-      <string>Schedule Grid</string>
+      <string>Recording Schedule</string>
      </property>
      <layout class="QVBoxLayout" name="scheduleGridLayout" stretch="0,0,1">
       <item>
@@ -71,7 +68,7 @@
         <item>
          <widget class="QCheckBox" name="displayQualityCheckBox">
           <property name="text">
-           <string>Display Quality on Grid</string>
+           <string>Show Quality on Schedule</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -99,7 +96,7 @@
         <item>
          <widget class="QCheckBox" name="displayFpsCheckBox">
           <property name="text">
-           <string>Display FPS on Grid</string>
+           <string>Show FPS on Schedule</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -353,7 +350,7 @@
             <item>
              <widget class="QLabel" name="labelMotionPlusLQ">
               <property name="text">
-               <string>Motion+ Lo-Res Always</string>
+               <string>Motion + Low-Res </string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -408,7 +405,7 @@
             <item>
              <widget class="QLabel" name="label_8">
               <property name="text">
-               <string>Do not Record</string>
+               <string>Do Not Record</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -464,7 +461,7 @@
             <item>
              <widget class="QLabel" name="minArchiveDaysWarningLabel">
               <property name="text">
-               <string>Warning! High value may prevent other cameras from recording!</string>
+               <string notr="true">&lt;Warning! High minimum value could decrease other cameras' recording durations.&gt;</string>
               </property>
              </widget>
             </item>
@@ -510,14 +507,14 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Min days:</string>
+             <string>Min. Days</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Max days:</string>
+             <string>Max. Days</string>
             </property>
            </widget>
           </item>

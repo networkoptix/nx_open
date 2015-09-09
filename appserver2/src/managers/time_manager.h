@@ -196,20 +196,28 @@ namespace ec2
         struct PeerContext
         {
             SocketAddress peerAddress;
+            nx_http::AuthInfoCache::AuthorizationCacheItem authData;
             TimerManager::TimerGuard syncTimerID;
             nx_http::AsyncHttpClientPtr httpClient;
 
-            PeerContext( SocketAddress _peerAddress )
-                : peerAddress( std::move( _peerAddress ) )
+            PeerContext(
+                SocketAddress _peerAddress,
+                nx_http::AuthInfoCache::AuthorizationCacheItem _authData )
+            :
+                peerAddress( std::move( _peerAddress ) ),
+                authData( std::move(_authData) )
             {}
 
+            //PeerContext( PeerContext&& right ) = default;
             PeerContext( PeerContext&& right )
             :
                 peerAddress( std::move(right.peerAddress) ),
+                authData( std::move(right.authData) ),
                 syncTimerID( std::move(right.syncTimerID) ),
                 httpClient( std::move(right.httpClient) )
             {}
 
+            //PeerContext& operator=( PeerContext&& right ) = default;
             PeerContext& operator=( PeerContext&& right )
             {
                 peerAddress = std::move(right.peerAddress);
@@ -272,12 +280,21 @@ namespace ec2
         qint64 getSyncTimeNonSafe() const;
         void startSynchronizingTimeWithPeer(
             const QnUuid& peerID,
-            SocketAddress peerAddress );
+            SocketAddress peerAddress,
+            nx_http::AuthInfoCache::AuthorizationCacheItem authData );
         void stopSynchronizingTimeWithPeer( const QnUuid& peerID );
         void synchronizeWithPeer( const QnUuid& peerID );
         void timeSyncRequestDone(
             const QnUuid& peerID,
             nx_http::AsyncHttpClientPtr clientPtr );
+        TimeSyncInfo getTimeSyncInfoNonSafe() const;
+        void syncTimeWithAllKnownServers(QMutexLocker* const lock);
+        void onBeforeSendingTransaction(
+            QnTransactionTransport* transport,
+            nx_http::HttpHeaders* const headers);
+        void onTransactionReceived(
+            QnTransactionTransport* transport,
+            const nx_http::HttpHeaders& headers);
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );

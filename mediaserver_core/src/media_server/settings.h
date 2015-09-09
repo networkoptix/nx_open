@@ -55,7 +55,7 @@ namespace nx_ms_conf
 
     //!If no one uses HLS for thid time period (in seconds), than live media cache is stopped and cleaned. It will be restarted with next HLS request
     static const QLatin1String HLS_INACTIVITY_PERIOD( "hlsInactivityPeriod" );
-    static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
+    static const int DEFAULT_HLS_INACTIVITY_PERIOD = 10;
 
     static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
     static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 32;

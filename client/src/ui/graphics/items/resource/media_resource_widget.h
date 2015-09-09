@@ -196,6 +196,18 @@ private:
     Q_SLOT void updateOverlayButton();
 
 private:
+    struct ResourceStates
+    {
+        bool isRealTimeSource;  /// Shows if resource is real-time source
+        bool isOffline;         /// Shows if resource is offline. Not-real-time resource is alwasy online
+        bool isUnauthorized;    /// Shows if resource is unauthorized. Not-real-time resource is alwasy online
+        bool hasVideo;          /// Shows if resource has video
+    };
+
+    /// @brief Return resource states
+    ResourceStates getResourceStates() const;
+
+private:
     /** Media resource. */
     QnMediaResourcePtr m_resource;
 
@@ -239,6 +251,7 @@ private:
     QnMediaDewarpingParams m_dewarpingParams;
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
+    bool m_ioCouldBeShown;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

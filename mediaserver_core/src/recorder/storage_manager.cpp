@@ -274,25 +274,6 @@ QnStorageManager::QnStorageManager():
     m_removeEmtyDirTimer.restart();
 }
 
-
-void QnStorageManager::getCurrentlyUsedLocalPathes(QList<QString> *pathList) const
-{
-    assert(pathList);
-    for (const auto &entry: m_localPathsInUse)
-        pathList->append(entry);
-}
-
-
-void QnStorageManager::addLocalPathInUse(const QString &path)
-{
-    m_localPathsInUse.append(path);
-}
-
-void QnStorageManager::removeFromLocalPathInUse(const QString &path)
-{
-    m_localPathsInUse.removeAll(path);
-}
-
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
 void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter)
 {
@@ -714,18 +695,30 @@ QStringList QnStorageManager::getAllStoragePathes() const
 
 void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
 {
-    QMutexLocker lock(&m_mutexStorages);
-    m_storagesStatisticsReady = false;
-
-    // remove existing storage record if exists
-    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
+    int storageIndex = -1;
     {
-        if (itr.value()->getId() == storage->getId()) {
-            QnStorageResourcePtr oldStorage = itr.value();
-            itr = m_storageRoots.erase(itr);
+        QMutexLocker lock(&m_mutexStorages);
+        m_storagesStatisticsReady = false;
+
+        // remove existing storage record if exists
+        for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
+        {
+            if (itr.value()->getId() == storage->getId()) {
+                storageIndex = itr.key();
+                itr = m_storageRoots.erase(itr);
+                break;
+            }
+            else {
+                ++itr;
+            }
         }
-        else {
-            ++itr;
+    }
+    if (storageIndex != -1)
+    {
+        QMutexLocker lock(&m_mutexCatalog);
+        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
+            for (const auto catalog: m_devFileCatalog[i].values())
+                catalog->removeChunks(storageIndex);
         }
     }
 }

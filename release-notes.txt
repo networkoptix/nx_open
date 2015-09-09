@@ -1,48 +1,39 @@
 -----------------------------------------------2.4.0.xxxx-----------------------------------------
-
-Features:
-#6052 - Audit monitor
-#5965 - Storage using information
-#5832 - ACTI encoder support 
-#5820, VMS-276 - IO module
-Ldap
+NEW FEATURES:
+I/O Module Support 
+LDAP Integration
 Storage SDK
-Web-client
+Audit Trail
+Storage Analytics
 
-Improvements:
-#6025 - Add compatibility for paxton plugin with server 2.3.1, 2.3.2 and 2.4.
-#5900,VMS-277 - multiple server writing to same NAS ( server side  issue ) 
-#5767 - Autoupdates: multiple servers support
-VMS-289 - Client Login: When you start qulu the keyboard focus is not on the login box
-VMS-306 - Buffer secondary stream for better HLS performance
-VMS-307 - camera name stays permanently
+NEW DEVICE SUPPORT:
+Axis P8221 I/O Module
+ACTi V32 16 channel IP encoder
+Digital Watchdog DWC-BVI2IR
+Latest standard Arecont and Axis cameras are supported
 
-Bug fixes:
-#6024 - Support: It's impossible to take videostreams and different information with client from remote server
-#6015 - Server api: Bug in generating images
-#5970 - Couldn't do anything with storages while fast archive scan
-#5796 - Large CPU usage on Jaguar
 
-#6051 - AbstractStorageResource interface tests
-#6047 - Add helper class for safe direct signal/slot connection
 
-NXtool improvements:
-NXTOOL-1 - Add an ability to update servers via NxTool 
-NXTOOL-10 - Add date\time validation and error dialogs 
-NXTOOL-14 - Change DNS server and default gateway for several servers 
-NXTOOL-20 - NxTool. Edit all button shouldn't be shown if it's nothing to edit.
-NXTOOL-26 - Display detailed server info
-NXTOOL-29 - Make "Enter password" button blink if user tries to do something
-NXTOOL-31 - NxTool. Don't show Update message for several servers, if user doesn't edit partition
-NXTOOL-35 - Save NxTool position between runs
+IMPROVEMENTS:
+Decrease CPU usage on camera-based Edge Server (ISD Jaguar).
+Improved usage statistics and crash reports.
+New warning when more than one server is recording to the same storage.
+When multiple servers are recording to a shared storage location (e.g. NAS) usage is shared more effectively.
+Mobile app performance improved when pulling video from Edge Server (ARM) devices.
+Adding NAS devices on Linux simplified to match Windows method.
+Check for updates automatically enabled by default.
+Video viewing synchronization in multi-server systems improved.
 
-Gathering statistics (improvements):
-#5996 - Need to introduce a way to check if there's a real audio track from camera
-5912 - Storage size is not spaceLimit
-5908 - while reporting stats, server should report actual OS (not just win64 or linux)
-5312 - statistics: network interfaces info (number and bandwidth)
-VMS-323 - Include customization into statistics and crash reports
 
+BUG FIXES:
+Motion mask couldn't be changed for panoramic AV cameras in smart search mode. Fixed.
+Small issues in server API. Fixed.
+Intermittent "Loading" error in client in multi-server systems. Fixed.
+When client is started the keyboard cursor was not automatically moved to login dialog box. Fixed.
+Viewing video streams and information from a remote server with 2 public IPs failed. Fixed.
+Cameras that were not being recorded were shown as offline when autodiscovery was disabled. Fixed.
+In some cases Edge Media Server could not be stopped (specifically ISD Jaguar camera). Fixed.
+Archived video was inaccessible during fast archive scan. Fixed.
 
 ----------------------------------------------2.3.2.xxxx------------------------------------------
 

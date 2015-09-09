@@ -73,6 +73,9 @@ float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution
     // SD NTCS/PAL resolutions have non standart SAR. fix it
     if (resolution.width() == 720 && (resolution.height() == 480 || resolution.height() == 576))
         result = float(4.0 / 3.0);
+    // SD NTCS/PAL resolutions have non standart SAR. fix it
+    else if (resolution.width() == 960 && (resolution.height() == 480 || resolution.height() == 576))
+        result = float(16.0 / 9.0);
     return result;
 }
 
@@ -171,6 +174,9 @@ static const bool transcodingAvailable = false;
 
 bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
+    //saving hasDualStreaming flag before locking mutex
+    const auto hasDualStreamingLocal = hasDualStreaming2();
+
     //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
     QMutexLocker lk( &m_mediaStreamsMutex );
 
@@ -185,6 +191,7 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
             return mediaInfo.transcodingRequired;
         } ) != supportedMediaStreams.streams.end();
 
+    bool needUpdateStreamInfo = true;
     if( isTranscodingAllowedByCurrentMediaStreamsParam == transcodingAvailable )
     {
         //checking if stream info has been changed
@@ -195,10 +202,10 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
             if( it->encoderIndex == mediaStreamInfo.encoderIndex )
             {
                 if( *it == mediaStreamInfo)
-                    return false;
+                    needUpdateStreamInfo = false;
                 //if new media stream info does not contain resolution, preferring existing one
                 if (isParamsCompatible(mediaStreamInfo, *it))
-                    return false;   //stream info has not been changed
+                    needUpdateStreamInfo = false;   //stream info has not been changed
                 break;
             }
         }
@@ -206,28 +213,55 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     //else
     //    we have to update information about transcoding availability anyway
 
-    //removing stream with same encoder index as mediaStreamInfo
-    QString previouslySavedResolution;
-    supportedMediaStreams.streams.erase(
-        std::remove_if(
+    bool modified = false;
+    if (needUpdateStreamInfo)
+    {
+        //removing stream with same encoder index as mediaStreamInfo
+        QString previouslySavedResolution;
+        supportedMediaStreams.streams.erase(
+            std::remove_if(
+                supportedMediaStreams.streams.begin(),
+                supportedMediaStreams.streams.end(),
+                [&mediaStreamInfo, &previouslySavedResolution]( CameraMediaStreamInfo& mediaInfo ) {
+                    if( mediaInfo.encoderIndex == mediaStreamInfo.encoderIndex )
+                    {
+                        previouslySavedResolution = std::move(mediaInfo.resolution);
+                        return true;
+                    }
+                    return false;
+                } ),
+            supportedMediaStreams.streams.end() );
+
+        CameraMediaStreamInfo newMediaStreamInfo = mediaStreamInfo; //have to copy it anyway to save to supportedMediaStreams.streams
+        if( !previouslySavedResolution.isEmpty() &&
+            newMediaStreamInfo.resolution == CameraMediaStreamInfo::anyResolution )
+        {
+            newMediaStreamInfo.resolution = std::move(previouslySavedResolution);
+        }
+        //saving new stream info
+        supportedMediaStreams.streams.push_back(std::move(newMediaStreamInfo));
+
+        modified = true;
+    }
+
+    if (!hasDualStreamingLocal)
+    {
+        //checking whether second stream has disappeared
+        auto secondStreamIter = std::find_if(
             supportedMediaStreams.streams.begin(),
             supportedMediaStreams.streams.end(),
-            [&mediaStreamInfo, &previouslySavedResolution]( CameraMediaStreamInfo& mediaInfo ) {
-                if( mediaInfo.encoderIndex == mediaStreamInfo.encoderIndex )
-                {
-                    previouslySavedResolution = std::move(mediaInfo.resolution);
-                    return true;
-                }
-                return false;
-            } ),
-        supportedMediaStreams.streams.end() );
-
-    CameraMediaStreamInfo newMediaStreamInfo = mediaStreamInfo; //have to copy it anyway to save to supportedMediaStreams.streams
-    if( !previouslySavedResolution.isEmpty() &&
-        newMediaStreamInfo.resolution == CameraMediaStreamInfo::anyResolution )
-    {
-        newMediaStreamInfo.resolution = std::move(previouslySavedResolution);
+            [](const CameraMediaStreamInfo& mediaInfo) {
+                return mediaInfo.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX;
+            });
+        if (secondStreamIter != supportedMediaStreams.streams.end())
+        {
+            supportedMediaStreams.streams.erase(secondStreamIter);
+            modified = true;
+        }
     }
+
+    if (!modified)
+        return false;
 
     //removing non-native streams (they will be re-generated)
     supportedMediaStreams.streams.erase(
@@ -238,9 +272,6 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
                 return mediaStreamInfo.transcodingRequired;
             } ),
         supportedMediaStreams.streams.end() );
-
-    //saving new stream info
-    supportedMediaStreams.streams.push_back( std::move(newMediaStreamInfo) );
 
     saveResolutionList( supportedMediaStreams );
 
@@ -285,6 +316,7 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
         ++it;
     }
 
+         //TODO: #GDM change to bool transcodingAvailable variable check
 #ifdef TRANSCODING_AVAILABLE
     static const char* WEBM_TRANSPORT_NAME = "webm";
 

@@ -2,6 +2,7 @@
 #include "ui_licenses_propose_widget.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_name.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/checkbox_utils.h>
@@ -76,7 +77,7 @@ void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &came
         return camera->isDtsBased(); }
     );
     int ioModules = boost::count_if(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {
-        return camera->hasCameraCapabilities(Qn::IOModuleCapability);
+        return camera->isIOModule();
     });
 
     setVisible(analogCameras > 0 || ioModules > 0);
@@ -84,12 +85,8 @@ void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &came
     QString title;
     if (analogCameras == m_cameras.size())
         title = tr("Use analog licenses to view these %n cameras", "", analogCameras);
-    else if (ioModules == m_cameras.size())
-        title = tr("Use I/O licenses to enable these %n modules", "", ioModules);
-    else if (ioModules > 0)
-        title = tr("Use licenses for selected cameras and modules");
-    else
-        title = tr("Use licenses for selected cameras");
+    else 
+        title = tr("Use licenses for selected %1").arg(getNumericDevicesName(m_cameras));
     ui->useLicenseCheckBox->setText(title);
 
     bool licenseUsed = m_cameras.isEmpty() ? false : m_cameras.front()->isLicenseUsed();

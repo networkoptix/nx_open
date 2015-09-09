@@ -28,20 +28,8 @@
 <context>
     <name>QnBusinessStringsHelper</name>
     <message>
-        <source>Camera output</source>
-        <translation>Kamera kimenet</translation>
-    </message>
-    <message>
-        <source>Camera output for 30 sec</source>
-        <translation>Kamera kimenet 30 másodpercig</translation>
-    </message>
-    <message>
         <source>Bookmark</source>
         <translation>Könyvjeltő</translation>
-    </message>
-    <message>
-        <source>Camera recording</source>
-        <translation>Kamera rögzítés</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -84,24 +72,12 @@
         <translation>Mozgás a kamerán</translation>
     </message>
     <message>
-        <source>Input Signal on Camera</source>
-        <translation>Bemeneti jel a kamerán</translation>
-    </message>
-    <message>
-        <source>Camera Disconnected</source>
-        <translation>Kamera szétkapcsolva</translation>
-    </message>
-    <message>
         <source>Storage Failure</source>
         <translation>Tárhely hiba</translation>
     </message>
     <message>
         <source>Network Issue</source>
         <translation>Hálózati probléma</translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict</source>
-        <translation>Kamera IP ütközés</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -120,10 +96,6 @@
         <translation>Licence probléma</translation>
     </message>
     <message>
-        <source>Any Camera Issue</source>
-        <translation>Bármilyen kamera hiba</translation>
-    </message>
-    <message>
         <source>Any Server Issue</source>
         <translation>Bármilyen szerver hiba</translation>
     </message>
@@ -134,10 +106,6 @@
     <message>
         <source>Undefined event has occurred on %1</source>
         <translation>Nem definiált esemény történ itt: %1</translation>
-    </message>
-    <message>
-        <source>Camera %1 was disconnected</source>
-        <translation>A(z) %1 kamera szétkapcsolt</translation>
     </message>
     <message>
         <source>Input on %1</source>
@@ -160,24 +128,12 @@
         <translation>%1 szerver hiba</translation>
     </message>
     <message>
-        <source>Camera IP Conflict at %1</source>
-        <translation>Kamera IP ütközés: %1</translation>
-    </message>
-    <message>
         <source>Server &quot;%1&quot; Conflict</source>
         <translation>&quot;%1&quot; szerver ütközés</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Started</source>
         <translation>&quot;%1&quot; szerver elindult</translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>&quot;%1&quot; szerver licence probléma</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>Ismeretlen esemény történt</translation>
     </message>
     <message>
         <source>Event: %1</source>
@@ -192,20 +148,8 @@
         <translation>Url: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Bemeneti port: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>Ok: %1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>Ütközés címe: %1</translation>
-    </message>
-    <message>
-        <source>Camera #%1 MAC: %2</source>
-        <translation>Kamera #%1 MAC: %2</translation>
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
@@ -239,20 +183,6 @@
             <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>Nem volt fogadott video képkocka az elmúlt %n másodpercben.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation>.A kapcsolat a kamerához (elsődleges stream) váratlanul bezárult.</translation>
-    </message>
-    <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation>.A kapcsolat a kamerához (másodlagos stream) váratlanul bezárult.</translation>
-    </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation>RTP csomag vesztés észlelve, előző = %1 következő = %2.</translation>
@@ -278,8 +208,20 @@
         <translation>%1 HDD/SDD lemez megtelt. A lemez túl sok adatot tartalmaz amit a VMS nem menedzsel.</translation>
     </message>
     <message>
-        <source>Recording on %n camera(s) is disabled: </source>
-        <translation>Felvétel a %n kamerán letiltva: </translation>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">Ismeretlen esemény történt</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">Bemeneti port: %1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">Ütközés címe: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -303,6 +245,67 @@
     </message>
     <message>
         <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 output for 30 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Signal on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any %1 Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2 was disconnected</source>
+        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 IP Conflict at %2</source>
+        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 #%2 MAC: %3</source>
+        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on %1 is disabled: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -333,32 +336,12 @@
         <translation>Nem lehet csatlakozni a %1 http porthoz.</translation>
     </message>
     <message>
-        <source>Make sure the camera is plugged into the network.</source>
-        <translation>Bizonyosodjon meg, hogy a kamera csatlakoztatva van a hálózatra.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
         <translation>Nem lehet megnyitni a %1 media url-t. Csatlakozás a %2 media porthoz meghiúsult.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>Bizonyosodjon meg róla, hogy a %2 port hozzáférhető (pl. át van irányítva). Próbálja meg újraindítani a kamerát, aztán visszaállítani a gyári alapértelmezett beállításokra a weblapon.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
         <translation>Nem lehet megnyitni a %1 media url-t. Kapcsolat a %2 media porthoz váratlanul bezárult.</translation>
-    </message>
-    <message>
-        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>Bizonyosodjon meg, hogy a kamera csatlakoztatva van a hálózatra. Próbálja meg újraindítani a kamerát.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>Nem lehet feldolgozni a kamera válaszát. Url %1, kérés neve %2.</translation>
-    </message>
-    <message>
-        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>Próbálja meg újraindítani a kamerát, aztán visszaállítani a gyári alapértelmezett beállításokra a weblapon.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -369,32 +352,12 @@
         <translation>Nincs támogatott media track a(z) %1 url-en.</translation>
     </message>
     <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Nem engedélyezett. %1 Url.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
         <translation>Nem lehet megnyitni a %1 media url-t.Nem támogatott %2 media protokoll.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
         <translation>Nem lehet konfigurálni a %1 paramétert.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>Először próbálja meg bekapcsolnia a rögzítést (ha ki van kapcsolva) és csökkentse az fps-t a kamera beállításokban.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>Ha ez nem segít, állítsa vissza gyári alapértelmezett beállításokra a kamera weboldalán. Ha a probléma továbbra is fennáll, lépjen kapcsolatba a technikai segítségnyújtóval.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>&quot;%1&quot; kamera kérés meghiúsult &quot;%2&quot; hibával.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.</source>
-        <translation>Ismeretlen kamera hiba.</translation>
     </message>
     <message>
         <source>Please contact support.</source>
@@ -409,20 +372,8 @@
         <translation>A szerver leállt.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the camera: %1.</source>
-        <translation>Érvénytelen adat érkezett %1 kamerától.</translation>
-    </message>
-    <message>
-        <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation>Túl sok media hiba. Kérem nyissa meg a kamera hiba ablakot a részletekért.</translation>
-    </message>
-    <message>
         <source>Media stream is opened but no media data was received.</source>
         <translation>Media stream nyitva, de nem érkezett media adat.</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress</source>
-        <translation>Kamare inicializálás folyamatban</translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
@@ -435,6 +386,76 @@
     <message>
         <source>(unknown)</source>
         <translation>(ismeretlen)</translation>
+    </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">Nem engedélyezett. %1 Url.</translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse %1 response. Url %2, request name %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown %1 Issue.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the %1: %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 initialization process in progress.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -451,12 +472,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>A Windows Explorer indítása sikertelen</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>Nem található az explorer.exe a Windows Explorer indításához.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">A Windows Explorer indítása sikertelen</translation>
     </message>
 </context>
 <context>
@@ -470,12 +491,12 @@
         <translation>Nem található enkóder a %1 codec-hez.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>Nem lehet inicializálni az audio enkódert.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">Nem lehet inicializálni az audio enkódert.</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>Nem lehet inicializálni az audio dekódert.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">Nem lehet inicializálni az audio dekódert.</translation>
     </message>
 </context>
 <context>
@@ -512,8 +533,8 @@
         <translation>Nem található enkóder a(z) %1 kodekhez.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>Nem lehet inicializálni a video enkódert.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">Nem lehet inicializálni a video enkódert.</translation>
     </message>
 </context>
 <context>
@@ -539,60 +560,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>Analóg enkóder</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>Video fal</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>Próba licencek</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>Analóg licencek</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>Professional licencek</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>Edge licencek</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Vmax licencek</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>Analóg enkóder licencek</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>Video fal licencek</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>Érvénytelen aláírás</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>A szerver a szükséges hardver azonosítóval nem található</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>Érvénytelen testreszabás</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>Lejárt</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>Érvénytelen típus</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -603,6 +576,10 @@
         <translation>Ismeretlen hiba</translation>
     </message>
     <message>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">Analóg enkóder</translation>
+    </message>
+    <message>
         <source>I/O Module</source>
         <translation type="unfinished"></translation>
     </message>
@@ -611,11 +588,67 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module licenses</source>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">Próba licencek</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">Analóg licencek</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">Professional licencek</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">Edge licencek</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">Vmax licencek</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">Analóg enkóder licencek</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">Video fal licencek</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start licenses</source>
+        <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Signature</source>
+        <translation type="unfinished">Érvénytelen aláírás</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">Érvénytelen testreszabás</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">Érvénytelen típus</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -646,24 +679,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>A licence kulcs aktiválásas közben probléma lépett fel. Adatbázis hiba történt.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>A licence kulcs aktiválásas közben probléma lépett fel. Érvénytelen adat érkezett. Kérem keresse fel a segítségnyújtó csapatot, hogy jelentse a problémát.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>A megadott licence kulcs érvénytelen. Kérem ellenőrizze a megadott licence kulcs helyességét. Ha a probléma továbbra is fennáll, kérem keresse fel a segítségnyújtó csapatot, hogy megerősítsék a licence kulcs érvényességét vagy egy érvényes licence kulcs beszserzéséhez.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">A licence kulcs aktiválásas közben probléma lépett fel. Adatbázis hiba történt.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Nem kompatibilis licencet próbál aktiválni a szoftverrel. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">A megadott licence kulcs érvénytelen. Kérem ellenőrizze a megadott licence kulcs helyességét. Ha a probléma továbbra is fennáll, kérem keresse fel a segítségnyújtó csapatot, hogy megerősítsék a licence kulcs érvényességét vagy egy érvényes licence kulcs beszserzéséhez.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>A licence kulcs előzőleg aktiválva lett a {{hwid}}hardver azonosítóval {{time}}. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Nem kompatibilis licencet próbál aktiválni a szoftverrel. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">A licence kulcs előzőleg aktiválva lett a {{hwid}}hardver azonosítóval {{time}}. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
     </message>
 </context>
 <context>
@@ -702,30 +735,117 @@
     </message>
 </context>
 <context>
+    <name>QnResourceNameStrings</name>
+    <message numerus="yes">
+        <source>%n Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n IO module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n device(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>device</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSignHelper</name>
     <message>
         <source>Unknown</source>
         <translation>Ismeretlen</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>Próba licence</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>Hardver azonosító:</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>Licencelve a következővel:</translation>
     </message>
     <message>
         <source>Watermark: </source>
         <translation>Vízjel:</translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>Ingyenes licence</translation>
+        <source>Trial License</source>
+        <translation type="unfinished">Próba licence</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">Licencelve a következővel:</translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">Ingyenes licence</translation>
     </message>
 </context>
 <context>
@@ -766,7 +886,7 @@
     <message>
         <source>Lo</source>
         <extracomment>Short for &apos;Low&apos;</extracomment>
-        <translation></translation>
+        <translation>Alacsony</translation>
     </message>
     <message>
         <source>Me</source>
@@ -856,14 +976,6 @@
         <translation>Hiba az email küldése közben</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>A tárhelyek beteltek</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>Tárhelyek nincsenek konfigurálva</translation>
-    </message>
-    <message>
         <source>Rebuilding archive index is completed</source>
         <translation>Archív index újraépítése befejeződött</translation>
     </message>
@@ -892,10 +1004,6 @@
         <translation>Nem tudnak fogadni rendszer figyelmeztetéseket emailen keresztül.</translation>
     </message>
     <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>Több szervernek más az ideje és a korrekt időt nem lehet automatikusan beazonosítani.</translation>
-    </message>
-    <message>
         <source>Storages are full on the following Server:</source>
         <translation>A tárhelyek beteltek a következő szerveren:</translation>
     </message>
@@ -914,6 +1022,18 @@
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>Archív index újraépítése befejeződött a következő szerveren:</translation>
+    </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">A tárhelyek beteltek</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">Tárhelyek nincsenek konfigurálva</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -965,12 +1085,12 @@
         <translation>Ismeretlen átkódolási metódus.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCL átkódolás nincs megvalósítva</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">OpenCL átkódolás nincs megvalósítva</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>Ismeretlen átkódolási metódus</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">Ismeretlen átkódolási metódus</translation>
     </message>
 </context>
 <context>

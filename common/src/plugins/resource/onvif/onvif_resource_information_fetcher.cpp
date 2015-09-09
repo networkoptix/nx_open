@@ -37,6 +37,7 @@ static const char* IGNORE_VENDORS[][2] =
     {"IP*", "*networkcamera*"}, // DLINK
     {"ISD", "*"},              // ISD
     {"spartan-6*", "*"},       // ArecontVision
+    {"Arecont Vision*", "*"},  // ArecontVision
     {"acti*", "*"},       // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
     {"*", "KCM*"},        // ACTi
     {"*", "DWCA-*"},      // NEW ISD cameras rebrended to DW
@@ -171,7 +172,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         soapWrapper.setPassword(info.defaultPassword);
     }
     else if (discoveryMode != DiscoveryMode::partiallyEnabled)
-        soapWrapper.fetchLoginPassword(info.manufacturer);
+        soapWrapper.fetchLoginPassword(info.manufacturer, info.name);
 
     if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
         return; //ignoring unknown cameras

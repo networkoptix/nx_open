@@ -34,6 +34,7 @@ protected:
 
     virtual Buttons calculateButtonsVisibility() const override;
     virtual QString calculateTitleText() const override;
+    virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual void at_itemDataChanged(int role) override;
 
