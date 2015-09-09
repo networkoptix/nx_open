@@ -20,8 +20,9 @@ public:
     ScopedGuard(ScopedGuard&& rhs)
     :
         m_callback(std::move(rhs.m_callback)),
-        m_fired(false)
+        m_fired(rhs.m_fired)
     {
+        rhs.m_fired = true;
     }
 
     /** Fires this guard */
@@ -33,6 +34,8 @@ public:
     ScopedGuard& operator=(ScopedGuard&& rhs)
     {
         m_callback = std::move(rhs.m_callback);
+        m_fired = rhs.m_fired;
+        rhs.m_fired = true;
         return *this;
     }
 
