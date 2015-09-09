@@ -21,4 +21,8 @@ QnListView {
 
         onClicked: Main.openMediaResource(model.uuid)
     }
+
+    QnScrollIndicator {
+        flickable: parent
+    }
 }

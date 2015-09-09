@@ -271,8 +271,6 @@ QnFlickable {
         }
     }
 
-//    Scrollbar { flickableItem: rootItem }
-
     Timer {
         id: refreshTimer
 

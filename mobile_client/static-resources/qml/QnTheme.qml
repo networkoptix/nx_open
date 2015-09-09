@@ -75,6 +75,7 @@ QtObject {
     property color attentionBackground
     property color loadingText
     property color preloaderDot
+    property color scrollIndicator
 
     function loadColors() {
         windowBackground        = colorTheme.color("window.background")
@@ -134,6 +135,7 @@ QtObject {
         attentionBackground     = colorTheme.color("other.attentionBackground")
         loadingText             = colorTheme.color("other.loadingText")
         preloaderDot            = colorTheme.color("other.preloaderDot")
+        scrollIndicator         = colorTheme.color("other.scrollIndicator")
     }
 
     function transparent(color, opacity) {

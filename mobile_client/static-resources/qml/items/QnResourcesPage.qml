@@ -44,6 +44,10 @@ QnPage {
         anchors.fill: parent
     }
 
+    QnScrollIndicator {
+        flickable: camerasList
+    }
+
     Rectangle {
         id: loadingDummy
         anchors.fill: parent
