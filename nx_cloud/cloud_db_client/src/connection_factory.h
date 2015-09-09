@@ -21,6 +21,8 @@ class ConnectionFactory
     public api::ConnectionFactory
 {
 public:
+    ConnectionFactory();
+
     //!Implementation of \a api::ConnectionFactory::connect
     virtual void connect(
         const std::string& login,

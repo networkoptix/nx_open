@@ -15,6 +15,12 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
+ConnectionFactory::ConnectionFactory()
+:
+    m_endPointFetcher("cdb")
+{
+}
+
 void ConnectionFactory::connect(
     const std::string& /*login*/,
     const std::string& /*password*/,

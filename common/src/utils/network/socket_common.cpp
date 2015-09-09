@@ -15,6 +15,11 @@ const HostAddress HostAddress::anyHost( (uint32_t)INADDR_ANY );
 static const QByteArray IP_V6_MAP_PREFIX_HEX = QByteArray(10*2, '0') + QByteArray(2*2, 'F');
 static const QByteArray IP_V6_MAP_PREFIX = QByteArray::fromHex(IP_V6_MAP_PREFIX_HEX);
 
+
+///////////////////////////////////////////////////
+//   class HostAddress
+///////////////////////////////////////////////////
+
 HostAddress::HostAddress()
 :
     m_addressResolved(true)
@@ -173,6 +178,11 @@ bool HostAddress::operator==( const HostAddress& rhs ) const
         : m_addrStr == rhs.m_addrStr;
 }
 
+bool HostAddress::operator!=(const HostAddress& right) const
+{
+    return !(*this == right);
+}
+
 bool HostAddress::operator<( const HostAddress& right ) const
 {
     if( m_addressResolved < right.m_addressResolved )
@@ -198,6 +208,88 @@ struct in_addr HostAddress::inAddr(bool* ok) const
         *ok = m_addressResolved;
     return m_sinAddr;
 }
+
+
+///////////////////////////////////////////////////
+//   class SocketAddress
+///////////////////////////////////////////////////
+
+SocketAddress::SocketAddress()
+:
+    port(0)
+{
+}
+
+SocketAddress::SocketAddress( HostAddress _address, quint16 _port )
+:
+    address( std::move(_address) ),
+    port( _port )
+{
+}
+
+SocketAddress::SocketAddress( const QString& str )
+:
+    port( 0 )
+{
+    initializeFromString(str);
+}
+
+SocketAddress::SocketAddress( const char* str )
+:
+    port( 0 )
+{
+    initializeFromString(QString::fromUtf8(str));
+}
+
+QString SocketAddress::toString() const
+{
+    return
+        address.toString() +
+        (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
+}
+
+bool SocketAddress::operator==( const SocketAddress& rhs ) const
+{
+    return address == rhs.address && port == rhs.port;
+}
+
+bool SocketAddress::operator!=( const SocketAddress& rhs ) const
+{
+    return !(*this == rhs);
+}
+
+bool SocketAddress::operator<( const SocketAddress& rhs ) const
+{
+    if( address < rhs.address )
+        return true;
+    if( rhs.address < address )
+        return false;
+    return port < rhs.port;
+}
+
+bool SocketAddress::isNull() const
+{
+    return address == HostAddress() && port == 0;
+}
+
+void SocketAddress::initializeFromString( const QString& str )
+{
+    int sepPos = str.indexOf(L':');
+    if( sepPos == -1 )
+    {
+        address = HostAddress(str);
+    }
+    else
+    {
+        address = HostAddress(str.mid( 0, sepPos ));
+        port = str.mid( sepPos+1 ).toInt();
+    }
+}
+
+
+///////////////////////////////////////////////////
+//   class SocketGlobalRuntimeInternal
+///////////////////////////////////////////////////
 
 class SocketGlobalRuntimeInternal
 {

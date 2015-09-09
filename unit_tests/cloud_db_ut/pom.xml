@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>build_ut</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.0.0-SNAPSHOT</version>
+        <relativePath>../build_ut</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cloud_db_ut</artifactId>
+    <packaging>pom</packaging>
+    <name>cloud_db unit tests</name>
+
+    <properties>
+        <product.title>cloud_db unit tests</product.title>
+        <!--Global libs-->
+        <qt.libs>core network xml concurrent sql multimedia</qt.libs>
+        <global.libs>-lcommon -ludt -lcloud_db -lcloud_db_client</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib -lssleay32 -llibeay32</windows.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac</linux.oslibs>
+        <linux.arm.oslibs></linux.arm.oslibs>
+        <windows.oslibs.release></windows.oslibs.release>
+        <windows.oslibs.debug></windows.oslibs.debug>
+        <mac.oslibs></mac.oslibs>
+        <!--Global defines-->
+        <global.defines></global.defines>
+        <!--Specific os defines-->
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
+        <linux.defines/>
+        <mac.defines/>
+    </properties>
+</project>
