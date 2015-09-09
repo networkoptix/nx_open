@@ -7,10 +7,10 @@
 #define NX_CLOUD_DB_SETTING_H
 
 #include <list>
-
-#include <QtCore/QSettings>
+#include <map>
 
 #include <utils/common/command_line_parser.h>
+#include <utils/common/settings.h>
 #include <utils/db/types.h>
 #include <utils/email/email.h>
 #include <utils/network/socket_common.h>
@@ -26,6 +26,7 @@ public:
     QString logLevel;
     QString logDir;
 };
+
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
@@ -53,9 +54,8 @@ public:
 
 private:
     QnCommandLineParser m_commandLineParser;
-    QSettings m_settings;
+    QnSettings m_settings;
     bool m_showHelp;
-    QString m_logLevel;
 
     Logging m_logging;
     db::ConnectionOptions m_dbConnectionOptions;

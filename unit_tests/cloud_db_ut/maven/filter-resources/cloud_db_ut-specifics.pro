@@ -5,6 +5,9 @@ INCLUDEPATH += ${root.dir}/nx_cloud/libcloud_db/src
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
 INCLUDEPATH += ${root.dir}/nx_cloud/
 
+include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsinglecoreapplication.pri)
+include($$ADDITIONAL_QT_INCLUDES/qtservice/src/qtservice.pri)
+
 include( ${libdir}/gtest.pri )
 include( ${libdir}/gmock.pri )
 

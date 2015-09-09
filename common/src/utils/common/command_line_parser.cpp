@@ -189,3 +189,47 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         argc = skipped;
     return result;
 }
+
+
+
+void parseCmdArgs(
+    int argc,
+    char **argv,
+    std::multimap<QString, QString>* const args)
+{
+    std::multimap<QString, QString>::iterator curParamIter = args->end();
+
+    for (int i = 0; i < argc; ++i)
+    {
+        const char* arg = argv[i];
+
+        const auto argLen = strlen(arg);
+        if (argLen == 0)
+            continue;
+
+        if (arg[0] == '-')
+        {
+            //param
+            if (argLen > 1 && arg[1] == '-')    //long param
+            {
+                //parsing log param
+                const char* sepPos = strchr(arg, '=');
+                if (sepPos == nullptr)
+                    args->emplace(QString::fromUtf8(arg+2), QString()); //no value
+                else
+                    args->emplace(QString::fromUtf8(arg+2, sepPos-(arg+2)), QString::fromUtf8(sepPos+1));
+            }
+            else
+            {
+                //short param value
+                curParamIter = args->emplace(QString::fromUtf8(arg+1), QString());
+            }
+        }
+        else
+        {
+            //we have value
+            if (curParamIter != args->end())
+                curParamIter->second = QString::fromUtf8(arg);
+        }
+    }
+}

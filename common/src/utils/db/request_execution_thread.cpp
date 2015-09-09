@@ -27,6 +27,7 @@ DbRequestExecutionThread::DbRequestExecutionThread(
 DbRequestExecutionThread::~DbRequestExecutionThread()
 {
     stop();
+    m_dbConnection.close();
 }
 
 bool DbRequestExecutionThread::open()

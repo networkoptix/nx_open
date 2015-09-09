@@ -28,7 +28,7 @@ namespace
     static const QLatin1String LOG_DIR( "logDir" );
 
     static const QLatin1String ENDPOINTS_TO_LISTEN( "listenOn" );
-    static const QLatin1String DEFAULT_ENDPOINTS_TO_LISTEN( ":3346" );
+    static const QLatin1String DEFAULT_ENDPOINTS_TO_LISTEN( "0.0.0.0:3346" );
 
     static const QLatin1String DATA_DIR( "dataDir" );
 
@@ -42,7 +42,7 @@ namespace
     static const QLatin1String DB_PORT( "db/port" );
     static const int DEFAULT_DB_PORT = 3306;
 
-    static const QLatin1String DB_DB_NAME( "db/dbName" );
+    static const QLatin1String DB_DB_NAME( "db/name" );
     static const QLatin1String DEFAULT_DB_DB_NAME( "nx_cloud" );
 
     static const QLatin1String DB_USER_NAME( "db/userName" );
@@ -126,7 +126,7 @@ std::list<SocketAddress> Settings::endpointsToListen() const
     const QStringList& httpAddrToListenStrList = m_settings.value(
         ENDPOINTS_TO_LISTEN,
         DEFAULT_ENDPOINTS_TO_LISTEN ).toString().split( ',' );
-    std::list<SocketAddress> httpAddrToListenList( httpAddrToListenStrList.size() );
+    std::list<SocketAddress> httpAddrToListenList;
     std::transform(
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
@@ -154,7 +154,9 @@ QString Settings::dataDir() const
 
 void Settings::load( int argc, char **argv )
 {
-    m_commandLineParser.parse( argc, argv, stderr );
+    m_commandLineParser.parse(argc, argv, stderr);
+    m_settings.parseArgs(argc, argv);
+
     loadConfiguration();
 }
 
@@ -167,18 +169,12 @@ void Settings::fillSupportedCmdParameters()
 {
     m_commandLineParser.addParameter(
         &m_showHelp, "--help", NULL, "Show help message", false );
-    m_commandLineParser.addParameter(
-        &m_logLevel, "--log-level", NULL,
-        lit( "Define log level. %1 by default" ).arg( DEFAULT_LOG_LEVEL ),
-        DEFAULT_LOG_LEVEL );
 }
 
 void Settings::loadConfiguration()
 {
     //log
-    m_logging.logLevel = !m_logLevel.isEmpty()
-        ? m_logLevel
-        : m_settings.value( LOG_LEVEL, DEFAULT_LOG_LEVEL ).toString();
+    m_logging.logLevel = m_settings.value( LOG_LEVEL, DEFAULT_LOG_LEVEL ).toString();
     m_logging.logDir = m_settings.value( LOG_DIR, dataDir() + lit( "/log/" ) ).toString();
 
     //DB

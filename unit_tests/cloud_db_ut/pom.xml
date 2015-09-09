@@ -22,7 +22,7 @@
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
         <global.libs>-lcommon -ludt -lcloud_db -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib Wldap32.lib</windows.oslibs>
         <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
