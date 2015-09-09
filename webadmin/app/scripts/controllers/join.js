@@ -41,35 +41,38 @@ angular.module('webadminApp')
         });
 
 
+        function errorHandler(errorToShow){
+            switch(errorToShow){
+                case 'FAIL':
+                    errorToShow = 'System is unreachable or doesn\'t exist.';
+                    break;
+                case 'currentPassword':
+                    errorToShow = 'Incorrect current password';
+                    break;
+                case 'UNAUTHORIZED':
+                case 'password':
+                    errorToShow = 'Wrong password.';
+                    break;
+                case 'INCOMPATIBLE':
+                    errorToShow = 'Found system has incompatible version.';
+                    break;
+                case 'url':
+                    errorToShow = 'Wrong url.';
+                    break;
+            }
+            alert('Connection failed: ' + errorToShow);
+        };
+
         $scope.test = function () {
 
             /*if (!$('#mergeSystemForm').valid()) {
                 return;
             }*/
 
-
             mediaserver.pingSystem($scope.settings.url, $scope.settings.password).then(function(r){
                 if(r.data.error!=='0'){
                     var errorToShow = r.data.errorString;
-                    switch(errorToShow){
-                        case 'FAIL':
-                            errorToShow = 'System is unreachable or doesn\'t exist.';
-                            break;
-                        case 'currentPassword':
-                            errorToShow = 'Incorrect current password';
-                            break;
-                        case 'UNAUTHORIZED':
-                        case 'password':
-                            errorToShow = 'Wrong password.';
-                            break;
-                        case 'INCOMPATIBLE':
-                            errorToShow = 'Found system has incompatible version.';
-                            break;
-                        case 'url':
-                            errorToShow = 'Wrong url.';
-                            break;
-                    }
-                    alert('Connection failed: ' + errorToShow);
+                    errorHandler(errorToShow);
                 }else {
                     $scope.systems.systemFound = true;
                     $scope.systems.joinSystemName = r.data.reply.systemName;
@@ -82,10 +85,16 @@ angular.module('webadminApp')
             /*if (!$('#mergeSustemForm').valid()) {
                 return;
             }*/
-            $modalInstance.close({url: $scope.settings.url,
-                password: $scope.settings.password,
-                keepMySystem:$scope.settings.keepMySystem,
-                currentPassword:$scope.settings.currentPassword});
+
+            ediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
+                if(r.data.error!=='0'){
+                    var errorToShow = r.data.errorString;
+                    errorHandler(errorToShow);
+                }else {
+                    alert('Merge succeed.');
+                    window.location.reload();
+                }
+            });
         };
 
         $scope.selectSystem = function (system){
