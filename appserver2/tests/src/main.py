@@ -55,7 +55,7 @@ class UnitTestRollback:
 
     def _doSingleRollback(self,methodName,serverAddress,resourceId):
         # this function will do a single rollback
-        req = urllib2.Request("http://%s/ec2/%s" % (serverAddress,"removeResource"), \
+        req = urllib2.Request("http://%s/ec2/%s" % (serverAddress,"removeResource"),
             data=self._removeTemplate % (resourceId), headers={'Content-Type': 'application/json'})
         response = None
         try:
@@ -192,7 +192,9 @@ class ClusterTest():
             response = urllib2.urlopen("http://%s/ec2/testConnection?format=json" % (s))
             if response.getcode() != 200:
                 return (False,"testConnection response with error code:%d" % (response.getcode()))
-            json_obj = json.loads(response.read())
+            json_obj = SafeJsonLoads(response.read(), s, 'testConnection')
+            if json_obj is None:
+                return (False, "Wrong response")
             server_id_list.append(self._patchUUID(json_obj["ecsGuid"]))
             response.close()
 
@@ -204,7 +206,9 @@ class ClusterTest():
         if response.getcode() != 200:
             return (False,"getMediaServersEx resposne with error code:%d" % (response.getcode()))
 
-        json_obj = json.loads(response.read())
+        json_obj = SafeJsonLoads(response.read(), self.clusterTestServerList[0], 'getMediaServersEx')
+        if json_obj is None:
+            return (False, "Wrong response")
 
         for uuid in server_id_list:
             n = self._getServerName(json_obj,uuid)
@@ -354,21 +358,25 @@ class ClusterTest():
             address = entry[1]
 
             if response.getcode() != 200:
-                return (False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode()))
+                return (False,"Server: %s method: %s HTTP request failed with code: %d" % (address,methodName,response.getcode()))
             else:
                 content = response.read()
                 if result == None:
                     result = content
                     resultAddr = address
+                    resultJsonObject = SafeJsonLoads(result, resultAddr, methodName)
+                    if resultJsonObject is None:
+                        return (False, "Wrong response")
                 else:
                     if content != result:
                         print "Server:%s has different status with server:%s on method:%s" % (address,resultAddr,methodName)
                         # Since the server could issue json object has different order which makes us
                         # have to do deep comparison of json object internally. This deep comparison
                         # is very slow and only performs on objects that has failed the naive comparison
-                        if resultJsonObject is None:
-                            resultJsonObject = json.loads(result)
-                        compareResult = compareJson( json.loads(content) , resultJsonObject )
+                        contentJsonObject = SafeJsonLoads(content, address, methodName)
+                        if contentJsonObject is None:
+                            return (False, "Wrong response")
+                        compareResult = compareJson(contentJsonObject, resultJsonObject)
                         if compareResult.hasDiff():
                             print "Server:%s has different status with server:%s on method:%s" % (address,resultAddr,methodName)
                             print compareResult.errorInfo()
@@ -1782,7 +1790,9 @@ class MergeTestBase:
             response = urllib2.urlopen("http://%s/ec2/testConnection" % (s))
             if response.getcode() != 200:
                 return False
-            jobj = json.loads(response.read())
+            jobj = SafeJsonLoads(response.read(), s, 'testConnection')
+            if jobj is None:
+                return False
             self._oldSystemName.append(jobj["systemName"])
             response.close()
         return True
@@ -1903,7 +1913,9 @@ class MergeTest_Resource(MergeTestBase):
             response = urllib2.urlopen("http://%s/ec2/testConnection" % (s))
             if response.getcode() != 200:
                 return False
-            jobj = json.loads(response.read())
+            jobj = SafeJsonLoads(response.read(), s, 'testConnection')
+            if jobj is None:
+                return False
             if oldSystemName == None:
                 oldSystemName = jobj["systemName"]
                 oldSystemNameAddr = s
@@ -2099,9 +2111,10 @@ class MergeTest_AdminPassword(MergeTestBase):
         else:
             return True
 
-    def _checkOnline(self,uidset,response,serverAddr):
-        obj = json.loads(response)
-        for ele in obj:
+    def _checkOnline(self,uidset,responseObj,serverAddr):
+        if responseObj is None:
+            return False
+        for ele in responseObj:
             if ele["id"] in uidset:
                 if ele["status"] != "Online":
                     # report the status
@@ -2126,7 +2139,7 @@ class MergeTest_AdminPassword(MergeTestBase):
             if response.getcode() != 200:
                 print "Connection failed with HTTP code:%d"%(response.getcode())
                 return False
-            if not self._checkOnline(uidSet,response.read(),s):
+            if not self._checkOnline(uidSet, SafeJsonLoads(response.read(), s, 'getMediaServersEx'),s):
                 return False
 
         return True
@@ -2134,10 +2147,13 @@ class MergeTest_AdminPassword(MergeTestBase):
     def _fetchAdmin(self):
         for s in clusterTest.clusterTestServerList:
             response = urllib2.urlopen("http://%s/ec2/getUsers"%(s))
-            obj = json.loads(response.read())
+            obj = SafeJsonLoads(response.read(), s, 'getUsers')
+            if obj is None:
+                return None
             for entry in obj:
                 if entry["isAdmin"]:
                     self._adminList[s] = (entry["id"],entry["name"],entry["email"])
+        return True
 
     def _setAdminPassword(self,ser,pwd,verbose=True):
         oldAdmin = self._adminList[ser]
@@ -2260,7 +2276,9 @@ class MergeTest_AdminPassword(MergeTestBase):
         print "==========================================="
         print "Merge Test:Admin Password Test Start!"
         # At first, we fetch each system's admin information
-        self._fetchAdmin()
+        if self._fetchAdmin() is None:
+            print "Merge Test:Fetch Admins list failed"
+            return False
         # Change each system into different system name
         print "Now set each server node into different and UNIQUE system name\n"
         self._setClusterSystemRandom()
@@ -2645,8 +2663,10 @@ class SingleServerRtspTestBase:
         response = urllib2.urlopen("http://%s/ec2/testConnection"%(self._serverEndpoint))
         if response.getcode() != 200:
             return False
-        obj = json.loads(response.read())
+        obj = SafeJsonLoads(response.read(), self._serverEndpoint, 'testConnection')
         response.close()
+        if obj is None:
+            return False
         guid = obj["ecsGuid"]
         if guid[0] == '{':
             return guid
@@ -2660,7 +2680,7 @@ class SingleServerRtspTestBase:
 
         if response.getcode() != 200:
             raise Exception("Cannot connect to server:%s using getCameras" % (self._serverEndpoint))
-        json_obj = json.loads(response.read())
+        json_obj = SafeJsonLoads(response.read(), self._serverEndpoint, 'getCameras')
 
         for c in json_obj:
             if c["typeId"] == "{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}":
@@ -3354,7 +3374,9 @@ class PerformanceOperation():
             if response.getcode() != 200:
                 return None
 
-            json_obj = json.loads(response.read())
+            json_obj = SafeJsonLoads(response.read(), s, methodName)
+            if json_obj is None:
+                return None
             for entry in json_obj:
                 if "isAdmin" in entry and entry["isAdmin"] == True:
                     continue # Skip the admin
@@ -3380,7 +3402,9 @@ class PerformanceOperation():
             if response.getcode() != 200:
                 return None
 
-            json_obj = json.loads(response.read())
+            json_obj = SafeJsonLoads(response.read(), s, methodName)
+            if json_obj is None:
+                return None
             for entry in json_obj:
                 if "name" in entry and entry["name"].startswith("ec2_test"):
                     if "isAdmin" in entry and entry["isAdmin"] == True:
@@ -3906,9 +3930,11 @@ class SystemNameTest:
 
         for s in self._serverList:
             ret = self._doGet(s,"testConnection")
-            if ret == None:
+            if ret is None:
                 return (False,"Server:%s cannot perform testConnection REST call" % (s))
-            obj = json.loads(ret)
+            obj = SafeJsonLoads(ret, s, "testConnection")
+            if obj is None:
+                return  (False, "Server: %s returns wrong testConnection answer" % (s))
 
             if systemName != None:
                 if systemName != obj["systemName"]:
@@ -3943,7 +3969,9 @@ class SystemNameTest:
         ret = self._doGet(s,"getMediaServersEx")
         if ret == None:
             return (False,"Server:%s cannot doGet on getMediaServersEx" % (s))
-        obj = json.loads(ret)
+        obj = SafeJsonLoads(ret, s, "getMediaServersEx")
+        if obj is None:
+            return (False, "The server %s sends wrong response to getMediaServersEx" % (s,))
         for ele in obj:
             if ele["id"] == thisGUID:
                 if ele["status"] == "Offline":

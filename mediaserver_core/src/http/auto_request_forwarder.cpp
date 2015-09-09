@@ -122,7 +122,7 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
     if( *res )
         return true;
     //searching by mac
-    *res = qnResPool->getResourceByMacAddress(resUniqueID);
+    //*res = qnResPool->getResourceByMacAddress(resUniqueID);
     return *res != nullptr;
 }
 
