@@ -87,7 +87,7 @@ Item {
             height: parent.height - dp(32)
             width: dp(1)
             y: dp(16)
-            color: "#2B383F"
+            color: QnTheme.calendarSplitter
         }
     }
 

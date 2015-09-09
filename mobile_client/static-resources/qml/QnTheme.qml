@@ -71,6 +71,7 @@ QtObject {
     property color calendarDisabledText
     property color calendarSelectedBackground
     property color calendarSelectedText
+    property color calendarSplitter
 
     property color attentionBackground
     property color loadingText
@@ -132,6 +133,7 @@ QtObject {
         calendarDisabledText    = colorTheme.color("calendar.disabledText")
         calendarSelectedBackground = colorTheme.color("calendar.selectedBackground")
         calendarSelectedText    = colorTheme.color("calendar.selectedText")
+        calendarSplitter        = colorTheme.color("calendar.splitter")
         attentionBackground     = colorTheme.color("other.attentionBackground")
         loadingText             = colorTheme.color("other.loadingText")
         preloaderDot            = colorTheme.color("other.preloaderDot")
