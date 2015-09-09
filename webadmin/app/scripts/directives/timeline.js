@@ -23,7 +23,10 @@ angular.module('webadminApp')
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
                     stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
+                    lastMinuteInterval:1 * 60 * 1000,
                     minMsPerPixel: 10, // Minimum level for zooming:
+                    lastMinuteAnimationMs:100,
+                    lastMinuteTextureSize:10,
                     minMarkWidth: 1, // Minimum width for visible mark
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
@@ -79,6 +82,7 @@ angular.module('webadminApp')
                     loadingChunkColor: [0,255,255,0.3],
                     blindChunkColor:  [255,0,0,0.3],
                     highlighChunkColor: [255,255,0,1],
+                    lastMinuteColor: [58,145,30,0.3],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
                     scrollBarHeight: 20/110, // %
@@ -272,7 +276,13 @@ angular.module('webadminApp')
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var canvas = element.find('canvas').get(0);
-                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100, timelineConfig.stickToLiveMs, timelineConfig.zoomAccuracy); //Init boundariesProvider
+                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,
+                    timelineConfig.maxMsPerPixel,
+                    timelineConfig.initialInterval,
+                    100,
+                    timelineConfig.stickToLiveMs,
+                    timelineConfig.zoomAccuracy,
+                    timelineConfig.lastMinuteInterval); //Init boundariesProvider
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
@@ -719,7 +729,6 @@ angular.module('webadminApp')
                 }
                 // !!! Draw events
                 function drawOrCheckEvents(context){
-
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
                     mouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
 
@@ -729,7 +738,6 @@ angular.module('webadminApp')
                     context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
                     context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
-
 
                     var level = scope.scaleManager.levels.events.level;
                     var levelIndex = scope.scaleManager.levels.events.index;
@@ -746,6 +754,8 @@ angular.module('webadminApp')
                             drawEvent(context,events[i],levelIndex);
                         }
                     }
+
+                    drawLastMinute(context);
                 }
                 function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
                     var startCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.start);
@@ -784,6 +794,55 @@ angular.module('webadminApp')
                         top,
                         (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
                         height);
+                }
+
+
+                var lastMinuteTexture = false;
+                var lastMinuteTextureImg = false;
+                    function drawLastMinute(context){
+                    // 1. Get start coordinate for last minute
+                    var end = scope.scaleManager.end;
+                    var start = scope.scaleManager.lastMinute();
+
+
+                    if(start >= scope.scaleManager.visibleEnd){
+                        return; // Do not draw - just skip it
+                    }
+                    // 2. Get texture
+
+                    if(lastMinuteTexture){
+                        context.fillStyle = lastMinuteTexture;
+                    }else{
+                        if(!lastMinuteTextureImg) {
+                            var img = new Image();
+                            img.onload = function () {
+                                lastMinuteTexture = context.createPattern(img, 'repeat');
+                                context.fillStyle = lastMinuteTexture;
+                            };
+                            img.src = 'images/lastminute.png';
+                            lastMinuteTextureImg = img;
+                        }
+                        context.fillStyle = blurColor(timelineConfig.lastMinuteColor,1);
+                    }
+
+                    // 3. Draw last minute with texture
+                    var startCoordinate = scope.scaleManager.dateToScreenCoordinate(start);
+                    var endCoordinate = scope.scaleManager.dateToScreenCoordinate(end);
+
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
+                    var height = timelineConfig.chunkHeight * scope.viewportHeight;
+
+                    var offset_x = (start / timelineConfig.lastMinuteAnimationMs) % timelineConfig.lastMinuteTextureSize;
+
+                    context.save();
+                    context.translate(offset_x, 0);
+
+                    context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2 - offset_x,
+                        top,
+                            (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
+                        height);
+
+                    context.restore();
                 }
 
                 var scrollBarWidth = 0;
@@ -1008,8 +1067,14 @@ angular.module('webadminApp')
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         var date = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
-                        scope.positionHandler(scope.scaleManager.screenCoordinateToDate(mouseCoordinate));
-                        scope.scaleManager.watchPlaying(date);
+                        
+                        var lastMinute = scope.scaleManager.lastMinute();
+                        if(date > lastMinute){
+                            scope.goToLive();
+                        }else {
+                            scope.positionHandler(date);
+                            scope.scaleManager.watchPlaying(date);
+                        }
 
                     }else{
                         if(!mouseInScrollbar){
