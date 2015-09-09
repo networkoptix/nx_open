@@ -59,6 +59,10 @@ angular.module('webadminApp')
                 case 'url':
                     errorToShow = 'Wrong url.';
                     break;
+                case 'STARTER_LICENSE_ERROR':
+                    errorToShow = 'Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.';
+                    alert(errorToShow);
+                    return;
             }
             alert('Connection failed: ' + errorToShow);
         };
