@@ -70,14 +70,16 @@ Item {
         QnCalendarDayNamesRow {
             id: dayNamesRow
 
-            width: parent.width
+            x: dp(8)
+            width: parent.width - dp(16)
             mondayIsFirstDay: mondayIsFirstDay
         }
 
         QnListView {
             id: monthsList
 
-            width: parent.width
+            x: dp(8)
+            width: parent.width - dp(16)
             height: 6 * dp(48)
             clip: true
 

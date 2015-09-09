@@ -24,8 +24,7 @@ Item {
         property real cellWidth: width / columns
         property real cellHeight: cellWidth
 
-        width: parent.width - dp(32)
-        x: dp(16)
+        width: parent.width
         height: parent.width / columns * 6
 
         columns: 7

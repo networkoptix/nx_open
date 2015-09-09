@@ -5,7 +5,7 @@ import com.networkoptix.qml 1.0
 Item {
     id: dayNames
 
-    width: dp(48) * 7
+    width: dp(48) * d.daysPerWeek
     height: row.height
 
     property bool mondayIsFirstDay: true
@@ -13,7 +13,8 @@ Item {
     QtObject {
         id: d
 
-        property var locale: Qt.locale()
+        readonly property var locale: Qt.locale()
+        readonly property int daysPerWeek: 7
     }
 
     Row {
@@ -25,7 +26,7 @@ Item {
             }
 
             Item {
-                width: dayNames.width / 7
+                width: dayNames.width / d.daysPerWeek
                 height: dp(24)
 
                 Text {
@@ -42,8 +43,8 @@ Item {
         dayNamesModel.clear()
 
         var s = mondayIsFirstDay ? 1 : 0
-        for (var i = 0; i < 7; ++i) {
-            var day = (i + s) % 7
+        for (var i = 0; i < d.daysPerWeek; ++i) {
+            var day = (i + s) % d.daysPerWeek
             dayNamesModel.append({
                 "dayName" : d.locale.dayName(day, Locale.ShortFormat),
                 "holiday" : day == 0 || day == 6
