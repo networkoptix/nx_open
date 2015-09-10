@@ -615,7 +615,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     bool updateUserResource = false;
     if( !defaultAdminPassword.isEmpty() )
     {
-        if (!userResource->checkPassword(defaultAdminPassword)) {
+        if (!userResource->checkPassword(defaultAdminPassword) || userResource->getRealm() != QnAppInfo::realm()) {
             userResource->setPassword( defaultAdminPassword );
             userResource->generateHash();
             updateUserResource = true;
