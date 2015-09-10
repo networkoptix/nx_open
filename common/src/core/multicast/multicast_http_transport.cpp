@@ -159,6 +159,8 @@ Transport::Transport(const QUuid& localGuid):
             setMulticastIF(sendSocket->socketDescriptor(), ipv4Addr); //sendSocket->setMulticastInterface(iface);
             m_sendSockets.push_back(std::move(sendSocket));
             hasSendIface = true;
+            if (m_localAddress.isEmpty())
+                m_localAddress = ipv4Addr;
         }
         else
             qWarning() << "Failed to open Multicast Http send socket";
@@ -169,6 +171,11 @@ Transport::Transport(const QUuid& localGuid):
     m_timer.reset(new QTimer());
     connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
     m_timer->start(1000);
+}
+
+QString Transport::localAddress() const
+{
+    return m_localAddress;
 }
 
 void Transport::at_timer()
@@ -288,14 +295,14 @@ QUuid Transport::addRequest(const Request& request, ResponseCallback callback, i
     transportRequest.responseCallback = callback;
     transportRequest.timeoutMs = timeoutMs;
     m_requests.push_back(std::move(transportRequest));
-    if (!m_nextSendQueued)
-        QTimer::singleShot(0, this, SLOT(sendNextData()));
+    queueNextSendData(0);
     return transportRequest.requestId;
 }
 
 void Transport::putPacketToTransport(TransportConnection& transportConnection, const Packet& packet)
 {
     QByteArray encodedData = packet.serialize();
+    Q_ASSERT(encodedData.size() <= Packet::MAX_DATAGRAM_SIZE);
     for (int i = 0; i < SEND_RETRY_COUNT; ++i) 
     {
         for (auto& socket: m_sendSockets)
@@ -330,8 +337,7 @@ void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const
 {
     QMutexLocker lock(&m_mutex);
     m_requests.push_back(serializeResponse(requestId, clientId, httpResponse));
-    if (!m_nextSendQueued)
-        QTimer::singleShot(0, this, SLOT(sendNextData()));
+    queueNextSendData(0);
 }
 
 Transport::TransportConnection Transport::serializeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
@@ -459,7 +465,7 @@ void Transport::sendNextData()
             }
             */
             if (bytesWriten > 0)
-                sentBytes += bytesWriten;
+                sentBytes += Packet::MAX_DATAGRAM_SIZE; // take into account max datagram size for bitrate calculation
         }
         
         if (request.dataToSend.isEmpty() && !request.responseCallback)
@@ -468,8 +474,15 @@ void Transport::sendNextData()
             ++itr;
     }
     if (sentBytes > 0) {
+        qreal delaySecs = (qreal) sentBytes * 8.0 / SEND_BITRATE;
+        queueNextSendData(int(delaySecs / 1000.0 + 0.5));
+    }
+}
+
+void Transport::queueNextSendData(int delay)
+{
+    if (!m_nextSendQueued) {
         m_nextSendQueued = true;
-        int delay = int(SEND_BITRATE / (qreal) sentBytes / 8.0 + 0.5);
         QTimer::singleShot(delay, this, SLOT(sendNextData()));
     }
 }

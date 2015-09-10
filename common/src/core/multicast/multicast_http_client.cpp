@@ -60,10 +60,17 @@ Request HTTPClient::updateRequest(const Request& srcRequest)
 
     // add user agent header
 
-    Header header;
-    header.first = lit("User-Agent");
-    header.second = m_userAgent;
-    request.headers << header;
+    Header userAgent;
+    userAgent.first = lit("User-Agent");
+    userAgent.second = m_userAgent;
+    request.headers << userAgent;
+
+    // add user IP info header
+    
+    Header localAddress;
+    localAddress.first = lit("X-User-Host");
+    localAddress.second = m_transport.localAddress();
+    request.headers << localAddress;
 
     // add auth params to url query
 

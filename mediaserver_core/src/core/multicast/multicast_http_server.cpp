@@ -24,8 +24,12 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
     QString url(lit("http://%1:%2/%3").arg("127.0.0.1").arg(m_tcpListener->getPort()).arg(request.url.toString()));
 
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
-    for (const auto& header: request.headers)
-        httpClient->addAdditionalHeader(header.first.toUtf8(), header.second.toUtf8());
+    for (const auto& header: request.headers) {
+        if (header.first == QLatin1String("User-Agent"))
+            httpClient->setUserAgent(header.second);
+        else
+            httpClient->addAdditionalHeader(header.first.toUtf8(), header.second.toUtf8());
+    }
     httpClient->addAdditionalHeader("Connection", "Close");
 
     connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, [httpClient, requestId, clientId, this](nx_http::AsyncHttpClientPtr)  mutable 

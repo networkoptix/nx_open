@@ -49,6 +49,7 @@ namespace QnMulticast
         void addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);
         void setRequestCallback(RequestCallback value) { m_requestCallback = value; }
         void cancelRequest(const QUuid& requestId);
+        QString localAddress() const;
     private slots:
         void sendNextData();
         void at_socketReadyRead();
@@ -87,6 +88,7 @@ namespace QnMulticast
         mutable QMutex m_mutex;
         bool m_nextSendQueued;
         bool m_initialized;
+        QString m_localAddress;
     private:
         QByteArray serializeMessage(const Request& request) const;
         TransportConnection serializeRequest(const Request& request);
@@ -96,6 +98,7 @@ namespace QnMulticast
         Request parseRequest(const TransportConnection& transportData, bool* ok) const;
         void putPacketToTransport(TransportConnection& transportConnection, const Packet& packet);
         void eraseRequest(const QUuid& id);
+        void queueNextSendData(int delay);
     };
 
 }
