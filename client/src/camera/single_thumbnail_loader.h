@@ -18,36 +18,12 @@ public:
         JpgFormat
     };
 
-    /**
-     * Creates a new thumbnail loader for the given camera resource. Returns NULL
-     * pointer in case loader cannot be created.
-     *
-     * \param resource                  Camera resource to create time period loader for.
-     * \param parent                    Parent object for the loader to create.
-     * \param rotation                  item rotation angle. -1 means - use default rotation from resource properties
-     * \returns                         Newly created thumbnail loader.
-     */
-    static QnSingleThumbnailLoader *newInstance(const QnVirtualCameraResourcePtr &camera,
-                                                qint64 microSecSinceEpoch,
-                                                int rotation = -1,
-                                                const QSize &size = QSize(),
-                                                ThumbnailFormat format = JpgFormat,
-                                                QObject *parent = NULL);
-
-
-    /**
-     * Constructor.
-     *
-     * \param connection                Video server connection to use.
-     * \param resource                  Network resource representing the camera to work with.
-     * \param parent                    Parent object.
-     */
-    explicit QnSingleThumbnailLoader(const QnMediaServerResourcePtr &server,
-                                     const QnVirtualCameraResourcePtr &camera,
-                                     qint64 microSecSinceEpoch,
-                                     int rotation,
-                                     const QSize &size,
-                                     ThumbnailFormat format,
+    explicit QnSingleThumbnailLoader(const QnVirtualCameraResourcePtr &camera,
+                                     const QnMediaServerResourcePtr &server,
+                                     qint64 msecSinceEpoch,
+                                     int rotation = -1,
+                                     const QSize &size = QSize(),
+                                     ThumbnailFormat format = JpgFormat,
                                      QObject *parent = NULL);
 
     virtual QImage image() const override;
@@ -56,19 +32,19 @@ protected:
 
     QString formatToString(ThumbnailFormat format);
 private slots:
-    void at_replyReceived(int status, const QImage& image, int requstHandle);
+    void at_replyReceived(int status, const QImage& image, int requestHandle);
 
 private:
     /** Camera that this loader gets thumbnail for. */
     QnVirtualCameraResourcePtr m_camera;
 
-    /** Server connection that this loader uses. */
+    /** Server that this loader uses. */
     QnMediaServerResourcePtr m_server;
 
     QImage m_image;
 
-    /** Time in microseconds since epoch */
-    qint64 m_microSecSinceEpoch;
+    /** Time in milliseconds since epoch */
+    qint64 m_msecSinceEpoch;
     int m_rotation;
     QSize m_size;
 

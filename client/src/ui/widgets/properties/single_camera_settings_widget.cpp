@@ -15,6 +15,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -141,6 +142,7 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
 }
 
 void QnSingleCameraSettingsWidget::retranslateUi() {
+    //: "Camera Settings" or "IO Module settings", etc
     setWindowTitle(tr("%1 Settings").arg(getDefaultDeviceNameUpper(m_camera)));
 }
 
@@ -410,7 +412,14 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
             ui->expertSettingsWidget->updateFromResources(cameras);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
+                m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
+                    m_camera, 
+                    m_camera->getParentResource().dynamicCast<QnMediaServerResource>(),
+                    -1,
+                    -1,
+                    fisheyeThumbnailSize, 
+                    QnSingleThumbnailLoader::JpgFormat,
+                    this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }

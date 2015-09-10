@@ -57,6 +57,8 @@
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 
+#include <core/onvif/onvif_config_data.h>
+
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
 #include <business/business_event_rule.h>
@@ -202,6 +204,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::PtzTraits>();
     qRegisterMetaType<Qn::PtzCapabilities>();
 
+    qRegisterMetaType<QnOnvifConfigDataPtr>();
+
     qRegisterMetaType<QnIOPortData>();
     qRegisterMetaType<QnIOStateData>();
     qRegisterMetaType<QnAuditRecord>();
@@ -256,6 +260,8 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
     QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
+
+    QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
 
     qn_commonMetaTypes_initialized = true;
 }

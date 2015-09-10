@@ -24,6 +24,7 @@
 #include "third_party_archive_delegate.h"
 #include "third_party_ptz_controller.h"
 #include "third_party_stream_reader.h"
+#include "utils/common/synctime.h"
 
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
@@ -405,7 +406,7 @@ void QnThirdPartyResource::inputPortStateChanged(
         toSharedPointer(),
         QString::fromUtf8(inputPortID),
         newState != 0,
-        QDateTime::currentMSecsSinceEpoch() );
+        qnSyncTime->currentUSecsSinceEpoch() );
 }
 
 const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( int encoderNumber ) const

@@ -24,6 +24,8 @@ namespace QnBusiness
 
     bool hasToggleState(EventType eventType);
 
+    QList<EventState> allowedEventStates(EventType eventType);
+
     bool requiresCameraResource(EventType eventType);
 
     bool requiresServerResource(EventType eventType);
@@ -87,7 +89,7 @@ private:
     /**
      * @brief m_timeStamp       Event date and time in usec from UTC.
      */
-    const qint64 m_timeStamp;
+    const qint64 m_timeStampUsec;
 
     /**
      * @brief m_resource        Resource that provide this event.

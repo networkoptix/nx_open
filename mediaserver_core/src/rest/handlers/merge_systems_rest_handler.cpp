@@ -25,6 +25,7 @@
 #include "audit/audit_manager.h"
 #include "rest/server/rest_connection_processor.h"
 #include "http/custom_headers.h"
+#include "settings.h"
 
 namespace {
     const int requestTimeout = 60000;
@@ -34,6 +35,15 @@ namespace {
 int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
 {
     Q_UNUSED(path)
+    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
+        return nx_http::StatusCode::forbidden;
+    }
+
+    if (ec2::Settings::instance()->dbReadOnly()) {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
+        return nx_http::StatusCode::forbidden;
+    }
 
     QUrl url = params.value(lit("url"));
     QString user = params.value(lit("user"), lit("admin"));

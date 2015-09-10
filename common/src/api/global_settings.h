@@ -8,7 +8,7 @@
 
 #include <utils/common/singleton.h>
 #include <utils/common/connective.h>
-#include <utils/common/email_fwd.h>
+#include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
 #include <core/resource/resource_fwd.h>

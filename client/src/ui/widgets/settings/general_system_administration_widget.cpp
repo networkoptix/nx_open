@@ -62,9 +62,11 @@ void QnGeneralSystemAdministrationWidget::retranslateUi() {
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
-    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log")));
-    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open %1 List").arg(getDefaultDevicesName())));
+    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management...")));
+    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log...")));
+
+    //: "Open Cameras List..." or "Open Devices List...", etc
+    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open %1 List...").arg(getDefaultDevicesName())));
 
     ui->cameraListButton->setText(tr("%1 List").arg(getDefaultDevicesName()));
 

@@ -6,7 +6,7 @@
 
 #include <api/model/email_attachment.h>
 
-#include <utils/common/email_fwd.h>
+#include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
 namespace ec2

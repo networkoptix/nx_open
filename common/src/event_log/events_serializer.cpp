@@ -3,6 +3,11 @@
 #include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 
+#include <business/business_action_parameters.h>
+#include <business/business_event_parameters.h>
+
+#include <utils/common/model_functions.h>
+
 
 inline int readInt(quint8* &curPtr)
 {
@@ -39,18 +44,18 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
     events.resize(sz);
     for (int i = 0; i < sz; ++i) {
         QnBusinessActionData& action = events[i];
-        action.setFlags(readInt(curPtr));
-        action.setActionType((QnBusiness::ActionType) readInt(curPtr));
-        action.setBusinessRuleId(readQnId(curPtr));
-        action.setAggregationCount(readInt(curPtr));
+        action.flags = readInt(curPtr);
+        action.actionType = (QnBusiness::ActionType) readInt(curPtr);
+        action.businessRuleId = readQnId(curPtr);
+        action.aggregationCount = readInt(curPtr);
         int runTimeParamsLen = readInt(curPtr);
         QByteArray ba = QByteArray::fromRawData((const char*)curPtr, runTimeParamsLen);
-        action.setRuntimeParams(QnBusinessEventParameters::unpack(ba));
+        action.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(ba);
         curPtr += runTimeParamsLen;
 
         int actionParamsLen = readInt(curPtr);
         ba = QByteArray::fromRawData((const char*)curPtr, actionParamsLen);
-        action.setParams(QnBusinessActionParameters::unpack(ba));
+        action.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(ba);
         curPtr += actionParamsLen;
 
     }

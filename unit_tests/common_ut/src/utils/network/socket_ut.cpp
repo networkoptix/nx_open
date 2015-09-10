@@ -98,8 +98,6 @@ protected:
     }
 };
 
-#if 0
-
 /*!
     This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
 */
@@ -153,8 +151,6 @@ TEST( Socket, ServerSocketAsyncCancellation )
     //waiting for some calls to deleted objects
     QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
 }
-
-#endif
 
 TEST( Socket, HostNameResolve1 )
 {

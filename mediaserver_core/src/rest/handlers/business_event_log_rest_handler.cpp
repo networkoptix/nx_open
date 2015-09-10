@@ -1,6 +1,7 @@
 #include "business_event_log_rest_handler.h"
 
-#include "business/actions/abstract_business_action.h"
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
 
 #include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
@@ -12,6 +13,7 @@
 #include "utils/common/util.h"
 
 #include <media_server/serverutil.h>
+#include "recording/time_period.h"
 
 int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
