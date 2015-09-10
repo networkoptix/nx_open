@@ -47,7 +47,6 @@ public slots:
 
 signals:
     void playbackStateChanged();
-    void frameReady(const QImage &image);
     void sourceChanged();
     void videoSurfaceChanged();
     void positionChanged();

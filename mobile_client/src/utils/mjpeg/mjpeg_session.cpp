@@ -2,8 +2,11 @@
 
 #include <QtCore/QUrl>
 #include <QtCore/QQueue>
+#include <QtGui/QImage>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
+
+#include <utils/common/delayed.h>
 
 namespace {
     const qint64 maxHttpBufferSize = 2 * 1024 * 1024;
@@ -15,16 +18,19 @@ class QnMjpegSessionPrivate : public QObject {
 public:
     struct FrameData {
         int presentationTime;
-        QByteArray data;
+        QImage image;
     };
 
     QnMjpegSession *q_ptr;
+
+    mutable QMutex mutex;
 
     QUrl url;
     QByteArray previousFrameData;
     qint64 previousFrameTimestampUSec;
     qint64 frameTimestampUSec;
     QQueue<FrameData> frameQueue;
+    QSemaphore queueSemaphore;
 
     QNetworkAccessManager *networkAccessManager;
     QNetworkReply *reply;
@@ -55,9 +61,10 @@ public:
 
     void setState(QnMjpegSession::State state);
 
-    void enqueueFrame(const QByteArray &data, int presentationTime);
+    void decodeAndEnqueueFrame(const QByteArray &data, int presentationTime);
+    bool dequeueFrame(QImage *image, int *presentationTime);
 
-    void connect();
+    bool connect();
     void disconnect();
 
     void at_reply_readyRead();
@@ -74,6 +81,7 @@ public:
 QnMjpegSessionPrivate::QnMjpegSessionPrivate(QnMjpegSession *parent)
     : QObject(parent)
     , q_ptr(parent)
+    , queueSemaphore(maxFrameQueueSize)
     , networkAccessManager(nullptr)
     , reply(nullptr)
     , state(QnMjpegSession::Stopped)
@@ -88,23 +96,53 @@ void QnMjpegSessionPrivate::setState(QnMjpegSession::State state) {
     this->state = state;
 }
 
-void QnMjpegSessionPrivate::enqueueFrame(const QByteArray &data, int presentationTime) {
-    Q_Q(QnMjpegSession);
-
+void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, int presentationTime) {
     FrameData frameData;
-    frameData.data = data;
+    frameData.image = QImage::fromData(data);
     frameData.presentationTime = presentationTime;
 
-    frameQueue.enqueue(frameData);
+    queueSemaphore.acquire();
+    {
+        QMutexLocker lock(&mutex);
+        if (state != QnMjpegSession::Playing) {
+            queueSemaphore.release();
+            return;
+        }
+
+        frameQueue.enqueue(frameData);
+    }
+
+    Q_Q(QnMjpegSession);
     q->frameEnqueued();
 }
 
-void QnMjpegSessionPrivate::connect() {
+bool QnMjpegSessionPrivate::dequeueFrame(QImage *image, int *presentationTime) {
+    QMutexLocker lock(&mutex);
+
+    if (frameQueue.isEmpty())
+        return false;
+
+    QnMjpegSessionPrivate::FrameData frameData = frameQueue.dequeue();
+
+    if (image)
+        *image = frameData.image;
+
+    if (presentationTime)
+        *presentationTime = frameData.presentationTime;
+
+    lock.unlock();
+
+    queueSemaphore.release();
+
+    return true;
+}
+
+bool QnMjpegSessionPrivate::connect() {
     if (!url.isValid())
-        return;
+        return false;
 
     if (reply)
-        return;
+        return false;
 
     boundary.clear();
     httpBuffer.clear();
@@ -122,6 +160,8 @@ void QnMjpegSessionPrivate::connect() {
     QObject::connect(reply, &QNetworkReply::readyRead, this, &QnMjpegSessionPrivate::at_reply_readyRead);
     QObject::connect(reply, &QNetworkReply::finished, this, &QnMjpegSessionPrivate::at_reply_finished);
     QObject::connect(reply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &QnMjpegSessionPrivate::at_reply_finished);
+
+    return true;
 }
 
 void QnMjpegSessionPrivate::disconnect() {
@@ -136,12 +176,10 @@ void QnMjpegSessionPrivate::disconnect() {
     httpBuffer.clear();
     frameQueue.clear();
     previousFrameData.clear();
-
-    setState(QnMjpegSession::Stopped);
 }
 
 void QnMjpegSessionPrivate::at_reply_readyRead() {
-    if (!reply)
+    if (reply != sender())
         return;
 
     if (boundary.isNull()) {
@@ -151,7 +189,7 @@ void QnMjpegSessionPrivate::at_reply_readyRead() {
         setState(QnMjpegSession::Playing);
     }
 
-    while (state == QnMjpegSession::Playing && frameQueue.size() < maxFrameQueueSize) {
+    while (state == QnMjpegSession::Playing) {
         if (!reply)
             break;
 
@@ -181,7 +219,7 @@ void QnMjpegSessionPrivate::at_reply_readyRead() {
 }
 
 void QnMjpegSessionPrivate::at_reply_finished() {
-    if (!reply)
+    if (reply != sender())
         return;
 
     reply->deleteLater();
@@ -226,7 +264,7 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::processBuffer() {
 
     processing = true;
 
-    while (result == ParseOk && frameQueue.size() < maxFrameQueueSize) {
+    while (result == ParseOk) {
         switch (parserState) {
         case ParseBoundary:
             result = parseBoundary();
@@ -365,7 +403,7 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody() {
     frameTimestampUSec = 0;
 
     if (!previousFrameData.isEmpty())
-        enqueueFrame(previousFrameData, framePresentationTimeMSec);
+        decodeAndEnqueueFrame(previousFrameData, framePresentationTimeMSec);
 
     previousFrameData = httpBuffer.left(bodyLength);
 
@@ -389,72 +427,56 @@ QnMjpegSession::~QnMjpegSession() {
 
 QUrl QnMjpegSession::url() const {
     Q_D(const QnMjpegSession);
+
+    QMutexLocker lock(&d->mutex);
+
     return d->url;
 }
 
 void QnMjpegSession::setUrl(const QUrl &url) {
     Q_D(QnMjpegSession);
 
-    if (d->url == url)
-        return;
+    {
+        QMutexLocker lock(&d->mutex);
 
-    d->url = url;
+        if (d->url == url)
+            return;
 
-    bool playing = d->state == Playing;
-
-    d->disconnect();
-
-    if (playing)
-        d->connect();
+        d->url = url;
+    }
 
     emit urlChanged();
 }
 
 QnMjpegSession::State QnMjpegSession::state() const {
     Q_D(const QnMjpegSession);
+
+    QMutexLocker lock(&d->mutex);
+
     return d->state;
 }
 
-bool QnMjpegSession::dequeueFrame(QByteArray *data, int *presentationTime) {
+bool QnMjpegSession::dequeueFrame(QImage *image, int *presentationTime) {
     Q_D(QnMjpegSession);
 
-    if (d->frameQueue.isEmpty())
-        return false;
-
-    QnMjpegSessionPrivate::FrameData frameData = d->frameQueue.dequeue();
-
-    if (data)
-        *data = frameData.data;
-
-    if (presentationTime)
-        *presentationTime = frameData.presentationTime;
-
-    if (d->frameQueue.size() == maxFrameQueueSize - 1)
-        d->processBuffer();
-
-    return true;
+    return d->dequeueFrame(image, presentationTime);
 }
 
-void QnMjpegSession::play() {
+void QnMjpegSession::start() {
     Q_D(QnMjpegSession);
 
-    if (d->state == Paused) {
-        d->setState(Playing);
-        d->processBuffer();
-    } else {
-        d->connect();
-    }
+    executeDelayed([d]() { d->connect(); }, 0, thread());
 }
 
 void QnMjpegSession::stop() {
     Q_D(QnMjpegSession);
 
-    d->disconnect();
-}
+    {
+        QMutexLocker lock(&d->mutex);
+        d->setState(Stopped);
+    }
 
-void QnMjpegSession::pause() {
-    Q_D(QnMjpegSession);
+    d->queueSemaphore.release(maxFrameQueueSize - d->queueSemaphore.available());
 
-    if (d->state == Playing)
-        d->setState(Paused);
+    executeDelayed([d]() { d->disconnect(); }, 0, thread());
 }

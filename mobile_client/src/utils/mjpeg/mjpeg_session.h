@@ -11,11 +11,10 @@ public:
     enum State {
         Stopped,
         Connecting,
-        Playing,
-        Paused
+        Playing
     };
 
-    QnMjpegSession(QObject *parent);
+    QnMjpegSession(QObject *parent = nullptr);
     ~QnMjpegSession();
 
     QUrl url() const;
@@ -23,7 +22,7 @@ public:
 
     State state() const;
 
-    bool dequeueFrame(QByteArray *data, int *presentationTime);
+    bool dequeueFrame(QImage *image, int *presentationTime);
 
 signals:
     void frameEnqueued();
@@ -31,9 +30,8 @@ signals:
     void urlChanged();
 
 public slots:
-    void play();
+    void start();
     void stop();
-    void pause();
 
 private:
     QScopedPointer<QnMjpegSessionPrivate> d_ptr;
