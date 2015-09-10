@@ -308,6 +308,10 @@ angular.module('webadminApp')
                     if(scope.positionProvider) {
                         scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
                     }
+                    if(scope.recordsProvider) {
+                        scope.recordsProvider.updateLastMinute();
+                    }
+
                     scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
 
                     processZooming();

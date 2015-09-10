@@ -238,6 +238,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width,timeCorrection) {
 
     var archiveReadyDefer = $q.defer();
     this.archiveReadyPromise = archiveReadyDefer.promise;
+    this.lastRequested = self.now();
     this.requestInterval(0, self.now() + 10000, 0).then(function () {
         archiveReadyDefer.resolve(!!self.chunksTree);
         if(!self.chunksTree){
@@ -324,6 +325,16 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,en
     return end <= start;
 };
 
+CameraRecordsProvider.prototype.updateLastMinute = function(){
+    return;
+
+    var now = this.now();
+    if(now - this.lastRequested > this.lastMinuteDuration/2) {
+        this.requestInterval(now - this.lastMinuteDuration, now + 10000,0);
+        this.lastRequested = now;
+    }
+};
+
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     var deferred = this.$q.defer();
     //this.start = start;
@@ -358,7 +369,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                 for (var i = 0; i < chunksToIterate; i++) {
                     var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
                     if (chunks[i].durationMs < 0) {
-                        endChunk = (new Date()).getTime() + 100000;// some date in future
+                        endChunk = (new Date()).getTime();// current moment
                     }
                     var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
                     self.addChunk(addchunk, null);
