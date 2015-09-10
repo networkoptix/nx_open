@@ -42,9 +42,6 @@ namespace aio
             std::cerr << "Could not start a single AIO thread. Terminating..." << std::endl;
             exit(1);
         }
-
-        Q_ASSERT( AIOService_instance.load() == nullptr );
-        AIOService_instance = this;
     }
 
     AIOService::~AIOService()
@@ -58,15 +55,6 @@ namespace aio
         for( auto thread : m_udtSocketAIO.aioThreadPool )
             delete thread;
         m_udtSocketAIO.aioThreadPool.clear();
-
-        Q_ASSERT( AIOService_instance == this );
-        AIOService_instance = nullptr;
-    }
-
-    AIOService* AIOService::instance()
-    {
-        SocketGlobalRuntime::instance();    //instanciates socket-related globals in correct order
-        return AIOService_instance.load( std::memory_order_relaxed );
     }
 
     //!Returns true, if object has been successfully initialized

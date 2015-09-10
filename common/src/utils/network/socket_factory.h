@@ -26,6 +26,7 @@ public:
     };
 
     static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
+
     /*!
         \param sslRequired If \a true than it is guaranteed that returned object can be safely cast to \a AbstractEncryptedStreamSocket
     */

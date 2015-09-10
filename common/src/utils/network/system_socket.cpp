@@ -505,13 +505,14 @@ namespace
 
 CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
-    int type,
-    int protocol,
+    bool natTraversal, int type, int protocol,
     PollableSystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr ) ),
+            new AsyncSocketImplHelper<Pollable>( this,
+                                                 abstractSocketPtr,
+                                                 natTraversal ) ),
         type,
         protocol,
         sockImpl ),
@@ -523,12 +524,14 @@ CommunicatingSocket::CommunicatingSocket(
 
 CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
-    int newConnSD,
+    bool natTraversal, int newConnSD,
     PollableSystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr ) ),
+            new AsyncSocketImplHelper<Pollable>( this,
+                                                 abstractSocketPtr,
+                                                 natTraversal ) ),
         newConnSD,
         sockImpl ),
     m_aioHelper( nullptr ),
@@ -737,7 +740,7 @@ bool CommunicatingSocket::isConnected() const
 void CommunicatingSocket::close()
 {
     //checking that socket is not registered in aio
-    assert( !aio::AIOService::instance()->isSocketBeingWatched( static_cast<Pollable*>(this) ) );
+    assert( !nx::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
 
     m_connected = false;
     Socket::close();
@@ -801,9 +804,10 @@ public:
 };
 #endif
 
-TCPSocket::TCPSocket()
+TCPSocket::TCPSocket( bool natTraversal )
 :
     base_type(
+        natTraversal,
         SOCK_STREAM,
         IPPROTO_TCP
 #ifdef _WIN32
@@ -813,9 +817,10 @@ TCPSocket::TCPSocket()
 {
 }
 
-TCPSocket::TCPSocket(int newConnSD)
+TCPSocket::TCPSocket( bool natTraversal, int newConnSD )
 :
     base_type(
+        natTraversal,
         newConnSD
 #ifdef _WIN32
         , new Win32TcpSocketImpl()
@@ -1095,9 +1100,9 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
         //not change m_implDelegate.impl()->terminated directly
     //m_implDelegate.m_baseAsyncHelper->terminateAsyncIO();
     ++m_implDelegate.impl()->terminated;
-    aio::AIOService::instance()->cancelPostedCalls(
+    nx::SocketGlobals::aioService().cancelPostedCalls(
         static_cast<Pollable*>(&m_implDelegate), waitForRunningHandlerCompletion );
-    aio::AIOService::instance()->removeFromWatch(
+    nx::SocketGlobals::aioService().removeFromWatch(
         static_cast<Pollable*>(&m_implDelegate), aio::etRead, waitForRunningHandlerCompletion );
 }
 

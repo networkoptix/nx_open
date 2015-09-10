@@ -21,6 +21,8 @@
 
 #include <QString>
 
+namespace nx { class DnsResolver; }
+
 //!Represents ipv4 address. Supports conversion to QString and to uint32
 /*!
     \note Not using QHostAddress because QHostAddress can trigger dns name lookup which depends on Qt sockets which we do not want to use
@@ -78,7 +80,8 @@ private:
     //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
     bool m_addressResolved;
 
-    friend class HostAddressResolver;
+    // TODO: use IpAddress instead
+    friend class nx::DnsResolver;
 };
 
 //!Represents host and port (e.g. 127.0.0.1:1234)
@@ -152,21 +155,6 @@ inline bool operator!=( const SocketAddress& lhs, const SocketAddress& rhs ) {
 inline uint qHash(const SocketAddress &address) {
     return qHash(address.address.toString(), address.port);
 }
-
-class SocketGlobalRuntimeInternal;
-
-//!This class instance MUST be created for sockets to be operational
-class SocketGlobalRuntime
-{
-public:
-    SocketGlobalRuntime();
-    ~SocketGlobalRuntime();
-
-    static SocketGlobalRuntime* instance();
-
-private:
-    SocketGlobalRuntimeInternal* m_data;
-};
 
 Q_DECLARE_METATYPE(SocketAddress)
 

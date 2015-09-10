@@ -15,7 +15,7 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
-#include <utils/network/aio/aioservice.h>
+#include <utils/network/socket_global.h>
 
 #include "listening_peer_pool.h"
 #include "mediaserver_api.h"

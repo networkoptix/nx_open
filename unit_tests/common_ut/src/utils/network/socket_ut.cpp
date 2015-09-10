@@ -14,7 +14,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <utils/network/host_address_resolver.h>
+#include <utils/network/dns_resolver.h>
 #include <utils/network/http/httpclient.h>
 
 #include "socket_test_helper.h"

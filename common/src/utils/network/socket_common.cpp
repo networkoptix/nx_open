@@ -1,13 +1,5 @@
-/**********************************************************
-* 30 aug 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "socket_common.h"
-
-#include "host_address_resolver.h"
-#include "aio/aioservice.h"
-
+#include "socket_global.h"
 
 const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
 const HostAddress HostAddress::anyHost( (uint32_t)INADDR_ANY );
@@ -190,37 +182,13 @@ struct in_addr HostAddress::inAddr(bool* ok) const
     if( !m_addressResolved )
     {
         Q_ASSERT( m_addrStr );
-        //resolving address
-        //TODO #ak remove const_cast
-        HostAddressResolver::instance()->resolveAddressSync( m_addrStr.get(), const_cast<HostAddress*>(this) );
+        const auto addrs = nx::SocketGlobals::addressResolver().resolveSync(
+                    m_addrStr.get(), false );
+
+        // TODO: use IpAddress instead
+        *const_cast< HostAddress* >( this) = addrs.at(0).host;
     }
     if( ok )
         *ok = m_addressResolved;
     return m_sinAddr;
-}
-
-class SocketGlobalRuntimeInternal
-{
-public:
-    HostAddressResolver hostAddressResolver;
-    aio::AIOService aioService;
-};
-
-SocketGlobalRuntime::SocketGlobalRuntime()
-:
-    m_data( new SocketGlobalRuntimeInternal() )
-{
-}
-
-SocketGlobalRuntime::~SocketGlobalRuntime()
-{
-    delete m_data;
-    m_data = nullptr;
-}
-
-Q_GLOBAL_STATIC( SocketGlobalRuntime, socketGlobalRuntimeInstance )
-
-SocketGlobalRuntime* SocketGlobalRuntime::instance()
-{
-    return socketGlobalRuntimeInstance();
 }

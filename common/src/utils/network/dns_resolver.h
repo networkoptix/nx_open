@@ -1,10 +1,5 @@
-/**********************************************************
-* 20 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef HOST_ADDRESS_RESOLVER_H
-#define HOST_ADDRESS_RESOLVER_H
+#ifndef DNS_RESOLVER_H
+#define DNS_RESOLVER_H
 
 #include <atomic>
 #include <functional>
@@ -17,21 +12,20 @@
 
 #include "socket_common.h"
 
+namespace nx {
 
 /*!
     \note Thread-safe
 */
-class HostAddressResolver
+class DnsResolver
 :
     public QnLongRunnable
 {
 public:
     typedef void* RequestID;
 
-    HostAddressResolver();
-    virtual ~HostAddressResolver();
-
-    static HostAddressResolver* instance();
+    DnsResolver();
+    virtual ~DnsResolver();
 
     //!Implementation of QnLongRunnable::pleaseStop
     virtual void pleaseStop() override;
@@ -86,5 +80,7 @@ private:
     RequestID m_runningTaskReqID;
     size_t m_currentSequence;
 };
+
+} // namespace nx
 
 #endif  //HOST_ADDRESS_RESOLVER_H
