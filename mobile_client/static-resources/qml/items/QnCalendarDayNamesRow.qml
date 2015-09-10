@@ -47,7 +47,7 @@ Item {
             var day = (i + s) % d.daysPerWeek
             dayNamesModel.append({
                 "dayName" : d.locale.dayName(day, Locale.ShortFormat),
-                "holiday" : day == 0 || day == 6 // TODO: #dklychkov In some locales holidays are not Saturday and Sunday.
+                "holiday" : d.locale.weekDays.indexOf(day) == -1
             })
         }
     }
