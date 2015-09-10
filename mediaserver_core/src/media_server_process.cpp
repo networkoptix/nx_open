@@ -1717,6 +1717,11 @@ void MediaServerProcess::run()
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
+    auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
+        QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr()); };
+    std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>
+        clearEc2ConnectionGuard(this, clearEc2ConnectionGuardFunc);
+
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     connect( ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
@@ -2262,7 +2267,7 @@ void MediaServerProcess::run()
     messageProcessor.reset();
 
     //disconnecting from EC2
-    QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
+    clearEc2ConnectionGuard.reset();
 
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );

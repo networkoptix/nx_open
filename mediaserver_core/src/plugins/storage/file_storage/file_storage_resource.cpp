@@ -310,7 +310,7 @@ bool QnFileStorageResource::updatePermissions() const
         memset(&netRes, 0, sizeof(netRes));
         netRes.dwType = RESOURCETYPE_DISK;
         QUrl storageUrl(getUrl());
-        QString path = storageUrl.path().mid((1));
+        QString path = lit("\\\\") + storageUrl.host() + lit("\\") + storageUrl.path().mid((1));
         netRes.lpRemoteName = (LPWSTR) path.constData();
         LPWSTR password = (LPWSTR) storageUrl.password().constData();
         LPWSTR user = (LPWSTR) storageUrl.userName().constData();

@@ -756,11 +756,12 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs,zoomAccuracy){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs,zoomAccuracy,lastMinuteInterval){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
     this.zoomAccuracy = zoomAccuracy;
+    this.lastMinuteInterval  = lastMinuteInterval;
 
     this.levels = {
         top:  {index:0,level:RulerModel.levels[0]},
@@ -1130,3 +1131,7 @@ ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){
     this.zoom(zoomValue);                    // zoom and update visible interval
     this.tryToRestoreAnchorDate(anchorDate); // try to restore anchorDate
 };
+
+ScaleManager.prototype.lastMinute = function(){
+    return (new Date(this.end - this.lastMinuteInterval)).getTime();
+}
