@@ -230,12 +230,9 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             dstRoute.id = camera->getParentId().toString();
     }
 
-    for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
-    {
-        if (itr->first == Qn::SERVER_GUID_HEADER_NAME)
-            dstRoute.id = itr->second;
-    }
-
+    nx_http::HttpHeaders::const_iterator itr = d->request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    if (itr != d->request.headers.end())
+        dstRoute.id = itr->second;
 
     if (dstRoute.id == qnCommon->moduleGUID() && !cameraGuid.isNull()) {
         if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
