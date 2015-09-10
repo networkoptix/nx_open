@@ -32,6 +32,7 @@
 #include "http_handlers/get_account_handler.h"
 #include "http_handlers/get_systems_handler.h"
 #include "http_handlers/verify_email_address_handler.h"
+#include "http_handlers/ping.h"
 #include "managers/account_manager.h"
 #include "managers/email_manager.h"
 #include "managers/system_manager.h"
@@ -108,6 +109,7 @@ int CloudDBProcess::executeApplication()
         SystemManager systemManager( &dbManager );
     
         QnAuthMethodRestrictionList authRestrictionList;
+        authRestrictionList.allow( PingHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( VerifyEmailAddressHandler::HANDLER_PATH, AuthMethod::noAuth );
         AuthenticationManager authenticationManager( 
@@ -197,6 +199,12 @@ void CloudDBProcess::registerApiHandlers(
     AccountManager* const accountManager,
     SystemManager* const systemManager )
 {
+    msgDispatcher->registerRequestProcessor<PingHandler>(
+        PingHandler::HANDLER_PATH,
+        [&authorizationManager]() -> std::unique_ptr<PingHandler> {
+            return std::make_unique<PingHandler>( authorizationManager );
+        } );
+
     //accounts
     msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
         AddAccountHttpHandler::HANDLER_PATH,

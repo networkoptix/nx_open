@@ -31,11 +31,11 @@ public:
     CloudModuleEndPointFetcher(QString moduleName);
     ~CloudModuleEndPointFetcher();
 
+    //!Specify endpoint explicitely
+    void setEndpoint(SocketAddress endpoint);
+
     //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
-    void get(
-        QString username,
-        QString password,
-        std::function<void(api::ResultCode, SocketAddress)> handler);
+    void get(std::function<void(api::ResultCode, SocketAddress)> handler);
 
 private:
     mutable QnMutex m_mutex;

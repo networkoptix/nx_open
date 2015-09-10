@@ -83,9 +83,7 @@ protected:
         }
 
         m_cdbEndPointFetcher->get(
-            std::move(username),
-            std::move(password),
-            [this, path, input, handler, errHandler](
+            [this, username, password, path, input, handler, errHandler](
                 api::ResultCode resCode,
                 SocketAddress endpoint) mutable
         {
@@ -96,6 +94,8 @@ protected:
             url.setHost(endpoint.address.toString());
             url.setPort(endpoint.port);
             url.setPath(url.path() + path);
+            url.setUserName(username);
+            url.setPassword(password);
             execute(
                 std::move(url),
                 input,
@@ -118,9 +118,7 @@ protected:
         }
 
         m_cdbEndPointFetcher->get(
-            std::move(username),
-            std::move(password),
-            [this, path, handler, errHandler](
+            [this, username, password, path, handler, errHandler](
                 api::ResultCode resCode,
                 SocketAddress endpoint) mutable
         {
@@ -131,6 +129,8 @@ protected:
             url.setHost(endpoint.address.toString());
             url.setPort(endpoint.port);
             url.setPath(url.path() + path);
+            url.setUserName(username);
+            url.setPassword(password);
             execute(
                 std::move(url),
                 std::move(handler));

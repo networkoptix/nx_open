@@ -10,7 +10,7 @@
 
 TEST(parseCmdArgs, common)
 {
-    char* argv[] = {"/path/to/bin", "-a", "aaa", "--arg1=arg1", "--arg2", "-b", "-c", "ccc", "-e", "eee", "--arg3=" };
+    char* argv[] = {"/path/to/bin", "-a", "aaa", "--arg1=arg1", "--arg2", "-b", "-c", "ccc", "-ddd", "val_ddd", "-e", "eee", "--arg3=" };
     const auto argc = sizeof(argv) / sizeof(*argv);
 
     std::multimap<QString, QString> args;
@@ -18,7 +18,7 @@ TEST(parseCmdArgs, common)
         argc,
         argv,
         &args);
-    ASSERT_EQ(args.size(), 7);
+    ASSERT_EQ(args.size(), 8);
 
     ASSERT_TRUE(args.find("a") != args.end());
     ASSERT_EQ(args.find("a")->second, "aaa");
@@ -34,4 +34,6 @@ TEST(parseCmdArgs, common)
     ASSERT_EQ(args.find("c")->second, "ccc");
     ASSERT_TRUE(args.find("e") != args.end());
     ASSERT_EQ(args.find("e")->second, "eee");
+    ASSERT_TRUE(args.find("ddd") != args.end());
+    ASSERT_EQ(args.find("ddd")->second, "val_ddd");
 }

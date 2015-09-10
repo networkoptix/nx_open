@@ -20,7 +20,7 @@ TEST(CloudModuleEndPointFetcher, common)
     std::promise<api::ResultCode> endpointPromise;
     auto endpointFuture = endpointPromise.get_future();
     SocketAddress cdbEndpoint;
-    endPointFetcher.get("", "", 
+    endPointFetcher.get(
         [&endpointPromise, &cdbEndpoint](api::ResultCode resCode, SocketAddress endpoint){
             endpointPromise.set_value(resCode);
             cdbEndpoint = endpoint;

@@ -5,6 +5,8 @@
 
 #include "cdb_connection.h"
 
+#include "data/module_info.h"
+
 
 namespace nx {
 namespace cdb {
@@ -14,6 +16,8 @@ Connection::Connection(
     CloudModuleEndPointFetcher* const endPointFetcher,
     const std::string& login,
     const std::string& password)
+:
+    AsyncRequestsExecutor(endPointFetcher)
 {
     m_accountManager = std::make_unique<AccountManager>(endPointFetcher);
     m_systemManager = std::make_unique<SystemManager>(endPointFetcher);
@@ -39,10 +43,13 @@ void Connection::setCredentials(
     m_systemManager->setCredentials(login, password);
 }
 
-void Connection::ping(std::function<void(api::ResultCode)> completionHandler)
+void Connection::ping(
+    std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler)
 {
-    //TODO #ak
-    completionHandler(api::ResultCode::notImplemented);
+    executeRequest(
+        "/ping",
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::ModuleInfo()));
 }
 
 }   //cl

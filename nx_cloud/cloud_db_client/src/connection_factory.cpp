@@ -45,6 +45,13 @@ std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
         password);
 }
 
+void ConnectionFactory::setCloudEndpoint(
+    const std::string& host,
+    unsigned short port)
+{
+    m_endPointFetcher.setEndpoint(SocketAddress(host.c_str(), port));
+}
+
 }   //cl
 }   //cdb
 }   //nx

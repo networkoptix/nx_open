@@ -1,5 +1,6 @@
 /**********************************************************
 * Sep 3, 2015
+* NetworkOptix
 * akolesnikov
 ***********************************************************/
 
@@ -11,6 +12,7 @@
 #include <string>
 
 #include "account_manager.h"
+#include "module_info.h"
 #include "result_code.h"
 #include "system_manager.h"
 
@@ -46,7 +48,7 @@ public:
         const std::string& login,
         const std::string& password) = 0;
     //!Pings cloud_db with current creentials
-    virtual void ping(std::function<void(api::ResultCode)> completionHandler) = 0;
+    virtual void ping(std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) = 0;
 };
 
 //!
@@ -70,6 +72,14 @@ public:
     virtual std::unique_ptr<api::Connection> createConnection(
         const std::string& login,
         const std::string& password) = 0;
+
+    //!Explicitely specify endpoint of cloud module. If this method not called, endpoint is detected automatically
+    /*!
+        \note Call this method only if you are sure about what you are doing
+    */
+    virtual void setCloudEndpoint(
+        const std::string& host,
+        unsigned short port) = 0;
 };
 
 }   //api

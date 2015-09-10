@@ -34,12 +34,18 @@ CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
         httpClientLocal->terminate();
 }
 
+void CloudModuleEndPointFetcher::setEndpoint(SocketAddress endpoint)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_endpoint = std::move(endpoint);
+}
+
 //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
 void CloudModuleEndPointFetcher::get(
-    QString username,
-    QString password,
     std::function<void(api::ResultCode, SocketAddress)> handler)
 {
+    //TODO #ak if async resolve is already started, should wait for its completion
+
     //if requested endpoint is known, providing it to the output
     QnMutexLocker lk(&m_mutex);
     if (m_endpoint)
@@ -116,7 +122,8 @@ void CloudModuleEndPointFetcher::parseCloudXml(QByteArray xmlData)
     if (!endpoints.empty())
     {
         QnMutexLocker lk(&m_mutex);
-        m_endpoint = std::move(endpoints.front());
+        if (!m_endpoint)
+            m_endpoint = std::move(endpoints.front());
     }
 }
 

@@ -33,6 +33,11 @@ public:
         const std::string& login,
         const std::string& password) override;
 
+    //!Implementation of \a api::ConnectionFactory::setCloudEndpoint
+    virtual void setCloudEndpoint(
+        const std::string& host,
+        unsigned short port) override;
+
 private:
     CloudModuleEndPointFetcher m_endPointFetcher;
 };

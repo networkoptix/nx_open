@@ -212,7 +212,7 @@ void parseCmdArgs(
             //param
             if (argLen > 1 && arg[1] == '-')    //long param
             {
-                //parsing log param
+                //parsing long param
                 const char* sepPos = strchr(arg, '=');
                 if (sepPos == nullptr)
                     args->emplace(QString::fromUtf8(arg+2), QString()); //no value

@@ -92,10 +92,10 @@ bool AuthenticationManager::authenticate(
 
 namespace
 {
-    const nx::String staticRealm(QN_PRODUCT_NAME_SHORT);
+    const nx::String staticRealm(QN_REALM);
 }
 
-nx::String AuthenticationManager::realm() const
+nx::String AuthenticationManager::realm()
 {
     return staticRealm;
 }

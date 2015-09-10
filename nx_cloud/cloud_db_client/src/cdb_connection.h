@@ -9,6 +9,7 @@
 #include <include/cdb/connection.h>
 
 #include "account_manager.h"
+#include "async_http_requests_executor.h"
 #include "system_manager.h"
 
 
@@ -20,7 +21,8 @@ class CloudModuleEndPointFetcher;
 
 class Connection
 :
-    public api::Connection
+    public api::Connection,
+    public AsyncRequestsExecutor
 {
 public:
     Connection(
@@ -38,7 +40,8 @@ public:
         const std::string& login,
         const std::string& password) override;
     //!Implemetation of api::Connection::ping
-    virtual void ping(std::function<void(api::ResultCode)> completionHandler) override;
+    virtual void ping(
+        std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override;
 
 private:
     std::unique_ptr<AccountManager> m_accountManager;

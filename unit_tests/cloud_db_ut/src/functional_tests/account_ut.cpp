@@ -3,6 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
+#include <chrono>
 #include <functional>
 #include <future>
 #include <thread>
@@ -10,6 +11,7 @@
 
 #include <gtest/gtest.h>
 
+#include <QtCore/QDir>
 #include <QtCore/QFile>
 
 #include <utils/common/cpp14.h>
@@ -27,15 +29,32 @@ namespace cdb {
 namespace cl {
 
 
-static char* argv[] = {
-    "D:/develop/netoptix_vms.nat_traversal/build_environment/target/x64/bin/debug/cloud_db_ut.exe",
-    "-e",
-    "--cloudDbUrl=http://10.0.2.95:3346/",
-    "--dataDir=C:/cloud_db_ut.data/",
-    "--db/driverName=QSQLITE",
-    "--db/name=cloud_db_ut.sqlite"
-};
-static const auto argc = sizeof(argv) / sizeof(*argv);
+template<typename ResultType>
+std::tuple<ResultType> makeSyncCall(
+    std::function<void(std::function<void(ResultType)>)> function)
+{
+    std::promise<ResultType> promise;
+    auto future = promise.get_future();
+    function([&promise](ResultType resCode){ promise.set_value(resCode); });
+    future.wait();
+    return std::make_tuple(future.get());
+}
+
+template<typename ResultType, typename OutArg1>
+std::tuple<ResultType, OutArg1> makeSyncCall(
+    std::function<void(std::function<void(ResultType, OutArg1)>)> function)
+{
+    std::promise<ResultType> promise;
+    auto future = promise.get_future();
+    OutArg1 result;
+    function([&promise, &result](ResultType resCode, OutArg1 outArg1) {
+        result = std::move(outArg1);
+        promise.set_value(resCode);
+    });
+    future.wait();
+    return std::make_tuple(future.get(), std::move(result));
+}
+
 
 class CdbFunctionalTest
 :
@@ -43,9 +62,26 @@ class CdbFunctionalTest
 {
 public:
     CdbFunctionalTest()
+    :
+        m_port(0),
+        m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
     {
-        QFile::remove("cloud_db_ut.sqlite");
-        m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcess>(argc, argv);
+        m_port = (std::rand() % 10000) + 50000;
+        m_tmpDir = QDir::homePath() + "/cdb_ut.data";
+        QDir(m_tmpDir).removeRecursively();
+
+        auto b = std::back_inserter(m_args);
+        *b = strdup("/path/to/bin");
+        *b = strdup("-e");
+        *b = strdup("-listenOn"); *b = strdup(lit("0.0.0.0:%1").arg(m_port).toLatin1().constData());
+        *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
+        *b = strdup("-db/driverName"); *b = strdup("QSQLITE");
+        *b = strdup("-db/name"); *b = strdup(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
+
+        m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
+
+        m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcess>(
+            static_cast<int>(m_args.size()), m_args.data());
 
         m_cdbProcessFuture = std::async(
             std::launch::async,
@@ -55,53 +91,66 @@ public:
     ~CdbFunctionalTest()
     {
         m_cdbInstance->pleaseStop();
-        m_cdbInstance.reset();
         m_cdbProcessFuture.wait();
+        m_cdbInstance.reset();
 
-        QFile::remove("cloud_db_ut.sqlite");
+        QDir(m_tmpDir).removeRecursively();
+    }
+
+    void waitUntilStarted()
+    {
+        static const std::chrono::seconds CDB_INITIALIZED_MAX_WAIT_TIME(15);
+
+        const auto endClock = std::chrono::steady_clock::now() + CDB_INITIALIZED_MAX_WAIT_TIME;
+        for (;;)
+        {
+            ASSERT_TRUE(std::chrono::steady_clock::now() < endClock);
+
+            auto connection = m_connectionFactory->createConnection("", "");
+            api::ResultCode result = api::ResultCode::ok;
+            std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
+                std::bind(
+                    &nx::cdb::api::Connection::ping,
+                    connection.get(),
+                    std::placeholders::_1));
+            if (result == api::ResultCode::ok)
+                break;
+        }
+    }
+
+protected:
+    nx::cdb::api::ConnectionFactory* connectionFactory()
+    {
+        return m_connectionFactory.get();
+    }
+
+    api::ModuleInfo moduleInfo() const
+    {
+        return m_moduleInfo;
     }
 
 private:
+    QString m_tmpDir;
+    int m_port;
+    std::vector<char*> m_args;
     std::unique_ptr<CloudDBProcess> m_cdbInstance;
     std::future<int> m_cdbProcessFuture;
+    std::unique_ptr<
+        nx::cdb::api::ConnectionFactory,
+        decltype(&destroyConnectionFactory)
+    > m_connectionFactory;
+    api::ModuleInfo m_moduleInfo;
 };
-
-
-api::ResultCode makeSyncCall(std::function<void(std::function<void(api::ResultCode)>)> function)
-{
-    std::promise<api::ResultCode> promise;
-    auto future = promise.get_future();
-    function([&promise](api::ResultCode resCode){ promise.set_value(resCode); });
-    future.wait();
-    return future.get();
-}
-
-template<typename OutArg1>
-std::tuple<api::ResultCode, OutArg1> makeSyncCall1(std::function<void(std::function<void(api::ResultCode, OutArg1)>)> function)
-{
-    std::promise<api::ResultCode> promise;
-    auto future = promise.get_future();
-    OutArg1 result;
-    function([&promise, &result](api::ResultCode resCode, OutArg1 outArg1) {
-        result = std::move(outArg1);
-        promise.set_value(resCode);
-    });
-    future.wait();
-    return std::make_tuple(future.get(), std::move(result));
-}
-
 
 
 TEST_F(CdbFunctionalTest, account)
 {
-    //waiting for initialization
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    //waiting for cloud_db initialization
+    waitUntilStarted();
 
     //initializing connection
-    std::unique_ptr<nx::cdb::api::ConnectionFactory, decltype(&destroyConnectionFactory)>
-        connectionFactory(createConnectionFactory(), &destroyConnectionFactory);
     {
-        auto connection = connectionFactory->createConnection( "", "" );
+        auto connection = connectionFactory()->createConnection( "", "" );
 
         //adding account
         nx::cdb::api::AccountData accountData;
@@ -110,9 +159,10 @@ TEST_F(CdbFunctionalTest, account)
         accountData.fullName = "Test Test";
         accountData.passwordHa1 = nx_http::calcHa1(
             lit("test"),
-            QLatin1String(QN_REALM),
+            QLatin1String(moduleInfo().realm.c_str()),
             lit("123"));
-        auto result = makeSyncCall(
+        api::ResultCode result = api::ResultCode::ok;
+        std::tie(result) = makeSyncCall<api::ResultCode>(
             std::bind(
                 &nx::cdb::api::AccountManager::registerNewAccount,
                 connection->accountManager(),
@@ -123,20 +173,19 @@ TEST_F(CdbFunctionalTest, account)
 
     //fetching account
     {
-        auto connection = connectionFactory->createConnection("test", "123");
+        auto connection = connectionFactory()->createConnection("test", "123");
 
         api::ResultCode resCode = api::ResultCode::ok;
         nx::cdb::api::AccountData accountData;
-        std::tie(resCode, accountData) = makeSyncCall1<nx::cdb::api::AccountData>(
-            std::bind(
-                &nx::cdb::api::AccountManager::getAccount,
-                connection->accountManager(),
-                std::placeholders::_1));
+        std::tie(resCode, accountData) =
+            makeSyncCall<api::ResultCode, nx::cdb::api::AccountData>(
+                std::bind(
+                    &nx::cdb::api::AccountManager::getAccount,
+                    connection->accountManager(),
+                    std::placeholders::_1));
         ASSERT_EQ(resCode, api::ResultCode::ok);
         ASSERT_EQ(accountData.login, "test");
     }
-
-    std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
 }   //cl
