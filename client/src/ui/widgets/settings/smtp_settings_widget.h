@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
-#include <utils/common/email_fwd.h>
+#include <utils/email/email_fwd.h>
 
 namespace Ui {
     class SmtpSettingsWidget;

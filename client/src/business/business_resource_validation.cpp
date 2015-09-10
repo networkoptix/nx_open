@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 
 namespace {
 

@@ -128,7 +128,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 #include <utils/common/time.h>
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/url.h>
