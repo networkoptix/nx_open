@@ -68,9 +68,7 @@ Expandable.MaskedSettingsPanel
             function tryApplyChanges(warnings)
             {
                 if (portNumber.changed)
-                {
                     rtuContext.changesManager().changeset().addPortChange(Number(portNumber.text));
-                }
 
                 if (!flagged.showFirst) // No changes
                     return true;

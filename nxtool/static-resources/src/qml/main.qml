@@ -89,11 +89,14 @@ Window
                 opacity: enabled ? 1 : 0.5;
 
                 activeFocusOnTab: false;
+                Layout.fillHeight: true;
             }
 
             Rtu.ProgressListView
             {
                 id: progressListView;
+
+                outsideSizeChange: selectionSplit.resizing;
 
                 model: rtuContext.changesManager().changesProgressModelObject();
 
@@ -157,7 +160,5 @@ Window
     {
         selectionSplit.width = mainWindow.width / 3.5;
         selectionSplit.Layout.minimumWidth = selectionPage.width;
-
-        selectionPage.height = mainWindow.height * 4 / 5;
     }
 }

@@ -26,7 +26,7 @@ namespace
         kIfListRequestsPeriod = 2 * 1000
         , kWaitTriesCount = 90
 
-        /// Accepted wait time is 120 seconds due to restart on network interface parameters change
+        /// Accepted wait time is 180 seconds due to restart on network interface parameters change
         , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
     };
 
@@ -264,7 +264,6 @@ rtu::ApplyChangesTask::Impl::Impl(const ChangesetPointer &changeset
 
 rtu::ApplyChangesTask::Impl::~Impl()
 {
-    qDebug() << "----- ~Impl";
 }
 
 void rtu::ApplyChangesTask::Impl::apply(const ApplyChangesTaskPtr &owner)
@@ -500,7 +499,6 @@ void rtu::ApplyChangesTask::Impl::sendRequests()
         ++m_lastChangesetIndex;
     }
 }
-
 
 void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
 {
@@ -898,11 +896,12 @@ rtu::ApplyChangesTask::ApplyChangesTask(const ChangesetPointer &changeset
     : QObject(helpers::qml_objects_parent())
     , m_impl(new Impl(changeset, targets, httpClient))
 {
+    QObject::connect(m_impl->failedModel(), &ChangesSummaryModel::changesCountChanged
+        , this, &ApplyChangesTask::errorsCountChanged);
 }
 
 rtu::ApplyChangesTask::~ApplyChangesTask()
 {
-    qDebug() <<" --------------destroying";
 }
 
 rtu::IDsVector rtu::ApplyChangesTask::targetServerIds() const
@@ -934,6 +933,11 @@ int rtu::ApplyChangesTask::totalChangesCount() const
 int rtu::ApplyChangesTask::appliedChangesCount() const
 {
     return m_impl->appliedChangesCount();
+}
+
+int rtu::ApplyChangesTask::errorsCount() const
+{
+    return m_impl->failedModel()->changesCount();
 }
 
 void rtu::ApplyChangesTask::serverDiscovered(const rtu::BaseServerInfo &baseInfo)

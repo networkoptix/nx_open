@@ -36,7 +36,6 @@ Item
         }
         
         spacing: 2;
-        enabled: (loggedState != NxRtu.Constants.NotLogged);
         opacity: (enabled ? 1.0 : 0.6);
         Item
         {

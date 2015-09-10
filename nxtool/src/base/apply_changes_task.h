@@ -18,7 +18,7 @@ namespace rtu
 
         Q_PROPERTY(int totalChangesCount READ totalChangesCount NOTIFY totalChangesCountChanged)
         Q_PROPERTY(int appliedChangesCount READ appliedChangesCount NOTIFY appliedChangesCountChanged)
-
+        Q_PROPERTY(int errorsCount READ errorsCount NOTIFY errorsCountChanged)
         Q_PROPERTY(QObject *successfulModel READ successfulModel NOTIFY changesApplied)
         Q_PROPERTY(QObject *failedModel READ failedModel NOTIFY changesApplied)
 
@@ -40,6 +40,8 @@ namespace rtu
         
         int appliedChangesCount() const;
 
+        int errorsCount() const;
+
         QObject *successfulModel();
         
         QObject *failedModel();
@@ -57,6 +59,8 @@ namespace rtu
         void totalChangesCountChanged();
         
         void appliedChangesCountChanged();
+
+        void errorsCountChanged();
 
         void itfUpdated(const QUuid &id
             , const QString &hostAddress

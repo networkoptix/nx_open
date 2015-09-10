@@ -10,8 +10,6 @@
 
 namespace rtu
 {
-    class ApplyChangesTask;
-
     class RtuContext : public QObject
     {
         Q_OBJECT

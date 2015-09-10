@@ -7,7 +7,7 @@
 #include <QElapsedTimer>
 #include <QUdpSocket>
 
-#include <QNetworkReply>;
+#include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QNetworkInterface>
 #include <QNetworkAccessManager>
@@ -446,8 +446,6 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
        return false;
 
     BaseServerInfo info;
-    if (sender.toString().contains("192.168.0.156"))
-        parseUdpPacket(data, info);
     if (!parseUdpPacket(data, info) )
         return true;
 

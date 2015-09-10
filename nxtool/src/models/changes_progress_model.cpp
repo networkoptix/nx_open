@@ -13,16 +13,20 @@ namespace
         , kInProgreess = kFirstCustomRoleId
         , kTotalChangesCount
         , kAppliedChagnesCount
+        , kErrorsCount
         
         , kLastCustomRoleId        
     };
     
+    typedef QVector<int> RolesVector;
+
     const rtu::Roles kRoles = []() -> rtu::Roles
     {
         rtu::Roles roles;
         roles.insert(kInProgreess, "inProgress");
         roles.insert(kTotalChangesCount, "totalChangesCount");
         roles.insert(kAppliedChagnesCount, "appliedChangesCount");
+        roles.insert(kErrorsCount, "errorsCount");
         return roles;
     }();
 }
@@ -31,6 +35,7 @@ rtu::ChangesProgressModel::ChangesProgressModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_changeHelper(CREATE_MODEL_CHANGE_HELPER(this))
     , m_tasks()
+    , m_completedCount(0)
 {
 }
 
@@ -38,36 +43,20 @@ rtu::ChangesProgressModel::~ChangesProgressModel()
 {
 }
 
-void rtu::ChangesProgressModel::taskStateChanged(const ApplyChangesTask *task
-    , int role)
+int rtu::ChangesProgressModel::completedCount() const
 {
-    const auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [task](const ApplyChangesTaskPtr &taskVal)
-    {
-        return (taskVal.get() == task);
-    });
-
-    if (it == m_tasks.end())
-        return;
-
-    const int row = (it - m_tasks.begin());
-    const auto ind = index(row);
-    dataChanged(ind, ind);
+    return m_completedCount;
 }
 
 bool rtu::ChangesProgressModel::addChangeProgress(const ApplyChangesTaskPtr &task)
 {
     const auto it = std::find_if(m_tasks.begin(), m_tasks.end()
-        , [task](const ApplyChangesTaskPtr &item)
-    {
-        return (item == task);
-    });
+        , [task](const ApplyChangesTaskPtr &item) { return (item == task); });
 
     if (it != m_tasks.end())
         return false;
 
-    const int insertIndex = m_tasks.size();
-    const auto insertGuard = m_changeHelper->insertRowsGuard(insertIndex, insertIndex);
-    Q_UNUSED(insertGuard);
+    const auto itInsert = findInsertPosition();
 
     ApplyChangesTask * const taskPointer = task.get();
     QObject::connect(taskPointer, &ApplyChangesTask::totalChangesCountChanged
@@ -76,45 +65,55 @@ bool rtu::ChangesProgressModel::addChangeProgress(const ApplyChangesTaskPtr &tas
     QObject::connect(taskPointer, &ApplyChangesTask::appliedChangesCountChanged
         , this, [this, taskPointer]() { taskStateChanged(taskPointer, kAppliedChagnesCount); });
 
-    m_tasks.push_back(task);
+    QObject::connect(taskPointer, &ApplyChangesTask::errorsCountChanged
+        , this, [this, taskPointer]()
+    {
+        const auto it = std::find_if(m_tasks.begin(), m_tasks.end()
+            , [taskPointer](const ApplyChangesTaskPtr &item) { return (item.get() == taskPointer); });
+        if (it == m_tasks.end())
+            return;
+
+        const int offset = (it - m_tasks.begin());
+        const auto ind = index(offset);
+        dataChanged(ind, ind, RolesVector(1, kErrorsCount));
+    });
+
+    const int insertIndex = itInsert - m_tasks.begin();
+    const auto insertGuard = m_changeHelper->insertRowsGuard(insertIndex, insertIndex);
+    Q_UNUSED(insertGuard);
+
+    m_tasks.insert(itInsert, task);
     return true;
 }
 
-void rtu::ChangesProgressModel::removeChangeProgress(int index)
+void rtu::ChangesProgressModel::removeByIndex(int index)
 {
     if ((index < 0) || (index >= m_tasks.size()))
         return;
 
-    const auto removeGuard = m_changeHelper->removeRowsGuard(index, index);
-    Q_UNUSED(removeGuard);
-    
     const auto it = (m_tasks.begin() + index);
     QObject::disconnect(it->get(), nullptr, this, nullptr);
+    if (!it->get()->inProgress())
+    {
+        --m_completedCount;
+        completedCountChanged();
+    }
+
+    const auto removeGuard = m_changeHelper->removeRowsGuard(index, index);
+    Q_UNUSED(removeGuard);
     m_tasks.erase(it);
 }
 
-void rtu::ChangesProgressModel::remove(ApplyChangesTask *task)
+void rtu::ChangesProgressModel::removeByTask(ApplyChangesTask *task)
 {
     const auto it = std::find_if(m_tasks.begin(), m_tasks.end()
-        , [task](const ApplyChangesTaskPtr &item)
-    {
-        return (item.get() == task);
-    });
+        , [task](const ApplyChangesTaskPtr &item) { return (item.get() == task); });
 
     if (it == m_tasks.end())
         return;
 
-    removeChangeProgress(it - m_tasks.begin());
+    removeByIndex(it - m_tasks.begin());
 }
-
-rtu::ApplyChangesTaskPtr rtu::ChangesProgressModel::atIndex(int index)
-{
-    if ((index < 0) || (index >= m_tasks.size()))
-        return ApplyChangesTaskPtr();
-
-    return m_tasks.at(index);
-}
-
 
 void rtu::ChangesProgressModel::serverDiscovered(const rtu::BaseServerInfo &info)
 {
@@ -134,14 +133,22 @@ void rtu::ChangesProgressModel::unknownAdded(const QString &ip)
         task->unknownAdded(ip);
 }
 
+rtu::ApplyChangesTaskPtr rtu::ChangesProgressModel::atIndex(int index)
+{
+    if ((index < 0) || (index >= m_tasks.size()))
+        return ApplyChangesTaskPtr();
+
+    return m_tasks.at(index);
+}
+
 int rtu::ChangesProgressModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid()) // Parent item should be root
         return 0;
 
-    return m_tasks.size();
+    return static_cast<int>(m_tasks.size());
 }
-        
+
 QVariant rtu::ChangesProgressModel::data(const QModelIndex &index
     , int role) const
 {
@@ -158,7 +165,8 @@ QVariant rtu::ChangesProgressModel::data(const QModelIndex &index
         return task->totalChangesCount();
     case kAppliedChagnesCount:
         return task->appliedChangesCount();
-
+    case kErrorsCount:
+        return task->errorsCount();
     default:
         return QVariant();
     }
@@ -167,4 +175,49 @@ QVariant rtu::ChangesProgressModel::data(const QModelIndex &index
 rtu::Roles rtu::ChangesProgressModel::roleNames() const
 {
     return kRoles;
+}
+
+void rtu::ChangesProgressModel::taskStateChanged(const ApplyChangesTask *task
+    , int role)
+{
+    const auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [task](const ApplyChangesTaskPtr &taskVal)
+        { return (taskVal.get() == task); });
+
+    if (it == m_tasks.end())
+        return;
+
+    const int row = (it - m_tasks.begin());
+    const auto ind = index(row);
+    
+    dataChanged(ind, ind);
+
+    if (task->inProgress())
+        return;
+    
+    const auto itInsert = findInsertPosition();
+    if ((itInsert == m_tasks.end()) || (itInsert < it))
+    {
+        /// Move completed task up
+        const int removeIndex = (it - m_tasks.begin());
+        
+        const auto tmp = *it;
+        m_tasks.erase(it);
+
+        const auto itInsert = findInsertPosition();
+        const int insertIndex = (itInsert - m_tasks.begin());
+        m_tasks.insert(itInsert, tmp);
+
+        m_changeHelper->dataChanged(insertIndex, rowCount() - 1);
+    }
+
+    ++m_completedCount;
+    completedCountChanged();
+}
+
+rtu::ChangesProgressModel::TasksContainer::iterator rtu::ChangesProgressModel::findInsertPosition()
+{
+    const auto itInsert = std::lower_bound(m_tasks.begin(), m_tasks.end(), true
+        , [this](const ApplyChangesTaskPtr &item, bool value) { return !item->inProgress(); });
+
+    return itInsert;
 }

@@ -114,9 +114,7 @@ FocusScope
                     , finishCallback, cancelCallback);
             }
             else
-            {
                 rtuContext.changesManager().applyChanges();
-            }
         }
         else
         {

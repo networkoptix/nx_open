@@ -1,6 +1,7 @@
 import QtQuick 2.1;
 import QtQuick.Controls 1.1;
 import QtQuick.Dialogs 1.1;
+import QtQuick.Layouts 1.0;
 
 import "../common" as Common;
 import "../controls/rtu" as Rtu;
@@ -72,6 +73,10 @@ ScrollView
             }
         }
 
+        Component.onCompleted:
+        {
+            thisComponent.Layout.minimumHeight = selectionView.headerItem.height + Common.SizeManager.spacing.base;
+        }
     }
 }
 

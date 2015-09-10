@@ -7,21 +7,29 @@
 
 namespace rtu
 {
-    class ModelChangeHelper;
     struct BaseServerInfo;
+    class ModelChangeHelper;
 
     class ChangesProgressModel : public QAbstractListModel
     {
         Q_OBJECT
 
+        Q_PROPERTY(int completedCount READ completedCount NOTIFY completedCountChanged)
     public:
         ChangesProgressModel(QObject *parent = nullptr);
 
         virtual ~ChangesProgressModel();
 
-        ///
-        
+    public:
+        /// Property getters
+        int completedCount() const;
+
+    public:
         bool addChangeProgress(const ApplyChangesTaskPtr &task);
+
+        void removeByIndex(int index);
+
+        void removeByTask(ApplyChangesTask *task);
 
         void serverDiscovered(const rtu::BaseServerInfo &info);
         
@@ -29,11 +37,10 @@ namespace rtu
 
         void unknownAdded(const QString &ip);
 
-        void removeChangeProgress(int index);
-
-        void remove(ApplyChangesTask *task);
-
         ApplyChangesTaskPtr atIndex(int index);
+
+    signals:
+        void completedCountChanged();
 
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -43,14 +50,16 @@ namespace rtu
         
         Roles roleNames() const;
 
-    private:
         void taskStateChanged(const ApplyChangesTask *task
             , int role);
 
     private:
         typedef std::vector<ApplyChangesTaskPtr> TasksContainer;
+        TasksContainer::iterator findInsertPosition();
 
+    private:
         const ModelChangeHelper * const m_changeHelper;
         TasksContainer m_tasks;
+        int m_completedCount;
     };
 }

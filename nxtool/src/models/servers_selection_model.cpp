@@ -49,7 +49,7 @@ namespace
         , bool isBusy
         , const rtu::ServerInfo initServerInfo)
         : updateTimestamp(initUpdateTimestamp)
-        , isBusy(isBusy)                 /// TODO: ynikitenkov check if isBusy initialization is not required
+        , isBusy(isBusy)
         , selectedState(initSelectedState)
         , loginState(initLoginState)
         , serverInfo(initServerInfo)
@@ -218,8 +218,8 @@ namespace
         , kSelectedServersCountRoleId
         , kServersCountRoleId
         , kLoggedState
-        , kBusyState
-        
+        , kEnabledRoleId
+
         /// Server's specific roles
         , kIdRoleId
         , kSystemNameRoleId
@@ -228,6 +228,7 @@ namespace
         , kPortRoleId
         , kLoggedIn
         , kDefaultPassword
+        , kBusyStateRoleId
         
         , kLastCustomRoleId
     };
@@ -242,7 +243,7 @@ namespace
         result.insert(kSelectedServersCountRoleId, "selectedServersCount");
         result.insert(kServersCountRoleId, "serversCount");
         result.insert(kLoggedState, "loggedState");
-        result.insert(kBusyState, "isBusy");
+        result.insert(kEnabledRoleId, "enabled");
 
         result.insert(kIdRoleId, "id");
         result.insert(kSystemNameRoleId, "systemName");
@@ -251,6 +252,7 @@ namespace
         result.insert(kPortRoleId, "port");
         result.insert(kLoggedIn, "loggedIn");
         result.insert(kDefaultPassword, "defaultPassword");
+        result.insert(kBusyStateRoleId, "isBusy");
         return result;
     }();
     
@@ -359,9 +361,6 @@ public:
 
     ///
     
-    bool findAndMarkSelected(const QUuid &id
-        , ItemSearchInfo &searchInfo);
-
     rtu::ExtraServerInfo& getExtraInfo(ItemSearchInfo &searchInfo);
 
     void updateTimeDateInfo(ItemSearchInfo &searchInfo
@@ -527,7 +526,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         }
         case kLoggedIn:
             return info.hasExtraInfo();
-        case kBusyState:
+        case kBusyStateRoleId:
             return searchInfo.serverInfoIterator->isBusy;
         case kPortRoleId:
             return info.baseInfo().port;
@@ -551,6 +550,17 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kLoggedState:
             return (systemInfo.unauthorizedServers == systemInfo.servers.size() ? Constants::NotLogged
                 : (systemInfo.unauthorizedServers ? Constants::PartiallyLogged : Constants::LoggedToAllServers));
+
+        case kEnabledRoleId:
+        {
+            /// TODO: #ynikitenkov refactor this. Add calcaulation "on fly", not here
+            for (const auto &serverModelInfo: systemInfo.servers)
+            {
+                if (!serverModelInfo.isBusy && (serverModelInfo.loginState == kServerLoggedInState))
+                    return true;
+            }
+            return false;
+        }
         case kSelectedServersCountRoleId:
             return systemInfo.selectedServers;
         case kServersCountRoleId:
@@ -636,11 +646,11 @@ void rtu::ServersSelectionModel::Impl::setSystemSelectedStateImpl(SystemModelInf
     int selectedCount = 0;
     for(ServerModelInfo &server: systemInfo.servers)
     {
-        if (server.serverInfo.hasExtraInfo())
-        {
-            server.selectedState = newState;
-            ++selectedCount;
-        }
+        if (!server.serverInfo.hasExtraInfo() || server.isBusy)
+            continue;
+
+        server.selectedState = newState;
+        ++selectedCount;
     }
     systemInfo.selectedServers = (selected ? selectedCount : 0);
 }
@@ -656,7 +666,7 @@ void rtu::ServersSelectionModel::Impl::setSelectedItems(const IDsVector &ids)
             const bool shouldBeSelected = ids.contains(serverModelInfo.serverInfo.baseInfo().id);
             const bool selected = (serverModelInfo.selectedState == Qt::Checked);
             const bool shouldBeUpdated = (shouldBeSelected ^ selected);
-            if (!shouldBeUpdated)
+            if (!shouldBeUpdated || serverModelInfo.isBusy)
                 continue;
 
             changeServerSelectedState(systemModelInfo, serverModelInfo, !selected, &guard);
@@ -707,8 +717,11 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
 
     if (searchInfo.serverInfoIterator != searchInfo.systemInfoIterator->servers.end())
     {
-        if (!searchInfo.serverInfoIterator->serverInfo.hasExtraInfo())  /// Not logged in - do nothing
+        if (!searchInfo.serverInfoIterator->serverInfo.hasExtraInfo() 
+            || searchInfo.serverInfoIterator->isBusy)  /// Not logged in or applying changes - do nothing
+        {
             return; 
+        }
 
         const ServerModelInfo &serverInfo = *searchInfo.serverInfoIterator;
         const bool wasSelected = (serverInfo.selectedState != Qt::Unchecked);
@@ -723,7 +736,7 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
             m_changeHelper->dataChanged(0, knownEntitiesCount() - 1);
         }
 
-        const bool selected = (!wasSelected || (explicitSelection && (prevSelectedCount > 1)));
+        const bool selected = (!wasSelected || explicitSelection);
 
         changeServerSelectedState(*searchInfo.systemInfoIterator, *searchInfo.serverInfoIterator
             , selected, guard);
@@ -859,23 +872,6 @@ void rtu::ServersSelectionModel::Impl::setSelectionOutdated(bool outdated)
 {
     m_selectionOutdated = outdated;
     emit m_owner->selectionOutdatedChanged();
-}
-
-bool rtu::ServersSelectionModel::Impl::findAndMarkSelected(const QUuid &id
-    , ItemSearchInfo &searchInfo)
-{
-    if (!findServer(id, searchInfo))
-        return false;
-
-    ServerModelInfo &serverModelInfo = *searchInfo.serverInfoIterator;
-    if (serverModelInfo.selectedState != Qt::Checked)
-    {
-        serverModelInfo.selectedState = Qt::Checked;
-        ++searchInfo.systemInfoIterator->selectedServers;
-        m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
-        m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
-    }
-    return true;
 }
 
 rtu::ExtraServerInfo& rtu::ServersSelectionModel::Impl::getExtraInfo(ItemSearchInfo &searchInfo)
@@ -1249,17 +1245,16 @@ void rtu::ServersSelectionModel::Impl::setBusyState(const IDsVector &ids
         if (modelInfo.isBusy == isBusy)
             continue;
 
-
         modelInfo.isBusy = isBusy;
         if (isBusy && (modelInfo.selectedState == Qt::Checked))
         {
             --searchInfo.systemInfoIterator->selectedServers;
             modelInfo.selectedState = Qt::Unchecked;
-            m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
 
             selectionChanged = true;
         }
 
+        m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);  /// to update enabled flag state
         m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
     }
 
@@ -1469,7 +1464,7 @@ void rtu::ServersSelectionModel::updateTimeDateInfo(const QUuid &id
     , qint64 timestampMs)
 {
     ItemSearchInfo searchInfo;
-    if (!m_impl->findAndMarkSelected(id, searchInfo))
+    if (!m_impl->findServer(id, searchInfo))
         return;
 
     m_impl->updateTimeDateInfo(searchInfo, utcDateTimeMs, timeZoneId, timestampMs);
@@ -1480,7 +1475,7 @@ void rtu::ServersSelectionModel::updateInterfacesInfo(const QUuid &id
     , const InterfaceInfoList &interfaces)
 {
     ItemSearchInfo searchInfo;
-    if (!m_impl->findAndMarkSelected(id, searchInfo))
+    if (!m_impl->findServer(id, searchInfo))
         return;
 
     m_impl->updateInterfacesInfo(searchInfo, interfaces, host);
@@ -1502,7 +1497,7 @@ void rtu::ServersSelectionModel::updatePasswordInfo(const QUuid &id
     , const QString &password)
 {
     ItemSearchInfo searchInfo;
-    if (!m_impl->findAndMarkSelected(id, searchInfo))
+    if (!m_impl->findServer(id, searchInfo))
         return;
 
     m_impl->updatePasswordInfo(searchInfo, password);

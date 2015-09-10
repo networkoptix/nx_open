@@ -1,5 +1,6 @@
 import QtQuick 2.1;
 import QtQuick.Controls 1.1;
+import QtQuick.Layouts 1.0;
 
 import "." as Rtu;
 import "../base" as Base;
@@ -59,7 +60,7 @@ ListView
                 
                 systemName: model.systemName;
                 loggedState: model.loggedState;
-
+                enabled: model.enabled;
                 selectedState: model.selectedState;
 
                 onSelectionStateShouldBeChanged:
@@ -69,7 +70,6 @@ ListView
                         thisComponent.model.changeItemSelectedState(index);
                     });
                 }
-
             }
         }
     
@@ -152,7 +152,7 @@ ListView
         function selectAllServers(select)
         {
             var selectedParam = select;
-            impl.tryChangeSelectedServers(function()
+            thisComponent.tryChangeSelectedServers(function()
             {
                 thisComponent.model.setAllItemSelected(selectedParam);
             });

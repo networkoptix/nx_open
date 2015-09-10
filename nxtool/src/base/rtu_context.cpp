@@ -150,7 +150,7 @@ void rtu::RtuContext::Impl::showProgressTask(const ApplyChangesTaskPtr &task)
         else
         {
             /// removes task
-            changesManager()->changesProgressModel()->remove(m_progressTask.get());
+            changesManager()->changesProgressModel()->removeByTask(m_progressTask.get());
         }
     }
 
@@ -170,7 +170,7 @@ void rtu::RtuContext::Impl::showProgressTask(const ApplyChangesTaskPtr &task)
         selectionModel()->setSelectedItems(task->targetServerIds());
         setCurrentPage(Constants::SummaryPage);
 
-        changesManager()->changesProgressModel()->remove(task.get()); /// remove from list if task complete
+        changesManager()->changesProgressModel()->removeByTask(task.get()); /// remove from list if task complete
     }
 }
 
@@ -198,7 +198,7 @@ void rtu::RtuContext::Impl::removeProgressTask(int index)
     if (task.get() == progressTask())
         m_owner->hideProgressTask();
 
-    changesManager()->changesProgressModel()->removeChangeProgress(index);
+    changesManager()->changesProgressModel()->removeByIndex(index);
 }
 
 void rtu::RtuContext::Impl::setCurrentPage(rtu::Constants::Pages pageId)
