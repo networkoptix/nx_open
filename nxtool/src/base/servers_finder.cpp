@@ -7,7 +7,7 @@
 #include <QElapsedTimer>
 #include <QUdpSocket>
 
-#include <QNetworkReply>
+#include <QNetworkReply>;
 #include <QNetworkRequest>
 #include <QNetworkInterface>
 #include <QNetworkAccessManager>
@@ -43,7 +43,7 @@ namespace
 
     enum { kInvalidOpSize = -1 };
 
-    /// Setupsmulticast parameters. Aviods error in QUdpSocket
+    /// Setups multicast parameters. Aviods error in QUdpSocket
     bool setupMulticast(QAbstractSocket *socket
         , const QString &interfaceAddress
         , const QString &multicastAddress)
@@ -104,8 +104,11 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-       // if (!jsonObject.value("systemName").toString().contains("nx1_"))
-       //     return false;
+        if (!jsonObject.value("systemName").toString().contains("nx")
+            && !jsonObject.value("systemName").toString().contains("NX")
+            && !jsonObject.value("systemName").toString().contains("yuriy")
+            )
+            return false;
         
         rtu::parseModuleInformationReply(jsonObject, info);
 
@@ -379,11 +382,27 @@ bool rtu::ServersFinder::Impl::readRequestPacket()
     if (!data.contains(kSearchRequestBody))
         return true;
 
-    const QString &address = sender.toString();
-    const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
-    if (!isKnown && onEntityDiscovered(address, m_unknownHosts))
-        emit m_owner->unknownAdded(address);
+    const auto &firstTimeProcessor = 
+        [this, sender](const Callback &secondTimeProcessor)
+    {
+        const QString &address = sender.toString();
+        const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
+        const bool isUnknown = (m_unknownHosts.find(address) != m_unknownHosts.end());
+        if (secondTimeProcessor && !isKnown && !isUnknown)
+        {
+            /// try to add unknown after period * 2 - to chance to discover entity as known first
+            QTimer::singleShot(kUpdateServersInfoInterval * 3, secondTimeProcessor);
+        }
+        else if (!isKnown && onEntityDiscovered(address, m_unknownHosts))
+            emit m_owner->unknownAdded(address);
+    };
 
+    const auto &secondTimeProcessor = [firstTimeProcessor]()
+    {
+        firstTimeProcessor(Callback());
+    };
+
+    firstTimeProcessor(secondTimeProcessor);
     return true;
 }
 
@@ -424,9 +443,11 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
     QHostAddress sender;
     quint16 port = 0;
     if (!readPendingPacket(socket, data, &sender, &port))
-        return false;
+       return false;
 
     BaseServerInfo info;
+    if (sender.toString().contains("192.168.0.156"))
+        parseUdpPacket(data, info);
     if (!parseUdpPacket(data, info) )
         return true;
 
@@ -436,8 +457,6 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
     onEntityDiscovered(host, m_knownHosts);
     if (m_unknownHosts.remove(host))
         emit m_owner->unknownRemoved(host);
-
-    emit m_owner->serverDiscovered(info);
 
     const auto it = m_infos.find(info.id);
     const qint64 timestamp = m_msecCounter.elapsed();
@@ -476,6 +495,8 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
             emit m_owner->serverChanged(info);
         }
     }
+
+    emit m_owner->serverDiscovered(info);
 
     const auto itWaited = std::find(m_waitedServers.begin(), m_waitedServers.end(), info.id);
     if (itWaited == m_waitedServers.end())

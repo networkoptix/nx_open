@@ -68,14 +68,16 @@ Expandable.MaskedSettingsPanel
             function tryApplyChanges(warnings)
             {
                 if (portNumber.changed)
-                    rtuContext.changesManager().addPortChange(Number(portNumber.text));
+                {
+                    rtuContext.changesManager().changeset().addPortChange(Number(portNumber.text));
+                }
 
                 if (!flagged.showFirst) // No changes
                     return true;
 
                 if (flagged.dhcpForceOnly && flagged.currentItem.forceUseDHCP)
                 {
-                    rtuContext.changesManager().turnOnDhcp();
+                    rtuContext.changesManager().changeset().turnOnDhcp();
                     return true;
                 }
 
@@ -160,7 +162,7 @@ Expandable.MaskedSettingsPanel
                 {
                     id: portNumber;
 
-                    width: Common.SizeManager.clickableSizes.base * 3 ;
+                    width: Common.SizeManager.clickableSizes.base * 4 ;
                     initialPort: rtuContext.selection.port;
 
                     KeyNavigation.tab: null;

@@ -13,7 +13,8 @@ ListView
     id: thisComponent;
 
     signal applyChanges();
-    
+    signal tryChangeSelectedServers(var func);
+
     property bool askForSelectionChange: false;
 
     cacheBuffer: 65535;
@@ -58,12 +59,12 @@ ListView
                 
                 systemName: model.systemName;
                 loggedState: model.loggedState;
+
                 selectedState: model.selectedState;
 
                 onSelectionStateShouldBeChanged:
                 {
-                    var selectedIndex = index;
-                    impl.tryChangeSelectedServers( function()
+                    thisComponent.tryChangeSelectedServers( function()
                     {
                         thisComponent.model.changeItemSelectedState(index);
                     });
@@ -78,15 +79,14 @@ ListView
             
             Rtu.ServerItemDelegate
             {
-                loggedIn: model.loggedIn;
+                loggedIn: model.loggedIn && !model.isBusy;
                 serverName: model.name;
                 macAddress: model.macAddress;
                 selectedState: model.selectedState;
                 
                 onExplicitSelectionCalled: 
                 {
-                    var selectedIndex = index;
-                    impl.tryChangeSelectedServers(function() 
+                    thisComponent.tryChangeSelectedServers(function()
                     {
                         thisComponent.model.setItemSelected(index);
                     });
@@ -94,8 +94,7 @@ ListView
 
                 onSelectionStateShouldBeChanged:
                 {
-                    var selectedIndex = index;
-                    impl.tryChangeSelectedServers( function()
+                    thisComponent.tryChangeSelectedServers( function()
                     {
                         thisComponent.model.changeItemSelectedState(index);
                     });
@@ -144,36 +143,6 @@ ListView
         }
     }
 
-    Dialogs.MessageDialog 
-    {
-        id: confirmationDialog;
-        
-        property var changeSelectionFunc;
-        property var applyChangesFunc;
-        
-        buttons: (NxRtu.Buttons.ApplyChanges 
-            | NxRtu.Buttons.DiscardChanges | NxRtu.Buttons.Cancel);
-        styledButtons: NxRtu.Buttons.ApplyChanges;
-        
-        title: qsTr("Confirmation");
-        message: qsTr("Configuration changes have not been saved yet");
-        
-        onButtonClicked:
-        {
-            switch(id)
-            {
-            case NxRtu.Buttons.ApplyChanges:
-                if (applyChangesFunc)
-                    applyChangesFunc();
-                return;
-            case NxRtu.Buttons.DiscardChanges:
-                if (changeSelectionFunc)
-                    changeSelectionFunc();
-                return;
-            }
-        }
-    }
-
     property QtObject impl: QtObject
     {
         readonly property int selectAllCheckedState:
@@ -187,20 +156,6 @@ ListView
             {
                 thisComponent.model.setAllItemSelected(selectedParam);
             });
-        }
-
-        function tryChangeSelectedServers(changeFunc)
-        {
-            if (askForSelectionChange)
-            {
-                confirmationDialog.changeSelectionFunc = function() { changeFunc(); }
-                confirmationDialog.applyChangesFunc = thisComponent.applyChanges;
-                confirmationDialog.show();
-            }
-            else
-            {
-                changeFunc();
-            }
         }
     }
 
