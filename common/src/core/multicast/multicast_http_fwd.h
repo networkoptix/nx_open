@@ -1,5 +1,4 @@
-#ifndef __MULTICAST_HTTP_FWD_H__
-#define __MULTICAST_HTTP_FWD_H__
+#pragma once
 
 #include <QUuid>
 #include <QUrl>
@@ -55,5 +54,3 @@ namespace QnMulticast
     //typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpData)> RequestCallback;
     typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const Request& request)> RequestCallback;
 }
-
-#endif // __MULTICAST_HTTP_FWD_H__

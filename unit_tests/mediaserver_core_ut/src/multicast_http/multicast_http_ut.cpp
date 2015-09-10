@@ -15,7 +15,7 @@
 namespace
 {
     const QByteArray UT_SERVER_GUID("{9DBF7579-3235-4910-A66C-0EB5DE8C443B}");
-    const int MT_REQUESTS = 10;
+    const int MT_REQUESTS = 20;
 
 }
 
@@ -98,7 +98,7 @@ public:
         request1.auth.setPassword(lit("admin"));
 
         QnMulticast::Request request2(request1);
-        request1.url = QUrl(lit("api/gettime"));
+        request1.url = QUrl(lit("api/auditLog"));
         for (int i = 0; i < MT_REQUESTS; ++i)
         {
             auto callback = [this](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)

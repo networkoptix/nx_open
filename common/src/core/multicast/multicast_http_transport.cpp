@@ -19,6 +19,7 @@ static const int SEND_BITRATE = 1024*1024 * 2;        // send data at speed 2Mbp
 static const int PROCESSED_REQUESTS_CACHE_SZE = 512;  // keep last sessions to ignore UDP duplicates
 static const int CSV_COLUMNS = 9;
 static char CSV_DELIMITER = ';';
+static char EMPTY_DATA_FILLER = '\x0';
 
 // --------- UDP / Multicast routines -----------------
 
@@ -44,12 +45,12 @@ static bool joinMulticastGroup(int fd, const QString &multicastGroup, const QStr
 
 QString getIfaceIPv4Addr(const QNetworkInterface& iface)
 {
-    for (const auto& adrentr: iface.addressEntries())
+    for (const auto& addr: iface.addressEntries())
     {
-        if (QAbstractSocket::IPv4Protocol == adrentr.ip().protocol() && // if it has IPV4
-            adrentr.ip()!=QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
-            adrentr.netmask().toIPv4Address()!=0) // and mask !=0
-            return adrentr.ip().toString();
+        if (QAbstractSocket::IPv4Protocol == addr.ip().protocol() && // if it has IPV4
+            addr.ip()!=QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
+            addr.netmask().toIPv4Address()!=0) // and mask !=0
+            return addr.ip().toString();
     }
     return QString();
 }
@@ -211,15 +212,18 @@ QByteArray Transport::serializeMessage(const Request& request) const
 
 bool Transport::parseHttpMessage(Message& result, const QByteArray& message) const
 {
+    static const QByteArray ENDL("\r\n");
+    static const QByteArray DOUBLE_ENDL("\r\n\r\n");
+
     // extract http result
-    int requestLineEnd = message.indexOf("\r\n");
+    int requestLineEnd = message.indexOf(ENDL);
     if (requestLineEnd == -1)
         return false; // error
-    int msgBodyPos = message.indexOf("\r\n\r\n");
+    int msgBodyPos = message.indexOf(DOUBLE_ENDL);
     if (msgBodyPos == -1)
         msgBodyPos = message.size();
     // parse headers
-    int headersStart = requestLineEnd + 2;
+    int headersStart = requestLineEnd + ENDL.size();
     QByteArray headers = QByteArray::fromRawData(message.data() + headersStart, msgBodyPos - headersStart);
     for (const auto& header: headers.split('\n'))
     {
@@ -234,7 +238,7 @@ bool Transport::parseHttpMessage(Message& result, const QByteArray& message) con
                 result.headers << h;
         }
     }
-    result.messageBody = message.mid(msgBodyPos + 4);
+    result.messageBody = message.mid(msgBodyPos + DOUBLE_ENDL.size());
     return true;
 }
 
@@ -285,7 +289,7 @@ QUuid Transport::addRequest(const Request& request, ResponseCallback callback, i
     transportRequest.timeoutMs = timeoutMs;
     m_requests.push_back(std::move(transportRequest));
     if (!m_nextSendQueued)
-        QMetaObject::invokeMethod(this, "sendNextData", Qt::QueuedConnection);
+        QTimer::singleShot(0, this, SLOT(sendNextData()));
     return transportRequest.requestId;
 }
 
@@ -327,7 +331,7 @@ void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const
     QMutexLocker lock(&m_mutex);
     m_requests.push_back(serializeResponse(requestId, clientId, httpResponse));
     if (!m_nextSendQueued)
-        QMetaObject::invokeMethod(this, "sendNextData", Qt::QueuedConnection);
+        QTimer::singleShot(0, this, SLOT(sendNextData()));
 }
 
 Transport::TransportConnection Transport::serializeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
@@ -368,58 +372,58 @@ void Transport::at_socketReadyRead()
     {
         QByteArray datagram;
         datagram.resize(m_recvSocket->pendingDatagramSize());
-        int readed = m_recvSocket->readDatagram(datagram.data(), datagram.size());
-        if (readed <= 0)
+        int gotBytes = m_recvSocket->readDatagram(datagram.data(), datagram.size());
+        if (gotBytes <= 0)
             continue;
         bool ok;
         Packet packet = Packet::deserialize(datagram, &ok);
-        if (ok)
+        if (!ok)
+            continue;
+
+        auto itr = std::find_if(m_requests.begin(), m_requests.end(), [packet](const TransportConnection& conn) {
+            return conn.requestId == packet.requestId;
+        });
+
+        if (packet.messageType == MessageType::response && itr == m_requests.end())
+            continue; // ignore response without request (probably request already removed because of timeout or other reason)
+
+        if (packet.messageType == MessageType::request && packet.serverId != m_localGuid)
+            continue; // foreign packet
+        if (packet.messageType == MessageType::response && packet.clientId != m_localGuid)
+            continue; // foreign packet
+        if (m_processedRequests.contains(packet.requestId))
+            continue; // request already processed
+
+        if (itr == m_requests.end()) {
+            m_requests.push_back(TransportConnection());
+            itr = m_requests.end()-1;
+        }
+        TransportConnection& transportData = *itr;
+        transportData.requestId = packet.requestId;
+        if (transportData.receivedData.isEmpty()) {
+            transportData.receivedData.resize(packet.messageSize);
+            transportData.receivedData.fill(EMPTY_DATA_FILLER);
+        }
+        memcpy(transportData.receivedData.data() + packet.offset, packet.payloadData.data(), packet.payloadData.size());
+        if (!transportData.receivedData.contains(EMPTY_DATA_FILLER))
         {
-            auto itr = std::find_if(m_requests.begin(), m_requests.end(), [packet](const TransportConnection& conn) {
-                return conn.requestId == packet.requestId;
-            });
-
-            if (packet.messageType == MessageType::response && itr == m_requests.end())
-                continue; // ignore response without request (probably request already removed because of timeout or other reason)
-
-            if (packet.messageType == MessageType::request && packet.serverId != m_localGuid)
-                continue; // foreign packet
-            if (packet.messageType == MessageType::response && packet.clientId != m_localGuid)
-                continue; // foreign packet
-            if (m_processedRequests.contains(packet.requestId))
-                continue; // request already processed
-
-            if (itr == m_requests.end()) {
-                m_requests.push_back(TransportConnection());
-                itr = m_requests.end()-1;
-            }
-            TransportConnection& transportData = *itr;
-            transportData.requestId = packet.requestId;
-            if (transportData.receivedData.isEmpty()) {
-                transportData.receivedData.resize(packet.messageSize);
-                transportData.receivedData.fill('\x0');
-            }
-            memcpy(transportData.receivedData.data() + packet.offset, packet.payloadData.data(), packet.payloadData.size());
-            if (!transportData.receivedData.contains('\x0'))
+            m_processedRequests.insert(packet.requestId, 0);
+            // all data has been received
+            bool ok;
+            if (packet.messageType == MessageType::response) 
             {
-                m_processedRequests.insert(packet.requestId, 0);
-                // all data has been received
-                bool ok;
-                if (packet.messageType == MessageType::response) 
-                {
-                    Response response = parseResponse(transportData, &ok);
-                    response.serverId = packet.serverId;
-                    if (transportData.responseCallback)
-                        transportData.responseCallback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
-                }
-                else if (packet.messageType == MessageType::request) 
-                {
-                    Request request = parseRequest(transportData, &ok);
-                    if (ok && m_requestCallback)
-                        m_requestCallback(transportData.requestId, packet.clientId, request);
-                }
-                eraseRequest(packet.requestId);
+                Response response = parseResponse(transportData, &ok);
+                response.serverId = packet.serverId;
+                if (transportData.responseCallback)
+                    transportData.responseCallback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
             }
+            else if (packet.messageType == MessageType::request) 
+            {
+                Request request = parseRequest(transportData, &ok);
+                if (ok && m_requestCallback)
+                    m_requestCallback(transportData.requestId, packet.clientId, request);
+            }
+            eraseRequest(packet.requestId);
         }
     }
 }

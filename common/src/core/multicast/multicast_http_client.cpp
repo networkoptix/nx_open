@@ -9,7 +9,7 @@ static const int HTTP_NOT_AUTHORIZED = 401;
 
 HTTPClient::HTTPClient(const QString& userAgent, const QUuid& localGuid):
     m_transport(localGuid.isNull() ? QUuid::createUuid() : localGuid),
-    m_defaultTimeoutMs(-1),
+    m_defaultTimeoutMs(NO_TIMEOUT),
     m_userAgent(userAgent)
 {
 
@@ -33,13 +33,13 @@ QByteArray HTTPClient::createHttpQueryAuthParam(
     QByteArray nonce )
 {
     //calculating user digest
-    const QByteArray& ha1 = createUserPasswordDigest( userName, password, realm );
+    const QByteArray& ha1 = createUserPasswordDigest( userName.toLower(), password, realm );
 
     //calculating "HA2"
     QCryptographicHash md5Hash( QCryptographicHash::Md5 );
     md5Hash.addData( method );
     md5Hash.addData( ":" );
-    const QByteArray nedoHa2 = md5Hash.result().toHex();
+    const QByteArray ha2Light = md5Hash.result().toHex();
 
     //calculating auth digest
     md5Hash.reset();
@@ -47,7 +47,7 @@ QByteArray HTTPClient::createHttpQueryAuthParam(
     md5Hash.addData( ":" );
     md5Hash.addData( nonce );
     md5Hash.addData( ":" );
-    md5Hash.addData( nedoHa2 );
+    md5Hash.addData( ha2Light );
     const QByteArray& authDigest = md5Hash.result().toHex();
 
     return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
@@ -97,7 +97,7 @@ void HTTPClient::updateAuthParams(const QUuid& serverId, const Response& respons
 
 QUuid HTTPClient::execRequest(const Request& request, ResponseCallback callback, int timeoutMs)
 {
-    if (timeoutMs == -1)
+    if (timeoutMs == NO_TIMEOUT)
         timeoutMs = m_defaultTimeoutMs;
     auto requestId = m_transport.addRequest(updateRequest(request), [request, callback, timeoutMs, this](const QUuid& requestId, ErrCode errCode, const Response& response) 
     {
@@ -105,21 +105,18 @@ QUuid HTTPClient::execRequest(const Request& request, ResponseCallback callback,
             updateAuthParams(request.serverId, response);
             auto requestId2 = m_transport.addRequest(updateRequest(request), [request, callback, timeoutMs, this](const QUuid& requestId2, ErrCode errCode, const Response& response)
             {
-                QUuid primaryRequestId = requestId2;
-                for (auto itr = m_requestsPairs.begin(); itr != m_requestsPairs.end(); ++itr) {
-                    if (itr.value() == requestId2) {
-                        primaryRequestId = itr.key();
-                        break;
-                    }
-                }
+                QUuid primaryRequestId = m_requestsPairs.key(requestId2, requestId2);
                 m_requestsPairs.remove(primaryRequestId);
-                callback(primaryRequestId, errCode, response);
+                if (callback)
+                    callback(primaryRequestId, errCode, response);
             },
             timeoutMs);
             m_requestsPairs.insert(requestId, requestId2);
         }
-        else
-            callback(requestId, errCode, response);
+        else {
+            if (callback)
+                callback(requestId, errCode, response);
+        }
     }, 
     timeoutMs);
     return requestId;
@@ -134,6 +131,7 @@ void HTTPClient::cancelRequest(const QUuid& requestId)
 
 void HTTPClient::setDefaultTimeout(int timeoutMs)
 {
+    Q_ASSERT(timeoutMs > 0);
     m_defaultTimeoutMs = timeoutMs;
 }
 

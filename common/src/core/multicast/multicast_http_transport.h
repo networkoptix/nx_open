@@ -1,5 +1,4 @@
-#ifndef __MULTICAST_HTTP_TRANSPORT_H_
-#define __MULTICAST_HTTP_TRANSPORT_H_
+#pragma once
 
 #include <QElapsedTimer>
 #include <QUdpSocket>
@@ -100,5 +99,3 @@ namespace QnMulticast
     };
 
 }
-
-#endif // __MULTICAST_HTTP_TRANSPORT_H_
