@@ -90,7 +90,7 @@ angular.module('webadminApp')
                 return;
             }*/
 
-            ediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
+            mediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
                 if(r.data.error!=='0'){
                     var errorToShow = r.data.errorString;
                     errorHandler(errorToShow);
