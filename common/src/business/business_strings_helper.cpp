@@ -250,7 +250,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
                 int m = 0;
                 for (const QString &camera: conflicts.camerasByServer[server]) {
                     result += delimiter;
-                    result += tr("MAC #%1: %2 ").arg(++n).arg(camera);
+                    result += tr("MAC #%1: %2 ").arg(++m).arg(camera);
                 }
 
             }

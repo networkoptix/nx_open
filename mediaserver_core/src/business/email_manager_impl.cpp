@@ -10,7 +10,7 @@
 #include <utils/common/log.h>
 
 #include "nx_ec/data/api_email_data.h"
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 
 namespace {
     SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct) {

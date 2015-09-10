@@ -8,7 +8,7 @@
 #include "resource_property_adaptor.h"
 
 #include <utils/common/app_info.h>
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 #include <utils/common/ldap.h>
 
 #include <nx_ec/data/api_resource_data.h>
