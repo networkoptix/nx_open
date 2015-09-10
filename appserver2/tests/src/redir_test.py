@@ -36,9 +36,10 @@ def safe_request_json(req):
 def unquote_guid(guid):
     return guid[1:-1] if guid[0] == '{' and guid[-1] == '}' else guid
 
+
 def get_server_guid(host):
-    req = urllib2.Request("%s/api/moduleInformation" % host)
-    info = safe_request_json(req)
+    #req = urllib2.Request("%s/api/moduleInformation" % host)
+    info = safe_request_json("%s/api/moduleInformation" % host)
     if info and (u'id' in info['reply']):
         IDS[host] = unquote_guid(info['reply']['id'])
         print "%s - %s" % (host, IDS[host])
