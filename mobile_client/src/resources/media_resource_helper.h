@@ -15,9 +15,18 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
     Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
-    Q_PROPERTY(QString protocol READ protocol NOTIFY protocolChanged)
+    Q_PROPERTY(Protocol protocol READ protocol NOTIFY protocolChanged)
+
+    Q_ENUMS(Protocol)
 
 public:
+    enum Protocol {
+        Webm,
+        Rtsp,
+        Hls,
+        Mjpeg
+    };
+
     explicit QnMediaResourceHelper(QObject *parent = 0);
 
     QString resourceId() const;
@@ -38,7 +47,7 @@ public:
 
     QString optimalResolution() const;
 
-    QString protocol() const;
+    Protocol protocol() const;
 
 signals:
     void resourceIdChanged();

@@ -14,15 +14,16 @@ class QnMjpegSessionPrivate : public QObject {
     Q_DECLARE_PUBLIC(QnMjpegSession)
 public:
     struct FrameData {
-        int disaplyTime;
+        int presentationTime;
         QByteArray data;
     };
 
     QnMjpegSession *q_ptr;
 
     QUrl url;
-    qint64 frameTimestamp;
-    qint64 nextFrameTimestamp;
+    QByteArray previousFrameData;
+    qint64 previousFrameTimestampUSec;
+    qint64 frameTimestampUSec;
     QQueue<FrameData> frameQueue;
 
     QNetworkAccessManager *networkAccessManager;
@@ -54,7 +55,7 @@ public:
 
     void setState(QnMjpegSession::State state);
 
-    void enqueueFrame(const QByteArray &data, int displayTime);
+    void enqueueFrame(const QByteArray &data, int presentationTime);
 
     void connect();
     void disconnect();
@@ -87,12 +88,12 @@ void QnMjpegSessionPrivate::setState(QnMjpegSession::State state) {
     this->state = state;
 }
 
-void QnMjpegSessionPrivate::enqueueFrame(const QByteArray &data, int displayTime) {
+void QnMjpegSessionPrivate::enqueueFrame(const QByteArray &data, int presentationTime) {
     Q_Q(QnMjpegSession);
 
     FrameData frameData;
     frameData.data = data;
-    frameData.disaplyTime = displayTime;
+    frameData.presentationTime = presentationTime;
 
     frameQueue.enqueue(frameData);
     q->frameEnqueued();
@@ -109,15 +110,11 @@ void QnMjpegSessionPrivate::connect() {
     httpBuffer.clear();
     frameQueue.clear();
     parserState = ParseHeaders;
-    frameTimestamp = 0;
-    nextFrameTimestamp = 0;
+    previousFrameTimestampUSec = 0;
+    frameTimestampUSec = 0;
+    previousFrameData.clear();
 
     setState(QnMjpegSession::Connecting);
-
-    Q_Q(QnMjpegSession);
-
-    if (!networkAccessManager)
-        networkAccessManager = new QNetworkAccessManager(q);
 
     reply = networkAccessManager->get(QNetworkRequest(url));
     reply->ignoreSslErrors();
@@ -138,6 +135,7 @@ void QnMjpegSessionPrivate::disconnect() {
     boundary.clear();
     httpBuffer.clear();
     frameQueue.clear();
+    previousFrameData.clear();
 
     setState(QnMjpegSession::Stopped);
 }
@@ -162,8 +160,10 @@ void QnMjpegSessionPrivate::at_reply_readyRead() {
         if (available < 1)
             break;
 
-        if (httpBuffer.size() >= maxHttpBufferSize)
+        if (httpBuffer.size() >= maxHttpBufferSize) {
+            /* It means buffer wasn't processed and length limit is exceeded. */
             return;
+        }
 
         int bytesToRead = qMin(available, maxHttpBufferSize - httpBuffer.size());
         int pos = httpBuffer.size();
@@ -205,10 +205,10 @@ bool QnMjpegSessionPrivate::processHeaders() {
     if (mimeType != "multipart/x-mixed-replace")
         return false;
 
-    const char boundaryMarker[] = "boundary=";
+    static const QByteArray boundaryMarker("boundary=");
     i = contentTypeHeader.indexOf(boundaryMarker, i);
     if (i > 0)
-        boundary = contentTypeHeader.mid(i + sizeof(boundaryMarker) - 1);
+        boundary = contentTypeHeader.mid(i + boundaryMarker.size());
 
     if (boundary.isNull())
         return false;
@@ -248,25 +248,22 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::processBuffer() {
 QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBoundary() {
     int pos = httpBuffer.indexOf(boundary);
     if (pos < 0) {
-        httpBuffer.remove(0, httpBuffer.size() - 2);
+        httpBuffer.remove(0, httpBuffer.size() - (boundary.size() - 1));
         return ParseNeedMoreData;
     }
 
     int boundaryStart = pos;
 
     pos += boundary.size();
-    int rest = httpBuffer.size() - pos;
 
-    if (rest >= 2 && httpBuffer[pos] == '-' && httpBuffer[pos + 1] == '-') {
+    if (pos <= httpBuffer.size() - 2 && httpBuffer[pos] == '-' && httpBuffer[pos + 1] == '-')
         pos += 2;
-        rest -= 2;
-    }
 
-    if (rest >= 1 && httpBuffer[pos] == '\n') {
+    if (pos <= httpBuffer.size() - 1 && httpBuffer[pos] == '\n') {
         pos += 1;
-    } else if (rest >= 2 && httpBuffer[pos] == '\r' && httpBuffer[pos + 1] == '\n') {
+    } else if (pos <= httpBuffer.size() - 2 && httpBuffer[pos] == '\r' && httpBuffer[pos + 1] == '\n') {
         pos += 2;
-    } else if (rest < 2) {
+    } else if (pos > httpBuffer.size() - 2) {
         httpBuffer.remove(0, boundaryStart);
         return ParseNeedMoreData;
     } else {
@@ -290,33 +287,46 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseHeaders() {
         if (lineEnd < 0)
             break;
 
-        unsigned length = ((lineEnd > 0 && httpBuffer[lineEnd - 1] == '\r') ? lineEnd - 1 : lineEnd) - pos;
+        /* Header length without \r\n */
+        int length = ((lineEnd > 0 && httpBuffer[lineEnd - 1] == '\r') ? lineEnd - 1 : lineEnd) - pos;
 
         ++lineEnd;
 
         if (!finalized && length > 0) {
-            static const char contentLengthMark[] = "Content-Length:";
-            static const char contentTypeMark[] = "Content-Type:";
-            static const char contentTimestampMark[] = "x-Content-Timestamp:";
+            static const QByteArray contentLengthMark("Content-Length:");
+            static const QByteArray contentTypeMark("Content-Type:");
+            static const QByteArray contentTimestampMark("x-Content-Timestamp:");
 
-            if (length >= sizeof(contentLengthMark) && qstrnicmp(httpBuffer.data() + pos, contentLengthMark, sizeof(contentLengthMark) - 1) == 0) {
-                bodyLength = httpBuffer.mid(pos + sizeof(contentLengthMark) - 1,
-                                            length - sizeof(contentLengthMark) + 1).trimmed().toLongLong();
-            } else if (length >= sizeof(contentTypeMark) && qstrnicmp(httpBuffer.data() + pos, contentTypeMark, sizeof(contentTypeMark) - 1) == 0) {
-                static const char tsMark[] = "ts=";
+            if (length >= contentLengthMark.size() &&
+                qstrnicmp(httpBuffer.data() + pos, contentLengthMark.data(), contentLengthMark.size()) == 0)
+            {
+                bodyLength = httpBuffer.mid(
+                        pos + contentLengthMark.size(),
+                        length - contentLengthMark.size()).trimmed().toLongLong();
+            }
+            else if (length >= contentTypeMark.size() &&
+                     qstrnicmp(httpBuffer.data() + pos, contentTypeMark.data(), contentTypeMark.size()) == 0)
+            {
+                static const QByteArray tsMark("ts=");
 
                 httpBuffer[lineEnd - 1] = '\0'; // workaround for missing strnstr function in msvc
 
-                char *tsStr = strstr(httpBuffer.data() + pos + sizeof(contentTypeMark), tsMark);
+                char *tsStr = strstr(httpBuffer.data() + pos + contentTypeMark.size(), tsMark);
                 if (tsStr) {
-                    tsStr += sizeof(tsMark) - 1;
-                    nextFrameTimestamp = httpBuffer.mid(tsStr - httpBuffer.data(), (httpBuffer.data() + lineEnd - 1) - tsStr).trimmed().toLongLong();
+                    tsStr += tsMark.size();
+                    frameTimestampUSec = httpBuffer.mid(
+                            tsStr - httpBuffer.data(),
+                            httpBuffer.data() + pos + length - tsStr).trimmed().toLongLong();
                 }
 
                 httpBuffer[lineEnd - 1] = '\n';
-            } else if (length >= sizeof(contentTimestampMark) && qstrnicmp(httpBuffer.data() + pos, contentTimestampMark, sizeof(contentTimestampMark) - 1) == 0) {
-                nextFrameTimestamp = httpBuffer.mid(pos + sizeof(contentTimestampMark) - 1,
-                                                length - sizeof(contentTimestampMark) + 1).trimmed().toLongLong();
+            }
+            else if (length >= contentTimestampMark.size() &&
+                     qstrnicmp(httpBuffer.data() + pos, contentTimestampMark.data(), contentTimestampMark.size()) == 0)
+            {
+                frameTimestampUSec = httpBuffer.mid(
+                        pos + contentTimestampMark.size(),
+                        length - contentTimestampMark.size()).trimmed().toLongLong();
             }
         }
 
@@ -350,11 +360,15 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody() {
     }
 
     parserState = ParseBoundary;
-    int frameDisplayTime = frameTimestamp > 0 ? (nextFrameTimestamp - frameTimestamp) / 1000 : 0;
-    frameTimestamp = nextFrameTimestamp;
-    nextFrameTimestamp = 0;
+    int framePresentationTimeMSec = previousFrameTimestampUSec > 0 ? (frameTimestampUSec - previousFrameTimestampUSec) / 1000 : 0;
+    previousFrameTimestampUSec = frameTimestampUSec;
+    frameTimestampUSec = 0;
 
-    enqueueFrame(httpBuffer.left(bodyLength), frameDisplayTime);
+    if (!previousFrameData.isEmpty())
+        enqueueFrame(previousFrameData, framePresentationTimeMSec);
+
+    previousFrameData = httpBuffer.left(bodyLength);
+
     httpBuffer.remove(0, bodyLength);
 
     return ParseOk;
@@ -365,6 +379,9 @@ QnMjpegSession::QnMjpegSession(QObject *parent)
     : QObject(parent)
     , d_ptr(new QnMjpegSessionPrivate(this))
 {
+    Q_D(QnMjpegSession);
+
+    d->networkAccessManager = new QNetworkAccessManager(this);
 }
 
 QnMjpegSession::~QnMjpegSession() {
@@ -383,7 +400,7 @@ void QnMjpegSession::setUrl(const QUrl &url) {
 
     d->url = url;
 
-    bool playing = state() == Playing;
+    bool playing = d->state == Playing;
 
     d->disconnect();
 
@@ -398,7 +415,7 @@ QnMjpegSession::State QnMjpegSession::state() const {
     return d->state;
 }
 
-bool QnMjpegSession::dequeueFrame(QByteArray *data, int *displayTime) {
+bool QnMjpegSession::dequeueFrame(QByteArray *data, int *presentationTime) {
     Q_D(QnMjpegSession);
 
     if (d->frameQueue.isEmpty())
@@ -409,8 +426,8 @@ bool QnMjpegSession::dequeueFrame(QByteArray *data, int *displayTime) {
     if (data)
         *data = frameData.data;
 
-    if (displayTime)
-        *displayTime = frameData.disaplyTime;
+    if (presentationTime)
+        *presentationTime = frameData.presentationTime;
 
     if (d->frameQueue.size() == maxFrameQueueSize - 1)
         d->processBuffer();
@@ -421,7 +438,7 @@ bool QnMjpegSession::dequeueFrame(QByteArray *data, int *displayTime) {
 void QnMjpegSession::play() {
     Q_D(QnMjpegSession);
 
-    if (state() == Paused) {
+    if (d->state == Paused) {
         d->setState(Playing);
         d->processBuffer();
     } else {
@@ -438,6 +455,6 @@ void QnMjpegSession::stop() {
 void QnMjpegSession::pause() {
     Q_D(QnMjpegSession);
 
-    if (state() == Playing)
+    if (d->state == Playing)
         d->setState(Paused);
 }

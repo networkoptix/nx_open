@@ -23,7 +23,7 @@ public:
 
     State state() const;
 
-    bool dequeueFrame(QByteArray *data, int *displayTime);
+    bool dequeueFrame(QByteArray *data, int *presentationTime);
 
 signals:
     void frameEnqueued();

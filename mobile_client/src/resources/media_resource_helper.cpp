@@ -20,19 +20,36 @@
 namespace {
 
 #ifdef Q_OS_IOS
-    QString nativeStreamProtocol = lit("hls");
-    QString httpFormat = lit("mpjpeg");
+    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Hls;
+    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #else
-    QString nativeStreamProtocol = lit("rtsp");
-    QString httpFormat = lit("webm");
+    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
+    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #endif
+
+    QString protocolName(QnMediaResourceHelper::Protocol protocol) {
+        switch (protocol) {
+        case QnMediaResourceHelper::Webm:   return lit("webm");
+        case QnMediaResourceHelper::Rtsp:   return lit("rtsp");
+        case QnMediaResourceHelper::Hls:    return lit("hls");
+        case QnMediaResourceHelper::Mjpeg:  return lit("mpjpeg");
+        }
+        return QString();
+    }
+
+    QString protocolScheme(QnMediaResourceHelper::Protocol protocol) {
+        if (protocol == QnMediaResourceHelper::Rtsp)
+            return lit("rtsp");
+
+        return lit("http");
+    }
 
     QString getAuth(const QnUserResourcePtr &user) {
         QString auth = user->getName() + lit(":0:") + QString::fromLatin1(user->getDigest());
         return QString::fromLatin1(auth.toUtf8().toBase64());
     }
 
-    qint64 convertPosition(qint64 position, const QString &protocol) {
+    qint64 convertPosition(qint64 position, QnMediaResourceHelper::Protocol protocol) {
         return protocol == nativeStreamProtocol ? position * 1000 : position;
     }
 
@@ -122,11 +139,12 @@ void QnMediaResourceHelper::updateUrl() {
 
     QUrlQuery query;
 
-    QString protocol = m_transcodingSupported ? lit("http") : nativeStreamProtocol;
+    Protocol protocol = m_transcodingSupported ? transcodingProtocol : nativeStreamProtocol;
     QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user();
 
-    if (protocol == lit("hls")) {
-        url.setScheme(lit("http"));
+    url.setScheme(protocolScheme(protocol));
+
+    if (protocol == Hls) {
         url.setPath(lit("/hls/%1.m3u").arg(camera->getPhysicalId()));
 
         query.addQueryItem(m_nativeStreamIndex == 0 ? lit("hi") : lit("lo"), QString());
@@ -137,9 +155,8 @@ void QnMediaResourceHelper::updateUrl() {
         url.setUserName(QnAppServerConnectionFactory::url().userName());
         url.setPassword(QnAppServerConnectionFactory::url().password());
     } else {
-        url.setScheme(protocol);
         if (m_transcodingSupported) {
-            url.setPath(lit("/media/%1.%2").arg(camera->getMAC().toString()).arg(httpFormat));
+            url.setPath(lit("/media/%1.%2").arg(camera->getMAC().toString()).arg(protocolName(protocol)));
             query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
         } else {
             url.setPath(lit("/%1").arg(camera->getPhysicalId()));
@@ -254,9 +271,9 @@ QString QnMediaResourceHelper::optimalResolution() const {
     return lit("%1p").arg(resolution);
 }
 
-QString QnMediaResourceHelper::protocol() const {
+QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const {
     if (m_transcodingSupported)
-        return httpFormat;
+        return transcodingProtocol;
     else
         return nativeStreamProtocol;
 }
@@ -276,7 +293,7 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
         if (info.transcodingRequired || info.resolution == CameraMediaStreamInfo::anyResolution)
             continue;
 
-        if (std::find(info.transports.begin(), info.transports.end(), nativeStreamProtocol) != info.transports.end()) {
+        if (std::find(info.transports.begin(), info.transports.end(), protocolName(nativeStreamProtocol)) != info.transports.end()) {
             if (nativeStreamIndex(info.resolution) != -1)
                 continue;
             m_nativeResolutions.insert(info.encoderIndex, info.resolution);

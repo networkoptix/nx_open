@@ -29,7 +29,7 @@ QnObject {
     QtObject {
         id: d
 
-        readonly property int liveBound: 60000
+        readonly property int lastMinuteLength: 60000
 
         property bool paused: false
         property real position: -1
@@ -42,7 +42,7 @@ QnObject {
 
     Loader {
         id: playerLoader
-        sourceComponent: resourceHelper.protocol != "mpjpeg" ? qtPlayer : mjpegPlayer
+        sourceComponent: resourceHelper.protocol != QnMediaResourceHelper.Mjpeg ? qtPlayer : mjpegPlayer
     }
 
     Component {
@@ -113,9 +113,9 @@ QnObject {
 
         var live = (new Date()).getTime()
         var aligned = -1
-        if (live - pos > d.liveBound) {
+        if (live - pos > d.lastMinuteLength) {
             aligned = alignedPosition(pos)
-            if (live - aligned <= d.liveBound)
+            if (live - aligned <= d.lastMinuteLength)
                 aligned = -1
         }
         if (d.position == -1 && aligned == -1) {
