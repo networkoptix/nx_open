@@ -232,9 +232,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
     for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
     {
-        if (itr->first.toLower() == "host" && !host.isEmpty())
-            itr->second = host.toUtf8();
-        else if (itr->first == Qn::SERVER_GUID_HEADER_NAME)
+        if (itr->first == Qn::SERVER_GUID_HEADER_NAME)
             dstRoute.id = itr->second;
     }
 
@@ -293,6 +291,13 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             &d->request.headers,
             nx_http::HttpHeader( "Via", via.toString() ) );
     }
+
+    auto hostIter = d->request.headers.find("Host");
+    if (hostIter != d->request.headers.end())
+        hostIter->second = SocketAddress(
+            dstUrl.host(),
+            dstUrl.port(nx_http::DEFAULT_HTTP_PORT)).toString().toLatin1();
+
 
     //NOTE next hop should accept Authorization header already present
     //  in request since we use current time as nonce value
