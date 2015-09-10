@@ -21,11 +21,11 @@
     <name>QnElevationChecker</name>
     <message>
         <source>Insufficient rights to manage services.</source>
-        <translation type="unfinished">สิทธิ์ไม่เพียงพอในการจัดการบริการ</translation>
+        <translation>สิทธิ์ไม่เพียงพอในการจัดการบริการ.</translation>
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished">UAC จะต้องได้รับการใช้งานขอรับสิทธิประโยชน์สำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบ</translation>
+        <translation>UAC จะต้องได้รับการใช้งานขอรับสิทธิประโยชน์สำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบ.</translation>
     </message>
 </context>
 <context>
@@ -112,7 +112,7 @@
     </message>
     <message>
         <source>Media server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์สื่อจะหยุด ต่อหรือไม่?</translation>
     </message>
 </context>
 </TS>

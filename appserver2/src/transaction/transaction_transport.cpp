@@ -135,7 +135,8 @@ QnTransactionTransport::QnTransactionTransport(
     if( !m_outgoingDataSocket->setSendTimeout( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE ) )
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit("Error setting socket write timeout for transaction connection %1 received from %2").
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lit("Error setting socket write timeout for transaction connection %1 received from %2").
             arg(connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
             arg(SystemError::toString(osErrorCode)), cl_logWARNING );
     }
@@ -188,7 +189,8 @@ QnTransactionTransport::QnTransactionTransport(
             std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) ) )
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit("Error scheduling async read on transaction connection %1 received from %2. %3").
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lit("Error scheduling async read on transaction connection %1 received from %2. %3").
             arg(connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
             arg(SystemError::toString(osErrorCode)), cl_logWARNING );
     }
@@ -632,7 +634,10 @@ void QnTransactionTransport::cancelConnecting()
 {
     if (getState() == ConnectingStage2)
         QnTransactionTransport::connectingCanceled(m_remotePeer.id, true);
-    NX_LOG( lit("%1 Connection canceled from state %2").arg(Q_FUNC_INFO).arg(toString(getState())), cl_logWARNING );
+    NX_LOG(QnLog::EC2_TRAN_LOG, 
+        lit("%1 Connection to peer %2 canceled from state %3").
+        arg(Q_FUNC_INFO).arg(m_remotePeer.id.toString()).arg(toString(getState())),
+        cl_logDEBUG1);
     setState(Error);
 }
 
@@ -650,7 +655,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     {
         if( errorCode == SystemError::timedOut )
         {
-            NX_LOG( lit("Peer %1 timed out. Disconnecting...").arg(m_remotePeer.id.toString()), cl_logWARNING );
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Peer %1 timed out. Disconnecting...").arg(m_remotePeer.id.toString()), cl_logWARNING );
         }
         return setStateNoLock( State::Error );
     }
@@ -662,7 +667,11 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
     //parsing and processing input data
     if( !m_incomingTransactionStreamParser->processData( m_readBuffer ) )
+    {
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error parsing data from peer %1. Disconnecting...").
+            arg(m_remotePeer.id.toString()), cl_logWARNING);
         return setStateNoLock( State::Error );
+    }
 
     m_readBuffer.resize(0);
 
@@ -693,6 +702,8 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
                     serializedTran ) )
             {
                 Q_ASSERT( false );
+                NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error deserializing JSON data from peer %1. Disconnecting...").
+                    arg(m_remotePeer.id.toString()), cl_logWARNING);
                 setStateNoLock( State::Error );
                 return;
             }
@@ -706,12 +717,16 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
                     serializedTran ) )
             {
                 Q_ASSERT( false );
+                NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error deserializing Ubjson data from peer %1. Disconnecting...").
+                    arg(m_remotePeer.id.toString()), cl_logWARNING);
                 setStateNoLock( State::Error );
                 return;
             }
             break;
 
         default:
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Received unkown format from peer %1. Disconnecting...").
+                arg(m_remotePeer.id.toString()), cl_logWARNING);
             setStateNoLock( State::Error );
             return;
     }
@@ -753,7 +768,11 @@ void QnTransactionTransport::receivedTransaction(
                     std::placeholders::_1 ) ) );
         }
         if( !m_sizedDecoder->processData( decodedTranData ) )
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error parsing data (2) from peer %1. Disconnecting...").
+                arg(m_remotePeer.id.toString()), cl_logWARNING);
             return setStateNoLock( State::Error );
+        }
     }
     else
     {
@@ -800,7 +819,11 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
 
     //checking transactions format
     if( !m_incomingTransactionStreamParser->processData( requestBuf ) )
+    {
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error parsing incoming data (3) from peer %1. Disconnecting...").
+            arg(m_remotePeer.id.toString()), cl_logWARNING);
         return setStateNoLock( State::Error );
+    }
 
     startListeningNonSafe();
 }
@@ -827,6 +850,8 @@ void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> 
 
 void QnTransactionTransport::connectionFailure()
 {
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Connection to peer %1 failure. Disconnecting...").
+        arg(m_remotePeer.id.toString()), cl_logWARNING);
     setState( Error );
 }
 
@@ -857,7 +882,11 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
         if( !m_outgoingDataSocket->registerTimer(
                 TCP_KEEPALIVE_TIMEOUT,
                 std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, 0) ) )
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error registering internal time. peer %1. Disconnecting...").
+                arg(m_remotePeer.id.toString()), cl_logWARNING);
             setStateNoLock( State::Error );
+        }
     }
     else
     {
@@ -876,16 +905,16 @@ void QnTransactionTransport::monitorConnectionForClosure(
 
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
-        NX_LOG( lit("transaction connection %1 received from %2 has been closed by remote peer").
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 has been closed by remote peer").
             arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()), cl_logWARNING );
         return setStateNoLock( State::Error );
     }
 
     if( bytesRead == 0 )
     {
-        NX_LOG( lit("Error reading transaction connection %1 received from %2. %3").
-            arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
-            arg(SystemError::toString(errorCode)), cl_logWARNING );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 has been closed").
+            arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()),
+            cl_logWARNING );
         return setStateNoLock( State::Error );
     }
 
@@ -898,7 +927,7 @@ void QnTransactionTransport::monitorConnectionForClosure(
             std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) ) )
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit("Error scheduling async read on transaction connection %1 received from %2. %3").
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error scheduling async read on transaction connection %1 received from %2. %3").
             arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
             arg(SystemError::toString(osErrorCode)), cl_logWARNING );
     }
@@ -1031,6 +1060,9 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
                 dataCtx.encodedSourceData,
                 std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
         {
+            const auto osErrorText = SystemError::getLastOSErrorText();
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error sending data to peer %1. %2. Disconnecting...").
+                arg(m_remotePeer.id.toString()).arg(osErrorText), cl_logWARNING);
             setStateNoLock( State::Error );
         }
     }
@@ -1095,7 +1127,7 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
 
     if( errorCode )
     {
-        NX_LOG( lit("Failed to send %1 bytes to %2. %3").arg(m_dataToSend.front().encodedSourceData.size()).
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Failed to send %1 bytes to %2. %3").arg(m_dataToSend.front().encodedSourceData.size()).
             arg(m_remotePeer.id.toString()).arg(SystemError::toString(errorCode)), cl_logWARNING );
         m_dataToSend.pop_front();
         return setStateNoLock( State::Error );
@@ -1303,7 +1335,11 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
     Q_ASSERT( m_peerRole == prOriginating );
     if( !m_incomingTransactionStreamParser->processData( data ) )
+    {
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error processing incoming data (4) from peer %1. Disconnecting...").
+            arg(m_remotePeer.id.toString()), cl_logWARNING);
         return setStateNoLock( State::Error );
+    }
 }
 
 bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
@@ -1467,6 +1503,9 @@ void QnTransactionTransport::scheduleAsyncRead()
     }
     else
     {
+        const auto osErrorText = SystemError::getLastOSErrorText();
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error reading from peer %1. %2. Disconnecting...").
+            arg(m_remotePeer.id.toString()).arg(osErrorText), cl_logWARNING);
         setStateNoLock( State::Error );
     }
 }
@@ -1486,6 +1525,9 @@ void QnTransactionTransport::startListeningNonSafe()
         m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
         if( !m_incomingDataSocket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
         {
+            const auto osErrorText = SystemError::getLastOSErrorText();
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error reading incoming data from peer %1. %2. Disconnecting...").
+                arg(m_remotePeer.id.toString()).arg(osErrorText), cl_logWARNING);
             m_lastReceiveTimer.invalidate();
             setStateNoLock( Error );
             return;

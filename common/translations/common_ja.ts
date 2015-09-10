@@ -18,11 +18,11 @@
     <name>QnActiResource</name>
     <message>
         <source>Output %1</source>
-        <translation type="unfinished"></translation>
+        <translation>出力 %1</translation>
     </message>
     <message>
         <source>Input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>入力%1</translation>
     </message>
 </context>
 <context>
@@ -209,104 +209,104 @@
     </message>
     <message>
         <source>start</source>
-        <translation type="unfinished"></translation>
+        <translation>開始</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation type="unfinished"></translation>
+        <translation>停止</translation>
     </message>
     <message>
         <source>While %1</source>
-        <translation type="unfinished"></translation>
+        <translation> %1の間</translation>
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
     <message>
         <source>%1 --&gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 --&gt; %2</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has a license problem</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー &apos;%1&apos;はライセンスに問題があります</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished">不明なイベント</translation>
+        <translation>不明なイベント</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished">入力ポート:・%1</translation>
+        <translation>入力ポート:・%1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished">競合アドレス: %1</translation>
+        <translation>競合アドレス: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーとの接続ロスト.</translation>
     </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n 秒間データを受信していません.</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 output</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 出力</translation>
     </message>
     <message>
         <source>%1 output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 30秒出力</translation>
     </message>
     <message>
         <source>%1 recording</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 録画</translation>
     </message>
     <message>
         <source>Input Signal on %1</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 の入力シグナル</translation>
     </message>
     <message>
         <source>%1 Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 切断</translation>
     </message>
     <message>
         <source>%1 IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>%1IP重複</translation>
     </message>
     <message>
         <source>Any %1 Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 問題</translation>
     </message>
     <message>
         <source>%1 %2 was disconnected</source>
         <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2 切断</translation>
     </message>
     <message>
         <source>%1 IP Conflict at %2</source>
         <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> %2 で%1 IP重複</translation>
     </message>
     <message>
         <source>%1 #%2 MAC: %3</source>
         <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 #%2 MAC: %3</translation>
     </message>
     <message>
         <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 (プライマリーストリーム)は予期せずに閉じられました.</translation>
     </message>
     <message>
         <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 (セカンダリーストリーム)は予期せずに閉じられました.</translation>
     </message>
     <message>
         <source>Recording on %1 is disabled: </source>
-        <translation type="unfinished"></translation>
+        <translation> %1 録画無効: </translation>
     </message>
 </context>
 <context>
@@ -389,27 +389,27 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished">・URL・%1.は、承認されていません.</translation>
+        <translation>・URL・%1.は、承認されていません.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 がネットワークに接続されているか確認してください.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ポート %2 にアクセス可能か確認してください　 %1 を再起動してウェブページより初期設定に戻し再起動を行ってください.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> %1 がネットワークに接続されているか確認してください　 %1 を再起動してください.</translation>
     </message>
     <message>
         <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 応答を解析できません Url %2, リクエスト名 %3.</translation>
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
@@ -420,42 +420,42 @@
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1,を再起動してウェブページより初期設定に戻してください.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> %1 設定の録画を有効にしてFPSを減らしてください.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> %1 ウェブページで初期設定に戻しても解決しない場合はサポート連絡してください.</translation>
     </message>
     <message>
         <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 リクエスト &quot;%2&quot; 失敗　 &quot;%3&quot;エラー.</translation>
     </message>
     <message>
         <source>Unknown %1 Issue.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>不明な %1 問題.</translation>
     </message>
     <message>
         <source>Invalid data was received from the %1: %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> %1: %2.より不明なデータ受信.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open %1 issues dialog for more details.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>メディアエラーが多すぎます　 %1 問題ダイアログを開き詳細を確認してください.</translation>
     </message>
     <message>
         <source>%1 initialization process in progress.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 イニシャライズプロセス中.</translation>
     </message>
 </context>
 <context>
@@ -477,7 +477,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished">ウィンドウズエクスプローラーの軌道に失敗しました</translation>
+        <translation>ウィンドウズエクスプローラーの軌道に失敗しました.</translation>
     </message>
 </context>
 <context>
@@ -492,11 +492,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished">音声エンコーダーを初期化出来ません.</translation>
+        <translation>音声エンコーダーを初期化出来ません..</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished">音声デコーダーを初期化出来ません.</translation>
+        <translation>音声デコーダーを初期化出来ません.</translation>
     </message>
 </context>
 <context>
@@ -534,7 +534,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished">ビデオエンコーダーを初期化出来ません.</translation>
+        <translation>ビデオエンコーダーを初期化出来ません.</translation>
     </message>
 </context>
 <context>
@@ -577,79 +577,79 @@
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>I/Oモジュール</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>開始</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished">アナログエンコーダー</translation>
+        <translation>アナログエンコーダー</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished">トライアルライセンス</translation>
+        <translation>トライアルライセンス</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished">アナログライセンス</translation>
+        <translation>アナログライセンス</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished">プロフェッショナルライセンス</translation>
+        <translation>プロフェッショナルライセンス</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished">エッジライセンス</translation>
+        <translation>エッジライセンス</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished">Vmaxライセンス</translation>
+        <translation>Vmaxライセンス</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished">アナログエンコーダーライセンス</translation>
+        <translation>アナログエンコーダーライセンス</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished">ビデオウォールライセンス</translation>
+        <translation>ビデオウォールライセンス</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>I/Oモジュールライセンス</translation>
     </message>
     <message>
         <source>Start Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>スタートライセンス</translation>
     </message>
     <message>
         <source>Invalid Signature</source>
-        <translation type="unfinished">無効な署名</translation>
+        <translation>無効な署名</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーのハードウェアIDが見つかりません</translation>
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished">無効なカスタマイズ</translation>
+        <translation>無効なカスタマイズ</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished">無効なタイプ</translation>
+        <translation>無効なタイプ</translation>
     </message>
     <message>
         <source>Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
     <message>
         <source>Invalid Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なライセンス</translation>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>このライセンスタイプには新しいバージョンが必要です.</translation>
     </message>
 </context>
 <context>
@@ -684,19 +684,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished">ライセンスキーのアクティベートエラー　データベースエラーが発生しました.</translation>
+        <translation>ライセンスキーのアクティベートエラー　データベースエラーが発生しました.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished">無効なライセンスキーが入力されました　サポート窓口に問合せて正しいライセンスキーを入力してください.</translation>
+        <translation>無効なライセンスキーが入力されました　サポート窓口に問合せて正しいライセンスキーを入力してください.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">互換性のないライセンスキーを入力しました　サポート窓口にお問合せ下さい.</translation>
+        <translation>互換性のないライセンスキーを入力しました　サポート窓口にお問合せ下さい.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">このライセンスキーはハードウェアID {{hwid}}  {{time}} に既にアクティベートされています..</translation>
+        <translation>このライセンスキーはハードウェアID {{hwid}}  {{time}} に既にアクティベートされています..</translation>
     </message>
 </context>
 <context>
@@ -717,14 +717,14 @@
     <name>QnPlAxisResource</name>
     <message>
         <source>Can&apos;t initialize IO port settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IOポート設定をイニシャライズできません</translation>
     </message>
 </context>
 <context>
     <name>QnPlOnvifResource</name>
     <message>
         <source>Otput %1</source>
-        <translation type="unfinished"></translation>
+        <translation>出力 %1</translation>
     </message>
 </context>
 <context>
@@ -738,87 +738,87 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n カメラ</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n カメラ</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n IOモジュール</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n IOモジュール</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n デバイス</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n デバイス</numerusform>
         </translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ</translation>
     </message>
     <message>
         <source>cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ</translation>
     </message>
     <message>
         <source>camera</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ</translation>
     </message>
     <message>
         <source>IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュール</translation>
     </message>
     <message>
         <source>IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュール</translation>
     </message>
     <message>
         <source>IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュール</translation>
     </message>
     <message>
         <source>IO module</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュール</translation>
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
     <message>
         <source>devices</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
     <message>
         <source>device</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
 </context>
 <context>
@@ -837,15 +837,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished">トライアルライセンス</translation>
+        <translation>トライアルライセンストライアルライセンス</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished">以下にライセンス:</translation>
+        <translation>以下にライセンス:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished">無償ライセンス</translation>
+        <translation>無償ライセンス</translation>
     </message>
 </context>
 <context>
@@ -1025,15 +1025,15 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished">ストレージが一杯です</translation>
+        <translation>ストレージが一杯です</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished">ストレージが構成されていません</translation>
+        <translation>ストレージが構成されていません</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー時間が同期されていません.</translation>
     </message>
 </context>
 <context>
@@ -1067,11 +1067,11 @@
     <name>QnThirdPartyResource</name>
     <message>
         <source>Otput %1</source>
-        <translation type="unfinished"></translation>
+        <translation>出力 %1</translation>
     </message>
     <message>
         <source>Input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>入力 %1</translation>
     </message>
 </context>
 <context>
@@ -1086,11 +1086,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished">オープンCLトランスコードが実装されていません</translation>
+        <translation>OpenCLトランスコードが実装されていません.</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished">未知のトランスコード手段</translation>
+        <translation>未知のトランスコード手段</translation>
     </message>
 </context>
 <context>

@@ -42,6 +42,7 @@ public:
     void setNetAddrList(const QList<QHostAddress>&);
     QList<QHostAddress> getNetAddrList() const;
 
+    // TODO: #dklychkov Use QSet instead of QList
     void setAdditionalUrls(const QList<QUrl> &urls);
     QList<QUrl> getAdditionalUrls() const;
 
