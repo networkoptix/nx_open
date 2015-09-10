@@ -61,7 +61,7 @@ namespace ec2
         */
         void gotIncomingTransactionsConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
-            const QSharedPointer<AbstractStreamSocket>& socket,
+            QSharedPointer<AbstractStreamSocket> socket,
             const ApiPeerData &remotePeer,
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,

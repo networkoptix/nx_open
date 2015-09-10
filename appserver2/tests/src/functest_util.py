@@ -1,8 +1,9 @@
 __author__ = 'Danil Lavrentyuk'
 "This module contains some utility functions and classes for the functional tests script."
 import sys
+import json
 
-__all__ = ['JsonDiff', 'compareJson', 'showHelp', 'ManagerAddPassword']
+__all__ = ['JsonDiff', 'compareJson', 'showHelp', 'ManagerAddPassword', 'SafeJsonLoads']
 
 # ---------------------------------------------------------------------
 # A deep comparison of json object
@@ -334,3 +335,10 @@ def ManagerAddPassword(passman, host, user, pwd):
     passman.add_password(None, "http://%s/ec2" % (host), user, pwd)
     passman.add_password(None, "http://%s/api" % (host), user, pwd)
 
+
+def SafeJsonLoads(text, serverAddr, methodName):
+    try:
+        return json.loads(text)
+    except ValueError, e:
+        print "Error parsing server %s, method %s response: %s" % (serverAddr, methodName, e)
+        return None
