@@ -2,7 +2,7 @@
 #define EMAIL_MANAGER_IMPL_H
 
 #include <nx_ec/data/api_fwd.h>
-#include <utils/common/email_fwd.h>
+#include <utils/email/email_fwd.h>
 
 class EmailManagerImpl
 {
