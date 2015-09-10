@@ -24,7 +24,7 @@ namespace {
     QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #else
     QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
-    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
+    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Webm;
 #endif
 
     QString protocolName(QnMediaResourceHelper::Protocol protocol) {
