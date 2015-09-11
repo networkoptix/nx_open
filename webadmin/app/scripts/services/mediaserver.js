@@ -90,6 +90,10 @@ angular.module('webadminApp')
             },
 
             previewUrl:function(cameraPhysicalId,time,width,height){
+                if( Config.allowDebugMode) { //TODO: remove this hack later!
+                    return '';
+                }
+
                 return proxy + '/api/image' +
                     '?physicalId=' + cameraPhysicalId +
                     (width? '&width=' + width:'') +
@@ -171,7 +175,7 @@ angular.module('webadminApp')
             getTime:function(){
                 return wrapRequest($http.get(proxy + '/api/gettime'));
             },
-            getRecords:function(serverUrl,physicalId,startTime,endTime,detail,limit,periodsType){
+            getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
                 //console.log("getRecords",serverUrl,physicalId,startTime,endTime,detail,periodsType);
                 var d = new Date();
@@ -197,7 +201,8 @@ angular.module('webadminApp')
                 }
                 //RecordedTimePeriods
                 return  wrapRequest($http.get(serverUrl + 'ec2/recordedTimePeriods' +
-                    '?physicalId=' + physicalId +
+                    '?' + (label||'') +
+                    '&physicalId=' + physicalId +
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +
                     '&detail=' + detail +

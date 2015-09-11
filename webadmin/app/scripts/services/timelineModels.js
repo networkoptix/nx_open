@@ -8,15 +8,18 @@ function Chunk(boundaries,start,end,level,title,extension){
     this.level = level || 0;
     this.expand = true;
 
-    var format = 'dd.mm.yyyy HH:MM';
+    var format = 'dd.mm.yyyy HH:MM:ss.l';
     this.title = (typeof(title) === 'undefined' || title === null) ? dateFormat(start,format) + ' - ' + dateFormat(end,format):title ;
 
     this.children = [];
 
     _.extend(this, extension);
-};
+}
 
 Chunk.prototype.debug = function(){
+    var format = 'dd.mm.yyyy HH:MM:ss.l';
+    this.title = dateFormat(this.start,format) + ' - ' + dateFormat(this.end,format) ;
+
     console.log(new Array(this.level + 1).join(" "), this.title, this.level,  this.children.length);
 };
 
@@ -169,24 +172,24 @@ var RulerModel = {
             topW: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 360, width: 3600 },
-        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 1800, width: 9000 },
+        { name:'6Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 360, width: 3600 },
+        { name:'3Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 1800, width: 9000 },
         { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 100000,   width: 600 , topW: 170, topFormat:'mmmm yyyy'},
         { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , marksW:5,  smallW: 20, middleW: 100,      width: 200 , topW: 170, topFormat:'d mmmm yyyy' ,contained:1},
-        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 200,      width: 1200},
-        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 600,      width: 1800 },
-        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 900 },
-        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 },
-        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 1500 },
-        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
-        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 250,      width: 500 },
-        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 , topW: 170, topFormat:'d mmmm yyyy HH:MM'},
-        { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 300,      width: 1500},
-        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
-        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 250,      width: 100000 },
-        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 , topW: 200, topFormat:'d mmmm yyyy HH:MM:ss'}
-        //{ name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 250,      width: 100000},
-        //{ name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 }
+        { name:'12h'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 200,      width: 1200},
+        { name:'6h'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 600,      width: 1800 },
+        { name:'3h'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 900 },
+        { name:'1h'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 },
+        { name:'30m' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 1500 },
+        { name:'10m' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
+        { name:'5m'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 250,      width: 500 },
+        { name:'1m'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 , topW: 170, topFormat:'d mmmm yyyy HH:MM'},
+        { name:'30s' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 300,      width: 1500},
+        { name:'10s' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
+        { name:'5s'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 250,      width: 100000 },
+        { name:'1s'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 , topW: 200, topFormat:'d mmmm yyyy HH:MM:ss'}
+        //{ name:'500ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 250,      width: 100000},
+        //{ name:'100ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 }
     ],
 
     getLevelIndex: function(searchdetailization,width){
@@ -325,12 +328,11 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,en
     return end <= start;
 };
 
-CameraRecordsProvider.prototype.updateLastMinute = function(){
-    return;
-
+CameraRecordsProvider.prototype.updateLastMinute = function(lastMinuteDuration, level){
     var now = this.now();
-    if(now - this.lastRequested > this.lastMinuteDuration/2) {
-        this.requestInterval(now - this.lastMinuteDuration, now + 10000,0);
+
+    if(now - this.lastRequested > lastMinuteDuration/2) {
+        this.requestInterval(now - lastMinuteDuration, now + 10000,level);
         this.lastRequested = now;
     }
 };
@@ -340,7 +342,8 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     //this.start = start;
     //this.end = end;
     this.level = level;
-    var detailization = RulerModel.levels[level].interval.getMilliseconds();
+    var levelData = RulerModel.levels[level];
+    var detailization = levelData.interval.getMilliseconds();
 
     var self = this;
     //1. Request records for interval
@@ -348,7 +351,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
     if(!self.lockRequests) {
         self.lockRequests = true; // We may lock requests here if we have no tree yet
-        this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization)
+        this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization, null, levelData.name)
             .then(function (data) {
 
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
@@ -430,18 +433,31 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,d
     return result;
 };
 
-CameraRecordsProvider.prototype.debug = function(currentNode){
+CameraRecordsProvider.prototype.debug = function(currentNode,depth){
     if(!currentNode){
         console.log("Chunks tree:" + (this.chunksTree?"":"empty"));
+    }
+    if(typeof(depth) == "undefined"){
+        depth = RulerModel.levels.length - 1;
     }
     currentNode = currentNode || this.chunksTree;
 
     if(currentNode) {
         currentNode.debug();
-        for (var i = 0; i < currentNode.children.length; i++) {
-            this.debug(currentNode.children[i]);
+        if(depth>0) {
+            for (var i = 0; i < currentNode.children.length; i++) {
+                this.debug(currentNode.children[i], depth - 1);
+            }
         }
     }
+};
+
+CameraRecordsProvider.prototype.debugSplice = function(events,level){
+    console.log("Events:", level, events.length);
+    for(var i=0;i<events.length;i++){
+        events[i].debug();
+    }
+    console.log("/ Events:", level, events.length);
 };
 /**
  * Add chunk to tree - find or create good position for it
@@ -455,6 +471,11 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
     }
 
     parent = parent || this.chunksTree;
+
+    if(parent.end < chunk.end){
+        parent.end = chunk.end;
+    }
+
     // Go through tree, find good place for chunk
     if(parent.children.length === 0 ){ // no children yet
         if(parent.level === chunk.level - 1){ //
@@ -481,9 +502,22 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
         }
 
         if (iteratingChunk.start < chunk.end) { // Intersection here!
-            //TODO: wtf!
-            iteratingChunk.end = Math.max(iteratingChunk.end, chunk.end);//Increase smaller chunk
-            iteratingChunk.start = Math.min(iteratingChunk.start, chunk.start);//Increase smaller chunk
+            // Cut chunk into pieces!
+            if(chunk.start < iteratingChunk.start){
+                iteratingChunk.start = chunk.start;
+            }
+
+            if(chunk.end > iteratingChunk.end){
+                if(!parent.children[i+1] || parent.children[i+1].start >= chunk.end){
+                    iteratingChunk.end = chunk.end;
+                }else {
+                    // TODO: WTF is going here?
+                    var rightChunk = new Chunk(null, iteratingChunk.end + 1, chunk.end, chunk.level);
+                    chunk.end = iteratingChunk.end;
+                    this.addChunk(rightChunk, parent);
+                }
+            }
+
             if (iteratingChunk.level != chunk.level) { // Add inside ot ignore
                 this.addChunk(chunk, iteratingChunk);
             }
@@ -1145,4 +1179,4 @@ ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){
 
 ScaleManager.prototype.lastMinute = function(){
     return (new Date(this.end - this.lastMinuteInterval)).getTime();
-}
+};
