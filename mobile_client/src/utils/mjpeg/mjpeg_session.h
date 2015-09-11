@@ -27,7 +27,7 @@ public:
 
 signals:
     void frameEnqueued();
-    void stateChanged(State state);
+    void stateChanged();
     void urlChanged();
 
 public slots:

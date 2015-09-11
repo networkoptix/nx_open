@@ -96,7 +96,7 @@ void QnMjpegSessionPrivate::setState(QnMjpegSession::State state) {
     this->state = state;
 
     Q_Q(QnMjpegSession);
-    q->stateChanged(state);
+    q->stateChanged();
 }
 
 void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, int presentationTime) {
@@ -132,8 +132,6 @@ bool QnMjpegSessionPrivate::dequeueFrame(QImage *image, int *presentationTime) {
 
     if (presentationTime)
         *presentationTime = frameData.presentationTime;
-
-    lock.unlock();
 
     queueSemaphore.release();
 
@@ -269,7 +267,7 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::processBuffer() {
 
     processing = true;
 
-    while (result == ParseOk) {
+    while (result == ParseOk && state == QnMjpegSession::Playing) {
         switch (parserState) {
         case ParseBoundary:
             result = parseBoundary();
@@ -479,9 +477,8 @@ void QnMjpegSession::stop() {
     {
         QMutexLocker lock(&d->mutex);
         d->setState(Disconnecting);
+        d->queueSemaphore.release(maxFrameQueueSize - d->queueSemaphore.available());
     }
-
-    d->queueSemaphore.release(maxFrameQueueSize - d->queueSemaphore.available());
 
     executeDelayed([d]() { d->disconnect(); }, 0, thread());
 }

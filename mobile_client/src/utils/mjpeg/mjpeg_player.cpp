@@ -113,7 +113,8 @@ QnMjpegPlayer::QnMjpegPlayer(QObject *parent)
     connect(d->session, &QnMjpegSession::urlChanged, this, &QnMjpegPlayer::sourceChanged);
 
     QThread *networkThread;
-    networkThread = new QThread(d->session);
+    networkThread = new QThread();
+    networkThread->setObjectName(lit("MJPEG Session Thread"));
     d->session->moveToThread(networkThread);
     networkThread->start();
 }
@@ -122,9 +123,11 @@ QnMjpegPlayer::~QnMjpegPlayer() {
     Q_D(QnMjpegPlayer);
 
     QnMjpegSession *session = d->session;
-    connect(session, &QnMjpegSession::stateChanged, session, [session](QnMjpegSession::State state) {
-        if (state == QnMjpegSession::Stopped)
+    connect(session, &QnMjpegSession::stateChanged, session, [session]() {
+        if (session->state() == QnMjpegSession::Stopped) {
             session->deleteLater();
+            QMetaObject::invokeMethod(session->thread(), "quit", Qt::QueuedConnection);
+        }
     });
 
     stop();
