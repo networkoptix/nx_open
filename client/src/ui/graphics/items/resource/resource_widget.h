@@ -285,7 +285,6 @@ protected:
 
     virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -354,10 +353,8 @@ private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
 
-    void addButtonsOverlay();
-    void addTitleOverlay();
     void addInfoOverlay();
-    void addTimeOverlay();
+    void addMainOverlay();
 
     Q_SLOT void updateCheckedButtons();
 
@@ -415,13 +412,14 @@ private:
     GraphicsLabel *m_footerLeftLabel;
     GraphicsLabel *m_footerRightLabel;
 
+    GraphicsLabel *m_infoNameLabel;
+    GraphicsLabel *m_infoTimeLabel;
+
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
     struct OverlayWidgets {
-        GraphicsWidget* nameWidget;
-        GraphicsWidget* timeWidget;
-        GraphicsWidget* buttonsWidget;
-        GraphicsWidget* footerWidget;
+        GraphicsWidget* infoOverlay;
+        GraphicsWidget* mainOverlay;
 
         OverlayWidgets();
     };

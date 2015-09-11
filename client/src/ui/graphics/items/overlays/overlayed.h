@@ -26,8 +26,8 @@ namespace detail {
         enum OverlayLayer {
             BaseLayer = 0,
             StatusLayer,
-            HudLayer,
             InfoLayer,
+            HudLayer,
             TopControlsLayer
         };
 
