@@ -935,8 +935,6 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
         layout->addItem(item);
     }
 
-    layout->setData(Qn::LayoutTimeLabelsRole, true);
-    //layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setCellAspectRatio(desiredCellAspectRatio);
