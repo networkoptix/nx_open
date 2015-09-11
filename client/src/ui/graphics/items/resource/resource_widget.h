@@ -404,22 +404,26 @@ private:
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;
 
     /* Widgets for overlaid stuff. */
-    GraphicsLabel *m_headerLeftLabel;
-    GraphicsLabel *m_headerRightLabel;
+
     QnImageButtonBar *m_buttonBar;
     QnImageButtonWidget *m_iconButton;
 
-    GraphicsLabel *m_footerLeftLabel;
-    GraphicsLabel *m_footerRightLabel;
 
-    GraphicsLabel *m_infoNameLabel;
-    GraphicsLabel *m_infoTimeLabel;
 
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
     struct OverlayWidgets {
         GraphicsWidget* infoOverlay;
         GraphicsWidget* mainOverlay;
+
+        GraphicsLabel *mainNameLabel;
+        GraphicsLabel *mainExtrasLabel;
+
+        GraphicsLabel *mainDetailsLabel;
+        GraphicsLabel *mainTimeLabel;
+
+        GraphicsLabel *infoNameLabel;
+        GraphicsLabel *infoTimeLabel;
 
         OverlayWidgets();
     };

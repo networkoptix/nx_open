@@ -86,12 +86,40 @@ namespace {
         return right.isEmpty() ? left : (left + QLatin1Char('\t') + right);
     }
 
+    GraphicsLabel *createGraphicsLabel() {
+        auto label = new GraphicsLabel();
+        label->setAcceptedMouseButtons(0);
+        label->setPerformanceHint(GraphicsLabel::PixmapCaching);
+        return label;
+    }
+
+    GraphicsWidget *createGraphicsWidget(QGraphicsLayout* layout) {
+        auto widget = new GraphicsWidget();
+        widget->setLayout(layout);
+        widget->setAcceptedMouseButtons(0);
+        widget->setAutoFillBackground(true);
+        setPaletteColor(widget, QPalette::Window, overlayBackgroundColor);
+        return widget;
+    }
+
+    QGraphicsLinearLayout *createGraphicsLayout(Qt::Orientation orientation) {
+        auto layout = new QGraphicsLinearLayout(orientation);
+        layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+        return layout;
+    }
+
 } // anonymous namespace
 
 
 QnResourceWidget::OverlayWidgets::OverlayWidgets():
       infoOverlay(nullptr)
     , mainOverlay(nullptr)
+    , mainNameLabel(createGraphicsLabel())
+    , mainExtrasLabel(createGraphicsLabel())
+    , mainDetailsLabel(createGraphicsLabel())
+    , mainTimeLabel(createGraphicsLabel())
+    , infoNameLabel(createGraphicsLabel())
+    , infoTimeLabel(createGraphicsLabel())
 {}
 
 
@@ -207,69 +235,38 @@ QnResourceWidget::~QnResourceWidget() {
 }
 
 void QnResourceWidget::addInfoOverlay() {
-    m_infoNameLabel = new GraphicsLabel();
-    m_infoNameLabel->setAcceptedMouseButtons(0);
-    m_infoNameLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    auto titleLayout = createGraphicsLayout(Qt::Horizontal);
+    titleLayout->addItem(m_overlayWidgets.infoNameLabel);
+    titleLayout->addStretch(); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
 
-    auto titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    titleLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    titleLayout->setSpacing(2.0);
-    titleLayout->addItem(m_infoNameLabel);
-    titleLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-
-    auto titleWidget = new GraphicsWidget();
-    titleWidget->setLayout(titleLayout);
-    titleWidget->setAcceptedMouseButtons(0);
-    titleWidget->setAutoFillBackground(true);
-    setPaletteColor(titleWidget, QPalette::Window, overlayBackgroundColor);
+    auto titleWidget = createGraphicsWidget(titleLayout);
 
     /* Footer overlay. */
-    m_infoTimeLabel = new GraphicsLabel();
-    m_infoTimeLabel->setAcceptedMouseButtons(0);
-    m_infoTimeLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    auto *footerLayout = createGraphicsLayout(Qt::Horizontal);
+    footerLayout->addStretch();
+    footerLayout->addItem(m_overlayWidgets.infoTimeLabel);
 
-    auto *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    footerLayout->addStretch(0x1000);
-    footerLayout->addItem(m_infoTimeLabel);
+    auto footerWidget = createGraphicsWidget(footerLayout);
 
-    auto footerWidget = new GraphicsWidget();
-    footerWidget->setLayout(footerLayout);
-    footerWidget->setAcceptedMouseButtons(0);
-    footerWidget->setAutoFillBackground(true);
-    setPaletteColor(footerWidget, QPalette::Window, overlayBackgroundColor);
-
-    QGraphicsLinearLayout *overlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    overlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    auto overlayLayout = createGraphicsLayout(Qt::Vertical);
     overlayLayout->addItem(titleWidget);
-    overlayLayout->addStretch(0x1000);
+    overlayLayout->addStretch();
     overlayLayout->addItem(footerWidget);
 
-    auto overlayWidget = new QnViewportBoundWidget(this);
-    overlayWidget->setLayout(overlayLayout);
-    overlayWidget->setAcceptedMouseButtons(0);
-
-    m_overlayWidgets.infoOverlay = overlayWidget;
+    m_overlayWidgets.infoOverlay = new QnViewportBoundWidget(this);
+    m_overlayWidgets.infoOverlay->setLayout(overlayLayout);
+    m_overlayWidgets.infoOverlay->setAcceptedMouseButtons(0);
 
     addOverlayWidget(m_overlayWidgets.infoOverlay, UserVisible, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, false, false);
 }
 
 void QnResourceWidget::addMainOverlay() {
-    m_headerLeftLabel = new GraphicsLabel();
-    m_headerLeftLabel->setAcceptedMouseButtons(0);
-    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    m_headerRightLabel = new GraphicsLabel();
-    m_headerRightLabel->setAcceptedMouseButtons(0);
-    m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    auto headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    auto headerLayout = createGraphicsLayout(Qt::Horizontal);
     headerLayout->setSpacing(2.0);
-    headerLayout->addItem(m_headerLeftLabel);
+    headerLayout->addItem(m_overlayWidgets.mainNameLabel);
     headerLayout->addStretch(); 
-    headerLayout->addItem(m_headerRightLabel);
+    headerLayout->addItem(m_overlayWidgets.mainExtrasLabel);
     headerLayout->addItem(m_buttonBar);
 
     connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this, [this, headerLayout](){
@@ -280,45 +277,24 @@ void QnResourceWidget::addMainOverlay() {
         }
     });
 
-    auto headerWidget = new GraphicsWidget();
-    headerWidget->setLayout(headerLayout);
-    headerWidget->setAcceptedMouseButtons(0);
-    headerWidget->setAutoFillBackground(true);
-    setPaletteColor(headerWidget, QPalette::Window, overlayBackgroundColor);
-
+    auto headerWidget = createGraphicsWidget(headerLayout);
 
     /* Footer overlay. */
-    m_footerLeftLabel = new GraphicsLabel();
-    m_footerLeftLabel->setAcceptedMouseButtons(0);
-    m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    m_footerRightLabel = new GraphicsLabel();
-    m_footerRightLabel->setAcceptedMouseButtons(0);
-    m_footerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    auto *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    footerLayout->addItem(m_footerLeftLabel);
+    auto footerLayout = createGraphicsLayout(Qt::Horizontal);
+    footerLayout->addItem(m_overlayWidgets.mainDetailsLabel);
     footerLayout->addStretch();
-    footerLayout->addItem(m_footerRightLabel);
+    footerLayout->addItem(m_overlayWidgets.mainTimeLabel);
 
-    auto footerWidget = new GraphicsWidget();
-    footerWidget->setLayout(footerLayout);
-    footerWidget->setAcceptedMouseButtons(0);
-    footerWidget->setAutoFillBackground(true);
-    setPaletteColor(footerWidget, QPalette::Window, overlayBackgroundColor);
+    auto footerWidget = createGraphicsWidget(footerLayout);
 
-    QGraphicsLinearLayout *overlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    overlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    QGraphicsLinearLayout *overlayLayout = createGraphicsLayout(Qt::Vertical);
     overlayLayout->addItem(headerWidget);
-    overlayLayout->addStretch(0x1000);
+    overlayLayout->addStretch();
     overlayLayout->addItem(footerWidget);
 
-    auto overlayWidget = new QnViewportBoundWidget(this);
-    overlayWidget->setLayout(overlayLayout);
-    overlayWidget->setAcceptedMouseButtons(0);
-
-    m_overlayWidgets.mainOverlay = overlayWidget;
+    m_overlayWidgets.mainOverlay = new QnViewportBoundWidget(this);
+    m_overlayWidgets.mainOverlay->setLayout(overlayLayout);
+    m_overlayWidgets.mainOverlay->setAcceptedMouseButtons(0);
 
     addOverlayWidget(m_overlayWidgets.mainOverlay, UserVisible, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, false, false);
@@ -441,7 +417,7 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
 }
 
 QString QnResourceWidget::titleText() const {
-    return m_headerLeftLabel->text();
+    return m_overlayWidgets.mainNameLabel->text();
 }
 
 QString QnResourceWidget::titleTextFormat() const {
@@ -463,10 +439,10 @@ void QnResourceWidget::setTitleTextInternal(const QString &titleText) {
 
     splitFormat(titleText, &leftText, &rightText);
 
-    m_headerLeftLabel->setText(leftText);
-    m_headerRightLabel->setText(rightText);
+    m_overlayWidgets.mainNameLabel->setText(leftText);
+    m_overlayWidgets.mainExtrasLabel->setText(rightText);
 
-    m_infoNameLabel->setText(leftText);
+    m_overlayWidgets.infoNameLabel->setText(leftText);
 }
 
 QString QnResourceWidget::calculateTitleText() const {
@@ -478,7 +454,7 @@ void QnResourceWidget::updateTitleText() {
 }
 
 QString QnResourceWidget::infoText() {
-    return mergeFormat(m_footerLeftLabel->text(), m_footerRightLabel->text());
+    return mergeFormat(m_overlayWidgets.mainDetailsLabel->text(), m_overlayWidgets.mainTimeLabel->text());
 }
 
 QString QnResourceWidget::infoTextFormat() const {
@@ -500,10 +476,10 @@ void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
     
     splitFormat(infoText, &leftText, &rightText);
 
-    m_footerLeftLabel->setText(leftText);
-    m_footerRightLabel->setText(rightText);
+    m_overlayWidgets.mainDetailsLabel->setText(leftText);
+    m_overlayWidgets.mainTimeLabel->setText(rightText);
 
-    m_infoTimeLabel->setText(rightText);
+    m_overlayWidgets.infoTimeLabel->setText(rightText);
 }
 
 QString QnResourceWidget::calculateInfoText() const {
