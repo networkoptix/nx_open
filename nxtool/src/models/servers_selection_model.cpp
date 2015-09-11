@@ -666,7 +666,7 @@ void rtu::ServersSelectionModel::Impl::setSelectedItems(const IDsVector &ids)
             const bool shouldBeSelected = ids.contains(serverModelInfo.serverInfo.baseInfo().id);
             const bool selected = (serverModelInfo.selectedState == Qt::Checked);
             const bool shouldBeUpdated = (shouldBeSelected ^ selected);
-            if (!shouldBeUpdated || serverModelInfo.isBusy)
+            if (!shouldBeUpdated || serverModelInfo.isBusy || (serverModelInfo.loginState != kServerLoggedInState))
                 continue;
 
             changeServerSelectedState(systemModelInfo, serverModelInfo, !selected, &guard);
