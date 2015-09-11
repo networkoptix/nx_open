@@ -60,7 +60,7 @@ ListView
                 
                 systemName: model.systemName;
                 loggedState: model.loggedState;
-                enabled: model.enabled;
+                selectionEnabled: model.enabled;
                 selectedState: model.selectedState;
 
                 onSelectionStateShouldBeChanged:
