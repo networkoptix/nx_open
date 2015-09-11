@@ -61,6 +61,8 @@ protected:
     virtual void tick(int deltaMSecs) override;
 
     virtual void at_itemDataChanged(int role) override;
+
+    virtual void updateHud(bool animate = true) override;
 private slots:
     void at_statistics_received();
     void at_pingButton_clicked();
@@ -69,7 +71,7 @@ private slots:
     
     void updateHoverKey();
     void updateGraphVisibility();
-    void updateInfoOpacity();
+    //void updateInfoOpacity();
     void updateColors();
 
 private:
@@ -91,6 +93,8 @@ private:
     QColor getColor(Qn::StatisticsDeviceType deviceType, int index);
 
     void updateCheckedHealthMonitoringButtons();
+
+    bool isLegendVisible() const;
 private:
     //TODO: #GDM #Common move all required fields to inner class
     friend class StatisticsOverlayWidget;
@@ -154,8 +158,6 @@ private:
     QHash<QString, GraphData> m_graphDataByKey;
 
     QString m_hoveredKey;
-
-    qreal m_infoOpacity;
 
     int m_hddCount;
     int m_networkCount;
