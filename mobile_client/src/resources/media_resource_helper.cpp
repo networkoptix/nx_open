@@ -156,7 +156,7 @@ void QnMediaResourceHelper::updateUrl() {
         url.setPassword(QnAppServerConnectionFactory::url().password());
     } else {
         if (m_transcodingSupported) {
-            url.setPath(lit("/media/%1.%2").arg(camera->getMAC().toString()).arg(protocolName(protocol)));
+            url.setPath(lit("/media/%1.%2").arg(camera->getUniqueId()).arg(protocolName(protocol)));
             query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
         } else {
             url.setPath(lit("/%1").arg(camera->getPhysicalId()));
