@@ -220,8 +220,10 @@ Item
                                     verticalCenter: parent.verticalCenter;
                                 }
 
-                                value: model.appliedChangesCount + 1;
-                                maximumValue: model.totalChangesCount + 1;
+                                indeterminate: true;
+                                // TODO: #ynikitenkov decide what is better - just running progress bar or showing stupid progress
+                                // value: model.appliedChangesCount + 1;
+                                // maximumValue: model.totalChangesCount + 1;
                             }
                         }
                     }
