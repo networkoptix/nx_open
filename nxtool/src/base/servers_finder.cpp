@@ -104,12 +104,13 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
+        /*
         if (!jsonObject.value("systemName").toString().contains("nx")
             && !jsonObject.value("systemName").toString().contains("NX")
             && !jsonObject.value("systemName").toString().contains("yuriy")
             )
             return false;
-        
+        */
         rtu::parseModuleInformationReply(jsonObject, info);
 
         return true;
