@@ -72,7 +72,7 @@ rtu::RestClient::Impl::~Impl()
 /// TODO: #ynikitenkov Temporary, until string error reason be removed
 namespace   
 {
-    rtu::HttpClient::ErrorCallback makeOldCallback(const rtu::RestClient::Request::ErrorCallback &error)
+    rtu::HttpClient::ErrorCallback makeOldCallback(const rtu::RestClient::ErrorCallback &error)
     {
         return [error](const QString &/*errorReason*/, int code)
         {
@@ -114,12 +114,48 @@ rtu::RestClient::~RestClient()
 
 void rtu::RestClient::sendGet(const Request &request)
 {
-    m_impl->sendHttpGet(request);
+    instance().m_impl->sendHttpGet(request);
 }
 
 void rtu::RestClient::sendPost(const Request &request
     , const QByteArray &data)
 {
-    m_impl->sendHttpPost(request, data);
+    instance().m_impl->sendHttpPost(request, data);
 }
         
+///
+
+rtu::RestClient::Request::Request(const rtu::BaseServerInfo &initTarget
+    , const QString &initPassword
+    , const QString &initPath
+    , const QUrlQuery &initParams
+    , int initTimeout
+    , const rtu::RestClient::SuccessCallback &initReplyCallback
+    , const rtu::RestClient::ErrorCallback &initErrorCallback)
+    
+    : target(initTarget)
+    , password(initPassword)
+    , path(initPath)
+    , params(initParams)
+    , timeout(initTimeout)
+    , replyCallback(initReplyCallback)
+    , errorCallback(initErrorCallback)
+{
+}
+
+rtu::RestClient::Request::Request(const rtu::ServerInfo &initServerInfo
+    , const QString &initPath
+    , const QUrlQuery &initParams
+    , int initTimeout
+    , const rtu::RestClient::SuccessCallback &initReplyCallback
+    , const rtu::RestClient::ErrorCallback &initErrorCallback)
+    
+    : target(initServerInfo.baseInfo())
+    , password(initServerInfo.hasExtraInfo() ? initServerInfo.extraInfo().password : QString())
+    , path(initPath)
+    , params(initParams)
+    , timeout(initTimeout)
+    , replyCallback(initReplyCallback)
+    , errorCallback(initErrorCallback)
+{
+}

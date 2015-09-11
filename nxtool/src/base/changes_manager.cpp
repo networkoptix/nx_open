@@ -13,13 +13,12 @@ namespace
 {
     rtu::ApplyChangesTaskPtr createTask(rtu::RtuContext *context
         , const rtu::ChangesetPointer &changeset
-        , rtu::HttpClient *httpClient
         , rtu::ServersSelectionModel *selectionModel
         , rtu::ServersFinder *serversFinder
         , rtu::ChangesManager *changesManager)
     {
         const rtu::ApplyChangesTaskPtr task = 
-            rtu::ApplyChangesTask::create(changeset, selectionModel->selectedServers(), httpClient);
+            rtu::ApplyChangesTask::create(changeset, selectionModel->selectedServers());
 
         selectionModel->setBusyState(task->targetServerIds(), true);
 
@@ -58,14 +57,12 @@ namespace
 }
 
 rtu::ChangesManager::ChangesManager(RtuContext *context
-    , HttpClient *httpClient
     , ServersSelectionModel *selectionModel
     , ServersFinder *serversFinder
     , QObject *parent)
     : QObject(parent)
 
     , m_context(context)
-    , m_httpClient(httpClient)
     , m_selectionModel(selectionModel)
     , m_changesModel(new ChangesProgressModel(this))
     , m_serversFinder(serversFinder)
@@ -95,7 +92,7 @@ QObject *rtu::ChangesManager::changeset()
 void rtu::ChangesManager::applyChanges()
 {
     const ApplyChangesTaskPtr &task = 
-        createTask(m_context, m_changeset, m_httpClient, m_selectionModel, m_serversFinder, this);
+        createTask(m_context, m_changeset, m_selectionModel, m_serversFinder, this);
     m_context->showProgressTask(task);
     clearChanges();
 }

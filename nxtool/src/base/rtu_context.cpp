@@ -13,7 +13,6 @@
 #include <models/servers_selection_model.h>
 
 #include <helpers/time_helper.h>
-#include <helpers/http_client.h>
 
 class rtu::RtuContext::Impl : public QObject
 {
@@ -40,8 +39,6 @@ public:
 
     void removeProgressTask(int index);
 
-    rtu::HttpClient *httpClient();
-
     ///
     
     void setCurrentPage(rtu::Constants::Pages pageId);
@@ -58,7 +55,6 @@ private:
     typedef QScopedPointer<Selection> SelectionPointer;
 
     rtu::RtuContext * const m_owner;
-    rtu::HttpClient * const m_httpClient;
     rtu::ServersSelectionModel * const m_selectionModel;
     
     SelectionPointer m_selection;
@@ -72,13 +68,12 @@ private:
 rtu::RtuContext::Impl::Impl(RtuContext *parent)
     : QObject(parent)
     , m_owner(parent)
-    , m_httpClient(new HttpClient(this))
     , m_selectionModel(new ServersSelectionModel(this))
 
     , m_selection()
     , m_serversFinder(ServersFinder::create())
     , m_changesManager(new ChangesManager(
-        parent, m_httpClient, m_selectionModel, m_serversFinder.data(), this))
+        parent, m_selectionModel, m_serversFinder.data(), this))
 
     , m_progressTask()
     , m_currentPageIndex(rtu::Constants::SettingsPage)

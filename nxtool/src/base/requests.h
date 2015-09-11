@@ -15,8 +15,6 @@ class QString;
 
 namespace rtu
 {
-    class HttpClient;
-    
     const QString &adminUserName();
     const QStringList &defaultAdminPasswords();
     
@@ -48,7 +46,6 @@ namespace rtu
     typedef std::shared_ptr<ItfUpdateInfoContainer> ItfUpdateInfoContainerPointer;
     
     typedef std::function<void (const int errorCode
-        , const QString &errorReason
         , Constants::AffectedEntities affectedEntities)> OperationCallback; 
     
     typedef std::function<void (const QUuid &serverId
@@ -60,6 +57,7 @@ namespace rtu
     {
         kNoErrorReponse = 0 
         , kUnspecifiedError = -1
+        , kRequestTimeout = -2
 
         , kUnauthorizedError = 401
     };
@@ -67,15 +65,13 @@ namespace rtu
     typedef std::function<void (const QUuid &id
         , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
     
-    void getTime(HttpClient *client
-        , const BaseServerInfo &baseInfo
+    void getTime(const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
         , int timeout = HttpClient::kUseDefaultTimeout);
 
-    void getIfList(HttpClient *client
-        , const BaseServerInfo &baseInfo
+    void getIfList(const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
@@ -83,15 +79,13 @@ namespace rtu
 
     /// Sends getTime and getIfList consequentially. 
     /// If getTime is successful, calls successfull callback anyway
-    void getServerExtraInfo(HttpClient *client
-        , const BaseServerInfo &baseInfo
+    void getServerExtraInfo(const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
         , int timeout = HttpClient::kUseDefaultTimeout);
 
-    void sendIfListRequest(HttpClient *client
-        , const BaseServerInfo &info
+    void sendIfListRequest(const BaseServerInfo &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
@@ -99,32 +93,27 @@ namespace rtu
 
     ///
 
-    void sendSetTimeRequest(HttpClient *client
-        , const ServerInfo &info
+    void sendSetTimeRequest(const ServerInfo &info
         , qint64 utcDateTimeMs
         , const QByteArray &timeZoneId
         , const OperationCallback &callback);
 
     ///
 
-    void sendSetSystemNameRequest(HttpClient *client
-        , const ServerInfo &info
+    void sendSetSystemNameRequest(const ServerInfo &info
         , const QString &systemName
         , const OperationCallback &callback);
     
-    void sendSetPasswordRequest(HttpClient *client
-        , const ServerInfo &info
+    void sendSetPasswordRequest(const ServerInfo &info
         , const QString &password
         , bool useNewPassword
         , const OperationCallback &callback);
 
-    void sendSetPortRequest(HttpClient *client
-        , const ServerInfo &info
+    void sendSetPortRequest(const ServerInfo &info
         , int port
         , const OperationCallback &callback);
 
-    void sendChangeItfRequest(HttpClient *client
-        , const ServerInfo &infos
+    void sendChangeItfRequest(const ServerInfo &infos
         , const ItfUpdateInfoContainer &updateInfo
         , const OperationCallback &callback);
 }

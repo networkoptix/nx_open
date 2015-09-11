@@ -15,20 +15,24 @@ namespace rtu
     class RestClient
     {
     public:
+        enum { kStandardTimeout = -1 };
+
         struct Request;
+        typedef std::function<void (int errorCode)> ErrorCallback;
+        typedef std::function<void (const QByteArray &data)> SuccessCallback;
 
     public:
-        static RestClient& instance();
+        static void sendGet(const Request &request);
 
-        void sendGet(const Request &request);
-
-        void sendPost(const Request &request
+        static void sendPost(const Request &request
             , const QByteArray &data);
         
     private:
         RestClient();
 
         ~RestClient();
+
+        static RestClient& instance();
 
     private:
         class Impl;
@@ -39,27 +43,29 @@ namespace rtu
 
     struct RestClient::Request
     {
-        typedef std::function<void (int errorCode)> ErrorCallback;
-        typedef std::function<void (const QByteArray &data)> ReplyCallback;
-
         BaseServerInfo target;
+        QString password;
 
         QString path;
         QUrlQuery params;
-        QString username;
-        QString password;
         qint64 timeout;
 
+        SuccessCallback replyCallback;
         ErrorCallback errorCallback;
-        ReplyCallback replyCallback;
 
-        Request(BaseServerInfo initTarget
-            , QString initPath
-            , QUrlQuery initParams
-            , QString initUsername
-            , QString initPassword
+        Request(const BaseServerInfo &initTarget
+            , const QString &initPassword
+            , const QString &initPath
+            , const QUrlQuery &initParams
             , int initTimeout
-            , const ErrorCallback &initErrorCallback
-            , const ReplyCallback &initReplyCallback);
+            , const SuccessCallback &initReplyCallback
+            , const ErrorCallback &initErrorCallback);
+
+        Request(const ServerInfo &initServerInfo
+            , const QString &initPath
+            , const QUrlQuery &initParams
+            , int initTimeout
+            , const SuccessCallback &initReplyCallback
+            , const ErrorCallback &initErrorCallback);
     };
 };

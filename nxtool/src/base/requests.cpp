@@ -9,7 +9,7 @@
 #include <QJsonDocument>
 
 #include <base/server_info.h>
-#include <helpers/http_client.h>
+#include <helpers/rest_client.h>
 #include <helpers/time_helper.h>
 
 namespace 
@@ -23,9 +23,6 @@ namespace
     const QString kGetTimeCommand = kApiNamespaceTag + "gettime";
     const QString kIfListCommand = kApiNamespaceTag + "iflist";
     const QString kGetServerExtraInfoCommand = kApiNamespaceTag + "aggregator";
-
-    const QString kInvalidRequest = "Invalid request parameters";
-    const QString kErrorDesc = "Invalid response";
 
     const QString kIDTag = "id";
     const QString kSeedTag = "seed";
@@ -110,6 +107,7 @@ namespace /// Parsers stuff
         return code;
     }
    
+    /*
     ///
 
     QString getErrorDescription(const QJsonObject &object)
@@ -118,12 +116,12 @@ namespace /// Parsers stuff
         return (object.contains(kReasonTag) ? 
             object.value(kReasonTag).toString() : QString());
     }
-    
+    */
     ///
     typedef std::function<bool (const QJsonObject &object
         , rtu::ExtraServerInfo &extraInfo)> ParseFunction;
 
-    rtu::HttpClient::ReplyCallback makeReplyCallbackEx(
+    rtu::RestClient::SuccessCallback makeReplyCallbackEx(
         const rtu::ExtraServerInfoSuccessCallback &successful
         , const rtu::OperationCallback &failed
         , const QUuid &id
@@ -146,49 +144,10 @@ namespace /// Parsers stuff
             }
             else if (failed)
             {
-                failed(rtu::kUnspecifiedError, kErrorDesc, affected);
+                failed(rtu::kUnspecifiedError, affected);
             }
         };
 
-        return result;
-    }
-
-    rtu::HttpClient::ReplyCallback makeReplyCallback(const rtu::OperationCallback &callback
-        , rtu::Constants::AffectedEntities affected)
-    {
-        const auto &result = [callback, affected](const QByteArray &data)
-        {
-            if (!callback)
-                return;
-            
-            const QJsonDocument &doc = QJsonDocument::fromJson(data.data());
-            const QJsonObject &object = doc.object();
-            if (isErrorReply(object))
-            {
-                callback(rtu::kUnspecifiedError, getErrorDescription(object), affected);
-            }
-            else
-            {
-                callback(rtu::kNoErrorReponse, QString(), affected);
-            }
-        };
-        
-        return result;
-    }
-    
-    ///
-
-    rtu::HttpClient::ErrorCallback makeErrorCallback(const rtu::OperationCallback &callback
-        , rtu::Constants::AffectedEntities affected)
-    {
-        const auto result = [callback, affected](const QString &reason, int code)
-        {
-            if (!callback)
-                return;
-            
-            callback(code, reason, affected);
-        };
-        
         return result;
     }
 
@@ -281,25 +240,38 @@ namespace /// Parsers stuff
     }
 
     ///
+    rtu::RestClient::SuccessCallback makeSuccessCalback(const rtu::OperationCallback &callback
+        , rtu::Constants::AffectedEntities affected)
+    {
+        return [callback, affected](const QByteArray & /* data */)
+        {
+            if (callback)
+                callback(rtu::kNoErrorReponse, affected);
+        };
+    }
 
-    void checkAuth(rtu::HttpClient *client
-        , const rtu::BaseServerInfo &baseInfo
+    rtu::RestClient::ErrorCallback makeErrorCalback(const rtu::OperationCallback &callback
+        , rtu::Constants::AffectedEntities affected)
+    {
+        return [callback, affected](int error)
+        {
+            if (callback)
+                callback(error, affected);
+        };
+    }
+
+    ///
+
+    void checkAuth(const rtu::BaseServerInfo &baseInfo
         , const QString &password
         , const rtu::OperationCallback &callback
         , int timeout = rtu::HttpClient::kUseDefaultTimeout)
     {
-
         static const rtu::Constants::AffectedEntities affected = rtu::Constants::kNoEntitiesAffected;
-        if (!client)
-        {
-            if (callback)
-                callback(rtu::kUnspecifiedError, kInvalidRequest, affected);
-            return;
-        }
 
-        const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port, password, kModuleInfoAuthCommand);
-        client->sendGet(url, makeReplyCallback(callback, affected)
-            , makeErrorCallback(callback, affected), timeout);
+        const rtu::RestClient::Request request(baseInfo, password, kModuleInfoAuthCommand, QUrlQuery(), timeout
+            , makeSuccessCalback(callback, affected), makeErrorCalback(callback, affected));
+        rtu::RestClient::sendGet(request);
     }
 
 }
@@ -343,8 +315,7 @@ void rtu::parseModuleInformationReply(const QJsonObject &reply
 
 ///
 
-void rtu::getTime(HttpClient *client
-    , const BaseServerInfo &baseInfo
+void rtu::getTime(const BaseServerInfo &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
@@ -353,67 +324,46 @@ void rtu::getTime(HttpClient *client
     static const Constants::AffectedEntities affected = 
         (Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
 
-    if (!client)
-    {
-        if (failed)
-            failed(rtu::kUnspecifiedError, kInvalidRequest, affected);
-        return;
-    }
-
-    QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
-        , password, kGetTimeCommand);
-
+    QUrlQuery query;
     if (baseInfo.flags & Constants::AllowChangeDateTimeFlag)
-    {
-        QUrlQuery query;
         query.addQueryItem(kLocalTimeFlagTag, QString());
-        url.setQuery(query);
-    }
 
     const auto &parser = [](const QJsonObject &object, ExtraServerInfo &extraInfo)
-    { 
-        return parseGetTimeCmd(object, extraInfo);
-    };
+        { return parseGetTimeCmd(object, extraInfo); };
+
     const auto &localSuccessful = makeReplyCallbackEx(
         successful, failed, baseInfo.id, password, affected, parser);
 
-    client->sendGet(url, localSuccessful
-        , makeErrorCallback(failed, affected), timeout);
+    const RestClient::Request request(baseInfo, password, kGetTimeCommand, query,  timeout
+        , localSuccessful, makeErrorCalback(failed, affected));
+
+    RestClient::sendGet(request);
 }
 
 ///
 
-void rtu::getIfList(HttpClient *client
-    , const BaseServerInfo &baseInfo
+void rtu::getIfList(const BaseServerInfo &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
     , int timeout)
 {
     static const Constants::AffectedEntities affected = Constants::kAllAddressFlagsAffected;
-    if (!client)
-    {
-        if (failed)
-            failed(kUnspecifiedError, kInvalidRequest, affected);
-        return;
-    }
 
     const auto &parser = [](const QJsonObject &object, ExtraServerInfo &extraInfo)
-    { 
-        return parseIfListCmd(object, extraInfo);
-    };
+        { return parseIfListCmd(object, extraInfo); };
 
     const auto &ifListSuccessfull = makeReplyCallbackEx(
         successful, failed, baseInfo.id, password, affected, parser);
 
-    const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port, password, kIfListCommand);
-    client->sendGet(url, ifListSuccessfull, makeErrorCallback(failed, affected), timeout);
+    const RestClient::Request request(baseInfo, password, kIfListCommand, QUrlQuery(),  timeout
+        , ifListSuccessfull, makeErrorCalback(failed, affected));
+    RestClient::sendGet(request);
 }
 
 ///
 
-void rtu::getServerExtraInfo(HttpClient *client
-    , const BaseServerInfo &baseInfo
+void rtu::getServerExtraInfo(const BaseServerInfo &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
@@ -422,26 +372,17 @@ void rtu::getServerExtraInfo(HttpClient *client
     static const Constants::AffectedEntities affected = (Constants::kAllAddressFlagsAffected 
         | Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
 
-    if (!client)
+    const auto &getTimeFailed = [failed](const int errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
         if (failed)
-            failed(kUnspecifiedError, kInvalidRequest, affected);
-        return;
-    }
-
-    const auto &getTimeFailed = [failed](const int errorCode 
-        , const QString &reason, Constants::AffectedEntities /* affectedEntities */)
-    {
-        if (failed)
-            failed(errorCode, reason, affected);
+            failed(errorCode, affected);
     };
 
-    const auto &getTimeSuccessfull = [client, baseInfo, password, successful, timeout]
+    const auto &getTimeSuccessfull = [baseInfo, password, successful, timeout]
         (const QUuid &id, const rtu::ExtraServerInfo &extraInfo) 
     {
         /// getTime command is successfully executed up to now
-        const auto &ifListFailed = [successful, id, extraInfo](const int, const QString & /* errorReason */
-            , Constants::AffectedEntities  /* affectedEntities */)
+        const auto &ifListFailed = [successful, id, extraInfo](const int, Constants::AffectedEntities  /* affectedEntities */)
         {
             if (successful)
                 successful(id, extraInfo);
@@ -456,109 +397,87 @@ void rtu::getServerExtraInfo(HttpClient *client
             }
         };
 
-        getIfList(client, baseInfo, password, ifListSuccessful, ifListFailed, timeout);
+        getIfList(baseInfo, password, ifListSuccessful, ifListFailed, timeout);
     };
 
-    const auto &callback = [failed, client, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout]
-        (const int errorCode, const QString &errorReason, Constants::AffectedEntities /* affectedEntities */)
+    const auto &callback = [failed, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout]
+        (const int errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
         if (errorCode != kNoErrorReponse)
         {
             if (failed)
-                failed(errorCode, errorReason, affected);
+                failed(errorCode, affected);
             return;
         }
 
-        getTime(client, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
+        getTime(baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
     };
 
-    return checkAuth(client, baseInfo, password, callback, timeout);
+    return checkAuth(baseInfo, password, callback, timeout);
 }
 
 ///
 
-void rtu::sendIfListRequest(HttpClient *client
-    , const BaseServerInfo &info
+void rtu::sendIfListRequest(const BaseServerInfo &info
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
     , int timeout)
 {
-    if (!client || !(info.flags & Constants::AllowIfConfigFlag))
+    if (!(info.flags & Constants::AllowIfConfigFlag))
     {
         if (failed)
-            failed(kUnspecifiedError, kInvalidRequest, Constants::kAllEntitiesAffected);
+            failed(kUnspecifiedError, Constants::kAllEntitiesAffected);
         return;
     }
-    
-    const QUrl url = makeUrl(info.hostAddress, info.port
-        , password, kIfListCommand);
-
-    const auto id = info.id;
-    const auto &successfullCallback =
-        [id, successful, failed](const QByteArray &data)
-    {
-        const QJsonObject &object = QJsonDocument::fromJson(data.data()).object();
-
-        rtu::ExtraServerInfo extraInfo;
-        if (!parseIfListCmd(object, extraInfo))
-        {
-            if (failed)
-                failed(kUnspecifiedError, kErrorDesc, Constants::kAllAddressFlagsAffected);
-        }
-        else if (successful)
-        {
-            successful(id, extraInfo);
-        }
-    };
-
-   client->sendGet(url, successfullCallback
-        , makeErrorCallback(failed, Constants::kAllAddressFlagsAffected), timeout);
+ 
+    const auto &parser = [](const QJsonObject &object, ExtraServerInfo &extraInfo)
+        { return parseIfListCmd(object, extraInfo); };
+    const auto &localSuccessful = makeReplyCallbackEx(successful, failed, info.id
+        , password, Constants::kAllAddressFlagsAffected, parser);
+    const RestClient::Request request(info, password, kIfListCommand, QUrlQuery(), timeout
+        , localSuccessful, makeErrorCalback(failed, Constants::kAllAddressFlagsAffected));
+    RestClient::sendGet(request);
 }
 
 ///
 
-void rtu::sendSetTimeRequest(HttpClient *client
-    , const ServerInfo &info
+void rtu::sendSetTimeRequest(const ServerInfo &info
     , qint64 utcDateTimeMs
     , const QByteArray &timeZoneId
     , const OperationCallback &callback)
 {
+    static const Constants::AffectedEntities affected = (Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
     if (!info.hasExtraInfo() || utcDateTimeMs <= 0
-        || !QTimeZone(timeZoneId).isValid() || !client)
+        || !QTimeZone(timeZoneId).isValid())
     {
         if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
+            callback(kUnspecifiedError, affected);
         return;
     }
     
     static const QString &kDateTimeTag = "datetime";
     static const QString &kTimeZoneTag = "timezone";
     
-    QUrl url = makeUrl(info, kSetTimeCommand);
-    
     QUrlQuery query;
     query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
     query.addQueryItem(kTimeZoneTag, timeZoneId);
-    url.setQuery(query);
     
-    const Constants::AffectedEntities affected = (Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
-    
-    client->sendGet(url, makeReplyCallback(callback, affected)
-        , makeErrorCallback(callback, affected));
+    const RestClient::Request request(info, kSetTimeCommand, query, RestClient::kStandardTimeout
+        , makeSuccessCalback(callback, affected), makeErrorCalback(callback, affected)); 
+    RestClient::sendGet(request);
 }
 
 ///
 
-void rtu::sendSetSystemNameRequest(HttpClient *client
-    , const ServerInfo &info
+void rtu::sendSetSystemNameRequest(const ServerInfo &info
     , const QString &systemName
     , const OperationCallback &callback)
 {
-    if (!client || !info.hasExtraInfo() || systemName.isEmpty())
+    if (!info.hasExtraInfo() || systemName.isEmpty())
     {
         if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, Constants::kSystemNameAffected);
+            callback(kUnspecifiedError, Constants::kSystemNameAffected);
         return;
     }
 
@@ -569,25 +488,23 @@ void rtu::sendSetSystemNameRequest(HttpClient *client
     query.addQueryItem(kSystemNameTag, systemName);
     query.addQueryItem(oldPasswordTag, info.extraInfo().password);
 
-    QUrl url = makeUrl(info, kConfigureCommand);
-    url.setQuery(query);
-
-    client->sendGet(url, makeReplyCallback(callback, Constants::kSystemNameAffected)
-        , makeErrorCallback(callback, Constants::kSystemNameAffected));
+    const RestClient::Request request(info, kConfigureCommand, query, RestClient::kStandardTimeout
+        , makeSuccessCalback(callback, Constants::kSystemNameAffected)
+        , makeErrorCalback(callback, Constants::kSystemNameAffected)); 
+    RestClient::sendGet(request);
 }
 
 ///
 
-void rtu::sendSetPasswordRequest(HttpClient *client
-    , const ServerInfo &info
+void rtu::sendSetPasswordRequest(const ServerInfo &info
     , const QString &password
     , bool useNewPassword
     , const OperationCallback &callback)
 {
-    if (!client || !info.hasExtraInfo() || password.isEmpty())
+    if (!info.hasExtraInfo() || password.isEmpty())
     {
         if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, Constants::kPasswordAffected);
+            callback(kUnspecifiedError, Constants::kPasswordAffected);
 
         return;
     }
@@ -600,24 +517,22 @@ void rtu::sendSetPasswordRequest(HttpClient *client
     query.addQueryItem(newPasswordTag, password);
     query.addQueryItem(oldPasswordTag, authPass);
     
-    QUrl url = makeUrl(info.baseInfo().hostAddress, info.baseInfo().port, authPass, kConfigureCommand);
-    url.setQuery(query);
-    
-    client->sendGet(url, makeReplyCallback(callback, Constants::kPasswordAffected)
-        , makeErrorCallback(callback, Constants::kPasswordAffected));
+    const RestClient::Request request(info.baseInfo(), authPass, kConfigureCommand, query, RestClient::kStandardTimeout
+        , makeSuccessCalback(callback, Constants::kPasswordAffected)
+        , makeErrorCalback(callback, Constants::kPasswordAffected)); 
+    RestClient::sendGet(request);
 }
 
 ///
 
-void rtu::sendSetPortRequest(HttpClient *client
-    , const ServerInfo &info
+void rtu::sendSetPortRequest(const ServerInfo &info
     , int port
     , const OperationCallback &callback)
 {
-    if (!client || !info.hasExtraInfo() || !port)
+    if (!info.hasExtraInfo() || !port)
     {
         if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, Constants::kPortAffected);
+            callback(kUnspecifiedError, Constants::kPortAffected);
        return;
     }
 
@@ -630,14 +545,13 @@ void rtu::sendSetPortRequest(HttpClient *client
     QUrl url = makeUrl(info, kConfigureCommand);
     url.setQuery(query);
 
-    client->sendGet(url, makeReplyCallback(callback, Constants::kPortAffected)
-        , makeErrorCallback(callback, Constants::kPortAffected));
+    const RestClient::Request request(info, kConfigureCommand, query, RestClient::kStandardTimeout
+        , makeSuccessCalback(callback, Constants::kPortAffected)
+        , makeErrorCalback(callback, Constants::kPortAffected)); 
+    RestClient::sendGet(request);
 }
 
-///
-
-void rtu::sendChangeItfRequest(HttpClient *client
-    , const ServerInfo &info
+void rtu::sendChangeItfRequest(const ServerInfo &info
     , const ItfUpdateInfoContainer &updateInfos
     , const OperationCallback &callback)
 {
@@ -689,18 +603,16 @@ void rtu::sendChangeItfRequest(HttpClient *client
         jsonInfoChanges.append(jsonInfoChange);   
     }
 
-    if (!client || !info.hasExtraInfo())
+    if (info.hasExtraInfo())
     {
-        if (callback)
-            callback(kUnspecifiedError, kInvalidRequest, affected);
-        return;
+        const RestClient::Request request(info, kIfConfigCommand, QUrlQuery(), RestClient::kStandardTimeout
+            , makeSuccessCalback(callback, affected), makeErrorCalback(callback, affected));
+        RestClient::sendPost(request, QJsonDocument(jsonInfoChanges).toJson());
     }
-
-    QUrl url = makeUrl(info, kIfConfigCommand);
-    
-    client->sendPost(url, QJsonDocument(jsonInfoChanges).toJson()
-        , makeReplyCallback(callback, affected)
-        , makeErrorCallback(callback, affected));
+    else if (callback)
+    {
+        callback(kUnspecifiedError, affected);
+    }
 }
 
 ///

@@ -8,7 +8,6 @@
 
 #include <base/server_info.h>
 #include <base/requests.h>
-#include <helpers/http_client.h>
 
 namespace
 {
@@ -51,7 +50,6 @@ private:
     typedef QHash<QUuid, qint64> LastUpdateTimeMap;
 
     ServerInfoManager * const m_owner;
-    HttpClient * const m_httpClient;
 
     QElapsedTimer m_msCounter;
     LastUpdateTimeMap m_lastUpdated;
@@ -60,8 +58,7 @@ private:
 rtu::ServerInfoManager::Impl::Impl(ServerInfoManager *parent)
     : QObject(parent)
     , m_owner(parent)
-    , m_httpClient(new HttpClient(this))
-
+    
     , m_msCounter()
     , m_lastUpdated()
 {
@@ -82,14 +79,14 @@ void rtu::ServerInfoManager::Impl::primaryLoginToServer(const BaseServerInfo &in
         globalSuccessful(successful, id, extra, info.hostAddress);
     };
 
-    const auto &localFailed = [this, info, failed](const int errorCode, const QString &, int)
+    const auto &localFailed = [this, info, failed](const int errorCode, int)
     {
         if (failed)
             failed(info.id, errorCode);
     };
     
     enum { kShortTimeout = 2000};
-    getServerExtraInfo(m_httpClient, info, password, localSuccessful, localFailed, kShortTimeout);
+    getServerExtraInfo(info, password, localSuccessful, localFailed, kShortTimeout);
 } 
 
 void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfo &info
@@ -105,7 +102,7 @@ void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfo &info
     }
     
     const auto &localFailed = 
-        [this, info, passwordIndex, successful, failed](const int errorCode, const QString &,int)
+        [this, info, passwordIndex, successful, failed](const int errorCode, int)
     {
         if (errorCode == kUnauthorizedError)
         {
@@ -122,7 +119,7 @@ void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfo &info
         globalSuccessful(successful, id, extra, info.hostAddress);
     };
 
-    getServerExtraInfo(m_httpClient, info
+    getServerExtraInfo(info
         , g_availablePasswords.at(passwordIndex), localSuccessful, localFailed);
 }
 
@@ -144,7 +141,7 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
         };
 
         const auto &localFailed = 
-            [this, base, successful, timestamp, failed](const int, const QString &, int) 
+            [this, base, successful, timestamp, failed](const int /* errorCode */, int /* affected */) 
         {
             /// on fail - try re-login
             const auto &loginFailed = [this, timestamp, failed](const QUuid &id, int errorCode)
@@ -158,7 +155,7 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
 
         const QString password = (server.hasExtraInfo() ? server.extraInfo().password 
             : defaultAdminPasswords().front());
-        getServerExtraInfo(m_httpClient, server.baseInfo()
+        getServerExtraInfo(server.baseInfo()
             , password, localSuccessful, localFailed);
     }
 }
