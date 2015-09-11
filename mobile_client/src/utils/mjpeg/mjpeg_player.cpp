@@ -2,6 +2,7 @@
 
 #include <QtMultimedia/QAbstractVideoSurface>
 #include <QtMultimedia/QVideoSurfaceFormat>
+#include <QtCore/QElapsedTimer>
 
 #include <utils/common/delayed.h>
 #include "mjpeg_session.h"
@@ -15,6 +16,8 @@ public:
     QnMjpegPlayer::PlaybackState state;
 
     bool waitingForFrame;
+    QElapsedTimer frameTimer;
+    int framePresentationTime;
 
     QAbstractVideoSurface *videoSurface;
     int position;
@@ -35,6 +38,7 @@ QnMjpegPlayerPrivate::QnMjpegPlayerPrivate(QnMjpegPlayer *parent)
     , session(new QnMjpegSession())
     , state(QnMjpegPlayer::Stopped)
     , waitingForFrame(true)
+    , framePresentationTime(0)
     , videoSurface(0)
     , reconnectOnPlay(false)
 {
@@ -65,6 +69,11 @@ void QnMjpegPlayerPrivate::processFrame() {
 
     position += presentationTime;
 
+    if (frameTimer.isValid())
+        presentationTime -= qMax(0, static_cast<int>(frameTimer.elapsed()) - framePresentationTime);
+
+    qDebug() << presentationTime;
+
     QVideoFrame frame(image);
     if (videoSurface) {
         if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != frame.pixelFormat())
@@ -79,11 +88,14 @@ void QnMjpegPlayerPrivate::processFrame() {
             videoSurface->present(frame);
     }
 
-    Q_Q(QnMjpegPlayer);
+    frameTimer.restart();
 
+    Q_Q(QnMjpegPlayer);
     q->positionChanged();
 
-    if (presentationTime <= 0) {
+    framePresentationTime = qMax(0, presentationTime);
+
+    if (framePresentationTime == 0) {
         processFrame();
     } else {
         waitingForFrame = false;
@@ -181,6 +193,7 @@ void QnMjpegPlayer::play() {
 
     QnMjpegSession::State sessionState = d->session->state();
 
+    d->frameTimer.invalidate();
     d->setState(Playing);
     d->session->start();
 
@@ -219,6 +232,7 @@ void QnMjpegPlayer::setSource(const QUrl &url) {
     if (url == d->session->url())
         return;
 
+    d->waitingForFrame = true;
     d->session->setUrl(url);
     d->session->stop();
     d->session->start();
