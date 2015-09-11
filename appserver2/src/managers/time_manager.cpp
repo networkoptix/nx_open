@@ -246,8 +246,8 @@ namespace ec2
         m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
         m_broadcastSysTimeTaskID( 0 ),
         m_internetSynchronizationTaskID( 0 ),
-        m_checkSystemTimeTaskID( 0 ),
         m_manualTimerServerSelectionCheckTaskID( 0 ),
+        m_checkSystemTimeTaskID( 0 ),
         m_terminated( false ),
         m_peerType( peerType ),
         m_internetTimeSynchronizationPeriod( INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC ),
@@ -1134,7 +1134,7 @@ namespace ec2
     }
 
     void TimeSynchronizationManager::onBeforeSendingTransaction(
-        QnTransactionTransport* transport,
+        QnTransactionTransport* /*transport*/,
         nx_http::HttpHeaders* const headers)
     {
         headers->emplace(
@@ -1143,7 +1143,7 @@ namespace ec2
     }
 
     void TimeSynchronizationManager::onTransactionReceived(
-        QnTransactionTransport* transport,
+        QnTransactionTransport* /*transport*/,
         const nx_http::HttpHeaders& headers)
     {
         for (auto header : headers)
