@@ -18,11 +18,11 @@
     <name>QnActiResource</name>
     <message>
         <source>Output %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Đầu ra %1</translation>
     </message>
     <message>
         <source>Input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>đầu vào %1</translation>
     </message>
 </context>
 <context>
@@ -209,104 +209,104 @@
     </message>
     <message>
         <source>start</source>
-        <translation type="unfinished"></translation>
+        <translation>bắt đầu</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation type="unfinished"></translation>
+        <translation>dừng lại</translation>
     </message>
     <message>
         <source>While %1</source>
-        <translation type="unfinished"></translation>
+        <translation>trong khi %1</translation>
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>trên %1 %2</translation>
     </message>
     <message>
         <source>%1 --&gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 --&gt; %2</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has a license problem</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ &apos;%1&apos; có một vấn đề giấy phép</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished">Một sự kiện chưa biết</translation>
+        <translation>Một sự kiện chưa biết</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished">Nhập các cổng giao tiếp：%1</translation>
+        <translation>Nhập các cổng giao tiếp：%1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished">xung đột địa chỉ：%1</translation>
+        <translation>xung đột địa chỉ：%1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối đến máy chủ bị mất.</translation>
     </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không có dữ liệu nhận được trong %n seconds cuối cùng.</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 output</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 đầu ra</translation>
     </message>
     <message>
         <source>%1 output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 đầu ra 30 sec</translation>
     </message>
     <message>
         <source>%1 recording</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ghi âm</translation>
     </message>
     <message>
         <source>Input Signal on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tín hiệu đầu vào %1</translation>
     </message>
     <message>
         <source>%1 Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ngắt kết nối</translation>
     </message>
     <message>
         <source>%1 IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 IP xung đột</translation>
     </message>
     <message>
         <source>Any %1 Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Bất kỳ vấn đề %1</translation>
     </message>
     <message>
         <source>%1 %2 was disconnected</source>
         <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2 đã được ngắt kết nối</translation>
     </message>
     <message>
         <source>%1 IP Conflict at %2</source>
         <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 IP xung đột tại %2</translation>
     </message>
     <message>
         <source>%1 #%2 MAC: %3</source>
         <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 #%2 MAC: %3</translation>
     </message>
     <message>
         <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối với %1 (luồng chính) đã bất ngờ đóng cửa.</translation>
     </message>
     <message>
         <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối với %1 (dòng thứ cấp) đã bất ngờ đóng cửa.</translation>
     </message>
     <message>
         <source>Recording on %1 is disabled: </source>
-        <translation type="unfinished"></translation>
+        <translation>Ghi trên %1 là người khuyết tật:</translation>
     </message>
 </context>
 <context>
@@ -389,27 +389,27 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished">Trái phép. nơi %1.</translation>
+        <translation>Trái phép. nơi %1.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hãy chắc chắn rằng %1 được cắm vào mạng.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp). Hãy cố gắng để khởi động lại máy %1, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Hãy chắc chắn rằng %1 được cắm vào mạng. Cố gắng khởi động lại máy %1.</translation>
     </message>
     <message>
         <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể phân tích phản ứng %1. Url %2, yêu cầu tên %3.</translation>
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
@@ -420,42 +420,42 @@
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Hãy cố gắng để khởi động lại máy %1, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt %1.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên %1 trang web. Nếu vấn đề vẫn còn, xin vui lòng liên hệ với hỗ trợ.</translation>
     </message>
     <message>
         <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Yêu cầu %1 &quot;%2&quot; thất bại với lỗi &quot;%3&quot;.</translation>
     </message>
     <message>
         <source>Unknown %1 Issue.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Không biết vấn đề %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the %1: %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Dữ liệu không hợp lệ đã nhận được từ %1: %2.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open %1 issues dialog for more details.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề %1 thoại để biết thêm chi tiết.</translation>
     </message>
     <message>
         <source>%1 initialization process in progress.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Quá trình khởi tạo %1 tiến hành.</translation>
     </message>
 </context>
 <context>
@@ -477,7 +477,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished">thực hiện Windows Explorer thất bại</translation>
+        <translation>thực hiện Windows Explorer thất bại.</translation>
     </message>
 </context>
 <context>
@@ -492,11 +492,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished">Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+        <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished">Không thể khởi tạo bộ giải mã âm thanh.</translation>
+        <translation>Không thể khởi tạo bộ giải mã âm thanh.</translation>
     </message>
 </context>
 <context>
@@ -534,7 +534,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished">Không thể khởi tạo bộ mã hóa video.</translation>
+        <translation>Không thể khởi tạo bộ mã hóa video.</translation>
     </message>
 </context>
 <context>
@@ -577,79 +577,79 @@
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Module</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>bắt đầu</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished">phép loại suy encoder</translation>
+        <translation>phép loại suy encoder</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished">giấy phép thử nghiệm</translation>
+        <translation>giấy phép thử nghiệm</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished">phép loại suy giấy phép</translation>
+        <translation>phép loại suy giấy phép</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished">giấy phép chuyên nghiệp</translation>
+        <translation>giấy phép chuyên nghiệp</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished">giấy phép cạnh</translation>
+        <translation>giấy phép cạnh</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished">giấy phép Vmax</translation>
+        <translation>giấy phép Vmax</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished">giấy phép phép loại suy encoder</translation>
+        <translation>giấy phép phép loại suy encoder</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished">Giấy phép bức tường video</translation>
+        <translation>Giấy phép bức tường video</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Module giấy phép</translation>
     </message>
     <message>
         <source>Start Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Start giấy phép</translation>
     </message>
     <message>
         <source>Invalid Signature</source>
-        <translation type="unfinished">chữ ký không hợp lệ</translation>
+        <translation>chữ ký không hợp lệ</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ với phù hợp với phần cứng của bạn không tìm thấy</translation>
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished">tùy biến không hợp lệ</translation>
+        <translation>tùy biến không hợp lệ</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished">kiểu không hợp lệ</translation>
+        <translation>kiểu không hợp lệ</translation>
     </message>
     <message>
         <source>Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>vô hiệu</translation>
     </message>
     <message>
         <source>Invalid Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Giấy phép không hợp lệ</translation>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Loại giấy phép này đòi hỏi phiên bản phần mềm cao hơn.</translation>
     </message>
 </context>
 <context>
@@ -684,19 +684,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished">Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished">Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <translation>Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <translation>Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
 </context>
 <context>
@@ -717,14 +717,14 @@
     <name>QnPlAxisResource</name>
     <message>
         <source>Can&apos;t initialize IO port settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể khởi tạo cài đặt cổng IO</translation>
     </message>
 </context>
 <context>
     <name>QnPlOnvifResource</name>
     <message>
         <source>Otput %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Đầu ra %1</translation>
     </message>
 </context>
 <context>
@@ -738,87 +738,87 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n máy chụp hình</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n máy chụp hình</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n IO Module(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n IO module(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n thiết bị</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n thiết bị</numerusform>
         </translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh</translation>
     </message>
     <message>
         <source>cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chụp hình</translation>
     </message>
     <message>
         <source>camera</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chụp hình</translation>
     </message>
     <message>
         <source>IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO Modules</translation>
     </message>
     <message>
         <source>IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modules</translation>
     </message>
     <message>
         <source>IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO Module</translation>
     </message>
     <message>
         <source>IO module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO module</translation>
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị</translation>
     </message>
     <message>
         <source>devices</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị</translation>
     </message>
     <message>
         <source>device</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị</translation>
     </message>
 </context>
 <context>
@@ -837,15 +837,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished">giấy phép thử nghiệm</translation>
+        <translation>giấy phép thử nghiệm</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished">Licensed to:</translation>
+        <translation>Licensed to:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished">miễn phí bản quyền</translation>
+        <translation>miễn phí bản quyền</translation>
     </message>
 </context>
 <context>
@@ -1025,15 +1025,15 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished">Lưu trữ đầy</translation>
+        <translation>Lưu trữ đầy</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished">Thiết bị lưu trữ không được thiết lập</translation>
+        <translation>Thiết bị lưu trữ không được thiết lập</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lần máy chủ không đồng bộ và một thời gian chung không thể được phát hiện tự động.</translation>
     </message>
 </context>
 <context>
@@ -1067,11 +1067,11 @@
     <name>QnThirdPartyResource</name>
     <message>
         <source>Otput %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Đầu ra %1</translation>
     </message>
     <message>
         <source>Input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>đầu vào %1</translation>
     </message>
 </context>
 <context>
@@ -1086,11 +1086,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished">OpenCL chuyển mã không được thực hiện</translation>
+        <translation>OpenCL chuyển mã không được thực hiện.</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished">Cách chuyển mã Unknown</translation>
+        <translation>Cách chuyển mã Unknown</translation>
     </message>
 </context>
 <context>
