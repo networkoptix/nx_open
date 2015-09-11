@@ -724,8 +724,9 @@ SocketAddress CommunicatingSocket::getForeignAddress() const
     sockaddr_in addr;
     unsigned int addr_len = sizeof(addr);
 
-    if (getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        qnWarning("Fetch of foreign address failed (getpeername()).");
+    const auto ret = getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len);
+    if (ret < 0) {
+        qnWarning("Fetch of foreign address failed (getpeername() = %1).", ret);
         return SocketAddress();
     }
     return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
@@ -817,10 +818,10 @@ TCPSocket::TCPSocket( bool natTraversal )
 {
 }
 
-TCPSocket::TCPSocket( bool natTraversal, int newConnSD )
+TCPSocket::TCPSocket( int newConnSD )
 :
     base_type(
-        natTraversal,
+        false, // in TCPSocket nat traversal only helps to resolve public address
         newConnSD
 #ifdef _WIN32
         , new Win32TcpSocketImpl()

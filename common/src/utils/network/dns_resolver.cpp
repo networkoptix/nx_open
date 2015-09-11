@@ -18,7 +18,7 @@ DnsResolver::ResolveTask::ResolveTask(
     RequestID _reqID,
     size_t _sequence )
 :
-    hostAddress( _hostAddress ),
+    hostAddress( std::move( _hostAddress ) ),
     completionHandler( _completionHandler ),
     reqID( _reqID ),
     sequence( _sequence )

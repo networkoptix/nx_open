@@ -180,10 +180,8 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
         auto transactionId = request.header.transactionId;
         m_requestQueue.pop_front();
 
-        const bool ret = true;
         m_baseConnection->sendMessage(
             std::move( request ),
-            // TODO: #c++14 [ transactionId{ std::move( transactionId ) }, handler ]
             [ = ]( SystemError::ErrorCode code ) mutable
             {
                 if( code != SystemError::noError )
@@ -202,10 +200,6 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
 
                 dispatchRequestsInQueue( &lock );
             } );
-
-        if( !ret )
-            m_baseConnection->socket()->post(
-                [ = ] () { handler( SystemError::nomem, Message() ); } );
     }
 }
 

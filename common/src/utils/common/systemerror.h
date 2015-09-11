@@ -56,7 +56,7 @@ namespace SystemError
     static const ErrorCode connectionAbort = ECONNABORTED;
     static const ErrorCode connectionReset = ECONNRESET;
     static const ErrorCode connectionRefused = ECONNREFUSED;
-    static const ErrorCode hostNotFound = EAI_NONAME;
+    static const ErrorCode hostNotFound = EHOSTUNREACH;
     static const ErrorCode notConnected = ENOTCONN;
     static const ErrorCode interrupted = EINTR;
     static const ErrorCode again = EAGAIN;

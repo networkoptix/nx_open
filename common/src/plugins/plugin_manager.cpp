@@ -167,7 +167,7 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
     QnAbstractClientPlugin* clientPlugin = dynamic_cast<QnAbstractClientPlugin*>(obj);
     if( !clientPlugin )
         return false;
-    clientPlugin->initializeLog( QnLog::instance() );
+    clientPlugin->initializeLog( QnLog::instance().get() );
     if( !clientPlugin->initialized() )
     {
         NX_LOG( lit("Failed to initialize Qt plugin %1").arg(fullFilePath), cl_logERROR );

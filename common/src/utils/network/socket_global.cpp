@@ -2,19 +2,18 @@
 
 namespace nx {
 
+SocketGlobals::SocketGlobals()
+    : m_log( QnLog::logs() )
+{
+}
+
 SocketGlobals& SocketGlobals::instance()
 {
-    if( s_instance )
-        return *s_instance;
-
-    QnMutexLocker lk( &s_mutex );
-    if( !s_instance )
-        s_instance.reset( new SocketGlobals() );
-
+    std::call_once( s_onceFlag, [](){ s_instance.reset( new SocketGlobals ); } );
     return *s_instance;
 }
 
-QnMutex SocketGlobals::s_mutex;
+std::once_flag SocketGlobals::s_onceFlag;
 std::unique_ptr< SocketGlobals > SocketGlobals::s_instance;
 
 } // namespace nx

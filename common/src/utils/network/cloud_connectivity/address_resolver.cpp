@@ -141,11 +141,13 @@ void AddressResolver::cancel( void* requestId, bool waitForRunningHandlerComplet
             {
                 needToWait = true;
                 ++it;
-                continue;
             }
+            else
+            {
 
-            // remove all we dont have to wait
-            it = m_requests.erase( it );
+                // remove all we dont have to wait
+                it = m_requests.erase( it );
+            }
         }
 
         if( !needToWait )
@@ -198,16 +200,18 @@ bool AddressResolver::dnsResolve( HaInfoIterator info, QnMutexLockerBase* lk )
 {
     auto functor = [ = ]( SystemError::ErrorCode code, const HostAddress& host )
     {
+        const HostAddress hostAddress( host.inAddr() );
         std::vector< Guard > guards;
 
         QnMutexLocker lk( &m_mutex );
         info->second.dnsState = HostAddressInfo::State::resolved;
         if( code == SystemError::noError )
         {
-            info->second.dnsResult = AddressEntry( AddressType::regular, host );
+            info->second.dnsResult = AddressEntry( AddressType::regular, hostAddress );
             NX_LOG( lit( "%1 address %2 is resolved to %3" )
                     .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                    .arg( info->first.toString() ).arg( host.toString() ), cl_logDEBUG1 );
+                    .arg( info->first.toString() )
+                    .arg( hostAddress.toString() ), cl_logDEBUG1 );
         }
         else
         {
@@ -303,7 +307,7 @@ std::vector< Guard > AddressResolver::grabHandlers( HaInfoIterator info )
             }
 
             it->second.inProgress = true;
-            guards.push_back( Guard( [ &info, &it, this, entries ]() {
+            guards.push_back( Guard( [ = ]() {
                 it->second.handler( std::move( entries ) );
 
                 QnMutexLocker lk( &m_mutex );

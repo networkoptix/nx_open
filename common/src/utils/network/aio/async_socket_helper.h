@@ -168,6 +168,9 @@ public:
         //TODO #ak if address is already resolved (or is an ip address) better make synchronous non-blocking call
         //NOTE: socket cannot be read from/written to if not connected yet. TODO #ak check that with assert
 
+        if( addr.address.isResolved() )
+            return startAsyncConnect( addr );
+
         return nx::SocketGlobals::addressResolver().resolveAsync(
             addr.address,
             [this, addr]( std::vector< nx::cc::AddressEntry > addresses )
@@ -195,6 +198,7 @@ public:
                         if( !startAsyncConnect( target ) )
                             this->post( std::bind( m_connectHandler,
                                                    SystemError::getLastOSErrorCode() ) );
+                        break;
                     }
                     default:
                         this->post( std::bind( m_connectHandler, SystemError::hostNotFound ) );

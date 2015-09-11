@@ -224,10 +224,10 @@ public:
     /**
      *   Construct a TCP socket with no connection
      */
-    TCPSocket( bool natTraversal ) ;
+    TCPSocket( bool natTraversal );
 
     //!User by \a TCPServerSocket class
-    TCPSocket( bool natTraversal, int newConnSD );
+    TCPSocket( int newConnSD );
     virtual ~TCPSocket();
 
 

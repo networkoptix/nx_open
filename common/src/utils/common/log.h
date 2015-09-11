@@ -5,6 +5,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
+#include <mutex>
 
 // TODO: #Elric #enum
 enum QnLogLevel { cl_logUNKNOWN, cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
@@ -59,14 +60,24 @@ public:
     }
 #undef QN_LOG_BODY
     
+    class Logs
+    {
+    public:
+        std::unique_ptr< QnLog >& get( int logID = MAIN_LOG_ID );
+        bool init( int logID, std::unique_ptr< QnLog > log );
+        bool init( int logID, const QString& logLevelStr );
+
+    private:
+        QnMutex m_mutex;
+        std::map< int, std::unique_ptr< QnLog > > m_logs;
+    };
+
     static void initLog(const QString &logLevelStr, int logID = MAIN_LOG_ID);
-    //!Initializes log with external instance \a externalInstance
-    /*!
-        Introduced to allow logging in dynamically loaded plugins. Required since common is a static library
-    */
     static bool initLog(QnLog *externalInstance, int logID = MAIN_LOG_ID);
+
     static QString logFileName( int logID = MAIN_LOG_ID );
-    static QnLog *instance( int logID = MAIN_LOG_ID );
+    static std::shared_ptr< Logs >& logs();
+    static std::unique_ptr< QnLog >& instance( int logID = MAIN_LOG_ID );
     
     static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);
@@ -81,6 +92,9 @@ private:
 
 private:
     QnLogPrivate *d;
+
+    static std::once_flag s_onceFlag;
+    static std::shared_ptr< Logs > s_instance;
 };
 
 #define CL_LOG(level)                                           \
@@ -91,18 +105,20 @@ private:
 #define GET_NX_LOG_MACRO(_1, _2, _3, NAME, ...) NAME
 #define NX_LOG(...) NX_LOG_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOG_3, NX_LOG_2)(__VA_ARGS__))
 
-#define NX_LOG_2(msg, level)                                        \
-    {                                                               \
-        QnLog* logInstance = QnLog::instance(QnLog::MAIN_LOG_ID);   \
-        if( level <= logInstance->logLevel() )                      \
-            logInstance->log( msg, level );                         \
+#define NX_LOG_2(msg, level)            \
+    if( auto logs = QnLog::logs() )     \
+    {                                   \
+        auto& log = logs->get();        \
+        if( level <= log->logLevel() )  \
+            log->log( msg, level );     \
     }
 
-#define NX_LOG_3(logID, msg, level)                             \
-    {                                                           \
-        QnLog* logInstance = QnLog::instance(logID);            \
-        if( level <= logInstance->logLevel() )                  \
-            logInstance->log( msg, level );                     \
+#define NX_LOG_3(logID, msg, level)     \
+    if( auto logs = QnLog::logs() )     \
+    {                                   \
+        auto& log = logs->get( logID ); \
+        if( level <= log->logLevel() )  \
+            log->log( msg, level );     \
     }
 
 #define cl_log (*QnLog::instance())
