@@ -11,8 +11,7 @@ class QnMjpegPlayerPrivate : public QObject {
     QnMjpegPlayer *q_ptr;
 
 public:
-    QScopedPointer<QnMjpegSession> session;
-    QThread *networkThread;
+    QnMjpegSession *session;
     QnMjpegPlayer::PlaybackState state;
 
     bool waitingForFrame;
@@ -110,15 +109,25 @@ QnMjpegPlayer::QnMjpegPlayer(QObject *parent)
 {
     Q_D(QnMjpegPlayer);
 
-    connect(d->session.data(), &QnMjpegSession::frameEnqueued, d, &QnMjpegPlayerPrivate::at_session_frameEnqueued);
-    connect(d->session.data(), &QnMjpegSession::urlChanged, this, &QnMjpegPlayer::sourceChanged);
+    connect(d->session, &QnMjpegSession::frameEnqueued, d, &QnMjpegPlayerPrivate::at_session_frameEnqueued);
+    connect(d->session, &QnMjpegSession::urlChanged, this, &QnMjpegPlayer::sourceChanged);
 
-    d->networkThread = new QThread(this);
-    d->session->moveToThread(d->networkThread);
-    d->networkThread->start();
+    QThread *networkThread;
+    networkThread = new QThread(d->session);
+    d->session->moveToThread(networkThread);
+    networkThread->start();
 }
 
 QnMjpegPlayer::~QnMjpegPlayer() {
+    Q_D(QnMjpegPlayer);
+
+    QnMjpegSession *session = d->session;
+    connect(session, &QnMjpegSession::stateChanged, session, [session](QnMjpegSession::State state) {
+        if (state == QnMjpegSession::Stopped)
+            session->deleteLater();
+    });
+
+    stop();
 }
 
 QnMjpegPlayer::PlaybackState QnMjpegPlayer::playbackState() const {

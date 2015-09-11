@@ -11,6 +11,7 @@ public:
     enum State {
         Stopped,
         Connecting,
+        Disconnecting,
         Playing
     };
 
@@ -26,7 +27,7 @@ public:
 
 signals:
     void frameEnqueued();
-    void stateChanged();
+    void stateChanged(State state);
     void urlChanged();
 
 public slots:

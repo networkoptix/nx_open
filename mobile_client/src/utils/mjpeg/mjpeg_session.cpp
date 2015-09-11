@@ -94,6 +94,9 @@ void QnMjpegSessionPrivate::setState(QnMjpegSession::State state) {
         return;
 
     this->state = state;
+
+    Q_Q(QnMjpegSession);
+    q->stateChanged(state);
 }
 
 void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, int presentationTime) {
@@ -176,6 +179,8 @@ void QnMjpegSessionPrivate::disconnect() {
     httpBuffer.clear();
     frameQueue.clear();
     previousFrameData.clear();
+
+    setState(QnMjpegSession::Stopped);
 }
 
 void QnMjpegSessionPrivate::at_reply_readyRead() {
@@ -473,7 +478,7 @@ void QnMjpegSession::stop() {
 
     {
         QMutexLocker lock(&d->mutex);
-        d->setState(Stopped);
+        d->setState(Disconnecting);
     }
 
     d->queueSemaphore.release(maxFrameQueueSize - d->queueSemaphore.available());
