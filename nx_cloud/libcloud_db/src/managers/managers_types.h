@@ -28,6 +28,7 @@ api::ResultCode fromDbResultCode( nx::db::DBResult );
 enum class EntityType
 {
     none,
+    module,
     account,
     system,
     subscription,

@@ -15,6 +15,12 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
+ConnectionFactory::ConnectionFactory()
+:
+    m_endPointFetcher("cdb")
+{
+}
+
 void ConnectionFactory::connect(
     const std::string& /*login*/,
     const std::string& /*password*/,
@@ -37,6 +43,13 @@ std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
         &m_endPointFetcher,
         login,
         password);
+}
+
+void ConnectionFactory::setCloudEndpoint(
+    const std::string& host,
+    unsigned short port)
+{
+    m_endPointFetcher.setEndpoint(SocketAddress(host.c_str(), port));
 }
 
 }   //cl

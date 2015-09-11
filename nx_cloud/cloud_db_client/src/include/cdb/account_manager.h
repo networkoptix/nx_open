@@ -9,7 +9,6 @@
 #include <functional>
 
 #include "account_data.h"
-#include "async_http_requests_executor.h"
 #include "result_code.h"
 
 

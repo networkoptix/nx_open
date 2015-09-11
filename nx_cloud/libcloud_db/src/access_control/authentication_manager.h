@@ -45,7 +45,7 @@ public:
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
         stree::AbstractResourceWriter* authProperties ) override;
         
-    nx::String realm() const; 
+    static nx::String realm(); 
 
 private:
     const AccountManager& m_accountManager;

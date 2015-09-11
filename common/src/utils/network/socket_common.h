@@ -67,6 +67,7 @@ public:
     HostAddress& operator=( HostAddress&& rhs );
 
     bool operator==( const HostAddress& right ) const;
+    bool operator!=( const HostAddress& right ) const;
     bool operator<( const HostAddress& right ) const;
 
     struct in_addr inAddr(bool* ok = nullptr) const;
@@ -80,6 +81,8 @@ private:
     //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
     bool m_addressResolved;
 
+    void initializeFromString(const char* addrStr);
+
     // TODO: use IpAddress instead
     friend class nx::DnsResolver;
 };
@@ -91,61 +94,19 @@ public:
     HostAddress address;
     quint16 port;
 
-    SocketAddress( const HostAddress& _address = HostAddress(), quint16 _port = 0 )
-    :
-        address( _address ),
-        port( _port )
-    {
-    }
+    SocketAddress();
+    SocketAddress( HostAddress _address, quint16 _port );
+    SocketAddress( const QString& str );
+    SocketAddress( const char* str );
 
-    SocketAddress( HostAddress&& _address, unsigned short _port = 0 )
-    :
-        address( std::move(_address) ),
-        port( _port )
-    {
-    }
+    QString toString() const;
+    bool operator==( const SocketAddress& rhs ) const;
+    bool operator!=( const SocketAddress& rhs ) const;
+    bool operator<( const SocketAddress& rhs ) const;
+    bool isNull() const;
 
-    SocketAddress( const QString& str )
-    :
-        port( 0 )
-    {
-        int sepPos = str.indexOf(QLatin1Char(':'));
-        if( sepPos == -1 )
-        {
-            address = HostAddress(str);
-        }
-        else
-        {
-            address = HostAddress(str.mid( 0, sepPos ));
-            port = str.mid( sepPos+1 ).toInt();
-        }
-    }
-
-    QString toString() const
-    {
-        return
-            address.toString() +
-            (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
-    }
-
-    bool operator==( const SocketAddress& rhs ) const
-    {
-        return address == rhs.address && port == rhs.port;
-    }
-
-    bool operator<( const SocketAddress& rhs ) const
-    {
-        if( address < rhs.address )
-            return true;
-        if( rhs.address < address )
-            return false;
-        return port < rhs.port;
-    }
-
-    bool isNull() const
-    {
-        return address == HostAddress() && port == 0;
-    }
+private:
+    void initializeFromString(const QString& str);
 };
 
 inline bool operator!=( const SocketAddress& lhs, const SocketAddress& rhs ) {

@@ -3,31 +3,72 @@
 
 #include <functional>
 
+
 /** RAII wrapper for @class std::function<void()> */
-class Guard
+template<typename Callback>
+class ScopedGuard
 {
 public:
-    typedef std::function<void()> Callback;
-
     /** Creates guard holding @param callback */
-    explicit Guard(const Callback& callback);
-    explicit Guard(Callback&& callback);
+    ScopedGuard(Callback callback)
+    :
+        m_callback(std::move(callback)),
+        m_fired(false)
+    {
+    }
 
-    Guard(Guard&&);
+    ScopedGuard(ScopedGuard&& rhs)
+    :
+        m_callback(std::move(rhs.m_callback)),
+        m_fired(rhs.m_fired)
+    {
+        rhs.m_fired = true;
+    }
 
     /** Fires this guard */
-    ~Guard();
+    ~ScopedGuard() //noexcept
+    {
+        fire();
+    }
+
+    ScopedGuard& operator=(ScopedGuard&& rhs)
+    {
+        m_callback = std::move(rhs.m_callback);
+        m_fired = rhs.m_fired;
+        rhs.m_fired = true;
+        return *this;
+    }
 
     /** Executes callback and disarms guard */
-    void fire();
+    void fire()
+    {
+        if (!m_fired)
+        {
+            m_callback();
+            m_fired = true;
+        }
+    }
 
     /** Disarms guard, so callback is newer called */
-    void disarm();
+    void disarm()
+    {
+        m_fired = true;
+    }
 
 private:
     Callback m_callback;
+    bool m_fired;
 
-    Guard(const Guard&);
+    ScopedGuard(const ScopedGuard&);
+    ScopedGuard& operator=(const ScopedGuard&);
 };
+
+typedef ScopedGuard<std::function<void()>> Guard;
+
+template<class Func>
+ScopedGuard<Func> makeScopedGuard(Func func)
+{
+    return ScopedGuard<Func>(std::move(func));
+}
 
 #endif // GUARD_H

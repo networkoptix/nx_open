@@ -204,7 +204,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP )
 TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP2 )
 {
     std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    ASSERT_TRUE( sock->connect( "192.168.0.1", 80 ) );
+    ASSERT_TRUE( sock->connect( SocketAddress("192.168.0.1", 80) ) );
     sock->send( QByteArray("GET /valgrind-arm-linaro-multilib-2013.09.tar.gz HTTP/1.0\r\n\r\n") );
     char buf[4*1024];
     qint64 totalBytesRead = 0;

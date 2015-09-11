@@ -53,7 +53,7 @@ std::shared_ptr<CloudTunnel> CloudTunnelPool::getTunnelToHost(
     const SocketAddress& targetEndpoint )
 {
     QMutexLocker lock( &m_mutex );
-    auto it = m_Pool.find( targetEndpoint.address );
+    auto it = m_Pool.find( targetEndpoint );
     if( it != m_Pool.end() )
         return it->second;
 

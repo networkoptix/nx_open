@@ -13,6 +13,9 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
+#include <utils/network/http/asynchttpclient.h>
+#include <utils/thread/mutex.h>
+
 #include "include/cdb/result_code.h"
 
 
@@ -25,20 +28,25 @@ namespace cl {
 class CloudModuleEndPointFetcher
 {
 public:
-    //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
-    void get(
-        QString username,
-        QString password,
-        std::function<void(api::ResultCode, SocketAddress)> handler)
-    {
-        //TODO #ak if requested endpoint is known, providing it to the output
-        //TODO #ak if requested url is unknown, fetching description xml
+    CloudModuleEndPointFetcher(QString moduleName);
+    ~CloudModuleEndPointFetcher();
 
-        //TODO #ak
-    }
+    //!Specify endpoint explicitely
+    void setEndpoint(SocketAddress endpoint);
+
+    //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
+    void get(std::function<void(api::ResultCode, SocketAddress)> handler);
 
 private:
+    mutable QnMutex m_mutex;
     boost::optional<SocketAddress> m_endpoint;
+    nx_http::AsyncHttpClientPtr m_httpClient;
+    QString m_moduleName;
+
+    void onHttpClientDone(
+        nx_http::AsyncHttpClientPtr client,
+        std::function<void(api::ResultCode, SocketAddress)> handler);
+    void parseCloudXml(QByteArray xmlData);
 };
 
 
