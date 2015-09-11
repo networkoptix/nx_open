@@ -531,8 +531,8 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
         appServerUrl.setHost(mserverUrl.host());
     }
 
-    QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getPhysicalId()).arg(ts/1000);
+    QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
+    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getUniqueId()).arg(ts);
 
     return result;
 }
