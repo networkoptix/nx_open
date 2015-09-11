@@ -111,7 +111,7 @@ public:
         //TODO #ak what's the difference of this method from cancelAsyncIO( aio::etNone ) ?
 
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
-        if( m_socket->impl()->aioThread.load() == QThread::currentThread() )
+        if( this->m_socket->impl()->aioThread.load() == QThread::currentThread() )
         {
             HostAddressResolver::instance()->cancel( this, true );    //TODO #ak must not block here!
 
