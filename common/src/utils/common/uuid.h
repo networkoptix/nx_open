@@ -35,6 +35,7 @@ public:
     const QByteArray& toByteArray() const;
     const QByteArray& toRfc4122() const;
     const QString& toString() const;
+    QUuid toQUuid() const { return m_uuid; }
 
     bool operator!=( const QnUuid& other ) const
     {
