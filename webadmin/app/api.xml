@@ -1547,6 +1547,59 @@
                         <caption>JSON with error code.</caption>
                     </result>
                 </function>
+                <function>
+                    <name>createEvent</name>
+                    <description>Generate user defined event. This event will be processed according to current event rules.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>eventTimestamp</name>
+                            <description>Event date and time. It could be either UTC milliseconds or human readible date and time at ISO 8601 format.
+							If eventTimestamp is absent, current server date and time is used.
+							</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>deviceName</name>
+                            <description> External device name. It could be used as a filter at business rules to math different action with different devices.
+							              Also, user could see device name in the notifications panel. For instance: 'POS terminal 5'.
+							</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>caption</name>
+                            <description> Short event description. It could be used as a filter at business rules to math different action with different events.
+							</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>description</name>
+                            <description> Long event description. It could be used as a filter at business rules to math different action with different events.
+							</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>state</name>
+                            <description> User defined events can be used either with long actions like 'do recording' or instant actions like 'send email'. If you are going to use long actions with user defined events, this parameter should be filled.
+							</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ActiveState</name>
+                                    <description>Custom user defined event consider as a 'long' event. It goes to the 'active' state. Long actions will continue untill user defined event goes to the inactive state.</description>
+                                </value>
+                                <value>
+                                    <name>InactiveState</name>
+                                    <description>Long action, associated with  user defined event in busiless rules, will stop.</description>
+                                </value>
+                            </values>
+                        </param>
+					</params>
+                    <result>
+                        <caption>Json result with error code.</caption>
+                    </result>
+                </function>
+				
             </functions>
         </group>
 
@@ -1655,6 +1708,13 @@
                             <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions 
                                          milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
                                          Otherwise, LIVE stream is provided</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>endPos</name>
+                            <description>If present then specifies archive stream end positions. It used only if 'pos' parameter is present.
+                                         milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
+                                         </description>
                             <optional>true</optional>
                         </param>
                         <param>
