@@ -4,17 +4,53 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+#include <QtCore/QDateTime>
+
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonValue>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 #include "hardware_id.h"
+#include "hardware_id_pvt.h"
 
 namespace {
 
-    QList<QByteArray> g_hardwareId;
+    QStringList g_hardwareId;
     bool g_hardwareIdInitialized(false);
 }
 
 namespace LLUtil {
-    void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings);
+
+    void HardwareInfo::write(QJsonObject &json) const {
+        json["boardID"] = boardID;
+        json["boardUUID"] = boardUUID;
+        json["compatibilityBoardUUID"] = compatibilityBoardUUID;
+        json["boardManufacturer"] = boardManufacturer;
+        json["boardProduct"] = boardProduct;
+
+        json["biosID"] = biosID;
+        json["biosManufacturer"] = biosManufacturer;
+
+        json["memoryPartNumber"] = memoryPartNumber;
+        json["memorySerialNumber"] = memorySerialNumber;
+
+        QJsonArray jsonNics;
+        for (DeviceClassAndMac cm: nics) {
+            QJsonObject jsonNic;
+            jsonNic["class"] = cm.xclass;
+            jsonNic["mac"] = cm.mac;
+
+            jsonNics.append(jsonNic);
+        }
+
+        json["nics"] = jsonNics;
+        json["mac"] = mac;
+    }
+
+    void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo);
 
     QString getSaveMacAddress(std::vector<DeviceClassAndMac> devices, QSettings *settings) {
         if (devices.empty())
@@ -63,7 +99,25 @@ QByteArray getHardwareId(int version, bool guidCompatibility, QSettings *setting
             g_hardwareId << QByteArray();
         }
         try {
-            fillHardwareIds(g_hardwareId, settings);
+            HardwareInfo hardwareInfo;
+            fillHardwareIds(g_hardwareId, settings, hardwareInfo);
+            
+            QString logFileName = settings->value("logFile").toString();
+            if (!logFileName.isEmpty()) {
+                logFileName += "_hw.log";
+
+                QFile file(logFileName);
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
+                    QTextStream stream(&file);
+
+                    QJsonObject jsonObject;
+                    hardwareInfo.write(jsonObject);
+                    jsonObject["date"] = QDateTime::currentDateTime().toString();
+
+                    stream << QJsonDocument(jsonObject).toJson(QJsonDocument::Compact) << "\n";
+                }
+            }
+
             g_hardwareIdInitialized = true;
         } catch (const LLUtil::HardwareIdError& err) {
             qWarning() << QLatin1String("getHardwareId()") << err.what();
@@ -79,7 +133,7 @@ QByteArray getHardwareId(int version, bool guidCompatibility, QSettings *setting
     int index = guidCompatibility ? (version - 1 + LATEST_HWID_VERSION) : (version - 1);
 
     QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-    md5Hash.addData(g_hardwareId[index]);
+    md5Hash.addData(g_hardwareId[index].toUtf8());
     return QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex())).toLatin1();
 }
 
