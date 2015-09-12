@@ -49,7 +49,6 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     QString SET_FPS(QLatin1String("CHANNEL=%1&VIDEO_FPS_NUM=%2"));
     QString SET_BITRATE(QLatin1String("CHANNEL=%1&VIDEO_BITRATE=%2"));
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
-    QString SET_AUDIO(QLatin1String("CHANNEL=%1&V2_AUDIO_ENABLED=%2"));
 
     m_multiCodec.setRole(m_role);
     int fps = m_actiRes->roundFps(params.fps, m_role);
@@ -60,7 +59,6 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = formatBitrateStr(bitrate);
     QString encoderStr(QLatin1String("H264"));
-    QString audioStr = m_actiRes->isAudioEnabled() ? QLatin1String("1") : QLatin1String("0");
     if (isCameraControlRequired)
     {
         CLHttpStatus status;
@@ -80,12 +78,8 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("encoder"));
 
-        if (m_actiRes->isAudioSupported())
-        {
-            result = m_actiRes->makeActiRequest(QLatin1String("system"), SET_AUDIO.arg(ch).arg(audioStr), status);
-            if (status != CL_HTTP_SUCCESS)
-                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
-        }
+        if (!m_actiRes->SetupAudioInput())
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
     }
 
     // get URL
