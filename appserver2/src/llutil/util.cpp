@@ -13,3 +13,13 @@ void LLUtil::changeGuidByteOrder(std::string& guid)
     guid = guid_fixed;
 }
 
+
+QString LLUtil::changedGuidByteOrder(const QString& guid)
+{
+    if (guid.length() != 36)
+        return QString();
+
+    std::string guid_str(guid.toStdString());
+    LLUtil::changeGuidByteOrder(guid_str);
+    return guid_str.c_str();
+}
