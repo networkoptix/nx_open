@@ -301,9 +301,12 @@ const QStringList &rtu::defaultAdminPasswords()
 
 ///
 
-void rtu::parseModuleInformationReply(const QJsonObject &reply
+bool rtu::parseModuleInformationReply(const QJsonObject &reply
     , rtu::BaseServerInfo &baseInfo)
 {
+    if (isErrorReply(reply))
+        return false;
+
     const QStringList &keys = reply.keys();
     for (const auto &key: keys)
     {
@@ -311,9 +314,45 @@ void rtu::parseModuleInformationReply(const QJsonObject &reply
         if (itHandler != parser.end())
             (*itHandler)(reply, baseInfo);
     }
+
+    return true;
 }
 
 ///
+
+void rtu::multicastModuleInformation(const QUuid &id
+    , const BaseServerInfoCallback &successCallback
+    , const OperationCallback &failedCallback)
+{
+    static const Constants::AffectedEntities affected = (Constants::kAllEntitiesAffected 
+        & ~Constants::kAllAddressFlagsAffected);
+
+    BaseServerInfo info;
+    info.id = id;
+    info.discoveredByHttp = false;  /// force multicast usage
+
+    const auto &successfull = [info, successCallback, failedCallback](const QByteArray &data)
+    {
+        const QJsonObject object = QJsonDocument::fromJson(data.data()).object();
+        BaseServerInfo resultInfo;
+        if (!parseModuleInformationReply(object, resultInfo))
+        {
+            if (failedCallback)
+                failedCallback(kUnspecifiedError, affected);
+            return;
+        }
+
+        if (successCallback)
+            successCallback(resultInfo);
+    };
+
+    const QString &kModuleInformationCommand = kApiNamespaceTag + "moduleInformation";
+    RestClient::Request request(info, kModuleInformationCommand, QUrlQuery(), RestClient::kStandardTimeout
+        , successfull, makeErrorCalback(failedCallback, affected));
+    RestClient::sendGet(request);
+}
+
+/// 
 
 void rtu::getTime(const BaseServerInfo &baseInfo
     , const QString &password

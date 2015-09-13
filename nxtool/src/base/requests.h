@@ -18,7 +18,7 @@ namespace rtu
     const QString &adminUserName();
     const QStringList &defaultAdminPasswords();
     
-    void parseModuleInformationReply(const QJsonObject &reply
+    bool parseModuleInformationReply(const QJsonObject &reply
         , rtu::BaseServerInfo &baseInfo);
 
     ///
@@ -61,10 +61,16 @@ namespace rtu
 
         , kUnauthorizedError = 401
     };
-    
+
+    typedef std::function<void (BaseServerInfo &info)> BaseServerInfoCallback;
+
     typedef std::function<void (const QUuid &id
-        , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
+        , const ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
     
+    void multicastModuleInformation(const QUuid &id
+        , const BaseServerInfoCallback &successCallback
+        , const OperationCallback &failedCallback);
+
     void getTime(const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
@@ -97,8 +103,6 @@ namespace rtu
         , qint64 utcDateTimeMs
         , const QByteArray &timeZoneId
         , const OperationCallback &callback);
-
-    ///
 
     void sendSetSystemNameRequest(const ServerInfo &info
         , const QString &systemName

@@ -87,10 +87,9 @@ namespace
 
 namespace 
 {
-    bool parseUdpPacket(const QByteArray &data
+    bool parseUdpPacket(const QJsonObject &jsonResponseObj
         , rtu::BaseServerInfo &info)
     {
-        const QJsonObject jsonResponseObj = QJsonDocument::fromJson(data.data()).object();
         const auto &itReply = jsonResponseObj.find(kReplyTag);
         const QJsonObject &jsonObject = (itReply != jsonResponseObj.end() 
             ? itReply.value().toObject() : jsonResponseObj);
@@ -163,12 +162,14 @@ private:
     /// Reads answers to sent "magic" messages
     void readResponseData(const SocketPtr &socket);
 
-    bool readResponsePacket(const SocketPtr &socket);
+    bool processNewServer(BaseServerInfo info
+        , const QString &host
+        , bool discoveredByHttp);
 
     /// Reads incomming "magic" packets
-    void readRequestData();
+    void readMagicData();
 
-    bool readRequestPacket();
+    bool readMagicPacket();
 
     /// Returns true if it is entity with new address, otherwise false
     bool onEntityDiscovered(const QString &address
@@ -281,12 +282,12 @@ void rtu::ServersFinder::Impl::updateServers()
 
         QObject::connect(m_serverSocket.data(), &QUdpSocket::readyRead, this, [this]
         {
-            readRequestData();
+            readMagicData();
         });
 
     }
 
-    readRequestData();
+    readMagicData();
 
     const auto allAddresses = QNetworkInterface::allAddresses();
     for(const auto &address: allAddresses)
@@ -340,12 +341,27 @@ void rtu::ServersFinder::Impl::updateServers()
 
 void rtu::ServersFinder::Impl::readResponseData(const SocketPtr &socket)
 {
-    while(socket->hasPendingDatagrams() && readResponsePacket(socket)) {}
+    const auto readPacket = [this, socket]() -> bool
+    {
+        QByteArray data;
+        QHostAddress sender;
+        quint16 port = 0;
+        if (!readPendingPacket(socket, data, &sender, &port))
+           return false;
+
+        BaseServerInfo info;
+        if (parseUdpPacket(QJsonDocument::fromJson(data.data()).object(), info))
+            processNewServer(info, sender.toString(), true);
+
+        return true;
+    };
+
+    while(socket->hasPendingDatagrams() && readPacket()) {}
 }
 
-void rtu::ServersFinder::Impl::readRequestData()
+void rtu::ServersFinder::Impl::readMagicData()
 {
-    while(m_serverSocket->hasPendingDatagrams() && readRequestPacket()) {}
+    while(m_serverSocket->hasPendingDatagrams() && readMagicPacket()) {}
 }
 
 bool rtu::ServersFinder::Impl::onEntityDiscovered(const QString &address
@@ -363,7 +379,7 @@ bool rtu::ServersFinder::Impl::onEntityDiscovered(const QString &address
     return false;
 }
 
-bool rtu::ServersFinder::Impl::readRequestPacket()
+bool rtu::ServersFinder::Impl::readMagicPacket()
 {
     QByteArray data;
     QHostAddress sender;
@@ -383,16 +399,20 @@ bool rtu::ServersFinder::Impl::readRequestPacket()
     if (!data.contains(kSearchRequestBody))
         return true;
 
+
+    /// try to add unknown or discover by multicast after period * 3 - to chance to discover entity as known and by Http first
+
+    enum { kDelayTimeout = kUpdateServersInfoInterval * 3};
+
+    const QString &address = sender.toString();
     const auto &firstTimeProcessor = 
-        [this, sender](const Callback &secondTimeProcessor)
+        [this, address](const Callback &secondTimeProcessor)
     {
-        const QString &address = sender.toString();
         const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
         const bool isUnknown = (m_unknownHosts.find(address) != m_unknownHosts.end());
         if (secondTimeProcessor && !isKnown && !isUnknown)
         {
-            /// try to add unknown after period * 2 - to chance to discover entity as known first
-            QTimer::singleShot(kUpdateServersInfoInterval * 3, secondTimeProcessor);
+            QTimer::singleShot(kDelayTimeout, secondTimeProcessor);
         }
         else if (!isKnown && onEntityDiscovered(address, m_unknownHosts))
             emit m_owner->unknownAdded(address);
@@ -403,7 +423,37 @@ bool rtu::ServersFinder::Impl::readRequestPacket()
         firstTimeProcessor(Callback());
     };
 
-    firstTimeProcessor(secondTimeProcessor);
+    const bool isMulticastServer = false; /// TODO: # check if contains new multicast header
+    if (!isMulticastServer)
+    {
+        firstTimeProcessor(secondTimeProcessor);
+        return true;
+    }
+
+    const auto delayedMulticastProcessor = [this, address, firstTimeProcessor, secondTimeProcessor]()
+    {
+        const QUuid id = QUuid(); /// TODO: add id extraction
+        const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
+        const bool isUnknown = (m_unknownHosts.find(address) != m_unknownHosts.end());
+        if (isKnown || isUnknown)
+            return true;
+
+        const auto successful = [this, address](const BaseServerInfo &info)
+        {
+            processNewServer(info, address, false);
+        };
+
+        const auto failed = [firstTimeProcessor, secondTimeProcessor]
+            (int /* errorCode */, Constants::AffectedEntities /* affected */)
+        {
+            /// try to add unknown item
+            firstTimeProcessor(secondTimeProcessor);
+        };
+
+        multicastModuleInformation(id, successful, failed);
+    };
+
+    QTimer::singleShot(kDelayTimeout, delayedMulticastProcessor);
     return true;
 }
 
@@ -438,20 +488,12 @@ bool rtu::ServersFinder::Impl::readPendingPacket(const SocketPtr &socket
     return true;
 }
 
-bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl::SocketPtr &socket)
+bool rtu::ServersFinder::Impl::processNewServer(rtu::BaseServerInfo info
+    , const QString &host
+    , bool discoveredByHttp)
 {
-    QByteArray data;
-    QHostAddress sender;
-    quint16 port = 0;
-    if (!readPendingPacket(socket, data, &sender, &port))
-       return false;
-
-    BaseServerInfo info;
-    if (!parseUdpPacket(data, info) )
-        return true;
-
-    const QString &host = sender.toString();
     info.hostAddress = host;
+    info.discoveredByHttp = discoveredByHttp;
 
     onEntityDiscovered(host, m_knownHosts);
     if (m_unknownHosts.remove(host))
