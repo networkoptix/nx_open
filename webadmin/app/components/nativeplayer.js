@@ -51,5 +51,43 @@ var nativePlayer = new (function () {
 
         currentVideo = $currentVideo.get(0);
         currentVideo.load();
+
+
+        var events = [
+            "abort",// Data loading was aborted
+            "error",// An error occured
+            "emptied",// Data not present unexpectedly
+            "stalled",// Data transfer stalled
+            "pause",// Video has paused (fired with pause())
+            "ended"//,// Video has ended
+
+            //"loadstart",// Browser starts loading data
+            //"progress",// Browser loads data
+            //"suspend",// Browser does not load data, waiting
+            //"play",// Video started playing (fired with play())
+            //"loadedmetadata",// Metadata loaded
+            //"loadeddata",// Data loaded
+            //"waiting",// Waiting for more data
+            //"playing",// Playback started
+            //"canplay",// Video can be played, but possibly must stop to buffer content
+            //"canplaythrough",// Enough data to play the whole video
+            //"seeking",// seeking is true (browser seeks a position)
+            //"seeked",// seeking is now false (position found)
+            //"timeupdate",// currentTime was changed
+            //"ratechange",// Playback rate has changed
+            //"durationchange",// Duration has changed (for streams)
+            //"volumechange"// Volume has changed"];
+        ];
+        for(var i=0;i<events.length;i++){
+            (function(eventName) {
+                currentVideo.addEventListener(eventName, function (event) {
+                    try {
+                        console.log("video event", eventName, event);
+                    }catch(a){
+                        // ignore errors
+                    }
+                });
+            })(events[i]);
+        }
     };
 })();
