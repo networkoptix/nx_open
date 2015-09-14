@@ -17,32 +17,12 @@
 #include "access_control/auth_types.h"
 #include "cache.h"
 #include "data/system_data.h"
-#include "data_event.h"
+#include "data_view.h"
 #include "managers_types.h"
 
 
 namespace nx {
 namespace cdb {
-
-typedef DataChangeEvent SystemChangeEvent;
-typedef DataInsertUpdateEvent<data::SystemData> SystemInsertUpdateEvent;
-
-
-
-
-/*
-
-NOTE (any fetch data request of any manager)
-
-If request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked immediately within fetch data function.
-Actually, in current implementation this is ALWAYS so.
-TODO If it always so, maybe async call is not needed?
-
-*/
-
-
-
-
 
 /*!
     Provides methods for manipulating system data on persisent storage.
@@ -106,17 +86,11 @@ public:
     api::SystemAccessRole::Value getAccountRightsForSystem(
         const QnUuid& accountID, const QnUuid& systemID) const;
 
-    /*!
-        Only notifications that match \a filter are returned
-        \return receiver ID
-    */
-    int registerNotificationReceiver(
+    //!Create data view restricted by \a authzInfo and \a filter
+    DataView<data::SystemData> createView(
         const AuthorizationInfo& authzInfo,
-        const DataFilter& filter,
-        TransactionSequence lastKnownTranSeq,
-        std::function<void(const std::unique_ptr<SystemChangeEvent>&)> eventReceiver);
-    void unregisterNotificationReceiver(int receiverID);
-
+        DataFilter filter);
+        
 private:
     nx::db::DBManager* const m_dbManager;
     Cache<QnUuid, data::SystemData> m_cache;
