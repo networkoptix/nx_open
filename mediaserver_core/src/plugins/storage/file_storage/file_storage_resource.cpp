@@ -151,11 +151,14 @@ bool QnFileStorageResource::checkWriteCap() const
 
 bool QnFileStorageResource::checkDBCap() const
 {
-    if (!initOrUpdate() || !m_localPath.isEmpty())
+    if (!initOrUpdate())
         return false;
 #ifdef _WIN32
     return true;
-#else    
+#else
+    if (!m_localPath.isEmpty())
+        return false;
+
     QList<QnPlatformMonitor::PartitionSpace> partitions = 
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
