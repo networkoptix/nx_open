@@ -12,7 +12,7 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-SystemManager::SystemManager(CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
+SystemManager::SystemManager(cc::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
 :
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {

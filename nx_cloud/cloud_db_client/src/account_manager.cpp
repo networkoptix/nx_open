@@ -10,7 +10,7 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-AccountManager::AccountManager(CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
+AccountManager::AccountManager(cc::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
 :
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {

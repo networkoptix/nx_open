@@ -26,6 +26,7 @@
 #include <QtGui/QVector4D>
 #include <QtGui/QFont>
 
+#include <common/common_globals.h>
 #include <utils/common/collection.h>
 #include <utils/common/latin1_array.h>
 

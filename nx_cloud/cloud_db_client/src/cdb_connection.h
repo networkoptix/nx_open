@@ -12,12 +12,13 @@
 #include "async_http_requests_executor.h"
 #include "system_manager.h"
 
+namespace nx { namespace cc {
+    class CloudModuleEndPointFetcher;
+} } // nx::cc
 
 namespace nx {
 namespace cdb {
 namespace cl {
-
-class CloudModuleEndPointFetcher;
 
 class Connection
 :
@@ -26,7 +27,7 @@ class Connection
 {
 public:
     Connection(
-        CloudModuleEndPointFetcher* const endPointFetcher,
+        cc::CloudModuleEndPointFetcher* const endPointFetcher,
         const std::string& login,
         const std::string& password);
 

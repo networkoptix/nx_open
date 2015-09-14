@@ -7,10 +7,8 @@
 
 #include <common/common_globals.h>
 
-
 namespace nx {
-namespace cdb {
-namespace cl {
+namespace cc {
 
 CloudModulesXmlHandler::CloudModulesXmlHandler()
 :
@@ -41,7 +39,7 @@ bool CloudModulesXmlHandler::startElement(
     switch (m_state)
     {
         case init:
-            if (qName == "modules")
+            if (qName == lit("modules"))
                 m_state = readingModules;
             else
                 return false;
@@ -53,7 +51,7 @@ bool CloudModulesXmlHandler::startElement(
             return true;
 
         case readingModuleEndpoints:
-            if (qName != "endpoint")
+            if (qName != lit("endpoint"))
                 return false;
             m_state = readingModuleEndpoint;
             return true;
@@ -119,6 +117,5 @@ std::list<SocketAddress> CloudModulesXmlHandler::moduleUrls(QString moduleName) 
         : it->second;
 }
 
-}   //cl
-}   //cdb
+}   //cc
 }   //nx

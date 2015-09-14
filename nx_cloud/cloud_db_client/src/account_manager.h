@@ -19,7 +19,7 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-class CloudModuleEndPointFetcher;
+class cc::CloudModuleEndPointFetcher;
 
 class AccountManager
 :
@@ -27,7 +27,7 @@ class AccountManager
     public AsyncRequestsExecutor
 {
 public:
-    AccountManager(CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    AccountManager(cc::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
 
     //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(

@@ -3,4 +3,8 @@
 <cdb>
 <endpoint>10.0.2.95:3346</endpoint>
 </cdb>
+<hpm>
+<!--AK's old PC-->
+<endpoint>10.0.2.175:3345</endpoint>
+</hpm>
 </modules>

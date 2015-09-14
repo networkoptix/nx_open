@@ -14,13 +14,13 @@
 #include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <utils/network/http/fusion_data_http_client.h>
+#include <utils/network/cloud_connectivity/cdb_endpoint_fetcher.h>
 #include <utils/thread/mutex.h>
 
 #include "data/account_data.h"
 #include "data/types.h"
 #include "include/cdb/account_manager.h"
 #include "include/cdb/result_code.h"
-#include "cdb_endpoint_fetcher.h"
 
 
 namespace nx {
@@ -35,7 +35,7 @@ namespace cl {
 class AsyncRequestsExecutor
 {
 public:
-    AsyncRequestsExecutor(CloudModuleEndPointFetcher* const cdbEndPointFetcher)
+    AsyncRequestsExecutor(cc::CloudModuleEndPointFetcher* const cdbEndPointFetcher)
     :
         m_cdbEndPointFetcher(cdbEndPointFetcher)
     {
@@ -84,11 +84,12 @@ protected:
 
         m_cdbEndPointFetcher->get(
             [this, username, password, path, input, handler, errHandler](
-                api::ResultCode resCode,
+                nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint) mutable
         {
-            if (resCode != api::ResultCode::ok)
-                return errHandler(resCode);
+            if (resCode != nx_http::StatusCode::ok)
+                return errHandler(api::httpStatusCodeToResultCode(resCode));
+
             QUrl url;
             url.setScheme("http");
             url.setHost(endpoint.address.toString());
@@ -119,11 +120,12 @@ protected:
 
         m_cdbEndPointFetcher->get(
             [this, username, password, path, handler, errHandler](
-                api::ResultCode resCode,
+                nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint) mutable
         {
-            if (resCode != api::ResultCode::ok)
-                return errHandler(resCode);
+            if (resCode != nx_http::StatusCode::ok)
+                return errHandler(api::httpStatusCodeToResultCode(resCode));
+
             QUrl url;
             url.setScheme("http");
             url.setHost(endpoint.address.toString());
@@ -142,7 +144,7 @@ private:
     QString m_username;
     QString m_password;
     std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
-    CloudModuleEndPointFetcher* const m_cdbEndPointFetcher;
+    cc::CloudModuleEndPointFetcher* const m_cdbEndPointFetcher;
 
     /*!
         \param completionHandler Can be invoked within this call if failed to initiate async request
