@@ -92,7 +92,7 @@ angular.module('webadminApp')
                 return;
             }*/
 
-            mediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
+            mediaserver.mergeSystems($scope.settings.url,$scope.settings.password,$scope.settings.currentPassword,$scope.settings.keepMySystem).then(function(r){
                 if(r.data.error!=='0') {
                     var errorToShow = errorHandler(r.data.errorString);
                     if (errorToShow) {
