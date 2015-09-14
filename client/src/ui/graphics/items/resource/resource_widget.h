@@ -278,6 +278,7 @@ signals:
     void frameDistinctionColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
+    void displayInfoChanged();
 
 protected:
     virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;

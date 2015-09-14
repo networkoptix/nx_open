@@ -161,9 +161,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setFont(font);
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
-    /* Header overlay. */
-    auto checkedButtons = static_cast<Buttons>(item->data(Qn::ItemCheckedButtonsRole).toInt());
-
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -174,7 +171,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
-    infoButton->setChecked(checkedButtons & InfoButton);
+    infoButton->setChecked(item->displayInfo());
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
@@ -227,6 +224,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
         if (m_enclosingGeometry.isValid())
             setGeometry(calculateGeometry(m_enclosingGeometry));
+    });
+
+    connect(this, &QnResourceWidget::displayInfoChanged, this, [this]() {
+        setInfoVisible(this->item()->displayInfo());
     });
 }
 
@@ -686,6 +687,7 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
         return;
 
     setOption(DisplayInfo, visible);
+    item()->setDisplayInfo(visible);
     updateHud(animate);
 }
 
