@@ -103,6 +103,7 @@ QN_HELP_TOPIC(ServerSettings_Storages_Help,                     "configuring_med
 QN_HELP_TOPIC(ServerSettings_ArchiveRestoring_Help,             "restoring_broken_archive.htm")
 QN_HELP_TOPIC(ServerSettings_WebClient_Help,                    "using_media_servers_web_interf.htm")
 QN_HELP_TOPIC(ServerSettings_Failover_Help,                     "configuring_failover.htm")
+QN_HELP_TOPIC(ServerSettings_StorageAnalitycs_Help,             "analyzingandanticipatingstorageusage.htm")
 
 QN_HELP_TOPIC(UserSettings_UserRoles_Help,						"introducing_user_roles.htm")
 QN_HELP_TOPIC(UserSettings_Help,                                "changing_user_settings.htm")
@@ -182,6 +183,8 @@ QN_HELP_TOPIC(CameraDiagnostics_Help,							"diagnosing_offline_cameras.htm")
 QN_HELP_TOPIC(VersionMismatch_Help,								"launching_product_name_in_comp.htm")
 
 QN_HELP_TOPIC(RemoveItems_Help,									"removing_item(s)_from_layouts.htm")
+
+QN_HELP_TOPIC(IOModules_Help,                                   "setting_up_i_o_modules.htm")
 
 QN_HELP_TOPIC(SaveLayout_Help,									"saving_layouts_(admin_only).htm")
 
