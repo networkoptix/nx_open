@@ -208,11 +208,11 @@ QByteArray Transport::serializeMessage(const Request& request) const
 
     QString encodedPath = request.url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters | QUrl::RemoveScheme | QUrl::RemoveAuthority);
 
-    result.append(QString(QLatin1String("%1 %2 HTTP/1.1\r\n")).arg(request.method).arg(encodedPath));
+    result.append(QStringLiteral("%1 %2 HTTP/1.1\r\n").arg(request.method).arg(encodedPath));
     for (const auto& header: request.headers)
-        result.append(QString(QLatin1String("%1: %2\r\n")).arg(header.first).arg(header.second));
+        result.append(QStringLiteral("%1: %2\r\n").arg(header.first).arg(header.second));
     if (!request.contentType.isEmpty())
-        result.append(QString(QLatin1String("%1: %2\r\n")).arg(QLatin1String("Content-Type")).arg(QLatin1String(request.contentType)));
+        result.append(QStringLiteral("%1: %2\r\n").arg(QLatin1String("Content-Type")).arg(QLatin1String(request.contentType)));
     result.append(QLatin1String("\r\n"));
     return result.toUtf8().append(request.messageBody);
 }

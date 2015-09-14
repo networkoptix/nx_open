@@ -21,7 +21,7 @@ QByteArray HTTPClient::createUserPasswordDigest(
     const QString& realm )
 {
     QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(QString(QLatin1String("%1:%2:%3")).arg(userName, realm, password).toLatin1());
+    md5.addData(QStringLiteral("%1:%2:%3").arg(userName, realm, password).toLatin1());
     return md5.result().toHex();
 }
 
