@@ -10,9 +10,10 @@
 #include <network/auth_restriction_list.h>
 #include <utils/network/http/auth_tools.h>
 
-#include "../data/cdb_ns.h"
-#include "../managers/account_manager.h"
-#include "../managers/system_manager.h"
+#include "data/cdb_ns.h"
+#include "managers/account_manager.h"
+#include "managers/system_manager.h"
+#include "stree/stree_manager.h"
 #include "version.h"
 
 
@@ -24,11 +25,13 @@ using namespace nx_http;
 AuthenticationManager::AuthenticationManager(
     const AccountManager& accountManager,
     const SystemManager& systemManager,
-    const QnAuthMethodRestrictionList& authRestrictionList )
+    const QnAuthMethodRestrictionList& authRestrictionList,
+    const StreeManager& stree)
 :
     m_accountManager( accountManager ),
     m_systemManager( systemManager ),
     m_authRestrictionList( authRestrictionList ),
+    m_stree( stree ),
     m_dist( 0, std::numeric_limits<size_t>::max() )
 {
 }
@@ -46,25 +49,37 @@ bool AuthenticationManager::authenticate(
         return true;
     if( !(allowedAuthMethods & AuthMethod::httpDigest) )
         return false;
-
-    auto authHeaderIter = request.headers.find( header::Authorization::NAME );
-    if( authHeaderIter == request.headers.end() )
-    {
-        addWWWAuthenticateHeader( wwwAuthenticate );
-        return false;
-    }
+        
+    const auto authHeaderIter = request.headers.find( header::Authorization::NAME );
 
     //checking header
-    header::DigestAuthorization authzHeader;
-    if( !authzHeader.parse( authHeaderIter->second ) ||
-        authzHeader.authScheme != header::AuthScheme::digest )
+    std::unique_ptr<header::DigestAuthorization> authzHeader;
+    nx::String username;
+    if (authHeaderIter != request.headers.end())
     {
-        addWWWAuthenticateHeader( wwwAuthenticate );
-        return false;
+        authzHeader.reset(new header::DigestAuthorization());
+        if (!authzHeader->parse(authHeaderIter->second))
+            authzHeader.reset();
     }
 
-    auto usernameIter = authzHeader.digest->params.find("username");
-    if( usernameIter == authzHeader.digest->params.end() )
+    //performing stree search
+    stree::ResourceContainer authResult;
+    stree::ResourceContainer inputRes;
+    if (authzHeader && !authzHeader->userid().isEmpty())
+        inputRes.put(param::userName, authzHeader->userid());
+    m_stree.search(
+        StreeOperation::authentication,
+        inputRes,//stree::MultiResourceReader(connection.socket(), request),
+        &authResult);
+    if (auto authenticated = authResult.get(param::authenticated))
+    {
+        if (authenticated.get().toBool())
+            return true;
+    }
+
+    if (!authzHeader ||
+        (authzHeader->authScheme != header::AuthScheme::digest) ||
+        (authzHeader->userid().isEmpty()))
     {
         addWWWAuthenticateHeader( wwwAuthenticate );
         return false;
@@ -72,9 +87,8 @@ bool AuthenticationManager::authenticate(
 
     nx::Buffer ha1;
     if( !findHa1(
-            connection,
-            request,
-            usernameIter.value(),
+            authResult,
+            authzHeader->userid(),
             &ha1,
             authProperties ) )
     {
@@ -84,10 +98,10 @@ bool AuthenticationManager::authenticate(
 
     return validateAuthorization(
         request.requestLine.method,
-        usernameIter.value(),
+        authzHeader->userid(),
         boost::none,
         ha1,
-        authzHeader );
+        *authzHeader);
 }
 
 namespace
@@ -101,12 +115,26 @@ nx::String AuthenticationManager::realm()
 }
 
 bool AuthenticationManager::findHa1(
-    const nx_http::HttpServerConnection& /*connection*/,
-    const nx_http::Request& /*request*/,
+    const stree::AbstractResourceReader& authSearchResult,
     const nx_http::StringType& username,
     nx::Buffer* const ha1,
     stree::AbstractResourceWriter* const authProperties ) const
 {
+    //TODO #ak analyzing authSearchResult for password or ha1 pesence
+    if (auto foundHa1 = authSearchResult.get(param::ha1))
+    {
+        *ha1 = foundHa1.get().toString().toLatin1();
+        return true;
+    }
+    if (auto password = authSearchResult.get(param::userPassword))
+    {
+        *ha1 = calcHa1(
+            username,
+            realm(),
+            password.get().toString() );
+        return true;
+    }
+    
     if( auto accountData = m_accountManager.findAccountByUserName( username ) )
     {
         *ha1 = accountData.get().passwordHa1.c_str();
@@ -124,11 +152,6 @@ bool AuthenticationManager::findHa1(
         authProperties->put(
             cdb::param::systemID,
             QVariant::fromValue(QnUuid(systemData.get().id)) );
-    }
-    else
-    {
-        //TODO #ak authenticating other nx_cloud modules by some. 
-        //  Probably, should use stree to specify authentication rules
     }
 
     return true;

@@ -49,7 +49,9 @@ private:
     mutable QnMutex m_treeMutex;
 
     void updateTree();
-    void loadXml( const QString& filePath, stree::AbstractNode** const treeRoot );
+    void loadXml(
+        const QString& filePath,
+        std::unique_ptr<stree::AbstractNode>* const treeRoot );
 };
 
 #endif  //PREDEFINEDUSAGECALCULATOR_H

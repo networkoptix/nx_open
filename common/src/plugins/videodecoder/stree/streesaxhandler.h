@@ -5,6 +5,7 @@
 #ifndef STREESAXHANDLER_H
 #define STREESAXHANDLER_H
 
+#include <memory>
 #include <stack>
 
 #include <QtXml/QXmlDefaultHandler>
@@ -24,7 +25,8 @@ namespace stree
             equal,
             greater,
             less,
-            wildcard
+            wildcard,
+            presence    //<! \a true if resource is present in input set
         };
 
         Value fromString( const QString& str );
@@ -48,9 +50,9 @@ namespace stree
         virtual bool fatalError( const QXmlParseException& exception );
 
         //!Returns root of tree, created during parsing xml
-        AbstractNode* root() const;
+        const std::unique_ptr<AbstractNode>& root() const;
         //!Releases ownership of tree, created during parsing
-        AbstractNode* releaseTree();
+        std::unique_ptr<AbstractNode> releaseTree();
 
     private:
         enum State
@@ -59,16 +61,16 @@ namespace stree
             skippingNode
         };
 
-        std::stack<AbstractNode*> m_nodes;
+        std::stack<std::pair<AbstractNode*, std::unique_ptr<AbstractNode>>> m_nodes;
         mutable QString m_errorDescription;
         State m_state;
         int m_inlineLevel;
-        AbstractNode* m_root;
+        std::unique_ptr<AbstractNode> m_root;
         const ResourceNameSet& m_resourceNameSet;
 
-        AbstractNode* createNode( const QString& nodeName, const QXmlAttributes& atts ) const;
-        template<typename T> AbstractNode* createConditionNode( MatchType::Value matchType, int matchResID ) const;
-        AbstractNode* createConditionNodeForStringRes( MatchType::Value matchType, int matchResID ) const;
+        std::unique_ptr<AbstractNode> createNode( const QString& nodeName, const QXmlAttributes& atts ) const;
+        template<typename T> std::unique_ptr<AbstractNode> createConditionNode( MatchType::Value matchType, int matchResID ) const;
+        std::unique_ptr<AbstractNode> createConditionNodeForStringRes( MatchType::Value matchType, int matchResID ) const;
     };
 }
 

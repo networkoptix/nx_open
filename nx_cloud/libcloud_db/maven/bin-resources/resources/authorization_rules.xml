@@ -3,6 +3,20 @@
     <sequence value="authentication">
     <!-- TODO cloud modules authentication rules should be added here -->
     <!-- TODO this section should be suitable for authentication by ip address and for password check -->
+        <set resName="authenticated" resValue="false"/>
+        
+        <condition resName="socket.intf.ip">
+            <!-- TODO -->
+            <set value="127.0.0.1" resName="authenticated" resValue="true"/>
+        </condition>
+        
+        <condition resName="user.name">
+            <set value="connection_mediator" resName="user.password" resValue="123456"/>
+            <!-- <sequence value="connection_mediator">
+                <set resName="user.realm" resValue="dwspectrum"/>
+                <set resName="user.ha1" resValue="111111111111111"/>
+            </sequence> -->
+        </condition>
     </sequence>
 
     <sequence value="authorization">

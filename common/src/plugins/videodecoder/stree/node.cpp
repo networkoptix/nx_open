@@ -10,23 +10,10 @@ namespace stree
     ////////////////////////////////////////////////////////////
     //// class SequenceNode
     ////////////////////////////////////////////////////////////
-    SequenceNode::~SequenceNode()
-    {
-        for( std::multimap<int, AbstractNode*>::iterator
-            it = m_children.begin();
-            it != m_children.end();
-             )
-        {
-            delete it->second;
-            m_children.erase( it++ );
-        }
-    }
-
     //!Implementation of AbstractNode::get
     void SequenceNode::get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const
     {
-        for( std::multimap<int, AbstractNode*>::const_iterator
-            it = m_children.begin();
+        for( auto it = m_children.begin();
             it != m_children.end();
             ++it )
         {
@@ -35,9 +22,50 @@ namespace stree
     }
     
     //!Implementation of AbstractNode::addChild
-    bool SequenceNode::addChild( const QVariant& value, AbstractNode* child )
+    bool SequenceNode::addChild( const QVariant& value, std::unique_ptr<AbstractNode> child )
     {
-        m_children.insert( std::make_pair( value.value<int>(), child ) );
+        m_children.emplace( value.value<int>(), std::move(child) );
+        return true;
+    }
+
+
+    ////////////////////////////////////////////////////////////
+    //// class ResPresenceNode
+    ////////////////////////////////////////////////////////////
+    ResPresenceNode::ResPresenceNode(int matchResID)
+    :
+        m_matchResID(matchResID)
+    {
+    }
+
+    void ResPresenceNode::get(const AbstractResourceReader& in, AbstractResourceWriter* const out) const
+    {
+        NX_LOG(lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResID), cl_logDEBUG2);
+
+        QVariant value;
+        if (!in.get(m_matchResID, &value))
+        {
+            NX_LOG(lit("Stree. Presence Condition. Resource (%1) not found in input data").arg(m_matchResID), cl_logDEBUG2);
+            return;
+        }
+
+        const int intVal = value.toBool() ? 1 : 0;
+        if (!m_children[intVal])
+        {
+            NX_LOG(lit("Stree. Presence Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2);
+            return;
+        }
+
+        NX_LOG(lit("Stree. Presence Condition. Found child by search value %1").arg(value.toString()), cl_logDEBUG2);
+        m_children[intVal]->get(in, out);
+    }
+
+    bool ResPresenceNode::addChild(const QVariant& value, std::unique_ptr<AbstractNode> child)
+    {
+        const int intVal = value.toBool() ? 1 : 0;
+        if (m_children[intVal])
+            return false;
+        m_children[intVal] = std::move(child);
         return true;
     }
 
@@ -49,16 +77,9 @@ namespace stree
         int resourceID,
         const QVariant& valueToSet )
     :
-        m_child( NULL ),
         m_resourceID( resourceID ),
         m_valueToSet( valueToSet )
     {
-    }
-
-    SetNode::~SetNode()
-    {
-        delete m_child;
-        m_child = NULL;
     }
 
     //!Implementation of AbstractNode::get
@@ -68,11 +89,11 @@ namespace stree
     }
     
     //!Implementation of AbstractNode::addChild
-    bool SetNode::addChild( const QVariant& /*value*/, AbstractNode* child )
+    bool SetNode::addChild( const QVariant& /*value*/, std::unique_ptr<AbstractNode> child )
     {
         if( m_child )
             return false;
-        m_child = child;
+        m_child = std::move(child);
         return true;
     }
 

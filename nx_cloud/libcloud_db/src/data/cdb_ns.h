@@ -7,11 +7,24 @@
 namespace nx {
 namespace cdb {
 
-enum param
+namespace param {
+enum Value
 {
-    accountID = 1,
-    systemID
+    operation = 1,
+    accountID,
+    systemID,
+    authenticated,
+    authorized,
+    ha1,
+    userName,
+    userPassword,
+    authAccountRightsOnSystem,
+
+    socketIntfIP,
+
+    requestPath
 };
+}
 
 }   //cdb
 }   //nx

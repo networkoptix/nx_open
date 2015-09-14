@@ -76,7 +76,7 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
 
 void PredefinedUsageCalculator::updateTree()
 {
-    stree::AbstractNode* newTree = NULL;
+    std::unique_ptr<stree::AbstractNode> newTree;
     loadXml( m_predefinedDataFilePath, &newTree );
     if( !newTree )
         return;
@@ -85,11 +85,13 @@ void PredefinedUsageCalculator::updateTree()
     {
         QnMutexLocker lk( &m_treeMutex );
         oldTree = std::move(m_currentTree);
-        m_currentTree.reset( newTree );
+        m_currentTree = std::move( newTree );
     }
 }
 
-void PredefinedUsageCalculator::loadXml( const QString& filePath, stree::AbstractNode** const treeRoot )
+void PredefinedUsageCalculator::loadXml(
+    const QString& filePath,
+    std::unique_ptr<stree::AbstractNode>* const treeRoot )
 {
     stree::SaxHandler xmlHandler( m_rns );
 

@@ -36,6 +36,7 @@
 #include "managers/account_manager.h"
 #include "managers/email_manager.h"
 #include "managers/system_manager.h"
+#include "stree/stree_manager.h"
 
 #include "version.h"
 
@@ -112,10 +113,14 @@ int CloudDBProcess::executeApplication()
         authRestrictionList.allow( PingHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( VerifyEmailAddressHandler::HANDLER_PATH, AuthMethod::noAuth );
+
+        StreeManager streeManager;
+
         AuthenticationManager authenticationManager( 
             accountManager,
             systemManager,
-            authRestrictionList );
+            authRestrictionList,
+            streeManager );
 
         AuthorizationManager authorizationManager;
     

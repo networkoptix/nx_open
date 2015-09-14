@@ -31,7 +31,7 @@ namespace stree
             Implementation is allowed to reject adding child. In this case it must return false.
             If noded added, true is returned and ownership of \a child object is taken
         */
-        virtual bool addChild( const QVariant& value, AbstractNode* child ) = 0;
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child ) = 0;
     };
 
     //!Iterates through all its children in order, defined by child value, cast to signed int
@@ -43,15 +43,13 @@ namespace stree
         public AbstractNode
     {
     public:
-        virtual ~SequenceNode();
-
         //!Implementation of AbstractNode::get
         virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const;
         //!Implementation of AbstractNode::addChild
-        virtual bool addChild( const QVariant& value, AbstractNode* child );
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child );
 
     private:
-        std::multimap<int, AbstractNode*> m_children;
+        std::multimap<int, std::unique_ptr<AbstractNode>> m_children;
     };
 
     //!Chooses child node to follow based on some condition
@@ -62,28 +60,18 @@ namespace stree
 
         example of \a ConditionContainer is std::map
     */
-    template<typename ConditionContainer>
+    template<typename Key, template<typename, typename> class ConditionContainer>
     class ConditionNode
     :
         public AbstractNode
     {
+        typedef ConditionContainer<Key, std::unique_ptr<AbstractNode>> Container;
+
     public:
         ConditionNode( int matchResID )
         :
             m_matchResID( matchResID )
         {
-        }
-
-        virtual ~ConditionNode()
-        {
-            for( typename ConditionContainer::iterator
-                it = m_children.begin();
-                it != m_children.end();
-                )
-            {
-                delete it->second;
-                m_children.erase( it++ );
-            }
         }
 
         //!Implementation of AbstractNode::get
@@ -98,8 +86,8 @@ namespace stree
                 return;
             }
 
-            const typename ConditionContainer::key_type& typedValue = value.value<typename ConditionContainer::key_type>();
-            typename ConditionContainer::const_iterator it = m_children.find( typedValue );
+            const typename Container::key_type& typedValue = value.value<typename Container::key_type>();
+            typename Container::const_iterator it = m_children.find( typedValue );
             if( it == m_children.end() )
             {
                 NX_LOG( lit("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2 );
@@ -111,13 +99,35 @@ namespace stree
         }
 
         //!Implementation of AbstractNode::addChild
-        virtual bool addChild( const QVariant& value, AbstractNode* child )
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child )
         {
-            return m_children.insert( std::make_pair( value.value<typename ConditionContainer::key_type>(), child ) ).second;
+            return m_children.emplace( value.value<typename Container::key_type>(), std::move(child) ).second;
         }
 
     private:
-        ConditionContainer m_children;
+        Container m_children;
+        int m_matchResID;
+    };
+
+    //!Checks presense of specified resource in input container
+    /*!
+        Allows only 2 children: \a false and \a true
+    */
+    class ResPresenceNode
+    :
+        public AbstractNode
+    {
+    public:
+        ResPresenceNode( int matchResID );
+
+        //!Implementation of AbstractNode::get
+        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const;
+        //!Implementation of AbstractNode::addChild
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child );
+
+    private:
+        //[0] - for \a false. [1] - for \a true
+        std::unique_ptr<AbstractNode> m_children[2];
         int m_matchResID;
     };
 
@@ -130,7 +140,6 @@ namespace stree
         SetNode(
             int resourceID,
             const QVariant& valueToSet );
-        virtual ~SetNode();
 
         //!Implementation of AbstractNode::get
         /*!
@@ -138,10 +147,10 @@ namespace stree
         */
         virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const;
         //!Implementation of AbstractNode::addChild
-        virtual bool addChild( const QVariant& value, AbstractNode* child );
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child );
 
     private:
-        AbstractNode* m_child;
+        std::unique_ptr<AbstractNode> m_child;
         int m_resourceID;
         const QVariant m_valueToSet;
     };

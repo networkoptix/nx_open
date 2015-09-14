@@ -21,6 +21,7 @@ namespace cdb {
 
 class AccountManager;
 class SystemManager;
+class StreeManager;
 
 //!Performs authentication based on various parameters
 /*!
@@ -36,7 +37,8 @@ public:
     AuthenticationManager(
         const AccountManager& accountManager,
         const SystemManager& systemManager,
-        const QnAuthMethodRestrictionList& authRestrictionList );
+        const QnAuthMethodRestrictionList& authRestrictionList,
+        const StreeManager& stree);
 
     //!Implementation of nx_http::AuthenticationManager::authenticate
     virtual bool authenticate(
@@ -51,12 +53,12 @@ private:
     const AccountManager& m_accountManager;
     const SystemManager& m_systemManager;
     const QnAuthMethodRestrictionList& m_authRestrictionList;
+    const StreeManager& m_stree;
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;
 
     bool findHa1(
-        const nx_http::HttpServerConnection& connection,
-        const nx_http::Request& request,
+        const stree::AbstractResourceReader& authSearchResult,
         const nx_http::StringType& username,
         nx::Buffer* const ha1,
         stree::AbstractResourceWriter* const authProperties ) const;

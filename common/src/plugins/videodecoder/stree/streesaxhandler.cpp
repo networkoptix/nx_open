@@ -7,6 +7,8 @@
 #include <map>
 #include <memory>
 
+#include <utils/common/cpp14.h>
+
 #include "streecontainer.h"
 #include "wildcardmatchcontainer.h"
 #include "node.h"
@@ -26,6 +28,8 @@ namespace stree
                 return less;
             else if( str == lit("wildcard") )
                 return wildcard;
+            else if( str == lit("presence") )
+                return presence;
             else
                 return unknown;
         }
@@ -36,28 +40,17 @@ namespace stree
     :
         m_state( buildingTree ),
         m_inlineLevel( 0 ),
-        m_root( NULL ),
         m_resourceNameSet( resourceNameSet )
     {
     }
 
     SaxHandler::~SaxHandler()
     {
-        //releasing allocated nodes
-        if( m_root )
-        {
-            delete m_root;
-            m_root = NULL;
-        }
     }
 
     bool SaxHandler::startDocument()
     {
-        if( m_root )
-        {
-            delete m_root;
-            m_root = NULL;
-        }
+        m_root.reset();
 
         return true;
     }
@@ -70,20 +63,23 @@ namespace stree
             return true;
         }
 
-        std::auto_ptr<AbstractNode> newNode( createNode( qName, atts ) );
+        std::unique_ptr<AbstractNode> newNode( createNode( qName, atts ) );
         if( !newNode.get())
             return false;
+        auto newNodePtr = newNode.get();
 
         int valuePos = atts.index(lit("value"));
         if( !m_nodes.empty() )
-            if( !m_nodes.top()->addChild( valuePos == -1 ? QVariant() : QVariant(atts.value(valuePos)), newNode.get() ) )
+            if( !m_nodes.top().first->addChild(
+                    valuePos == -1 ? QVariant() : QVariant(atts.value(valuePos)),
+                    std::move(newNode) ) )
             {
                 m_state = skippingNode;
                 m_inlineLevel = 1;
                 return true;
             }
 
-        m_nodes.push( newNode.release() );
+        m_nodes.emplace(newNodePtr, std::move(newNode));
         return true;
     }
 
@@ -103,7 +99,7 @@ namespace stree
         }
 
         if( m_nodes.size() == 1 )
-            m_root = m_nodes.top(); //reached tree root
+            m_root = std::move(m_nodes.top().second); //reached tree root
         m_nodes.pop();
 
         return true;
@@ -128,19 +124,17 @@ namespace stree
         return false;
     }
 
-    AbstractNode* SaxHandler::root() const
+    const std::unique_ptr<AbstractNode>& SaxHandler::root() const
     {
         return m_root;
     }
 
-    AbstractNode* SaxHandler::releaseTree()
+    std::unique_ptr<AbstractNode> SaxHandler::releaseTree()
     {
-        AbstractNode* rootCopy = m_root;
-        m_root = NULL;
-        return rootCopy;
+        return std::move(m_root);
     }
 
-    AbstractNode* SaxHandler::createNode( const QString& nodeName, const QXmlAttributes& atts ) const
+    std::unique_ptr<AbstractNode> SaxHandler::createNode( const QString& nodeName, const QXmlAttributes& atts ) const
     {
         if( nodeName == lit("condition") )
         {
@@ -192,7 +186,7 @@ namespace stree
         }
         else if( nodeName == lit("sequence") )
         {
-            return new SequenceNode();
+            return std::make_unique<SequenceNode>();
         }
         else if( nodeName == lit("set") )
         {
@@ -226,40 +220,45 @@ namespace stree
                 return NULL;
             }
 
-            return new SetNode( res.id, resValue );
+            return std::make_unique<SetNode>( res.id, resValue );
         }
 
         return NULL;
     }
 
-    template<typename ResValueType> AbstractNode* SaxHandler::createConditionNode( MatchType::Value matchType, int matchResID ) const
+    template<typename ResValueType>
+    std::unique_ptr<AbstractNode> SaxHandler::createConditionNode( MatchType::Value matchType, int matchResID ) const
     {
         switch( matchType )
         {
             case MatchType::equal:
-                return new ConditionNode<std::map<ResValueType, AbstractNode*> >( matchResID );
+                return std::make_unique<ConditionNode<ResValueType, EqualMatchContainer>>( matchResID );
             case MatchType::greater:
-                return new ConditionNode<MaxLesserMatchContainer<ResValueType, AbstractNode*> >( matchResID );
+                return std::make_unique<ConditionNode<ResValueType, MaxLesserMatchContainer>>( matchResID );
             case MatchType::less:
-                return new ConditionNode<MinGreaterMatchContainer<ResValueType, AbstractNode*> >( matchResID );
+                return std::make_unique<ConditionNode<ResValueType, MinGreaterMatchContainer>>( matchResID );
+            case MatchType::presence:
+                return std::make_unique<ResPresenceNode>( matchResID );
             default:
                 Q_ASSERT(false);
                 return NULL;
         }
     }
 
-    AbstractNode* SaxHandler::createConditionNodeForStringRes( MatchType::Value matchType, int matchResID ) const
+    std::unique_ptr<AbstractNode> SaxHandler::createConditionNodeForStringRes( MatchType::Value matchType, int matchResID ) const
     {
         switch( matchType )
         {
             case MatchType::equal:
-                return new ConditionNode<std::map<QString, AbstractNode*> >( matchResID );
+                return std::make_unique<ConditionNode<QString, EqualMatchContainer>>( matchResID );
             case MatchType::greater:
-                return new ConditionNode<MaxLesserMatchContainer<QString, AbstractNode*> >( matchResID );
+                return std::make_unique<ConditionNode<QString, MaxLesserMatchContainer>>( matchResID );
             case MatchType::less:
-                return new ConditionNode<MinGreaterMatchContainer<QString, AbstractNode*> >( matchResID );
+                return std::make_unique<ConditionNode<QString, MinGreaterMatchContainer>>( matchResID );
             case MatchType::wildcard:
-                return new ConditionNode<WildcardMatchContainer<QString, AbstractNode*> >( matchResID );
+                return std::make_unique<ConditionNode<QString, WildcardMatchContainer>>( matchResID );
+            case MatchType::presence:
+                return std::make_unique<ResPresenceNode>(matchResID);
             default:
                 Q_ASSERT(false);
                 return NULL;
