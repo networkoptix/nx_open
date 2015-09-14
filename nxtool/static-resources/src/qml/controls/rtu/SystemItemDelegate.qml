@@ -17,6 +17,7 @@ Item
     property string systemName;
     property int loggedState;
     property int selectedState;
+    property bool selectionEnabled: true;
     
     signal selectionStateShouldBeChanged(int currentItemIndex);
 
@@ -36,7 +37,7 @@ Item
         }
         
         spacing: 2;
-        enabled: (loggedState != NxRtu.Constants.NotLogged);
+        enabled: thisComponent.selectionEnabled;
         opacity: (enabled ? 1.0 : 0.6);
         Item
         {

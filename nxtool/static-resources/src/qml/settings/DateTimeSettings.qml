@@ -119,7 +119,7 @@ Expandable.MaskedSettingsPanel
                             newTime = nowConverted;
                         }
 
-                        rtuContext.changesManager().addDateTimeChange(newDate, newTime, timeZoneId);
+                        rtuContext.changesManager().changeset().addDateTimeChange(newDate, newTime, timeZoneId);
                         return true;
                     }
 

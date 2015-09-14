@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.0;
 import networkoptix.rtu 1.0 as NxRtu;
 
 import "pages" as Pages;
+import "controls/rtu" as Rtu;
 
 Window
 {
@@ -53,10 +54,12 @@ Window
         
         Pages.ProgressPage 
         {
+            property var currentTask: rtuContext.progressTask;
+
             caption: (!changesCount ? qsTr("Applying changes...")
                 : qsTr("Applying changes (%1/%2)").arg(currentCount.toString()).arg(changesCount.toString()));
-            changesCount: rtuContext.changesManager().totalChangesCount;
-            currentCount: rtuContext.changesManager().appliedChangesCount;
+            changesCount: (currentTask ? currentTask.totalChangesCount : 0);
+            currentCount: (currentTask ? currentTask.appliedChangesCount : 0);
         }
     }
     
@@ -72,19 +75,41 @@ Window
         anchors.fill: parent;
         orientation: Qt.Horizontal;
         
-        Pages.ServerSelectionPage
+        SplitView
         {
-            id: selectionPage;
-            
-            askForSelectionChange: (loader.item && loader.item.hasOwnProperty("parametersChanged")
-                ? loader.item.parametersChanged : false);
-            
-            enabled: (rtuContext.currentPage === NxRtu.Constants.SettingsPage);
-            opacity: enabled ? 1 : 0.5;
+            id: selectionSplit;
+            orientation: Qt.Vertical;
 
-            activeFocusOnTab: false;
+            Pages.ServerSelectionPage
+            {
+                id: selectionPage;
+                askForSelectionChange: (loader.item && loader.item.hasOwnProperty("parametersChanged")
+                    ? loader.item.parametersChanged : false);
+
+                opacity: enabled ? 1 : 0.5;
+
+                activeFocusOnTab: false;
+                Layout.fillHeight: true;
+            }
+
+            Rtu.ProgressListView
+            {
+                id: progressListView;
+
+                outsideSizeChange: selectionSplit.resizing;
+
+                model: rtuContext.changesManager().changesProgressModelObject();
+
+                onShowDetails:
+                {
+                    selectionPage.tryChangeSelection(function()
+                    {
+                        rtuContext.showProgressTaskFromList(index);
+                    });
+                }
+            }
         }
-        
+
         Item
         {
             id: holder;
@@ -121,7 +146,7 @@ Window
                     case NxRtu.Constants.SummaryPage:
                         loader.sourceComponent = summaryPageComponent;
                         break;
-                    default:
+                     default:
                         loader.sourceComponent = (rtuContext.selection && (rtuContext.selection !== null)
                             && rtuContext.selection.count ? settingsPageComponent : emptyPage);
                     }
@@ -133,7 +158,7 @@ Window
     
     Component.onCompleted: 
     {
-        selectionPage.width = mainWindow.width / 3.5;
-        selectionPage.Layout.minimumWidth = selectionPage.width;
+        selectionSplit.width = mainWindow.width / 3.5;
+        selectionSplit.Layout.minimumWidth = selectionPage.width;
     }
 }

@@ -53,7 +53,7 @@ Expandable.MaskedSettingsPanel
                     return false;
                 }
 
-                rtuContext.changesManager().addSystemChange(systemName.text);
+                rtuContext.changesManager().changeset().addSystemChange(systemName.text);
             }
             if (password.changed)
             {
@@ -66,7 +66,7 @@ Expandable.MaskedSettingsPanel
                     return false;
                 }
 
-                rtuContext.changesManager().addPasswordChange(password.text);
+                rtuContext.changesManager().changeset().addPasswordChange(password.text);
             }
             return true;
         }

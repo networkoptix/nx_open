@@ -1,5 +1,4 @@
-#ifndef QN_RESOURCE_WIDGET_H
-#define QN_RESOURCE_WIDGET_H
+#pragma once
 
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
@@ -279,6 +278,7 @@ signals:
     void frameDistinctionColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
+    void displayInfoChanged();
 
 protected:
     virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
@@ -286,7 +286,6 @@ protected:
 
     virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -303,6 +302,10 @@ protected:
     void setChannelScreenSize(const QSize &size);
     virtual void channelScreenSizeChangedNotify() {}
 
+    virtual void updateHud(bool animate = true);
+
+    virtual bool isHovered() const;
+
     Qn::ResourceStatusOverlay statusOverlay() const;
     void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
     Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus, bool hasVideo) const;
@@ -318,18 +321,12 @@ protected:
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
 
-    void updateInfoVisiblity(bool animate = true);
-
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
     }
 
     QnImageButtonWidget *iconButton() const {
         return m_iconButton;
-    }
-
-    QnViewportBoundWidget* headerOverlayWidget() const {
-        return m_headerOverlayWidget;
     }
 
     QnStatusOverlayWidget *statusOverlayWidget() const {
@@ -357,9 +354,11 @@ private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
 
+    void addInfoOverlay();
+    void addMainOverlay();
+
     Q_SLOT void updateCheckedButtons();
 
-    Q_SLOT void at_iconButton_visibleChanged();
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
@@ -406,21 +405,31 @@ private:
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;
 
     /* Widgets for overlaid stuff. */
-    QnViewportBoundWidget *m_headerOverlayWidget;
-    QGraphicsLinearLayout *m_headerLayout;
-    GraphicsWidget *m_headerWidget;
-    GraphicsLabel *m_headerLeftLabel;
-    GraphicsLabel *m_headerRightLabel;
+
     QnImageButtonBar *m_buttonBar;
     QnImageButtonWidget *m_iconButton;
 
-    QnViewportBoundWidget *m_footerOverlayWidget;
-    GraphicsWidget *m_footerWidget;
-    GraphicsLabel *m_footerLeftLabel;
-    GraphicsLabel *m_footerRightLabel;
+
 
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
+    struct OverlayWidgets {
+        GraphicsWidget* infoOverlay;
+        GraphicsWidget* mainOverlay;
+
+        GraphicsLabel *mainNameLabel;
+        GraphicsLabel *mainExtrasLabel;
+
+        GraphicsLabel *mainDetailsLabel;
+        GraphicsLabel *mainTimeLabel;
+
+        GraphicsLabel *infoNameLabel;
+        GraphicsLabel *infoTimeLabel;
+
+        OverlayWidgets();
+    };
+    
+    OverlayWidgets m_overlayWidgets;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
@@ -445,5 +454,3 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons)
 Q_DECLARE_METATYPE(QnResourceWidget::Options)
 Q_DECLARE_METATYPE(QnResourceWidget *)
 Q_DECLARE_METATYPE(QnResourceWidgetList);
-
-#endif // QN_RESOURCE_WIDGET_H

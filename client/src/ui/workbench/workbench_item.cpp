@@ -18,7 +18,8 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid,
     m_resourceUid(resourceUid),
     m_uuid(uuid),
     m_flags(0),
-    m_rotation(0.0)
+    m_rotation(0.0),
+    m_displayInfo(false)
 {
     if(resourceUid.isEmpty())
         return;
@@ -38,7 +39,8 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     m_resourceUid(data.resource.path),
     m_uuid(data.uuid),
     m_flags(0),
-    m_rotation(0.0)
+    m_rotation(0.0),
+    m_displayInfo(false)
 {
     if(m_resourceUid.isEmpty()) {
         qnWarning("Creating a workbench item from item data with invalid unique id.");
@@ -55,6 +57,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setZoomRect(data.zoomRect);
     setImageEnhancement(data.contrastParams);
     setDewarpingParams(data.dewarpingParams);
+    setDisplayInfo(data.displayInfo);
 
     m_dataByRole = data.dataByRole; // TODO: #Elric
 }
@@ -79,6 +82,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.contrastParams = imageEnhancement();
     data.dewarpingParams = dewarpingParams();
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
+    data.displayInfo = displayInfo();
     data.dataByRole = m_dataByRole;
 
     return data;
@@ -104,6 +108,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     setZoomRect(data.zoomRect);
     setImageEnhancement(data.contrastParams);
     setDewarpingParams(data.dewarpingParams);
+    setDisplayInfo(data.displayInfo);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     m_dataByRole = data.dataByRole; // TODO
@@ -128,6 +133,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
     data.dewarpingParams = dewarpingParams();
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
     data.combinedGeometry = combinedGeometry();
+    data.displayInfo = displayInfo();
     data.dataByRole = m_dataByRole;
 }
 
@@ -281,6 +287,18 @@ void QnWorkbenchItem::setRotation(qreal rotation) {
 
     emit rotationChanged();
     emit dataChanged(Qn::ItemRotationRole);
+}
+
+bool QnWorkbenchItem::displayInfo() const {
+    return m_displayInfo;
+}
+
+void QnWorkbenchItem::setDisplayInfo(bool value) {
+    if (m_displayInfo == value)
+        return;
+    m_displayInfo = value;
+    emit displayInfoChanged();
+    emit dataChanged(Qn::ItemDisplayInfoRole);
 }
 
 void QnWorkbenchItem::adjustGeometry() {
