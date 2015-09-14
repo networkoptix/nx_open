@@ -85,7 +85,7 @@ namespace QnMulticast
         std::vector<std::unique_ptr<QUdpSocket>> m_sendSockets;
         RequestCallback m_requestCallback;
         std::unique_ptr<QTimer> m_timer;
-        QCache<QUuid, void> m_processedRequests;
+        QCache<QUuid, char> m_processedRequests;
         mutable QMutex m_mutex;
         bool m_nextSendQueued;
         bool m_initialized;

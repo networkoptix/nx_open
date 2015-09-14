@@ -208,12 +208,12 @@ QByteArray Transport::serializeMessage(const Request& request) const
 
     QString encodedPath = request.url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters | QUrl::RemoveScheme | QUrl::RemoveAuthority);
 
-    result.append(lit("%1 %2 HTTP/1.1\r\n").arg(request.method).arg(encodedPath));
+    result.append(QString(QLatin1String("%1 %2 HTTP/1.1\r\n")).arg(request.method).arg(encodedPath));
     for (const auto& header: request.headers)
-        result.append(lit("%1: %2\r\n").arg(header.first).arg(header.second));
+        result.append(QString(QLatin1String("%1: %2\r\n")).arg(header.first).arg(header.second));
     if (!request.contentType.isEmpty())
-        result.append(lit("%1: %2\r\n").arg(lit("Content-Type")).arg(QLatin1String(request.contentType)));
-    result.append(lit("\r\n"));
+        result.append(QString(QLatin1String("%1: %2\r\n")).arg(QLatin1String("Content-Type")).arg(QLatin1String(request.contentType)));
+    result.append(QLatin1String("\r\n"));
     return result.toUtf8().append(request.messageBody);
 }
 
@@ -239,7 +239,7 @@ bool Transport::parseHttpMessage(Message& result, const QByteArray& message) con
             Header h;
             h.first = QLatin1String(header.left(delimiterPos).trimmed());
             h.second = QLatin1String(header.mid(delimiterPos+1).trimmed());
-            if (h.first.toLower() == lit("content-type"))
+            if (h.first.toLower() == QLatin1String("content-type"))
                 result.contentType = header.mid(delimiterPos+1).trimmed();
             else
                 result.headers << h;
