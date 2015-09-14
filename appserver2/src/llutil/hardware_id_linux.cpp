@@ -23,7 +23,6 @@
 
 #include "util.h"
 #include "hardware_id.h"
-#include "hardware_id_pvt.h"
 
 namespace {
 
@@ -40,10 +39,9 @@ std::string trim(const std::string& str) {
     return result;
 }
 
-QString read_file(const char* path) {
+std::string read_file(const char* path) {
     std::ifstream ifs(path);
-    std::string content = trim(std::string((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>()));
-    return QString::fromStdString(content);
+    return trim(std::string((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>()));
 }
 
 void trim2(std::string& str) {
@@ -58,7 +56,7 @@ void trim2(std::string& str) {
     }
 }
 
-void getMemoryInfo(QString &partNumber, QString &serialNumber) {
+void getMemoryInfo(std::string& memoryInfo) {
     static const int PARAMETER_COUNT = 2;
 
     const char *STRINGS[] = {
@@ -86,16 +84,11 @@ void getMemoryInfo(QString &partNumber, QString &serialNumber) {
         }
     }
 
-
-    for (StrSet::const_iterator ci = values[0].begin(); ci != values[0].end(); ++ci) {
-        partNumber += ci->c_str();
+    for (int i = 0; i < PARAMETER_COUNT; i++) {
+        for (StrSet::const_iterator ci = values[i].begin(); ci != values[i].end(); ++ci) {
+            memoryInfo += *ci;
+        }
     }
-
-
-    for (StrSet::const_iterator ci = values[1].begin(); ci != values[1].end(); ++ci) {
-        serialNumber += ci->c_str();
-    }
-
 
     pclose(fp);
 }
@@ -134,42 +127,43 @@ void findMacAddresses(DevicesList& devices) {
     }
 }
 
-static void calcHardwareId(QString &hardwareId, const HardwareInfo& hi, int version, bool guidCompatibility)
-{
-    if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length()) {
-        hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
-        if (version == 3 || version == 4) { // this part differs from windows, unfortunately
-            hardwareId += hi.memoryPartNumber + hi.memorySerialNumber;
-        }
-    } else {
-        hardwareId.clear();
-    }
+void getMacAddress(QString &mac, QSettings *settings) {
+    DevicesList devices;
 
-    if (version == 4 && hi.mac.length() > 0)
-        hardwareId += hi.mac;
+    findMacAddresses(devices);
+    mac = getSaveMacAddress(devices, settings);
 }
 
-void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo)
+void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
 {
-    hardwareInfo.boardUUID = read_file("/sys/class/dmi/id/product_uuid");
-    hardwareInfo.compatibilityBoardUUID = changedGuidByteOrder(hardwareInfo.boardUUID);
+    std::string board_serial = read_file("/sys/class/dmi/id/board_serial");
+    std::string board_vendor = read_file("/sys/class/dmi/id/board_vendor");
+    std::string board_name = read_file("/sys/class/dmi/id/board_name");
 
-    hardwareInfo.boardID = read_file("/sys/class/dmi/id/board_serial");
-    hardwareInfo.boardManufacturer = read_file("/sys/class/dmi/id/board_vendor");
-    hardwareInfo.boardProduct = read_file("/sys/class/dmi/id/board_name");
+    std::string product_uuid = read_file("/sys/class/dmi/id/product_uuid");
+    std::string product_serial = read_file("/sys/class/dmi/id/product_serial");
+    std::string bios_vendor = read_file("/sys/class/dmi/id/bios_vendor");
 
-    hardwareInfo.biosID = read_file("/sys/class/dmi/id/product_serial");
-    hardwareInfo.biosManufacturer = read_file("/sys/class/dmi/id/bios_vendor");
+    std::string memory_info;
+    getMemoryInfo(memory_info);
+    QByteArray memory_info_ba = fromString(memory_info);
 
-    getMemoryInfo(hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
+    QString mac;
+    getMacAddress(mac, settings);
 
-    findMacAddresses(hardwareInfo.nics);
-    hardwareInfo.mac = getSaveMacAddress(hardwareInfo.nics, settings);
+    QByteArray hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
+    hardwareIds[0] = hardwareId;
+    hardwareIds[1] = hardwareId;
+    hardwareIds[2] = (hardwareId + memory_info_ba);
+    hardwareIds[3] = (hardwareId + memory_info_ba + mac.toLatin1());
 
-    for (int i = 0; i < LATEST_HWID_VERSION; i++) {
-        calcHardwareId(hardwareIds[i], hardwareInfo, i + 1, false);
-        calcHardwareId(hardwareIds[LATEST_HWID_VERSION + i], hardwareInfo, i + 1, true);
-    }
+    changeGuidByteOrder(product_uuid);
+    hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
+
+    hardwareIds[4] = hardwareId;
+    hardwareIds[5] = hardwareId;
+    hardwareIds[6] = (hardwareId + memory_info_ba);
+    hardwareIds[7] = (hardwareId + memory_info_ba + mac.toLatin1());
 }
 
 #elif defined(__arm__)
@@ -194,16 +188,14 @@ void mac_eth0(char  MAC_str[13], char** host)
 }
 
 
-void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo)
+void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
 {
     Q_UNUSED(settings)
-
     char MAC_str[13];
     memset(MAC_str, sizeof(MAC_str), 0);
     mac_eth0( MAC_str, nullptr );
     QByteArray hardwareId = QByteArray( MAC_str, sizeof(MAC_str) );
     hardwareIds.clear();
-    hardwareInfo.mac = hardwareId;
 
     for (int i = 0; i < 2 * LATEST_HWID_VERSION; i++) {
         hardwareIds << hardwareId;
