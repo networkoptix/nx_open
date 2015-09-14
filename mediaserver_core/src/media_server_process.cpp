@@ -1647,6 +1647,7 @@ void MediaServerProcess::run()
 
     qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
+    qnCommon->setLocalPeerType(Qn::PT_Server);
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &MediaServerProcess::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));

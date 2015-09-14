@@ -98,7 +98,7 @@ public:
         request1.auth.setPassword(lit("admin"));
 
         QnMulticast::Request request2(request1);
-        request1.url = QUrl(lit("api/auditLog"));
+        request1.url = QUrl(lit("/api/auditLog"));
         for (int i = 0; i < MT_REQUESTS; ++i)
         {
             auto callback = [this](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)

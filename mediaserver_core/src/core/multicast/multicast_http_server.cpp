@@ -20,8 +20,10 @@ HttpServer::HttpServer(const QUuid& localGuid, QnTcpListener* tcpListener):
 
 void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, const Request& request)
 {
-    //int port = MSSettings::roSettings()->value("port", 7001).toInt();
-    QString url(lit("http://%1:%2/%3").arg("127.0.0.1").arg(m_tcpListener->getPort()).arg(request.url.toString()));
+    QString urlStr = request.url.toString();
+    while (urlStr.startsWith(lit("/")))
+        urlStr = urlStr.mid(1);
+    QString url(lit("http://%1:%2/%3").arg("127.0.0.1").arg(m_tcpListener->getPort()).arg(urlStr));
 
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     for (const auto& header: request.headers) {
