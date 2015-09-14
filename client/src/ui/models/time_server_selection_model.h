@@ -48,6 +48,7 @@ private:
     void updateColumn(Columns column);
 
     bool calculateSameTimezone() const;
+    void resetData(qint64 currentSyncTime);
 private:
     struct Item {
         QnUuid peerId;
