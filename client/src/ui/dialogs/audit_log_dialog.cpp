@@ -723,7 +723,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
     setWarningStyle(ui->warningLabel);
 
-    //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
+    setHelpTopic(this, Qn::AuditTrail_Help);
 
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
@@ -935,8 +935,6 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
         layout->addItem(item);
     }
 
-    layout->setData(Qn::LayoutTimeLabelsRole, true);
-    //layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setCellAspectRatio(desiredCellAspectRatio);

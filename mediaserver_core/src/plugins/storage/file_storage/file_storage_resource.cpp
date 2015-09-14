@@ -151,11 +151,14 @@ bool QnFileStorageResource::checkWriteCap() const
 
 bool QnFileStorageResource::checkDBCap() const
 {
-    if (!initOrUpdate() || !m_localPath.isEmpty())
+    if (!initOrUpdate())
         return false;
 #ifdef _WIN32
     return true;
-#else    
+#else
+    if (!m_localPath.isEmpty())
+        return false;
+
     QList<QnPlatformMonitor::PartitionSpace> partitions = 
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
@@ -211,12 +214,16 @@ void QnFileStorageResource::removeOldDirs()
 {
 #ifndef _WIN32
     QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(
-        QStringList() << (lit("*") + NX_TEMP_FOLDER_NAME + lit("*")),
         QDir::AllDirs | QDir::NoDotAndDotDot
     );
 
+    const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
+
     for (const QFileInfo &entry : tmpEntries)
     {
+        if (entry.absoluteFilePath().indexOf(prefix) == -1)
+            continue;
+
         int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
         if (ecode != 0)
         {
