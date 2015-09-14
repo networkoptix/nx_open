@@ -15,7 +15,7 @@
                         <ul class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>No systems found</a></li>
                             <li ng-repeat="system in systems.discoveredUrls">
-                                <a href="#" ng-click="selectSystem(system);$event.stopPropagation();">{{system.name}} ({{system.ip}}) ({{system.systemName}})</a>
+                                <a ng-click="selectSystem(system);">{{system.name}} ({{system.ip}}) ({{system.systemName}})</a>
                             </li>
                         </ul>
 
