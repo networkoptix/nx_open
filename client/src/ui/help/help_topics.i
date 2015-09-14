@@ -83,6 +83,7 @@ QN_HELP_TOPIC(SystemSettings_General_Logs_Help,                 "collecting_logs
 QN_HELP_TOPIC(SystemSettings_General_AutoPause_Help,            "cpu_and_bandwidth_saving_durin.htm")
 QN_HELP_TOPIC(SystemSettings_General_AutoStartWithSystem_Help,  "Run_VMS_when_.htm")
 QN_HELP_TOPIC(SystemSettings_General_DoubleBuffering_Help,      "double_buffering.htm")
+QN_HELP_TOPIC(SystemSettings_General_AnonymousUsage_Help,       "sending_anonymous_usage_and_cr.htm")
 QN_HELP_TOPIC(SystemSettings_ScreenRecording_Help,              "setting_up_screen_recording.htm")
 QN_HELP_TOPIC(SystemSettings_Licenses_Help,                     "obtaining_and_Activating_VMS_Licenses.htm")
 QN_HELP_TOPIC(SystemSettings_Server_Mail_Help,                  "configuring_mail_server_for_e-.htm")
@@ -179,6 +180,7 @@ QN_HELP_TOPIC(PtzManagement_HomePosition_Help,                  "home_positions_
 QN_HELP_TOPIC(EventLog_Help,									"viewing_events_log.htm")
 
 QN_HELP_TOPIC(CameraList_Help,									"viewing_full_cameras_list.htm")
+QN_HELP_TOPIC(AuditTrail_Help,									"viewing_users_actions_log_audi.htm")
 
 QN_HELP_TOPIC(ImageEnhancement_Help,							"color_correction.htm")
 
