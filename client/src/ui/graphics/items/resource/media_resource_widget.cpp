@@ -899,8 +899,10 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         if (!m_resource->toResource()->flags().testFlag(Qn::io_module))
             return false;
          
-        if (m_camera && !m_camera->hasVideo(m_display->mediaProvider()))
-            return true;
+        if (m_camera 
+            && m_display 
+            && !m_camera->hasVideo(m_display->mediaProvider()))
+                return true;
 
         return (m_ioModuleOverlayWidget && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
     };
