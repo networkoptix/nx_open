@@ -89,6 +89,7 @@ QN_HELP_TOPIC(SystemSettings_Server_Mail_Help,                  "configuring_mai
 QN_HELP_TOPIC(SystemSettings_Server_Backup_Help,                "backing_up_and_restoring_produ.htm")
 QN_HELP_TOPIC(SystemSettings_Server_CameraAutoDiscovery_Help,   "disabling_automatic_discovery.htm")
 QN_HELP_TOPIC(SystemSettings_Notifications_Help,                "notifications.htm")
+QN_HELP_TOPIC(SystemSettings_UserManagement_Help,               "user_management_form.htm")
 
 QN_HELP_TOPIC(Administration_Help,                              "system-wide_configurations.htm")
 QN_HELP_TOPIC(Administration_General_CamerasList_Help,          "viewing_full_cameras_list.htm")
@@ -108,6 +109,9 @@ QN_HELP_TOPIC(ServerSettings_StorageAnalitycs_Help,             "analyzingandant
 QN_HELP_TOPIC(UserSettings_UserRoles_Help,						"introducing_user_roles.htm")
 QN_HELP_TOPIC(UserSettings_Help,                                "changing_user_settings.htm")
 QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_user_(admin_only).htm")
+QN_HELP_TOPIC(UserSettings_DisableUser_Help,                    "disabling_user.htm")
+QN_HELP_TOPIC(UserSettings_LdapIntegration_Help,                "setting_up_ldap_integration.htm")
+QN_HELP_TOPIC(UserSettings_LdapFetch_Help,                      "importing_users_from_ldap_serv.htm")
 
 QN_HELP_TOPIC(ManualCameraAddition_Help,                        "adding_cameras_manually.htm")
 

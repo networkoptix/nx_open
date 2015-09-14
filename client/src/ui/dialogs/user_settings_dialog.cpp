@@ -50,6 +50,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     
     setHelpTopic(ui->accessRightsLabel, ui->accessRightsComboBox,   Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->accessRightsGroupbox,                          Qn::UserSettings_UserRoles_Help);
+    setHelpTopic(ui->enabledLabel, ui->enabledCheckBox,             Qn::UserSettings_DisableUser_Help);
 
     ui->accessRightsGroupbox->hide();
 
