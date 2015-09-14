@@ -8,7 +8,7 @@
 #include <QtCore/QBuffer>
 #include <QtXml/QXmlSimpleReader>
 
-#include <cloud_db_client/src/cloud_modules_xml_sax_handler.h>
+#include <utils/network/cloud_connectivity/cloud_modules_xml_sax_handler.h>
 
 
 namespace nx {
@@ -31,7 +31,7 @@ TEST(CloudModulesXmlHandler, common)
         </modules>                                  \
         ");
 
-    CloudModulesXmlHandler xmlHandler;
+    nx::cc::CloudModulesXmlHandler xmlHandler;
 
     QXmlSimpleReader reader;
     reader.setContentHandler(&xmlHandler);
