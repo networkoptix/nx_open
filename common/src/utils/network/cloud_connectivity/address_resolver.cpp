@@ -33,7 +33,7 @@ bool AddressEntry::operator ==( const AddressEntry& rhs ) const
 }
 
 AddressResolver::AddressResolver()
-    : m_stunClient( MEDIATOR_ADDRESS )
+    : m_stunClient( new stun::AsyncClient( MEDIATOR_ADDRESS ) )
 {
 }
 
@@ -164,6 +164,11 @@ bool AddressResolver::isRequestIdKnown( void* requestId ) const
     return m_requests.count( requestId );
 }
 
+void AddressResolver::resetMediatorAddress( const SocketAddress& newAddress )
+{
+    m_stunClient.reset( new stun::AsyncClient( newAddress ) );
+}
+
 AddressResolver::HostAddressInfo::HostAddressInfo()
     : dnsState( State::unresolved )
     , mediatorState( State::unresolved )
@@ -276,7 +281,7 @@ bool AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
 
     info->second.mediatorState = HostAddressInfo::State::inProgress;
     lk->unlock();
-    if( !m_stunClient.sendRequest( std::move( request ), std::move( functor ) ) )
+    if( !m_stunClient->sendRequest( std::move( request ), std::move( functor ) ) )
     {
         lk->relock();
         info->second.mediatorState = HostAddressInfo::State::unresolved;

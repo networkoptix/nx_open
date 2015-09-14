@@ -34,6 +34,8 @@ public:
             std::move(factoryFunc) );
     }
 
+    bool registerStaticProcessor( const QString& path, QByteArray response );
+
 private:
     nx_http::MessageDispatcher m_httpMessageDispatcher;
     std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;

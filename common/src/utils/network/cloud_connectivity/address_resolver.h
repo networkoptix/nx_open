@@ -91,6 +91,10 @@ public:
     void cancel( void* requestId, bool waitForRunningHandlerCompletion = true );
     bool isRequestIdKnown( void* requestId ) const;
 
+    // TODO: refactor out
+    // NOTE: test case ONLY!
+    void resetMediatorAddress( const SocketAddress& newAddress );
+
 private:
     struct HostAddressInfo
     {
@@ -138,7 +142,7 @@ private:
     std::multimap< void*, RequestInfo > m_requests;
 
     DnsResolver m_dnsResolver;
-    stun::AsyncClient m_stunClient;
+    std::unique_ptr< stun::AsyncClient > m_stunClient;
 };
 
 } // namespace cc
