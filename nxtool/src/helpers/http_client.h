@@ -14,8 +14,7 @@ namespace rtu
     {
     public:
         typedef std::function<void (const QByteArray &data)> ReplyCallback;
-        typedef std::function<void (const QString &errorReason
-            , int errorCode)> ErrorCallback;
+        typedef std::function<void (int errorCode)> ErrorCallback;
         
         enum { kUseDefaultTimeout = 0 };
 

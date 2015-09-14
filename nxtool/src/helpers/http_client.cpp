@@ -176,9 +176,9 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
                 httpErrorVar.toString() : QString());
 
             //TODO: #tr #ynikitenkov Strings must be generated in the UI class, not in the network one
-            const QString &errorReason = (!httpError.isEmpty()? httpError 
-                : QString("Network Error: %1").arg(errorCodeToString(errorCode)));
-            errorCallback(errorReason, httpCode);
+//            const QString &errorReason = (!httpError.isEmpty()? httpError 
+//                : QString("Network Error: %1").arg(errorCodeToString(errorCode)));
+            errorCallback(httpCode);
         }
     }
     else if (const ReplyCallback &successCallback = it->success)

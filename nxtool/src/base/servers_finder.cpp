@@ -399,20 +399,37 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
     if (!data.contains(kSearchRequestBody))
         return true;
 
-
-    /// try to add unknown or discover by multicast after period * 3 - to chance to discover entity as known and by Http first
-
-    enum { kDelayTimeout = kUpdateServersInfoInterval * 3};
-
     const QString &address = sender.toString();
     const auto &firstTimeProcessor = 
         [this, address](const Callback &secondTimeProcessor)
     {
+        const bool isMulticastServer = false; /// TODO: # check if contains new multicast header
         const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
         const bool isUnknown = (m_unknownHosts.find(address) != m_unknownHosts.end());
-        if (secondTimeProcessor && !isKnown && !isUnknown)
+        const bool notKnown = !isKnown && !isUnknown;
+
+        if (secondTimeProcessor && notKnown)
         {
-            QTimer::singleShot(kDelayTimeout, secondTimeProcessor);
+            const auto multicastProcessor = [this, address, secondTimeProcessor]()
+            {
+                const QUuid id = QUuid(); /// TODO: add id extraction
+                const auto successful = [this, address](const BaseServerInfo &info)
+                {
+                    processNewServer(info, address, false);
+                };
+
+                const auto failed = [secondTimeProcessor] (int /* errorCode */, Constants::AffectedEntities /* affected */)
+                {
+                    secondTimeProcessor(); 
+                };
+
+                multicastModuleInformation(id, successful, failed);
+            };
+
+            /// try to add unknown or discover by multicast after period * 3 
+            /// - to have a chance to discover entity as known or by Http first
+            enum { kDelayTimeout = kUpdateServersInfoInterval * 3};
+            QTimer::singleShot(kDelayTimeout, (isMulticastServer ? multicastProcessor : secondTimeProcessor));
         }
         else if (!isKnown && onEntityDiscovered(address, m_unknownHosts))
             emit m_owner->unknownAdded(address);
@@ -423,37 +440,7 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
         firstTimeProcessor(Callback());
     };
 
-    const bool isMulticastServer = false; /// TODO: # check if contains new multicast header
-    if (!isMulticastServer)
-    {
-        firstTimeProcessor(secondTimeProcessor);
-        return true;
-    }
-
-    const auto delayedMulticastProcessor = [this, address, firstTimeProcessor, secondTimeProcessor]()
-    {
-        const QUuid id = QUuid(); /// TODO: add id extraction
-        const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
-        const bool isUnknown = (m_unknownHosts.find(address) != m_unknownHosts.end());
-        if (isKnown || isUnknown)
-            return true;
-
-        const auto successful = [this, address](const BaseServerInfo &info)
-        {
-            processNewServer(info, address, false);
-        };
-
-        const auto failed = [firstTimeProcessor, secondTimeProcessor]
-            (int /* errorCode */, Constants::AffectedEntities /* affected */)
-        {
-            /// try to add unknown item
-            firstTimeProcessor(secondTimeProcessor);
-        };
-
-        multicastModuleInformation(id, successful, failed);
-    };
-
-    QTimer::singleShot(kDelayTimeout, delayedMulticastProcessor);
+    firstTimeProcessor(secondTimeProcessor);
     return true;
 }
 

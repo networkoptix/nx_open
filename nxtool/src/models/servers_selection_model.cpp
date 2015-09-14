@@ -409,6 +409,8 @@ public:
     void setBusyState(const IDsVector &ids
         , bool isBusy);
 
+    void switchToMulticast(const QUuid &id);
+
 private:
     SystemModelInfo *findSystemModelInfo(const QString &systemName
         , int &row);
@@ -1263,6 +1265,15 @@ void rtu::ServersSelectionModel::Impl::setBusyState(const IDsVector &ids
 
 }
 
+void rtu::ServersSelectionModel::Impl::switchToMulticast(const QUuid &id)
+{
+    ItemSearchInfo searchInfo;
+    if (!findServer(id, searchInfo))
+        return;
+
+    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().discoveredByHttp = false;
+}
+
 void rtu::ServersSelectionModel::Impl::removeServers(const IDsVector &removed)
 {
     const int wasSelected = selectedCount();
@@ -1507,6 +1518,11 @@ void rtu::ServersSelectionModel::setBusyState(const IDsVector &ids
     , bool isBusy)
 {
     m_impl->setBusyState(ids, isBusy);
+}
+
+void rtu::ServersSelectionModel::switchToMulticast(const QUuid &id)
+{
+    m_impl->switchToMulticast(id);
 }
 
 bool rtu::ServersSelectionModel::selectionOutdated() const

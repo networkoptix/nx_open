@@ -2,9 +2,12 @@
 #include "rest_client.h"
 
 #include <helpers/http_client.h>
+#include <helpers/multicast/multicast_http_client.h>
 
 namespace
 {
+    const QString kUserAgent = "NX Tool";
+
     const QString &adminUserName()
     {
         static QString result("admin");
@@ -40,12 +43,26 @@ namespace
         url.setQuery(request.params);
         return url;
     }
+
+    const QnMulticast::Request makeMulticastRequest(const rtu::RestClient::Request &request
+        , bool isGetRequest)
+    {
+        QnMulticast::Request result;
+        result.method = (isGetRequest ? "GET" : "POST");
+        result.url = request.path;
+        result.serverId = request.target.id;
+        result.contentType = "application/json";
+
+        result.auth.setUser(adminUserName());
+        result.auth.setPassword(request.password);
+        return result;
+    }
 }
 
 class rtu::RestClient::Impl
 {
 public:
-    Impl();
+    Impl(RestClient *owner);
 
     ~Impl();
 
@@ -54,14 +71,28 @@ public:
     void sendHttpPost(const Request &request
         , const QByteArray &data);
 
+    void sendMulticastGet(const Request &request);
+
+    void sendMulticastPost(const Request &request
+        , const QByteArray &data);
+
 private:
+    rtu::HttpClient::ErrorCallback makeHttpErrorCallback(const rtu::RestClient::Request &request
+        , bool isGetRequest
+        , const QByteArray &data = QByteArray());
+
+private:
+    RestClient * const m_owner;
     rtu::HttpClient m_httpClient;
+    QnMulticast::HTTPClient m_multicastClient;
 };
 
 ///
 
-rtu::RestClient::Impl::Impl()
-    : m_httpClient(nullptr)
+rtu::RestClient::Impl::Impl(RestClient *owner)
+    : m_owner(owner)
+    , m_httpClient(nullptr)
+    , m_multicastClient(kUserAgent)
 {
 }
 
@@ -69,58 +100,129 @@ rtu::RestClient::Impl::~Impl()
 {
 }
 
-/// TODO: #ynikitenkov Temporary, until string error reason be removed
-namespace   
+rtu::HttpClient::ErrorCallback rtu::RestClient::Impl::makeHttpErrorCallback(const rtu::RestClient::Request &request
+    , bool isGetRequest
+    , const QByteArray &data)
 {
-    rtu::HttpClient::ErrorCallback makeOldCallback(const rtu::RestClient::ErrorCallback &error)
+    const auto httpTryErrorCallback = 
+        [this, request, isGetRequest, data](int code)
     {
-        return [error](const QString &/*errorReason*/, int code)
+        enum { kUnauthorized = 401 };
+        if (code == kUnauthorized)
         {
-            if (error)
-                error(code);
+            if (request.errorCallback)
+                request.errorCallback(code);
+        }
+
+        Request tmp(request);
+
+        /// Multicast error replaced by initial http code
+        const auto errorCallbackToCapture = request.errorCallback;
+        tmp.errorCallback = [errorCallbackToCapture, code](int /* errorCode */)   
+        {
+            if (errorCallbackToCapture)
+                errorCallbackToCapture(code);
         };
-    }
+
+        /// Server not accessible by HTTP, but accessible by multicast
+        const auto replyCallbackToCapture = request.replyCallback;
+        const auto id = request.target.id;
+        tmp.replyCallback = [this, replyCallbackToCapture, id](const QByteArray &data)
+        {
+            emit m_owner->accessibleOnlyByMulticast(id);
+            if (replyCallbackToCapture)
+                replyCallbackToCapture(data);
+        };
+
+        if (isGetRequest)
+            sendMulticastGet(tmp);
+        else
+            sendMulticastPost(tmp, data);
+    };
+
+    return httpTryErrorCallback;
 }
 
 void rtu::RestClient::Impl::sendHttpGet(const Request &request)
 {
     m_httpClient.sendGet(makeHttpUrl(request), request.replyCallback
-        , makeOldCallback(request.errorCallback), request.timeout);
+        , makeHttpErrorCallback(request, true), request.timeout);
 }
 
 void rtu::RestClient::Impl::sendHttpPost(const Request &request
     , const QByteArray &data)
 {
-    m_httpClient.sendPost(makeHttpUrl(request), data
-        , request.replyCallback, makeOldCallback(request.errorCallback), request.timeout);
+    m_httpClient.sendPost(makeHttpUrl(request), data, request.replyCallback
+        , makeHttpErrorCallback(request, false, data), request.timeout);
 }
-        
-///
 
-rtu::RestClient& rtu::RestClient::instance()
+QnMulticast::ResponseCallback makeCallback(const rtu::RestClient::Request &request)
+{
+    const auto callback = [request](const QUuid& /* requestId */
+        , QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
+    {
+        if (errCode == QnMulticast::ErrCode::ok)
+        {
+            if (request.replyCallback)
+                request.replyCallback(response.messageBody);
+        }
+        else if (request.errorCallback)
+            request.errorCallback(response.httpResult);
+    };
+    return callback;
+}
+
+void rtu::RestClient::Impl::sendMulticastGet(const Request &request)
+{
+    m_multicastClient.execRequest(makeMulticastRequest(request, true)
+        , makeCallback(request) , request.timeout);
+}
+
+void rtu::RestClient::Impl::sendMulticastPost(const Request &request
+    , const QByteArray &data)
+{
+    m_multicastClient.execRequest(makeMulticastRequest(request, false)
+        , makeCallback(request) , request.timeout);
+}
+
+///
+rtu::RestClient *rtu::RestClient::instance()
 {
     static RestClient client;
-    return client;
+    return &client;
+}
+
+
+rtu::RestClient::Impl& rtu::RestClient::implInstance()
+{
+    return *(*instance()).m_impl;
 }
 
 rtu::RestClient::RestClient()
-    : m_impl(new Impl())
+    : m_impl(new Impl(this))
 {
 }
 
 rtu::RestClient::~RestClient()
 {
+    QObject::disconnect(nullptr, nullptr, nullptr, nullptr);
 }
 
 void rtu::RestClient::sendGet(const Request &request)
 {
-    instance().m_impl->sendHttpGet(request);
+    if (request.target.discoveredByHttp)
+        implInstance().sendHttpGet(request);
+    else
+        implInstance().sendMulticastGet(request);
 }
 
 void rtu::RestClient::sendPost(const Request &request
     , const QByteArray &data)
 {
-    instance().m_impl->sendHttpPost(request, data);
+    if (request.target.discoveredByHttp)
+        implInstance().sendHttpPost(request, data);
+    else
+        implInstance().sendMulticastPost(request, data);
 }
         
 ///

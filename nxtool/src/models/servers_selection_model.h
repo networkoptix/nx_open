@@ -82,6 +82,8 @@ namespace rtu
         void setBusyState(const IDsVector &ids
             , bool isBusy);
 
+        void switchToMulticast(const QUuid &id);
+
     signals:
         void layoutChanged();
 

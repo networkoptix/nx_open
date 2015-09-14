@@ -13,6 +13,7 @@
 #include <models/servers_selection_model.h>
 
 #include <helpers/time_helper.h>
+#include <helpers/rest_client.h>
 
 class rtu::RtuContext::Impl : public QObject
 {
@@ -98,6 +99,9 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
         , m_selectionModel, &ServersSelectionModel::unknownRemoved);
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_selectionModel, &ServersSelectionModel::serverDiscovered);
+
+    QObject::connect(RestClient::instance(), &RestClient::accessibleOnlyByMulticast
+        , [this](const QUuid &id) { m_selectionModel->switchToMulticast(id); });
 }
 
 rtu::RtuContext::Impl::~Impl()

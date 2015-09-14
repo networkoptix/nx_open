@@ -12,8 +12,9 @@ namespace rtu
 {
     /// @brief Sends REST requests to the specified server according to it availability 
     /// through the HTTP or multicast
-    class RestClient
+    class RestClient : public QObject
     {
+        Q_OBJECT
     public:
         enum { kStandardTimeout = -1 };
 
@@ -27,16 +28,22 @@ namespace rtu
         static void sendPost(const Request &request
             , const QByteArray &data);
         
+        static RestClient *instance();
+
+    signals:
+        /// Emits when command has failed by http, but successfully executed by multicast
+        void accessibleOnlyByMulticast(const QUuid &id);
+
     private:
         RestClient();
 
         ~RestClient();
 
-        static RestClient& instance();
-
     private:
         class Impl;
         typedef std::unique_ptr<Impl> ImplPtr;
+
+        static RestClient::Impl& implInstance();
 
         const ImplPtr m_impl;
     };
