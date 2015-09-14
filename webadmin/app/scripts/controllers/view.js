@@ -169,6 +169,11 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return;
             }
 
+            if(treeRequest){
+                treeRequest.abort(); //abort tree reloading request to speed up loading new video
+            }
+
+
             $scope.positionProvider.init(playing);
             if(live){
                 playing = (new Date()).getTime();
@@ -188,11 +193,10 @@ angular.module('webadminApp').controller('ViewCtrl',
             var rstpAuthPararm = "&auth=" + mediaserver.authForRtsp();
 
             var positionMedia = !live ? "&pos=" + (playing) : "";
-            var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
             // TODO: check resolution ?
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionHls   + authParam ), type: mimeTypes['hls'], transport:'hls'},
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionMedia   + authParam ), type: mimeTypes['hls'], transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
 
                 // Not supported:
@@ -339,11 +343,17 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             return object.name + '__' + num;
         }
+
+        var treeRequest = null;
+
         function getCameras() {
 
             var deferred = $q.defer();
-
-            mediaserver.getCameras().then(function (data) {
+            if(treeRequest){
+                treeRequest.abort();
+            }
+            treeRequest = mediaserver.getCameras();
+            treeRequest.then(function (data) {
                 var cameras = data.data;
                 
                 var findMediaStream = function(param){
@@ -504,7 +514,11 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             var deferred = $q.defer();
 
-            mediaserver.getMediaServers().then(function (data) {
+            if(treeRequest){
+                treeRequest.abort();
+            }
+            treeRequest = mediaserver.getMediaServers();
+            treeRequest.then(function (data) {
 
                 if(!$scope.mediaServers) {
                     $scope.mediaServers = _.sortBy(data.data,serverSorter);
@@ -551,7 +565,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
                 console.error(error);
-                //timer = $timeout(reloader, quickReloadInterval);
+                timer = $timeout(reloader, reloadInterval); // Some error happened. Maybe, request was aborted. Wait and try again
             });
         }
         var desktopCameraTypeId = null;
