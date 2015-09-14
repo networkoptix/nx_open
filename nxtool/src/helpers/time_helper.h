@@ -19,4 +19,14 @@ namespace rtu
         , const QTimeZone &timeZone);
 
     QString timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &atDateTime);
+
+    struct DateTime
+    {
+        qint64 utcDateTimeMs;
+        QByteArray timeZoneId;
+
+        DateTime(qint64 utcDateTimeMs
+            , const QByteArray &timeZoneId);
+    };
+
 }

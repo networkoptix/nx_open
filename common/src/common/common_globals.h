@@ -478,6 +478,7 @@ public:
         ItemFrameDistinctionColorRole,              /**< Role for item's frame distinction color. Value of type QColor. */
         ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
+        ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
