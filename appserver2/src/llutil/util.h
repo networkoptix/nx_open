@@ -6,7 +6,6 @@
 namespace LLUtil {
 
 void changeGuidByteOrder(std::string& guid);
-QString changedGuidByteOrder(const QString& guid);
 
 } // namespace LLutil {}
 

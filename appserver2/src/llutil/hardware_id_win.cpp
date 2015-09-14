@@ -250,6 +250,16 @@ static unsigned int SwapWord(unsigned int a)
   return a;
 }
 
+static QString changedGuidByteOrder(const QString& guid)
+{
+    if (guid.length() != 36)
+        return QString();
+
+    std::string guid_str(guid.toStdString());
+    LLUtil::changeGuidByteOrder(guid_str);
+    return guid_str.c_str();
+}
+
 typedef QString (*ExecQueryFunction)(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName);
 
 static void fillHardwareInfo(IWbemServices *pSvc, ExecQueryFunction execQuery, HardwareInfo& hardwareInfo)
