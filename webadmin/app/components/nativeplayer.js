@@ -38,6 +38,13 @@ var nativePlayer = new (function () {
 
     this.load = function(url,type){
         if( currentVideo || node.has("video").length){
+            try {
+                node.find("video").attr("src", "");
+                node.find("source").attr("src", "");
+                node.find("video").get(0).load();
+            }catch(a){
+                // ignore errors above
+            }
             node.find("video").remove();
         }
         $currentVideo = $("<video  src='" + url + "' type='" + type + "'>").appendTo(node).html('<source src="' + url + '" type="' + type + '"></source>' );

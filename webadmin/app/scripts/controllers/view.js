@@ -564,7 +564,9 @@ angular.module('webadminApp').controller('ViewCtrl',
                 firstTime = false;
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
-                console.error(error);
+                if(typeof(error.status)=="undefined" || !error.status) {
+                    console.error(error);
+                }
                 timer = $timeout(reloader, reloadInterval); // Some error happened. Maybe, request was aborted. Wait and try again
             });
         }
