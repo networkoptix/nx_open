@@ -41,7 +41,7 @@ QList<QByteArray> getCompatibleHardwareIds(int guidCompatibility)
 
 namespace LLUtil
 {
-void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
+void fillHardwareIds(QStringList& hardwareIds, QSettings *settings)
 {
     Q_UNUSED(settings)
     #define MAX_HWID_SIZE 1024
@@ -54,6 +54,6 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
     CFStringGetCString(uuidCf, buf, MAX_HWID_SIZE, kCFStringEncodingMacRoman);
     CFRelease(uuidCf);
 
-    hardwareIds[0] = hardwareIds[1] = hardwareIds[2] = hardwareIds[3] = hardwareIds[4] = hardwareIds[5] = buf;
+    hardwareIds[0] = hardwareIds[1] = hardwareIds[2] = hardwareIds[3] = hardwareIds[4] = hardwareIds[5] = QLatin1String(buf);
 }
 }
