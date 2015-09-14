@@ -194,7 +194,7 @@ void mac_eth0(char  MAC_str[13], char** host)
 }
 
 
-void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo)
+void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo)
 {
     Q_UNUSED(settings)
 
