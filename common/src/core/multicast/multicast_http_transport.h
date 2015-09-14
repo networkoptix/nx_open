@@ -6,6 +6,7 @@
 #include "multicast_http_fwd.h"
 #include <memory>
 #include <QCache>
+#include <QMutex>
 
 namespace QnMulticast
 {
