@@ -39,4 +39,13 @@ namespace rtu
 
     class ChangesProgressModel;
     typedef std::unique_ptr<ChangesProgressModel> ChangesProgressModelPtr;
+
+    enum class RequestError
+    {
+        kSuccess = 0 
+        , kRequestTimeout = - 1
+        , kUnauthorized = - 2
+        , kUnspecified = - 3
+    };
+
 }

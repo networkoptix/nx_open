@@ -57,6 +57,32 @@ namespace
         result.auth.setPassword(request.password);
         return result;
     }
+
+    rtu::RequestError convertMulticastClientErrorToGlobal(QnMulticast::ErrCode errorCode
+        , int httpCode)
+    {
+        switch(errorCode)
+        {
+        case QnMulticast::ErrCode::ok:
+        {
+            /// Checks Http codes
+            const bool isSuccessHttp = ((httpCode >= rtu::HttpClient::kHttpSuccessCodeFirst) 
+                && (httpCode <= rtu::HttpClient::kHttpSuccessCodeLast));
+
+            if (isSuccessHttp)
+                return rtu::RequestError::kSuccess;
+            else if (httpCode == rtu::HttpClient::kHttpUnauthorized)
+                return rtu::RequestError::kUnauthorized;
+            return rtu::RequestError::kUnspecified;
+        }
+        case QnMulticast::ErrCode::timeout:
+            return rtu::RequestError::kRequestTimeout;
+
+        default:
+            return rtu::RequestError::kUnspecified;
+        }
+    }
+
 }
 
 class rtu::RestClient::Impl
@@ -94,6 +120,8 @@ rtu::RestClient::Impl::Impl(RestClient *owner)
     , m_httpClient(nullptr)
     , m_multicastClient(kUserAgent)
 {
+    enum { kDefaultTimeout = 10 * 1000 };   /// move http client timeout initialization here
+    m_multicastClient.setDefaultTimeout(kDefaultTimeout);
 }
 
 rtu::RestClient::Impl::~Impl()
@@ -105,23 +133,29 @@ rtu::HttpClient::ErrorCallback rtu::RestClient::Impl::makeHttpErrorCallback(cons
     , const QByteArray &data)
 {
     const auto httpTryErrorCallback = 
-        [this, request, isGetRequest, data](int code)
+        [this, request, isGetRequest, data](RequestError errorCode)
     {
-        enum { kUnauthorized = 401 };
-        if (code == kUnauthorized)
+        if (request.path.contains("configure"))
+            int i = 0;
+
+        qDebug() << " --- Error callback " << request.path;
+        if (errorCode == RequestError::kUnauthorized)
         {
             if (request.errorCallback)
-                request.errorCallback(code);
+                request.errorCallback(errorCode);
         }
 
         Request tmp(request);
 
-        /// Multicast error replaced by initial http code
+        /// Multicast error replaced by initial http code (except unauthorized)
         const auto errorCallbackToCapture = request.errorCallback;
-        tmp.errorCallback = [errorCallbackToCapture, code](int /* errorCode */)   
+        tmp.errorCallback = [errorCallbackToCapture, errorCode](RequestError errorCode)   
         {
-            if (errorCallbackToCapture)
-                errorCallbackToCapture(code);
+            if (!errorCallbackToCapture)
+                return;
+
+            errorCallbackToCapture(errorCode != RequestError::kUnauthorized 
+                ? errorCode : RequestError::kUnauthorized);
         };
 
         /// Server not accessible by HTTP, but accessible by multicast
@@ -161,19 +195,23 @@ QnMulticast::ResponseCallback makeCallback(const rtu::RestClient::Request &reque
     const auto callback = [request](const QUuid& /* requestId */
         , QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
     {
+        if (request.path.contains("configure"))
+            int i = 0;
         if (errCode == QnMulticast::ErrCode::ok)
         {
             if (request.replyCallback)
                 request.replyCallback(response.messageBody);
         }
         else if (request.errorCallback)
-            request.errorCallback(response.httpResult);
+            request.errorCallback(convertMulticastClientErrorToGlobal(errCode, response.httpResult));
     };
     return callback;
 }
 
 void rtu::RestClient::Impl::sendMulticastGet(const Request &request)
 {
+    if (request.path.contains("configure"))
+        int i = 0;
     m_multicastClient.execRequest(makeMulticastRequest(request, true)
         , makeCallback(request) , request.timeout);
 }

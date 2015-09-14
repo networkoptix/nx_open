@@ -103,13 +103,13 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        /*
+        
         if (!jsonObject.value("systemName").toString().contains("nx")
             && !jsonObject.value("systemName").toString().contains("NX")
             && !jsonObject.value("systemName").toString().contains("yuriy")
             )
             return false;
-        */
+        
         rtu::parseModuleInformationReply(jsonObject, info);
 
         return true;
@@ -418,7 +418,7 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
                     processNewServer(info, address, false);
                 };
 
-                const auto failed = [secondTimeProcessor] (int /* errorCode */, Constants::AffectedEntities /* affected */)
+                const auto failed = [secondTimeProcessor] (RequestError /* errorCode */, Constants::AffectedEntities /* affected */)
                 {
                     secondTimeProcessor(); 
                 };

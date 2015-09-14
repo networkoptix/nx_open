@@ -144,7 +144,7 @@ namespace /// Parsers stuff
             }
             else if (failed)
             {
-                failed(rtu::kUnspecifiedError, affected);
+                failed(rtu::RequestError::kUnspecified, affected);
             }
         };
 
@@ -246,14 +246,14 @@ namespace /// Parsers stuff
         return [callback, affected](const QByteArray & /* data */)
         {
             if (callback)
-                callback(rtu::kNoErrorReponse, affected);
+                callback(rtu::RequestError::kSuccess, affected);
         };
     }
 
     rtu::RestClient::ErrorCallback makeErrorCalback(const rtu::OperationCallback &callback
         , rtu::Constants::AffectedEntities affected)
     {
-        return [callback, affected](int error)
+        return [callback, affected](rtu::RequestError error)
         {
             if (callback)
                 callback(error, affected);
@@ -338,7 +338,7 @@ void rtu::multicastModuleInformation(const QUuid &id
         if (!parseModuleInformationReply(object, resultInfo))
         {
             if (failedCallback)
-                failedCallback(kUnspecifiedError, affected);
+                failedCallback(RequestError::kUnspecified, affected);
             return;
         }
 
@@ -411,7 +411,7 @@ void rtu::getServerExtraInfo(const BaseServerInfo &baseInfo
     static const Constants::AffectedEntities affected = (Constants::kAllAddressFlagsAffected 
         | Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
 
-    const auto &getTimeFailed = [failed](const int errorCode, Constants::AffectedEntities /* affectedEntities */)
+    const auto &getTimeFailed = [failed](const RequestError errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
         if (failed)
             failed(errorCode, affected);
@@ -421,7 +421,8 @@ void rtu::getServerExtraInfo(const BaseServerInfo &baseInfo
         (const QUuid &id, const rtu::ExtraServerInfo &extraInfo) 
     {
         /// getTime command is successfully executed up to now
-        const auto &ifListFailed = [successful, id, extraInfo](const int, Constants::AffectedEntities  /* affectedEntities */)
+        const auto &ifListFailed = [successful, id, extraInfo](const RequestError /* errorCode */
+            , Constants::AffectedEntities  /* affectedEntities */)
         {
             if (successful)
                 successful(id, extraInfo);
@@ -440,9 +441,9 @@ void rtu::getServerExtraInfo(const BaseServerInfo &baseInfo
     };
 
     const auto &callback = [failed, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout]
-        (const int errorCode, Constants::AffectedEntities /* affectedEntities */)
+        (const RequestError errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
-        if (errorCode != kNoErrorReponse)
+        if (errorCode != RequestError::kSuccess)
         {
             if (failed)
                 failed(errorCode, affected);
@@ -466,7 +467,7 @@ void rtu::sendIfListRequest(const BaseServerInfo &info
     if (!(info.flags & Constants::AllowIfConfigFlag))
     {
         if (failed)
-            failed(kUnspecifiedError, Constants::kAllEntitiesAffected);
+            failed(RequestError::kUnspecified, Constants::kAllEntitiesAffected);
         return;
     }
  
@@ -491,7 +492,7 @@ void rtu::sendSetTimeRequest(const ServerInfo &info
         || !QTimeZone(timeZoneId).isValid())
     {
         if (callback)
-            callback(kUnspecifiedError, affected);
+            callback(RequestError::kUnspecified, affected);
         return;
     }
     
@@ -516,7 +517,7 @@ void rtu::sendSetSystemNameRequest(const ServerInfo &info
     if (!info.hasExtraInfo() || systemName.isEmpty())
     {
         if (callback)
-            callback(kUnspecifiedError, Constants::kSystemNameAffected);
+            callback(RequestError::kUnspecified, Constants::kSystemNameAffected);
         return;
     }
 
@@ -543,7 +544,7 @@ void rtu::sendSetPasswordRequest(const ServerInfo &info
     if (!info.hasExtraInfo() || password.isEmpty())
     {
         if (callback)
-            callback(kUnspecifiedError, Constants::kPasswordAffected);
+            callback(RequestError::kUnspecified, Constants::kPasswordAffected);
 
         return;
     }
@@ -571,7 +572,7 @@ void rtu::sendSetPortRequest(const ServerInfo &info
     if (!info.hasExtraInfo() || !port)
     {
         if (callback)
-            callback(kUnspecifiedError, Constants::kPortAffected);
+            callback(RequestError::kUnspecified, Constants::kPortAffected);
        return;
     }
 
@@ -650,7 +651,7 @@ void rtu::sendChangeItfRequest(const ServerInfo &info
     }
     else if (callback)
     {
-        callback(kUnspecifiedError, affected);
+        callback(RequestError::kUnspecified, affected);
     }
 }
 

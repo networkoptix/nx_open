@@ -10,7 +10,7 @@
 #include <base/server_info.h>
 #include <base/changes_manager.h>
 
-#include <helpers/http_client.h>
+#include <helpers/rest_client.h>
 #include <helpers/time_helper.h>
 #include <helpers/qml_helpers.h>
 
@@ -193,12 +193,12 @@ private:
     bool addSummaryItem(const rtu::ServerInfo &info
         , const QString &description
         , const QString &value
-        , int errorCode
+        , RequestError errorCode
         , Constants::AffectedEntities checkFlags
         , Constants::AffectedEntities affected);
 
     bool addUpdateInfoSummaryItem(const rtu::ServerInfo &info
-        , int errorCode
+        , RequestError errorCode
         , const ItfUpdateInfo &change
         , Constants::AffectedEntities affected);
 
@@ -350,7 +350,7 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &ba
             const bool applied = (it != extraInfo.interfaces.end());
             const Constants::AffectedEntities affected = 
                 (applied ? Constants::kAllEntitiesAffected : Constants::kNoEntitiesAffected);
-            shared->addUpdateInfoSummaryItem(info, (applied ? kNoErrorReponse : kUnspecifiedError) , change, affected);
+            shared->addUpdateInfoSummaryItem(info, (applied ? RequestError::kSuccess : RequestError::kUnspecified) , change, affected);
             
             if (applied)
                 newInterfaces.push_back(*it);
@@ -375,7 +375,7 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &ba
     };
 
     const auto &failed = 
-        [processCallback, baseInfo](const int /* errorCode */, int /* affected */)
+        [processCallback, baseInfo](const RequestError /* errorCode */, int /* affected */)
     {
         processCallback(false, baseInfo.id, ExtraServerInfo());
     };
@@ -454,7 +454,7 @@ void rtu::ApplyChangesTask::Impl::itfRequestSuccessfullyApplied(const ItfChanges
     for(const auto &change: request.itfUpdateInfo)
     {
         addUpdateInfoSummaryItem(*request.info
-            , kNoErrorReponse, change, Constants::kAllEntitiesAffected);
+            , RequestError::kSuccess, change, Constants::kAllEntitiesAffected);
     }
 
     const int changesCount = request.changesCount;
@@ -513,7 +513,7 @@ void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
                 return;
 
             const auto &callback = [weak, info, change, timestampMs]
-                (const int errorCode, Constants::AffectedEntities affected)
+                (const RequestError errorCode, Constants::AffectedEntities affected)
             {
                 static const QString kDateTimeDescription = "date / time";
                 static const QString kTimeZoneDescription = "time zone";
@@ -570,7 +570,7 @@ void rtu::ApplyChangesTask::Impl::addSystemNameChangeRequests()
                 return;
 
             const auto &callback = [weak, info, systemName]
-                (const int errorCode, Constants::AffectedEntities affected)
+                (const RequestError errorCode, Constants::AffectedEntities affected)
             {
                 static const QString &kSystemNameDescription = "system name";
 
@@ -615,7 +615,7 @@ void rtu::ApplyChangesTask::Impl::addPortChangeRequests()
 
 
             const auto &callback = [weak, info, port]
-                (const int errorCode, Constants::AffectedEntities affected)
+                (const RequestError errorCode, Constants::AffectedEntities affected)
             {
                 static const QString kPortDescription = "port";
 
@@ -665,7 +665,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
                 return;
 
             const auto &failedCallback =
-                [weak, info, changes](const int errorCode, Constants::AffectedEntities affected)
+                [weak, info, changes](const RequestError errorCode, Constants::AffectedEntities affected)
             {
                 if (weak.expired())
                     return;
@@ -684,9 +684,9 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
             };
 
             const auto &callback = 
-                [failedCallback](const int errorCode, Constants::AffectedEntities affected)
+                [failedCallback](const RequestError errorCode, Constants::AffectedEntities affected)
             {
-                if (errorCode)
+                if (errorCode != RequestError::kSuccess)
                 {
                     failedCallback(errorCode , affected);
                 }
@@ -695,7 +695,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
                     /* In case of success we need to wait more until server is rediscovered. */
                     QTimer::singleShot(kTotalIfConfigTimeout, [failedCallback, affected]() 
                     {
-                        failedCallback(kRequestTimeout, affected);
+                        failedCallback(RequestError::kRequestTimeout, affected);
                     });
                 }
                 
@@ -761,7 +761,7 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
                 return;
 
             const auto finalCallback =
-                [weak, info, password](const int errorCode, Constants::AffectedEntities affected)
+                [weak, info, password](const RequestError errorCode, Constants::AffectedEntities affected)
             {
                 static const QString kPasswordDescription = "password";
 
@@ -780,12 +780,12 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
             };
             
             const auto &callback = 
-                [weak, info, password, finalCallback](const int errorCode, Constants::AffectedEntities affected)
+                [weak, info, password, finalCallback](const RequestError errorCode, Constants::AffectedEntities affected)
             {
                 if (weak.expired())
                     return;
 
-                if (errorCode)
+                if (errorCode != RequestError::kSuccess)
                 {
                     finalCallback(errorCode, affected);
                 }
@@ -808,11 +808,11 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
 bool rtu::ApplyChangesTask::Impl::addSummaryItem(const rtu::ServerInfo &info
     , const QString &description
     , const QString &value
-    , int errorCode
+    , RequestError errorCode
     , Constants::AffectedEntities checkFlags
     , Constants::AffectedEntities affected)
 {
-    const bool successResult = !errorCode && 
+    const bool successResult = (errorCode == RequestError::kSuccess) && 
         ((affected & checkFlags) == checkFlags);
     ChangesSummaryModel * const model = (successResult ? &m_succesfulChangesModel : &m_failedChangesModel);
 
@@ -821,11 +821,11 @@ bool rtu::ApplyChangesTask::Impl::addSummaryItem(const rtu::ServerInfo &info
 }
 
 bool rtu::ApplyChangesTask::Impl::addUpdateInfoSummaryItem(const rtu::ServerInfo &info
-    , int errorCode
+    , RequestError errorCode
     , const ItfUpdateInfo &change
     , Constants::AffectedEntities affected)
 {
-    bool success = !errorCode;
+    bool success = (errorCode == RequestError::kSuccess);
 
     if (change.useDHCP)
     {

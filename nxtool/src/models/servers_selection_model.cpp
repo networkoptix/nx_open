@@ -401,7 +401,7 @@ public:
         , const QString &host);
 
     void updateExtraInfoFailed(const QUuid &id
-        , int errorCode);
+        , RequestError errorCode);
 
     bool findServer(const QUuid &id
         , ItemSearchInfo &searchInfo);
@@ -451,7 +451,7 @@ rtu::ServersSelectionModel::Impl::Impl(rtu::ServersSelectionModel *owner
 
     , m_updateExtra([this](const QUuid &id, const ExtraServerInfo &extra
         , const QString &host) { updateExtraInfo(id, extra, host); })
-    , m_updateExtraFailed([this](const QUuid &id, int errorCode) { updateExtraInfoFailed(id, errorCode); })
+    , m_updateExtraFailed([this](const QUuid &id, RequestError errorCode) { updateExtraInfoFailed(id, errorCode); })
     , m_unknownEntities()
 
 {
@@ -914,14 +914,15 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfo(const QUuid &id
 }
 
 void rtu::ServersSelectionModel::Impl::updateExtraInfoFailed(const QUuid &id
-    , int errorCode)
+    , RequestError errorCode)
 {
     /// Server is not available or can't be logged in
     ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
         return;
 
-    const ServerLoggedState newLoggedState = (errorCode == kUnauthorizedError ? kServerUnauthorized : kDifferentNetwork);
+    const ServerLoggedState newLoggedState = (errorCode == RequestError::kUnauthorized 
+        ? kServerUnauthorized : kDifferentNetwork);
 
     ServerLoggedState &currentLoggedState = searchInfo.serverInfoIterator->loginState;
 

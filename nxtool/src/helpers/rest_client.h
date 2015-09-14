@@ -6,6 +6,7 @@
 
 #include <QUrlQuery>
 
+#include <base/types.h>
 #include <base/server_info.h>
 
 namespace rtu
@@ -19,7 +20,7 @@ namespace rtu
         enum { kStandardTimeout = -1 };
 
         struct Request;
-        typedef std::function<void (int errorCode)> ErrorCallback;
+        typedef std::function<void (RequestError errorCode)> ErrorCallback;
         typedef std::function<void (const QByteArray &data)> SuccessCallback;
 
     public:

@@ -14,8 +14,7 @@ namespace
     rtu::ApplyChangesTaskPtr createTask(rtu::RtuContext *context
         , const rtu::ChangesetPointer &changeset
         , rtu::ServersSelectionModel *selectionModel
-        , rtu::ServersFinder *serversFinder
-        , rtu::ChangesManager *changesManager)
+        , rtu::ServersFinder *serversFinder)
     {
         const rtu::ApplyChangesTaskPtr task = 
             rtu::ApplyChangesTask::create(changeset, selectionModel->selectedServers());
@@ -92,7 +91,7 @@ QObject *rtu::ChangesManager::changeset()
 void rtu::ChangesManager::applyChanges()
 {
     const ApplyChangesTaskPtr &task = 
-        createTask(m_context, m_changeset, m_selectionModel, m_serversFinder, this);
+        createTask(m_context, m_changeset, m_selectionModel, m_serversFinder);
     m_context->showProgressTask(task);
     clearChanges();
 }
