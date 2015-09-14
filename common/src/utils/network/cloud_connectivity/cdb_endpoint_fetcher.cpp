@@ -11,13 +11,10 @@
 #include <utils/common/log.h>
 
 #include "cloud_modules_xml_sax_handler.h"
-#include "data/types.h"
 #include "version.h"
 
-
 namespace nx {
-namespace cdb {
-namespace cl {
+namespace cc {
 
 CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(QString moduleName)
 :
@@ -42,7 +39,7 @@ void CloudModuleEndPointFetcher::setEndpoint(SocketAddress endpoint)
 
 //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
 void CloudModuleEndPointFetcher::get(
-    std::function<void(api::ResultCode, SocketAddress)> handler)
+    std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler)
 {
     //TODO #ak if async resolve is already started, should wait for its completion
 
@@ -52,7 +49,7 @@ void CloudModuleEndPointFetcher::get(
     {
         auto result = m_endpoint.get();
         lk.unlock();
-        handler(api::ResultCode::ok, std::move(result));
+        handler(nx_http::StatusCode::ok, std::move(result));
         return;
     }
 
@@ -63,30 +60,33 @@ void CloudModuleEndPointFetcher::get(
         m_httpClient.get(), [this, handler](nx_http::AsyncHttpClientPtr client){
             onHttpClientDone(std::move(client), std::move(handler)); },
         Qt::DirectConnection);
-    if (!m_httpClient->doGet(QUrl(QN_CLOUD_MODULES_XML)))
+    if (!m_httpClient->doGet(QUrl(lit(QN_CLOUD_MODULES_XML))))
     {
         m_httpClient.reset();
-        return handler(api::ResultCode::networkError, SocketAddress());
+        return handler(nx_http::StatusCode::serviceUnavailable, SocketAddress());
     }
 }
 
 void CloudModuleEndPointFetcher::onHttpClientDone(
     nx_http::AsyncHttpClientPtr client,
-    std::function<void(api::ResultCode, SocketAddress)> handler)
+    std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler)
 {
-    auto localHandler = [this, handler](api::ResultCode resCode, SocketAddress endpoint){
+    auto localHandler = [this, handler](nx_http::StatusCode::Value resCode,
+                                        SocketAddress endpoint)
+    {
         handler(resCode, std::move(endpoint));
         QnMutexLocker lk(&m_mutex);
         m_httpClient.reset();
     };
 
     if (!client->response())
-        return localHandler(api::ResultCode::networkError, SocketAddress());
+        return localHandler(nx_http::StatusCode::serviceUnavailable,
+                            SocketAddress());
 
     if (client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
         return localHandler(
-            api::httpStatusCodeToResultCode(static_cast<nx_http::StatusCode::Value>(
-                client->response()->statusLine.statusCode)),
+            static_cast< nx_http::StatusCode::Value >(
+                client->response()->statusLine.statusCode ),
             SocketAddress());
 
     parseCloudXml(client->fetchMessageBodyBuffer());
@@ -96,9 +96,10 @@ void CloudModuleEndPointFetcher::onHttpClientDone(
     lk.unlock();
 
     if (!endpoint)
-        return localHandler(api::ResultCode::networkError, SocketAddress());
-    
-    localHandler(api::ResultCode::ok, m_endpoint.get());
+        return localHandler(nx_http::StatusCode::serviceUnavailable,
+                            SocketAddress());
+
+    localHandler(nx_http::StatusCode::ok, m_endpoint.get());
 }
 
 void CloudModuleEndPointFetcher::parseCloudXml(QByteArray xmlData)
@@ -113,8 +114,9 @@ void CloudModuleEndPointFetcher::parseCloudXml(QByteArray xmlData)
     QXmlInputSource input(&xmlBuffer);
     if (!reader.parse(&input))
     {
-        NX_LOG(lit("Failed to parse cloud_modules.xml from %1. %2").
-            arg(QN_CLOUD_MODULES_XML).arg(xmlHandler.errorString()), cl_logERROR);
+        NX_LOG(lit("Failed to parse cloud_modules.xml from %1. %2")
+               .arg(lit(QN_CLOUD_MODULES_XML)).arg(xmlHandler.errorString()),
+               cl_logERROR);
         return;
     }
 
@@ -127,7 +129,5 @@ void CloudModuleEndPointFetcher::parseCloudXml(QByteArray xmlData)
     }
 }
 
-
-}   //cl
-}   //cdb
+}   //cc
 }   //nx

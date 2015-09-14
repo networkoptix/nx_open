@@ -3,8 +3,8 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_CDB_ENDPOINT_FETCHER_H
-#define NX_CDB_ENDPOINT_FETCHER_H
+#ifndef NX_CC_CDB_ENDPOINT_FETCHER_H
+#define NX_CC_CDB_ENDPOINT_FETCHER_H
 
 #include <functional>
 
@@ -16,13 +16,8 @@
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/thread/mutex.h>
 
-#include "include/cdb/result_code.h"
-
-
 namespace nx {
-namespace cdb {
-namespace cl {
-
+namespace cc {
 
 //!Retrieves url to the specified cloud module
 class CloudModuleEndPointFetcher
@@ -35,7 +30,7 @@ public:
     void setEndpoint(SocketAddress endpoint);
 
     //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
-    void get(std::function<void(api::ResultCode, SocketAddress)> handler);
+    void get(std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler);
 
 private:
     mutable QnMutex m_mutex;
@@ -45,13 +40,11 @@ private:
 
     void onHttpClientDone(
         nx_http::AsyncHttpClientPtr client,
-        std::function<void(api::ResultCode, SocketAddress)> handler);
+        std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler);
     void parseCloudXml(QByteArray xmlData);
 };
 
-
-}   //cl
-}   //cdb
+}   //cc
 }   //nx
 
-#endif  //NX_CDB_ENDPOINT_FETCHER_H
+#endif  //NX_CC_CDB_ENDPOINT_FETCHER_H

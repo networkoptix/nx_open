@@ -3,8 +3,8 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_CDB_CL_CLOUD_MODULES_XML_SAX_HANDLER_H
-#define NX_CDB_CL_CLOUD_MODULES_XML_SAX_HANDLER_H
+#ifndef NX_CC_CLOUD_MODULES_XML_SAX_HANDLER_H
+#define NX_CC_CLOUD_MODULES_XML_SAX_HANDLER_H
 
 #include <list>
 #include <map>
@@ -13,11 +13,8 @@
 
 #include <utils/network/socket_common.h>
 
-
 namespace nx {
-namespace cdb {
-namespace cl {
-
+namespace cc {
 
 class CloudModulesXmlHandler
 :
@@ -60,8 +57,7 @@ private:
     QString m_currentModule;
 };
 
-}   //cl
-}   //cdb
+}   //cc
 }   //nx
 
-#endif  //NX_CDB_CL_CLOUD_MODULES_XML_SAX_HANDLER_H
+#endif  //NX_CC_CLOUD_MODULES_XML_SAX_HANDLER_H
