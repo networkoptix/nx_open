@@ -18,7 +18,7 @@ public:
     QnNetworkProxyFactory();
     virtual ~QnNetworkProxyFactory();
 
-    QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString());
+    virtual QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString());
 
     virtual QNetworkProxy proxyToResource(const QnResourcePtr &resource);
 

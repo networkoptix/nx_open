@@ -30,3 +30,15 @@ QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &
 
     return QNetworkProxy(QNetworkProxy::HttpProxy, url.host(), url.port(), url.userName(), url.password());
 }
+
+QUrl QnSimpleNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName) {
+    QUrl url = base_type::urlToResource(baseUrl, resource, proxyQueryParameterName);
+
+    QUrl ecUrl = QnAppServerConnectionFactory::url();
+    if (ecUrl.isValid()) {
+        url.setHost(ecUrl.host());
+        url.setPort(ecUrl.port());
+    }
+
+    return url;
+}
