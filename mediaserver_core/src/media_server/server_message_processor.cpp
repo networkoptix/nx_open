@@ -201,9 +201,8 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
     if( xServerGuidIter != request.headers.end() )
     {
-        const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;
-        const QByteArray localServerGUID = qnCommon->moduleGUID().toByteArray();
-        return desiredServerGuid != localServerGUID;
+        QnUuid desiredServerGuid(xServerGuidIter->second);
+        return desiredServerGuid != qnCommon->moduleGUID();
     }
 
     nx_http::BufferType desiredCameraGuid;

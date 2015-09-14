@@ -456,15 +456,6 @@ namespace nx_hls
         nx_hls::VariantPlaylist playlist;
 
         QUrl baseUrl;
-        nx_http::HttpHeaders::const_iterator hostIter = request.headers.find( "Host" );
-        if( hostIter != request.headers.end() )
-        {
-            SocketAddress sockAddress( hostIter->second );
-            baseUrl.setHost( sockAddress.address.toString() );
-            if( sockAddress.port > 0 )
-                baseUrl.setPort( sockAddress.port );
-            baseUrl.setScheme( QLatin1String("http") );
-        }
 
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
@@ -596,15 +587,6 @@ namespace nx_hls
         }
 
         QUrl baseChunkUrl;
-        nx_http::HttpHeaders::const_iterator hostIter = request.headers.find( "Host" );
-        if( hostIter != request.headers.end() )
-        {
-            SocketAddress sockAddress( hostIter->second );
-            baseChunkUrl.setHost( sockAddress.address.toString() );
-            if( sockAddress.port > 0 )
-                baseChunkUrl.setPort( sockAddress.port );
-            baseChunkUrl.setScheme( QLatin1String("http") );
-        }
         baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
 
         //if needed, adding proxy information to playlist url

@@ -13,7 +13,8 @@ static const uint MIN_DELAY_RATIO = 30;
 static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
 static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
 
-static const uint TIMER_CYCLE = 60000; /* msecs, update state every minute */
+static const uint TIMER_CYCLE = 60 * 1000; /* msecs, update state every minute */
+static const uint TIMER_CYCLE_MAX = 24 * 60 * 60 * 1000; /* msecs, once a day at least */
 static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
 static const QString ALREADY_IN_PROGRESS = lit("already in progress");
@@ -63,6 +64,7 @@ namespace ec2
         : m_admin(getAdmin(userManager))
         , m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
         , m_msManager(msManager)
+        , m_timerCycle( TIMER_CYCLE )
         , m_timerDisabled(false)
         , m_timerId(boost::none)
     {
@@ -198,8 +200,13 @@ namespace ec2
     {
         QMutexLocker lk(&m_mutex);
         if (!m_timerDisabled)
+        {
             m_timerId = TimerManager::instance()->addTimer(
-                std::bind(&Ec2StaticticsReporter::timerEvent, this), TIMER_CYCLE);
+                std::bind(&Ec2StaticticsReporter::timerEvent, this), m_timerCycle);
+
+            NX_LOG(lit("Ec2StaticticsReporter: Timer is set with delay %1")
+                   .arg(m_timerCycle), cl_logDEBUG1);
+        }
     }
 
     void Ec2StaticticsReporter::removeTimer()
@@ -294,8 +301,12 @@ namespace ec2
         const auto format = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         if (!m_httpClient->doPost(url, format, QJson::serialized(data)))
         {
-            NX_LOG(lit("Ec2StaticticsReporter: Could not send report to %1")
-                   .arg(url.toString()), cl_logWARNING);
+            if ((m_timerCycle *= 2) > TIMER_CYCLE_MAX)
+                m_timerCycle = TIMER_CYCLE_MAX;
+
+            NX_LOG(lit("Ec2StaticticsReporter: Could not doPost to %1, update timer cycle to %2")
+                   .arg(url.toString()).arg(m_timerCycle), cl_logWARNING);
+
             return ErrorCode::failure;
         }
 
@@ -329,6 +340,7 @@ namespace ec2
     {
         if (httpClient->hasRequestSuccesed())
         {
+            m_timerCycle = TIMER_CYCLE;
             NX_LOG(lit("Ec2StaticticsReporter: Statistics report successfully sent to %1")
                    .arg(httpClient->url().toString()), cl_logINFO);
             
@@ -340,8 +352,12 @@ namespace ec2
         }
         else
         {
-            NX_LOG(lit("Ec2StaticticsReporter: Could not send report to %1, retry after random delay...")
-                   .arg(httpClient->url().toString()), cl_logWARNING);
+            if ((m_timerCycle *= 2) > TIMER_CYCLE_MAX)
+                m_timerCycle = TIMER_CYCLE_MAX;
+
+            NX_LOG(lit("Ec2StaticticsReporter: doPost to %1 has failed, update timer cycle to %2")
+                   .arg(httpClient->url().toString()).arg(m_timerCycle), cl_logWARNING);
+
         }
 
         setupTimer();

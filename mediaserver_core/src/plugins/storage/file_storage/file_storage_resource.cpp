@@ -304,7 +304,7 @@ int QnFileStorageResource::mountTmpDrive() const
 #else
 bool QnFileStorageResource::updatePermissions() const
 {
-    if (getUrl().startsWith("smb://"))
+    if (getUrl().startsWith("smb://") && !QUrl(getUrl()).userName().isEmpty())
     {
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));

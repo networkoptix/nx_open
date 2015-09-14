@@ -39,8 +39,6 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
-#include <platform/platform_abstraction.h>
-
 #include <redass/redass_controller.h>
 
 #include <recording/time_period.h>
@@ -85,8 +83,6 @@
 #include <utils/common/uuid_pool.h>
 
 #include <utils/common/app_info.h>
-
-#include "version.h"
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -504,7 +500,7 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexLi
     cleanupUnusedLayouts();
 }
 
-bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr &videowall) {
+bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr &videowall) const {
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) {
         qWarning() << "Warning: pc UUID is null, cannot start Video Wall on this pc";
@@ -1685,24 +1681,13 @@ void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered() {
     if (!videowall)
         return;
 
-    bool shortcutsSupported = qnPlatform->shortcuts()->supported();
-
     QScopedPointer<QnVideowallSettingsDialog> dialog(new QnVideowallSettingsDialog(mainWindow()));
     dialog->loadFromResource(videowall);
-    dialog->setShortcutsSupported(shortcutsSupported);
-    if (shortcutsSupported)
-        dialog->setCreateShortcut(shortcutExists(videowall));
+
     if (!dialog->exec())
         return;
 
     dialog->submitToResource(videowall);
-    if (shortcutsSupported) {
-        if (dialog->isCreateShortcut())
-            createShortcut(videowall);
-        else
-            deleteShortcut(videowall);
-    }
-
     saveVideowall(videowall);
 }
 
@@ -2338,49 +2323,6 @@ void QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout() {
         }
         sendMessage(message);
     }
-}
-
-QString QnWorkbenchVideoWallHandler::shortcutPath() {
-    QString result = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    if (result.isEmpty())
-        result = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    return result;
-}
-
-
-bool QnWorkbenchVideoWallHandler::shortcutExists(const QnVideoWallResourcePtr &videowall) const {
-    QString destinationPath = shortcutPath();
-    if (destinationPath.isEmpty())
-        return false;
-
-    return qnPlatform->shortcuts()->shortcutExists(destinationPath, videowall->getName());
-}
-
-bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &videowall) {
-
-    QString destinationPath = shortcutPath();
-    if (destinationPath.isEmpty())
-        return false;
-
-    QStringList arguments;
-    arguments << lit("--videowall");
-    arguments << videowall->getId().toString();
-
-    QUrl url = QnAppServerConnectionFactory::url();
-    url.setUserName(QString());
-    url.setPassword(QString());
-
-    arguments << lit("--auth");
-    arguments << QString::fromUtf8(url.toEncoded());
-
-    return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments, IDI_ICON_VIDEOWALL);
-}
-
-bool QnWorkbenchVideoWallHandler::deleteShortcut(const QnVideoWallResourcePtr &videowall) {
-    QString destinationPath = shortcutPath();
-    if (destinationPath.isEmpty())
-        return true;
-    return qnPlatform->shortcuts()->deleteShortcut(destinationPath, videowall->getName());
 }
 
 void QnWorkbenchVideoWallHandler::saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout) {
