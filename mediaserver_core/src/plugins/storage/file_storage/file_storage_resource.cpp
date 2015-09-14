@@ -308,8 +308,9 @@ int QnFileStorageResource::mountTmpDrive() const
 #else
 bool QnFileStorageResource::updatePermissions() const
 {
-    if (getUrl().startsWith("smb://") && !QUrl(getUrl()).userName().isEmpty())
+    if (getUrl().startsWith("smb://"))
     {
+        QString userName = QUrl(getUrl()).userName().isEmpty() ? "guest" : QUrl(getUrl()).userName();
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));
         netRes.dwType = RESOURCETYPE_DISK;
@@ -317,7 +318,7 @@ bool QnFileStorageResource::updatePermissions() const
         QString path = lit("\\\\") + storageUrl.host() + lit("\\") + storageUrl.path().mid((1));
         netRes.lpRemoteName = (LPWSTR) path.constData();
         LPWSTR password = (LPWSTR) storageUrl.password().constData();
-        LPWSTR user = (LPWSTR) storageUrl.userName().constData();
+        LPWSTR user = (LPWSTR) userName.constData();
         if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
             return false;
     }
