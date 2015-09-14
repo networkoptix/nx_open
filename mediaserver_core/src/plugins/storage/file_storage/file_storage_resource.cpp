@@ -211,12 +211,16 @@ void QnFileStorageResource::removeOldDirs()
 {
 #ifndef _WIN32
     QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(
-        QStringList() << (lit("*") + NX_TEMP_FOLDER_NAME + lit("*")),
         QDir::AllDirs | QDir::NoDotAndDotDot
     );
 
+    static const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
+
     for (const QFileInfo &entry : tmpEntries)
     {
+        if (entry.absoluteFilePath().indexOf(prefix) == -1)
+            continue;
+
         int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
         if (ecode != 0)
         {
