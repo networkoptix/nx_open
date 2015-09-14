@@ -164,10 +164,6 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
     hardwareIds[5] = hardwareId;
     hardwareIds[6] = (hardwareId + memory_info_ba);
     hardwareIds[7] = (hardwareId + memory_info_ba + mac.toLatin1());
-
-    QString logFile = settings->get("logFile");
-    if (logFile.isEmpty())
-        return;
 }
 
 #elif defined(__arm__)

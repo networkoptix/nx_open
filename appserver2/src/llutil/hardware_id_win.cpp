@@ -26,7 +26,6 @@
 
 #include "util.h"
 #include "hardware_id.h"
-#include "hardware_id_pvt.h"
 
 #define _WIN32_DCOM
 # pragma comment(lib, "wbemuuid.lib")
@@ -106,16 +105,20 @@ static void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
 
 
 
-static QByteArray getMacAddress(const DevicesList &devices,  QSettings *settings) {
+static QByteArray getMacAddress(IWbemServices *pSvc,  QSettings *settings) {
+    DevicesList devices;
+
+    findMacAddresses(pSvc, devices);
+
     if (devices.empty())
         return QByteArray();
 
     return getSaveMacAddress(devices, settings).toUtf8();
 }
 
-static QString execQueryForHWID1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName)
+static void execQuery1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr)
 {
-    bstr_t rezStr = _T("");
+    rezStr = _T("");
 
     bstr_t reqStr = bstr_t(_T("SELECT ")) + fieldName + _T(" FROM ") + objectName;
 
@@ -165,13 +168,11 @@ static QString execQueryForHWID1(IWbemServices *pSvc, const BSTR fieldName, cons
     }
 
     pEnumerator->Release();
-
-    return (LPCSTR)rezStr;
 }
 
-static QString execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName)
+static void execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr)
 {
-    bstr_t rezStr = _T("");
+    rezStr = _T("");
 
     bstr_t reqStr = bstr_t(_T("SELECT ")) + fieldName + _T(" FROM ") + objectName;
 
@@ -231,8 +232,6 @@ static QString execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR 
     for (StrSet::const_iterator ci = values.begin(); ci != values.end(); ++ci) {
         rezStr += bstr_t(ci->AllocSysString(), false);
     }
-
-    return (LPCSTR)rezStr;
 }
 
 static unsigned short SwapShort(unsigned short a)
@@ -250,56 +249,64 @@ static unsigned int SwapWord(unsigned int a)
   return a;
 }
 
-static QString changedGuidByteOrder(const QString& guid)
+static void changeGuidByteOrder(bstr_t& guid)
 {
     if (guid.length() != 36)
-        return QString();
+        return;
 
-    std::string guid_str(guid.toStdString());
+    std::string guid_str((const char*)guid);
     LLUtil::changeGuidByteOrder(guid_str);
-    return guid_str.c_str();
+    guid = guid_str.c_str();
 }
 
-typedef QString (*ExecQueryFunction)(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName);
-
-static void fillHardwareInfo(IWbemServices *pSvc, ExecQueryFunction execQuery, HardwareInfo& hardwareInfo)
+static void calcHardwareId(QByteArray &hardwareId, IWbemServices *pSvc, int version, bool guidCompatibility, QSettings *settings, const QByteArray& mac)
 {
-    hardwareInfo.compatibilityBoardUUID = execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"));
-    hardwareInfo.boardUUID = changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
+    void (*execQuery)(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr);
 
-    hardwareInfo.boardID = execQuery(pSvc, _T("SerialNumber"), _T("Win32_BaseBoard"));
-    hardwareInfo.boardManufacturer = execQuery(pSvc, _T("Manufacturer"), _T("Win32_BaseBoard"));
-    hardwareInfo.boardProduct = execQuery(pSvc, _T("Product"), _T("Win32_BaseBoard"));
+    execQuery = version == 1 ? execQuery1 : execQuery2;
 
-    hardwareInfo.biosID = execQuery(pSvc, _T("SerialNumber"), _T("CIM_BIOSElement"));
-    hardwareInfo.biosManufacturer = execQuery(pSvc, _T("Manufacturer"), _T("CIM_BIOSElement"));
+    bstr_t boardID, boardUUID, boardManufacturer, boardProduct;
+    bstr_t biosID, biosManufacturer;
+    bstr_t hddID, hddManufacturer;
+    bstr_t memoryPartNumber, memorySerialNumber;
 
-    hardwareInfo.memoryPartNumber = execQuery(pSvc, _T("PartNumber"), _T("Win32_PhysicalMemory"));
-    hardwareInfo.memorySerialNumber = execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"));
-}
+    execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"), boardUUID);
 
-static void calcHardwareId(QString &hardwareId, const HardwareInfo& hi, int version, bool guidCompatibility)
-{
-    if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length()) {
-        hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
+    if (!guidCompatibility)
+        changeGuidByteOrder(boardUUID);
+
+    execQuery(pSvc, _T("SerialNumber"), _T("Win32_BaseBoard"), boardID);
+    execQuery(pSvc, _T("Manufacturer"), _T("Win32_BaseBoard"), boardManufacturer);
+    execQuery(pSvc, _T("Product"), _T("Win32_BaseBoard"), boardProduct);
+
+    execQuery(pSvc, _T("SerialNumber"), _T("CIM_BIOSElement"), biosID);
+    execQuery(pSvc, _T("Manufacturer"), _T("CIM_BIOSElement"), biosManufacturer);
+
+    execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMedia"), hddID);
+    execQuery(pSvc, _T("Manufacturer"), _T("Win32_PhysicalMedia"), hddManufacturer);
+    execQuery(pSvc, _T("PartNumber"), _T("Win32_PhysicalMemory"), memoryPartNumber);
+    execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"), memorySerialNumber);
+
+    if (boardID.length() || boardUUID.length() || biosID.length()) {
+        hardwareId = (LPCSTR) (boardID + boardUUID + boardManufacturer + boardProduct + biosID + biosManufacturer);
         if (version == 3) {
-            hardwareId += hi.memoryPartNumber + hi.memorySerialNumber;
+            hardwareId += (LPCSTR)(memoryPartNumber + memorySerialNumber);
         }
     } else {
         hardwareId.clear();
     }
 
-    if (version == 4 && hi.mac.length() > 0)
-        hardwareId += hi.mac;
+    if (version == 4 && mac.length() > 0)
+        hardwareId += mac;
 }
 
 } // namespace {}
 
 namespace LLUtil {
-    void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo);
+    void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings);
 }
 
-void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo)
+void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
 {
     bool needUninitialize = true;
     HRESULT hres;
@@ -339,8 +346,8 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, Hard
         NULL                         // Reserved
         );
 
-    // NOTE: on the client CoInitializeSecurity might be already executed,
-    //       which should not leed to the error
+	// NOTE: on the client CoInitializeSecurity might be already executed,
+	//       which should not leed to the error
     if (FAILED(hres) && hres != RPC_E_TOO_LATE)
     {
         std::ostringstream os;
@@ -428,21 +435,10 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, Hard
         throw HardwareIdError(os.str());
     }
 
-
-    findMacAddresses(pSvc, hardwareInfo.nics);
-    hardwareInfo.mac = getMacAddress(hardwareInfo.nics, settings);
-
-    // Only for HWID1
-    HardwareInfo v1HardwareInfo;
-    fillHardwareInfo(pSvc, execQueryForHWID1, v1HardwareInfo);
-    calcHardwareId(hardwareIds[0], v1HardwareInfo, 1, false);
-    calcHardwareId(hardwareIds[LATEST_HWID_VERSION], v1HardwareInfo, 1, true);
-
-    // For HWID>1
-    fillHardwareInfo(pSvc, execQuery2, hardwareInfo);
-    for (int i = 1; i < LATEST_HWID_VERSION; i++) {
-        calcHardwareId(hardwareIds[i], hardwareInfo, i + 1, false);
-        calcHardwareId(hardwareIds[LATEST_HWID_VERSION + i], hardwareInfo, i + 1, true);
+    QByteArray mac = getMacAddress(pSvc, settings);
+    for (int i = 0; i < LATEST_HWID_VERSION; i++) {
+        calcHardwareId(hardwareIds[i], pSvc, i + 1, false, settings, mac);
+        calcHardwareId(hardwareIds[LATEST_HWID_VERSION + i], pSvc, i + 1, true, settings, mac);
     }
 
     // Cleanup
