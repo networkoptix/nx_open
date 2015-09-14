@@ -214,7 +214,7 @@ void QnFileStorageResource::removeOldDirs()
         QDir::AllDirs | QDir::NoDotAndDotDot
     );
 
-    static const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
+    const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
 
     for (const QFileInfo &entry : tmpEntries)
     {
