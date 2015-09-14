@@ -196,7 +196,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             // TODO: check resolution ?
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionMedia   + authParam ), type: mimeTypes['hls'], transport:'hls'},
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['hls'], transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
 
                 // Not supported:
@@ -213,6 +213,11 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.positionProvider = null;
 
         $scope.updateTime = function(currentTime, duration){
+            if(currentTime === null && duration === null){
+                //Video ended
+                $scope.switchPosition(false); // go to live here
+                return;
+            }
             currentTime = currentTime || 0;
 
             $scope.positionProvider.setPlayingPosition(currentTime*1000);

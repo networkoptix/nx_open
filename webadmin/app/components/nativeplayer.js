@@ -53,7 +53,7 @@ var nativePlayer = new (function () {
         currentVideo.load();
 
 
-        var events = [
+        /*var events = [
             "abort",// Data loading was aborted
             "error",// An error occured
             "emptied",// Data not present unexpectedly
@@ -88,6 +88,6 @@ var nativePlayer = new (function () {
                     }
                 });
             })(events[i]);
-        }
+        }*/
     };
 })();
