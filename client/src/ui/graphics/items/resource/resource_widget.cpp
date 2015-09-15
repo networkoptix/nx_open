@@ -297,7 +297,7 @@ void QnResourceWidget::addMainOverlay() {
     m_overlayWidgets.mainOverlay->setLayout(overlayLayout);
     m_overlayWidgets.mainOverlay->setAcceptedMouseButtons(0);
 
-    addOverlayWidget(m_overlayWidgets.mainOverlay, UserVisible, true, true, InfoLayer);
+    addOverlayWidget(m_overlayWidgets.mainOverlay, AutoVisible, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, false, false);
 }
 
@@ -760,7 +760,6 @@ void QnResourceWidget::updateHud(bool animate) {
     m_buttonBar->setVisible(buttonsVisible);
 
     setOverlayWidgetVisible(m_overlayWidgets.infoOverlay,   detailsVisible && !m_mouseInWidget, animate);
-    setOverlayWidgetVisible(m_overlayWidgets.mainOverlay,   m_mouseInWidget, animate);
 }
 
 bool QnResourceWidget::isHovered() const {
@@ -885,13 +884,20 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
 void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     m_mouseInWidget = true;
 
+    setOverlayVisible();
     updateHud();
     base_type::hoverEnterEvent(event);
+}
+
+void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+    setOverlayVisible();
+    base_type::hoverMoveEvent(event);
 }
 
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     m_mouseInWidget = false;
 
+    setOverlayVisible(false);
     updateHud();
     base_type::hoverLeaveEvent(event);
 }
