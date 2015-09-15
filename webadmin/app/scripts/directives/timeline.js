@@ -277,6 +277,10 @@ angular.module('webadminApp')
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var canvas = element.find('canvas').get(0);
+                canvas.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                });
+
                 scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,
                     timelineConfig.maxMsPerPixel,
                     timelineConfig.initialInterval,
@@ -740,12 +744,13 @@ angular.module('webadminApp')
                 // !!! Draw events
                 function drawOrCheckEvents(context){
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
-                    var newMouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
-                    mouseInEvents = newMouseInEvents;
 
                     if(!context){
+                        var newMouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
+                        mouseInEvents = newMouseInEvents;
                         return;
                     }
+
                     context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
                     context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
@@ -900,12 +905,10 @@ angular.module('webadminApp')
                 }
 
                 function drawPointerMarker(context){
-                    if(window.jscd.mobile){
+                    if(window.jscd.mobile || !mouseCoordinate || !mouseInEvents){
                         return;
                     }
-                    if(!mouseCoordinate || !mouseInEvents){
-                        return;
-                    }
+
                     drawMarker(context, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
                 }
 
@@ -998,7 +1001,9 @@ angular.module('webadminApp')
                     mouseRow = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     drawOrCheckScrollBar();
-                    drawOrCheckEvents();
+                    if( mouseCoordinate >= 0 ) {
+                        drawOrCheckEvents();
+                    }
 
                 }
 
@@ -1103,6 +1108,8 @@ angular.module('webadminApp')
                     //TODO: "move playing position";
                 };
                 scope.mouseLeave = function(event){
+                    mouseInEvents = false;
+                    mouseInTimeline = false;
                     //updateMouseCoordinate(null);
                 };
                 scope.mouseMove = function(event){
