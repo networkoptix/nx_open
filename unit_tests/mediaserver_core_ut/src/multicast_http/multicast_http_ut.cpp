@@ -27,6 +27,7 @@ public:
     {
         StateSingleTest,
         StateAuthTest,
+        StateTimeoutTest,
         StateParralelTest,
         StateParralelTestInProgress,
         StateStopping
@@ -83,8 +84,42 @@ public:
             ASSERT_TRUE(response.httpResult == 401); // HTTP Unauthorized
             m_runningRequestId = QUuid();
 
-            m_state = StateParralelTest;
+            m_state = StateTimeoutTest;
         }, 3000);
+    }
+
+    void callbackTimeout(const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
+    {
+        ASSERT_TRUE(m_runningRequestId == requestId);
+        ASSERT_TRUE(errCode == QnMulticast::ErrCode::timeout);
+        m_runningRequestId = QUuid();
+        if (++m_requests == 5)
+            m_state = StateParralelTest;
+        else 
+        {
+            QnMulticast::Request request;
+            request.method = lit("GET");
+            request.serverId = QUuid::createUuid(); // missing server
+            request.url = QUrl(lit("api/showLog"));
+            request.auth.setUser(lit("admin"));
+            request.auth.setPassword(lit("12345"));
+            using namespace std::placeholders;
+            m_runningRequestId = m_client.execRequest(request, std::bind(&MulticastHttpTestWorker::callbackTimeout, this, _1, _2, _3), 50);
+        }
+    };
+
+    void doTimeoutTest()
+    {
+        m_requests = 0;
+        QnMulticast::Request request;
+        request.method = lit("GET");
+        request.serverId = QUuid::createUuid(); // missing server
+        request.url = QUrl(lit("api/showLog"));
+        request.auth.setUser(lit("admin"));
+        request.auth.setPassword(lit("12345"));
+
+        using namespace std::placeholders;
+        m_runningRequestId = m_client.execRequest(request, std::bind(&MulticastHttpTestWorker::callbackTimeout, this, _1, _2, _3), 50);
     }
 
     void doParallelTest()
@@ -140,6 +175,8 @@ public:
             doSingleTest();
         else if (m_state == StateAuthTest)
             doAuthTest();
+        else if (m_state == StateTimeoutTest)
+            doTimeoutTest();
         else if (m_state == StateParralelTest)
             doParallelTest();
     }
