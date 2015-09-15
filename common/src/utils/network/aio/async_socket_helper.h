@@ -8,7 +8,6 @@
 
 #include <atomic>
 #include <functional>
-#include <future>
 
 #include <QtCore/QThread>
 
@@ -239,16 +238,21 @@ public:
 
         if (waitForRunningHandlerCompletion)
         {
-            std::promise<void> terminatedPromise;
-            std::future<void> teminatedFuture = terminatedPromise.get_future();
+            QMutex mtx;
+            QWaitCondition cond;
+            bool done = false;
             aio::AIOService::instance()->dispatch(
                 this->m_socket,
-                [this, &terminatedPromise, eventType]() {
+                [this, &mtx, &cond, &done, eventType]() {
                     stopPollingSocket(this->m_socket, eventType);
-                    terminatedPromise.set_value();
+                    QMutexLocker lk(&mtx);
+                    done = true;
+                    cond.wakeAll();
                 });
 
-            teminatedFuture.wait();
+            QMutexLocker lk(&mtx);
+            while(!done)
+                cond.wait(lk.mutex());
         }
         else
         {
