@@ -5,7 +5,7 @@
 
 #include "http_request_attr_reader.h"
 
-#include "data/cdb_ns.h"
+#include "cdb_ns.h"
 
 
 namespace nx {
@@ -21,7 +21,7 @@ bool HttpRequestResourceReader::getAsVariant(int resID, QVariant* const value) c
 {
     switch (resID)
     {
-        case param::requestPath:
+        case attr::requestPath:
             *value = m_request.requestLine.url.path();
             return true;
         default:

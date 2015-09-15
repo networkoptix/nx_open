@@ -12,7 +12,7 @@
 #include <utils/serialization/sql_functions.h>
 
 #include "access_control/authorization_manager.h"
-#include "data/cdb_ns.h"
+#include "stree/cdb_ns.h"
 
 
 namespace nx {
@@ -33,7 +33,7 @@ void SystemManager::bindSystemToAccount(
     std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
     QnUuid accountID;
-    if (!authzInfo.get(cdb::param::accountID, &accountID))
+    if (!authzInfo.get(cdb::attr::accountID, &accountID))
     {
         completionHandler(api::ResultCode::notAuthorized, data::SystemData());
         return;
@@ -89,7 +89,7 @@ void SystemManager::getSystems(
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     data::SystemDataList resultData;
-    if (auto systemID = wholeFilterMap.get(cdb::param::systemID))
+    if (auto systemID = wholeFilterMap.get(cdb::attr::systemID))
     {
         //selecting system by id
         auto system = m_cache.find(systemID.get().value<QnUuid>());
@@ -97,7 +97,7 @@ void SystemManager::getSystems(
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
     }
-    //    else if(auto accountID = wholeFilterMap.get<QnUuid>(cdb::param::accountID)) 
+    //    else if(auto accountID = wholeFilterMap.get<QnUuid>(cdb::attr::accountID)) 
     //        ;//TODO #ak effectively selecting systems with specified account id
     else
     {

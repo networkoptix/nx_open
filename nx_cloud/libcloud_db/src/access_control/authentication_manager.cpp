@@ -12,7 +12,7 @@
 #include <network/auth_restriction_list.h>
 #include <utils/network/http/auth_tools.h>
 
-#include "data/cdb_ns.h"
+#include "stree/cdb_ns.h"
 #include "managers/account_manager.h"
 #include "managers/system_manager.h"
 #include "stree/http_request_attr_reader.h"
@@ -69,14 +69,14 @@ bool AuthenticationManager::authenticate(
     stree::ResourceContainer authResult;
     stree::ResourceContainer inputRes;
     if (authzHeader && !authzHeader->userid().isEmpty())
-        inputRes.put(param::userName, authzHeader->userid());
+        inputRes.put(attr::userName, authzHeader->userid());
     SocketResourceReader socketResources(*connection.socket());
     HttpRequestResourceReader httpRequestResources(request);
     m_stree.search(
         StreeOperation::authentication,
         stree::MultiSourceResourceReader(socketResources, httpRequestResources, inputRes),
         &authResult);
-    if (auto authenticated = authResult.get(param::authenticated))
+    if (auto authenticated = authResult.get(attr::authenticated))
     {
         if (authenticated.get().toBool())
             return true;
@@ -126,12 +126,12 @@ bool AuthenticationManager::findHa1(
     stree::AbstractResourceWriter* const authProperties) const
 {
     //TODO #ak analyzing authSearchResult for password or ha1 pesence
-    if (auto foundHa1 = authSearchResult.get(param::ha1))
+    if (auto foundHa1 = authSearchResult.get(attr::ha1))
     {
         *ha1 = foundHa1.get().toString().toLatin1();
         return true;
     }
-    if (auto password = authSearchResult.get(param::userPassword))
+    if (auto password = authSearchResult.get(attr::userPassword))
     {
         *ha1 = calcHa1(
             username,
@@ -144,7 +144,7 @@ bool AuthenticationManager::findHa1(
     {
         *ha1 = accountData.get().passwordHa1.c_str();
         authProperties->put(
-            cdb::param::accountID,
+            cdb::attr::accountID,
             QVariant::fromValue(accountData.get().id));
     }
     else if (auto systemData = m_systemManager.findSystemByID(QnUuid::fromStringSafe(username)))
@@ -155,7 +155,7 @@ bool AuthenticationManager::findHa1(
             realm(),
             nx::String(systemData.get().authKey.c_str()));
         authProperties->put(
-            cdb::param::systemID,
+            cdb::attr::systemID,
             QVariant::fromValue(QnUuid(systemData.get().id)));
     }
 

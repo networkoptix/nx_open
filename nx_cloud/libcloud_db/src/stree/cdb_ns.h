@@ -7,7 +7,8 @@
 namespace nx {
 namespace cdb {
 
-namespace param {
+//!Attributes to be used with stree
+namespace attr {
 enum Value
 {
     operation = 1,

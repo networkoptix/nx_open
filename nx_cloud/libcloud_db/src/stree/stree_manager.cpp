@@ -14,7 +14,7 @@
 #include <utils/common/log.h>
 #include <utils/common/model_functions.h>
 
-#include "data/cdb_ns.h"
+#include "cdb_ns.h"
 
 
 namespace nx {
@@ -37,7 +37,7 @@ void StreeManager::search(
     stree::AbstractResourceWriter* const output) const
 {
     stree::SingleResourceContainer operationRes(
-        param::operation, QnLexical::serialized(operation));
+        attr::operation, QnLexical::serialized(operation));
     stree::MultiSourceResourceReader realInput(operationRes, input);
 
     m_stree->get(realInput, output);
@@ -45,17 +45,17 @@ void StreeManager::search(
 
 void StreeManager::prepareNamespace()
 {
-    m_rns.registerResource(param::operation, "operation", QVariant::String);
-    m_rns.registerResource(param::accountID, "accountID", QVariant::String);
-    m_rns.registerResource(param::systemID, "systemID", QVariant::String);
-    m_rns.registerResource(param::authenticated, "authenticated", QVariant::Bool);
-    m_rns.registerResource(param::authorized, "authorized", QVariant::Bool);
-    m_rns.registerResource(param::ha1, "ha1", QVariant::String);
-    m_rns.registerResource(param::userName, "user.name", QVariant::String);
-    m_rns.registerResource(param::userPassword, "user.password", QVariant::String);
-    m_rns.registerResource(param::authAccountRightsOnSystem, "authAccountRightsOnSystem", QVariant::String);
-    m_rns.registerResource(param::socketIntfIP, "socket.intf.ip", QVariant::String);
-    m_rns.registerResource(param::requestPath, "request.path", QVariant::String);
+    m_rns.registerResource(attr::operation, "operation", QVariant::String);
+    m_rns.registerResource(attr::accountID, "accountID", QVariant::String);
+    m_rns.registerResource(attr::systemID, "systemID", QVariant::String);
+    m_rns.registerResource(attr::authenticated, "authenticated", QVariant::Bool);
+    m_rns.registerResource(attr::authorized, "authorized", QVariant::Bool);
+    m_rns.registerResource(attr::ha1, "ha1", QVariant::String);
+    m_rns.registerResource(attr::userName, "user.name", QVariant::String);
+    m_rns.registerResource(attr::userPassword, "user.password", QVariant::String);
+    m_rns.registerResource(attr::authAccountRightsOnSystem, "authAccountRightsOnSystem", QVariant::String);
+    m_rns.registerResource(attr::socketIntfIP, "socket.intf.ip", QVariant::String);
+    m_rns.registerResource(attr::requestPath, "request.path", QVariant::String);
 }
 
 namespace {

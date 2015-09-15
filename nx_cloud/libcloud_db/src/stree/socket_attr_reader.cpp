@@ -5,7 +5,7 @@
 
 #include "socket_attr_reader.h"
 
-#include "data/cdb_ns.h"
+#include "cdb_ns.h"
 
 
 namespace nx {
@@ -21,10 +21,10 @@ bool SocketResourceReader::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
     {
-        case param::socketIntfIP:
+        case attr::socketIntfIP:
             *value = m_socket.getLocalAddress().address.toString();
             return true;
-        case param::socketRemoteIP:
+        case attr::socketRemoteIP:
             *value = m_socket.getForeignAddress().address.toString();
             return true;
         default:

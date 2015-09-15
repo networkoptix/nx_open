@@ -7,7 +7,7 @@
 
 #include <utils/common/model_functions.h>
 
-#include "cdb_ns.h"
+#include "stree/cdb_ns.h"
 
 
 namespace nx {
@@ -33,10 +33,10 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 {
     switch( resID )
     {
-        case param::accountID:
+        case attr::accountID:
             *value = QVariant::fromValue(ownerAccountID);
             return true;
-        case param::systemID:
+        case attr::systemID:
             *value = QVariant::fromValue(id);
             return true;
     }
@@ -65,7 +65,7 @@ bool SystemID::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
     {
-        case param::systemID:
+        case attr::systemID:
             *value = QVariant::fromValue(id);
             return true;
         default:
