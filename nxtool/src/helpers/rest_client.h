@@ -33,7 +33,8 @@ namespace rtu
 
     signals:
         /// Emits when command has failed by http, but successfully executed by multicast
-        void accessibleOnlyByMulticast(const QUuid &id);
+        void accessMethodChanged(const QUuid &id
+            , bool byHttp);
 
     private:
         RestClient();

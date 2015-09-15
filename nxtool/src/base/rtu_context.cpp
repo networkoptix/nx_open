@@ -100,8 +100,8 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_selectionModel, &ServersSelectionModel::serverDiscovered);
 
-    QObject::connect(RestClient::instance(), &RestClient::accessibleOnlyByMulticast
-        , [this](const QUuid &id) { m_selectionModel->switchToMulticast(id); });
+    QObject::connect(RestClient::instance(), &RestClient::accessMethodChanged
+        , [this](const QUuid &id, bool byHttp) { m_selectionModel->changeAccessMethod(id, byHttp); });
 }
 
 rtu::RtuContext::Impl::~Impl()

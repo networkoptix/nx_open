@@ -229,7 +229,7 @@ namespace
         , kLoggedIn
         , kDefaultPassword
         , kBusyStateRoleId
-        
+
         , kLastCustomRoleId
     };
     
@@ -253,6 +253,7 @@ namespace
         result.insert(kLoggedIn, "loggedIn");
         result.insert(kDefaultPassword, "defaultPassword");
         result.insert(kBusyStateRoleId, "isBusy");
+
         return result;
     }();
     
@@ -409,7 +410,8 @@ public:
     void setBusyState(const IDsVector &ids
         , bool isBusy);
 
-    void switchToMulticast(const QUuid &id);
+    void changeAccessMethod(const QUuid &id
+        , bool byHttp);
 
 private:
     SystemModelInfo *findSystemModelInfo(const QString &systemName
@@ -514,7 +516,8 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kSystemNameRoleId:
             return systemInfo.name;
         case kNameRoleId:
-            return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress);
+            return QString("%1 (%2) (%3)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress)
+                .arg(info.baseInfo().discoveredByHttp ? "HTTP" : "MULTICAST");  /// TODO: remove after inner testing
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
@@ -1111,7 +1114,7 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
 
     qDebug() << "--- Sending update request";
     const ServerInfo &foundInfo = searchInfo.serverInfoIterator->serverInfo;
-    const ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
+    ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
         : ServerInfo(baseInfo, foundInfo.extraInfo()));
 
     m_serverInfoManager->updateServerInfos(ServerInfoContainer(1, tmp)
@@ -1269,14 +1272,15 @@ void rtu::ServersSelectionModel::Impl::setBusyState(const IDsVector &ids
 
 }
 
-void rtu::ServersSelectionModel::Impl::switchToMulticast(const QUuid &id)
+void rtu::ServersSelectionModel::Impl::changeAccessMethod(const QUuid &id
+    , bool byHttp)
 {
     ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
         return;
 
-    qDebug() << " ----- SWITCHING TO MULTICAST";
-    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().discoveredByHttp = false;
+    qDebug() << " ----- SWITCHING TO " << (byHttp ? "HTTP" : "MULTICAST");
+    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().discoveredByHttp = byHttp;
 }
 
 void rtu::ServersSelectionModel::Impl::removeServers(const IDsVector &removed)
@@ -1525,9 +1529,10 @@ void rtu::ServersSelectionModel::setBusyState(const IDsVector &ids
     m_impl->setBusyState(ids, isBusy);
 }
 
-void rtu::ServersSelectionModel::switchToMulticast(const QUuid &id)
+void rtu::ServersSelectionModel::changeAccessMethod(const QUuid &id
+    , bool byHttp)
 {
-    m_impl->switchToMulticast(id);
+    m_impl->changeAccessMethod(id, byHttp);
 }
 
 bool rtu::ServersSelectionModel::selectionOutdated() const

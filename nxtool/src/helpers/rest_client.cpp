@@ -105,6 +105,8 @@ public:
         , const QByteArray &data);
 
 private:
+    rtu::RestClient::SuccessCallback makeHttpReplyCallback(const Request &request);
+
     rtu::HttpClient::ErrorCallback makeHttpErrorCallback(const rtu::RestClient::Request &request
         , bool isGetRequest
         , const QByteArray &data = QByteArray());
@@ -142,6 +144,9 @@ rtu::HttpClient::ErrorCallback rtu::RestClient::Impl::makeHttpErrorCallback(cons
         qDebug() << " --- HTTP error callback " << request.path << " : " << static_cast<int>(errorCode);
         if (errorCode == RequestError::kUnauthorized)
         {
+            request.target->discoveredByHttp = true;
+            emit m_owner->accessMethodChanged(request.target->id, true);
+
             if (request.errorCallback)
                 request.errorCallback(errorCode);
             return;
@@ -177,16 +182,29 @@ rtu::HttpClient::ErrorCallback rtu::RestClient::Impl::makeHttpErrorCallback(cons
     return httpTryErrorCallback;
 }
 
+rtu::RestClient::SuccessCallback rtu::RestClient::Impl::makeHttpReplyCallback(const Request &request)
+{
+    const auto result = [this, request](const QByteArray &data)
+    {
+        request.target->discoveredByHttp = true;
+        emit m_owner->accessMethodChanged(request.target->id, true);
+        if (request.replyCallback)
+            request.replyCallback(data);
+    };
+
+    return result;
+}
+
 void rtu::RestClient::Impl::sendHttpGet(const Request &request)
 {
-    m_httpClient.sendGet(makeHttpUrl(request), request.replyCallback
+    m_httpClient.sendGet(makeHttpUrl(request), makeHttpReplyCallback(request)
         , makeHttpErrorCallback(request, true), request.timeout);
 }
 
 void rtu::RestClient::Impl::sendHttpPost(const Request &request
     , const QByteArray &data)
 {
-    m_httpClient.sendPost(makeHttpUrl(request), data, request.replyCallback
+    m_httpClient.sendPost(makeHttpUrl(request), data, makeHttpReplyCallback(request)
         , makeHttpErrorCallback(request, false, data), request.timeout);
 }
 
@@ -204,7 +222,7 @@ QnMulticast::ResponseCallback rtu::RestClient::Impl::makeCallbackForMulticast(co
             || (requestError == RequestError::kUnauthorized))
         {
             request.target->discoveredByHttp = false;
-            emit m_owner->accessibleOnlyByMulticast(request.target->id);
+            emit m_owner->accessMethodChanged(request.target->id, false);
         }
 
         if (requestError == rtu::RequestError::kSuccess)
