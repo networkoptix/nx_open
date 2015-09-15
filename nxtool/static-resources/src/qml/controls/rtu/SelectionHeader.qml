@@ -62,8 +62,11 @@ Base.Column
 
             Base.Text
             {
-
-                anchors.left: parent.left;
+                anchors
+                {
+                    left: parent.left;
+                    right: parent.right;
+                }
 
                 color: "white";
                 wrapMode: Text.Wrap;
@@ -75,7 +78,11 @@ Base.Column
 
             Base.Text
             {
-                anchors.left: parent.left;
+                anchors
+                {
+                    left: parent.left;
+                    right: parent.right;
+                }
 
                 color: "white";
                 wrapMode: Text.Wrap;
