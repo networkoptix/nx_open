@@ -90,6 +90,8 @@ public:
     void doParallelTest()
     {
         m_state = StateParralelTestInProgress;
+        m_firstRequest = 0;
+        m_requests = 0;
         QnMulticast::Request request1;
         request1.method = lit("GET");
         request1.serverId = QUuid(UT_SERVER_GUID);
