@@ -21,8 +21,8 @@ namespace QnMulticast
     {
         Packet();
 
-        static const int MAX_DATAGRAM_SIZE = 1412;
-        static const int MAX_PAYLOAD_SIZE = MAX_DATAGRAM_SIZE - 167;
+        static const int MAX_DATAGRAM_SIZE;
+        static const int MAX_PAYLOAD_SIZE;
 
         QUuid magic;
         int version;

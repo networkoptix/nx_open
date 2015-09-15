@@ -4,6 +4,9 @@
 namespace QnMulticast
 {
 
+const int Packet::MAX_DATAGRAM_SIZE = 1412;
+const int Packet::MAX_PAYLOAD_SIZE = Packet::MAX_DATAGRAM_SIZE - 167;
+
 static const QUuid PROTO_MAGIC("422DEA47-0B0C-439A-B1FA-19644CCBC0BD");
 static const int PROTO_VERSION = 1;
 
