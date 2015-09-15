@@ -20,25 +20,71 @@ Base.Column
         leftMargin: Common.SizeManager.spacing.medium;
         rightMargin: Common.SizeManager.spacing.medium;
     }
-    
-    Base.EmptyCell {}
 
-    Base.Text
+    Rectangle
     {
-        id: headerText;
+        color: "#1DA6DC";
 
+        height: icon.height;
         anchors
         {
             left: parent.left;
             right: parent.right;
+            leftMargin: -Common.SizeManager.spacing.medium;
+            rightMargin: -Common.SizeManager.spacing.medium;
         }
 
-        color: "#666666";
-        wrapMode: Text.Wrap;
-        font.pixelSize: Common.SizeManager.fontSizes.large;
-        horizontalAlignment: Text.AlignHCenter;
 
-        text: qsTr("Auto-Detected Servers and Systems.");
+        Image
+        {
+            id: icon;
+            source: "qrc:/resources/section_header_icon.png";
+
+            width: Common.SizeManager.clickableSizes.large * 2;
+            height: width;
+            anchors
+            {
+                left: parent.left;
+                leftMargin: Common.SizeManager.spacing.base;
+                verticalCenter: parent.verticalCenter;
+            }
+        }
+
+        Column
+        {
+            anchors
+            {
+                left: icon.right;
+                right: parent.right;
+                rightMargin: Common.SizeManager.spacing.base;
+                verticalCenter: parent.verticalCenter;
+            }
+
+            Base.Text
+            {
+
+                anchors.left: parent.left;
+
+                color: "white";
+                wrapMode: Text.Wrap;
+                font.pixelSize: Common.SizeManager.fontSizes.large;
+                horizontalAlignment: Text.AlignLeft;
+
+                text: qsTr("Auto-Detected");
+            }
+
+            Base.Text
+            {
+                anchors.left: parent.left;
+
+                color: "white";
+                wrapMode: Text.Wrap;
+                font.pixelSize: Common.SizeManager.fontSizes.large;
+                horizontalAlignment: Text.AlignLeft;
+
+                text: qsTr("Servers and Systems.");
+            }
+        }
     }
 
     Rtu.SelectAllCheckbox
