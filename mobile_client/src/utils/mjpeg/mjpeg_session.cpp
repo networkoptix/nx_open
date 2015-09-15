@@ -216,6 +216,7 @@ void QnMjpegSessionPrivate::disconnect() {
 }
 
 void QnMjpegSessionPrivate::at_reply_readyRead() {
+    /* We should process replies from the current and existing QNetworkReply object only. */
     if (reply != sender())
         return;
 

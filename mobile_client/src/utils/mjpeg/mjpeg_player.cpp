@@ -119,14 +119,14 @@ QnMjpegPlayer::QnMjpegPlayer(QObject *parent)
 {
     Q_D(QnMjpegPlayer);
 
-    connect(d->session, &QnMjpegSession::frameEnqueued, d, &QnMjpegPlayerPrivate::at_session_frameEnqueued);
-    connect(d->session, &QnMjpegSession::urlChanged, this, &QnMjpegPlayer::sourceChanged);
-
     QThread *networkThread;
     networkThread = new QThread();
     networkThread->setObjectName(lit("MJPEG Session Thread"));
     d->session->moveToThread(networkThread);
     networkThread->start();
+
+    connect(d->session, &QnMjpegSession::frameEnqueued, d, &QnMjpegPlayerPrivate::at_session_frameEnqueued);
+    connect(d->session, &QnMjpegSession::urlChanged, this, &QnMjpegPlayer::sourceChanged);
 }
 
 QnMjpegPlayer::~QnMjpegPlayer() {
