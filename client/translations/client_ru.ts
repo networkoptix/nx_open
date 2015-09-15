@@ -2603,27 +2603,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Move %1</source>
-        <translation>Переместить %1</translation>
+        <translation>Переместить</translation>
     </message>
     <message>
         <source>Check %1 Issues...</source>
-        <translation>Проверить проблемы %1...</translation>
+        <translation>Проверить проблемы: %1...</translation>
     </message>
     <message>
         <source>%1 List...</source>
-        <translation>Список %1...</translation>
+        <translation>Список устройств...</translation>
     </message>
     <message>
         <source>%1 Rules...</source>
-        <translation>Правила %1...</translation>
+        <translation>Правила: %1...</translation>
     </message>
     <message>
         <source>%1 Settings...</source>
-        <translation>Настройки %1...</translation>
+        <translation>Настройки: %1...</translation>
     </message>
     <message>
         <source>Open in %1 Settings Dialog...</source>
-        <translation>Открыть в окне настроек %1...</translation>
+        <translation>Открыть в окне настроек...</translation>
     </message>
     <message>
         <source>Add Device(s)...</source>
@@ -2631,7 +2631,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 List by Server...</source>
-        <translation>Список %1 по серверам...</translation>
+        <translation>Список устройств по серверам...</translation>
     </message>
 </context>
 <context>
@@ -4214,11 +4214,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open %1 List</source>
-        <translation>Открыть список %1</translation>
+        <translation type="unfinished">Открыть список: %1</translation>
     </message>
     <message>
         <source>%1 List</source>
-        <translation>Список %1</translation>
+        <translation type="unfinished">Список: %1</translation>
     </message>
 </context>
 <context>
