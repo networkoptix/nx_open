@@ -171,15 +171,17 @@ public:
         if( addr.address.isResolved() )
             return startAsyncConnect( addr );
 
-        return nx::SocketGlobals::addressResolver().resolveAsync(
+        nx::SocketGlobals::addressResolver().resolveAsync(
             addr.address,
-            [this, addr]( std::vector< nx::cc::AddressEntry > addresses )
+            [this, addr]( SystemError::ErrorCode code,
+                          std::vector< nx::cc::AddressEntry > addresses )
             {
                 //always calling m_connectHandler within aio thread socket is bound to
                 if( addresses.empty() )
                 {
-                    this->post( std::bind( m_connectHandler,
-                                           SystemError::hostNotFound ) );
+                    if (code == SystemError::noError)
+                        code = SystemError::hostNotFound;
+                    this->post( std::bind( m_connectHandler, code ) );
                     return;
                 }
 
@@ -206,6 +208,8 @@ public:
             },
             m_natTraversalEnabled,
             this );
+
+        return true;
     }
 
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )

@@ -46,7 +46,7 @@ void DnsResolver::pleaseStop()
     m_cond.wakeAll();
 }
 
-bool DnsResolver::resolveAddressAsync(
+void DnsResolver::resolveAddressAsync(
     const HostAddress& addressToResolve,
     std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
     RequestID reqID )
@@ -54,7 +54,6 @@ bool DnsResolver::resolveAddressAsync(
     QnMutexLocker lk( &m_mutex );
     m_taskQueue.push_back( ResolveTask( addressToResolve, completionHandler, reqID, ++m_currentSequence ) );
     m_cond.wakeAll();
-    return true;
 }
 
 bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress )

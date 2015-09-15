@@ -24,6 +24,8 @@ enum class AddressType
     cloud,      //!< Address that requires mediator (e.g. hole punching)
 };
 
+QString toString( const AddressType& type );
+
 enum class AddressAttributeType
 {
     peerFoundPassively, //!< NX peer reported its address and name by itself
@@ -37,6 +39,7 @@ struct AddressAttribute
 
     AddressAttribute( AddressAttributeType type_, quint64 value_ );
     bool operator ==( const AddressAttribute& rhs ) const;
+    QString toString() const;
 };
 
 struct AddressEntry
@@ -48,6 +51,7 @@ struct AddressEntry
     AddressEntry( AddressType type_ = AddressType::unknown,
                   HostAddress host_ = HostAddress() );
     bool operator ==( const AddressEntry& rhs ) const;
+    QString toString() const;
 };
 
 //!Contains peer names, their known addresses and some attributes
@@ -71,6 +75,9 @@ public:
     void addPeerAddress( const HostAddress& peerName, HostAddress hostAddress,
                          std::vector< AddressAttribute > attributes );
 
+    typedef std::function< void( SystemError::ErrorCode,
+                                 std::vector< AddressEntry > ) > ResolveHandler;
+
     //!Resolves hostName like DNS server does
     /*!
         \a handler is called with complete address list includung:
@@ -83,8 +90,7 @@ public:
 
         \a natTraversal defines if mediator should be used for address resolution
     */
-    bool resolveAsync( const HostAddress& hostName,
-                       std::function< void( std::vector< AddressEntry > ) > handler,
+    void resolveAsync( const HostAddress& hostName, ResolveHandler handler,
                        bool natTraversal, void* requestId = nullptr );
 
     std::vector< AddressEntry > resolveSync( const HostAddress& hostName, bool natTraversal );
@@ -100,20 +106,33 @@ private:
     {
         enum class State { unresolved, resolved, inProgress };
 
-        // TODO: add expiration times
         std::vector< AddressEntry > peers;
-
-        State dnsState;
-        boost::optional< AddressEntry > dnsResult;
-
-        State mediatorState;
-        std::vector< AddressEntry > mediatorResult;
-
         std::set< void* > pendingRequests;
 
         HostAddressInfo();
+
+        State dnsState() { return m_dnsState; }
+        void dnsProgress() { m_dnsState = State::inProgress; }
+        void setDnsEntries( std::vector< AddressEntry > entries
+                                = std::vector< AddressEntry >() );
+
+        State mediatorState() { return m_mediatorState; }
+        void mediatorProgress() { m_mediatorState = State::inProgress; }
+        void setMediatorEntries( std::vector< AddressEntry > entries
+                                    = std::vector< AddressEntry >() );
+
+        void checkExpirations();
         bool isResolved( bool natTraversal ) const;
         std::vector< AddressEntry > getAll() const;
+
+    private:
+        State m_dnsState;
+        std::chrono::system_clock::time_point m_dnsResolveTime;
+        std::vector< AddressEntry > m_dnsEntries;
+
+        State m_mediatorState;
+        std::chrono::system_clock::time_point m_mediatorResolveTime;
+        std::vector< AddressEntry > m_mediatorEntries;
     };
 
     typedef std::map< HostAddress, HostAddressInfo > HaInfoMap;
@@ -121,19 +140,21 @@ private:
 
     struct RequestInfo
     {
-        const HostAddress& address;
+        const HostAddress address;
         bool inProgress;
         bool natTraversal;
-        std::function< void( std::vector< AddressEntry > ) > handler;
+        ResolveHandler handler;
 
-        RequestInfo( const HostAddress& _address, bool _natTraversal,
-                     std::function< void( std::vector< AddressEntry > ) > _handler );
+        RequestInfo( HostAddress _address,
+                     bool _natTraversal,
+                     ResolveHandler _handler );
     };
 
-    bool dnsResolve( HaInfoIterator info, QnMutexLockerBase* lk );
-    bool mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk );
+    void dnsResolve( HaInfoIterator info, QnMutexLockerBase* lk );
+    void mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk );
 
-    std::vector< Guard > grabHandlers( HaInfoIterator info );
+    std::vector< Guard > grabHandlers( SystemError::ErrorCode lastErrorCode,
+                                       HaInfoIterator info );
 
 private:
     mutable QnMutex m_mutex;

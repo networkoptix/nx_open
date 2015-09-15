@@ -6,6 +6,7 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #include <utils/math/defines.h> /* For INT64_MAX. */
 #include <utils/common/unused.h>
@@ -753,6 +754,26 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #else
 #   define lit(s) QLatin1String(s)
 #endif
+
+template<typename T>
+QString toString( const T& t ) { return t.toString(); }
+
+template<typename Container>
+QString containerString(const Container& container,
+                        const QString& delimiter = lit(", "),
+                        const QString& prefix = lit("{ "),
+                        const QString& suffix = lit(" }"),
+                        const QString& empty = lit("none"))
+{
+    if (container.begin() == container.end())
+        return empty;
+
+    QStringList strings;
+    for (const auto& item : container)
+          strings << toString(item);
+
+    return lit("%1%2%3").arg(prefix).arg(strings.join(delimiter)).arg(suffix);
+}
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner),

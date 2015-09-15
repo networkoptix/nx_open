@@ -33,10 +33,9 @@ public:
     /*!
         \param completionHandler MUST not block
         \param reqID Used to cancel request. Multiple requests can be started using same request id
-        \return false if failed to start asynchronous resolve operation
         \note It is garanteed that \a reqID is set before \a completionHandler is called
     */
-    bool resolveAddressAsync(
+    void resolveAddressAsync(
         const HostAddress& addressToResolve,
         std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
         RequestID reqID );

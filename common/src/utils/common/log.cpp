@@ -201,13 +201,13 @@ QnLog::~QnLog()
     delete d;
 }
 
-std::shared_ptr< QnLog::Logs >& QnLog::logs()
+const std::shared_ptr< QnLog::Logs >& QnLog::logs()
 {
     std::call_once( s_onceFlag, [](){ s_instance.reset( new Logs ); } );
     return s_instance;
 }
 
-std::unique_ptr< QnLog >& QnLog::instance( int logID )
+const std::unique_ptr< QnLog >& QnLog::instance( int logID )
 {
     return logs()->get( logID );
 }
@@ -301,7 +301,7 @@ QString QnLog::logFileName( int logID )
     return instance(logID)->d->syncCurrFileName();
 }
 
-std::unique_ptr< QnLog >& QnLog::Logs::get( int logID )
+const std::unique_ptr< QnLog >& QnLog::Logs::get( int logID )
 {
     QnMutexLocker lk( &m_mutex );
     auto& log = m_logs[logID];

@@ -63,7 +63,7 @@ public:
     class Logs
     {
     public:
-        std::unique_ptr< QnLog >& get( int logID = MAIN_LOG_ID );
+        const std::unique_ptr< QnLog >& get( int logID = MAIN_LOG_ID );
         bool init( int logID, std::unique_ptr< QnLog > log );
         bool init( int logID, const QString& logLevelStr );
 
@@ -76,8 +76,8 @@ public:
     static bool initLog(QnLog *externalInstance, int logID = MAIN_LOG_ID);
 
     static QString logFileName( int logID = MAIN_LOG_ID );
-    static std::shared_ptr< Logs >& logs();
-    static std::unique_ptr< QnLog >& instance( int logID = MAIN_LOG_ID );
+    static const std::shared_ptr< Logs >& logs();
+    static const std::unique_ptr< QnLog >& instance( int logID = MAIN_LOG_ID );
     
     static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);
