@@ -162,16 +162,37 @@ namespace stree
     //// class MultiSourceResourceReader
     ////////////////////////////////////////////////////////////
 
-    MultiSourceResourceReader::MultiSourceResourceReader( const AbstractResourceReader& rc1, const AbstractResourceReader& rc2 )
+    MultiSourceResourceReader::MultiSourceResourceReader(
+        const AbstractResourceReader& rc1,
+        const AbstractResourceReader& rc2)
     :
-        m_rc1( rc1 ),
-        m_rc2( rc2 )
+        m_elementCount(2)
     {
+        m_readers[0] = &rc1;
+        m_readers[1] = &rc2;
+    }
+
+    MultiSourceResourceReader::MultiSourceResourceReader(
+        const AbstractResourceReader& rc1,
+        const AbstractResourceReader& rc2,
+        const AbstractResourceReader& rc3)
+    :
+        m_elementCount(3)
+    {
+        m_readers[0] = &rc1;
+        m_readers[1] = &rc2;
+        m_readers[2] = &rc3;
     }
 
     bool MultiSourceResourceReader::getAsVariant( int resID, QVariant* const value ) const
     {
-        return m_rc1.get( resID, value ) || m_rc2.get( resID, value );
+        for (size_t i = 0; i < m_elementCount; ++i)
+        {
+            if (m_readers[i]->getAsVariant(resID, value))
+                return true;
+        }
+
+        return false;
     }
 
 

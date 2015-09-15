@@ -466,6 +466,7 @@ namespace nx_http
         {
         public:
             DigestAuthorization();
+            DigestAuthorization( DigestAuthorization&& right );
 
             void addParam( const BufferType& name, const BufferType& value );
         };

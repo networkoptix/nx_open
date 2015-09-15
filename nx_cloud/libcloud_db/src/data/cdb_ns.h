@@ -21,6 +21,7 @@ enum Value
     authAccountRightsOnSystem,
 
     socketIntfIP,
+    socketRemoteIP,
 
     requestPath
 };

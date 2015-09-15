@@ -5,6 +5,7 @@
 #ifndef RESOURCECONTAINER_H
 #define RESOURCECONTAINER_H
 
+#include <array>
 #include <map>
 #include <memory>
 
@@ -161,7 +162,14 @@ namespace stree
         public AbstractResourceReader
     {
     public:
-        MultiSourceResourceReader( const AbstractResourceReader& rc1, const AbstractResourceReader& rc2 );
+        //TODO #ak make initializer a variadic template func
+        MultiSourceResourceReader(
+            const AbstractResourceReader& rc1,
+            const AbstractResourceReader& rc2);
+        MultiSourceResourceReader(
+            const AbstractResourceReader& rc1,
+            const AbstractResourceReader& rc2,
+            const AbstractResourceReader& rc3);
 
         //!Implementation of AbstractResourceReader::get
         /*!
@@ -170,9 +178,12 @@ namespace stree
         virtual bool getAsVariant( int resID, QVariant* const value ) const;
 
     private:
-        const AbstractResourceReader& m_rc1;
-        const AbstractResourceReader& m_rc2;
+        const size_t m_elementCount;
+        std::array<const AbstractResourceReader*, 3> m_readers;
     };
+
+    //TODO #ak using variadic template add method makeMultiSourceResourceReader that accepts any number of aguments
+
 
     class MultiIteratableResourceReader
     :
