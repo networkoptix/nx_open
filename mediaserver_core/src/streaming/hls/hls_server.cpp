@@ -408,7 +408,7 @@ namespace nx_hls
                     : MEDIA_Quality_Low;
             }
 
-            if( !camResource->hasDualStreaming() )
+            if( !camResource->hasDualStreaming2() )
             {
                 if( streamQuality == MEDIA_Quality_Low )
                 {
@@ -829,8 +829,11 @@ namespace nx_hls
         requiredQualities.reserve( 2 );
         if( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Auto )
             requiredQualities.push_back( MEDIA_Quality_High );
-        if( streamQuality == MEDIA_Quality_Low || streamQuality == MEDIA_Quality_Auto )
+        if( (streamQuality == MEDIA_Quality_Low) || 
+            (streamQuality == MEDIA_Quality_Auto && camResource->hasDualStreaming2()) )
+        {
             requiredQualities.push_back( MEDIA_Quality_Low );
+        }
 
         boost::optional<quint64> startTimestamp;
         std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME);
