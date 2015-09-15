@@ -1037,6 +1037,9 @@ void MediaServerProcess::updateAddressesList()
 
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()
             ->save(m_mediaServer, this, &MediaServerProcess::at_serverSaved);
+
+    m_mediatorAddressPublisher->updateAddresses(std::list<SocketAddress>(
+        serverAddresses.begin(), serverAddresses.end()));
 }
 
 void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
@@ -2131,6 +2134,26 @@ void MediaServerProcess::run()
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
+    m_mediatorAddressFetcher.reset(new nx::cc::CloudModuleEndPointFetcher(lit("hpm")));
+    m_mediatorAddressPublisher.reset(new nx::cc::MediatorAddressPublisher(
+        m_mediatorAddressFetcher.get(), qnCommon->moduleGUID().toSimpleString().toUtf8()));
+
+    auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
+    {
+        auto cloudSystemId = admin->getProperty(Qn::CLOUD_SYSTEM_ID);
+        auto cloudAuthKey = admin->getProperty(Qn::CLOUD_AUTH_KEY);
+        if (m_mediatorAddressPublisher &&
+            !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
+        {
+            nx::cc::MediatorAddressPublisher::Authorization auth = {
+                cloudSystemId.toUtf8(), cloudAuthKey.toUtf8()};
+            m_mediatorAddressPublisher->authorizationChanged(std::move(auth));
+            return;
+        }
+
+        m_mediatorAddressPublisher->authorizationChanged(boost::none);
+    };
+
     loadResourcesFromECS(messageProcessor.data());
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
@@ -2143,8 +2166,10 @@ void MediaServerProcess::run()
         bool adminParamsChanged = false;
 
         // TODO: fix, when VS supports init lists:
-        //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
-        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+        //       for (const auto& param : { stats::SR_TIME_CYCLE, ... })
+        const QString* statParams[] = {
+            &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API,
+            &Qn::CLOUD_SYSTEM_ID, &Qn::CLOUD_AUTH_KEY };
         for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
             const QString& param = **it;
@@ -2161,7 +2186,17 @@ void MediaServerProcess::run()
             propertyDictionary->saveParams(adminUser->getId());
             MSSettings::roSettings()->sync();
         }
+
+        updateCloudProperties(adminUser);
     }
+
+    connect(qnResPool, &QnResourcePool::resourceChanged,
+            [ = ](const QnResourcePtr& resource)
+    {
+        if (const auto user = resource.dynamicCast<QnUserResource>())
+            if (user->isAdmin())
+                updateCloudProperties(user);
+    });
 
     QnStorageResourceList storages = m_mediaServer->getStorages();
     QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
@@ -2242,6 +2277,8 @@ void MediaServerProcess::run()
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
     m_crashReporter.reset();
+    m_mediatorAddressFetcher.reset();
+    m_mediatorAddressPublisher.reset();
 
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;

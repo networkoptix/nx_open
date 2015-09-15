@@ -21,7 +21,7 @@
 #include "utils/common/public_ip_discovery.h"
 #include <utils/network/http/http_mod_manager.h>
 #include <utils/network/upnp/upnp_port_mapper.h>
-
+#include <utils/network/cloud_connectivity/mediator_address_publisher.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -103,6 +103,10 @@ private:
     bool m_stopping;
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
+
+    // TODO: Create cloud providers factory to reuse CloudModuleEndPointFetcher
+    std::unique_ptr<nx::cc::CloudModuleEndPointFetcher> m_mediatorAddressFetcher;
+    std::unique_ptr<nx::cc::MediatorAddressPublisher> m_mediatorAddressPublisher;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H
