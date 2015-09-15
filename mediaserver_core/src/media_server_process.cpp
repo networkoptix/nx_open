@@ -136,6 +136,7 @@
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/handlers/log_level_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
+#include <rest/handlers/get_hardware_info_rest_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -1306,6 +1307,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/getHardwareInfo", new QnGetHardwareInfoHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());

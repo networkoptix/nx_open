@@ -17,7 +17,7 @@
 #include "licensing/hardware_info.h"
 
 namespace {
-
+    QnHardwareInfo g_hardwareInfo;
     QStringList g_hardwareId;
     bool g_hardwareIdInitialized(false);
 }
@@ -75,12 +75,11 @@ QString getHardwareId(int version, bool guidCompatibility, QSettings *settings) 
         }
 
         try {
-            QnHardwareInfo hardwareInfo;
-            fillHardwareIds(g_hardwareId, settings, hardwareInfo);
+            fillHardwareIds(g_hardwareId, settings, g_hardwareInfo);
             Q_ASSERT(g_hardwareId.size() == 2 * LATEST_HWID_VERSION);
 
-            hardwareInfo.date = QDateTime::currentDateTime().toString();
-            NX_LOG(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(hardwareInfo)).trimmed(), cl_logINFO);
+            g_hardwareInfo.date = QDateTime::currentDateTime().toString();
+            NX_LOG(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed(), cl_logINFO);
 
             g_hardwareIdInitialized = true;
         } catch (const LLUtil::HardwareIdError& err) {
@@ -121,4 +120,7 @@ QStringList getCompatibleHardwareIds(int guidCompatibility, QSettings *settings)
     return hardwareIds;
 }
 
+const QnHardwareInfo& getHardwareInfo() {
+    return g_hardwareInfo;
+}
 } // namespace LLUtil {}
