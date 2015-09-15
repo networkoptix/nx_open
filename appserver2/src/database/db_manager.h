@@ -541,8 +541,8 @@ namespace ec2
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
 
-        bool beforeInstallUpdate(const QString& updateName);
-        bool afterInstallUpdate(const QString& updateName);
+        virtual bool beforeInstallUpdate(const QString& updateName) override;
+        virtual bool afterInstallUpdate(const QString& updateName) override;
 
         ErrorCode addCameraHistory(const ApiServerFootageData& params);
         ErrorCode removeCameraHistory(const QnUuid& serverId);

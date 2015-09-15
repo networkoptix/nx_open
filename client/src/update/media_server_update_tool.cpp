@@ -191,8 +191,8 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
     return url;
 }
 
-void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version, bool denyMajorUpdates, std::function<void(const QnCheckForUpdateResult &result)> func) {
-    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
+void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version, std::function<void(const QnCheckForUpdateResult &result)> func) {
+    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     checkForUpdates(target, func);
 }
 
@@ -202,8 +202,8 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName, std::func
 }
 
 
-void QnMediaServerUpdateTool::startUpdate(const QnSoftwareVersion &version /* = QnSoftwareVersion()*/, bool denyMajorUpdates /* = false*/) {
-    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
+void QnMediaServerUpdateTool::startUpdate(const QnSoftwareVersion &version /* = QnSoftwareVersion()*/) {
+    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     startUpdate(target);
 }
 

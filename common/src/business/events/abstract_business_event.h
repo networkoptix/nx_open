@@ -24,6 +24,8 @@ namespace QnBusiness
 
     bool hasToggleState(EventType eventType);
 
+    QList<EventState> allowedEventStates(EventType eventType);
+
     bool requiresCameraResource(EventType eventType);
 
     bool requiresServerResource(EventType eventType);

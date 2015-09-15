@@ -126,8 +126,11 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user)
 
     if ((permissions & Qn::GlobalViewLivePermission) && permissionStrings.isEmpty())
         permissionStrings.append(tr("View live video"));
+
     if (permissions & Qn::GlobalEditCamerasPermission)
+        //: "Adjust camera settings" or "Adjust device settings"
         permissionStrings.append(tr("Adjust %1 settings").arg(getDefaultDeviceNameLower()));
+
     if (permissions & Qn::GlobalPtzControlPermission)
         permissionStrings.append(tr("Use PTZ controls"));
     if (permissions & Qn::GlobalViewArchivePermission)

@@ -1,9 +1,9 @@
 #include "system_socket.h"
 
-#include <memory>
-#include <boost/type_traits/is_same.hpp>
-
 #include <atomic>
+#include <memory>
+
+#include <boost/type_traits/is_same.hpp>
 
 #include <platform/win32_syscall_resolver.h>
 #include <utils/common/systemerror.h>
@@ -19,6 +19,8 @@
 #endif
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
@@ -999,7 +1001,10 @@ static int acceptWithTimeout( int m_fd, int timeoutMillis = DEFAULT_ACCEPT_TIMEO
         return -1;
     }
     if( sockPollfd.revents & POLLIN )
-        return ::accept( m_fd, NULL, NULL );
+    {
+        auto fd = ::accept( m_fd, NULL, NULL );
+        return fd;
+    }
     if( (sockPollfd.revents & POLLHUP)
 #ifdef _GNU_SOURCE
         || (sockPollfd.revents & POLLRDHUP)
@@ -1091,14 +1096,46 @@ bool TCPServerSocket::listen( int queueLen )
 
 void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
 {
-    //TODO #ak better call here m_implDelegate.m_baseAsyncHelper->terminateAsyncIO(), 
-        //not change m_implDelegate.impl()->terminated directly
-    //m_implDelegate.m_baseAsyncHelper->terminateAsyncIO();
-    ++m_implDelegate.impl()->terminated;
-    aio::AIOService::instance()->cancelPostedCalls(
-        static_cast<Pollable*>(&m_implDelegate), waitForRunningHandlerCompletion );
-    aio::AIOService::instance()->removeFromWatch(
-        static_cast<Pollable*>(&m_implDelegate), aio::etRead, waitForRunningHandlerCompletion );
+    //TODO #ak add general implementation to Socket class and remove this method
+    if (waitForRunningHandlerCompletion)
+    {
+        QWaitCondition cond;
+        QMutex mtx;
+        bool cancelled = false;
+
+        m_implDelegate.dispatchImpl(
+            [this, &cond, &mtx, &cancelled]()
+            {
+                aio::AIOService::instance()->cancelPostedCalls(
+                    static_cast<Pollable*>(&m_implDelegate), true);
+                aio::AIOService::instance()->removeFromWatch(
+                    static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
+                aio::AIOService::instance()->removeFromWatch(
+                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
+                
+                QMutexLocker lk(&mtx);
+                cancelled = true;
+                cond.wakeAll();
+            } );
+
+        QMutexLocker lk(&mtx);
+        while(!cancelled)
+            cond.wait(lk.mutex());
+    }
+    else
+    {
+        m_implDelegate.dispatchImpl(
+            [this]()
+            {
+                //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
+                aio::AIOService::instance()->cancelPostedCalls(
+                    static_cast<Pollable*>(&m_implDelegate), true);
+                aio::AIOService::instance()->removeFromWatch(
+                    static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
+                aio::AIOService::instance()->removeFromWatch(
+                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
+        } );
+    }
 }
 
 //!Implementation of AbstractStreamServerSocket::accept

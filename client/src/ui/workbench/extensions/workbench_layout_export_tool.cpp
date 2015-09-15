@@ -388,7 +388,8 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
     if (error) {
         QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
         Q_ASSERT_X(camRes, Q_FUNC_INFO, "Make sure camera exists");
-        m_errorMessage = tr("Could not export %1 %2.").arg(getDefaultDeviceNameLower(camRes)).arg(getShortResourceName(camera->resource()->toResourcePtr()));
+        //: "Could not export camera AXIS1334"
+        m_errorMessage = tr("Could not export %1 %2.").arg(getDefaultDeviceNameLower(camRes)).arg(getShortResourceName(camRes));
         finishExport(false);
     } else {
         exportNextCamera();

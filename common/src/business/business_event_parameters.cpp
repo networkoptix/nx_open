@@ -24,7 +24,7 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
                 || reasonCode == QnBusiness::StorageTooSlowReason 
                 || reasonCode == QnBusiness::StorageFullReason 
                 || reasonCode == QnBusiness::LicenseRemoved)
-                paramKey += '_' + reasonParamsEncoded.toUtf8();
+                paramKey += '_' + description.toUtf8();
             break;
 
         case QnBusiness::CameraInputEvent:
@@ -41,4 +41,4 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
     return guidFromArbitraryData(paramKey);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq), QnBusinessEventParameters_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq)(xml)(csv_record), QnBusinessEventParameters_Fields, (optional, true) )

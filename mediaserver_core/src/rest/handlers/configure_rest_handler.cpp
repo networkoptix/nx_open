@@ -19,6 +19,7 @@
 #include "utils/network/tcp_listener.h"
 #include "server/host_system_password_synchronizer.h"
 #include "audit/audit_manager.h"
+#include "settings.h"
 
 
 namespace {
@@ -32,6 +33,11 @@ namespace {
 int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
 {
     Q_UNUSED(path)
+
+    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
+        return nx_http::StatusCode::forbidden;
+    }
 
     bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
     QString systemName = params.value(lit("systemName"));

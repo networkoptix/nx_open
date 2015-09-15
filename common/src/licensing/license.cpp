@@ -33,6 +33,17 @@ namespace {
         "vtLsDeNC9eU2aLCt0Ba4KLnuVnDDWSXQ9914i8s0KXXTM+GOHpvrChUCAwEAAQ==\n"
         "-----END PUBLIC KEY-----";
 
+    // This key is introduced in v2.4 to make iomodule and starter license types do not work in v2.3 and earlier
+    const char *networkOptixRSAPublicKey3 = "-----BEGIN PUBLIC KEY-----\n"
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtb16Q2sJL/eZqNpfItB0\n"
+        "oMdhttY9Ov21QN8PedcJm8+1t/qjVBg2c1AxJsMnX+0MH4dcbC9W2JCU+e2vMCX7\n"
+        "HMUW4gpmvRtHPDhNutgyByOVJ7TXzCrHR/5xCXojiOLISdikVyP+IDYP+ATe5mM5\n"
+        "GIWG1uTTaG7gwwJn2IVggBzUapRWAm3VZUpytfPaLzqucc/zuvoMSUD5K9DZqg4p\n"
+        "Meu8VWFCPA7VhFKyuTtdTjrj/72WpLdlcSbARYjjqOO51KUIESXrGUEiw1Mo0OOn\n"
+        "acOz/C4G+lXfFDOALsYUNeG//UibSsfLPghvcIXdC7ghMtYBIzafA/UVcQOqZWPK\n"
+        "6wIDAQAB\n"
+        "-----END PUBLIC KEY-----";
+
     /* One analog encoder requires one license to maintain this number of cameras. */
     const int camerasPerAnalogEncoderCount = 1;
 
@@ -472,7 +483,7 @@ void QnLicense::parseLicenseBlock(
                 m_brand = QString::fromUtf8(avalue);
             else if (aname == "EXPIRATION")
                 m_expiration = QString::fromUtf8(avalue);
-            else if (aname == "SIGNATURE2" || aname == "SIGNATURE3")
+            else if (aname == "SIGNATURE2" || aname == "SIGNATURE3" || aname == "SIGNATURE4")
                 m_signature2 = avalue;
         }
 
@@ -492,7 +503,8 @@ void QnLicense::parseLicenseBlock(
 
 void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock )
 {
-    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey2)) ||
+    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey3)) ||
+        isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey2)) ||
         isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
         m_isValid2 = true;
     } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)) && m_brand.isEmpty()) {
@@ -563,6 +575,8 @@ Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 QnLicensePool::QnLicensePool(): 
     m_mutex(QnMutex::Recursive)
 {
+    if (!qApp)
+        return;
     connect(&m_timer, &QTimer::timeout, this, &QnLicensePool::at_timer);
     m_timer.start(1000 * 60);
 }
