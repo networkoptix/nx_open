@@ -58,7 +58,7 @@ public:
     }
 
     static QnUuid fromRfc4122( const QByteArray& bytes );
-    static QnUuid fromHardwareId( const QByteArray& bytes );
+    static QnUuid fromHardwareId( const QString& hwid );
     static QnUuid createUuid();
 
     /** Construct QnUuid from pool of id's. Pool is determined by base id and individual offset. */

@@ -58,8 +58,8 @@ namespace ec2
         /** Priority of this peer as the time synchronization server. */
         quint64 serverTimePriority;
 
-        QVector<QByteArray> mainHardwareIds;
-        QVector<QByteArray> compatibleHardwareIds;
+        QVector<QString> mainHardwareIds;
+        QVector<QString> compatibleHardwareIds;
 
         bool updateStarted;
     };

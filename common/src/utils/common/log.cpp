@@ -55,7 +55,7 @@ public:
         m_file.setFileName(currFileName());
 
         bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered);
-        if (rez)
+        if (rez && m_file.size() == 0)
             m_file.write(UTF8_BOM);
         return rez;
     }
