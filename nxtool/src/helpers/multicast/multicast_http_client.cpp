@@ -16,7 +16,6 @@ HTTPClient::HTTPClient(const QString& userAgent, const QUuid& localGuid):
     m_defaultTimeoutMs(NO_TIMEOUT),
     m_userAgent(userAgent)
 {
-
 }
 
 QByteArray HTTPClient::createUserPasswordDigest(

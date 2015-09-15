@@ -71,13 +71,11 @@ rtu::ServerInfoManager::Impl::~Impl()
 {
 }
 
-#include <qdebug.h>
 void rtu::ServerInfoManager::Impl::primaryLoginToServer(const BaseServerInfoPtr &info
     , const QString &password
     , const ServerInfoManager::SuccessfulCallback &successful
     , const ServerInfoManager::FailedCallback &failed)
 {
-    qDebug() << " ++++ primaryLoginToServer";
     const auto &localSuccessful = [successful, info](const QUuid &id, const ExtraServerInfo &extra)
     {
         globalSuccessful(successful, id, extra, info->hostAddress);
@@ -122,8 +120,6 @@ void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfoPtr &info
         globalSuccessful(successful, id, extra, info->hostAddress);
     };
 
-    qDebug() << " ++++ loginToServer with " << g_availablePasswords.at(passwordIndex);
-
     getServerExtraInfo(info
         , g_availablePasswords.at(passwordIndex), localSuccessful, localFailed, kShortTimeout);
 }
@@ -161,7 +157,6 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
         const QString password = (server.hasExtraInfo() ? server.extraInfo().password 
             : defaultAdminPasswords().front());
 
-        qDebug() << "________ getting server info with password" << password << " " << server.hasExtraInfo() << " " << server.baseInfo().discoveredByHttp;
         getServerExtraInfo(base, password, localSuccessful, localFailed);
     }
 }
@@ -197,7 +192,6 @@ void rtu::ServerInfoManager::updateServerInfos(const ServerInfoContainer &server
     , const SuccessfulCallback &success
     , const FailedCallback &failed)
 {
-    qDebug() << "--------------------------------";
     m_impl->updateServerInfos(servers, success, failed);
 }
 

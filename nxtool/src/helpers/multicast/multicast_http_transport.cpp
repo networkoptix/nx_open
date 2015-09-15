@@ -141,6 +141,8 @@ Transport::Transport(const QUuid& localGuid):
     m_nextSendQueued(false),
     m_initialized(false)
 {
+    qDebug() << "CLIENT ID " << localGuid;
+
     m_recvSocket.reset(new QUdpSocket());
     if (!m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint))
         qWarning() << "Failed to open Multicast Http receive socket";
@@ -188,6 +190,8 @@ QString Transport::localAddress() const
 
 void Transport::at_timer()
 {
+    at_socketReadyRead();
+
     QMutexLocker lock(&m_mutex);
     for (auto itr = m_requests.begin(); itr != m_requests.end();)
     {

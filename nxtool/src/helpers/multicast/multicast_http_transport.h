@@ -6,6 +6,7 @@
 #include "multicast_http_fwd.h"
 #include <memory>
 #include <QCache>
+#include <QLinkedList>
 
 #define lit(a) QString(a)
 
@@ -79,7 +80,7 @@ namespace QnMulticast
             QElapsedTimer timer;
         };
         
-        QQueue<TransportConnection> m_requests;
+        QLinkedList<TransportConnection> m_requests;
         QUuid m_localGuid;
 
         std::unique_ptr<QUdpSocket> m_recvSocket;

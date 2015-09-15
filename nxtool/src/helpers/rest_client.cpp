@@ -263,6 +263,9 @@ rtu::RestClient::~RestClient()
 
 void rtu::RestClient::sendGet(const Request &request)
 {
+    qDebug() << "++++ Sending GET [ " << (request.target->discoveredByHttp ? "HTTP" : "MULTICAST") 
+        << " ] : " << request.path << " with password " << request.password;
+
     if (request.target->discoveredByHttp)
         implInstance().sendHttpGet(request);
     else
