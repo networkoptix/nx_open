@@ -22,6 +22,7 @@
 #endif
 
 #include "util.h"
+#include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_pvt.h"
 
@@ -106,7 +107,7 @@ namespace LLUtil {
 
 #if defined(__i686__) || defined(__x86_64__)
 
-void findMacAddresses(DevicesList& devices) {
+void findMacAddresses(QnMacAndDeviceClassList& devices) {
     QStringList classes;
     classes << "PCI" << "USB";
 
@@ -129,12 +130,12 @@ void findMacAddresses(DevicesList& devices) {
         QString xclass = QDir(subsystemFileInfo.symLinkTarget()).dirName().toUpper();
 
         if (classes.contains(xclass)) {
-            devices.push_back(DeviceClassAndMac(xclass, mac));
+            devices.push_back(QnMacAndDeviceClass(xclass, mac));
         }
     }
 }
 
-static void calcHardwareId(QString &hardwareId, const HardwareInfo& hi, int version, bool guidCompatibility)
+static void calcHardwareId(QString &hardwareId, const QnHardwareInfo& hi, int version, bool guidCompatibility)
 {
     if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length()) {
         hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
@@ -149,7 +150,7 @@ static void calcHardwareId(QString &hardwareId, const HardwareInfo& hi, int vers
         hardwareId += hi.mac;
 }
 
-void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo)
+void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.boardUUID = read_file("/sys/class/dmi/id/product_uuid");
     hardwareInfo.compatibilityBoardUUID = changedGuidByteOrder(hardwareInfo.boardUUID);
@@ -194,7 +195,7 @@ void mac_eth0(char  MAC_str[13], char** host)
 }
 
 
-void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo)
+void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
 {
     Q_UNUSED(settings)
 
