@@ -17,20 +17,14 @@ namespace {
     const QString moduleInfoStr (lit(", { seed: \"%1\" }, {peerType: \"%2\"}"));
 }
 
-bool RevealRequest::serialize(quint8 ** const bufStart, const quint8 *bufEnd) 
+QByteArray RevealRequest::serialize()
 {
     QByteArray result = revealRequestStr;
     QString moduleGuid = qnCommon->moduleGUID().toString();
     if (moduleGuid.startsWith(lit("{")))
         moduleGuid = moduleGuid.mid(1, moduleGuid.length() - 2);
     result += moduleInfoStr.arg(moduleGuid).arg(QnLexical::serialized(qnCommon->localPeerType())).toLatin1();
-
-    if (bufEnd - *bufStart < revealRequestStr.size())
-        return false;
-
-    memcpy(*bufStart, revealRequestStr.data(), revealRequestStr.size());
-    *bufStart += revealRequestStr.size();
-    return true;
+    return result;
 }
 
 bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd) {
