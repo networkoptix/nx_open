@@ -28,8 +28,7 @@ android {
     
     ANDROID_EXTRA_LIBS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcrypto.so \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libssl.so \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libquazip.so
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libssl.so
 
     ANDROID_PACKAGE_SOURCE_DIR = ${basedir}/${arch}/android
 
