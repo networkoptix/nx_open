@@ -35,7 +35,7 @@ public:
 
     QByteArray activationKey() const;
 
-    void setHardwareId(const QByteArray &);
+    void setHardwareId(const QString &);
 
     State state() const;
     void setState(State state);

@@ -25,6 +25,7 @@
 #include <QtCore/QSettings>
 
 #include "util.h"
+#include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_pvt.h"
 
@@ -33,7 +34,7 @@
 
 namespace LLUtil {
 
-static void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
+static void findMacAddresses(IWbemServices *pSvc, QnMacAndDeviceClassList& devices) {
     HRESULT hres;
     IEnumWbemClassObject* pEnumerator = NULL;
     hres = pSvc->ExecQuery(
@@ -63,7 +64,7 @@ static void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
         if (0 == uReturn)
             break;
 
-        DeviceClassAndMac device;
+        QnMacAndDeviceClass device;
 
         VARIANT vtProp;
         hr = pclsObj->Get(L"PNPDeviceID", 0, &vtProp, 0, 0);
@@ -106,7 +107,7 @@ static void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
 
 
 
-static QByteArray getMacAddress(const DevicesList &devices,  QSettings *settings) {
+static QByteArray getMacAddress(const QnMacAndDeviceClassList &devices,  QSettings *settings) {
     if (devices.empty())
         return QByteArray();
 
@@ -252,7 +253,7 @@ static unsigned int SwapWord(unsigned int a)
 
 typedef QString (*ExecQueryFunction)(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName);
 
-static void fillHardwareInfo(IWbemServices *pSvc, ExecQueryFunction execQuery, HardwareInfo& hardwareInfo)
+static void fillHardwareInfo(IWbemServices *pSvc, ExecQueryFunction execQuery, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.compatibilityBoardUUID = execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"));
     hardwareInfo.boardUUID = changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
@@ -268,7 +269,7 @@ static void fillHardwareInfo(IWbemServices *pSvc, ExecQueryFunction execQuery, H
     hardwareInfo.memorySerialNumber = execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"));
 }
 
-static void calcHardwareId(QString &hardwareId, const HardwareInfo& hi, int version, bool guidCompatibility)
+static void calcHardwareId(QString &hardwareId, const QnHardwareInfo& hi, int version, bool guidCompatibility)
 {
     if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length()) {
         hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
@@ -286,10 +287,10 @@ static void calcHardwareId(QString &hardwareId, const HardwareInfo& hi, int vers
 } // namespace {}
 
 namespace LLUtil {
-    void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo);
+    void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo);
 }
 
-void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, HardwareInfo& hardwareInfo)
+void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
 {
     bool needUninitialize = true;
     HRESULT hres;
@@ -423,7 +424,7 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, Hard
     hardwareInfo.mac = getMacAddress(hardwareInfo.nics, settings);
 
     // Only for HWID1
-    HardwareInfo v1HardwareInfo;
+    QnHardwareInfo v1HardwareInfo;
     fillHardwareInfo(pSvc, execQueryForHWID1, v1HardwareInfo);
     calcHardwareId(hardwareIds[0], v1HardwareInfo, 1, false);
     calcHardwareId(hardwareIds[LATEST_HWID_VERSION], v1HardwareInfo, 1, true);

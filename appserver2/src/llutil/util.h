@@ -1,11 +1,10 @@
 #ifndef _LLUTIL_UTIL_H_
 #define _LLUTIL_UTIL_H_
 
-#include <string>
+#include <QString>
 
 namespace LLUtil {
 
-void changeGuidByteOrder(std::string& guid);
 QString changedGuidByteOrder(const QString& guid);
 
 } // namespace LLutil {}
