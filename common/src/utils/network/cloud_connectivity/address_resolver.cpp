@@ -17,8 +17,8 @@ QString toString( const AddressType& type )
     switch( type )
     {
         case AddressType::unknown:  return lit( "unknown" );
-        case AddressType::regular:  return lit( "unknown" );
-        case AddressType::cloud:    return lit( "unknown" );
+        case AddressType::regular:  return lit( "regular" );
+        case AddressType::cloud:    return lit( "cloud" );
     };
 
     Q_ASSERT_X( false, Q_FUNC_INFO, "undefined AddressType" );
@@ -136,7 +136,7 @@ void AddressResolver::resolveAsync(
     // NOTE: in case of failure or information outdates state will be dropped to init
 
     if( info->second.dnsState() == HostAddressInfo::State::unresolved )
-        dnsResolve( info, &lk );
+        dnsResolve( info );
 
     if( natTraversal &&
         info->second.mediatorState() == HostAddressInfo::State::unresolved )
@@ -228,14 +228,14 @@ void AddressResolver::HostAddressInfo::setMediatorEntries(
 void AddressResolver::HostAddressInfo::checkExpirations()
 {
     if( m_dnsState == State::resolved &&
-        m_dnsResolveTime + DNS_CACHE_TIME > std::chrono::system_clock::now() )
+        m_dnsResolveTime + DNS_CACHE_TIME < std::chrono::system_clock::now() )
     {
         m_dnsState = State::unresolved;
         m_dnsEntries.clear();
     }
 
     if( m_mediatorState == State::resolved &&
-        m_mediatorResolveTime + MEDIATOR_CACHE_TIME > std::chrono::system_clock::now() )
+        m_mediatorResolveTime + MEDIATOR_CACHE_TIME < std::chrono::system_clock::now() )
     {
         m_mediatorState = State::unresolved;
         m_mediatorEntries.clear();
@@ -265,7 +265,7 @@ AddressResolver::RequestInfo::RequestInfo(
 {
 }
 
-void AddressResolver::dnsResolve( HaInfoIterator info, QnMutexLockerBase* lk )
+void AddressResolver::dnsResolve( HaInfoIterator info )
 {
     auto functor = [ = ]( SystemError::ErrorCode code, const HostAddress& host )
     {
@@ -296,6 +296,7 @@ void AddressResolver::dnsResolve( HaInfoIterator info, QnMutexLockerBase* lk )
     };
 
     info->second.dnsProgress();
+    m_dnsResolver.resolveAddressAsync( info->first, std::move( functor ), this );
 }
 
 void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk )

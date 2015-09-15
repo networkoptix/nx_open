@@ -150,7 +150,7 @@ private:
                      ResolveHandler _handler );
     };
 
-    void dnsResolve( HaInfoIterator info, QnMutexLockerBase* lk );
+    void dnsResolve( HaInfoIterator info );
     void mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk );
 
     std::vector< Guard > grabHandlers( SystemError::ErrorCode lastErrorCode,
