@@ -2,8 +2,9 @@
 #include <IOKit/IOKitLib.h>
 #include <cassert>
 
-#include <QList>
+#include <QtCore/QStringList>
 
+#include "licensing/hardware_info.h"
 #include "hardware_id.h"
 
 namespace {
@@ -20,28 +21,28 @@ inline std::string trim(const std::string& str)
 
 }
 
-QByteArray getHardwareId(int version, bool guidCompatibility)
+QString getHardwareId(int version, bool guidCompatibility)
 {
     assert( false );
-    return QByteArray();
+    return QString();
 }
 
-QList<QByteArray> getMainHardwareIds(int guidCompatibility)
+QStringList getMainHardwareIds(int guidCompatibility)
 {
     assert( false );
-    return QList<QByteArray>();
+    return QStringList();
 }
 
-QList<QByteArray> getCompatibleHardwareIds(int guidCompatibility)
+QStringList getCompatibleHardwareIds(int guidCompatibility)
 {
     assert( false );
-    return QList<QByteArray>();
+    return QStringList();
 }
 
 
 namespace LLUtil
 {
-void fillHardwareIds(QStringList& hardwareIds, QSettings *settings)
+void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
 {
     Q_UNUSED(settings)
     #define MAX_HWID_SIZE 1024
