@@ -485,14 +485,14 @@ void rtu::sendIfListRequest(const BaseServerInfoPtr &info
 
 ///
 
-void rtu::sendSetTimeRequest(const ServerInfo &info
+void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
+    , const QString &password
     , qint64 utcDateTimeMs
     , const QByteArray &timeZoneId
     , const OperationCallback &callback)
 {
     static const Constants::AffectedEntities affected = (Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
-    if (!info.hasExtraInfo() || utcDateTimeMs <= 0
-        || !QTimeZone(timeZoneId).isValid())
+    if (utcDateTimeMs <= 0 || !QTimeZone(timeZoneId).isValid())
     {
         if (callback)
             callback(RequestError::kUnspecified, affected);
@@ -506,19 +506,20 @@ void rtu::sendSetTimeRequest(const ServerInfo &info
     query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
     query.addQueryItem(kTimeZoneTag, timeZoneId);
     
-    const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
-        , info.extraInfo().password, kSetTimeCommand, query, RestClient::kStandardTimeout
+    const RestClient::Request request(baseInfo
+        , password, kSetTimeCommand, query, RestClient::kStandardTimeout
         , makeSuccessCalback(callback, affected), makeErrorCalback(callback, affected)); 
     RestClient::sendGet(request);
 }
 
 ///
 
-void rtu::sendSetSystemNameRequest(const ServerInfo &info
+void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
+    , const QString &password
     , const QString &systemName
     , const OperationCallback &callback)
 {
-    if (!info.hasExtraInfo() || systemName.isEmpty())
+    if (systemName.isEmpty())
     {
         if (callback)
             callback(RequestError::kUnspecified, Constants::kSystemNameAffected);
@@ -528,13 +529,12 @@ void rtu::sendSetSystemNameRequest(const ServerInfo &info
     static const QString kSystemNameTag = "systemName";
     static const QString oldPasswordTag = "oldPassword";
 
-    const QString password = info.extraInfo().password;
     QUrlQuery query;
     query.addQueryItem(kSystemNameTag, systemName);
     query.addQueryItem(oldPasswordTag, password);
 
-    const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
-        , info.extraInfo().password, kConfigureCommand, query, RestClient::kStandardTimeout
+    const RestClient::Request request(baseInfo
+        , password, kConfigureCommand, query, RestClient::kStandardTimeout
         , makeSuccessCalback(callback, Constants::kSystemNameAffected)
         , makeErrorCalback(callback, Constants::kSystemNameAffected)); 
     RestClient::sendGet(request);
@@ -542,12 +542,13 @@ void rtu::sendSetSystemNameRequest(const ServerInfo &info
 
 ///
 
-void rtu::sendSetPasswordRequest(const ServerInfo &info
+void rtu::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
+    , const QString &currentPassword
     , const QString &password
     , bool useNewPassword
     , const OperationCallback &callback)
 {
-    if (!info.hasExtraInfo() || password.isEmpty())
+    if (password.isEmpty())
     {
         if (callback)
             callback(RequestError::kUnspecified, Constants::kPasswordAffected);
@@ -558,12 +559,12 @@ void rtu::sendSetPasswordRequest(const ServerInfo &info
     static const QString newPasswordTag = "password";
     static const QString oldPasswordTag = "oldPassword";
     
-    const QString authPass = (useNewPassword ? password : info.extraInfo().password);
+    const QString authPass = (useNewPassword ? password : currentPassword);
     QUrlQuery query;
     query.addQueryItem(newPasswordTag, password);
     query.addQueryItem(oldPasswordTag, authPass);
     
-    const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
+    const RestClient::Request request(baseInfo
         , authPass, kConfigureCommand, query, RestClient::kStandardTimeout
         , makeSuccessCalback(callback, Constants::kPasswordAffected)
         , makeErrorCalback(callback, Constants::kPasswordAffected)); 
@@ -572,11 +573,12 @@ void rtu::sendSetPasswordRequest(const ServerInfo &info
 
 ///
 
-void rtu::sendSetPortRequest(const ServerInfo &info
+void rtu::sendSetPortRequest(const BaseServerInfoPtr &baseInfo
+    , const QString &password
     , int port
     , const OperationCallback &callback)
 {
-    if (!info.hasExtraInfo() || !port)
+    if (!port)
     {
         if (callback)
             callback(RequestError::kUnspecified, Constants::kPortAffected);
@@ -587,19 +589,17 @@ void rtu::sendSetPortRequest(const ServerInfo &info
 
     QUrlQuery query;
     query.addQueryItem(kPortTag, QString::number(port));
-    query.addQueryItem(oldPasswordTag, info.extraInfo().password);
+    query.addQueryItem(oldPasswordTag, password);
 
-    QUrl url = makeUrl(info, kConfigureCommand);
-    url.setQuery(query);
-
-    const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
-        , info.extraInfo().password, kConfigureCommand, query, RestClient::kStandardTimeout
+    const RestClient::Request request(baseInfo
+        , password, kConfigureCommand, query, RestClient::kStandardTimeout
         , makeSuccessCalback(callback, Constants::kPortAffected)
         , makeErrorCalback(callback, Constants::kPortAffected)); 
     RestClient::sendGet(request);
 }
 
-void rtu::sendChangeItfRequest(const ServerInfo &info
+void rtu::sendChangeItfRequest(const BaseServerInfoPtr &baseInfo
+    , const QString &password
     , const ItfUpdateInfoContainer &updateInfos
     , const OperationCallback &callback)
 {
@@ -651,17 +651,10 @@ void rtu::sendChangeItfRequest(const ServerInfo &info
         jsonInfoChanges.append(jsonInfoChange);   
     }
 
-    if (info.hasExtraInfo())
-    {
-        const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
-            , info.extraInfo().password, kIfConfigCommand, QUrlQuery(), RestClient::kStandardTimeout
-            , makeSuccessCalback(callback, affected), makeErrorCalback(callback, affected));
-        RestClient::sendPost(request, QJsonDocument(jsonInfoChanges).toJson());
-    }
-    else if (callback)
-    {
-        callback(RequestError::kUnspecified, affected);
-    }
+    const RestClient::Request request(baseInfo, password, kIfConfigCommand, QUrlQuery()
+        , RestClient::kStandardTimeout, makeSuccessCalback(callback, affected)
+        , makeErrorCalback(callback, affected));
+    RestClient::sendPost(request, QJsonDocument(jsonInfoChanges).toJson());
 }
 
 ///

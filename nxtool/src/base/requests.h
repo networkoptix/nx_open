@@ -90,25 +90,30 @@ namespace rtu
 
     ///
 
-    void sendSetTimeRequest(const ServerInfo &info
+    void sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
+        , const QString &password
         , qint64 utcDateTimeMs
         , const QByteArray &timeZoneId
         , const OperationCallback &callback);
 
-    void sendSetSystemNameRequest(const ServerInfo &info
+    void sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
+        , const QString &password
         , const QString &systemName
         , const OperationCallback &callback);
     
-    void sendSetPasswordRequest(const ServerInfo &info
+    void sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
+        , const QString &currentPassword
         , const QString &password
         , bool useNewPassword
         , const OperationCallback &callback);
 
-    void sendSetPortRequest(const ServerInfo &info
+    void sendSetPortRequest(const BaseServerInfoPtr &baseInfo
+        , const QString &password
         , int port
         , const OperationCallback &callback);
 
-    void sendChangeItfRequest(const ServerInfo &infos
+    void sendChangeItfRequest(const rtu::BaseServerInfoPtr &baseInfo
+        , const QString &password
         , const ItfUpdateInfoContainer &updateInfo
         , const OperationCallback &callback);
 }

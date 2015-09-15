@@ -728,7 +728,6 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
         const ServerModelInfo &serverInfo = *searchInfo.serverInfoIterator;
         const bool wasSelected = (serverInfo.selectedState != Qt::Unchecked);
 
-        const int prevSelectedCount = selectedCount();
         if (explicitSelection)
         {
             for(auto &system: m_systems)
@@ -1146,6 +1145,7 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
         }
 
         const auto &guard = m_changeHelper->insertRowsGuard(row, row);
+        Q_UNUSED(guard);
         systemModelInfo = m_systems.insert(place, systemInfo);
     }
 
@@ -1180,6 +1180,7 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     if (!findServer(baseInfo.id, searchInfo))
         return;
     
+    qDebug() << " ----- " << (searchInfo.serverInfoIterator->serverInfo.baseInfo().discoveredByHttp ? " HTTP " : " MULTICAST ");
     unknownRemoved(baseInfo.hostAddress);
     ServerInfo foundServer = searchInfo.serverInfoIterator->serverInfo;
     if ((searchInfo.serverInfoIterator->selectedState == Qt::Checked)
@@ -1274,6 +1275,7 @@ void rtu::ServersSelectionModel::Impl::switchToMulticast(const QUuid &id)
     if (!findServer(id, searchInfo))
         return;
 
+    qDebug() << " ----- SWITCHING TO MULTICAST";
     searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().discoveredByHttp = false;
 }
 
