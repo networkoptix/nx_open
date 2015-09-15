@@ -1547,6 +1547,60 @@
                         <caption>JSON with error code.</caption>
                     </result>
                 </function>
+                <function>
+                    <name>logLevel</name>
+                    <description>Get or set server log level.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>id</name>
+                            <description>Log id</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>0</name>
+                                    <description>Main server log</description>
+                                </value>
+                                <value>
+                                    <name>2</name>
+                                    <description>Transaction log</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>value</name>
+                            <description>Target value for log level. More detailed level includes all less detailed levels.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>Always</name>
+                                    <description>Log only the most important messages.</description>
+                                </value>
+                                <value>
+                                    <name>Error</name>
+                                    <description>Log errors.</description>
+                                </value>
+                                <value>
+                                    <name>Warning</name>
+                                    <description>Log warnings.</description>
+                                </value>
+                                <value>
+                                    <name>Info</name>
+                                    <description>Log information messages.</description>
+                                </value>
+                                <value>
+                                    <name>Debug</name>
+                                    <description>Log debug messages.</description>
+                                </value>
+                                <value>
+                                    <name>Debug2</name>
+                                    <description>Log additional debug messages.</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result/>
+                </function>
             </functions>
         </group>
 
