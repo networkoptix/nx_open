@@ -59,8 +59,7 @@ bool rtu::operator == (const BaseServerInfo &first
     return ((first.id == second.id)
         && (first.name == second.name)
         && (first.port == second.port)
-        && (first.systemName == second.systemName)
-        && (first.discoveredByHttp == second.discoveredByHttp));
+        && (first.systemName == second.systemName));
 }
 
 bool rtu::operator != (const BaseServerInfo &first
