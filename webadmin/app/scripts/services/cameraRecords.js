@@ -7,14 +7,14 @@ angular.module('webadminApp')
         return {
             getRecordsProvider:function(cameras,width,timeCorrection){
                 if(lastRecordProvider){
-                    lastRecordProvider.abort();
+                    lastRecordProvider.abort("getRecordsProvider");
                 }
                 lastRecordProvider = new CameraRecordsProvider(cameras,mediaserver,$q,width,timeCorrection);
                 return lastRecordProvider;
             },
             getPositionProvider:function(cameras,timeCorrection){
                 if(lastPositionProvider){
-                    lastPositionProvider.abort();
+                    lastPositionProvider.abort("getPositionProvider");
                 }
                 lastPositionProvider = new ShortCache(cameras,mediaserver,$q,timeCorrection);
                 return lastPositionProvider;
