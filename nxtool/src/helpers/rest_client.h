@@ -51,7 +51,7 @@ namespace rtu
 
     struct RestClient::Request
     {
-        BaseServerInfo target;
+        BaseServerInfoPtr target;
         QString password;
 
         QString path;
@@ -61,15 +61,8 @@ namespace rtu
         SuccessCallback replyCallback;
         ErrorCallback errorCallback;
 
-        Request(const BaseServerInfo &initTarget
+        Request(const BaseServerInfoPtr &initTarget
             , const QString &initPassword
-            , const QString &initPath
-            , const QUrlQuery &initParams
-            , int initTimeout
-            , const SuccessCallback &initReplyCallback
-            , const ErrorCallback &initErrorCallback);
-
-        Request(const ServerInfo &initServerInfo
             , const QString &initPath
             , const QUrlQuery &initParams
             , int initTimeout

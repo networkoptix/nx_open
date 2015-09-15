@@ -19,6 +19,7 @@ namespace rtu
         typedef std::function<void (RequestError errorCode)> ErrorCallback;
         
         enum { kUseDefaultTimeout = -1 };
+        enum { kDefaultTimeoutMs = 10 * 1000 };
 
         enum
         {

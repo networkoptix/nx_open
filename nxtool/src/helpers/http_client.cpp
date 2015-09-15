@@ -46,8 +46,6 @@ namespace
 #else
 #define logReply(...)
 #endif
-
-    const qint64 defaultRequestTimeoutMs = 10 * 1000;
 }
 
 class rtu::HttpClient::Impl : public QObject
@@ -131,7 +129,7 @@ void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs)
         return;
 
     if (timeoutMs == kUseDefaultTimeout)
-        timeoutMs = defaultRequestTimeoutMs;
+        timeoutMs = HttpClient::kDefaultTimeoutMs;
 
     QPointer<QNetworkReply> replyPtr(reply);
     QTimer::singleShot(timeoutMs, [replyPtr] {

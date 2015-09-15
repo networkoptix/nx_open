@@ -262,14 +262,15 @@ namespace /// Parsers stuff
 
     ///
 
-    void checkAuth(const rtu::BaseServerInfo &baseInfo
+    void checkAuth(const rtu::BaseServerInfoPtr &baseInfo
         , const QString &password
         , const rtu::OperationCallback &callback
         , int timeout = rtu::HttpClient::kUseDefaultTimeout)
     {
         static const rtu::Constants::AffectedEntities affected = rtu::Constants::kNoEntitiesAffected;
 
-        const rtu::RestClient::Request request(baseInfo, password, kModuleInfoAuthCommand, QUrlQuery(), timeout
+        const rtu::RestClient::Request request(baseInfo
+            , password, kModuleInfoAuthCommand, QUrlQuery(), timeout
             , makeSuccessCalback(callback, affected), makeErrorCalback(callback, affected));
         rtu::RestClient::sendGet(request);
     }
@@ -327,11 +328,7 @@ void rtu::multicastModuleInformation(const QUuid &id
     static const Constants::AffectedEntities affected = (Constants::kAllEntitiesAffected 
         & ~Constants::kAllAddressFlagsAffected);
 
-    BaseServerInfo info;
-    info.id = id;
-    info.discoveredByHttp = false;  /// force multicast usage
-
-    const auto &successfull = [info, successCallback, failedCallback](const QByteArray &data)
+    const auto &successfull = [successCallback, failedCallback](const QByteArray &data)
     {
         const QJsonObject object = QJsonDocument::fromJson(data.data()).object();
         BaseServerInfo resultInfo;
@@ -346,15 +343,19 @@ void rtu::multicastModuleInformation(const QUuid &id
             successCallback(resultInfo);
     };
 
+    BaseServerInfoPtr info = std::make_shared<BaseServerInfo>();
+    info->id = id;
+    info->discoveredByHttp = false;  /// force multicast usage
+
     const QString &kModuleInformationCommand = kApiNamespaceTag + "moduleInformation";
-    RestClient::Request request(info, kModuleInformationCommand, QUrlQuery(), RestClient::kStandardTimeout
-        , successfull, makeErrorCalback(failedCallback, affected));
+    RestClient::Request request(info, QString(), kModuleInformationCommand, QUrlQuery()
+        , RestClient::kStandardTimeout, successfull, makeErrorCalback(failedCallback, affected));
     RestClient::sendGet(request);
 }
 
 /// 
 
-void rtu::getTime(const BaseServerInfo &baseInfo
+void rtu::getTime(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
@@ -364,16 +365,17 @@ void rtu::getTime(const BaseServerInfo &baseInfo
         (Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
 
     QUrlQuery query;
-    if (baseInfo.flags & Constants::AllowChangeDateTimeFlag)
+    if (baseInfo->flags & Constants::AllowChangeDateTimeFlag)
         query.addQueryItem(kLocalTimeFlagTag, QString());
 
     const auto &parser = [](const QJsonObject &object, ExtraServerInfo &extraInfo)
         { return parseGetTimeCmd(object, extraInfo); };
 
     const auto &localSuccessful = makeReplyCallbackEx(
-        successful, failed, baseInfo.id, password, affected, parser);
+        successful, failed, baseInfo->id, password, affected, parser);
 
-    const RestClient::Request request(baseInfo, password, kGetTimeCommand, query,  timeout
+    const RestClient::Request request(baseInfo
+        , password, kGetTimeCommand, query,  timeout
         , localSuccessful, makeErrorCalback(failed, affected));
 
     RestClient::sendGet(request);
@@ -381,7 +383,7 @@ void rtu::getTime(const BaseServerInfo &baseInfo
 
 ///
 
-void rtu::getIfList(const BaseServerInfo &baseInfo
+void rtu::getIfList(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
@@ -393,16 +395,17 @@ void rtu::getIfList(const BaseServerInfo &baseInfo
         { return parseIfListCmd(object, extraInfo); };
 
     const auto &ifListSuccessfull = makeReplyCallbackEx(
-        successful, failed, baseInfo.id, password, affected, parser);
+        successful, failed, baseInfo->id, password, affected, parser);
 
-    const RestClient::Request request(baseInfo, password, kIfListCommand, QUrlQuery(),  timeout
+    const RestClient::Request request(baseInfo
+        , password, kIfListCommand, QUrlQuery(),  timeout
         , ifListSuccessfull, makeErrorCalback(failed, affected));
     RestClient::sendGet(request);
 }
 
 ///
 
-void rtu::getServerExtraInfo(const BaseServerInfo &baseInfo
+void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
@@ -446,7 +449,7 @@ void rtu::getServerExtraInfo(const BaseServerInfo &baseInfo
         if (errorCode != RequestError::kSuccess)
         {
             if (failed)
-                failed(errorCode, affected);
+                failed(errorCode, affected);;
             return;
         }
 
@@ -458,13 +461,13 @@ void rtu::getServerExtraInfo(const BaseServerInfo &baseInfo
 
 ///
 
-void rtu::sendIfListRequest(const BaseServerInfo &info
+void rtu::sendIfListRequest(const BaseServerInfoPtr &info
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
     , int timeout)
 {
-    if (!(info.flags & Constants::AllowIfConfigFlag))
+    if (!(info->flags & Constants::AllowIfConfigFlag))
     {
         if (failed)
             failed(RequestError::kUnspecified, Constants::kAllEntitiesAffected);
@@ -473,7 +476,7 @@ void rtu::sendIfListRequest(const BaseServerInfo &info
  
     const auto &parser = [](const QJsonObject &object, ExtraServerInfo &extraInfo)
         { return parseIfListCmd(object, extraInfo); };
-    const auto &localSuccessful = makeReplyCallbackEx(successful, failed, info.id
+    const auto &localSuccessful = makeReplyCallbackEx(successful, failed, info->id
         , password, Constants::kAllAddressFlagsAffected, parser);
     const RestClient::Request request(info, password, kIfListCommand, QUrlQuery(), timeout
         , localSuccessful, makeErrorCalback(failed, Constants::kAllAddressFlagsAffected));
@@ -503,7 +506,8 @@ void rtu::sendSetTimeRequest(const ServerInfo &info
     query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
     query.addQueryItem(kTimeZoneTag, timeZoneId);
     
-    const RestClient::Request request(info, kSetTimeCommand, query, RestClient::kStandardTimeout
+    const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
+        , info.extraInfo().password, kSetTimeCommand, query, RestClient::kStandardTimeout
         , makeSuccessCalback(callback, affected), makeErrorCalback(callback, affected)); 
     RestClient::sendGet(request);
 }
@@ -524,11 +528,13 @@ void rtu::sendSetSystemNameRequest(const ServerInfo &info
     static const QString kSystemNameTag = "systemName";
     static const QString oldPasswordTag = "oldPassword";
 
+    const QString password = info.extraInfo().password;
     QUrlQuery query;
     query.addQueryItem(kSystemNameTag, systemName);
-    query.addQueryItem(oldPasswordTag, info.extraInfo().password);
+    query.addQueryItem(oldPasswordTag, password);
 
-    const RestClient::Request request(info, kConfigureCommand, query, RestClient::kStandardTimeout
+    const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
+        , info.extraInfo().password, kConfigureCommand, query, RestClient::kStandardTimeout
         , makeSuccessCalback(callback, Constants::kSystemNameAffected)
         , makeErrorCalback(callback, Constants::kSystemNameAffected)); 
     RestClient::sendGet(request);
@@ -557,7 +563,8 @@ void rtu::sendSetPasswordRequest(const ServerInfo &info
     query.addQueryItem(newPasswordTag, password);
     query.addQueryItem(oldPasswordTag, authPass);
     
-    const RestClient::Request request(info.baseInfo(), authPass, kConfigureCommand, query, RestClient::kStandardTimeout
+    const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
+        , authPass, kConfigureCommand, query, RestClient::kStandardTimeout
         , makeSuccessCalback(callback, Constants::kPasswordAffected)
         , makeErrorCalback(callback, Constants::kPasswordAffected)); 
     RestClient::sendGet(request);
@@ -585,7 +592,8 @@ void rtu::sendSetPortRequest(const ServerInfo &info
     QUrl url = makeUrl(info, kConfigureCommand);
     url.setQuery(query);
 
-    const RestClient::Request request(info, kConfigureCommand, query, RestClient::kStandardTimeout
+    const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
+        , info.extraInfo().password, kConfigureCommand, query, RestClient::kStandardTimeout
         , makeSuccessCalback(callback, Constants::kPortAffected)
         , makeErrorCalback(callback, Constants::kPortAffected)); 
     RestClient::sendGet(request);
@@ -645,7 +653,8 @@ void rtu::sendChangeItfRequest(const ServerInfo &info
 
     if (info.hasExtraInfo())
     {
-        const RestClient::Request request(info, kIfConfigCommand, QUrlQuery(), RestClient::kStandardTimeout
+        const RestClient::Request request(std::make_shared<BaseServerInfo>(info.baseInfo())
+            , info.extraInfo().password, kIfConfigCommand, QUrlQuery(), RestClient::kStandardTimeout
             , makeSuccessCalback(callback, affected), makeErrorCalback(callback, affected));
         RestClient::sendPost(request, QJsonDocument(jsonInfoChanges).toJson());
     }

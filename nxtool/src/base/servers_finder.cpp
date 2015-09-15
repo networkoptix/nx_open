@@ -103,10 +103,10 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        
-        if (!jsonObject.value("systemName").toString().contains("nx")
-            && !jsonObject.value("systemName").toString().contains("NX")
-            && !jsonObject.value("systemName").toString().contains("yuriy")
+        if (//!jsonObject.value("systemName").toString().contains("nx123")
+            //&& !jsonObject.value("systemName").toString().contains("nx")
+            //&& !jsonObject.value("systemName").toString().contains("NX")
+             !jsonObject.value("systemName").toString().contains("000_nx1_1")
             )
             return false;
         
@@ -349,6 +349,9 @@ void rtu::ServersFinder::Impl::readResponseData(const SocketPtr &socket)
         if (!readPendingPacket(socket, data, &sender, &port))
            return false;
 
+        //if (sender.toString().contains("110"))
+         //   qDebug() << "---" << sender;
+
         BaseServerInfo info;
         if (parseUdpPacket(QJsonDocument::fromJson(data.data()).object(), info))
             processNewServer(info, sender.toString(), true);
@@ -403,7 +406,8 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
     const auto &firstTimeProcessor = 
         [this, address](const Callback &secondTimeProcessor)
     {
-        const bool isMulticastServer = false; /// TODO: # check if contains new multicast header
+        /// TODO: # check if contains new multicast header
+        const bool isMulticastServer = false;//(address.contains("192.168.0.145") || address.contains("192.168.0.110")); 
         const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
         const bool isUnknown = (m_unknownHosts.find(address) != m_unknownHosts.end());
         const bool notKnown = !isKnown && !isUnknown;
@@ -412,7 +416,9 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
         {
             const auto multicastProcessor = [this, address, secondTimeProcessor]()
             {
-                const QUuid id = QUuid(); /// TODO: add id extraction
+                /// TODO: add id extraction
+                const QUuid id = (address.contains("192.168.0.145") ? QUuid("{9a77693a-e9bb-ad43-a913-b12cfc014cd5}") 
+                    : QUuid("{360a8da5-ba7a-a89e-7875-f25cff1fdcd9}")); 
                 const auto successful = [this, address](const BaseServerInfo &info)
                 {
                     processNewServer(info, address, false);

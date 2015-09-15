@@ -303,12 +303,12 @@ int rtu::ApplyChangesTask::Impl::appliedChangesCount() const
     return m_appliedChangesCount;
 }
 
-void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &baseInfo)
+void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &initInfo)
 {
-    if (unknownAdded(baseInfo.hostAddress))
+    if (unknownAdded(initInfo.hostAddress))
         return;
 
-    const auto &it = m_itfChanges.find(baseInfo.id);
+    const auto &it = m_itfChanges.find(initInfo.id);
     if (it == m_itfChanges.end())
         return;
     
@@ -320,6 +320,7 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &ba
     if ((current - request.timestamp) < kIfListRequestsPeriod)
         return;
     
+    const auto baseInfo = std::make_shared<BaseServerInfo>(initInfo);
     const ThisWeakPtr &weak = shared_from_this();
 
     const auto processCallback =
@@ -358,9 +359,9 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &ba
 
         if (successful && totalApplied)
         {
-            request.info->writableBaseInfo().hostAddress = baseInfo.hostAddress;
+            request.info->writableBaseInfo().hostAddress = baseInfo->hostAddress;
             emit shared->m_owner->itfUpdated(info.baseInfo().id
-                , baseInfo.hostAddress, newInterfaces);
+                , baseInfo->hostAddress, newInterfaces);
         }
         
         const int changesCount = request.changesCount;
@@ -377,7 +378,7 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &ba
     const auto &failed = 
         [processCallback, baseInfo](const RequestError /* errorCode */, int /* affected */)
     {
-        processCallback(false, baseInfo.id, ExtraServerInfo());
+        processCallback(false, baseInfo->id, ExtraServerInfo());
     };
     
     request.inProgress = true;

@@ -31,7 +31,7 @@ namespace
 
     QUrl makeHttpUrl(const rtu::RestClient::Request &request)
     {
-        const rtu::BaseServerInfo &info = request.target;
+        const rtu::BaseServerInfo &info = *request.target;
 
         QUrl url;
         url.setScheme("http");
@@ -49,10 +49,12 @@ namespace
     {
         QnMulticast::Request result;
         result.method = (isGetRequest ? "GET" : "POST");
-        result.url = request.path;
-        result.serverId = request.target.id;
+        /// TODO: remove when Roman fix server
+        const QString tmp = (request.path.isEmpty() || request.path[0] != '/' ? request.path
+            : request.path.right(request.path.length() - 1) + "?" + request.params.toString());
+        result.url = tmp;
+        result.serverId = request.target->id;
         result.contentType = "application/json";
-
         result.auth.setUser(adminUserName());
         result.auth.setPassword(request.password);
         return result;
@@ -107,6 +109,8 @@ private:
         , bool isGetRequest
         , const QByteArray &data = QByteArray());
 
+    QnMulticast::ResponseCallback makeCallbackForMulticast(const rtu::RestClient::Request &request);
+
 private:
     RestClient * const m_owner;
     rtu::HttpClient m_httpClient;
@@ -135,35 +139,31 @@ rtu::HttpClient::ErrorCallback rtu::RestClient::Impl::makeHttpErrorCallback(cons
     const auto httpTryErrorCallback = 
         [this, request, isGetRequest, data](RequestError errorCode)
     {
-        if (request.path.contains("configure"))
-            int i = 0;
-
-        qDebug() << " --- Error callback " << request.path;
+        qDebug() << " --- HTTP error callback " << request.path << " : " << static_cast<int>(errorCode);
         if (errorCode == RequestError::kUnauthorized)
         {
             if (request.errorCallback)
                 request.errorCallback(errorCode);
+            return;
         }
 
         Request tmp(request);
 
         /// Multicast error replaced by initial http code (except unauthorized)
         const auto errorCallbackToCapture = request.errorCallback;
-        tmp.errorCallback = [errorCallbackToCapture, errorCode](RequestError errorCode)   
+        tmp.errorCallback = [errorCallbackToCapture, errorCode](RequestError currentErrorCode)   
         {
             if (!errorCallbackToCapture)
                 return;
 
-            errorCallbackToCapture(errorCode != RequestError::kUnauthorized 
+            errorCallbackToCapture(currentErrorCode != RequestError::kUnauthorized 
                 ? errorCode : RequestError::kUnauthorized);
         };
 
         /// Server not accessible by HTTP, but accessible by multicast
         const auto replyCallbackToCapture = request.replyCallback;
-        const auto id = request.target.id;
-        tmp.replyCallback = [this, replyCallbackToCapture, id](const QByteArray &data)
+        tmp.replyCallback = [this, replyCallbackToCapture](const QByteArray &data)
         {
-            emit m_owner->accessibleOnlyByMulticast(id);
             if (replyCallbackToCapture)
                 replyCallbackToCapture(data);
         };
@@ -190,40 +190,55 @@ void rtu::RestClient::Impl::sendHttpPost(const Request &request
         , makeHttpErrorCallback(request, false, data), request.timeout);
 }
 
-QnMulticast::ResponseCallback makeCallback(const rtu::RestClient::Request &request)
+QnMulticast::ResponseCallback rtu::RestClient::Impl::makeCallbackForMulticast(const rtu::RestClient::Request &request)
 {
-    const auto callback = [request](const QUuid& /* requestId */
+    const auto callback = [this, request](const QUuid& /* requestId */
         , QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
     {
-        if (request.path.contains("configure"))
-            int i = 0;
-        if (errCode == QnMulticast::ErrCode::ok)
+        const rtu::RequestError requestError = 
+            convertMulticastClientErrorToGlobal(errCode, response.httpResult);
+        
+        qDebug() << " --- Multicast callback " << request.path << " : " << static_cast<int>(requestError) << " : " << response.httpResult;
+
+        if ((requestError == RequestError::kSuccess) 
+            || (requestError == RequestError::kUnauthorized))
         {
+            request.target->discoveredByHttp = false;
+            emit m_owner->accessibleOnlyByMulticast(request.target->id);
+        }
+
+        if (requestError == rtu::RequestError::kSuccess)
+        {
+            if (request.path.contains("iflist"))
+                qDebug() << "\n" << response.messageBody << "\n";
+
             if (request.replyCallback)
                 request.replyCallback(response.messageBody);
+
         }
         else if (request.errorCallback)
-            request.errorCallback(convertMulticastClientErrorToGlobal(errCode, response.httpResult));
+            request.errorCallback(requestError);
     };
     return callback;
 }
 
 void rtu::RestClient::Impl::sendMulticastGet(const Request &request)
 {
-    if (request.path.contains("configure"))
-        int i = 0;
     m_multicastClient.execRequest(makeMulticastRequest(request, true)
-        , makeCallback(request) , request.timeout);
+        , makeCallbackForMulticast(request) , request.timeout);
 }
 
 void rtu::RestClient::Impl::sendMulticastPost(const Request &request
     , const QByteArray &data)
 {
-    m_multicastClient.execRequest(makeMulticastRequest(request, false)
-        , makeCallback(request) , request.timeout);
+    auto msecRequest = makeMulticastRequest(request, false);
+    msecRequest.messageBody = data;
+    m_multicastClient.execRequest(msecRequest
+        , makeCallbackForMulticast(request) , request.timeout);
 }
 
 ///
+
 rtu::RestClient *rtu::RestClient::instance()
 {
     static RestClient client;
@@ -248,7 +263,7 @@ rtu::RestClient::~RestClient()
 
 void rtu::RestClient::sendGet(const Request &request)
 {
-    if (request.target.discoveredByHttp)
+    if (request.target->discoveredByHttp)
         implInstance().sendHttpGet(request);
     else
         implInstance().sendMulticastGet(request);
@@ -257,7 +272,7 @@ void rtu::RestClient::sendGet(const Request &request)
 void rtu::RestClient::sendPost(const Request &request
     , const QByteArray &data)
 {
-    if (request.target.discoveredByHttp)
+    if (request.target->discoveredByHttp)
         implInstance().sendHttpPost(request, data);
     else
         implInstance().sendMulticastPost(request, data);
@@ -265,7 +280,7 @@ void rtu::RestClient::sendPost(const Request &request
         
 ///
 
-rtu::RestClient::Request::Request(const rtu::BaseServerInfo &initTarget
+rtu::RestClient::Request::Request(const rtu::BaseServerInfoPtr &initTarget
     , const QString &initPassword
     , const QString &initPath
     , const QUrlQuery &initParams
@@ -275,23 +290,6 @@ rtu::RestClient::Request::Request(const rtu::BaseServerInfo &initTarget
     
     : target(initTarget)
     , password(initPassword)
-    , path(initPath)
-    , params(initParams)
-    , timeout(initTimeout)
-    , replyCallback(initReplyCallback)
-    , errorCallback(initErrorCallback)
-{
-}
-
-rtu::RestClient::Request::Request(const rtu::ServerInfo &initServerInfo
-    , const QString &initPath
-    , const QUrlQuery &initParams
-    , int initTimeout
-    , const rtu::RestClient::SuccessCallback &initReplyCallback
-    , const rtu::RestClient::ErrorCallback &initErrorCallback)
-    
-    : target(initServerInfo.baseInfo())
-    , password(initServerInfo.hasExtraInfo() ? initServerInfo.extraInfo().password : QString())
     , path(initPath)
     , params(initParams)
     , timeout(initTimeout)

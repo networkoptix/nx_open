@@ -11,6 +11,8 @@
 
 namespace
 {
+    enum { kShortTimeout = 3000};
+
     QStringList g_availablePasswords = rtu::defaultAdminPasswords();
 
     const auto globalSuccessful = [](const rtu::ServerInfoManager::SuccessfulCallback &callback
@@ -31,12 +33,12 @@ public:
     
     virtual ~Impl();
     
-    void primaryLoginToServer(const BaseServerInfo &info
+    void primaryLoginToServer(const BaseServerInfoPtr &info
         , const QString &password
         , const ServerInfoManager::SuccessfulCallback &successful
         , const ServerInfoManager::FailedCallback &failed);
     
-    void loginToServer(const BaseServerInfo &info
+    void loginToServer(const BaseServerInfoPtr &info
         , int passwordIndex
         , const ServerInfoManager::SuccessfulCallback &successful
         , const ServerInfoManager::FailedCallback &failed);    
@@ -69,27 +71,28 @@ rtu::ServerInfoManager::Impl::~Impl()
 {
 }
 
-void rtu::ServerInfoManager::Impl::primaryLoginToServer(const BaseServerInfo &info
+#include <qdebug.h>
+void rtu::ServerInfoManager::Impl::primaryLoginToServer(const BaseServerInfoPtr &info
     , const QString &password
     , const ServerInfoManager::SuccessfulCallback &successful
     , const ServerInfoManager::FailedCallback &failed)
 {
+    qDebug() << " ++++ primaryLoginToServer";
     const auto &localSuccessful = [successful, info](const QUuid &id, const ExtraServerInfo &extra)
     {
-        globalSuccessful(successful, id, extra, info.hostAddress);
+        globalSuccessful(successful, id, extra, info->hostAddress);
     };
 
     const auto &localFailed = [this, info, failed](const RequestError errorCode, int)
     {
         if (failed)
-            failed(info.id, errorCode);
+            failed(info->id, errorCode);
     };
     
-    enum { kShortTimeout = 2000};
     getServerExtraInfo(info, password, localSuccessful, localFailed, kShortTimeout);
 } 
 
-void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfo &info
+void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfoPtr &info
     , int passwordIndex
     , const ServerInfoManager::SuccessfulCallback &successful
     , const ServerInfoManager::FailedCallback &failed)
@@ -97,7 +100,7 @@ void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfo &info
     if (passwordIndex >= g_availablePasswords.size())
     {
         if (failed)
-            failed(info.id, RequestError::kUnauthorized);
+            failed(info->id, RequestError::kUnauthorized);
         return;
     }
     
@@ -111,16 +114,18 @@ void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfo &info
         }
 
         if (failed)
-            failed(info.id, RequestError::kUnspecified);
+            failed(info->id, RequestError::kUnspecified);
     };
     
     const auto &localSuccessful = [successful, info](const QUuid &id, const ExtraServerInfo &extra)
     {
-        globalSuccessful(successful, id, extra, info.hostAddress);
+        globalSuccessful(successful, id, extra, info->hostAddress);
     };
 
+    qDebug() << " ++++ loginToServer with " << g_availablePasswords.at(passwordIndex);
+
     getServerExtraInfo(info
-        , g_availablePasswords.at(passwordIndex), localSuccessful, localFailed);
+        , g_availablePasswords.at(passwordIndex), localSuccessful, localFailed, kShortTimeout);
 }
 
 void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &servers
@@ -130,14 +135,14 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
 
     for (const ServerInfo &server: servers)
     {
-        const BaseServerInfo &base = server.baseInfo();
+        const BaseServerInfoPtr &base = std::make_shared<BaseServerInfo>(server.baseInfo());
         const int timestamp = m_msCounter.elapsed();
         const auto &localSuccessful = 
             [this, base, timestamp, successful](const QUuid &, const ExtraServerInfo &extraInfo)
         {
-            m_lastUpdated[base.id] = timestamp;
+            m_lastUpdated[base->id] = timestamp;
             if (successful)
-                successful(base.id, extraInfo, base.hostAddress);
+                successful(base->id, extraInfo, base->hostAddress);
         };
 
         const auto &localFailed = 
@@ -155,8 +160,9 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
 
         const QString password = (server.hasExtraInfo() ? server.extraInfo().password 
             : defaultAdminPasswords().front());
-        getServerExtraInfo(server.baseInfo()
-            , password, localSuccessful, localFailed);
+
+        qDebug() << "________ getting server info with password" << password << " " << server.hasExtraInfo() << " " << server.baseInfo().discoveredByHttp;
+        getServerExtraInfo(base, password, localSuccessful, localFailed);
     }
 }
 
@@ -176,7 +182,7 @@ void rtu::ServerInfoManager::loginToServer(const BaseServerInfo &info
     , const SuccessfulCallback &success
     , const FailedCallback &failed)
 {
-    m_impl->loginToServer(info, 0, success, failed);
+    m_impl->loginToServer(std::make_shared<BaseServerInfo>(info), 0, success, failed);
 }
 
 void rtu::ServerInfoManager::loginToServer(const BaseServerInfo &info
@@ -184,13 +190,14 @@ void rtu::ServerInfoManager::loginToServer(const BaseServerInfo &info
     , const SuccessfulCallback &success
     , const FailedCallback &failed)
 {
-    m_impl->primaryLoginToServer(info, password, success, failed);
+    m_impl->primaryLoginToServer(std::make_shared<BaseServerInfo>(info), password, success, failed);
 }
 
 void rtu::ServerInfoManager::updateServerInfos(const ServerInfoContainer &servers
     , const SuccessfulCallback &success
     , const FailedCallback &failed)
 {
+    qDebug() << "--------------------------------";
     m_impl->updateServerInfos(servers, success, failed);
 }
 
