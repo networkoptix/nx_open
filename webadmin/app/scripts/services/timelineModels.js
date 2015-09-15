@@ -337,9 +337,9 @@ CameraRecordsProvider.prototype.updateLastMinute = function(lastMinuteDuration, 
     }
 };
 
-CameraRecordsProvider.prototype.abort = function (){
+CameraRecordsProvider.prototype.abort = function (reason){
     if(this.currentRequest) {
-        this.currentRequest.abort();
+        this.currentRequest.abort(reason);
         this.currentRequest = null;
     }
 };
@@ -356,7 +356,9 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     //1. Request records for interval
     // And do we need to request it?
 
-    this.abort();
+    if(self.currentRequest){
+        return;
+    }
     self.currentRequest = this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization, null, levelData.name);
 
     self.currentRequest.then(function (data) {
@@ -652,9 +654,9 @@ ShortCache.prototype.init = function(start){
     this.update();
 };
 
-ShortCache.prototype.abort = function(){
+ShortCache.prototype.abort = function(reason){
     if(this.currentRequest) {
-        this.currentRequest.abort();
+        this.currentRequest.abort(reason);
         this.currentRequest = null;
     }
 };
@@ -674,7 +676,7 @@ ShortCache.prototype.update = function(requestPosition,position){
     this.lastRequestDate = requestPosition;
     this.lastRequestPosition = position || this.played;
 
-    this.abort();
+    this.abort("update again");
     // Get next {{limitChunks}} chunks
     this.currentRequest = this.mediaserver.getRecords('/',
             this.cameras[0],
