@@ -608,6 +608,19 @@ private:
             boost::optional<unsigned int>(),
             [this, resolvedAddress, sendTimeout](){ m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
     }
+
+    //!Call this from within aio thread only
+    void stopPollingSocket(SocketType* sock, const aio::EventType eventType)
+    {
+        //TODO #ak move this method to aioservice?
+        aio::AIOService::instance()->cancelPostedCalls(sock, true);
+        if (eventType == aio::etNone || eventType == aio::etRead)
+            aio::AIOService::instance()->removeFromWatch(sock, aio::etRead, true);
+        if (eventType == aio::etNone || eventType == aio::etWrite)
+            aio::AIOService::instance()->removeFromWatch(sock, aio::etWrite, true);
+        if (eventType == aio::etNone || eventType == aio::etTimedOut)
+            aio::AIOService::instance()->removeFromWatch(sock, aio::etTimedOut, true);
+    }
 };
 
 
@@ -717,19 +730,6 @@ private:
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
     bool* m_terminatedFlagPtr;
-
-    //!Call this from within aio thread only
-    void stopPollingSocket(SocketType* sock, const aio::EventType eventType)
-    {
-        //TODO #ak move this method to aioservice?
-        aio::AIOService::instance()->cancelPostedCalls(sock, true);
-        if (eventType == aio::etNone || eventType == aio::etRead)
-            aio::AIOService::instance()->removeFromWatch(sock, aio::etRead, true);
-        if (eventType == aio::etNone || eventType == aio::etWrite)
-            aio::AIOService::instance()->removeFromWatch(sock, aio::etWrite, true);
-        if (eventType == aio::etNone || eventType == aio::etTimedOut)
-            aio::AIOService::instance()->removeFromWatch(sock, aio::etTimedOut, true);
-    }
 };
 
 #endif  //ASYNC_SOCKET_HELPER_H

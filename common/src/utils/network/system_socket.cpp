@@ -1103,7 +1103,7 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
         QMutex mtx;
         bool cancelled = false;
 
-        m_implDelegate.dispatchImpl(
+        m_implDelegate.dispatch(
             [this, &cond, &mtx, &cancelled]()
             {
                 aio::AIOService::instance()->cancelPostedCalls(
@@ -1124,7 +1124,7 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
     }
     else
     {
-        m_implDelegate.dispatchImpl(
+        m_implDelegate.dispatch(
             [this]()
             {
                 //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
