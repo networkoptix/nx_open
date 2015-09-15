@@ -11,7 +11,7 @@
 #include <utils/serialization/json.h>
 
 #include "hardware_id.h"
-#include "hardware_id_pvt.h"
+#include "hardware_id_p.h"
 
 #include "utils/common/log.h"
 #include "licensing/hardware_info.h"

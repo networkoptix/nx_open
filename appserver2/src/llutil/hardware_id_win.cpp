@@ -27,7 +27,7 @@
 #include "util.h"
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
-#include "hardware_id_pvt.h"
+#include "hardware_id_p.h"
 
 #define _WIN32_DCOM
 # pragma comment(lib, "wbemuuid.lib")
