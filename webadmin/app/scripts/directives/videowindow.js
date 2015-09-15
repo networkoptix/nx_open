@@ -225,7 +225,7 @@ angular.module('webadminApp')
                             });
                             scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
-                            scope.vgApi.addEventListener("timeupdate", function (event, arg2, arg3) {
+                            scope.vgApi.addEventListener("timeupdate", function (event) {
                                 var video = event.srcElement || event.originalTarget;
                                 scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 if (scope.loading) {
@@ -233,6 +233,11 @@ angular.module('webadminApp')
                                         scope.loading = false;
                                     });
                                 }
+                            });
+
+                            scope.vgApi.addEventListener("ended",function(event){
+                                scope.vgUpdateTime({$currentTime: null, $duration: null});
+
                             });
                         }
 

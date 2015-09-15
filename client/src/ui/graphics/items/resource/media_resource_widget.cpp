@@ -679,8 +679,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     for(int channel = 0; channel < channelCount(); channel++)
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
-    if(isOverlayVisible() && isInfoVisible())
-        updateInfoTextLater();
+    updateInfoTextLater();
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {

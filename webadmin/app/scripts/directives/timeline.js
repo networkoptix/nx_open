@@ -17,6 +17,7 @@ angular.module('webadminApp')
             link: function (scope, element/*, attrs*/) {
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
+                var debugTime = Config.debug.chunksOnTimeline && Config.allowDebugMode;
 
 
                 var timelineConfig = {
@@ -276,6 +277,10 @@ angular.module('webadminApp')
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var canvas = element.find('canvas').get(0);
+                canvas.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                });
+
                 scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,
                     timelineConfig.maxMsPerPixel,
                     timelineConfig.initialInterval,
@@ -308,6 +313,10 @@ angular.module('webadminApp')
                     if(scope.positionProvider) {
                         scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
                     }
+                    if(scope.recordsProvider) {
+                        scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
+                    }
+
                     scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
 
                     processZooming();
@@ -322,6 +331,9 @@ angular.module('webadminApp')
                     }else{
                         debugEvents(context);
                     }
+
+                    drawLastMinute(context);
+
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
@@ -712,29 +724,33 @@ angular.module('webadminApp')
                     if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
 
                         var targetLevelIndex = scope.scaleManager.levels.events.index;
-
+                        var events = null;
                         for(var levelIndex=0;levelIndex<RulerModel.levels.length;levelIndex++) {
                             var level = RulerModel.levels[levelIndex];
                             var start = scope.scaleManager.alignStart(level);
                             var end = scope.scaleManager.alignEnd(level);
                             // 1. Splice events
-                            var events = scope.recordsProvider.getIntervalRecords(start, end, levelIndex, true );
+                            var events = scope.recordsProvider.getIntervalRecords(start, end, levelIndex, levelIndex != targetLevelIndex);
 
                             // 2. Draw em!
                             for (var i = 0; i < events.length; i++) {
                                 drawEvent(context, events[i], levelIndex, true, targetLevelIndex);
                             }
                         }
+
+
                     }
                 }
                 // !!! Draw events
                 function drawOrCheckEvents(context){
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
-                    mouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
 
                     if(!context){
+                        var newMouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
+                        mouseInEvents = newMouseInEvents;
                         return;
                     }
+
                     context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
                     context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
@@ -755,32 +771,29 @@ angular.module('webadminApp')
                         }
                     }
 
-                    drawLastMinute(context);
                 }
                 function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
                     var startCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.start);
                     var endCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.end);
 
-                    var exactChunk = levelIndex == chunk.level;
                     var blur = 1;//chunk.level/(RulerModel.levels.length - 1);
 
-                    context.fillStyle = blurColor(timelineConfig.exactChunkColor,blur);
-
-
+                    context.fillStyle = blurColor(timelineConfig.exactChunkColor,blur); //green
 
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
                     var height = timelineConfig.chunkHeight * scope.viewportHeight;
 
                     if(debug){
-                        if(targetLevelIndex == levelIndex) {
-                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1);
+                        if(levelIndex == chunk.level) { // not exact chunk
+                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur); //blue
                         }
 
-                        if(levelIndex == chunk.level) { // not exact chunk
-                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur);
-                        }
                         if(!chunk.level){ //blind spot!
-                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1); // red
+                        }
+
+                        if(targetLevelIndex == levelIndex) {
+                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1); //yellow
                         }
 
                         top += (1+levelIndex) / RulerModel.levels.length * height;
@@ -832,7 +845,7 @@ angular.module('webadminApp')
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
                     var height = timelineConfig.chunkHeight * scope.viewportHeight;
 
-                    var offset_x = (start / timelineConfig.lastMinuteAnimationMs) % timelineConfig.lastMinuteTextureSize;
+                    var offset_x = - (start / timelineConfig.lastMinuteAnimationMs) % timelineConfig.lastMinuteTextureSize;
 
                     context.save();
                     context.translate(offset_x, 0);
@@ -892,16 +905,14 @@ angular.module('webadminApp')
                 }
 
                 function drawPointerMarker(context){
-                    if(window.jscd.mobile){
+                    if(window.jscd.mobile || !mouseCoordinate || !mouseInEvents){
                         return;
                     }
-                    if(!mouseCoordinate || !mouseInEvents){
-                        return;
-                    }
+
                     drawMarker(context, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
                 }
 
-                function drawMarker(context, date,markerColor,textColor){
+                function drawMarker(context, date, markerColor, textColor){
                     var coordinate =  scope.scaleManager.dateToScreenCoordinate(date);
 
                     if(coordinate < 0 || coordinate > scope.viewportWidth ) {
@@ -947,7 +958,7 @@ angular.module('webadminApp')
                     context.font = formatFont(timelineConfig.markerDateFont);
                     coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
 
-                    var dateString = dateFormat(date, timelineConfig.dateFormat);
+                    var dateString = debugTime? date.getTime() : dateFormat(date, timelineConfig.dateFormat);
                     var dateWidth = context.measureText(dateString).width;
                     var textStart = (height - timelineConfig.markerDateFont.size) / 2;
                     context.fillText(dateString,coordinate - dateWidth/2, textStart);
@@ -990,7 +1001,10 @@ angular.module('webadminApp')
                     mouseRow = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     drawOrCheckScrollBar();
-                    drawOrCheckEvents();
+                    if( mouseCoordinate >= 0 ) {
+                        drawOrCheckEvents();
+                    }
+
                 }
 
                 var zoomTarget = 0;
@@ -1094,6 +1108,8 @@ angular.module('webadminApp')
                     //TODO: "move playing position";
                 };
                 scope.mouseLeave = function(event){
+                    mouseInEvents = false;
+                    mouseInTimeline = false;
                     //updateMouseCoordinate(null);
                 };
                 scope.mouseMove = function(event){

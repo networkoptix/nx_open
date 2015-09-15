@@ -246,6 +246,9 @@ public:
     void setRotation(qreal rotation);
 
 
+    bool displayInfo() const;
+    void setDisplayInfo(bool value);
+
     /**
      * Marks this item as waiting for geometry adjustment. It will be placed
      * at the best slot available when its layout becomes active.
@@ -303,6 +306,7 @@ signals:
     void dewarpingParamsChanged();
     void zoomTargetItemChanged();
     void rotationChanged();
+    void displayInfoChanged();
     void dataChanged(int role);
 
 protected:
@@ -342,6 +346,9 @@ private:
 
     /** Current item dewarping parameters. */
     QnItemDewarpingParams m_itemDewarpingParams;
+
+    /** Should the info be always displayed on the item. */
+    bool m_displayInfo;
 
     /** User data by role. */
     QHash<int, QVariant> m_dataByRole;

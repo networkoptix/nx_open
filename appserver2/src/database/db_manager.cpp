@@ -2100,11 +2100,13 @@ ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data, qint32 inter
         INSERT INTO vms_layoutitem (zoom_bottom, right, uuid, zoom_left, resource_guid, \
         zoom_right, top, layout_id, bottom, zoom_top, \
         zoom_target_uuid, flags, contrast_params, rotation, \
-        dewarping_params, left) VALUES \
+        dewarping_params, left, display_info \
+        ) VALUES \
         (:zoomBottom, :right, :id, :zoomLeft, :resourceId, \
         :zoomRight, :top, :layoutId, :bottom, :zoomTop, \
         :zoomTargetId, :flags, :contrastParams, :rotation, \
-        :dewarpingParams, :left)\
+        :dewarpingParams, :left, :displayInfo \
+        )\
     ");
     for(const ApiLayoutItemData& item: data.items)
     {
@@ -2892,7 +2894,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
         SELECT r.guid as layoutId, li.zoom_bottom as zoomBottom, li.right, li.uuid as id, li.zoom_left as zoomLeft, li.resource_guid as resourceId, \
         li.zoom_right as zoomRight, li.top, li.bottom, li.zoom_top as zoomTop, \
         li.zoom_target_uuid as zoomTargetId, li.flags, li.contrast_params as contrastParams, li.rotation, li.id, \
-        li.dewarping_params as dewarpingParams, li.left FROM vms_layoutitem li \
+        li.dewarping_params as dewarpingParams, li.left, li.display_info as displayInfo \
+        FROM vms_layoutitem li \
         JOIN vms_resource r on r.id = li.layout_id order by r.guid\
     ");
 

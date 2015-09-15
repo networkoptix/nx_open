@@ -51,7 +51,7 @@ rtu::ModelChangeHelper::~ModelChangeHelper()
 }
 
 rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::insertRowsGuard(int startIndex
-    , int finishIndex)
+    , int finishIndex) const
 {
     m_beginInsertRows(startIndex, finishIndex);
     return Guard(new ChangeGuard([this]()
@@ -64,7 +64,7 @@ rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::insertRowsGuard(int startI
 }
 
 rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::removeRowsGuard(int startIndex
-    , int finishIndex)
+    , int finishIndex) const
 {
     m_beginRemoveRows(startIndex, finishIndex);
     return Guard(new ChangeGuard([this]()
@@ -76,14 +76,14 @@ rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::removeRowsGuard(int startI
     }));
 }
 
-rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::resetModelGuard()
+rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::resetModelGuard() const
 {
     m_beginResetModel();
     return Guard(new ChangeGuard(m_endResetModel));
 }
 
 void rtu::ModelChangeHelper::dataChanged(int startIndex
-    , int finishIndex)
+    , int finishIndex) const
 {
     m_dataChangedFunction(startIndex, finishIndex);
 }

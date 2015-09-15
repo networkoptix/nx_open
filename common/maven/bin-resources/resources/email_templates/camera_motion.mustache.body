@@ -8,6 +8,14 @@
             </tr>
         </table>
         {{/aggregated}}
+    
+		{{#urlint}}
+			<p><a href="{{urlint}}">Play archive (internal link)</a></p>
+		{{/urlint}}
+
+		{{#urlext}}
+			<p><a href="{{urlext}}">Play archive (public link)</a></p>
+		{{/urlext}}
     </div>
 {{#screenshot}}
     <div>
