@@ -22,7 +22,7 @@ QString toString( const AddressType& type )
     };
 
     Q_ASSERT_X( false, Q_FUNC_INFO, "undefined AddressType" );
-    return lit( "undefined" );
+    return lit( "undefined=%1" ).arg( static_cast< int >( type ) );
 }
 
 AddressAttribute::AddressAttribute( AddressAttributeType type_, quint64 value_ )
@@ -48,7 +48,7 @@ QString AddressAttribute::toString() const
     };
 
     Q_ASSERT_X( false, Q_FUNC_INFO, "undefined AddressAttributeType" );
-    return lit( "undefined" );
+    return lit( "undefined=%1" ).arg( static_cast< int >( type ) );
 }
 
 AddressEntry::AddressEntry( AddressType type_, HostAddress host_ )
@@ -66,8 +66,7 @@ bool AddressEntry::operator ==( const AddressEntry& rhs ) const
 QString AddressEntry::toString() const
 {
     return lit("%1:%2%3")
-            .arg( host.toString() )
-            .arg( ::nx::cc::toString( type ) )
+            .arg( ::nx::cc::toString( type ) ).arg( host.toString() )
             .arg( containerString( attributes,
                                    lit(","), lit("("), lit(")"), lit("") ) );
 }
@@ -373,7 +372,7 @@ std::vector< Guard > AddressResolver::grabHandlers(
                 it->second.handler( code, std::move( entries ) );
 
                 QnMutexLocker lk( &m_mutex );
-                NX_LOG( lit( "%1 address %2 is resolved to request %3 to %4" )
+                NX_LOG( lit( "%1 address %2 is resolved by request %3 to %4" )
                         .arg( QString::fromUtf8( Q_FUNC_INFO ) )
                         .arg( info->first.toString() )
                         .arg( reinterpret_cast< size_t >( it->first ) )
@@ -390,9 +389,10 @@ std::vector< Guard > AddressResolver::grabHandlers(
             ++req;
     }
 
-    NX_LOG( lit( "%1 there are %2 about to be notified:%3" )
+    NX_LOG( lit( "%1 there are %2 about to be notified: %3 resolved to %4" )
             .arg( QString::fromUtf8( Q_FUNC_INFO ) ).arg( guards.size() )
-            .arg( containerString( entries ) ), cl_logDEBUG1 );
+            .arg( info->first.toString() ).arg( containerString( entries ) ),
+            cl_logDEBUG1 );
     return guards;
 }
 
