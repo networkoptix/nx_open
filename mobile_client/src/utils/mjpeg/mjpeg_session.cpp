@@ -5,14 +5,22 @@
 #include <QtGui/QImage>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
-#include <libjpeg/jpeglib.h>
 
 #include <utils/common/delayed.h>
+
+#if defined(Q_OS_IOS) || defined(Q_OS_MAC)
+#define USE_LIBJPEG
+#endif
+
+#ifdef USE_LIBJPEG
+#include <libjpeg/jpeglib.h>
+#endif
 
 namespace {
     const qint64 maxHttpBufferSize = 2 * 1024 * 1024;
     const qint64 maxFrameQueueSize = 8;
 
+#ifdef USE_LIBJPEG
     void imageCleanup(void *info) {
         delete [](uchar*)info;
     }
@@ -45,6 +53,11 @@ namespace {
 
         return QImage(buffer, width, height, QImage::Format_ARGB32, &imageCleanup, buffer);
     }
+#else
+    QImage decompressJpegImage(const char *data, size_t size) {
+        return QImage::fromData(reinterpret_cast<const uchar*>(data), size);
+    }
+#endif
 }
 
 class QnMjpegSessionPrivate : public QObject {
