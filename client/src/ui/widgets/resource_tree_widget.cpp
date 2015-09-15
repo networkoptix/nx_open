@@ -177,8 +177,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     connect(ui->resourcesTreeView,      SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
     connect(ui->resourcesTreeView,      SIGNAL(clicked(QModelIndex)),       this,               SLOT(at_treeView_clicked(QModelIndex)));
 
-    connect(this,                       SIGNAL(viewportSizeChanged()),      this,               SLOT(updateColumnsSize()), Qt::QueuedConnection);
-
     connect(ui->filterLineEdit,         SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,         SIGNAL(editingFinished()),          this,               SLOT(updateFilter()));
 
@@ -186,6 +184,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
 
     ui->resourcesTreeView->installEventFilter(this);
     ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
+//    ui->resourcesTreeView->setItemDelegateForColumn(Qn::InfoColumn)
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
@@ -224,6 +223,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
 
         updateCheckboxesVisibility();
         updateFilter();
+        updateColumnsSize();
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
@@ -361,14 +361,22 @@ QAbstractItemView* QnResourceTreeWidget::treeView() const {
 }
 
 void QnResourceTreeWidget::updateCheckboxesVisibility() {
-    ui->resourcesTreeView->setColumnHidden(1, !m_checkboxesVisible);
+    ui->resourcesTreeView->setColumnHidden(Qn::CheckColumn, !m_checkboxesVisible);
+    ui->resourcesTreeView->setColumnHidden(Qn::InfoColumn,  !m_checkboxesVisible);
 }
 
 void QnResourceTreeWidget::updateColumnsSize() {
     const int checkBoxSize = 16;
-    const int offset = checkBoxSize * 1.5;
-    ui->resourcesTreeView->setColumnWidth(1, checkBoxSize);
-    ui->resourcesTreeView->setColumnWidth(0, ui->resourcesTreeView->viewport()->width() - offset);
+
+    if (m_checkboxesVisible) {
+        ui->resourcesTreeView->header()->setStretchLastSection(false);
+        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::CheckColumn,  QHeaderView::Fixed);
+        ui->resourcesTreeView->setColumnWidth(Qn::CheckColumn, checkBoxSize);
+        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::InfoColumn,   QHeaderView::ResizeToContents);
+        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::NameColumn,   QHeaderView::Stretch);
+    } else {
+        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::NameColumn,   QHeaderView::Stretch);
+    }
 }
 
 void QnResourceTreeWidget::updateFilter() {

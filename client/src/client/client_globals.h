@@ -162,6 +162,7 @@ namespace Qn {
      */
     enum ResourceTreeColumn {
         NameColumn,
+        InfoColumn,
         CheckColumn,
         ColumnCount
     };

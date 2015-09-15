@@ -12,6 +12,8 @@
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/workaround/qtbug_workaround.h>
 
+#include <ui/dialogs/failover_priority_dialog.h>
+
 // -------------------------------------------------------------------------- //
 // QnDebugControlDialog
 // -------------------------------------------------------------------------- //
@@ -75,6 +77,9 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
     qDebug() << qnRuntime->debugCounter();
+
+    QScopedPointer<QnFailoverPriorityDialog> dialog(new QnFailoverPriorityDialog(mainWindow()));
+    dialog->exec();
 }
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered() {

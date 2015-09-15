@@ -170,7 +170,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             if(treeRequest){
-                treeRequest.abort(); //abort tree reloading request to speed up loading new video
+                treeRequest.abort("updateVideoSource"); //abort tree reloading request to speed up loading new video
             }
 
 
@@ -355,7 +355,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             var deferred = $q.defer();
             if(treeRequest){
-                treeRequest.abort();
+                treeRequest.abort("getCameras");
             }
             treeRequest = mediaserver.getCameras();
             treeRequest.then(function (data) {
@@ -520,7 +520,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             var deferred = $q.defer();
 
             if(treeRequest){
-                treeRequest.abort();
+                treeRequest.abort("reloadTree");
             }
             treeRequest = mediaserver.getMediaServers();
             treeRequest.then(function (data) {

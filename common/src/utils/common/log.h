@@ -68,6 +68,7 @@ public:
     static bool initLog(QnLog *externalInstance, int logID = MAIN_LOG_ID);
     static QString logFileName( int logID = MAIN_LOG_ID );
     static QnLog *instance( int logID = MAIN_LOG_ID );
+    static bool instanceExists(int logID = MAIN_LOG_ID);
     
     static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);

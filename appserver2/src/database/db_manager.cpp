@@ -1671,7 +1671,9 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             min_archive_days,               \
             max_archive_days,               \
             prefered_server_id,             \
-            license_used)                   \
+            license_used,                   \
+            failover_priority               \
+            )                               \
          VALUES (                           \
             :cameraID,                      \
             :cameraName,                    \
@@ -1686,7 +1688,9 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :minArchiveDays,                \
             :maxArchiveDays,                \
             :preferedServerId,              \
-            :licenseUsed)                   \
+            :licenseUsed,                   \
+            :failoverPriority               \
+            )                               \
         ");
     QnSql::bind(data, &insQuery);
     if( !insQuery.exec() )
@@ -3071,7 +3075,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
             min_archive_days as minArchiveDays,          \
             max_archive_days as maxArchiveDays,          \
             prefered_server_id as preferedServerId,      \
-            license_used as licenseUsed                  \
+            license_used as licenseUsed,                 \
+            failover_priority as failoverPriority        \
          FROM vms_camera_user_attributes                 \
          LEFT JOIN vms_resource r on r.guid = camera_guid     \
          %1                                              \
@@ -3130,6 +3135,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             cu.max_archive_days as maxArchiveDays,             \
             cu.prefered_server_id as preferedServerId,         \
             cu.license_used as licenseUsed                     \
+            cu.failover_priority as failoverPriority           \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id \

@@ -77,9 +77,15 @@ angular.module('webadminApp')
         function wrapGet(url){
             var canceller = $q.defer();
             var obj =  wrapRequest($http.get(url, { timeout: canceller.promise }));
-
-            obj.abort = function(){
-                canceller.resolve("abort request");
+            obj.then(function(){
+                canceller = null;
+            },function(){
+                canceller = null;
+            });
+            obj.abort = function(reason){
+                if(canceller) {
+                    canceller.resolve("abort request: " + reason);
+                }
             };
             return obj;
         }
