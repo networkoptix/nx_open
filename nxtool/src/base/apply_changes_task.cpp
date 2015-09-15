@@ -814,8 +814,23 @@ bool rtu::ApplyChangesTask::Impl::addSummaryItem(const ServerInfoCacheItem &item
         ((affected & checkFlags) == checkFlags);
     ChangesSummaryModel * const model = (successResult ? &m_succesfulChangesModel : &m_failedChangesModel);
 
+    const auto codeToString = [](RequestError code) -> QString
+    {
+        switch(code)
+        {
+        case RequestError::kSuccess:
+            return QString();
+        case RequestError::kRequestTimeout:
+            return tr("Request Timeout");
+        case RequestError::kUnauthorized:
+            return tr("Unauthorized");
+        default:
+            return tr("Unknown error");
+        }
+    };
+
     model->addRequestResult(ServerInfo(*item.first, item.second)
-        , description, value, (successResult ? "OK - CHANGE IT" : "FAILED - CHANGE IT"));
+        , description, value, codeToString(errorCode));
     return successResult;
 }
 

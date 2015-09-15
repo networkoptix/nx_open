@@ -349,9 +349,6 @@ void rtu::ServersFinder::Impl::readResponseData(const SocketPtr &socket)
         if (!readPendingPacket(socket, data, &sender, &port))
            return false;
 
-        //if (sender.toString().contains("110"))
-         //   qDebug() << "---" << sender;
-
         BaseServerInfo info;
         if (parseUdpPacket(QJsonDocument::fromJson(data.data()).object(), info))
             processNewServer(info, sender.toString(), true);
@@ -434,7 +431,7 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
 
             /// try to add unknown or discover by multicast after period * 3 
             /// - to have a chance to discover entity as known or by Http first
-            enum { kDelayTimeout = kUpdateServersInfoInterval * 3};
+            enum { kDelayTimeout = HttpClient::kDefaultTimeoutMs * 3};
             QTimer::singleShot(kDelayTimeout, (isMulticastServer ? multicastProcessor : secondTimeProcessor));
         }
         else if (!isKnown && onEntityDiscovered(address, m_unknownHosts))
