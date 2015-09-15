@@ -357,6 +357,10 @@ void QnTransactionTransport::setStateNoLock(State state)
     {
         ; // only Error -> Closed setState is allowed
     }
+    else if (m_state == Closed)
+    {
+        ; // no state allowed after Closed
+    }
     else if (this->m_state != state) 
     {
         this->m_state = state;
