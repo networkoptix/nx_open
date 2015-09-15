@@ -277,6 +277,10 @@ angular.module('webadminApp')
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var canvas = element.find('canvas').get(0);
+                canvas.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                });
+
                 scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,
                     timelineConfig.maxMsPerPixel,
                     timelineConfig.initialInterval,
