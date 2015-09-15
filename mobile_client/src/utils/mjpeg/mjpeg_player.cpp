@@ -72,8 +72,6 @@ void QnMjpegPlayerPrivate::processFrame() {
     if (frameTimer.isValid())
         presentationTime -= qMax(0, static_cast<int>(frameTimer.elapsed()) - framePresentationTime);
 
-    qDebug() << presentationTime;
-
     QVideoFrame frame(image);
     if (videoSurface) {
         if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != frame.pixelFormat())
@@ -248,5 +246,5 @@ void QnMjpegPlayer::setVideoSurface(QAbstractVideoSurface *videoSurface) {
 
     d->videoSurface = videoSurface;
 
-    emit videoSurfaceChanged();;
+    emit videoSurfaceChanged();
 }

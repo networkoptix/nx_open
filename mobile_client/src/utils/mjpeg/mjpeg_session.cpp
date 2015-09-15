@@ -5,12 +5,46 @@
 #include <QtGui/QImage>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
+#include <libjpeg/jpeglib.h>
 
 #include <utils/common/delayed.h>
 
 namespace {
     const qint64 maxHttpBufferSize = 2 * 1024 * 1024;
     const qint64 maxFrameQueueSize = 8;
+
+    void imageCleanup(void *info) {
+        delete [](uchar*)info;
+    }
+
+    QImage decompressJpegImage(const char *data, size_t size) {
+        jpeg_decompress_struct jinfo;
+        jpeg_error_mgr jerr;
+
+        jinfo.err = jpeg_std_error(&jerr);
+
+        jpeg_create_decompress(&jinfo);
+        jpeg_mem_src(&jinfo, (uchar*)data, size);
+        jpeg_read_header(&jinfo, TRUE);
+        jinfo.out_color_space = JCS_EXT_BGRX;
+
+        jpeg_start_decompress(&jinfo);
+
+        int width = jinfo.output_width;
+        int height = jinfo.output_height;
+        int bytesPerLine = jinfo.output_width * jinfo.output_components;
+        uchar *buffer = new uchar[bytesPerLine * height];
+
+        while (jinfo.output_scanline < jinfo.output_height) {
+            uchar *line = buffer + bytesPerLine * jinfo.output_scanline;
+            jpeg_read_scanlines(&jinfo, &line, 1);
+        }
+
+        jpeg_finish_decompress(&jinfo);
+        jpeg_destroy_decompress(&jinfo);
+
+        return QImage(buffer, width, height, QImage::Format_ARGB32, &imageCleanup, buffer);
+    }
 }
 
 class QnMjpegSessionPrivate : public QObject {
@@ -101,7 +135,7 @@ void QnMjpegSessionPrivate::setState(QnMjpegSession::State state) {
 
 void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, int presentationTime) {
     FrameData frameData;
-    frameData.image = QImage::fromData(data);
+    frameData.image = decompressJpegImage(data.data(), data.size());
     frameData.presentationTime = presentationTime;
 
     queueSemaphore.acquire();
