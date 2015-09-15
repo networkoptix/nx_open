@@ -1577,6 +1577,10 @@
                             <optional>true</optional>
                             <values>
                                 <value>
+                                    <name>None</name>
+                                    <description>Disable log.</description>
+                                </value>
+                                <value>
                                     <name>Always</name>
                                     <description>Log only the most important messages.</description>
                                 </value>

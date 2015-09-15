@@ -7,6 +7,8 @@
 namespace {
     const QString idParam = lit("id");
     const QString valueParam = lit("value");
+
+    const QString disableLogsOption = lit("none");
 }
 
 
@@ -27,7 +29,9 @@ int QnLogLevelRestHandler::executeGet(const QString &path, const QnRequestParams
         QString level = *setValue;
 
         QnLogLevel logLevel = QnLog::logLevelFromString(level);
-        if (logLevel == cl_logUNKNOWN) {
+        if (logLevel == cl_logUNKNOWN 
+            && level.toLower() != disableLogsOption //TODO: #ak add cl_logNONE level to disable logs
+            ) {
             result.setError(QnJsonRestResult::InvalidParameter,
                 lit("Parameter '%1' has invalid value '%2'").arg(valueParam).arg(level));
             return CODE_INVALID_PARAMETER;
