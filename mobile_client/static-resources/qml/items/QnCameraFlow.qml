@@ -23,6 +23,9 @@ QnFlickable {
         id: d
 
         property var pendingHiddenItems: []
+        property real maxItemWidth: dp(192)
+        property int thumbnailsInRow: Math.max(2, Math.floor(flow.width / maxItemWidth))
+        property real thumbnailWidth: flow.width / thumbnailsInRow - flow.spacing * (1 - (1 / thumbnailsInRow))
 
         function hidePendingItems() {
             if (pendingHiddenItems.length == 0)
@@ -68,7 +71,7 @@ QnFlickable {
                         text: model.resourceName
                         status: model.resourceStatus
                         thumbnail: model.thumbnail
-                        thumbnailWidth: flow.width / 2 - flow.spacing / 2
+                        thumbnailWidth: d.thumbnailWidth
 
                         onClicked: Main.openMediaResource(model.uuid)
                         onHiddenChanged: {
