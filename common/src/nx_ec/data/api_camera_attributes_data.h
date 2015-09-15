@@ -47,7 +47,8 @@ namespace ec2
             secondaryStreamQuality(Qn::SSQualityNotDefined),
             controlEnabled(true),
             minArchiveDays(0),
-            maxArchiveDays(0) 
+            maxArchiveDays(0),
+            failoverPriority(Qn::FP_Medium)
         {}
 
         QnUuid              cameraID;
@@ -65,6 +66,7 @@ namespace ec2
         int                 minArchiveDays;
         int                 maxArchiveDays;
         QnUuid              preferedServerId;
+        Qn::FailoverPriority failoverPriority;
     };
 
 #define ApiCameraAttributesData_Fields_Short \
@@ -80,7 +82,8 @@ namespace ec2
     (dewarpingParams)       \
     (minArchiveDays)        \
     (maxArchiveDays)        \
-    (preferedServerId)
+    (preferedServerId)      \
+    (failoverPriority)
 
 #define ApiCameraAttributesData_Fields (cameraID) (cameraName) ApiCameraAttributesData_Fields_Short
 

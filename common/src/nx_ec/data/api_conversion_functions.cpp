@@ -252,6 +252,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
     dst->minDays = src.minArchiveDays;
     dst->maxDays = src.maxArchiveDays;
     dst->preferedServerId = src.preferedServerId;
+    dst->failoverPriority = src.failoverPriority;
 }
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
@@ -279,6 +280,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.minArchiveDays = src->minDays;
     dst.maxArchiveDays = src->maxDays;
     dst.preferedServerId = src->preferedServerId;
+    dst.failoverPriority = src->failoverPriority;
 }
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)

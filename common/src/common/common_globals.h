@@ -33,7 +33,8 @@ namespace Qn
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult)
+            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            FailoverPriority)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -717,6 +718,16 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
 
+    enum FailoverPriority {
+        FP_Never,
+        FP_Low,
+        FP_Medium,
+        FP_High,
+
+        FP_Count
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -766,7 +777,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult),
+        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
+        (Qn::FailoverPriority)
+        ,
     (metatype)(lexical)
 )
 
