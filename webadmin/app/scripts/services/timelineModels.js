@@ -337,6 +337,13 @@ CameraRecordsProvider.prototype.updateLastMinute = function(lastMinuteDuration, 
     }
 };
 
+CameraRecordsProvider.prototype.abort = function (){
+    if(this.currentRequest) {
+        this.currentRequest.abort();
+        this.currentRequest = null;
+    }
+};
+
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     var deferred = this.$q.defer();
     //this.start = start;
@@ -349,44 +356,42 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     //1. Request records for interval
     // And do we need to request it?
 
-    if(!self.lockRequests) {
-        self.lockRequests = true; // We may lock requests here if we have no tree yet
-        this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization, null, levelData.name)
-            .then(function (data) {
+    this.abort();
+    self.currentRequest = this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization, null, levelData.name);
 
-                self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
-                var chunks = data.data.reply;
-                //if(chunks.length == 0){} // No chunks for this camera
+    self.currentRequest.then(function (data) {
 
-                _.forEach(chunks,function(chunk){
-                    chunk.durationMs = parseInt(chunk.durationMs);
-                    chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
-                });
+            self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
+            var chunks = data.data.reply;
+            //if(chunks.length == 0){} // No chunks for this camera
 
-                var chunksToIterate = chunks.length;
-                //If level == 0 - we want only first chunk
-                if(!level && chunks.length>0){ // Special hack
-                    chunks[0].durationMs = -1; // Make it 'live'
-                    chunksToIterate = 1;
-                }
-                for (var i = 0; i < chunksToIterate; i++) {
-                    var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
-                    if (chunks[i].durationMs < 0) {
-                        endChunk = (new Date()).getTime();// current moment
-                    }
-                    var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
-                    self.addChunk(addchunk, null);
-                }
-
-                self.cacheRequestedInterval(start,end,level);
-
-                deferred.resolve(self.chunksTree);
-            }, function (error) {
-                deferred.reject(error);
+            _.forEach(chunks,function(chunk){
+                chunk.durationMs = parseInt(chunk.durationMs);
+                chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
             });
-    }else{
-        deferred.reject("request in progress");
-    }
+
+            var chunksToIterate = chunks.length;
+            //If level == 0 - we want only first chunk
+            if(!level && chunks.length>0){ // Special hack
+                chunks[0].durationMs = -1; // Make it 'live'
+                chunksToIterate = 1;
+            }
+            for (var i = 0; i < chunksToIterate; i++) {
+                var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
+                if (chunks[i].durationMs < 0) {
+                    endChunk = (new Date()).getTime();// current moment
+                }
+                var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
+                self.addChunk(addchunk, null);
+            }
+
+            self.cacheRequestedInterval(start,end,level);
+
+            deferred.resolve(self.chunksTree);
+        }, function (error) {
+            deferred.reject(error);
+        });
+
     this.ready = deferred.promise;
     //3. return promise
     return this.ready;
@@ -647,6 +652,13 @@ ShortCache.prototype.init = function(start){
     this.update();
 };
 
+ShortCache.prototype.abort = function(){
+    if(this.currentRequest) {
+        this.currentRequest.abort();
+        this.currentRequest = null;
+    }
+};
+
 ShortCache.prototype.update = function(requestPosition,position){
     //Request from current moment to 1.5 minutes to future
 
@@ -662,14 +674,16 @@ ShortCache.prototype.update = function(requestPosition,position){
     this.lastRequestDate = requestPosition;
     this.lastRequestPosition = position || this.played;
 
+    this.abort();
     // Get next {{limitChunks}} chunks
-    this.mediaserver.getRecords('/',
+    this.currentRequest = this.mediaserver.getRecords('/',
             this.cameras[0],
             Math.max(requestPosition - this.timeCorrection,0),
             (new Date()).getTime() + 100000 - this.timeCorrection,
             this.requestDetailization,
-            this.limitChunks).
-        then(function(data){
+            this.limitChunks);
+
+    this.currentRequest.then(function(data){
             self.updating = false;
 
             var chunks = data.data.reply;
