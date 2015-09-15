@@ -37,7 +37,7 @@ int QnLogLevelRestHandler::executeGet(const QString &path, const QnRequestParams
     }
             
     QnLogLevel resultLevel = QnLog::instance(logID)->logLevel();
-    result.setReply(resultLevel);
+    result.setReply(QnLog::logLevelToString(resultLevel));
 
     return CODE_OK;
 }
