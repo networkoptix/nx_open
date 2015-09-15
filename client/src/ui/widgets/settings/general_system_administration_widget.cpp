@@ -28,7 +28,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     setHelpTopic(ui->businessRulesButton,   Qn::EventsActions_Help);
     setHelpTopic(ui->cameraListButton,      Qn::Administration_General_CamerasList_Help);
-    setHelpTopic(ui->auditLogButton,      Qn::Administration_General_CamerasList_Help);
+    setHelpTopic(ui->auditLogButton,        Qn::AuditTrail_Help);
     setHelpTopic(ui->eventLogButton,        Qn::EventLog_Help);
     setHelpTopic(ui->healthMonitorButton,   Qn::Administration_General_HealthMonitoring_Help);
 

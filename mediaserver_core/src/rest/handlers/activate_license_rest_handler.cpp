@@ -35,10 +35,10 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     QLocale locale;
     params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
 
-    const QVector<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QVector<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
+    const QVector<QString> mainHardwareIds = qnLicensePool->mainHardwareIds();
+    const QVector<QString> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
     int hw = 0;
-    for (const QByteArray& hwid: mainHardwareIds) {
+    for (const QString& hwid: mainHardwareIds) {
         QString name;
         if (hw == 0)
             name = QLatin1String("oldhwid");
@@ -47,15 +47,15 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
         else
             name = QString(QLatin1String("hwid%1")).arg(hw);
 
-        params.addQueryItem(name, QLatin1String(hwid));
+        params.addQueryItem(name, hwid);
 
         hw++;
     }
 
     hw = 1;
-    for(const QByteArray& hwid: compatibleHardwareIds) {
+    for(const QString& hwid: compatibleHardwareIds) {
         QString name = QString(QLatin1String("chwid%1")).arg(hw);
-        params.addQueryItem(name, QLatin1String(hwid));
+        params.addQueryItem(name, hwid);
         hw++;
     }
 

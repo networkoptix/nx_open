@@ -151,11 +151,14 @@ bool QnFileStorageResource::checkWriteCap() const
 
 bool QnFileStorageResource::checkDBCap() const
 {
-    if (!initOrUpdate() || !m_localPath.isEmpty())
+    if (!initOrUpdate())
         return false;
 #ifdef _WIN32
     return true;
-#else    
+#else
+    if (!m_localPath.isEmpty())
+        return false;
+
     QList<QnPlatformMonitor::PartitionSpace> partitions = 
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
@@ -211,12 +214,16 @@ void QnFileStorageResource::removeOldDirs()
 {
 #ifndef _WIN32
     QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(
-        QStringList() << (lit("*") + NX_TEMP_FOLDER_NAME + lit("*")),
         QDir::AllDirs | QDir::NoDotAndDotDot
     );
 
+    const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
+
     for (const QFileInfo &entry : tmpEntries)
     {
+        if (entry.absoluteFilePath().indexOf(prefix) == -1)
+            continue;
+
         int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
         if (ecode != 0)
         {
@@ -304,8 +311,9 @@ int QnFileStorageResource::mountTmpDrive() const
 #else
 bool QnFileStorageResource::updatePermissions() const
 {
-    if (getUrl().startsWith("smb://") && !QUrl(getUrl()).userName().isEmpty())
+    if (getUrl().startsWith("smb://"))
     {
+        QString userName = QUrl(getUrl()).userName().isEmpty() ? "guest" : QUrl(getUrl()).userName();
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));
         netRes.dwType = RESOURCETYPE_DISK;
@@ -313,7 +321,7 @@ bool QnFileStorageResource::updatePermissions() const
         QString path = lit("\\\\") + storageUrl.host() + lit("\\") + storageUrl.path().mid((1));
         netRes.lpRemoteName = (LPWSTR) path.constData();
         LPWSTR password = (LPWSTR) storageUrl.password().constData();
-        LPWSTR user = (LPWSTR) storageUrl.userName().constData();
+        LPWSTR user = (LPWSTR) userName.constData();
         if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
             return false;
     }

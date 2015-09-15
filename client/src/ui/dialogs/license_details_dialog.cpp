@@ -15,7 +15,7 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWid
 
     ui->licenseTypeLabel->setText(license->displayName());
     ui->licenseKeyLabel->setText(QLatin1String(license->key()));
-    ui->licenseHwidLabel->setText(QLatin1String(license->hardwareId()));
+    ui->licenseHwidLabel->setText(license->hardwareId());
 
     auto addFeature = [this](const QString &text, int count) {
         QLabel* valueLabel = new QLabel(this);
@@ -57,7 +57,7 @@ QString QnLicenseDetailsDialog::licenseDescription(const QnLicensePtr &license) 
     result << tr("Generic:");
     addStringValue(tr("License Type"), license->displayName());
     addStringValue(tr("License Key"), QString::fromUtf8(license->key()));
-    addStringValue(tr("Locked to Hardware ID"), QString::fromUtf8(license->hardwareId()));
+    addStringValue(tr("Locked to Hardware ID"), license->hardwareId());
     result << QString(); //spacer
     result << tr("Features:");
     if (license->type() == Qn::LC_VideoWall) {

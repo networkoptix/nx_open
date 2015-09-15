@@ -18,11 +18,11 @@
     <name>QnActiResource</name>
     <message>
         <source>Output %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход %1</translation>
     </message>
     <message>
         <source>Input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход %1</translation>
     </message>
 </context>
 <context>
@@ -213,106 +213,106 @@
     </message>
     <message>
         <source>start</source>
-        <translation type="unfinished"></translation>
+        <translation>начать</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation type="unfinished"></translation>
+        <translation>остановить</translation>
     </message>
     <message>
         <source>While %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Пока %1</translation>
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>При %1 %2</translation>
     </message>
     <message>
         <source>%1 --&gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 --&gt; %2</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has a license problem</source>
-        <translation type="unfinished"></translation>
+        <translation>Проблема с лицензией на сервере &apos;%1&apos;</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished">Произошло неизвестное событие</translation>
+        <translation>Произошло неизвестное событие</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished">Тревожный вход: %1</translation>
+        <translation>Тревожный вход: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished">Конфликтующий адрес: %1</translation>
+        <translation>Конфликтующий адрес: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>Потеряно соединение с сервером.</translation>
     </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Нет данных в течение %n секунды.</numerusform>
+            <numerusform>Нет данных в течение %n секунд.</numerusform>
+            <numerusform>Нет данных в течение %n секунд.</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 output</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход %1</translation>
     </message>
     <message>
         <source>%1 output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход %1 в течение 30 секунд</translation>
     </message>
     <message>
         <source>%1 recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись %1</translation>
     </message>
     <message>
         <source>Input Signal on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Сигнал входа на %1</translation>
     </message>
     <message>
         <source>%1 Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключение %1</translation>
     </message>
     <message>
         <source>%1 IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>IP конфликт %1</translation>
     </message>
     <message>
         <source>Any %1 Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Любое событие %1</translation>
     </message>
     <message>
         <source>%1 %2 was disconnected</source>
         <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2 отключена</translation>
     </message>
     <message>
         <source>%1 IP Conflict at %2</source>
         <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>IP конфликт %1 %2</translation>
     </message>
     <message>
         <source>%1 #%2 MAC: %3</source>
         <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>MAC адрес %1 # %2: %3</translation>
     </message>
     <message>
         <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Подключение к %1 (основной поток) было неожиданно сброшено.</translation>
     </message>
     <message>
         <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Подключение к %1 (второй поток) было неожиданно сброшено.</translation>
     </message>
     <message>
         <source>Recording on %1 is disabled: </source>
-        <translation type="unfinished"></translation>
+        <translation>Запись на %1 отключена: </translation>
     </message>
 </context>
 <context>
@@ -395,27 +395,27 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished">Ошибка авторизации. Адрес %1.</translation>
+        <translation>Ошибка авторизации. Адрес %1.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что %1 подключено к сети.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что порт %2 доступен (напр. проброшен). Попробуйте перезагрузить %1, затем сбросить настройки через веб-интерфейс.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что %1 подключено к сети. Попробуйте перезагрузить %1.</translation>
     </message>
     <message>
         <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно разобрать ответ %1. URL %2, имя запроса %3.</translation>
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
@@ -426,42 +426,42 @@
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Попробуйте перезагрузить %1, затем сбросить настройки через веб-интерфейс.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Сначала попробуйте включить запись (если она отключена) и снизить FPS в настройках %1.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Если это не поможет, восстановите заводские настройки в веб-интерфейсе %1. Если проблема не исчезнет, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Запрос %1 &quot;%2&quot; вернул ошибку &quot;%3&quot;.</translation>
     </message>
     <message>
         <source>Unknown %1 Issue.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестная ошибка %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the %1: %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 вернула некорректные данные: %2.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open %1 issues dialog for more details.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Слишком много ошибок. Откройте диалог ошибок %1 для побробной информации.</translation>
     </message>
     <message>
         <source>%1 initialization process in progress.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Идёт процесс инициализации %1.</translation>
     </message>
 </context>
 <context>
@@ -483,7 +483,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished">Ошибка запуска Проводника Windows</translation>
+        <translation>Ошибка запуска Проводника Windows.</translation>
     </message>
 </context>
 <context>
@@ -498,11 +498,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished">Невозможно инициализировать аудио кодировщик.</translation>
+        <translation>Невозможно инициализировать аудио кодировщик.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished">Невозможно инициализировать аудио декодер.</translation>
+        <translation>Невозможно инициализировать аудио декодер.</translation>
     </message>
 </context>
 <context>
@@ -540,7 +540,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished">Невозможно инициализировать видео кодировщик.</translation>
+        <translation>Невозможно инициализировать видео кодировщик.</translation>
     </message>
 </context>
 <context>
@@ -583,79 +583,79 @@
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Модуль ввода/вывода</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished">Аналоговый энкодер</translation>
+        <translation>Аналоговый энкодер</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished">Временная лицензия</translation>
+        <translation>Временная лицензия</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished">Лицензия на аналоговую камеру</translation>
+        <translation>Лицензия на аналоговую камеру</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished">Профессиональная лицензия</translation>
+        <translation>Профессиональная лицензия</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished">Лицензия Edge</translation>
+        <translation>Лицензия Edge</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished">Лицензия Vmax</translation>
+        <translation>Лицензия Vmax</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished">Лицензии на аналоговые энкодеры</translation>
+        <translation>Лицензии на аналоговые энкодеры</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished">Лицензии на видеостены</translation>
+        <translation>Лицензии на видеостены</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензии на модули ввода/вывода</translation>
     </message>
     <message>
         <source>Start Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензии Start</translation>
     </message>
     <message>
         <source>Invalid Signature</source>
-        <translation type="unfinished">Неверная подпись</translation>
+        <translation>Неверная подпись</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер с соответствующим аппаратным ID не найден</translation>
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished">Неверная кастомизация</translation>
+        <translation>Неверная кастомизация</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished">Неверный тип</translation>
+        <translation>Неверный тип</translation>
     </message>
     <message>
         <source>Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверно</translation>
     </message>
     <message>
         <source>Invalid Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверные лицензии</translation>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Данный тип лицензии требует более старшей версии ПО.</translation>
     </message>
 </context>
 <context>
@@ -698,19 +698,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished">Проблема при активации лицензионного ключа. Произошла ошибка базы данных.</translation>
+        <translation>Проблема при активации лицензионного ключа. Произошла ошибка базы данных.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished">Лицензионный ключ, введенный вами, неверен. Пожалуйста, проверьте, что вы правильно ввели лицензионный ключ. Если проблема не исчезла обратитесь в службу поддержки, стобы подтвердить правильность лицензионного ключа либо для получения верного лицензионного ключа.</translation>
+        <translation>Лицензионный ключ, введенный вами, неверен. Пожалуйста, проверьте, что вы правильно ввели лицензионный ключ. Если проблема не исчезла обратитесь в службу поддержки, стобы подтвердить правильность лицензионного ключа либо для получения верного лицензионного ключа.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">Вы пытаетесь активировать несовместимую с вашим программным обеспечением лицензию. Обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
+        <translation>Вы пытаетесь активировать несовместимую с вашим программным обеспечением лицензию. Обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">Этот лицензионный ключ был активирован {{time}} для аппаратного ID {{hwid}}. Пожалуйста, обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
+        <translation>Этот лицензионный ключ был активирован {{time}} для аппаратного ID {{hwid}}. Пожалуйста, обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
     </message>
 </context>
 <context>
@@ -731,14 +731,14 @@
     <name>QnPlAxisResource</name>
     <message>
         <source>Can&apos;t initialize IO port settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно инициализировать настройки порта ввода/вывода</translation>
     </message>
 </context>
 <context>
     <name>QnPlOnvifResource</name>
     <message>
         <source>Otput %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход %1</translation>
     </message>
 </context>
 <context>
@@ -752,99 +752,99 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n камера</numerusform>
+            <numerusform>%n камеры</numerusform>
+            <numerusform>%n камер</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n камера</numerusform>
+            <numerusform>%n камеры</numerusform>
+            <numerusform>%n камер</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n модуль ввода/вывода</numerusform>
+            <numerusform>%n модуля ввода/вывода</numerusform>
+            <numerusform>%n модулей ввода/вывода</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n модуль ввода/вывода</numerusform>
+            <numerusform>%n модуля ввода/вывода</numerusform>
+            <numerusform>%n модулей ввода/вывода</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n устройство</numerusform>
+            <numerusform>%n устройства</numerusform>
+            <numerusform>%n устройств</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n устройство</numerusform>
+            <numerusform>%n устройства</numerusform>
+            <numerusform>%n устройств</numerusform>
         </translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Камеры</translation>
     </message>
     <message>
         <source>cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>камеры</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Камера</translation>
     </message>
     <message>
         <source>camera</source>
-        <translation type="unfinished"></translation>
+        <translation>камеры</translation>
     </message>
     <message>
         <source>IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Модули ввода/вывода</translation>
     </message>
     <message>
         <source>IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>модули ввода/вывода</translation>
     </message>
     <message>
         <source>IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Модуль ввода/вывода</translation>
     </message>
     <message>
         <source>IO module</source>
-        <translation type="unfinished"></translation>
+        <translation>модуль ввода/вывода</translation>
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройства</translation>
     </message>
     <message>
         <source>devices</source>
-        <translation type="unfinished"></translation>
+        <translation>устройства</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство</translation>
     </message>
     <message>
         <source>device</source>
-        <translation type="unfinished"></translation>
+        <translation>устройство</translation>
     </message>
 </context>
 <context>
@@ -863,15 +863,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished">Временная лицензия</translation>
+        <translation>Временная лицензия</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished">Лицензировано для:</translation>
+        <translation>Лицензировано для: </translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished">Бесплатная лицензия</translation>
+        <translation>Бесплатная лицензия</translation>
     </message>
 </context>
 <context>
@@ -1051,15 +1051,15 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished">Хранилища заполнены</translation>
+        <translation>Хранилище заполнено</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished">Хранилища не настроены</translation>
+        <translation>Хранилище не настроено</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Время серверов не синхронизировано и общее время не моэжет быть вычислено автоматически.</translation>
     </message>
 </context>
 <context>
@@ -1093,11 +1093,11 @@
     <name>QnThirdPartyResource</name>
     <message>
         <source>Otput %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход %1</translation>
     </message>
     <message>
         <source>Input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход %1</translation>
     </message>
 </context>
 <context>
@@ -1112,11 +1112,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished">OpenCLTranscode не реализован</translation>
+        <translation>OpenCLTranscode не реализован.</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished">Неизвестный метод перекодирования</translation>
+        <translation>Неизвестный метод перекодирования</translation>
     </message>
 </context>
 <context>

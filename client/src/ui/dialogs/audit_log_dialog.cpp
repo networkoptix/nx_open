@@ -723,7 +723,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
     setWarningStyle(ui->warningLabel);
 
-    //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
+    setHelpTopic(this, Qn::AuditTrail_Help);
 
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);

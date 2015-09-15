@@ -619,11 +619,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All data</source>
-        <translation type="unfinished"></translation>
+        <translation>All Data</translation>
     </message>
     <message>
         <source>Bitrate for the last recorded:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrate for the Last Recorded</translation>
     </message>
 </context>
 <context>
@@ -1462,13 +1462,11 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%n millisecond(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n second(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1476,13 +1474,11 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%n minute(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1490,13 +1486,11 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%n day(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1504,13 +1498,11 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%n month(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2810,7 +2802,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%n action(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2928,7 +2919,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%n of %1</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3201,7 +3191,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Scanning hosts... (%1)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -3260,13 +3249,11 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%n devices added successfully.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3285,7 +3272,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%n devices found</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3533,7 +3519,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4038,13 +4023,11 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Event log for %1 - %n event(s) found</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4458,7 +4441,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Test completed successfully: %n users found.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -4666,13 +4648,11 @@ Short for &quot;seconds&quot;</extracomment>
         <source>At least %n %2 are required</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %2 are currently in use</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5494,7 +5474,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -5613,7 +5592,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n seconds</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -5680,13 +5658,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n years</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n months</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5694,13 +5670,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n days</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hours</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6883,7 +6857,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n of %1 additional email addresses are invalid</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6894,13 +6867,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n User(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1, %n additional</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7290,7 +7261,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Could not save the following %n items.</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -7436,7 +7406,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7834,7 +7803,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Could not save the following %n layout(s) to Server.</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -8078,7 +8046,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -8108,7 +8075,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n matrices?</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

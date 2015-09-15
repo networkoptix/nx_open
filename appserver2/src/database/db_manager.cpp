@@ -32,6 +32,7 @@
 #include "nx_ec/data/api_update_data.h"
 #include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
+#include "nx_ec/data/api_client_info_data.h"
 #include "api/runtime_info_manager.h"
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
@@ -281,6 +282,7 @@ QnDbManager::QnDbManager()
     m_needResyncbRules(false),
     m_needResyncUsers(false),
     m_needResyncStorages(false),
+    m_needResyncClientInfoData(false),
     m_dbReadOnly(false)
 {
 }
@@ -584,6 +586,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
             if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
                 return false;
         }
+        if(m_needResyncClientInfoData) {
+            if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+                return false;
+        }
 
     }
 
@@ -615,7 +621,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     bool updateUserResource = false;
     if( !defaultAdminPassword.isEmpty() )
     {
-        if (!userResource->checkPassword(defaultAdminPassword)) {
+        if (!userResource->checkPassword(defaultAdminPassword) || userResource->getRealm() != QnAppInfo::realm()) {
             userResource->setPassword( defaultAdminPassword );
             userResource->generateHash();
             updateUserResource = true;
@@ -725,6 +731,9 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+        return false;
+
+    if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
         return false;
 
     return true;
@@ -1346,6 +1355,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             if (updateBusinessRule(bRuleData) != ErrorCode::ok)
                 return false;
         }
+    }
+    else if (updateName == lit(":/updates/43_resync_client_info_data.sql")) {
+        if (!m_dbJustCreated)
+            m_needResyncClientInfoData = true;
     }
 
     return true;
