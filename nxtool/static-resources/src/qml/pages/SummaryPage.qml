@@ -64,6 +64,7 @@ Item
                     }
 
                     model: rtuContext.progressTask.successfulModel;
+                    expanded: !failedSummary.model.changesCount;
                 }
                 
                 Rtu.ChangesSummary
