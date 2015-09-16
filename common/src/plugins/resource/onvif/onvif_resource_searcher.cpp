@@ -180,6 +180,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         {
             QnPlOnvifResourcePtr updatedResource = createResource(rt, QnResourceParams()).dynamicCast<QnPlOnvifResource>();
             updatedResource->update(resource);
+            updatedResource->setTypeId(rt);
             updatedResource->setPhysicalId(resource->getPhysicalId());
             updatedResource->updateOnvifUrls(resource); // runtime resource data
             updatedResource->setTimeDrift(resource->getTimeDrift()); // runtime resource data
