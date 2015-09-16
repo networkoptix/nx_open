@@ -76,22 +76,16 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
 
 void PredefinedUsageCalculator::updateTree()
 {
-    std::unique_ptr<stree::AbstractNode> newTree;
-    loadXml( m_predefinedDataFilePath, &newTree );
+    auto newTree = loadXml(m_predefinedDataFilePath);
     if( !newTree )
         return;
 
-    std::unique_ptr<stree::AbstractNode> oldTree;
-    {
-        QnMutexLocker lk( &m_treeMutex );
-        oldTree = std::move(m_currentTree);
-        m_currentTree = std::move( newTree );
-    }
+    QnMutexLocker lk(&m_treeMutex);
+    m_currentTree = std::move(newTree);
 }
 
-void PredefinedUsageCalculator::loadXml(
-    const QString& filePath,
-    std::unique_ptr<stree::AbstractNode>* const treeRoot )
+std::unique_ptr<stree::AbstractNode> PredefinedUsageCalculator::loadXml(
+    const QString& filePath)
 {
     stree::SaxHandler xmlHandler( m_rns );
 
@@ -103,15 +97,15 @@ void PredefinedUsageCalculator::loadXml(
     if( !xmlFile.open( QIODevice::ReadOnly ) )
     {
         NX_LOG( lit( "Failed to open stree xml file (%1). %2" ).arg(filePath).arg(xmlFile.errorString()), cl_logERROR );
-        return;
+        return std::unique_ptr<stree::AbstractNode>();
     }
     QXmlInputSource input( &xmlFile );
     NX_LOG( lit( "Parsing stree xml file (%1)" ).arg(filePath), cl_logDEBUG1 );
     if( !reader.parse( &input ) )
     {
         NX_LOG( lit( "Failed to parse stree xml (%1). %2" ).arg(filePath).arg(xmlHandler.errorString()), cl_logERROR );
-        return;
+        return std::unique_ptr<stree::AbstractNode>();
     }
 
-    *treeRoot = xmlHandler.releaseTree();
+    return xmlHandler.releaseTree();
 }
