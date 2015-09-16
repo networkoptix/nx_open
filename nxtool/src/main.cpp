@@ -7,6 +7,7 @@
 #include <models/buttons.h>
 #include <base/constants.h>
 #include <base/rtu_context.h>
+#include <helpers/rest_client.h>
 
 void registerTypes()
 {

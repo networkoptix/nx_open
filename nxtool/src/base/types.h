@@ -18,6 +18,11 @@ namespace rtu
     class ServerInfo;
     typedef QVector<ServerInfo *> ServerInfoPtrContainer;
     typedef QVector<ServerInfo> ServerInfoContainer;
+    typedef std::shared_ptr<ServerInfo> ServerInfoPtr;
+
+    struct BaseServerInfo;
+    typedef std::shared_ptr<BaseServerInfo> BaseServerInfoPtr;
+
 
     typedef QVector<QUuid> IDsVector;
 
@@ -31,7 +36,6 @@ namespace rtu
     typedef std::shared_ptr<QString> StringPointer;
     typedef std::shared_ptr<int> IntPointer;
     typedef std::shared_ptr<bool> BoolPointer;
-
     typedef std::function<void ()> Callback;
 
     class ApplyChangesTask;
@@ -39,4 +43,13 @@ namespace rtu
 
     class ChangesProgressModel;
     typedef std::unique_ptr<ChangesProgressModel> ChangesProgressModelPtr;
+
+    enum class RequestError
+    {
+        kSuccess = 0 
+        , kRequestTimeout = 408
+        , kUnauthorized = 401
+        , kUnspecified = -1
+    };
+
 }
