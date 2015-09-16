@@ -10,9 +10,9 @@
 # Description:       Provides the ability to boot up automatically depending on available 
 #                    boot devices and ability to override boot using the boot menu.
 ### END INIT INFO
-# VERSION: 2.4.1.9730
+# VERSION: ${release.version}.${buildNumber}
 
-export CUSTOMIZATION=networkoptix
+export CUSTOMIZATION=${deb.customization.company.name}
 /etc/init.d/cron stop
 /etc/init.d/$CUSTOMIZATION-mediaserver stop
 export CHECKBOOTHDDPART=
