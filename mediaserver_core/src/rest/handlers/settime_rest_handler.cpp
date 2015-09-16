@@ -78,8 +78,8 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
 
 #endif
 
-    //ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    //ec2Connection->getTimeManager()->forceTimeResync();
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    ec2Connection->getTimeManager()->forceTimeResync();
 
     return CODE_OK;
 }

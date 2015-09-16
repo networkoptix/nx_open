@@ -240,9 +240,6 @@ namespace ec2
         quint64 m_broadcastSysTimeTaskID;
         quint64 m_internetSynchronizationTaskID;
         quint64 m_manualTimerServerSelectionCheckTaskID;
-        quint64 m_checkSystemTimeTaskID;
-        boost::optional<qint64> m_prevSysTime;
-        boost::optional<qint64> m_prevMonotonicClock;
         bool m_terminated;
         /*!
             \a TimeSyncInfo::syncTime stores local time on specified server
@@ -301,7 +298,6 @@ namespace ec2
             QnTransactionTransport* transport,
             const nx_http::HttpHeaders& headers);
         void forgetSynchronizedTimeNonSafe(QMutexLocker* const /*lock*/);
-        void checkSystemTimeForChange();
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );

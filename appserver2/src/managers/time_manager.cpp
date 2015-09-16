@@ -230,8 +230,6 @@ namespace ec2
         This should help against redundant clock resync
     */
     static const int MIN_GET_TIME_ERROR_MS = 100;
-    //!once per this interval we check if local OS time has been changed
-    static const int SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS = 10 * MILLIS_PER_SEC;
 
     static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC > 0, "MIN_INTERNET_SYNC_TIME_PERIOD_SEC MUST be > 0!" );
     static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SEC,
@@ -246,7 +244,6 @@ namespace ec2
         m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
         m_broadcastSysTimeTaskID( 0 ),
         m_internetSynchronizationTaskID( 0 ),
-        m_checkSystemTimeTaskID( 0 ),
         m_manualTimerServerSelectionCheckTaskID( 0 ),
         m_terminated( false ),
         m_peerType( peerType ),
@@ -266,22 +263,15 @@ namespace ec2
         quint64 broadcastSysTimeTaskID = 0;
         quint64 manualTimerServerSelectionCheckTaskID = 0;
         quint64 internetSynchronizationTaskID = 0;
-        quint64 checkSystemTimeTaskID = 0;
         {
             QMutexLocker lk( &m_mutex );
             m_terminated = false;
-
             broadcastSysTimeTaskID = m_broadcastSysTimeTaskID;
             m_broadcastSysTimeTaskID = 0;
-
             manualTimerServerSelectionCheckTaskID = m_manualTimerServerSelectionCheckTaskID;
             m_manualTimerServerSelectionCheckTaskID = 0;
-
             internetSynchronizationTaskID = m_internetSynchronizationTaskID;
             m_internetSynchronizationTaskID = 0;
-
-            checkSystemTimeTaskID = m_checkSystemTimeTaskID;
-            m_checkSystemTimeTaskID = 0;
         }
 
         if( broadcastSysTimeTaskID )
@@ -292,9 +282,6 @@ namespace ec2
 
         if( internetSynchronizationTaskID )
             TimerManager::instance()->joinAndDeleteTimer( internetSynchronizationTaskID );
-
-        if( checkSystemTimeTaskID )
-            TimerManager::instance()->joinAndDeleteTimer( checkSystemTimeTaskID );
 
         if( m_timeSynchronizer )
         {
@@ -352,10 +339,6 @@ namespace ec2
                         new TimeProtocolClient(QLatin1String(timeServer))));
                 m_timeSynchronizer = std::move( multiFetcher );
                 addInternetTimeSynchronizationTask();
-
-                m_checkSystemTimeTaskID = TimerManager::instance()->addTimer(
-                    std::bind(&TimeSynchronizationManager::checkSystemTimeForChange, this),
-                    SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS);
             }
             else
                 m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
@@ -506,14 +489,6 @@ namespace ec2
         const auto curSyncTime = getSyncTime();
         WhileExecutingDirectCall callGuard(this);
         emit timeChanged(curSyncTime);
-
-        QMutexLocker lk(&m_mutex);
-        //notifying everyone about local time change
-        if (!m_terminated)
-        {
-            if (m_broadcastSysTimeTaskID)
-                TimerManager::instance()->modifyTimerDelay(m_broadcastSysTimeTaskID, 0);
-        }
     }
 
     QnPeerTimeInfoList TimeSynchronizationManager::getPeerTimeInfoList() const
@@ -1169,49 +1144,9 @@ namespace ec2
         m_systemTimeByPeer.clear();
         m_timeSynchronized = false;
         m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
-        ++m_localTimePriorityKey.sequence;
         m_usedTimeSyncInfo = TimeSyncInfo(
             m_monotonicClock.elapsed(),
             currentMSecsSinceEpoch(),
             m_localTimePriorityKey);
-    }
-
-    void TimeSynchronizationManager::checkSystemTimeForChange()
-    {
-        {
-            QMutexLocker lk(&m_mutex);
-            if (m_terminated)
-                return;
-        }
-
-        const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
-        const auto curMonotonicClock = m_monotonicClock.elapsed();
-        if (m_prevSysTime)
-        {
-            const auto timeDiff = 
-                curMonotonicClock - m_prevMonotonicClock.get() -
-                abs(curSysTime - m_prevSysTime.get());
-
-            if (abs(timeDiff) > SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS)
-            {
-                //local OS time has been changed. If system time is set 
-                    //by local host time then updating system time
-                if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
-                    !(m_localTimePriorityKey.flags & peerTimeSynchronizedWithInternetServer))
-                {
-                    forceTimeResync();
-                }
-            }
-        }
-        
-        m_prevSysTime = curSysTime;
-        m_prevMonotonicClock = curMonotonicClock;
-
-        QMutexLocker lk(&m_mutex);
-        if (m_terminated)
-            return;
-        m_checkSystemTimeTaskID = TimerManager::instance()->addTimer(
-            std::bind(&TimeSynchronizationManager::checkSystemTimeForChange, this),
-            SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS);
     }
 }
