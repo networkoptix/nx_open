@@ -31,6 +31,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
+#include <ui/delegates/resource_pool_model_custom_column_delegate.h>
 #include <ui/models/resource_pool_model_node.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
@@ -62,13 +63,6 @@ namespace {
     }
 
 } // namespace
-
-QnResourcePoolModelCustomColumnDelegate::QnResourcePoolModelCustomColumnDelegate(QObject* parent /*= nullptr*/):
-    QObject(parent)
-{}
-
-QnResourcePoolModelCustomColumnDelegate::~QnResourcePoolModelCustomColumnDelegate()
-{}
 
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
@@ -354,10 +348,23 @@ void QnResourcePoolModel::setCustomColumnDelegate(QnResourcePoolModelCustomColum
     if (m_customColumnDelegate == columnDelegate)
         return;
 
+    if (m_customColumnDelegate)
+        disconnect(m_customColumnDelegate, nullptr, this, nullptr);
+
     m_customColumnDelegate = columnDelegate;
 
-    Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
-    m_rootNodes[rootNodeType]->updateRecursive();
+    auto notifyCustomColumnChanged = [this](){
+        //TODO: #GDM update only custom column and changed rows
+        Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+        m_rootNodes[rootNodeType]->updateRecursive();
+    };
+
+    if (m_customColumnDelegate)
+        connect(m_customColumnDelegate, &QnResourcePoolModelCustomColumnDelegate::notifyDataChanged,
+                this, notifyCustomColumnChanged);
+
+    notifyCustomColumnChanged();
+
 }
 
 
@@ -621,7 +628,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         connect(camera,     &QnVirtualCameraResource::groupIdChanged,   this,   &QnResourcePoolModel::at_resource_parentIdChanged);
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
         connect(camera,     &QnVirtualCameraResource::statusFlagsChanged, this, &QnResourcePoolModel::at_resource_resourceChanged);
-        connect(camera,     &QnVirtualCameraResource::failoverPriorityChanged, this, &QnResourcePoolModel::at_resource_resourceChanged); /**< Used in custom field. */
         auto updateParent = [this](const QnResourcePtr &resource) {
             /* Automatically update display name of the EDGE server if its camera was renamed. */
             QnResourcePtr parent = resource->getParentResource();

@@ -2,76 +2,29 @@
 
 #include <api/app_server_connection.h>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
+#include <ui/delegates/failover_priority_resource_model_delegate.h>
 #include <ui/models/resource_pool_model.h>
 
 namespace {
-
-    class QnFailoverPriorityResourceModelDelegate: public QnResourcePoolModelCustomColumnDelegate {
-        typedef QnResourcePoolModelCustomColumnDelegate base_type;
-    public:
-        QnFailoverPriorityResourceModelDelegate(QObject* parent = nullptr):
-            base_type(parent)
-        {};
-
-        virtual ~QnFailoverPriorityResourceModelDelegate(){}
-
-        virtual Qt::ItemFlags flags(const QModelIndex &index) const override {
-            Q_UNUSED(index);
-            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemNeverHasChildren;
-        }
-
-        virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override {
-            QnVirtualCameraResourcePtr camera = index.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnVirtualCameraResource>();
-            if (!camera)
-                return QVariant();
-
-            auto priority = camera->failoverPriority();
-
-            switch (role) {
-            case Qt::DisplayRole:
-            case Qt::StatusTipRole:
-            case Qt::WhatsThisRole:
-            case Qt::AccessibleTextRole:
-            case Qt::AccessibleDescriptionRole:
-            case Qt::ToolTipRole:
-                return QnFailoverPriorityDialog::priorityToString(priority);
-            case Qt::ForegroundRole:
-                switch (priority) {
-                case Qn::FP_High:
-                    return QBrush(Qt::red);
-                case Qn::FP_Medium:
-                    return QBrush(Qt::yellow);
-                case Qn::FP_Low:
-                    return QBrush(Qt::green);
-                case Qn::FP_Never:
-                    return QBrush(Qt::gray);
-                default:
-                    break;
-                }
-            default:
-                break;
-            }
-            return QVariant();
-        }
-
-        virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override {
-            QN_UNUSED(index, value, role);
-            return false;
-        }
-    };
-
     class QnFailoverPriorityDialogDelegate: public QnResourceSelectionDialogDelegate {
         typedef QnResourceSelectionDialogDelegate base_type;
+
+        Q_DECLARE_TR_FUNCTIONS(QnFailoverPriorityDialogDelegate);
     public:
         typedef std::function<void(Qn::FailoverPriority)> ButtonCallback;
 
-        QnFailoverPriorityDialogDelegate(ButtonCallback callback, QWidget* parent):
+        QnFailoverPriorityDialogDelegate(
+            ButtonCallback callback, 
+            QnFailoverPriorityResourceModelDelegate* customColumnDelegate,
+            QWidget* parent):
+
             base_type(parent),
             m_callback(callback),
-            m_customColumnDelegate(new QnFailoverPriorityResourceModelDelegate(this))
+            m_customColumnDelegate(customColumnDelegate)
         {}
 
         ~QnFailoverPriorityDialogDelegate() 
@@ -81,6 +34,8 @@ namespace {
             QWidget* placeholder = new QWidget(parent);
             QHBoxLayout* layout = new QHBoxLayout(placeholder);
             placeholder->setLayout(layout);
+
+            layout->addWidget(new QLabel(tr("Set Priority:"), parent));
 
             for (int i = 0; i < Qn::FP_Count; ++i) {
                 Qn::FailoverPriority priority = static_cast<Qn::FailoverPriority>(i);
@@ -113,19 +68,37 @@ namespace {
         ButtonCallback m_callback;
         QnResourcePoolModelCustomColumnDelegate* m_customColumnDelegate;
     };
-
-
-   
+  
 }
+
 
 QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/):
     base_type(parent)
+    , m_customColumnDelegate(new QnFailoverPriorityResourceModelDelegate(this))
 {
     setWindowTitle(tr("Failover Priority"));
     setDelegate(new QnFailoverPriorityDialogDelegate([this](Qn::FailoverPriority priority){
-        updatePriorityForSelectedCameras(priority);
-    }, this));
+            updatePriorityForSelectedCameras(priority);
+        },
+        m_customColumnDelegate,
+        this));
 
+
+    auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
+        connect(camera, &QnVirtualCameraResource::failoverPriorityChanged, m_customColumnDelegate, &QnResourcePoolModelCustomColumnDelegate::notifyDataChanged);
+    };
+
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(QnResourcePtr(), true)) {
+        connectToCamera(camera);
+    }
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, [connectToCamera](const QnResourcePtr &resource) {
+        if (QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
+            connectToCamera(camera);
+    });
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
+        disconnect(resource, nullptr, this, nullptr);
+    });
 }
 
 QString QnFailoverPriorityDialog::priorityToString(Qn::FailoverPriority priority) {
@@ -144,6 +117,15 @@ QString QnFailoverPriorityDialog::priorityToString(Qn::FailoverPriority priority
     }
     return QString();
 }
+
+const QnFailoverPriorityColors & QnFailoverPriorityDialog::colors() const {
+    return m_customColumnDelegate->colors();
+}
+
+void QnFailoverPriorityDialog::setColors(const QnFailoverPriorityColors &colors) {
+    m_customColumnDelegate->setColors(colors);
+}
+
 
 void QnFailoverPriorityDialog::updatePriorityForSelectedCameras(Qn::FailoverPriority priority) {
     QMap<QnVirtualCameraResourcePtr, Qn::FailoverPriority> backup;

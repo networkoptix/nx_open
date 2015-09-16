@@ -3,14 +3,14 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QScopedPointer>
-#include <utils/common/uuid.h>
 
-#include <utils/common/id.h>
+#include <client/client_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <client/client_globals.h>
 
+#include <utils/common/id.h>
 #include <utils/common/connective.h>
 
 class QnResourceModelPrivate;
@@ -21,18 +21,7 @@ class QnVideoWallMatrix;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 class QnResourcePoolModelNode;
-
-class QnResourcePoolModelCustomColumnDelegate: public QObject {
-    Q_OBJECT
-public:
-    //TODO: #GDM think about model-changed notifications
-    QnResourcePoolModelCustomColumnDelegate(QObject* parent = nullptr);
-    virtual ~QnResourcePoolModelCustomColumnDelegate();
-
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const = 0;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const = 0;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) = 0;
-};
+class QnResourcePoolModelCustomColumnDelegate;
 
 class QnResourcePoolModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware {
     Q_OBJECT
