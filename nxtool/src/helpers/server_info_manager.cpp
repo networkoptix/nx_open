@@ -8,12 +8,13 @@
 
 #include <base/requests.h>
 #include <base/server_info.h>
+#include <helpers/rest_client.h>
 
 namespace
 {
     enum { kShortTimeout = 3000};
 
-    QStringList g_availablePasswords = rtu::defaultAdminPasswords();
+    QStringList g_availablePasswords = rtu::RestClient::defaultAdminPasswords();
 
     const auto globalSuccessful = [](const rtu::ServerInfoManager::SuccessfulCallback &callback
         , const QUuid &id, const rtu::ExtraServerInfo &extraInfo, const QString &host)
@@ -155,7 +156,7 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
         };
 
         const QString password = (server.hasExtraInfo() ? server.extraInfo().password 
-            : defaultAdminPasswords().front());
+            : rtu::RestClient::defaultAdminPasswords().front());
 
         getServerExtraInfo(base, password, localSuccessful, localFailed);
     }

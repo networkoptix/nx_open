@@ -7,6 +7,7 @@
 
 #include <base/server_info.h>
 #include <base/requests.h>
+#include <helpers/rest_client.h>
 #include <helpers/server_info_manager.h>
 #include <helpers/model_change_helper.h>
 
@@ -536,7 +537,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
-            return (info.hasExtraInfo() && rtu::defaultAdminPasswords().contains(info.extraInfo().password));
+            return (info.hasExtraInfo() && rtu::RestClient::defaultAdminPasswords().contains(info.extraInfo().password));
         }
     }
     else

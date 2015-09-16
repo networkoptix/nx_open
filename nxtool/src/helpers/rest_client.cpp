@@ -8,27 +8,6 @@ namespace
 {
     const QString kUserAgent = "NX Tool";
 
-    const QString &adminUserName()
-    {
-        static QString result("admin");
-        return result;
-    }
-
-    ///
-
-    const QStringList &defaultAdminPasswords()
-    {
-        static QStringList result = []() -> QStringList
-        {
-            QStringList result;
-            result.push_back("123");
-            result.push_back("admin");
-            return result;
-        }();
-
-        return result;
-    }
-
     QUrl makeHttpUrl(const rtu::RestClient::Request &request)
     {
         const rtu::BaseServerInfo &info = *request.target;
@@ -37,7 +16,7 @@ namespace
         url.setScheme("http");
         url.setHost(info.hostAddress);
         url.setPort(info.port);
-        url.setUserName(adminUserName());
+        url.setUserName(rtu::RestClient::adminUserName());
         url.setPassword(request.password);
         url.setPath(request.path);
         url.setQuery(request.params);
@@ -55,7 +34,7 @@ namespace
         result.url = tmp;
         result.serverId = request.target->id;
         result.contentType = "application/json";
-        result.auth.setUser(adminUserName());
+        result.auth.setUser(rtu::RestClient::adminUserName());
         result.auth.setPassword(request.password);
         return result;
     }
@@ -299,6 +278,27 @@ void rtu::RestClient::sendPost(const Request &request
         implInstance().sendMulticastPost(request, data);
 }
         
+const QString &rtu::RestClient::adminUserName()
+{
+    static QString result("admin");
+    return result;
+}
+
+///
+
+const QStringList &rtu::RestClient::defaultAdminPasswords()
+{
+    static QStringList result = []() -> QStringList
+    {
+        QStringList result;
+        result.push_back("123");
+        result.push_back("admin");
+        return result;
+    }();
+
+    return result;
+}
+
 ///
 
 rtu::RestClient::Request::Request(const rtu::BaseServerInfoPtr &initTarget

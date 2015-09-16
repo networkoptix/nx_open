@@ -6,21 +6,14 @@
 #include <base/types.h>
 #include <base/requests.h>
 #include <base/changeset.h>
-#include <base/rtu_context.h>
-#include <base/server_info.h>
-#include <base/changes_manager.h>
 
-#include <helpers/rest_client.h>
 #include <helpers/time_helper.h>
 #include <helpers/qml_helpers.h>
 
 #include <models/changes_summary_model.h>
-#include <models/servers_selection_model.h>
 
 namespace
 {
-    const QString kFakeErrorReason = "!change me!"; /// TODO: #ynikitenkov add errors handling
-
     enum { kSingleInterfaceChangeCount = 1 };
 
     enum 

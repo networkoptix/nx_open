@@ -6,9 +6,8 @@
 #include "multicast_http_fwd.h"
 #include <memory>
 #include <QCache>
+#include <QMutex>
 #include <QLinkedList>
-
-#define lit(a) QString(a)
 
 namespace QnMulticast
 {
@@ -23,8 +22,8 @@ namespace QnMulticast
     {
         Packet();
 
-        static const int MAX_DATAGRAM_SIZE = 1412;
-        static const int MAX_PAYLOAD_SIZE = MAX_DATAGRAM_SIZE - 167;
+        static const int MAX_DATAGRAM_SIZE;
+        static const int MAX_PAYLOAD_SIZE;
 
         QUuid magic;
         int version;
@@ -57,13 +56,14 @@ namespace QnMulticast
         void sendNextData();
         void at_socketReadyRead();
         void at_timer();
+        void initSockets(const QSet<QString>& addrList);
     private:
 
         struct TransportPacket
         {
             TransportPacket(): socket(0) {}
-            TransportPacket(QUdpSocket* socket, const QByteArray& data): socket(socket), data(data) {}
-            QUdpSocket* socket;
+            TransportPacket(std::shared_ptr<QUdpSocket> socket, const QByteArray& data): socket(socket), data(data) {}
+            std::shared_ptr<QUdpSocket> socket;
             QByteArray data;
         };
 
@@ -84,14 +84,14 @@ namespace QnMulticast
         QUuid m_localGuid;
 
         std::unique_ptr<QUdpSocket> m_recvSocket;
-        std::vector<std::unique_ptr<QUdpSocket>> m_sendSockets;
+        std::vector<std::shared_ptr<QUdpSocket>> m_sendSockets;
         RequestCallback m_requestCallback;
         std::unique_ptr<QTimer> m_timer;
-        QCache<QUuid, void> m_processedRequests;
+        QCache<QUuid, char> m_processedRequests;
         mutable QMutex m_mutex;
         bool m_nextSendQueued;
-        bool m_initialized;
-        QString m_localAddress;
+        QElapsedTimer m_checkInterfacesTimer;
+        QSet<QString> m_localAddressList;
     private:
         QByteArray serializeMessage(const Request& request) const;
         TransportConnection serializeRequest(const Request& request);
@@ -102,6 +102,7 @@ namespace QnMulticast
         void putPacketToTransport(TransportConnection& transportConnection, const Packet& packet);
         void eraseRequest(const QUuid& id);
         void queueNextSendData(int delay);
+        QSet<QString> getLocalAddressList() const;
     };
 
 }

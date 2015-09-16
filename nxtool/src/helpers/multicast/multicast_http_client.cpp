@@ -24,7 +24,7 @@ QByteArray HTTPClient::createUserPasswordDigest(
     const QString& realm )
 {
     QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(QString(lit("%1:%2:%3")).arg(userName, realm, password).toLatin1());
+    md5.addData(QStringLiteral("%1:%2:%3").arg(userName, realm, password).toLatin1());
     return md5.result().toHex();
 }
 
@@ -64,14 +64,14 @@ Request HTTPClient::updateRequest(const Request& srcRequest)
     // add user agent header
 
     Header userAgent;
-    userAgent.first = lit("User-Agent");
+    userAgent.first = QLatin1String("User-Agent");
     userAgent.second = m_userAgent;
     request.headers << userAgent;
 
     // add user IP info header
     
     Header localAddress;
-    localAddress.first = lit("X-User-Host");
+    localAddress.first = QLatin1String("X-User-Host");
     localAddress.second = m_transport.localAddress();
     request.headers << localAddress;
 
@@ -84,7 +84,7 @@ Request HTTPClient::updateRequest(const Request& srcRequest)
     QByteArray nonce = QByteArray::number(authInfo.nonce + authInfo.timer.elapsed() * 1000ll, 16);
     QString auth = QLatin1String(createHttpQueryAuthParam(request.auth.user(), request.auth.password(), authInfo.realm, srcRequest.method.toUtf8(), nonce));
     QUrlQuery query(request.url.query());
-    query.addQueryItem(lit("auth"), auth);
+    query.addQueryItem(QLatin1String("auth"), auth);
     request.url.setQuery(query);
 
     return request;
@@ -94,7 +94,7 @@ void HTTPClient::updateAuthParams(const QUuid& serverId, const Response& respons
 {
     for (const auto& header: response.headers)
     {
-        if (header.first == lit("WWW-Authenticate"))
+        if (header.first == QLatin1String("WWW-Authenticate"))
         {
             auto params = parseAuthData(header.second.mid(header.second.indexOf(L' ')).toUtf8(), ',');
             AuthInfo& authInfo = m_authByServer[serverId];

@@ -29,6 +29,10 @@ namespace rtu
         static void sendPost(const Request &request
             , const QByteArray &data);
         
+        static const QString &adminUserName();
+
+        static const QStringList &defaultAdminPasswords();
+
         static RestClient *instance();
 
     signals:

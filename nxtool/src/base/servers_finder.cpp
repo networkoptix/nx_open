@@ -103,10 +103,8 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        if (//!jsonObject.value("systemName").toString().contains("nx123")
-            //&& !jsonObject.value("systemName").toString().contains("nx")
-            //&& !jsonObject.value("systemName").toString().contains("NX")
-             !jsonObject.value("systemName").toString().contains("000_nx1_1")
+        if (
+            !jsonObject.value("systemName").toString().contains("000_nx1")
             )
             return false;
         
@@ -400,6 +398,9 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
         return true;
 
     const QString &address = sender.toString();
+    if (address.contains("192.168.0.101") || address.contains("192.168.0.200"))
+        qDebug() << data;
+
     const auto &firstTimeProcessor = 
         [this, address](const Callback &secondTimeProcessor)
     {
@@ -431,7 +432,7 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
 
             /// try to add unknown or discover by multicast after period * 3 
             /// - to have a chance to discover entity as known or by Http first
-            enum { kDelayTimeout = HttpClient::kDefaultTimeoutMs * 3};
+            enum { kDelayTimeout = kUpdateServersInfoInterval * 3};
             QTimer::singleShot(kDelayTimeout, (isMulticastServer ? multicastProcessor : secondTimeProcessor));
         }
         else if (!isKnown && onEntityDiscovered(address, m_unknownHosts))

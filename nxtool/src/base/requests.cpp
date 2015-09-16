@@ -42,7 +42,7 @@ namespace
         url.setScheme("http");
         url.setHost(host);
         url.setPort(port);
-        url.setUserName(rtu::adminUserName());
+        url.setUserName(rtu::RestClient::adminUserName());
         url.setPassword(password);
         url.setPath(command);
         return url;
@@ -275,29 +275,6 @@ namespace /// Parsers stuff
         rtu::RestClient::sendGet(request);
     }
 
-}
-
-///
-
-const QString &rtu::adminUserName()
-{
-    static QString result("admin");
-    return result;
-}
-
-///
-
-const QStringList &rtu::defaultAdminPasswords()
-{
-    static QStringList result = []() -> QStringList
-    {
-        QStringList result;
-        result.push_back("123");
-        result.push_back("admin");
-        return result;
-    }();
-
-    return result;
 }
 
 ///

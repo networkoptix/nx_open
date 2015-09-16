@@ -12,6 +12,9 @@
 namespace QnMulticast
 {
 
+const int Packet::MAX_DATAGRAM_SIZE = 1412;
+const int Packet::MAX_PAYLOAD_SIZE = Packet::MAX_DATAGRAM_SIZE - 167;
+
 static const QUuid PROTO_MAGIC("422DEA47-0B0C-439A-B1FA-19644CCBC0BD");
 static const int PROTO_VERSION = 1;
 
@@ -19,15 +22,45 @@ static const int MTU_SIZE = 1412;
 static const QHostAddress MULTICAST_GROUP(QLatin1String("239.57.43.102"));
 static const int MULTICAST_PORT = 7001;
 
-static const int MAX_SEND_BUFFER_SIZE = 1024 * 8;     // how many bytes we send before socket delay
-static const int SOCKET_RECV_BUFFER_SIZE = 1024 * 64; // socket read buffer size
-static const int SEND_RETRY_COUNT = 2;                // how many times send all UDP packets
-static const int SEND_BITRATE = 1024*1024 * 2;        // send data at speed 2Mbps
+static const int MAX_SEND_BUFFER_SIZE = 1024 * 8;      // how many bytes we send before socket delay
+static const int SOCKET_RECV_BUFFER_SIZE = 1024 * 128; // socket read buffer size
+static const int SEND_RETRY_COUNT = 2;                 // how many times send all UDP packets
+static const int SEND_BITRATE = 1024*1024 * 2;         // send data at speed 2Mbps
+static const int DELAY_IF_OVERFLOW_MS = 100;           // delay if send buffer overflow
 
 static const int PROCESSED_REQUESTS_CACHE_SZE = 512;  // keep last sessions to ignore UDP duplicates
 static const int CSV_COLUMNS = 9;
 static char CSV_DELIMITER = ';';
 static char EMPTY_DATA_FILLER = '\x0';
+
+static const int INTERFACE_LIST_CHECK_INTERVAL = 1000 * 15;
+
+
+namespace SystemError
+{
+#ifdef _WIN32
+    typedef DWORD ErrorCode;
+#else
+    typedef int ErrorCode;
+#endif
+
+#ifdef _WIN32
+    static const ErrorCode wouldBlock = WSAEWOULDBLOCK;
+#else
+    static const ErrorCode wouldBlock = EWOULDBLOCK;
+#endif
+
+    ErrorCode getLastOSErrorCode()
+    {
+#ifdef _WIN32
+        return GetLastError();
+#else
+        //EAGAIN and EWOULDBLOCK are usually same, but not always
+        return errno == EAGAIN ? EWOULDBLOCK : errno;
+#endif
+    }
+}
+
 
 // --------- UDP / Multicast routines -----------------
 
@@ -46,6 +79,21 @@ static bool joinMulticastGroup(int fd, const QString &multicastGroup, const QStr
         (const char *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
             qWarning() << "failed to join multicast group" << multicastGroup << "from IF" << multicastIF;
+            return false;
+    }
+    return true;
+}
+
+bool leaveMulticastGroup(int fd, const QString &multicastGroup, const QString& multicastIF)  
+{
+    struct ip_mreq multicastRequest;
+
+    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
+    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
+    if( setsockopt( fd, IPPROTO_IP, IP_DROP_MEMBERSHIP,
+        (const char *) &multicastRequest,
+        sizeof(multicastRequest)) < 0) {
+            qWarning() << "failed to leave multicast group" << multicastGroup << "from IF" << multicastIF;
             return false;
     }
     return true;
@@ -138,54 +186,76 @@ Transport::Transport(const QUuid& localGuid):
     m_localGuid(localGuid),
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE),
     m_mutex(QMutex::Recursive),
-    m_nextSendQueued(false),
-    m_initialized(false)
+    m_nextSendQueued(false)
 {
-    qDebug() << "CLIENT ID " << localGuid;
+    initSockets(getLocalAddressList());
 
-    m_recvSocket.reset(new QUdpSocket());
-    if (!m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint))
-        qWarning() << "Failed to open Multicast Http receive socket";
+    m_timer.reset(new QTimer());
+    connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
+    m_timer->start(1000);
+    m_checkInterfacesTimer.restart();
+}
+
+QSet<QString> Transport::getLocalAddressList() const
+{
+    QSet<QString> result;
+
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-    bool hasRecvIface = false;
-    bool hasSendIface = false;
     for (const QNetworkInterface &iface: interfaces)
     {
         if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
             continue;
-        // QT joinMulticastGroup has a bug: it takes first address from the interface. It fail if the first addr is a IPv6 addr
-        //m_recvSocket->joinMulticastGroup(MULTICAST_GROUP, iface);
 
         QString ipv4Addr = getIfaceIPv4Addr(iface);
-        if (ipv4Addr.isEmpty())
-            continue; // no IPv4 address found
-        
-        if (joinMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr))
-            hasRecvIface = true;
-
-        auto sendSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
-        if (sendSocket->bind(QHostAddress(ipv4Addr))) 
-        {
-            setMulticastIF(sendSocket->socketDescriptor(), ipv4Addr); //sendSocket->setMulticastInterface(iface);
-            m_sendSockets.push_back(std::move(sendSocket));
-            hasSendIface = true;
-            if (m_localAddress.isEmpty())
-                m_localAddress = ipv4Addr;
-        }
-        else
-            qWarning() << "Failed to open Multicast Http send socket";
+        if (!ipv4Addr.isEmpty())
+            result << ipv4Addr;
     }
+    return result;
+}
+
+void Transport::initSockets(const QSet<QString>& addrList)
+{
+    if (m_recvSocket) 
+    {
+        // unsabscribe socket from old multicast list
+        for (const QString& ipv4Addr: m_localAddressList)
+            leaveMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr);
+    }
+
+    m_localAddressList.clear();
+
+    // receive socket is initialized once. It doesn't require to recreate it if interfaces will be changed
+    m_recvSocket.reset(new QUdpSocket());
+    if (!m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint))
+        qWarning() << "Failed to open Multicast Http receive socket";
     setRecvBufferSize(m_recvSocket->socketDescriptor(), SOCKET_RECV_BUFFER_SIZE);
     connect(m_recvSocket.get(), &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
-    m_initialized = hasSendIface && hasRecvIface;
-    m_timer.reset(new QTimer());
-    connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
-    m_timer->start(1000);
+
+    m_sendSockets.clear();
+
+    for (const QString& ipv4Addr: addrList)
+    {
+        // QT joinMulticastGroup has a bug: it takes first address from the interface. It fail if the first addr is a IPv6 addr
+        if (!joinMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr))
+            continue;
+        
+        auto sendSocket = std::shared_ptr<QUdpSocket>(new QUdpSocket());
+        if (!sendSocket->bind(QHostAddress(ipv4Addr))) {
+            qWarning() << "Failed to open Multicast Http send socket";
+            continue;
+        }
+
+        if (!setMulticastIF(sendSocket->socketDescriptor(), ipv4Addr))
+            continue;
+
+        m_localAddressList << ipv4Addr;
+        m_sendSockets.push_back(std::move(sendSocket));
+    }
 }
 
 QString Transport::localAddress() const
 {
-    return m_localAddress;
+    return m_localAddressList.isEmpty() ? QString() : *m_localAddressList.begin();
 }
 
 void Transport::at_timer()
@@ -205,6 +275,15 @@ void Transport::at_timer()
         else
             ++itr;
     }
+    
+    // 2. check if interface list changed
+    if (m_checkInterfacesTimer.hasExpired(INTERFACE_LIST_CHECK_INTERVAL))
+    {
+        QSet<QString> addrList = getLocalAddressList();
+        if (addrList != m_localAddressList)
+            initSockets(addrList);
+        m_checkInterfacesTimer.restart();
+    }
 }
 
 void Transport::cancelRequest(const QUuid& requestId)
@@ -220,12 +299,12 @@ QByteArray Transport::serializeMessage(const Request& request) const
 
     QString encodedPath = request.url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters | QUrl::RemoveScheme | QUrl::RemoveAuthority);
 
-    result.append(lit("%1 %2 HTTP/1.1\r\n").arg(request.method).arg(encodedPath));
+    result.append(QStringLiteral("%1 %2 HTTP/1.1\r\n").arg(request.method).arg(encodedPath));
     for (const auto& header: request.headers)
-        result.append(lit("%1: %2\r\n").arg(header.first).arg(header.second));
+        result.append(QStringLiteral("%1: %2\r\n").arg(header.first).arg(header.second));
     if (!request.contentType.isEmpty())
-        result.append(lit("%1: %2\r\n").arg(lit("Content-Type")).arg(QLatin1String(request.contentType)));
-    result.append(lit("\r\n"));
+        result.append(QStringLiteral("%1: %2\r\n").arg(QLatin1String("Content-Type")).arg(QLatin1String(request.contentType)));
+    result.append(QLatin1String("\r\n"));
     return result.toUtf8().append(request.messageBody);
 }
 
@@ -251,7 +330,7 @@ bool Transport::parseHttpMessage(Message& result, const QByteArray& message) con
             Header h;
             h.first = QLatin1String(header.left(delimiterPos).trimmed());
             h.second = QLatin1String(header.mid(delimiterPos+1).trimmed());
-            if (h.first.toLower() == lit("content-type"))
+            if (h.first.toLower() == QLatin1String("content-type"))
                 result.contentType = header.mid(delimiterPos+1).trimmed();
             else
                 result.headers << h;
@@ -318,7 +397,7 @@ void Transport::putPacketToTransport(TransportConnection& transportConnection, c
     for (int i = 0; i < SEND_RETRY_COUNT; ++i) 
     {
         for (auto& socket: m_sendSockets)
-            transportConnection.dataToSend << TransportPacket(socket.get(), encodedData);
+            transportConnection.dataToSend << TransportPacket(socket, encodedData);
     }
 }
 
@@ -455,7 +534,7 @@ void Transport::sendNextData()
     {
         TransportConnection& request = *itr;
 
-        if (!m_initialized) {
+        if (m_localAddressList.isEmpty()) {
             if (request.responseCallback)
                 request.responseCallback(request.requestId, ErrCode::networkIssue, Response());
             itr = m_requests.erase(itr);
@@ -464,20 +543,19 @@ void Transport::sendNextData()
 
         while (sentBytes < MAX_SEND_BUFFER_SIZE && !request.dataToSend.isEmpty())
         {
-            TransportPacket data = request.dataToSend.dequeue();
+            TransportPacket& data = request.dataToSend.front();
             int bytesWriten = data.socket->writeDatagram(data.data, MULTICAST_GROUP, MULTICAST_PORT);
-            /*
-            if (bytesWriten == -1) {
-                if (request.responseCallback)
-                    request.responseCallback(request.requestId, ErrCode::networkIssue, Response());
-                request.dataToSend.clear();
+            if (bytesWriten > 0) {
+                sentBytes += Packet::MAX_DATAGRAM_SIZE; // take into account max datagram size for bitrate calculation
+                request.dataToSend.dequeue();
             }
             else {
-                sentBytes += bytesWriten;
+                if (SystemError::getLastOSErrorCode() == SystemError::wouldBlock) {
+                    queueNextSendData(DELAY_IF_OVERFLOW_MS); // send buffer overflow. delay and repeat
+                    return;
+                }
+                request.dataToSend.dequeue(); // skip packet
             }
-            */
-            if (bytesWriten > 0)
-                sentBytes += Packet::MAX_DATAGRAM_SIZE; // take into account max datagram size for bitrate calculation
         }
         
         if (request.dataToSend.isEmpty() && !request.responseCallback)
@@ -487,7 +565,7 @@ void Transport::sendNextData()
     }
     if (sentBytes > 0) {
         qreal delaySecs = (qreal) sentBytes * 8.0 / SEND_BITRATE;
-        queueNextSendData(int(delaySecs / 1000.0 + 0.5));
+        queueNextSendData(int(delaySecs * 1000.0 + 0.5));
     }
 }
 

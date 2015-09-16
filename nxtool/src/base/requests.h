@@ -15,9 +15,6 @@ class QString;
 
 namespace rtu
 {
-    const QString &adminUserName();
-    const QStringList &defaultAdminPasswords();
-    
     bool parseModuleInformationReply(const QJsonObject &reply
         , rtu::BaseServerInfo &baseInfo);
 
