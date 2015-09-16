@@ -70,11 +70,6 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
         emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), textRoles);
     });
 
-    connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this, [this](qint64 syncTime) {
-        /* Requesting initial time. */
-        resetData(syncTime);
-    });
-
     /* Handle adding new online server peers. */
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this, [this](const QnPeerRuntimeInfo &info) {
         if (info.data.peer.peerType != Qn::PT_Server)
@@ -147,8 +142,23 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
     });
 
     /* Requesting initial time. */
-    resetData(qnSyncTime->currentMSecsSinceEpoch());
+    qint64 currentSyncTime = qnSyncTime->currentMSecsSinceEpoch();
+    if (auto connection = QnAppServerConnectionFactory::getConnection2()) {
+        auto timeManager = connection->getTimeManager();
+        foreach(const ec2::QnPeerTimeInfo &info, timeManager->getPeerTimeInfoList())
+            m_serverOffsetCache[info.peerId] = info.time - currentSyncTime;
+    }
+
+    /* Fill table with current data. */
+    beginResetModel();
+    foreach (const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
+            continue;
+        addItem(runtimeInfo);
+    }
+    endResetModel();
 }
+
 
 int QnTimeServerSelectionModel::columnCount(const QModelIndex &parent) const {
     if (parent.isValid())
@@ -402,25 +412,4 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const {
                 return false;
     }
     return true;
-}
-
-void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
-{
-    if (auto connection = QnAppServerConnectionFactory::getConnection2())
-    {
-        auto timeManager = connection->getTimeManager();
-        foreach(const ec2::QnPeerTimeInfo &info, timeManager->getPeerTimeInfoList())
-            m_serverOffsetCache[info.peerId] = info.time - currentSyncTime;
-    }
-
-    /* Fill table with current data. */
-    beginResetModel();
-    m_items.clear();
-    foreach(const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems())
-    {
-        if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
-            continue;
-        addItem(runtimeInfo);
-    }
-    endResetModel();
 }
