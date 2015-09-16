@@ -143,11 +143,11 @@
     </message>
     <message>
         <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Alle Server Offline. Prüfdaten sind nicht verfügbar.</translation>
+        <translation>Alle Server Offline. Überwachungsdaten sind nicht verfügbar.</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation>Prüfpfad</translation>
+        <translation>Überwachungspfad</translation>
     </message>
 </context>
 <context>
@@ -796,7 +796,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open audit trail log</source>
-        <translation>Öffne Prüfpfadprotokoll</translation>
+        <translation>Öffne Überwachungsprotokoll</translation>
     </message>
     <message>
         <source>Monitor All Servers on a Single Layout</source>
@@ -808,7 +808,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation>Prüfpfad</translation>
+        <translation>Überwachungspfad</translation>
     </message>
 </context>
 <context>
@@ -2602,7 +2602,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Audit Trail...</source>
-        <translation>Prüfpfad...</translation>
+        <translation>Überwachungspfad...</translation>
     </message>
     <message>
         <source>Move %1</source>
@@ -2718,7 +2718,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Audit log replay</source>
-        <translation>Prüfprotokoll wiedergeben</translation>
+        <translation>Überwachungsprotokoll wiedergeben</translation>
     </message>
     <message>
         <source>%1 actions</source>
@@ -8820,7 +8820,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enable audit trail</source>
-        <translation>Aktiviere Prüfpfad</translation>
+        <translation>Aktiviere Überwachungspfad</translation>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>

@@ -225,7 +225,7 @@
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation>При %1 %2</translation>
+        <translation>При %2: %1</translation>
     </message>
     <message>
         <source>%1 --&gt; %2</source>
@@ -261,31 +261,31 @@
     </message>
     <message>
         <source>%1 output</source>
-        <translation>Выход %1</translation>
+        <translation>%1: Тревожный выход</translation>
     </message>
     <message>
         <source>%1 output for 30 sec</source>
-        <translation>Выход %1 в течение 30 секунд</translation>
+        <translation>%1: Тревожный выход на 30 секунд</translation>
     </message>
     <message>
         <source>%1 recording</source>
-        <translation>Запись %1</translation>
+        <translation>%1: Запись</translation>
     </message>
     <message>
         <source>Input Signal on %1</source>
-        <translation>Сигнал входа на %1</translation>
+        <translation>%1: Сигнал входа</translation>
     </message>
     <message>
         <source>%1 Disconnected</source>
-        <translation>Отключение %1</translation>
+        <translation>%1: Отключение</translation>
     </message>
     <message>
         <source>%1 IP Conflict</source>
-        <translation>IP конфликт %1</translation>
+        <translation>%1: IP конфликт</translation>
     </message>
     <message>
         <source>Any %1 Issue</source>
-        <translation>Любое событие %1</translation>
+        <translation>%1: Любое событие</translation>
     </message>
     <message>
         <source>%1 %2 was disconnected</source>
@@ -295,12 +295,12 @@
     <message>
         <source>%1 IP Conflict at %2</source>
         <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
-        <translation>IP конфликт %1 %2</translation>
+        <translation>IP конфликт: %1 %2</translation>
     </message>
     <message>
         <source>%1 #%2 MAC: %3</source>
         <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation>MAC адрес %1 # %2: %3</translation>
+        <translation>%1 #%2, MAC адрес: %3</translation>
     </message>
     <message>
         <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
@@ -399,23 +399,23 @@
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network.</source>
-        <translation>Убедитесь, что %1 подключено к сети.</translation>
+        <translation>Убедитесь, что %1 находится в сети.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Убедитесь, что порт %2 доступен (напр. проброшен). Попробуйте перезагрузить %1, затем сбросить настройки через веб-интерфейс.</translation>
+        <translation>Убедитесь, что порт %2 доступен (напр. проброшен). Попробуйте перезагрузить устройство, затем сбросить настройки через веб-интерфейс.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Убедитесь, что %1 подключено к сети. Попробуйте перезагрузить %1.</translation>
+        <translation>Убедитесь, что устройство подключено к сети. Попробуйте перезагрузить устройство.</translation>
     </message>
     <message>
         <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation>Невозможно разобрать ответ %1. URL %2, имя запроса %3.</translation>
+        <translation>Невозможно разобрать ответ устройства. URL %2, имя запроса %3.</translation>
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
@@ -426,42 +426,42 @@
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
 ----------
 %1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Попробуйте перезагрузить %1, затем сбросить настройки через веб-интерфейс.</translation>
+        <translation>Попробуйте перезагрузить устройство, затем сбросить настройки через веб-интерфейс.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Сначала попробуйте включить запись (если она отключена) и снизить FPS в настройках %1.</translation>
+        <translation>Сначала попробуйте включить запись (если она отключена) и снизить FPS в настройках устройства.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Если это не поможет, восстановите заводские настройки в веб-интерфейсе %1. Если проблема не исчезнет, свяжитесь с техподдержкой.</translation>
+        <translation>Если это не поможет, восстановите заводские настройки в веб-интерфейсе устройства. Если проблема не исчезнет, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Запрос %1 &quot;%2&quot; вернул ошибку &quot;%3&quot;.</translation>
+        <translation>Запрос к устройству &quot;%2&quot; вернул ошибку &quot;%3&quot;.</translation>
     </message>
     <message>
         <source>Unknown %1 Issue.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Неизвестная ошибка %1.</translation>
+        <translation>Неизвестная ошибка устройства.</translation>
     </message>
     <message>
         <source>Invalid data was received from the %1: %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>%1 вернула некорректные данные: %2.</translation>
+        <translation>Устройство вернуло некорректные данные: %2.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open %1 issues dialog for more details.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Слишком много ошибок. Откройте диалог ошибок %1 для побробной информации.</translation>
+        <translation>Слишком много ошибок. Откройте диалог ошибок устройства для побробной информации.</translation>
     </message>
     <message>
         <source>%1 initialization process in progress.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Идёт процесс инициализации %1.</translation>
+        <translation>Идёт процесс инициализации устройства.</translation>
     </message>
 </context>
 <context>
@@ -812,7 +812,7 @@
     </message>
     <message>
         <source>camera</source>
-        <translation>камеры</translation>
+        <translation>камера</translation>
     </message>
     <message>
         <source>IO Modules</source>
