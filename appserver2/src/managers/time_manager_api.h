@@ -26,6 +26,8 @@ namespace ec2
         virtual int getCurrentTimeImpl( impl::CurrentTimeHandlerPtr handler ) override;
         //!Implementation of AbstractTimeManager::forcePrimaryTimeServerImpl
         virtual int forcePrimaryTimeServerImpl( const QnUuid& serverGuid, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractTimeManager::forceTimeResync
+        virtual void forceTimeResync() override;
 
     private:
         QueryProcessorType* m_queryProcessor;

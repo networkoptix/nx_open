@@ -94,7 +94,7 @@ namespace {
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
         (TestLdapSettingsObject,   "testLdapSettings")
-        (ModulesInformationObject, "moduleInformationAuthenticated")
+        (ModulesInformationObject, "moduleInformation")
         (MergeLdapUsersObject,     "mergeLdapUsers")
     );
 #if 0
