@@ -699,9 +699,6 @@ void initLog(const QString& _logLevel)
     if (!configLogLevel.isEmpty())
         logLevel = configLogLevel;
 
-    if(logLevel == lit("none"))
-        return;
-
     QnLog::initLog(logLevel);
     const QString& dataLocation = getDataDirectory();
     const QString& logFileLocation = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
@@ -2372,9 +2369,7 @@ protected:
             logDir + QLatin1String("/http_log"),
             MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-            cmdLineArguments.msgLogLevel == lit("none")
-                ? cl_logALWAYS
-                : QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
+            QnLog::logLevelFromString(cmdLineArguments.msgLogLevel));
 
         //preparing transaction log
         if( cmdLineArguments.ec2TranLogLevel.isEmpty() )
@@ -2387,9 +2382,7 @@ protected:
             logDir + QLatin1String("/ec2_tran"),
             MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-            cmdLineArguments.ec2TranLogLevel == lit("none")
-                ? cl_logALWAYS
-                : QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
+            QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel));
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
@@ -2409,8 +2402,7 @@ protected:
         NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
         NX_LOG(lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
 
-        if( cmdLineArguments.logLevel != lit("none") )
-            defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+        defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
         qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
