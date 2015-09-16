@@ -50,7 +50,8 @@ if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then
     mkdir -p $MNTBOOTHDDPART
     mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
     mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
-    if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ]; then HDDNX1=true; else HDDNX1=false; fi
+    HDDMAC=`cat $MNTBOOTHDDPART/var/tmp/mac`
+    if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ] && [ "$HDDMAC" = "$MAC" ]; then HDDNX1=true; else HDDNX1=false; fi
     ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
     ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
     if [ ! -z $ARCHIVE_FILES ] && [ ! -z $ARCHIVE_DB ]; then ARCHIVE=true; else ARCHIVE=false; fi
@@ -258,6 +259,7 @@ system_restore () {
         rm /var/tmp/keep_ip         
         rm $MNTBOOTHDDPART/restore
         touch $MNTBOOTHDDPART/restored
+        echo $MAC > $MNTBOOTHDDPART/var/tmp/mac
         hddboot_indicator_flush
         umount $BOOTHDDPART
         /etc/init.d/nx1led stop
