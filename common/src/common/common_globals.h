@@ -727,6 +727,7 @@ public:
         FP_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
+    static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.")
 
     /**
      * Invalid value for a timezone UTC offset.
