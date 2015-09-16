@@ -16,6 +16,7 @@
 #include <core/resource/videowall_resource.h>
 
 #include <ui/delegates/resource_tree_item_delegate.h>
+#include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 
 #include <ui/style/noptix_style.h>
@@ -158,12 +159,14 @@ private:
 // -------------------------------------------------------------------------- //
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnResourceTreeWidget()),
-    m_resourceProxyModel(0),
-    m_checkboxesVisible(true),
-    m_graphicsTweaksFlags(0),
-    m_editingEnabled(false),
-    m_simpleSelectionEnabled(false)
+    ui(new Ui::QnResourceTreeWidget())
+    , m_criterion()
+    , m_itemDelegate(nullptr)
+    , m_resourceProxyModel(nullptr)
+    , m_checkboxesVisible(true)
+    , m_graphicsTweaksFlags(0)
+    , m_editingEnabled(false)
+    , m_simpleSelectionEnabled(false)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false);
@@ -184,7 +187,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
 
     ui->resourcesTreeView->installEventFilter(this);
     ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
-//    ui->resourcesTreeView->setItemDelegateForColumn(Qn::InfoColumn)
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
@@ -192,7 +194,9 @@ QnResourceTreeWidget::~QnResourceTreeWidget() {
 }
 
 QAbstractItemModel *QnResourceTreeWidget::model() const {
-    return m_resourceProxyModel ? m_resourceProxyModel->sourceModel() : NULL;
+    return m_resourceProxyModel 
+        ? m_resourceProxyModel->sourceModel() 
+        : nullptr;
 }
 
 void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
@@ -221,9 +225,8 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
         connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this, &QnResourceTreeWidget::afterRecursiveOperation);
         at_resourceProxyModel_rowsInserted(QModelIndex());
 
-        updateCheckboxesVisibility();
         updateFilter();
-        updateColumnsSize();
+        updateColumns();
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
@@ -277,11 +280,38 @@ void QnResourceTreeWidget::setCheckboxesVisible(bool visible) {
     if (m_checkboxesVisible == visible)
         return;
     m_checkboxesVisible = visible;
-    updateCheckboxesVisibility();
+    updateColumns();
 }
 
 bool QnResourceTreeWidget::isCheckboxesVisible() const {
     return m_checkboxesVisible;
+}
+
+QnResourcePoolModelCustomColumnDelegate* QnResourceTreeWidget::customColumnDelegate() const {
+    QAbstractItemModel* sourceModel = model();
+    while (QAbstractProxyModel* proxy = qobject_cast<QAbstractProxyModel*>(sourceModel))
+        sourceModel = proxy->sourceModel();
+
+    if (QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel)) 
+        return resourceModel->customColumnDelegate();
+   
+
+    return nullptr;
+}
+
+void QnResourceTreeWidget::setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate) {
+    QAbstractItemModel* sourceModel = model();
+    while (QAbstractProxyModel* proxy = qobject_cast<QAbstractProxyModel*>(sourceModel))
+        sourceModel = proxy->sourceModel();
+
+    QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel);
+    Q_ASSERT_X(resourceModel != nullptr, Q_FUNC_INFO, "Invalid model");
+
+    if (!resourceModel)
+        return;
+
+    resourceModel->setCustomColumnDelegate(columnDelegate);
+    updateColumns();
 }
 
 void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags) {
@@ -360,23 +390,23 @@ QAbstractItemView* QnResourceTreeWidget::treeView() const {
     return ui->resourcesTreeView;
 }
 
-void QnResourceTreeWidget::updateCheckboxesVisibility() {
-    ui->resourcesTreeView->setColumnHidden(Qn::CheckColumn, !m_checkboxesVisible);
-    ui->resourcesTreeView->setColumnHidden(Qn::InfoColumn,  !m_checkboxesVisible);
-}
-
-void QnResourceTreeWidget::updateColumnsSize() {
+void QnResourceTreeWidget::updateColumns() {
     const int checkBoxSize = 16;
+    ui->resourcesTreeView->header()->setStretchLastSection(false);
 
+    ui->resourcesTreeView->setColumnHidden(Qn::CheckColumn, !m_checkboxesVisible);
     if (m_checkboxesVisible) {
-        ui->resourcesTreeView->header()->setStretchLastSection(false);
         ui->resourcesTreeView->header()->setSectionResizeMode(Qn::CheckColumn,  QHeaderView::Fixed);
         ui->resourcesTreeView->setColumnWidth(Qn::CheckColumn, checkBoxSize);
-        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::InfoColumn,   QHeaderView::ResizeToContents);
-        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::NameColumn,   QHeaderView::Stretch);
-    } else {
-        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::NameColumn,   QHeaderView::Stretch);
     }
+
+    bool customColumnVisible = (customColumnDelegate() != nullptr);
+
+    ui->resourcesTreeView->setColumnHidden(Qn::CustomColumn, !customColumnVisible);
+    if (customColumnVisible)
+        ui->resourcesTreeView->header()->setSectionResizeMode(Qn::CustomColumn, QHeaderView::ResizeToContents);
+
+    ui->resourcesTreeView->header()->setSectionResizeMode(Qn::NameColumn,   QHeaderView::Stretch);
 }
 
 void QnResourceTreeWidget::updateFilter() {
