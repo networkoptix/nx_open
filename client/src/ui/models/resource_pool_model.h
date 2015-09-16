@@ -22,6 +22,18 @@ class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 class QnResourcePoolModelNode;
 
+class QnResourcePoolModelCustomColumnDelegate: public QObject {
+    Q_OBJECT
+public:
+    //TODO: #GDM think about model-changed notifications
+    QnResourcePoolModelCustomColumnDelegate(QObject* parent = nullptr);
+    virtual ~QnResourcePoolModelCustomColumnDelegate();
+
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const = 0;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const = 0;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) = 0;
+};
+
 class QnResourcePoolModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware {
     Q_OBJECT
 
@@ -59,6 +71,9 @@ public:
 
     bool isUrlsShown();
     void setUrlsShown(bool urlsShown);
+
+    QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
+    void setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate);
 private:
     QnResourcePoolModelNode *node(const QnResourcePtr &resource);
     QnResourcePoolModelNode *node(const QnUuid &uuid);
@@ -139,6 +154,9 @@ private:
 
     /** Full list of all created nodes. */
     QList<QnResourcePoolModelNode *> m_allNodes;
+
+    /** Delegate for custom column data. */
+    QPointer<QnResourcePoolModelCustomColumnDelegate> m_customColumnDelegate;
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;
