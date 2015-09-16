@@ -76,12 +76,11 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
 
 void PredefinedUsageCalculator::updateTree()
 {
-    auto newTree = loadXml(m_predefinedDataFilePath);
-    if( !newTree )
-        return;
-
-    QnMutexLocker lk(&m_treeMutex);
-    m_currentTree = std::move(newTree);
+    if (auto newTree = loadXml(m_predefinedDataFilePath))
+    {
+        QnMutexLocker lk(&m_treeMutex);
+        m_currentTree = std::move(newTree);
+    }
 }
 
 std::unique_ptr<stree::AbstractNode> PredefinedUsageCalculator::loadXml(
