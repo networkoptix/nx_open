@@ -10,9 +10,9 @@
 # Description:       Provides the ability to boot up automatically depending on available 
 #                    boot devices and ability to override boot using the boot menu.
 ### END INIT INFO
-# VERSION: ${release.version}.${buildNumber}
+# VERSION: 2.4.1.9730
 
-export CUSTOMIZATION=${deb.customization.company.name}
+export CUSTOMIZATION=networkoptix
 /etc/init.d/cron stop
 /etc/init.d/$CUSTOMIZATION-mediaserver stop
 export CHECKBOOTHDDPART=
@@ -81,7 +81,7 @@ get_serial_number() {
     mount -t vfat $BOOTPART $MNTBOOTPART
     ln -s $MNTBOOTPART/backup/bootloader /tmp/fw_printenv
     rm /tmp/serial
-    echo $(/tmp/fw_printenv serial) > /tmp/serial
+    echo $(/tmp/fw_printenv serial | sed 's/serial=//') > /tmp/serial
     rm /tmp/fw_printenv
     umount $BOOTPART
     rm -Rf $MNTBOOTPART
