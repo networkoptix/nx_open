@@ -81,7 +81,7 @@ get_serial_number() {
     mount -t vfat $BOOTPART $MNTBOOTPART
     ln -s $MNTBOOTPART/backup/bootloader /tmp/fw_printenv
     rm /tmp/serial
-    echo $(/tmp/fw_printenv serial) > /tmp/serial
+    echo $(/tmp/fw_printenv serial | sed 's/serial=//') > /tmp/serial
     rm /tmp/fw_printenv
     umount $BOOTPART
     rm -Rf $MNTBOOTPART
