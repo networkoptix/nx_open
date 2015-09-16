@@ -8,7 +8,6 @@
 #include <utils/common/util.h>
 #include "nx_ec/data/api_runtime_data.h"
 #include "utils/network/simple_http_client.h"
-#include "utils/network/nettools.h"
 #include "common/common_module.h"
 #include "licensing/license.h"
 #include "api/runtime_info_manager.h"
@@ -21,23 +20,9 @@
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
-namespace
-{
-    QString readFile(const QString& file)
-    {
-        QString result;
-
-        QFile f(file);
-        if (!f.open(QFile::ReadOnly | QFile::Text))
-            return result;
-
-        QTextStream in(&f);
-        result = in.readAll();
-        f.close();
-
-        return result.trimmed();
-    }
-}
+#ifdef Q_OS_LINUX
+#include "nx1/info.h"
+#endif
 
 CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey, bool infoMode, QByteArray& response)
 {
@@ -53,9 +38,9 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     params.addQueryItem(QLatin1String("version"), QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
 
 #ifdef Q_OS_LINUX
-    if( QnAppInfo::armBox() == "nx1" ) {
-        QString mac = getMacFromPrimaryIF();
-        QString serial = readFile(lit("/tmp/serial"));
+    if( QnAppInfo::armBox() == "nx1" || QnAppInfo::armBox() == "bpi") {
+        QString mac = Nx1::getMac(); 
+        QString serial = Nx1::getSerial();
 
         if (!mac.isEmpty())
             params.addQueryItem(QLatin1String("mac"), mac);
