@@ -260,7 +260,11 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
 
     QnSoftwareVersion currentRelease = qnCommon->engineVersion();
     currentRelease = QnSoftwareVersion(currentRelease.major(), currentRelease.minor(), currentRelease.bugfix());
-    if (m_target.version < currentRelease) {
+    /* Server downgrade should be allowed to another builds of the same release only.
+       E.g. 2.3.1.9300 -> 2.3.1.9200 is ok, but 2.3.1.9300 -> 2.3.0.9000 is not.
+       Client could be downgraded with no limits.
+     */
+    if (!m_target.targets.isEmpty() && m_target.version < currentRelease) {
         finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
         return;
     }

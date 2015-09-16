@@ -581,6 +581,8 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::MainWindow_Tree_Local_Help;
         } else if(m_flags & Qn::server) {
             return Qn::MainWindow_Tree_Servers_Help;
+        } else if(m_flags & Qn::io_module) {
+            return Qn::IOModules_Help;
         } else if(m_flags & Qn::live_cam) {
             return Qn::MainWindow_Tree_Camera_Help;
         } else if(m_flags & Qn::videowall) {

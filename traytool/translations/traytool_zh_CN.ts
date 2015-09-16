@@ -20,11 +20,11 @@
     <name>QnElevationChecker</name>
     <message>
         <source>Insufficient rights to manage services.</source>
-        <translation type="unfinished">未获得管理服务权限</translation>
+        <translation>未获得管理服务权限</translation>
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished">非管理员用户必须通过账户控制来获取权限</translation>
+        <translation>非管理员用户必须通过账户控制来获取权限</translation>
     </message>
 </context>
 <context>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished">指定的数据库不存在.</translation>
+        <translation>指定的数据库不存在.</translation>
     </message>
     <message>
         <source>Specified parameter is invalid.</source>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>Media server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务器将停止，是否继续？</translation>
     </message>
 </context>
 </TS>

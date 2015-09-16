@@ -146,7 +146,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
                     break;
                 }
             }
-            if (t.elapsed() >= AUTH_TIMEOUT)
+            if (t.elapsed() >= AUTH_TIMEOUT || !d->socket->isConnected())
                 return false; // close connection
         }
         if (usedMethod != AuthMethod::noAuth)

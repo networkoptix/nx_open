@@ -78,71 +78,71 @@
     <name>AuditLogDialog</name>
     <message>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>С</translation>
     </message>
     <message>
         <source>till</source>
-        <translation type="unfinished"></translation>
+        <translation>по</translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished">Обновить</translation>
+        <translation>Обновить</translation>
     </message>
     <message>
         <source>User actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Действия пользователя</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр архива</translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт видео</translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр живого видео</translation>
     </message>
     <message>
         <source>Login/logout</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход/выход из системы</translation>
     </message>
     <message>
         <source>Event rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Связь с событием</translation>
     </message>
     <message>
         <source>Server actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Действия сервера</translation>
     </message>
     <message>
         <source>E-mail settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки e-mail</translation>
     </message>
     <message>
         <source>System actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Системные действия</translation>
     </message>
     <message>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать всё</translation>
     </message>
     <message>
         <source>Sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>Сессии</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Детали</translation>
+        <translation>Детали</translation>
     </message>
     <message>
         <source>All Servers are offline.  Audit data are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Все сервера отключены. Данные аудита недоступны.</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Аудит</translation>
     </message>
 </context>
 <context>
@@ -260,35 +260,35 @@
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation type="unfinished">Выбранный сервер:</translation>
+        <translation>Выбранный сервер:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished">&amp;Сканировать Сеть</translation>
+        <translation>&amp;Сканировать Сеть</translation>
     </message>
     <message>
         <source>Brand</source>
-        <translation type="unfinished"></translation>
+        <translation>Брэнд</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation type="unfinished">Модель</translation>
+        <translation>Модель</translation>
     </message>
     <message>
         <source>New Scan...</source>
-        <translation type="unfinished">Новый поиск...</translation>
+        <translation>Новый поиск...</translation>
     </message>
     <message>
         <source>Add device(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить устройства...</translation>
     </message>
     <message>
         <source>Device Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес устройства:</translation>
     </message>
     <message>
         <source>Discovered Devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>Найденные устройства:</translation>
     </message>
 </context>
 <context>
@@ -307,11 +307,11 @@
     </message>
     <message>
         <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
-        <translation type="unfinished"></translation>
+        <translation>Расширенные настройки недоступны для данной камеры. Перейдите в web-интерфейс камерыЮ чтобы получить больше настроек.</translation>
     </message>
     <message>
         <source>Note: Any changes made will be applied instantly!</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание: Все изменения будут мгновенно сохранены!</translation>
     </message>
 </context>
 <context>
@@ -405,19 +405,19 @@
     </message>
     <message>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Это сделает настройки Качество и Частота кадров (FPS) неактуальными.</translation>
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished">Не перезаписывать</translation>
+        <translation>Не перезаписывать</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Выбор Высокого качества можетотразиться на загрузке ЦП и сети, что может привести к дополнительным проблемам.</translation>
     </message>
     <message>
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Не изменяйте эти настройки, если вы не уверены, что это не отразится на производительности вашей системы.</translation>
     </message>
 </context>
 <context>
@@ -520,31 +520,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Расписание записи</translation>
     </message>
     <message>
         <source>Show Quality on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать качество в расписании</translation>
     </message>
     <message>
         <source>Show FPS on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать FPS в расписании</translation>
     </message>
     <message>
         <source>Motion + Low-Res </source>
-        <translation type="unfinished"></translation>
+        <translation>Движение + Низкое разрешение</translation>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation type="unfinished">Не писать</translation>
+        <translation>Не писать</translation>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished">Мин. дней:</translation>
+        <translation>Мин. дней</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished">Макс. дней:</translation>
+        <translation>Макс. дней</translation>
     </message>
 </context>
 <context>
@@ -600,31 +600,31 @@ Short for &quot;seconds&quot;</extracomment>
     <name>CustomHorizontalHeader</name>
     <message>
         <source>5 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>5 минут</translation>
     </message>
     <message>
         <source>Hour</source>
-        <translation type="unfinished"></translation>
+        <translation>Час</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>День</translation>
     </message>
     <message>
         <source>Week</source>
-        <translation type="unfinished"></translation>
+        <translation>Неделя</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>Месяц</translation>
     </message>
     <message>
         <source>All data</source>
-        <translation type="unfinished"></translation>
+        <translation>Все данные</translation>
     </message>
     <message>
         <source>Bitrate for the last recorded:</source>
-        <translation type="unfinished"></translation>
+        <translation>Битрейт последней записи:</translation>
     </message>
 </context>
 <context>
@@ -658,11 +658,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Event Log</source>
-        <translation type="unfinished">Журнал событий</translation>
+        <translation>Журнал событий</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation type="unfinished">Очистить фильтр</translation>
+        <translation>Очистить фильтр</translation>
     </message>
 </context>
 <context>
@@ -673,19 +673,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ceiling Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Потолочное крепление</translation>
     </message>
     <message>
         <source>Wall Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Настенное крепление</translation>
     </message>
     <message>
         <source>Floor/Table Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Напольное/настольное крепление</translation>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished">Коррекция угла обзора:</translation>
+        <translation>Коррекция угла обзора</translation>
     </message>
 </context>
 <context>
@@ -724,31 +724,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished">Микшировать звук 5.1 в 2.1:</translation>
+        <translation>Микшировать звук 5.1 в 2.1</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation type="unfinished">Приостанавливать воспроизведение:</translation>
+        <translation>Приостанавливать воспроизведение</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished">минут простоя</translation>
+        <translation>минут простоя</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished">Запустить приложение при загрузке ПК:</translation>
+        <translation>Запустить приложение при загрузке ПК:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation type="unfinished">Двояная буферизация:</translation>
+        <translation>Двойная буферизация:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation type="unfinished">Просмотр журнала событий</translation>
+        <translation>Просмотр журнала событий</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation type="unfinished">Очистить локальный кэш</translation>
+        <translation>Очистить локальный кэш</translation>
     </message>
 </context>
 <context>
@@ -787,19 +787,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open audit trail log</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть журнал аудита</translation>
     </message>
     <message>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Отслеживать все сервера в одной раскладке</translation>
     </message>
     <message>
         <source>System Backup and Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>Восстановление системы и резервирование</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Аудит</translation>
     </message>
 </context>
 <context>
@@ -814,66 +814,66 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation type="unfinished">Пролистать сюда</translation>
+        <translation>Пролистать сюда</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation type="unfinished">Левая граница</translation>
+        <translation>Левая граница</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation type="unfinished">Правая граница</translation>
+        <translation>Правая граница</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation type="unfinished">На страницу влево</translation>
+        <translation>На страницу влево</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation type="unfinished">На страницу вверх</translation>
+        <translation>На страницу вверх</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation type="unfinished">На страницу вправо</translation>
+        <translation>На страницу вправо</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation type="unfinished">На страницу вниз</translation>
+        <translation>На страницу вниз</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation type="unfinished">Листать влево</translation>
+        <translation>Листать влево</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation type="unfinished">Листать вверх</translation>
+        <translation>Листать вверх</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation type="unfinished">Листать вправо</translation>
+        <translation>Листать вправо</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation type="unfinished">Листать вниз</translation>
+        <translation>Листать вниз</translation>
     </message>
 </context>
 <context>
     <name>ImageControlWidget</name>
     <message>
         <source>Image Control</source>
-        <translation type="unfinished">Управление изображением</translation>
+        <translation>Управление изображением</translation>
     </message>
     <message>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished">Принудительно выставить:</translation>
+        <translation>Принудительно выставить:</translation>
     </message>
     <message>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Поворот по-умолчанию:</translation>
     </message>
     <message>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished">Это камера с объективом &quot;рыбий глаз&quot; (fish-eye)</translation>
+        <translation>Это камера с объективом &quot;рыбий глаз&quot; (fish-eye)</translation>
     </message>
 </context>
 <context>
@@ -888,7 +888,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished">Загрузка изображения... Пожалуйста, подождите.</translation>
+        <translation>Загрузка изображения... Пожалуйста, подождите.</translation>
     </message>
 </context>
 <context>
@@ -943,77 +943,77 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation type="unfinished">Запретить изменение раскладки</translation>
+        <translation>Изменение раскладки запрещено</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished">Обработка изображения... Пожалуйста, подождите.</translation>
+        <translation>Обработка изображения... Пожалуйста, подождите.</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished">Сохранять соотношение сторон</translation>
+        <translation>Сохранять соотношение сторон</translation>
     </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
     <message>
         <source>Server UR&amp;L:</source>
-        <translation type="unfinished"></translation>
+        <translation>UR&amp;L сервера:</translation>
     </message>
     <message>
         <source>ldap(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation>ldap(s)://host:port</translation>
     </message>
     <message>
         <source>Ad&amp;min DN:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ad&amp;min DN:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Пароль:</translation>
+        <translation>&amp;Пароль:</translation>
     </message>
     <message>
         <source>Search Base:</source>
-        <translation type="unfinished"></translation>
+        <translation>Поисковая основа:</translation>
     </message>
     <message>
         <source>Search Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Поисковый фильтр:</translation>
     </message>
     <message>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>Не обязательно</translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished">проверка...</translation>
+        <translation>Проверка...</translation>
     </message>
     <message>
         <source>LDAP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки LDAP</translation>
     </message>
 </context>
 <context>
     <name>LdapUsersDialog</name>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить пользователей LDAP...</translation>
     </message>
     <message>
         <source>Select users to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите пользователей для импорта</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation type="unfinished">Фильтр...</translation>
+        <translation>Фильтр...</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Загрузка...</translation>
+        <translation>Загрузка...</translation>
     </message>
     <message>
         <source>Connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка подключения</translation>
     </message>
 </context>
 <context>
@@ -1044,7 +1044,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Данный тип лицензии требует более высокой версии приложения.</translation>
     </message>
 </context>
 <context>
@@ -1121,22 +1121,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation type="unfinished">Неверный лицензионный ключ</translation>
+        <translation>Неверный лицензионный ключ</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation type="unfinished">Выбрать файл лицензии...</translation>
+        <translation>Выбрать файл лицензии...</translation>
     </message>
 </context>
 <context>
     <name>LicensesProposeWidget</name>
     <message>
         <source>Licensing</source>
-        <translation type="unfinished">Лицензирование</translation>
+        <translation>Лицензирование</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation type="unfinished">Добавить лицензии...</translation>
+        <translation>Добавить лицензии...</translation>
     </message>
 </context>
 <context>
@@ -1180,7 +1180,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished">П&amp;араметры подключения:</translation>
+        <translation>П&amp;араметры подключения:</translation>
     </message>
 </context>
 <context>
@@ -1263,7 +1263,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation type="unfinished">Режим шкалы времени:</translation>
+        <translation>Режим шкалы времени:</translation>
     </message>
 </context>
 <context>
@@ -1294,7 +1294,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished">Включить звук</translation>
+        <translation>Включить звук</translation>
     </message>
 </context>
 <context>
@@ -1320,7 +1320,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation type="unfinished">Только Администраторам</translation>
+        <translation>Только Администраторам</translation>
     </message>
 </context>
 <context>
@@ -1385,7 +1385,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation type="unfinished">Маршрут обхода не выбран</translation>
+        <translation>Маршрут обхода не выбран</translation>
     </message>
 </context>
 <context>
@@ -1427,7 +1427,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Position</source>
-        <translation type="unfinished">Запомнить позицию</translation>
+        <translation>Запомнить позицию</translation>
     </message>
 </context>
 <context>
@@ -2243,7 +2243,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Clear Motion Selection</source>
-        <translation>Очистить регион поиска движения</translation>
+        <translation>Очистить область поиска движения</translation>
     </message>
     <message>
         <source>Toggle Smart Search</source>
@@ -2583,55 +2583,55 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation type="unfinished">Положить ресурсы на новую раскладку</translation>
+        <translation>Поместить ресурсы на новую раскладку</translation>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation type="unfinished">Выбрать сервер времени</translation>
+        <translation>Выбрать сервер времени</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation type="unfinished">Активировать объект PTZ</translation>
+        <translation>Активировать объект PTZ</translation>
     </message>
     <message>
         <source>User Management...</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление пользователями...</translation>
     </message>
     <message>
         <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
+        <translation>Аудит...</translation>
     </message>
     <message>
         <source>Move %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Переместить</translation>
     </message>
     <message>
         <source>Check %1 Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверить проблемы: %1...</translation>
     </message>
     <message>
         <source>%1 List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Список устройств...</translation>
     </message>
     <message>
         <source>%1 Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Правила: %1...</translation>
     </message>
     <message>
         <source>%1 Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки: %1...</translation>
     </message>
     <message>
         <source>Open in %1 Settings Dialog...</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в окне настроек...</translation>
     </message>
     <message>
         <source>Add Device(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить устройства...</translation>
     </message>
     <message>
         <source>%1 List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Список устройств по серверам...</translation>
     </message>
 </context>
 <context>
@@ -2679,218 +2679,218 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnAuditLogDialog</name>
     <message>
         <source>Play this</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизвести</translation>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Скопировать выделение в буфер обмена</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выделения в файл...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать всё</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Поиск</translation>
+        <translation>Поиск</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация</translation>
     </message>
     <message>
         <source>No archive data for that position left</source>
-        <translation type="unfinished"></translation>
+        <translation>В архиве нет данных для этой позиции</translation>
     </message>
     <message>
         <source>This resources already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation>РЕсурсы уже удалены из системы</translation>
     </message>
     <message>
         <source>Export selected records to a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Выгрузить выбранные записи в файл</translation>
     </message>
     <message>
         <source>Audit log replay</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизвести журнал аудита</translation>
     </message>
     <message>
         <source>%1 actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Действия %1</translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
     <message>
         <source>%1d </source>
-        <translation type="unfinished"></translation>
+        <translation>%1д </translation>
     </message>
     <message>
         <source>%1h </source>
-        <translation type="unfinished"></translation>
+        <translation>%1ч </translation>
     </message>
     <message>
         <source>%1m </source>
-        <translation type="unfinished"></translation>
+        <translation>%1м </translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">неизвестно</translation>
+        <translation>Неизвестно</translation>
     </message>
     <message>
         <source>Unsuccessful login</source>
-        <translation type="unfinished"></translation>
+        <translation>Неудачная попытка авторизации</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">Логин</translation>
+        <translation>Логин</translation>
     </message>
     <message>
         <source>User updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователь обновлен</translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр живого видео</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр архива</translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт видео</translation>
     </message>
     <message>
         <source>System name changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменено имя системы</translation>
     </message>
     <message>
         <source>System merge</source>
-        <translation type="unfinished"></translation>
+        <translation>Объединение систем</translation>
     </message>
     <message>
         <source>General settings updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменение общих настроек</translation>
     </message>
     <message>
         <source>Server updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер обновлён</translation>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновлены правила поведения</translation>
     </message>
     <message>
         <source>Server removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер удалён</translation>
     </message>
     <message>
         <source>Business rule removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Правило поведения удалено</translation>
     </message>
     <message>
         <source>User removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователь удалён</translation>
     </message>
     <message>
         <source>Business rule reseted</source>
-        <translation type="unfinished"></translation>
+        <translation>Правило поведения сброшено</translation>
     </message>
     <message>
         <source>Database restored</source>
-        <translation type="unfinished"></translation>
+        <translation>Восстановлена база данных</translation>
     </message>
     <message>
         <source>Play this</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизвести</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">Настройки</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>%1 - %2, </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2, </translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n действие</numerusform>
+            <numerusform>%n действия</numerusform>
+            <numerusform>%n действий</numerusform>
         </translation>
     </message>
     <message>
         <source>Session begins</source>
-        <translation type="unfinished"></translation>
+        <translation>Начата сессия</translation>
     </message>
     <message>
         <source>Session ends</source>
-        <translation type="unfinished"></translation>
+        <translation>Сессия завершена</translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>Длительность</translation>
     </message>
     <message>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователь</translation>
     </message>
     <message>
         <source>IP</source>
-        <translation type="unfinished"></translation>
+        <translation>IP</translation>
     </message>
     <message>
         <source>Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Активность</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Дата</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Время</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished">Описание</translation>
+        <translation>Описание</translation>
     </message>
     <message>
         <source>View it</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотреть</translation>
     </message>
     <message>
         <source>Click to expand</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите, чтобы раскрыть</translation>
     </message>
     <message>
         <source>Red mark means that an archive is still available</source>
-        <translation type="unfinished"></translation>
+        <translation>Красная метка означает, что архив всё ещё доступен</translation>
     </message>
     <message>
         <source>E-mail settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки e-mail изменены</translation>
     </message>
     <message>
         <source>%1 updated</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 обновлен</translation>
     </message>
     <message>
         <source>%1 added</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 добавлен</translation>
     </message>
     <message>
         <source>%1 removed</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 удалён</translation>
     </message>
     <message>
         <source>%1 name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя %1</translation>
     </message>
 </context>
 <context>
@@ -2905,7 +2905,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation type="unfinished">Есть новые оповещения</translation>
+        <translation>Есть новые оповещения.</translation>
     </message>
 </context>
 <context>
@@ -2924,34 +2924,34 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation type="unfinished">Установить выбранную сборку</translation>
+        <translation>Установить выбранную сборку.</translation>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation type="unfinished">Номер сборки:</translation>
+        <translation>Номер сборки:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation type="unfinished">Введён неправильный пароль</translation>
+        <translation>Введён неправильный пароль.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
         <source>%n of %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %1</numerusform>
+            <numerusform>%n %1</numerusform>
+            <numerusform>%n %1</numerusform>
         </translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любой %1&gt;</translation>
     </message>
     <message>
         <source>Select at least one %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите хотя бы один %1.</translation>
     </message>
 </context>
 <context>
@@ -3041,27 +3041,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Administrators Only</source>
-        <translation type="unfinished">Только администраторам</translation>
+        <translation>Только администраторам</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished">Для всех</translation>
+        <translation>Для всех</translation>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation type="unfinished">Выберите звук</translation>
+        <translation>Выберите звук</translation>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation type="unfinished">Введите текст</translation>
+        <translation>Введите текст</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любой %1&gt;</translation>
     </message>
     <message>
         <source>Select at least one %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите хотя бы один %1.</translation>
     </message>
 </context>
 <context>
@@ -3076,11 +3076,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любой %1&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Выберите хотя бы один %1&gt;</translation>
     </message>
 </context>
 <context>
@@ -3139,23 +3139,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation type="unfinished">Подтверждение сброса</translation>
+        <translation>Подтверждение сброса</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation type="unfinished">Ошибка при удалении правила</translation>
+        <translation>Ошибка при удалении правила.</translation>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation type="unfinished">Подтвердите сохранение</translation>
+        <translation>Подтвердите сохранение</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished">Закрыть окно</translation>
+        <translation>Закрыть окно</translation>
     </message>
     <message>
         <source>filter by %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>фильтр по %1...</translation>
     </message>
 </context>
 <context>
@@ -3245,87 +3245,87 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation type="unfinished">Выбранный диапазон содержит более 255 адресов.</translation>
+        <translation>Выбранный диапазон содержит более 255 адресов.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished">Поиск заканчивается...</translation>
+        <translation>Поиск заканчивается...</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation type="unfinished">Сервер вышел из сети, поиск прекращен.</translation>
+        <translation>Сервер вышел из сети, поиск прекращен.</translation>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished">Сервер был удален, поиск прекращен.</translation>
+        <translation>Сервер был удален, поиск прекращен.</translation>
     </message>
     <message>
         <source>Device addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавление камеры возможно только для включенных серверов.</translation>
     </message>
     <message>
         <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation>Поле адрес устройства должно содержать URL, IP адрес или RTSP-ссылку.</translation>
     </message>
     <message>
         <source>No devices selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройства не выбраны.</translation>
     </message>
     <message>
         <source>Please select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите хотя бы одно устройство</translation>
     </message>
     <message numerus="yes">
         <source>%n devices added successfully.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n устройство успешно добавлено.</numerusform>
+            <numerusform>%n устройства успешно добавлено.</numerusform>
+            <numerusform>%n устройств успешно добавлено.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ошибка при добавлении %n устройства.</numerusform>
+            <numerusform>Ошибка при добавлении %n устройств.</numerusform>
+            <numerusform>Ошибка при добавлении %n устройств.</numerusform>
         </translation>
     </message>
     <message>
         <source>Server is offline, devices can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер отключен. Устройства можно добавлять только на включённый сервер.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер удалён. Невозможно добавить устройства.</translation>
     </message>
     <message>
         <source>Error while searching for device(s).</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при поиске устройств.</translation>
     </message>
     <message numerus="yes">
         <source>%n devices found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Найдено %n устройство</numerusform>
+            <numerusform>Найдено %n устройства</numerusform>
+            <numerusform>Найдено %n устройств</numerusform>
         </translation>
     </message>
     <message>
         <source>All devices are already in the resource tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Все устройства уже находятся в списке ресурсов</translation>
     </message>
     <message>
         <source>No devices found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройства не найдены.</translation>
     </message>
     <message>
         <source>Add devices to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить устройства к %1</translation>
     </message>
     <message>
         <source>Add devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить устройства...</translation>
     </message>
 </context>
 <context>
@@ -3350,15 +3350,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation type="unfinished">Применение настроек...</translation>
+        <translation>Применение настроек...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервис выбранной камеры недоступен. Попробуйте снова.</translation>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation type="unfinished">Невозможно сохранить настройки</translation>
+        <translation>Невозможно сохранить настройки.</translation>
     </message>
 </context>
 <context>
@@ -3401,11 +3401,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation type="unfinished">Не блокировать архив</translation>
+        <translation>Не блокировать архив.</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation type="unfinished">Список тегов, разделённый запятыми или пробелами</translation>
+        <translation>Список тегов, разделённый запятыми или пробелами.</translation>
     </message>
 </context>
 <context>
@@ -3424,33 +3424,33 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished">Проверка доступности сервера</translation>
+        <translation>Проверка доступности сервера.</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished">Проверка корректности медиапотока</translation>
+        <translation>Проверка корректности медиапотока.</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика завершена!</translation>
     </message>
     <message>
         <source>Diagnostics for %1 %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика: %1 %2.</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика: %1</translation>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Доступность %1 подтверждена.</translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 передаёт медиа поток.</translation>
     </message>
 </context>
 <context>
@@ -3487,15 +3487,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 List for &apos;%2&apos; - %3 found</source>
-        <translation type="unfinished"></translation>
+        <translation>Список %1 для &apos;%2&apos; - найдено %3</translation>
     </message>
     <message>
         <source>%1 List - %2 found</source>
-        <translation type="unfinished"></translation>
+        <translation>Список %1 - найдено %2</translation>
     </message>
     <message>
         <source>Export selected %1 to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспортировать выбранные %1 в файл.</translation>
     </message>
 </context>
 <context>
@@ -3537,19 +3537,19 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraMotionMaskWidget</name>
     <message>
         <source>Too many motion windows</source>
-        <translation>Слишком много регионов детекции движения</translation>
+        <translation>Слишком много областей детекции движения</translation>
     </message>
     <message>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
-        <translation>Максимальное количество регионов детекции движения %1 , а выбрано %2.</translation>
+        <translation>Максимальное количество областей детекции движения %1, а выбрано %2.</translation>
     </message>
     <message>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
-        <translation>Максимальное количество степеней детекции движения %1 , а выбрано %2.</translation>
+        <translation>Максимальное количество степеней детекции движения %1, а выбрано %2.</translation>
     </message>
     <message>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
-        <translation>Максимальное количество регионов детекции движения %1 , а выбрано %2.</translation>
+        <translation>Максимальное количество областей детекции движения %1, а выбрано %2.</translation>
     </message>
 </context>
 <context>
@@ -3608,23 +3608,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Высокое минимальное значение может уменьшить длительность записи прочих %1.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по движению отключена или не поддерживается некоторыми из выбранных %1. Перейдите на страницу настроек детектора движения, чтобы убедиться, что он поддерживается и включён.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 не поддерживает двойной поток.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 не поддерживает двойной поток и запись по движению.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по движению отключена. Перейдите на страницу настройки движения, чтобы задать зону и чувствительность движения для %1.</translation>
     </message>
 </context>
 <context>
@@ -3639,47 +3639,47 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished">Настройки записи не были сохранены. Выберите желаемые Тип, Частоту кадров и Качество и отметьте изменения в расписании.</translation>
+        <translation>Настройки записи не были сохранены. Выберите желаемые Тип, Частоту кадров и Качество и отметьте изменения в расписании.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished">Изменения не сохранены</translation>
+        <translation>Изменения не сохранены.</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation type="unfinished">Чувствительность детектора движения не изменена. Чтобы изменить чувствительность детектора движения, выберите область на изображении.</translation>
+        <translation>Чувствительность детектора движения не изменена. Чтобы изменить чувствительность детектора движения, выберите область на изображении.</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished">Исчерпан лимит лицензий. Изменения будут сохранены, но не вступят в силу.</translation>
+        <translation>Исчерпан лимит лицензий. Изменения будут сохранены, но не вступят в силу.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation type="unfinished">Невозможно сохранить изменения</translation>
+        <translation>Невозможно сохранить изменения.</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки %1</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика %1</translation>
     </message>
     <message>
         <source>%1 Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Правила %1</translation>
     </message>
     <message>
         <source>%1 not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 не сохранена.</translation>
     </message>
     <message>
         <source>Save changes to the following %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить изменения для следующих %1?</translation>
     </message>
     <message>
         <source>Could not save the following %1 to Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно сохранить следующие %1 на сервере.</translation>
     </message>
 </context>
 <context>
@@ -3690,7 +3690,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No %1 selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 не выбрана.</translation>
     </message>
 </context>
 <context>
@@ -3711,22 +3711,22 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnClockLabel</name>
     <message>
         <source>Server Time</source>
-        <translation type="unfinished">Время сервера</translation>
+        <translation>Время сервера</translation>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation type="unfinished">Локальное время системы</translation>
+        <translation>Локальное время системы</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation type="unfinished">Настройка сервера(ов)</translation>
+        <translation>Настройка сервера(ов)</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation type="unfinished">Обновление сервера(ов)</translation>
+        <translation>Обновление сервера(ов)</translation>
     </message>
 </context>
 <context>
@@ -3833,19 +3833,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished">Введенные имя пользователя или пароль некорректны, пожалуйста, попробуйте снова.</translation>
+        <translation>Введенные имя пользователя или пароль некорректны, пожалуйста, попробуйте снова.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет соединения с сервером.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">Процесс Launcher не найден</translation>
+        <translation>Процесс Launcher не найден.</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Истекло время ожидания подключения к серверу LDAP.</translation>
     </message>
 </context>
 <context>
@@ -3856,11 +3856,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation type="unfinished">Истекло время ожидания ответа на запрос.</translation>
+        <translation>Истекло время ожидания ответа на запрос</translation>
     </message>
     <message>
         <source>Test Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка не удалась</translation>
     </message>
 </context>
 <context>
@@ -3875,7 +3875,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished">Введите имя пользователя и пароль...</translation>
+        <translation>Введите корректные имя пользователя и пароль...</translation>
     </message>
 </context>
 <context>
@@ -3946,15 +3946,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation type="unfinished">Не удалось сохранить копию базы данных сервера в &apos;%1&apos;</translation>
+        <translation>Не удалось сохранить копию базы данных сервера в %1</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите восстановить базу данных? Все существующие данные будут удалены.</translation>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished">Нужно подключиться к серверу, прежде чем делать резервную копию</translation>
+        <translation>Нужно подключиться к серверу, прежде чем делать резервную копию.</translation>
     </message>
 </context>
 <context>
@@ -3989,7 +3989,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation type="unfinished">Ширина экрана должна быть кратна 8.</translation>
+        <translation>Ширина экрана должна быть кратна 8.</translation>
     </message>
 </context>
 <context>
@@ -4083,11 +4083,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Any Action</source>
-        <translation type="unfinished">Любое действие</translation>
+        <translation>Любое действие</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любой %1&gt;</translation>
     </message>
 </context>
 <context>
@@ -4130,7 +4130,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished">Всем пользователям</translation>
+        <translation>Всем пользователям</translation>
     </message>
 </context>
 <context>
@@ -4141,15 +4141,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Schedule motion type is not supported by some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип движения в расписании не поддерживается некоторыми %1.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно включить запись для некоторых %1.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки расписания несовместимы с некоторыми %1.</translation>
     </message>
 </context>
 <context>
@@ -4195,11 +4195,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished">Папка уже добавлена</translation>
+        <translation>Папка уже добавлена.</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished">Эта папка уже была добавлена.</translation>
+        <translation>Эта папка уже была добавлена.</translation>
     </message>
 </context>
 <context>
@@ -4214,11 +4214,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open %1 List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Открыть список: %1</translation>
     </message>
     <message>
         <source>%1 List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Список: %1</translation>
     </message>
 </context>
 <context>
@@ -4296,127 +4296,127 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnIOPortItemDelegate</name>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключено</translation>
     </message>
     <message>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход</translation>
     </message>
     <message>
         <source>Open circuit</source>
-        <translation type="unfinished"></translation>
+        <translation>Разомкнутая цепь</translation>
     </message>
     <message>
         <source>Grounded circuit</source>
-        <translation type="unfinished"></translation>
+        <translation>Заземлённая цепь</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortsViewModel</name>
     <message>
         <source>#</source>
-        <translation type="unfinished">#</translation>
+        <translation>#</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished">Тип</translation>
+        <translation>Тип</translation>
     </message>
     <message>
         <source>Default state</source>
-        <translation type="unfinished"></translation>
+        <translation>Состояние по-умолчанию</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <source>Pulse time(ms)</source>
-        <translation type="unfinished"></translation>
+        <translation>Время импульса (мс)</translation>
     </message>
     <message>
         <source>Unknown</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished">неизвестно</translation>
+        <translation>Неизвестно</translation>
     </message>
     <message>
         <source>Disabled</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>Отключено</translation>
     </message>
     <message>
         <source>Input</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>Вход</translation>
     </message>
     <message>
         <source>Output</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>Выход</translation>
     </message>
     <message>
         <source>Invalid</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>Некорректный</translation>
     </message>
     <message>
         <source>Open Circuit</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>Разомкнутая цепь</translation>
     </message>
     <message>
         <source>Grounded circuit</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>Заземлённая цепь</translation>
     </message>
     <message>
         <source>Invalid state</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>Некорректное состояние</translation>
     </message>
 </context>
 <context>
     <name>QnImageControlWidget</name>
     <message>
         <source>4:3</source>
-        <translation type="unfinished">4:3</translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation type="unfinished">16:9</translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <source>1:1</source>
-        <translation type="unfinished">1:1</translation>
+        <translation>1:1</translation>
     </message>
     <message>
         <source>%1 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 градусов</translation>
     </message>
 </context>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
         <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозвоможно активировать порт &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозвоможно деактивировать порт &apos;%1&apos;</translation>
     </message>
     <message>
         <source>IO port error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка порта ввода/вывода</translation>
     </message>
 </context>
 <context>
@@ -4431,11 +4431,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not create output file %1.</source>
-        <translation type="unfinished">Невозможно создать файл %1.</translation>
+        <translation>Невозможно создать файл %1.</translation>
     </message>
     <message>
         <source>Could not export %1 %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно экспортировать %1 %2.</translation>
     </message>
 </context>
 <context>
@@ -4477,18 +4477,18 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapSettingsDialog</name>
     <message>
         <source>Test</source>
-        <translation type="unfinished">Проверка</translation>
+        <translation>Проверка</translation>
     </message>
     <message>
         <source>Test failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка не удалась</translation>
     </message>
     <message numerus="yes">
         <source>Test completed successfully: %n users found.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Проверка завершилась успешно: найден %n пользователь.</numerusform>
+            <numerusform>Проверка завершилась успешно: найдены %n пользователя.</numerusform>
+            <numerusform>Проверка завершилась успешно: найдено %n пользователей.</numerusform>
         </translation>
     </message>
 </context>
@@ -4496,73 +4496,73 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Указанные настройки не верны.</translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно выполнить проверку.</translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>НИ один из серверов не подключен к интернету.</translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation type="unfinished">Время ожидания истекло</translation>
+        <translation>Время ожидания истекло</translation>
     </message>
 </context>
 <context>
     <name>QnLdapUserListModel</name>
     <message>
         <source>Login</source>
-        <translation type="unfinished">Логин</translation>
+        <translation>Логин</translation>
     </message>
     <message>
         <source>Full Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Полное имя</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation type="unfinished">Почта</translation>
+        <translation>Почта</translation>
     </message>
     <message>
         <source>DN</source>
-        <translation type="unfinished"></translation>
+        <translation>DN</translation>
     </message>
 </context>
 <context>
     <name>QnLdapUsersDialog</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Указанные настройки не верны.</translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно выполнить проверку.</translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>НИ один из серверов не подключен к интернету.</translation>
     </message>
     <message>
         <source>Could not load users.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно загрузить пользователей.</translation>
     </message>
     <message>
         <source>Import users</source>
-        <translation type="unfinished"></translation>
+        <translation>Импортировать пользователей</translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation type="unfinished">Время ожидания истекло</translation>
+        <translation>Время ожидания истекло</translation>
     </message>
     <message>
         <source>Error while loading users.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при загрузке пользователей.</translation>
     </message>
     <message>
         <source>No new users found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Новые пользователи не найдены.</translation>
     </message>
 </context>
 <context>
@@ -4731,35 +4731,35 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation type="unfinished">Получение лицензий с сервера...</translation>
+        <translation>Получение лицензий с сервера...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензия уже активирована.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation type="unfinished">При активации лицензии произошла сетевая ошибка.</translation>
+        <translation>При активации лицензии произошла сетевая ошибка.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished">Невозможно активировать лицензию:  %1</translation>
+        <translation>Невозможно активировать лицензию:  %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished">Невозможно удалить лицензию с сервера:  %1</translation>
+        <translation>Невозможно удалить лицензию с сервера:  %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">Этот лицензионный ключ уже был активирован на аппаратный ID %1. Свяжитесь со службой поддержки для получения лицензии.</translation>
+        <translation>Этот лицензионный ключ уже был активирован на аппаратный ID %1. Свяжитесь со службой поддержки для получения лицензии.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation type="unfinished">При автоматической активации лицензии произошла сетевая ошибка. Свяжитесь со службой поддержки для активации вручную.</translation>
+        <translation>При автоматической активации лицензии произошла сетевая ошибка. Свяжитесь со службой поддержки для активации вручную.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation type="unfinished">Выбранный файл ключа ручной активации некорректен. Выберите правильный файл или обратитесь в службу поддержки.</translation>
+        <translation>Выбранный файл ключа ручной активации некорректен. Выберите правильный файл или обратитесь в службу поддержки.</translation>
     </message>
 </context>
 <context>
@@ -4824,15 +4824,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
         <source>Use analog licenses to view these %n cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Использовать аналоговую лицензию для просмотра %n камеры</numerusform>
+            <numerusform>Использовать аналоговые лицензии для просмотра этих %n камер</numerusform>
+            <numerusform>Использовать аналоговые лицензии для просмотра этих %n камер</numerusform>
         </translation>
     </message>
     <message>
         <source>Use licenses for selected %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать лицензии для выбранных %1</translation>
     </message>
 </context>
 <context>
@@ -4891,19 +4891,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation type="unfinished">Неверные параметры</translation>
+        <translation>Неверные параметры</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation type="unfinished">Соединение уже существует</translation>
+        <translation>Соединение уже существует.</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished">Соединение с таким именем уже существует. Перезаписать?</translation>
+        <translation>Соединение с таким именем уже существует. Перезаписать?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation type="unfinished">Удалить соединени(я)</translation>
+        <translation>Удалить соединения</translation>
     </message>
 </context>
 <context>
@@ -4966,7 +4966,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished">Выбрать файл...</translation>
+        <translation>Выбрать файл...</translation>
     </message>
 </context>
 <context>
@@ -5024,15 +5024,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Модуль ввода/вывода</translation>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation type="unfinished">Окно увеличения</translation>
+        <translation>Окно увеличения</translation>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation type="unfinished">Lo-Res</translation>
+        <translation>Lo-Res</translation>
     </message>
 </context>
 <context>
@@ -5130,19 +5130,22 @@ Short for &quot;seconds&quot;</extracomment>
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Вы собираетесь объединить системы с лицензией START.
+Т.к. только 1 лицензия START допустима в системе, то после объединения у вас останется 1 лицензия START.
+Если вы поняли и хотите продолжить, нажмите Объединить для продолжения.
+</translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished">проверка...</translation>
+        <translation>Проверка...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation type="unfinished">объединение систем...</translation>
+        <translation>Объединение систем...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished">Найденная система %1 несовместима с версией %2.</translation>
+        <translation>Найденная система %1 несовместима с версией %2.</translation>
     </message>
 </context>
 <context>
@@ -5159,11 +5162,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished">Неправильное расписание</translation>
+        <translation>Неправильное расписание</translation>
     </message>
     <message>
         <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сторой поток отключен для этих камер. Опция По движению + низкое качество недоступна. Нажмите Да для изменения на опцию Всегда, или Нет для включения второго потока.</translation>
     </message>
 </context>
 <context>
@@ -5279,19 +5282,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Sound Files</source>
-        <translation type="unfinished">Звуковые файлы</translation>
+        <translation>Звуковые файлы</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished">Выбрать файл...</translation>
+        <translation>Выбрать файл...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation type="unfinished">Введите новое название:</translation>
+        <translation>Введите новое название:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation type="unfinished">Подтвердите удаление файла</translation>
+        <translation>Подтвердите удаление файла</translation>
     </message>
 </context>
 <context>
@@ -5365,19 +5368,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Open %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть %1</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки %1</translation>
     </message>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">Настройки сервера</translation>
+        <translation>Настройки сервера</translation>
     </message>
     <message>
         <source>Open %1 Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть веб страницу %1...</translation>
     </message>
 </context>
 <context>
@@ -5469,27 +5472,27 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation type="unfinished">Невозможно получить положение камеры</translation>
+        <translation>Невозможно получить положение камеры.</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation type="unfinished">Невозможно задать положение камеры</translation>
+        <translation>Невозможно задать положение камеры.</translation>
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation type="unfinished">Удалить позицию</translation>
+        <translation>Удалить позицию</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
-        <translation type="unfinished">Управление PTZ для %1.</translation>
+        <translation>Управление PTZ для %1.</translation>
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished">Настройки PTZ не сохранены</translation>
+        <translation>Настройки PTZ не сохранены.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished">Изменения не сохранены. Сохранить?</translation>
+        <translation>Изменения не сохранены. Сохранить?</translation>
     </message>
 </context>
 <context>
@@ -5560,19 +5563,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation type="unfinished">Новый маршрут %1</translation>
+        <translation>Новый маршрут %1</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
-        <translation type="unfinished">Сохраненная позиция %1</translation>
+        <translation>Сохраненная позиция %1</translation>
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation type="unfinished">Маршрут обхода должен содержать хотя бы 2 позиции</translation>
+        <translation>Маршрут обхода должен содержать хотя бы 2 позиции.</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation type="unfinished">Время маршрута обхода: %1</translation>
+        <translation>Время маршрута обхода: %1.</translation>
     </message>
 </context>
 <context>
@@ -5602,11 +5605,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation type="unfinished">Горячая клавиша уже используется позицией &quot;%1&quot;</translation>
+        <translation>Горячая клавиша уже используется позицией &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation type="unfinished">Горячая клавиша уже используется маршрутом &quot;%1&quot;</translation>
+        <translation>Горячая клавиша уже используется маршрутом &quot;%1&quot;.</translation>
     </message>
 </context>
 <context>
@@ -5699,98 +5702,98 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnRecordingStatisticsWidget</name>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Скопировать выделение в буфер обмена</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выделения в файл...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать всё</translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation type="unfinished">Экспорт выбранных событий в файл</translation>
+        <translation>Экспорт выбранных событий в файл</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatsModel</name>
     <message numerus="yes">
         <source>%n years</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n год</numerusform>
+            <numerusform>%n года</numerusform>
+            <numerusform>%n лет</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n months</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n месяц</numerusform>
+            <numerusform>%n месяца</numerusform>
+            <numerusform>%n месяцев</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n день</numerusform>
+            <numerusform>%n дня</numerusform>
+            <numerusform>%n дней</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n час</numerusform>
+            <numerusform>%n часа</numerusform>
+            <numerusform>%n часов</numerusform>
         </translation>
     </message>
     <message>
         <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation type="unfinished"></translation>
+        <translation>Длительность архива в днях между первой записью и текущим моментом</translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
-        <translation type="unfinished"></translation>
+        <translation>Средний битрейт для записанного периода</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished">Доступно</translation>
+        <translation>Доступно</translation>
     </message>
     <message>
         <source>Calendar Days</source>
-        <translation type="unfinished"></translation>
+        <translation>Дней</translation>
     </message>
     <message>
         <source>less than an hour</source>
-        <translation type="unfinished"></translation>
+        <translation>менее часа</translation>
     </message>
     <message>
         <source>%1 Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Мбит/с</translation>
     </message>
     <message>
         <source>%1 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ТБ</translation>
     </message>
     <message>
         <source>%1 Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ГБ</translation>
     </message>
     <message>
         <source>Total %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Всего %1</translation>
     </message>
     <message>
         <source>%1 with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 с не пустым архивом</translation>
     </message>
     <message>
         <source>Storage space occupied by %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Пространство занятое %1</translation>
     </message>
 </context>
 <context>
@@ -5840,7 +5843,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Live %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 в режиме реального времени</translation>
     </message>
 </context>
 <context>
@@ -5870,15 +5873,15 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation type="unfinished">Выберите пользователей...</translation>
+        <translation>Выберите пользователей...</translation>
     </message>
     <message>
         <source>Select Resources...</source>
-        <translation type="unfinished">Выберите ресурсы...</translation>
+        <translation>Выберите ресурсы...</translation>
     </message>
     <message>
         <source>Select %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите %1...</translation>
     </message>
 </context>
 <context>
@@ -6018,90 +6021,90 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>General</source>
-        <translation type="unfinished">Общие</translation>
+        <translation>Общие</translation>
     </message>
     <message>
         <source>Storage Analytics</source>
-        <translation type="unfinished"></translation>
+        <translation>Анализ хранилища</translation>
     </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
     <message>
         <source>Remove Storage</source>
-        <translation type="unfinished">Удалить хранилище</translation>
+        <translation>Удалить хранилище</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Загрузка...</translation>
+        <translation>Загрузка...</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation type="unfinished">Недоступно</translation>
+        <translation>Недоступно</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Предупреждение</translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation type="unfinished">Вы собираетесь запустить ресинхронизацию архива.</translation>
+        <translation>Вы собираетесь запустить ресинхронизацию архива.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished">ВНИМАНИЕ! Использование жесткого диска возрастёт в процессе ресинхронизации! В зависимости от общего объёма архива, процесс может занять несколько часов.</translation>
+        <translation>ВНИМАНИЕ! Использование жесткого диска возрастёт в процессе ресинхронизации! В зависимости от общего объёма архива, процесс может занять несколько часов.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">Данная процедура необходима только в том случае, если папки архива были перемещены, переименованы или заменены. Вы можете прервать процесс в любой момент без потери данных.</translation>
+        <translation>Данная процедура необходима только в том случае, если папки архива были перемещены, переименованы или заменены. Вы можете прервать процесс в любой момент без потери данных.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Вы уверены, что хотите продолжить?</translation>
+        <translation>Вы уверены, что хотите продолжить?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">Идет восстановление архива для хранилища &apos;%1&apos;</translation>
+        <translation>Идет восстановление архива для хранилища &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">Идет быстрое сканирование архива для хранилища &apos;%1&apos;</translation>
+        <translation>Идет быстрое сканирование архива для хранилища &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished">Завершено</translation>
+        <translation>Завершено</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished">Восстановление архива завершено.</translation>
+        <translation>Восстановление архива завершено.</translation>
     </message>
     <message>
         <source>At least two servers are required for this feature.</source>
-        <translation type="unfinished">Для этого требуется как минимум 2 сервера.</translation>
+        <translation>Для этого требуется как минимум 2 сервера.</translation>
     </message>
     <message>
         <source>Could not load storages from server.</source>
-        <translation type="unfinished">Невозможно загрузить хранилища с сервера.</translation>
+        <translation>Невозможно загрузить хранилища с сервера.</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished">Добавить внешнее хранилище...</translation>
+        <translation>Добавить внешнее хранилище...</translation>
     </message>
     <message>
         <source>Enable failover (server will take %1 automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить резервирование (сервер автоматически перехватит %1 с отключенных серверов)</translation>
     </message>
     <message>
         <source>Max. %1 on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Макс. %1 на этом сервере:</translation>
     </message>
     <message>
         <source>This server already has more than max %1</source>
-        <translation type="unfinished"></translation>
+        <translation>На сервере превышено максимальное количество %1</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Воизбежание неполадок настройте максимальное количесвто %1</translation>
     </message>
 </context>
 <context>
@@ -6339,79 +6342,79 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание: Не рекомендуется обновлять систему в конце недели.</translation>
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation type="unfinished">Последняя версия:</translation>
+        <translation>Последняя версия:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation type="unfinished">Целевая весия:</translation>
+        <translation>Целевая весия:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation type="unfinished">Обновление завершено... 100%</translation>
+        <translation>Обновление завершено... 100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновите клиента вручную.</translation>
     </message>
     <message>
         <source>Please update the client manually using an installation package.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновите клиента вручную, используя инсталлятор.</translation>
     </message>
     <message>
         <source>Update Succeeded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обнавление успешно завершено.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">Процесс Launcher не найден</translation>
+        <translation>Процесс Launcher не найден.</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation type="unfinished">Обновление отменено</translation>
+        <translation>Обновление отменено</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished">Обновление прошло успешно</translation>
+        <translation>Обновление не удалось.</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished">Кто-то уже запустил процесс обновления.</translation>
+        <translation>Кто-то уже запустил процесс обновления.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished">Проблема с подключением к Интернету</translation>
+        <translation>Проблема с подключением к Интернету</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
-        <translation type="unfinished"></translation>
+        <translation>На сервере обновлений нет такой сборки.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished">Невозможно начать обновление. Обновление для одного или нескольких серверов не найдено.</translation>
+        <translation>Невозможно начать обновление. Обновление для одного или нескольких серверов не найдено.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished">Невозможно начать обновление. Обновление для клиента не найдено.</translation>
+        <translation>Невозможно начать обновление. Обновление для клиента не найдено.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно распаковать файл обновления.</translation>
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished">Невозможно проверить наличие обновлений через интернет.</translation>
+        <translation>Невозможно проверить наличие обновлений через интернет.</translation>
     </message>
     <message>
         <source>Available Update:</source>
-        <translation type="unfinished"></translation>
+        <translation>Доступные обновления:</translation>
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished">Для того чтобы обновиться вручную, скачайте архив по следующей ссылке:</translation>
+        <translation>Для того чтобы обновиться вручную, скачайте архив по следующей ссылке:</translation>
     </message>
 </context>
 <context>
@@ -6426,58 +6429,58 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation type="unfinished">Водяной знак не найден</translation>
+        <translation>Водяной знак не найден</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation type="unfinished">Корректный водяной знак</translation>
+        <translation>Корректный водяной знак</translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished"></translation>
+        <translation>Слишком высокий FPS</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущее значение FPS в расписании %1. FPS снижено до максимального для камеры значения %2.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Для программной детекции движения зарезервировано 2 FPS второго потока. Текущее FPS: %1. FPS снижено до %2.</translation>
     </message>
     <message>
         <source>Invalid schedule</source>
-        <translation type="unfinished">Неправильное расписание</translation>
+        <translation>Неправильное расписание</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished">Второй поток для данной камеры отключён. Опция &apos;По движению + Низкое качество&apos; не будет иметь никакого эффекта. Нажмите &quot;Да&quot; для изменения типа записи на &quot;Всегда&quot; или &quot;Нет&quot; для включения второго потока.</translation>
+        <translation>Второй поток для данной камеры отключён. Опция &apos;По движению + Низкое качество&apos; не будет иметь никакого эффекта. Нажмите &quot;Да&quot; для изменения типа записи на &quot;Всегда&quot; или &quot;Нет&quot; для включения второго потока.</translation>
     </message>
     <message>
         <source>Confirm motion regions reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Подтвердите сброс областей детектора движения</translation>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите сбросить зоны детекции движения в состояние по-умолчанию?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished">Это действие не может быть отменено!</translation>
+        <translation>Это действие не может быть отменено!</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished">Аппаратный (встроенный в камеру)</translation>
+        <translation>Аппаратный (встроенный в камеру)</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation type="unfinished">Не записывать движение</translation>
+        <translation>Не записывать движение</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки %1</translation>
     </message>
 </context>
 <context>
@@ -6528,23 +6531,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">Приведенные параметры неверны. Выполнение теста невозможно.</translation>
+        <translation>Приведенные параметры неверны. Выполнение теста невозможно.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">Время ожидания истекло</translation>
+        <translation>Время ожидания истекло</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished">Некорректный e-mail</translation>
+        <translation>Некорректный e-mail</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished">Шаблон не найден. Воспользуйтесь дополнительными настройками</translation>
+        <translation>Шаблон не найден. Воспользуйтесь дополнительными настройками.</translation>
     </message>
     <message>
         <source>Support email is not valid.</source>
-        <translation type="unfinished">Некорректный адрес техподдержки</translation>
+        <translation>Некорректный адрес техподдержки.</translation>
     </message>
 </context>
 <context>
@@ -6586,31 +6589,31 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No video stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет видео потока</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished">Диагностика...</translation>
+        <translation>Диагностика...</translation>
     </message>
     <message>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить</translation>
     </message>
     <message>
         <source>Activate license...</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать лицензию...</translation>
     </message>
     <message>
         <source>Module is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Модуль отключён</translation>
     </message>
     <message>
         <source>Server Offline</source>
-        <translation type="unfinished">Сервер не в сети</translation>
+        <translation>Сервер не в сети</translation>
     </message>
     <message>
         <source>Please check authentication information in %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверьте настройки авторизации для %1</translation>
     </message>
 </context>
 <context>
@@ -6632,23 +6635,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished">Общий ресурс сети Windows</translation>
+        <translation>Общий ресурс сети Windows</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>В системе есть сервер(а), использующие то же сетевое хранилище и папку на нём. Запись с нескольких серверов в одну и ту же папку не рекомендуется.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание</translation>
     </message>
     <message>
         <source>Add storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить хранилище</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished">Введённый путь не указывает на корректное внешнее хранилище.</translation>
+        <translation>Введённый путь не указывает на корректное внешнее хранилище.</translation>
     </message>
 </context>
 <context>
@@ -6699,18 +6702,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Users</source>
-        <translation type="unfinished">Пользователи</translation>
+        <translation>Пользователи</translation>
     </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable %1 and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить автоопределение %1 и серверов</translation>
     </message>
     <message>
         <source>Allow system to optimize %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешить системе оптимизировать настройки %1</translation>
     </message>
 </context>
 <context>
@@ -6962,105 +6965,105 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnUserListModel</name>
     <message>
         <source>LDAP user</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователь LDAP</translation>
     </message>
     <message>
         <source>Normal user</source>
-        <translation type="unfinished"></translation>
+        <translation>Обычный пользователь</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Активирован</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Деактивирован</translation>
     </message>
     <message>
         <source>Edit user</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать пользователя</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <source>Permissions</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешения</translation>
     </message>
     <message>
         <source>LDAP</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP</translation>
     </message>
 </context>
 <context>
     <name>QnUserListModelPrivate</name>
     <message>
         <source>Owner</source>
-        <translation type="unfinished">Владелец</translation>
+        <translation>Владелец</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished">Администратор</translation>
+        <translation>Администратор</translation>
     </message>
     <message>
         <source>View live video</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр живого видео</translation>
     </message>
     <message>
         <source>Use PTZ controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Использование PTZ</translation>
     </message>
     <message>
         <source>View video archives</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр архива</translation>
     </message>
     <message>
         <source>Export video</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт видео</translation>
     </message>
     <message>
         <source>Edit Video Walls</source>
-        <translation type="unfinished"></translation>
+        <translation>Работа с видеостенами</translation>
     </message>
     <message>
         <source>Adjust %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить настройки %1</translation>
     </message>
 </context>
 <context>
     <name>QnUserManagementWidget</name>
     <message>
         <source>LDAP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки LDAP...</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation type="unfinished">Фильтр...</translation>
+        <translation>Фильтр...</translation>
     </message>
     <message>
         <source>New User...</source>
-        <translation type="unfinished">Создать пользователя...</translation>
+        <translation>Создать пользователя...</translation>
     </message>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить пользователей LDAP...</translation>
     </message>
     <message>
         <source>Enable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать выбранных</translation>
     </message>
     <message>
         <source>Disable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Деактивировать выбранных</translation>
     </message>
     <message>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить выбранных</translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation type="unfinished">Очистить выделение</translation>
+        <translation>Очистить выделение</translation>
     </message>
 </context>
 <context>
@@ -7143,15 +7146,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To modify your password, please enter existing one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Для изменения вашего пароля, введите текущий пароль.</translation>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation type="unfinished">Имя пользоавтеля изменено. Пароль должен быть обновлён.</translation>
+        <translation>Имя пользоавтеля изменено. Пароль должен быть обновлён.</translation>
     </message>
     <message>
         <source>Can adjust %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Может изменять настроки %1</translation>
     </message>
 </context>
 <context>
@@ -7211,11 +7214,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished">Запускать видеостену при запуске Windows</translation>
+        <translation>Запускать видеостену при запуске Windows.</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
-        <translation type="unfinished"></translation>
+        <translation>Поместить ярлык на рабочия стол.</translation>
     </message>
 </context>
 <context>
@@ -7438,71 +7441,71 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished">Новая раскладка</translation>
+        <translation>Новая раскладка</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished">Новая раскладка %1</translation>
+        <translation>Новая раскладка %1</translation>
     </message>
     <message>
         <source>Open File</source>
-        <translation type="unfinished">Открыть файл</translation>
+        <translation>Открыть файл</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished">Невозможно выполнить поиск по фрагментам</translation>
+        <translation>Невозможно выполнить поиск по фрагментам.</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished">Процесс выполняется</translation>
+        <translation>Процесс выполняется...</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation type="unfinished">Видеостена с таким именем уже существует</translation>
+        <translation>Видеостена с таким именем уже существует.</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation type="unfinished">Обновление заднего фона</translation>
+        <translation>Обновление заднего фона...</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished">Обработка изображения может занять длительное время. Наберитесь терпения.</translation>
+        <translation>Обработка изображения может занять длительное время. Наберитесь терпения.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это beta-версия %1.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">Процесс Launcher не найден</translation>
+        <translation>Процесс Launcher не найден.</translation>
     </message>
     <message>
         <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно переместить %1 на сервер %2. Сервер не отвечает.</translation>
     </message>
     <message>
         <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер %1 не может найти и получить доступ к данным %2. Вы уверены, что хотите преместить их?</translation>
     </message>
     <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавление устройств уже происходит. Вы уверены, что хотите прервать данный процесс?</translation>
     </message>
     <message>
         <source>These %1 are auto-discovered.</source>
-        <translation type="unfinished"></translation>
+        <translation>Данные %1 обнаружены автоматически.</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n из этих %1 найдено автоматически.</numerusform>
+            <numerusform>%n из этих %1 найдены автоматически.</numerusform>
+            <numerusform>%n из этих %1 найдены автоматически.</numerusform>
         </translation>
     </message>
     <message>
         <source>Do you really want to delete the following %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы действительно хотите удалить следующие %1?</translation>
     </message>
 </context>
 <context>
@@ -7521,19 +7524,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation type="unfinished">Закладка может быть добавлена только на сервер, находящийся в сети.</translation>
+        <translation>Закладка может быть добавлена только на сервер, находящийся в сети.</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation type="unfinished">Закладка может быть отредактирована только на сервере, находящемся в сети.</translation>
+        <translation>Закладка может быть отредактирована только на сервере, находящемся в сети.</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation type="unfinished">Закладка может быть удалена только с сервера, находящегося в сети.</translation>
+        <translation>Закладка может быть удалена только с сервера, находящегося в сети.</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished">Потвердите удаление</translation>
+        <translation>Потвердите удаление</translation>
     </message>
 </context>
 <context>
@@ -7583,15 +7586,15 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation type="unfinished">Невозможно начать запись из-за следующей ошибки: %1</translation>
+        <translation>Невозможно начать запись из-за следующей ошибки: %1</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished">Невозможно перезаписать файл &apos;%1&apos;. Попробуйте другое имя.</translation>
+        <translation>Невозможно перезаписать файл &apos;%1&apos;. Попробуйте другое имя.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation type="unfinished">Нажмите любую кнопку, чтобы остановить тур</translation>
+        <translation>Нажмите любую кнопку, чтобы остановить тур.</translation>
     </message>
 </context>
 <context>
@@ -7710,71 +7713,71 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>File is in use.</source>
-        <translation type="unfinished">Файл используется</translation>
+        <translation>Файл используется.</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно экспортировать файл.</translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">Предупреждение</translation>
+        <translation>Предупреждение!</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished">Без отметок времени</translation>
+        <translation>Без отметок времени</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation type="unfinished">Верхний левый угол (требуется перекодирование)</translation>
+        <translation>Верхний левый угол (требуется перекодирование)</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation type="unfinished">Верхний правый угол (требуется перекодирование)</translation>
+        <translation>Верхний правый угол (требуется перекодирование)</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation type="unfinished">Нижний левый угол (требуется перекодирование)</translation>
+        <translation>Нижний левый угол (требуется перекодирование)</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation type="unfinished">Нижний правый угол (требуется перекодирование)</translation>
+        <translation>Нижний правый угол (требуется перекодирование)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation type="unfinished">Вы собираетесь экспортировать видео с фильтрами, которые требуют перекодировки. Перекодировка может занять длительное время. Продолжить?</translation>
+        <translation>Вы собираетесь экспортировать видео с фильтрами, которые требуют перекодировки. Перекодировка может занять длительное время. Продолжить?</translation>
     </message>
     <message>
         <source>Export Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт завершён</translation>
     </message>
     <message>
         <source>Export Successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт завершён успешно</translation>
     </message>
     <message>
         <source>Unable to export layout.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно экспортировать раскладку.</translation>
     </message>
     <message>
         <source>Unable to save layout.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно сохранить раскладку.</translation>
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation type="unfinished">Сохранить раскладку как...</translation>
+        <translation>Сохранить раскладку как...</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation type="unfinished">Сделать доступным только для чтения</translation>
+        <translation>Сделать доступным только для чтения.</translation>
     </message>
     <message>
         <source>Export Successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт завершён успешно.</translation>
     </message>
     <message>
         <source>Unable to export video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно экспортировать видео.</translation>
     </message>
 </context>
 <context>
@@ -7828,23 +7831,26 @@ If you would like to disable this feature you can do so in the System Settings d
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Вы собираетесь объединить системы с лицензией START.
+Т.к. только 1 лицензия START допустима в системе, то после объединения у вас останется 1 лицензия START.
+Если вы поняли и хотите продолжить, нажмите Объединить для продолжения.
+</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание</translation>
     </message>
     <message>
         <source>Merge</source>
-        <translation type="unfinished"></translation>
+        <translation>Объединить</translation>
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished">Пожалуйста, подождите пока предыдущий сервер будет добавлен в систему.</translation>
+        <translation>Пожалуйста, подождите. Запрошенные сервера будут добавлены в вашу систему.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation type="unfinished">Выбранные сервера были успешно добавлен в систему!</translation>
+        <translation>Выбранные сервера были успешно добавлены в систему!</translation>
     </message>
 </context>
 <context>
@@ -7911,23 +7917,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation type="unfinished">Раскладка уже существует</translation>
+        <translation>Раскладка уже существует.</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation type="unfinished">Раскладка с таким именем уже существует и у Вас нет прав на её изменение.</translation>
+        <translation>Раскладка с таким именем уже существует и у Вас нет прав на её изменение.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation type="unfinished">Введите имя раскладки:</translation>
+        <translation>Введите имя раскладки:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished">Раскладка с таким именем уже существует. Перезаписать?</translation>
+        <translation>Раскладка с таким именем уже существует. Перезаписать?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished">Новая раскладка %1</translation>
+        <translation>Новая раскладка %1</translation>
     </message>
 </context>
 <context>
@@ -7954,7 +7960,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>All %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Все %1</translation>
     </message>
 </context>
 <context>
@@ -7977,15 +7983,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished">Невозможно получить положение камеры</translation>
+        <translation>Невозможно получить положение камеры.</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished">Невозможно задать положение камеры</translation>
+        <translation>Невозможно задать положение камеры.</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно задать положение камеры.</translation>
     </message>
 </context>
 <context>
@@ -8028,35 +8034,35 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished">Без отметок времени</translation>
+        <translation>Без отметок времени</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation type="unfinished">Верхний левый угол</translation>
+        <translation>Верхний левый угол</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation type="unfinished">Верхний правый угол</translation>
+        <translation>Верхний правый угол</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation type="unfinished">Нижний левый угол</translation>
+        <translation>Нижний левый угол</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation type="unfinished">Нижний правый угол</translation>
+        <translation>Нижний правый угол</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation type="unfinished">Невозможно перезаписать файл</translation>
+        <translation>Невозможно перезаписать файл.</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation type="unfinished">Нвозможно сохранить скриншот</translation>
+        <translation>Нвозможно сохранить скриншот.</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished">Ошибка при сохранении скриншота &quot;%1&quot;.</translation>
+        <translation>Ошибка при сохранении скриншота &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -8087,15 +8093,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished">Доступна более новая версия</translation>
+        <translation>Доступна более новая версия.</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished">Рекомендовано обновление</translation>
+        <translation>Рекомендовано обновление.</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished">Не уведомлять больше об этом обновлении.</translation>
+        <translation>Не уведомлять больше об этом обновлении.</translation>
     </message>
 </context>
 <context>
@@ -8203,43 +8209,43 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation type="unfinished">Сессия управления уже запущена</translation>
+        <translation>Сессия управления уже запущена.</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation type="unfinished">Случилась непредвиденная ошибка. Изменения не могут быть сохранены.</translation>
+        <translation>Случилась непредвиденная ошибка. Изменения не могут быть сохранены.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation type="unfinished">Отсутствуют оффлайн элементы видеостены, прикрепленные к этому компьютеру.</translation>
+        <translation>Отсутствуют оффлайн элементы видеостены, прикрепленные к этому компьютеру.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished">Видеостена сейчас будет запущена. Вы хотите закрыть этот экземпляр клиента %1?</translation>
+        <translation>Видеостена сейчас будет запущена. Вы хотите закрыть этот экземпляр клиента %1?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Требуется дополнительная лицензия.</translation>
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished">Для включения этой функции, пожалуйста, активируйте хотя бы одну лицензию на видеостену.</translation>
+        <translation>Для включения этой функции, пожалуйста, активируйте хотя бы одну лицензию на видеостену.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished">Для включения этой функции, пожалуйста, активируйте хотя бы одну лицензию на видеостену.</translation>
+        <translation>Для включения этой функции, пожалуйста, активируйте хотя бы одну лицензию на видеостену.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation type="unfinished">Видеостена уже существует</translation>
+        <translation>Видеостена уже существует.</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation type="unfinished">Видеостена с таким именем уже существует</translation>
+        <translation>Видеостена с таким именем уже существует.</translation>
     </message>
     <message>
         <source>%n items</source>
-        <translation type="unfinished"></translation>
+        <translation>%n элементов</translation>
     </message>
 </context>
 <context>
@@ -8250,7 +8256,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished">Пожалуйста подождите пока соединение будет восстановлено...</translation>
+        <translation>Пожалуйста подождите пока соединение будет восстановлено...</translation>
     </message>
 </context>
 <context>
@@ -8273,11 +8279,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation type="unfinished">Пре-запись:</translation>
+        <translation>Предзапись:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation type="unfinished">Постзапись:</translation>
+        <translation>Постзапись:</translation>
     </message>
 </context>
 <context>
@@ -8384,58 +8390,58 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Рекомендуется использовать мощный компьютер для &apos;Лучшего&apos; качества и разрешения.</translation>
     </message>
 </context>
 <context>
     <name>RecordingStatisticsWidget</name>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished">Обновить</translation>
+        <translation>Обновить</translation>
     </message>
     <message>
         <source>10 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>10 ТБ</translation>
     </message>
     <message>
         <source>Forecast for full storage(s) usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Прогноз на полное использование хранилищ</translation>
     </message>
     <message>
         <source>0 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>0 ТБ</translation>
     </message>
     <message>
         <source>Additional storage:</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительное хранилище:</translation>
     </message>
     <message>
         <source>1000 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>1000 ТБ</translation>
     </message>
     <message>
         <source>100 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>100 ТБ</translation>
     </message>
     <message>
         <source>Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>ТБ</translation>
     </message>
     <message>
         <source>1 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>1 ТБ</translation>
     </message>
     <message>
         <source>Current usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущее использование</translation>
     </message>
     <message>
         <source>Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Прогноз</translation>
     </message>
     <message>
         <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервера отключены. Статистика недоступна.</translation>
     </message>
 </context>
 <context>
@@ -8498,98 +8504,99 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>ServerSettingsDialog</name>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">Настройки сервера</translation>
+        <translation>Настройки сервера</translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя:</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation type="unfinished">IP адрес:</translation>
+        <translation>IP адрес:</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation type="unfinished">Проверить подключение</translation>
+        <translation>Проверить подключение</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished">Порт:</translation>
+        <translation>Порт:</translation>
     </message>
     <message>
         <source>9000</source>
-        <translation type="unfinished">9000</translation>
+        <translation>9000</translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation type="unfinished">Обработка отказов</translation>
+        <translation>Резервирование</translation>
     </message>
     <message>
         <source>Storages</source>
-        <translation type="unfinished">Хранилища</translation>
+        <translation>Хранилища</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation type="unfinished">Используется</translation>
+        <translation>Используется</translation>
     </message>
     <message>
         <source>Protocol</source>
-        <translation type="unfinished"></translation>
+        <translation>Протокол</translation>
     </message>
     <message>
         <source>Path</source>
-        <translation type="unfinished">Путь</translation>
+        <translation>Путь</translation>
     </message>
     <message>
         <source>Capacity</source>
-        <translation type="unfinished">Емкость</translation>
+        <translation>Емкость</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">Логин</translation>
+        <translation>Логин</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Пароль</translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished">Доступно</translation>
+        <translation>Доступно</translation>
     </message>
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмена выбора хранилища приведёт только к остановке записи.
+Это не отменит удаление старых записей с диска.</translation>
     </message>
     <message>
         <source>Rebuild archive index</source>
-        <translation type="unfinished">Перестроить индекс архива</translation>
+        <translation>Перестроить индекс архива</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished">Начать</translation>
+        <translation>Начать</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
+        <translation>Отмена</translation>
     </message>
 </context>
 <context>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation type="unfinished">Проверка водяного знака</translation>
+        <translation>Проверка водяного знака</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation type="unfinished">Проверенный файл:</translation>
+        <translation>Проверенный файл:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation type="unfinished">Результат:</translation>
+        <translation>Результат:</translation>
     </message>
 </context>
 <context>
@@ -8676,47 +8683,47 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>IO ports</source>
-        <translation type="unfinished"></translation>
+        <translation>Порты ввода/вывода</translation>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished">Включить звук</translation>
+        <translation>Включить звук</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished">Для данной камеры недоступна детекция движения</translation>
+        <translation>Для данной камеры недоступна детекция движения.</translation>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation type="unfinished">Настройки детекции движения</translation>
+        <translation>Настройки детекции движения</translation>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation type="unfinished">Детектор движения:</translation>
+        <translation>Детектор движения</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation type="unfinished"></translation>
+        <translation>Программный - максимальное FPS может незначительно снизиться</translation>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished">Без детекции движения (0)</translation>
+        <translation>Без детекции движения (0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished">Веб-страница настройки детектора движения камеры:</translation>
+        <translation>Веб-страница настройки камеры:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished">Сброс регионов детекции движения</translation>
+        <translation>Сброс областей детекции движения</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished">Аппаратный (Встроенний в камеру)</translation>
+        <translation>Аппаратный (Встроенний в камеру)</translation>
     </message>
     <message>
         <source>Fisheye</source>
-        <translation type="unfinished"></translation>
+        <translation>Рыбий глаз</translation>
     </message>
 </context>
 <context>
@@ -8803,19 +8810,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">Введите краткое описание...</translation>
+        <translation>Введите краткое описание.</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">Незащищенное соединение</translation>
+        <translation>Незащищенное соединение</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">Защищенное соединение с TLS</translation>
+        <translation>Защищенное соединение с TLS.</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">Защищенное соединение с SSL</translation>
+        <translation>Защищенное соединение с SSL.</translation>
     </message>
 </context>
 <context>
@@ -8856,19 +8863,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">Внимание! Настройки &quot;Частота кадров&quot; и&quot;Качество&quot; в настройках записи камеры работать не будут!</translation>
+        <translation>Внимание! Настройки &quot;Частота кадров&quot; и&quot;Качество&quot; в настройках записи камеры работать не будут!</translation>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation type="unfinished">(рекомендованные)</translation>
+        <translation>(рекомендованные)</translation>
     </message>
     <message>
         <source>Enable audit trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить аудит</translation>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправлять анонимную статистику использования и сбоев разработчикам</translation>
     </message>
 </context>
 <context>
@@ -8879,11 +8886,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation type="unfinished">Текущее системное время:</translation>
+        <translation>Текущее системное время:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите локальный сервер времени, если система не имеет доступа в интернет:</translation>
     </message>
 </context>
 <context>
@@ -8922,11 +8929,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished">&amp;Е-mail:</translation>
+        <translation>&amp;Е-mail:</translation>
     </message>
     <message>
         <source>Enabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>Включено:</translation>
     </message>
 </context>
 <context>
@@ -8945,11 +8952,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Расписание</translation>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished">Примечание: Расписание по серверному времени</translation>
+        <translation>Примечание: Расписание по серверному времени.</translation>
     </message>
 </context>
 </TS>

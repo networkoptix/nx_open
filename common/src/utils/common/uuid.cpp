@@ -79,12 +79,11 @@ QnUuid QnUuid::fromRfc4122( const QByteArray& bytes )
     return _uuid;
 }
 
-QnUuid QnUuid::fromHardwareId( const QByteArray& bytes )
+QnUuid QnUuid::fromHardwareId( const QString& hwid )
 {
-    if (bytes.length() != 34)
+    if (hwid.length() != 34)
         return QnUuid();
 
-    QString hwid = QLatin1String(bytes);
     return QnUuid(lit("%1-%2-%3-%4-%5")
         .arg(hwid.mid(2, 8)).arg(hwid.mid(10, 4)).arg(hwid.mid(14, 4))
         .arg(hwid.mid(18, 4)).arg(hwid.mid(22, 12)));

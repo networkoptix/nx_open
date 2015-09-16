@@ -1720,6 +1720,13 @@
                             <optional>true</optional>
                         </param>
                         <param>
+                            <name>endPos</name>
+                            <description>If present then specifies archive stream end positions. It used only if 'pos' parameter is present.
+                                         Milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
+                                         </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
                             <name>rotation</name>
                             <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
                             <optional>true</optional>
@@ -1727,6 +1734,11 @@
                         <param>
                             <name>sfd</name>
                             <description>Stand Frame Duration. If parameter is present, video speed is limited by real time.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rt</name>
+                            <description>Turn on realtime optimization. It will drop some frames if not enough CPU for realtime transcoding.</description>
                             <optional>true</optional>
                         </param>
                     </params>
