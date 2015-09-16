@@ -2368,12 +2368,13 @@ protected:
                 nx_ms_conf::HTTP_MSG_LOG_LEVEL,
                 nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL ).toString();
 
-        if( cmdLineArguments.msgLogLevel != lit("none") )
-            QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
-                logDir + QLatin1String("/http_log"),
-                MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
-                MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-                QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
+        QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
+            logDir + QLatin1String("/http_log"),
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
+            cmdLineArguments.msgLogLevel == lit("none")
+                ? cl_logALWAYS
+                : QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
 
         //preparing transaction log
         if( cmdLineArguments.ec2TranLogLevel.isEmpty() )
@@ -2381,21 +2382,21 @@ protected:
                 nx_ms_conf::EC2_TRAN_LOG_LEVEL,
                 nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL ).toString();
 
-        if( cmdLineArguments.ec2TranLogLevel != lit("none") )
-        {
-            QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-                logDir + QLatin1String("/ec2_tran"),
-                MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
-                MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-                QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS );
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
-        }
+        //on "always" log level only server start messages are logged, so using it instead of disabled
+        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+            logDir + QLatin1String("/ec2_tran"),
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
+            cmdLineArguments.ec2TranLogLevel == lit("none")
+                ? cl_logALWAYS
+                : QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
 
         QnLog::instance(QnLog::HWID_LOG)->create(
             logDir + QLatin1String("/hw_log"),

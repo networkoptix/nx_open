@@ -21,7 +21,7 @@ int QnLogLevelRestHandler::executeGet(const QString &path, const QnRequestParams
     if (!QnLog::instanceExists(logID)) {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("Parameter '%1' has invalid value '%2'").arg(idParam).arg(logID));
-        return CODE_INVALID_PARAMETER;
+        return CODE_OK;
     }
 
     auto setValue = params.find(valueParam);
@@ -30,11 +30,11 @@ int QnLogLevelRestHandler::executeGet(const QString &path, const QnRequestParams
 
         QnLogLevel logLevel = QnLog::logLevelFromString(level);
         if (logLevel == cl_logUNKNOWN 
-            && level.toLower() != disableLogsOption //TODO: #ak add cl_logNONE level to disable logs
-            ) {
+            && level.toLower() != disableLogsOption )
+        {
             result.setError(QnJsonRestResult::InvalidParameter,
                 lit("Parameter '%1' has invalid value '%2'").arg(valueParam).arg(level));
-            return CODE_INVALID_PARAMETER;
+            return CODE_OK;
         }
 
         QnLog::instance(logID)->setLogLevel(logLevel);
