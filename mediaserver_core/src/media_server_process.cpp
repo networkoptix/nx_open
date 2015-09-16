@@ -203,6 +203,11 @@
 #include "audit/mserver_audit_manager.h"
 #include "utils/common/waiting_for_qthread_to_empty_event_queue.h"
 
+
+#ifdef __arm__
+#include "nx1/info.h"
+#endif
+
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
@@ -1670,6 +1675,8 @@ void MediaServerProcess::run()
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
+    runtimeData.nx1mac = Nx1::getMac();
+    runtimeData.nx1serial = Nx1::getSerial();
     int guidCompatibility = 0;
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
