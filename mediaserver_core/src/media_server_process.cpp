@@ -1675,8 +1675,15 @@ void MediaServerProcess::run()
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
-    runtimeData.nx1mac = Nx1::getMac();
-    runtimeData.nx1serial = Nx1::getSerial();
+
+#ifdef __arm__
+    if (QnAppInfo::armBox() == "nx1" || QnAppInfo::armBox() == "bpi")
+    {
+        runtimeData.nx1mac = Nx1::getMac();
+        runtimeData.nx1serial = Nx1::getSerial();
+    }
+#endif
+
     int guidCompatibility = 0;
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
