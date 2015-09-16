@@ -67,12 +67,6 @@ namespace ec2
         return reqID;
     }
 
-    template<class QueryProcessorType>
-    void QnTimeManager<QueryProcessorType>::forceTimeResync()
-    {
-        return TimeSynchronizationManager::instance()->forceTimeResync();
-    }
-
 
     template class QnTimeManager<FixedUrlClientQueryProcessor>;
     template class QnTimeManager<ServerQueryProcessor>;

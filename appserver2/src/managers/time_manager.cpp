@@ -475,20 +475,15 @@ namespace ec2
     void TimeSynchronizationManager::forgetSynchronizedTime()
     {
         QMutexLocker lk( &m_mutex );
-        forgetSynchronizedTimeNonSafe(&lk);
-    }
 
-    void TimeSynchronizationManager::forceTimeResync()
-    {
-        {
-            QMutexLocker lk(&m_mutex);
-            forgetSynchronizedTimeNonSafe(&lk);
-            syncTimeWithAllKnownServers(&lk);
-        }
-
-        const auto curSyncTime = getSyncTime();
-        WhileExecutingDirectCall callGuard(this);
-        emit timeChanged(curSyncTime);
+        m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
+        m_systemTimeByPeer.clear();
+        m_timeSynchronized = false;
+        m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
+        m_usedTimeSyncInfo = TimeSyncInfo(
+            m_monotonicClock.elapsed(),
+            currentMSecsSinceEpoch(),
+            m_localTimePriorityKey );
     }
 
     QnPeerTimeInfoList TimeSynchronizationManager::getPeerTimeInfoList() const
@@ -1136,17 +1131,5 @@ namespace ec2
                 syncTimeWithAllKnownServers(&lk);
             return;
         }
-    }
-
-    void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QMutexLocker* const /*lock*/ )
-    {
-        m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
-        m_systemTimeByPeer.clear();
-        m_timeSynchronized = false;
-        m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
-        m_usedTimeSyncInfo = TimeSyncInfo(
-            m_monotonicClock.elapsed(),
-            currentMSecsSinceEpoch(),
-            m_localTimePriorityKey);
     }
 }

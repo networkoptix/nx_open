@@ -149,8 +149,6 @@ namespace ec2
         qint64 getMonotonicClock() const;
         //!Resets synchronized time to local system time with local peer priority
         void forgetSynchronizedTime();
-        //!Reset sync time and resynce
-        void forceTimeResync();
         QnPeerTimeInfoList getPeerTimeInfoList() const;
         ApiPeerSystemTimeDataList getKnownPeersSystemTime() const;
         void processTimeSyncInfoHeader(
@@ -297,7 +295,6 @@ namespace ec2
         void onTransactionReceived(
             QnTransactionTransport* transport,
             const nx_http::HttpHeaders& headers);
-        void forgetSynchronizedTimeNonSafe(QMutexLocker* const /*lock*/);
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );
