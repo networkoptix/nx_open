@@ -1,12 +1,14 @@
 #include <QUrlQuery>
 #include <QUrl>
 #include <QLocale>
+#include <QtCore/QFile>
 
 #include "activate_license_rest_handler.h"
 #include <utils/network/tcp_connection_priv.h>
 #include <utils/common/util.h>
 #include "nx_ec/data/api_runtime_data.h"
 #include "utils/network/simple_http_client.h"
+#include "utils/network/nettools.h"
 #include "common/common_module.h"
 #include "licensing/license.h"
 #include "api/runtime_info_manager.h"
@@ -18,6 +20,24 @@
 #include <utils/common/app_info.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
+
+namespace
+{
+    QString readFile(const QString& file)
+    {
+        QString result;
+
+        QFile f(file);
+        if (!f.open(QFile::ReadOnly | QFile::Text))
+            return result;
+
+        QTextStream in(&f);
+        result = in.readAll();
+        f.close();
+
+        return result.trimmed();
+    }
+}
 
 CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey, bool infoMode, QByteArray& response)
 {
@@ -31,6 +51,19 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     params.addQueryItem(QLatin1String("box"), runtimeData.box);
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
     params.addQueryItem(QLatin1String("version"), QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
+
+#ifdef Q_OS_LINUX
+    if( QnAppInfo::armBox() == "nx1" ) {
+        QString mac = getMacFromPrimaryIF();
+        QString serial = readFile(lit("/tmp/serial"));
+
+        if (!mac.isEmpty())
+            params.addQueryItem(QLatin1String("mac"), mac);
+
+        if (!serial.isEmpty())
+            params.addQueryItem(QLatin1String("serial"), serial);
+    }
+#endif
 
     QLocale locale;
     params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
