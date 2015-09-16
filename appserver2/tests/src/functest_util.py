@@ -24,11 +24,23 @@ class JsonDiff:
         self._hasDiff = True
         return self
 
+    def keysDiffer(self, lhs, rhs):
+        " format the error information on key sets difference"
+        self._errorInfo = ("CurrentPosition:{anchor}\n"
+            "Different keys found. {lk} in one object and {rk} in the other\n"
+        ).format(anchor=self._anchorStr,
+                 lk=str(list(lhs.viewkeys()-rhs.viewkeys())),
+                 rk=str(list(rhs.viewkeys()-lhs.viewkeys()))
+                 )
+        self._hasDiff = True
+        return self
+
     def arrayIndexNotFound(self,lhs,idx):
         """ format the error information based on the array index lost"""
         self._errorInfo= ("CurrentPosition:{anchor}\n"
-                    "The element in array at index:{i} cannot be found in other objects\n").\
-            format(anchor=self._anchorStr,i=idx)
+                    "The element in array at index:{i} cannot be found in other objects\n"
+                    "Element: {e}"
+            ).format(anchor=self._anchorStr, i=idx, e=lhs[idx])
         self._hasDiff = True
         return self
 
@@ -37,27 +49,23 @@ class JsonDiff:
         rhs_str = None
         try :
             lhs_str = str(lhs)
+        except Exception:
+            lhs_str = repr(lhs)
+        try:
             rhs_str = str(rhs)
         except:
-            lhs_str = lhs.__str__()
-            rhs_str = rhs.__str__()
+            rhs_str = repr(rhs)
 
         self._errorInfo= ("CurrentPosition:{anchor}\n"
-                    "The left hand side value:{lval} and right hand side value:{rval} is not same").format(anchor=self._anchorStr,
-                                                                                                           lval=lhs_str,
-                                                                                                           rval=rhs_str)
+            "The left hand side value:{lval} and right hand side value:{rval} is not same"
+            ).format(anchor=self._anchorStr, lval=lhs_str, rval=rhs_str)
         self._hasDiff = True
         return self
 
     def typeNotSame(self,lhs,rhs):
-        ltype = type(lhs)
-        rtype = type(rhs)
-
-        self._errorInfo=(
-            "CurrentPosition:{anchor}\n"
-            "The left hand value type:{lt} is not same with right hand value type:{rt}\n").format(anchor=self._anchorStr,
-                                                                                                  lt=ltype,
-                                                                                                  rt=rtype)
+        self._errorInfo=("CurrentPosition:{anchor}\n"
+            "The left hand value type:{lt} is not same with right hand value type:{rt}\n"
+            ).format(anchor=self._anchorStr, lt=type(lhs), rt=type(rhs))
         self._hasDiff = True
         return self
 
@@ -100,7 +108,9 @@ def _compareJsonObject(lhs,rhs,result):
     assert isinstance(lhs,dict),"The lhs object _MUST_ be an object"
     assert isinstance(rhs,dict),"The rhs object _MUST_ be an object"
     # compare the loop and stuff
-    for lhs_key in lhs:
+    if lhs.viewkeys() ^ rhs.viewkeys():
+        return result.keysDiffer(lhs, rhs)
+    for lhs_key in lhs.iterkeys():
         if lhs_key not in rhs:
             return result.keyNotExisted(lhs,rhs,lhs_key);
         else:
@@ -135,7 +145,7 @@ def _compareJsonList(lhs,rhs,result):
             if not _compareJson(lhs_ele,val,result).hasDiff():
                 tabooSet.add(idx)
                 notFound = False
-                continue
+                break
             else:
                 result.resetDiff()
 

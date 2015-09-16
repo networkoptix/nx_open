@@ -55,7 +55,7 @@ public:
         m_file.setFileName(currFileName());
 
         bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered);
-        if (rez)
+        if (rez && m_file.size() == 0)
             m_file.write(UTF8_BOM);
         return rez;
     }
@@ -214,6 +214,12 @@ public:
         return log;
     }
 
+    bool exists( int logID )
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_logs.find(logID) != m_logs.cend();
+    }
+
     bool put( int logID, QnLog* log )
     {
         QMutexLocker lk( &m_mutex );
@@ -242,6 +248,10 @@ QnLog::~QnLog()
 QnLog* QnLog::instance( int logID )
 {
     return qn_logsInstance()->get(logID);
+}
+
+bool QnLog::instanceExists( int logID ) {
+    return qn_logsInstance()->exists(logID);
 }
 
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {

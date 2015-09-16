@@ -32,6 +32,7 @@
 #include "nx_ec/data/api_update_data.h"
 #include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
+#include "nx_ec/data/api_client_info_data.h"
 #include "api/runtime_info_manager.h"
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
@@ -281,6 +282,7 @@ QnDbManager::QnDbManager()
     m_needResyncbRules(false),
     m_needResyncUsers(false),
     m_needResyncStorages(false),
+    m_needResyncClientInfoData(false),
     m_dbReadOnly(false)
 {
 }
@@ -584,6 +586,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
             if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
                 return false;
         }
+        if(m_needResyncClientInfoData) {
+            if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+                return false;
+        }
 
     }
 
@@ -615,7 +621,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     bool updateUserResource = false;
     if( !defaultAdminPassword.isEmpty() )
     {
-        if (!userResource->checkPassword(defaultAdminPassword)) {
+        if (!userResource->checkPassword(defaultAdminPassword) || userResource->getRealm() != QnAppInfo::realm()) {
             userResource->setPassword( defaultAdminPassword );
             userResource->generateHash();
             updateUserResource = true;
@@ -725,6 +731,9 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+        return false;
+
+    if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
         return false;
 
     return true;
@@ -1347,6 +1356,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
                 return false;
         }
     }
+    else if (updateName == lit(":/updates/43_resync_client_info_data.sql")) {
+        if (!m_dbJustCreated)
+            m_needResyncClientInfoData = true;
+    }
 
     return true;
 }
@@ -1658,7 +1671,9 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             min_archive_days,               \
             max_archive_days,               \
             prefered_server_id,             \
-            license_used)                   \
+            license_used,                   \
+            failover_priority               \
+            )                               \
          VALUES (                           \
             :cameraID,                      \
             :cameraName,                    \
@@ -1673,7 +1688,9 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :minArchiveDays,                \
             :maxArchiveDays,                \
             :preferedServerId,              \
-            :licenseUsed)                   \
+            :licenseUsed,                   \
+            :failoverPriority               \
+            )                               \
         ");
     QnSql::bind(data, &insQuery);
     if( !insQuery.exec() )
@@ -3058,7 +3075,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
             min_archive_days as minArchiveDays,          \
             max_archive_days as maxArchiveDays,          \
             prefered_server_id as preferedServerId,      \
-            license_used as licenseUsed                  \
+            license_used as licenseUsed,                 \
+            failover_priority as failoverPriority        \
          FROM vms_camera_user_attributes                 \
          LEFT JOIN vms_resource r on r.guid = camera_guid     \
          %1                                              \
@@ -3116,7 +3134,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             cu.min_archive_days as minArchiveDays,             \
             cu.max_archive_days as maxArchiveDays,             \
             cu.prefered_server_id as preferedServerId,         \
-            cu.license_used as licenseUsed                     \
+            cu.license_used as licenseUsed,                    \
+            cu.failover_priority as failoverPriority           \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id \

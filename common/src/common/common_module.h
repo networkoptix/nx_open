@@ -92,6 +92,9 @@ public:
     inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 
+    void setLocalPeerType(Qn::PeerType peerType);
+    Qn::PeerType localPeerType() const;
+
     void updateModuleInformation();
 
 signals:
@@ -122,6 +125,7 @@ private:
     QByteArray m_adminPaswdHash;
     QByteArray m_adminPaswdDigest;
     bool m_lowPriorityAdminPassword;
+    Qn::PeerType m_localPeerType;
 };
 
 #define qnCommon (QnCommonModule::instance())

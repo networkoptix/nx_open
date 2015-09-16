@@ -986,6 +986,7 @@ namespace ec2
 
         //!Returns list of peers whose local system time is known
         virtual QnPeerTimeInfoList getPeerTimeInfoList() const = 0;
+        virtual void forceTimeResync() = 0;
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically

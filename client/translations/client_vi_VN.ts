@@ -78,71 +78,71 @@
     <name>AuditLogDialog</name>
     <message>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>từ</translation>
     </message>
     <message>
         <source>till</source>
-        <translation type="unfinished"></translation>
+        <translation>đến</translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished">Làm mới</translation>
+        <translation>Làm mới</translation>
     </message>
     <message>
         <source>User actions</source>
-        <translation type="unfinished"></translation>
+        <translation>hành động người dùng</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation type="unfinished"></translation>
+        <translation>xem lưu trữ</translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation>xuất ra video</translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation type="unfinished"></translation>
+        <translation>xem trực tiếp</translation>
     </message>
     <message>
         <source>Login/logout</source>
-        <translation type="unfinished"></translation>
+        <translation>Đăng nhập / đăng xuất</translation>
     </message>
     <message>
         <source>Event rules</source>
-        <translation type="unfinished"></translation>
+        <translation>quy định tổ chức sự kiện</translation>
     </message>
     <message>
         <source>Server actions</source>
-        <translation type="unfinished"></translation>
+        <translation>hành động máy chủ</translation>
     </message>
     <message>
         <source>E-mail settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt e-mail</translation>
     </message>
     <message>
         <source>System actions</source>
-        <translation type="unfinished"></translation>
+        <translation>hành động hệ thống</translation>
     </message>
     <message>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn tất cả</translation>
     </message>
     <message>
         <source>Sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>Sessions</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">chi tiết</translation>
+        <translation>chi tiết</translation>
     </message>
     <message>
         <source>All Servers are offline.  Audit data are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tất cả máy chủ đang offline. Dữ liệu kiểm toán không có sẵn.</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Đường mòn kiểm toán</translation>
     </message>
 </context>
 <context>
@@ -264,35 +264,35 @@
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation type="unfinished">Máy chủ đã chọn:</translation>
+        <translation>Máy chủ đã chọn:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished">子&amp;quét mạng</translation>
+        <translation>子&amp;quét mạng</translation>
     </message>
     <message>
         <source>Brand</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhãn hiệu</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation type="unfinished">kiểu mẫu</translation>
+        <translation>kiểu mẫu</translation>
     </message>
     <message>
         <source>New Scan...</source>
-        <translation type="unfinished">quét…</translation>
+        <translation>quét…</translation>
     </message>
     <message>
         <source>Add device(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thêm thiết bị (s) ...</translation>
     </message>
     <message>
         <source>Device Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị Địa chỉ:</translation>
     </message>
     <message>
         <source>Discovered Devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị phát hiện:</translation>
     </message>
 </context>
 <context>
@@ -311,11 +311,11 @@
     </message>
     <message>
         <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
-        <translation type="unfinished"></translation>
+        <translation>cài đặt nâng cao không có sẵn cho máy ảnh này. Kiểm tra các trang web camera trực tiếp cho nhiều lựa chọn hơn.</translation>
     </message>
     <message>
         <source>Note: Any changes made will be applied instantly!</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu ý: Bất kỳ thay đổi này sẽ được áp dụng ngay lập tức!</translation>
     </message>
 </context>
 <context>
@@ -409,19 +409,19 @@
     </message>
     <message>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo! Điều này sẽ làm cho chất lượng và tỷ lệ khung hình (FPS) thiết lập trong Biểu ghi không liên quan.</translation>
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished">không sử dụng</translation>
+        <translation>không sử dụng</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo! Lựa chọn chất lượng cao có thể ảnh hưởng đến CPU của bạn và hiệu suất mạng và có thể gây ra các vấn đề bổ sung.</translation>
     </message>
     <message>
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo! Không thay đổi các thiết lập này, trừ khi bạn hoàn toàn chắc chắn về tác động tiềm năng của họ về hiệu năng hệ thống của bạn.</translation>
     </message>
 </context>
 <context>
@@ -526,31 +526,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Lịch trình ghi âm</translation>
     </message>
     <message>
         <source>Show Quality on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiện chất lượng đúng tiến độ</translation>
     </message>
     <message>
         <source>Show FPS on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiện FPS trên lịch</translation>
     </message>
     <message>
         <source>Motion + Low-Res </source>
-        <translation type="unfinished"></translation>
+        <translation>Motion + Low-Res </translation>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation type="unfinished">làm Video</translation>
+        <translation>làm Video</translation>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished">Tối thiểu (ngày):</translation>
+        <translation>Tối thiểu (ngày)</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished">Tối đa (ngày):</translation>
+        <translation>Tối đa (ngày)</translation>
     </message>
 </context>
 <context>
@@ -606,31 +606,31 @@ Short for &quot;seconds&quot;</extracomment>
     <name>CustomHorizontalHeader</name>
     <message>
         <source>5 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>5 phút</translation>
     </message>
     <message>
         <source>Hour</source>
-        <translation type="unfinished"></translation>
+        <translation>giờ</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>ngày</translation>
     </message>
     <message>
         <source>Week</source>
-        <translation type="unfinished"></translation>
+        <translation>tuần</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>tháng</translation>
     </message>
     <message>
         <source>All data</source>
-        <translation type="unfinished"></translation>
+        <translation>Tất cả các dữ liệu</translation>
     </message>
     <message>
         <source>Bitrate for the last recorded:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrate cho thu âm cuối cùng:</translation>
     </message>
 </context>
 <context>
@@ -664,11 +664,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Event Log</source>
-        <translation type="unfinished">ghi sự kiện</translation>
+        <translation>ghi sự kiện</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation type="unfinished">rõ ràng Lọc</translation>
+        <translation>rõ ràng Lọc</translation>
     </message>
 </context>
 <context>
@@ -679,19 +679,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ceiling Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Giá treo máy chiếu</translation>
     </message>
     <message>
         <source>Wall Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Tường núi</translation>
     </message>
     <message>
         <source>Floor/Table Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Tầng / Bảng Núi</translation>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished">Chỉnh góc độ máy ảnh:</translation>
+        <translation>Chỉnh góc độ máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -730,31 +730,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished">Những âm thanh từ 5.1 giảm 2.1:</translation>
+        <translation>Những âm thanh từ 5.1 giảm 2.1</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation type="unfinished">Hình ảnh tự động treo:</translation>
+        <translation>Hình ảnh tự động treo</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished">phút nhàn rỗi</translation>
+        <translation>phút nhàn rỗi</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished">Với các máy tính bắt đầu thực hiện các phần mềm:</translation>
+        <translation>Với các máy tính bắt đầu thực hiện các phần mềm:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation type="unfinished">Đôi đệm:</translation>
+        <translation>Đôi đệm:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation type="unfinished">lịch sử</translation>
+        <translation>lịch sử</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation type="unfinished">Bộ nhớ cache của địa phương rõ ràng</translation>
+        <translation>Bộ nhớ cache của địa phương rõ ràng</translation>
     </message>
 </context>
 <context>
@@ -793,19 +793,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open audit trail log</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở đường mòn kiểm toán log</translation>
     </message>
     <message>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Giám sát tất cả các máy chủ trên một diện đơn</translation>
     </message>
     <message>
         <source>System Backup and Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>Sao lưu hệ thống và phục hồi</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Đường mòn kiểm toán</translation>
     </message>
 </context>
 <context>
@@ -820,66 +820,66 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation type="unfinished">Trong cuốn này</translation>
+        <translation>Trong cuốn này</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation type="unfinished">cạnh trái</translation>
+        <translation>cạnh trái</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation type="unfinished">cạnh phải</translation>
+        <translation>cạnh phải</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation type="unfinished">trang trái</translation>
+        <translation>trang trái</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation type="unfinished">trang</translation>
+        <translation>trang</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation type="unfinished">trang bên phải</translation>
+        <translation>trang bên phải</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation type="unfinished">trang tiếp theo</translation>
+        <translation>trang tiếp theo</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation type="unfinished">Di chuyển sang trái</translation>
+        <translation>Di chuyển sang trái</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation type="unfinished">Di chuyển lên</translation>
+        <translation>Di chuyển lên</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation type="unfinished">Di chuyển sang phải</translation>
+        <translation>Di chuyển sang phải</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation type="unfinished">cuộn xuống</translation>
+        <translation>cuộn xuống</translation>
     </message>
 </context>
 <context>
     <name>ImageControlWidget</name>
     <message>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>điều khiển hình ảnh</translation>
     </message>
     <message>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished">Tỷ lệ màn hình Buộc:</translation>
+        <translation>Tỷ lệ màn hình Buộc:</translation>
     </message>
     <message>
         <source>Default rotation:</source>
-        <translation type="unfinished">Mặc định quay:</translation>
+        <translation>Mặc định quay:</translation>
     </message>
     <message>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished">Đây là một mắt cá (180 độ) camera</translation>
+        <translation>Đây là một mắt cá (180 độ) camera</translation>
     </message>
 </context>
 <context>
@@ -894,7 +894,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished">Đang tải hình ảnh ... Xin vui lòng chờ đợi.</translation>
+        <translation>Đang tải hình ảnh ... Xin vui lòng chờ đợi.</translation>
     </message>
 </context>
 <context>
@@ -949,77 +949,77 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation type="unfinished">Layout bị khóa</translation>
+        <translation>Layout bị khóa</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished">Xử lý hình ảnh ... Xin vui lòng chờ .</translation>
+        <translation>Xử lý hình ảnh ... Xin vui lòng chờ .</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished">Giữ tỉ lệ</translation>
+        <translation>Giữ tỉ lệ</translation>
     </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
     <message>
         <source>Server UR&amp;L:</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ UR&amp;L:</translation>
     </message>
     <message>
         <source>ldap(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation>ldap(s)://host:port</translation>
     </message>
     <message>
         <source>Ad&amp;min DN:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ad&amp;min DN:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;mật khẩu:</translation>
+        <translation>&amp;mật khẩu:</translation>
     </message>
     <message>
         <source>Search Base:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tìm kiếm cơ sở:</translation>
     </message>
     <message>
         <source>Search Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tìm kiếm bộ lọc:</translation>
     </message>
     <message>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>không bắt buộc</translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished">thử nghiệm ...</translation>
+        <translation>thử nghiệm ...</translation>
     </message>
     <message>
         <source>LDAP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP Cài đặt</translation>
     </message>
 </context>
 <context>
     <name>LdapUsersDialog</name>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>Người dùng lấy từ LDAP ...</translation>
     </message>
     <message>
         <source>Select users to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn người dùng để nhập khẩu</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation type="unfinished">Lọc...</translation>
+        <translation>Lọc...</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Đang tải...</translation>
+        <translation>Đang tải...</translation>
     </message>
     <message>
         <source>Connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>Lôi kêt nôi</translation>
     </message>
 </context>
 <context>
@@ -1050,7 +1050,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Loại giấy phép này đòi hỏi phiên bản phần mềm cao hơn.</translation>
     </message>
 </context>
 <context>
@@ -1127,22 +1127,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation type="unfinished">Key bản quyền là không hợp lệ</translation>
+        <translation>Key bản quyền là không hợp lệ</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation type="unfinished">Chọn tập tin giấy phép ...</translation>
+        <translation>Chọn tập tin giấy phép ...</translation>
     </message>
 </context>
 <context>
     <name>LicensesProposeWidget</name>
     <message>
         <source>Licensing</source>
-        <translation type="unfinished">ủy quyền</translation>
+        <translation>ủy quyền</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation type="unfinished">Nhận quyền nhiều hơn(giấy phép)…</translation>
+        <translation>Nhận quyền nhiều hơn(giấy phép)…</translation>
     </message>
 </context>
 <context>
@@ -1186,7 +1186,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished">&amp;Lựa chọn kết nối:</translation>
+        <translation>&amp;Lựa chọn kết nối:</translation>
     </message>
 </context>
 <context>
@@ -1269,7 +1269,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation type="unfinished">Chế độ cột thời gian:</translation>
+        <translation>Chế độ cột thời gian:</translation>
     </message>
 </context>
 <context>
@@ -1300,7 +1300,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished">cho phép âm thanh</translation>
+        <translation>cho phép âm thanh</translation>
     </message>
 </context>
 <context>
@@ -1326,7 +1326,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation type="unfinished">Hiện chỉ có các nhà quản lý</translation>
+        <translation>Hiện chỉ có các nhà quản lý</translation>
     </message>
 </context>
 <context>
@@ -1391,7 +1391,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation type="unfinished">Không có sự lựa chọn hành trình</translation>
+        <translation>Không có sự lựa chọn hành trình</translation>
     </message>
 </context>
 <context>
@@ -1433,7 +1433,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Position</source>
-        <translation type="unfinished">lưu trữ Location</translation>
+        <translation>lưu trữ Location</translation>
     </message>
 </context>
 <context>
@@ -2572,55 +2572,55 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation type="unfinished">Vứt bỏ các nguồn lực để bố trí mới</translation>
+        <translation>Vứt bỏ các nguồn lực để bố trí mới</translation>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation type="unfinished">Chọn máy chủ thời gian</translation>
+        <translation>Chọn máy chủ thời gian</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation type="unfinished">Kích hoạt PTZ đối tượng</translation>
+        <translation>Kích hoạt PTZ đối tượng</translation>
     </message>
     <message>
         <source>User Management...</source>
-        <translation type="unfinished"></translation>
+        <translation>Quản lý người sử dụng ...</translation>
     </message>
     <message>
         <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
+        <translation>Đường mòn kiểm toán...</translation>
     </message>
     <message>
         <source>Move %1</source>
-        <translation type="unfinished"></translation>
+        <translation>chuyển động %1</translation>
     </message>
     <message>
         <source>Check %1 Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra vấn đề %1 ...</translation>
     </message>
     <message>
         <source>%1 List...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 danh sách...</translation>
     </message>
     <message>
         <source>%1 Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Nội quy...</translation>
     </message>
     <message>
         <source>%1 Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Cài đặt...</translation>
     </message>
     <message>
         <source>Open in %1 Settings Dialog...</source>
-        <translation type="unfinished"></translation>
+        <translation>Open in %1 Cài đặt Dialog ...</translation>
     </message>
     <message>
         <source>Add Device(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thêm thiết bị (s) ...</translation>
     </message>
     <message>
         <source>%1 List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Danh sách bởi máy chủ ...</translation>
     </message>
 </context>
 <context>
@@ -2668,216 +2668,216 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnAuditLogDialog</name>
     <message>
         <source>Play this</source>
-        <translation type="unfinished"></translation>
+        <translation>chơi này</translation>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Sao chép vào clipboard lựa chọn</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished">Lựa chọn Export to File...</translation>
+        <translation>Lựa chọn Export to File...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished">chọn tất cả</translation>
+        <translation>chọn tất cả</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished">tìm kiếm</translation>
+        <translation>tìm kiếm</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished">tin tức</translation>
+        <translation>tin tức</translation>
     </message>
     <message>
         <source>No archive data for that position left</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có dữ liệu lưu trữ cho vị trí đó lại</translation>
     </message>
     <message>
         <source>This resources already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation>Nguồn tài nguyên này đã được gỡ bỏ khỏi hệ thống</translation>
     </message>
     <message>
         <source>Export selected records to a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Xuất khẩu chọn lọc hồ sơ vào một tập tin</translation>
     </message>
     <message>
         <source>Audit log replay</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm toán log replay</translation>
     </message>
     <message>
         <source>%1 actions</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 hành động</translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
     <message>
         <source>%1d </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1h </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1m </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">không biết</translation>
+        <translation>không biết</translation>
     </message>
     <message>
         <source>Unsuccessful login</source>
-        <translation type="unfinished"></translation>
+        <translation>đăng nhập không thành công</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">đăng nhập</translation>
+        <translation>đăng nhập</translation>
     </message>
     <message>
         <source>User updated</source>
-        <translation type="unfinished"></translation>
+        <translation>người sử dụng cập nhật</translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation type="unfinished"></translation>
+        <translation>xem trực tiếp</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation type="unfinished"></translation>
+        <translation>xem lưu trữ</translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation>xuất ra video</translation>
     </message>
     <message>
         <source>System name changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Tên hệ thống thay đổi</translation>
     </message>
     <message>
         <source>System merge</source>
-        <translation type="unfinished"></translation>
+        <translation>hệ thống hợp nhất</translation>
     </message>
     <message>
         <source>General settings updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt chung cập nhật</translation>
     </message>
     <message>
         <source>Server updated</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ cập nhật</translation>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Quy tắc kinh doanh cập nhật</translation>
     </message>
     <message>
         <source>Server removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Quy tắc kinh doanh cập nhật</translation>
     </message>
     <message>
         <source>Business rule removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Quy luật kinh doanh bỏ</translation>
     </message>
     <message>
         <source>User removed</source>
-        <translation type="unfinished"></translation>
+        <translation>người dùng xóa</translation>
     </message>
     <message>
         <source>Business rule reseted</source>
-        <translation type="unfinished"></translation>
+        <translation>Business rule reseted</translation>
     </message>
     <message>
         <source>Database restored</source>
-        <translation type="unfinished"></translation>
+        <translation>Cơ sở dữ liệu phục hồi</translation>
     </message>
     <message>
         <source>Play this</source>
-        <translation type="unfinished"></translation>
+        <translation>chơi này</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">thiết lập</translation>
+        <translation>thiết lập</translation>
     </message>
     <message>
         <source>%1 - %2, </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2, </translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n hoạt động</numerusform>
         </translation>
     </message>
     <message>
         <source>Session begins</source>
-        <translation type="unfinished"></translation>
+        <translation>Session bắt đầu</translation>
     </message>
     <message>
         <source>Session ends</source>
-        <translation type="unfinished"></translation>
+        <translation>Session đầu</translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>thời gian</translation>
     </message>
     <message>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>người sử dụng</translation>
     </message>
     <message>
         <source>IP</source>
-        <translation type="unfinished"></translation>
+        <translation>IP</translation>
     </message>
     <message>
         <source>Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>hoạt động</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>ngày tháng</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>thời gian</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished">miêu tả</translation>
+        <translation>miêu tả</translation>
     </message>
     <message>
         <source>View it</source>
-        <translation type="unfinished"></translation>
+        <translation>xem nó</translation>
     </message>
     <message>
         <source>Click to expand</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhấn vào đây để mở rộng</translation>
     </message>
     <message>
         <source>Red mark means that an archive is still available</source>
-        <translation type="unfinished"></translation>
+        <translation>Đánh dấu màu đỏ có nghĩa là một kho lưu trữ vẫn còn có sẵn</translation>
     </message>
     <message>
         <source>E-mail settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt e-mail thay đổi</translation>
     </message>
     <message>
         <source>%1 updated</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 cập nhật</translation>
     </message>
     <message>
         <source>%1 added</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 thêm</translation>
     </message>
     <message>
         <source>%1 removed</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 loại bỏ</translation>
     </message>
     <message>
         <source>%1 name</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 tên</translation>
     </message>
 </context>
 <context>
@@ -2890,7 +2890,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation type="unfinished">Bạn có thông báo mới</translation>
+        <translation>Bạn có thông báo mới.</translation>
     </message>
 </context>
 <context>
@@ -2909,32 +2909,32 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation type="unfinished">Cài đặt xây dựng cụ thể</translation>
+        <translation>Cài đặt xây dựng cụ thể.</translation>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation type="unfinished">Xây dựng số:</translation>
+        <translation>Xây dựng số:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation type="unfinished">Mật khẩu bạn đã nhập không hợp lệ</translation>
+        <translation>Mật khẩu bạn đã nhập không hợp lệ.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
         <source>%n of %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n of %1</numerusform>
         </translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;bất kỳ %1&gt;</translation>
     </message>
     <message>
         <source>Select at least one %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn ít nhất một %1.</translation>
     </message>
 </context>
 <context>
@@ -3014,27 +3014,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Administrators Only</source>
-        <translation type="unfinished">chỉ có các nhà quản lý</translation>
+        <translation>chỉ có các nhà quản lý</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished">Tất cả người dùng</translation>
+        <translation>Tất cả người dùng</translation>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation type="unfinished">Chọn một giọng nói</translation>
+        <translation>Chọn một giọng nói</translation>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation type="unfinished">nhập văn bản</translation>
+        <translation>nhập văn bản</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;bất kỳ %1&gt;</translation>
     </message>
     <message>
         <source>Select at least one %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn ít nhất một %1</translation>
     </message>
 </context>
 <context>
@@ -3049,11 +3049,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;bất kỳ %1&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn ít nhất một %1</translation>
     </message>
 </context>
 <context>
@@ -3112,23 +3112,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation type="unfinished">Thiết lập lại để xác nhận các quy tắc</translation>
+        <translation>Thiết lập lại để xác nhận các quy tắc</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation type="unfinished">Đã xảy ra lỗi khi xóa các quy tắc</translation>
+        <translation>Đã xảy ra lỗi khi xóa các quy tắc.</translation>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation type="unfinished">Xác nhận cửa hàng</translation>
+        <translation>Xác nhận cửa hàng</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished">Xác nhận Exit</translation>
+        <translation>Xác nhận Exit</translation>
     </message>
     <message>
         <source>filter by %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>lọc theo %1 ...</translation>
     </message>
 </context>
 <context>
@@ -3216,81 +3216,81 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation type="unfinished">Các địa chỉ IP được chỉ định là lớn hơn 255 địa chỉ.</translation>
+        <translation>Các địa chỉ IP được chỉ định là lớn hơn 255 địa chỉ.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished">quét End…</translation>
+        <translation>quét End…</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation type="unfinished">Các máy chủ đã được loại bỏ, tìm kiếm không thành.</translation>
+        <translation>Các máy chủ đã được loại bỏ, tìm kiếm không thành.</translation>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished">máy chủ đang ẩn, tìm kiếm thất bại.</translation>
+        <translation>máy chủ đang ẩn, tìm kiếm thất bại.</translation>
     </message>
     <message>
         <source>Device addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ngoài ra thiết bị là có thể cho chỉ máy chủ trực tuyến.</translation>
     </message>
     <message>
         <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị trường địa chỉ bạn cần phải chứa một URL hợp lệ, địa chỉ IP, hoặc liên kết RTSP.</translation>
     </message>
     <message>
         <source>No devices selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có thiết bị được lựa chọn.</translation>
     </message>
     <message>
         <source>Please select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng chọn ít nhất một thiết bị</translation>
     </message>
     <message numerus="yes">
         <source>%n devices added successfully.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n thiết bị thêm thành công.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Lỗi khi thêm %n thiết bị.</numerusform>
         </translation>
     </message>
     <message>
         <source>Server is offline, devices can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ đang ẩn, thiết bị này chỉ có thể được thêm vào một máy chủ trực tuyến.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ đã được gỡ bỏ - không thể thêm các thiết bị.</translation>
     </message>
     <message>
         <source>Error while searching for device(s).</source>
-        <translation type="unfinished"></translation>
+        <translation>Lỗi trong khi tìm kiếm thiết bị (s).</translation>
     </message>
     <message numerus="yes">
         <source>%n devices found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n thiết bị được tìm</numerusform>
         </translation>
     </message>
     <message>
         <source>All devices are already in the resource tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tất cả các thiết bị đã có trong cây tài nguyên.</translation>
     </message>
     <message>
         <source>No devices found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không tìm thấy thiết bị.</translation>
     </message>
     <message>
         <source>Add devices to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Thêm thiết bị cho %1</translation>
     </message>
     <message>
         <source>Add devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thêm thiết bị ...</translation>
     </message>
 </context>
 <context>
@@ -3314,15 +3314,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation type="unfinished">Áp dụng các thiết lập ...</translation>
+        <translation>Áp dụng các thiết lập ...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dịch vụ máy ảnh của mục tiêu là không có. Thử lại.</translation>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation type="unfinished">Không thể lưu thông số</translation>
+        <translation>Không thể lưu thông số.</translation>
     </message>
 </context>
 <context>
@@ -3365,11 +3365,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation type="unfinished">Không khóa lưu trữ</translation>
+        <translation>Không khóa lưu trữ.</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation type="unfinished">Danh sách các thẻ chia bằng dấu phẩy hoặc dấu cách</translation>
+        <translation>Danh sách các thẻ chia bằng dấu phẩy hoặc dấu cách.</translation>
     </message>
 </context>
 <context>
@@ -3388,33 +3388,33 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished">Kiểm tra tính sẵn sàng chủ</translation>
+        <translation>Kiểm tra tính sẵn sàng chủ.</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished">Kiểm tra các lỗi dòng phương tiện truyền thông</translation>
+        <translation>Kiểm tra các lỗi dòng phương tiện truyền thông.</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics hoàn tất!</translation>
     </message>
     <message>
         <source>Diagnostics for %1 %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Chẩn đoán cho %1 %2.</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 Chẩn đoán</translation>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận %1 có thể truy cập.</translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Khẳng định mục tiêu %1 cung cấp dòng phương tiện truyền thông.</translation>
     </message>
 </context>
 <context>
@@ -3449,15 +3449,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 List for &apos;%2&apos; - %3 found</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 List for &apos;%2&apos; - %3 found</translation>
     </message>
     <message>
         <source>%1 List - %2 found</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 List - %2 found</translation>
     </message>
     <message>
         <source>Export selected %1 to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xuất khẩu chọn lọc %1 vào một tập tin.</translation>
     </message>
 </context>
 <context>
@@ -3564,23 +3564,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo! Giá trị tối thiểu cao có thể làm giảm thời hạn khác ghi %1.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển động ghi âm bị vô hiệu hóa hoặc không được hỗ trợ bởi một số các %1 chọn. Xin vui lòng đến trang thiết lập chuyển động để đảm bảo nó được hỗ trợ và kích hoạt.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual-streaming không được hỗ trợ bởi %1 này.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual-Streaming và Motion Detection là không có sẵn cho %1 này.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển động ghi âm bị vô hiệu hóa. Xin vui lòng đến trang thiết lập chuyển động đến khu vực thiết lập chuyển động của %1 và nhạy cảm.</translation>
     </message>
 </context>
 <context>
@@ -3595,47 +3595,47 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished">Những thay đổi tích đã không được lưu. Pick mong muốn Loại Recording, FPS, và chất lượng và đánh dấu những thay đổi về lịch trình.</translation>
+        <translation>Những thay đổi tích đã không được lưu. Pick mong muốn Loại Recording, FPS, và chất lượng và đánh dấu những thay đổi về lịch trình.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished">Không áp dụng các thay đổi</translation>
+        <translation>Không áp dụng các thay đổi.</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation type="unfinished">Độ nhạy phát hiện chuyển động đã không được thay đổi. Hãy Marquee Tool và thay đổi độ nhạy chuyển trên màn hình.</translation>
+        <translation>Độ nhạy phát hiện chuyển động đã không được thay đổi. Hãy Marquee Tool và thay đổi độ nhạy chuyển trên màn hình.</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished">Vượt quá giới hạn cho phép. Để lưu thay đổi của bạn, nhưng sẽ không có hiệu lực.</translation>
+        <translation>Vượt quá giới hạn cho phép. Để lưu thay đổi của bạn, nhưng sẽ không có hiệu lực.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation type="unfinished">Không thể áp dụng các thay đổi</translation>
+        <translation>Không thể áp dụng các thay đổi.</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Cài đặt</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Chẩn đoán</translation>
     </message>
     <message>
         <source>%1 Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Nội quy</translation>
     </message>
     <message>
         <source>%1 not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 không được lưu.</translation>
     </message>
     <message>
         <source>Save changes to the following %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu thay đổi vào các %1 sau?</translation>
     </message>
     <message>
         <source>Could not save the following %1 to Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể lưu %1 sau để Server.</translation>
     </message>
 </context>
 <context>
@@ -3646,7 +3646,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No %1 selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không %1 chọn.</translation>
     </message>
 </context>
 <context>
@@ -3667,22 +3667,22 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnClockLabel</name>
     <message>
         <source>Server Time</source>
-        <translation type="unfinished">thời gian máy chủ</translation>
+        <translation>thời gian máy chủ</translation>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation type="unfinished">Hiện hệ thống địa phương</translation>
+        <translation>Hiện hệ thống địa phương</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation type="unfinished">Cấu hình máy chủ (s)</translation>
+        <translation>Cấu hình máy chủ (s)</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation type="unfinished">Đang cập nhật máy chủ (s)</translation>
+        <translation>Đang cập nhật máy chủ (s)</translation>
     </message>
 </context>
 <context>
@@ -3789,19 +3789,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished">Đăng nhập Tên đăng nhập hoặc mật khẩu không đúng, vui lòng thử lại.</translation>
+        <translation>Đăng nhập Tên đăng nhập hoặc mật khẩu không đúng, vui lòng thử lại.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể kết nối đến máy chủ</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">Quá trình phóng không được tìm thấy</translation>
+        <translation>Quá trình phóng không được tìm thấy.</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối LDAP Server time out.</translation>
     </message>
 </context>
 <context>
@@ -3812,11 +3812,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation type="unfinished">Yêu cầu thời gian ra.</translation>
+        <translation>Yêu cầu thời gian ra</translation>
     </message>
     <message>
         <source>Test Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thử nghiệm</translation>
     </message>
 </context>
 <context>
@@ -3831,7 +3831,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished">Nhập tên người dùng và mật khẩu ...</translation>
+        <translation>Nhập tên người dùng và mật khẩu ...</translation>
     </message>
 </context>
 <context>
@@ -3902,15 +3902,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation type="unfinished">Không thể đổ cơ sở dữ liệu máy chủ để &apos;%1&apos;</translation>
+        <translation>Không thể đổ cơ sở dữ liệu máy chủ để %1.</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có chắc chắn bạn muốn khôi phục lại cơ sở dữ liệu? Tất cả các dữ liệu hiện có sẽ bị mất.</translation>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished">Bạn cần phải kết nối với một máy chủ sao lưu trước khi làm</translation>
+        <translation>Bạn cần phải kết nối với một máy chủ sao lưu trước khi làm.</translation>
     </message>
 </context>
 <context>
@@ -3945,7 +3945,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation type="unfinished">Chiều rộng màn hình phải có một số nhân của 8.</translation>
+        <translation>Chiều rộng màn hình phải có một số nhân của 8.</translation>
     </message>
 </context>
 <context>
@@ -4035,11 +4035,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Any Action</source>
-        <translation type="unfinished">bất kỳ hành động</translation>
+        <translation>bất kỳ hành động</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;bất kỳ %1&gt;</translation>
     </message>
 </context>
 <context>
@@ -4082,7 +4082,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished">Tất cả người dùng</translation>
+        <translation>Tất cả người dùng</translation>
     </message>
 </context>
 <context>
@@ -4093,15 +4093,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Schedule motion type is not supported by some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Loại lịch trình chuyển động không được hỗ trợ bởi một số %1.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ghi âm không thể được kích hoạt cho một số %1.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết lập lịch trình không tương thích với một số %1.</translation>
     </message>
 </context>
 <context>
@@ -4147,11 +4147,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished">Thư mục đã được thêm vào</translation>
+        <translation>Thư mục đã được thêm vào.</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished">Thư mục này đã được thêm vào.</translation>
+        <translation>Thư mục này đã được thêm vào.</translation>
     </message>
 </context>
 <context>
@@ -4166,11 +4166,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open %1 List</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở Danh sách %1</translation>
     </message>
     <message>
         <source>%1 List</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 danh sách</translation>
     </message>
 </context>
 <context>
@@ -4248,127 +4248,127 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnIOPortItemDelegate</name>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>tàn tật</translation>
     </message>
     <message>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>đầu vào</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Đầu ra</translation>
     </message>
     <message>
         <source>Open circuit</source>
-        <translation type="unfinished"></translation>
+        <translation>mở mạch</translation>
     </message>
     <message>
         <source>Grounded circuit</source>
-        <translation type="unfinished"></translation>
+        <translation>mạch nối đất</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>hình thức</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortsViewModel</name>
     <message>
         <source>#</source>
-        <translation type="unfinished">#</translation>
+        <translation>#</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished">kiểu</translation>
+        <translation>kiểu</translation>
     </message>
     <message>
         <source>Default state</source>
-        <translation type="unfinished"></translation>
+        <translation>trạng thái mặc định</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">tên</translation>
+        <translation>tên</translation>
     </message>
     <message>
         <source>Pulse time(ms)</source>
-        <translation type="unfinished"></translation>
+        <translation>Thời gian xung (ms)</translation>
     </message>
     <message>
         <source>Unknown</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished">không biết</translation>
+        <translation>không biết</translation>
     </message>
     <message>
         <source>Disabled</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>tàn tật</translation>
     </message>
     <message>
         <source>Input</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>đầu vào</translation>
     </message>
     <message>
         <source>Output</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>Đầu ra</translation>
     </message>
     <message>
         <source>Invalid</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>vô hiệu</translation>
     </message>
     <message>
         <source>Open Circuit</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>mở mạch</translation>
     </message>
     <message>
         <source>Grounded circuit</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>mạch nối đất</translation>
     </message>
     <message>
         <source>Invalid state</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>nhà nước không hợp lệ</translation>
     </message>
 </context>
 <context>
     <name>QnImageControlWidget</name>
     <message>
         <source>4:3</source>
-        <translation type="unfinished">4:3</translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation type="unfinished">16:9</translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <source>1:1</source>
-        <translation type="unfinished">1:1</translation>
+        <translation>1:1</translation>
     </message>
     <message>
         <source>%1 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 độ</translation>
     </message>
 </context>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
         <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể bật IO port &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Không để tắt cổng IO &apos;%1&apos;</translation>
     </message>
     <message>
         <source>IO port error</source>
-        <translation type="unfinished"></translation>
+        <translation>Lỗi cổng IO</translation>
     </message>
 </context>
 <context>
@@ -4383,11 +4383,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not create output file %1.</source>
-        <translation type="unfinished">Không thể tạo tập tin đầu ra %1.</translation>
+        <translation>Không thể tạo tập tin đầu ra %1.</translation>
     </message>
     <message>
         <source>Could not export %1 %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể xuất %1 %2.</translation>
     </message>
 </context>
 <context>
@@ -4429,16 +4429,16 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapSettingsDialog</name>
     <message>
         <source>Test</source>
-        <translation type="unfinished">thử</translation>
+        <translation>thử</translation>
     </message>
     <message>
         <source>Test failed</source>
-        <translation type="unfinished"></translation>
+        <translation>thử nghiệm thất bại</translation>
     </message>
     <message numerus="yes">
         <source>Test completed successfully: %n users found.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kiểm tra đã hoàn thành công: %n người đã được tìm thấy.</numerusform>
         </translation>
     </message>
 </context>
@@ -4446,73 +4446,73 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Các thiết lập được cung cấp không hợp lệ.</translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể thực hiện một thử nghiệm.</translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation type="unfinished">giờ nghĩ giảo lao</translation>
+        <translation>giờ nghĩ giảo lao</translation>
     </message>
 </context>
 <context>
     <name>QnLdapUserListModel</name>
     <message>
         <source>Login</source>
-        <translation type="unfinished">đăng nhập</translation>
+        <translation>đăng nhập</translation>
     </message>
     <message>
         <source>Full Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Họ và tên</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation type="unfinished">Emai</translation>
+        <translation>Emai</translation>
     </message>
     <message>
         <source>DN</source>
-        <translation type="unfinished"></translation>
+        <translation>DN</translation>
     </message>
 </context>
 <context>
     <name>QnLdapUsersDialog</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Các thiết lập được cung cấp không hợp lệ.</translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể thực hiện một thử nghiệm.</translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
     </message>
     <message>
         <source>Could not load users.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể tải người sử dụng.</translation>
     </message>
     <message>
         <source>Import users</source>
-        <translation type="unfinished"></translation>
+        <translation>người sử dụng nhập khẩu</translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation type="unfinished">giờ nghĩ giảo lao</translation>
+        <translation>giờ nghĩ giảo lao</translation>
     </message>
     <message>
         <source>Error while loading users.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lỗi trong khi tải người sử dụng.</translation>
     </message>
     <message>
         <source>No new users found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có người dùng mới được tìm thấy.</translation>
     </message>
 </context>
 <context>
@@ -4675,35 +4675,35 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation type="unfinished">Lấy giấy phép từ Server ...</translation>
+        <translation>Lấy giấy phép từ Server ...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Giấy phép đã arleady được kích hoạt.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation type="unfinished">Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi mạng đã xảy ra.</translation>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi mạng đã xảy ra.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished">Không thể kích hoạt giấy phép: %1</translation>
+        <translation>Không thể kích hoạt giấy phép: %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished">Không thể loại bỏ giấy phép từ máy chủ:%1</translation>
+        <translation>Không thể loại bỏ giấy phép từ máy chủ:%1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">Key bản quyền này trước đó đã được kích hoạt để id phần cứng %1. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <translation>Key bản quyền này trước đó đã được kích hoạt để id phần cứng %1. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation type="unfinished">Lỗi mạng đã xảy ra trong quá trình kích hoạt giấy phép tự động. Hãy liên hệ với nhóm hỗ trợ để kích hoạt key bản quyền của bạn bằng tay.</translation>
+        <translation>Lỗi mạng đã xảy ra trong quá trình kích hoạt giấy phép tự động. Hãy liên hệ với nhóm hỗ trợ để kích hoạt key bản quyền của bạn bằng tay.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation type="unfinished">Hướng dẫn khóa kích hoạt tập tin bạn đã chọn không hợp lệ. Chọn đúng nhãn key kích hoạt tập tin. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ.</translation>
+        <translation>Hướng dẫn khóa kích hoạt tập tin bạn đã chọn không hợp lệ. Chọn đúng nhãn key kích hoạt tập tin. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ.</translation>
     </message>
 </context>
 <context>
@@ -4768,13 +4768,13 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
         <source>Use analog licenses to view these %n cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Sử dụng giấy phép tương tự để xem những %n máy ảnh</numerusform>
         </translation>
     </message>
     <message>
         <source>Use licenses for selected %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sử dụng giấy phép cho %1 chọn</translation>
     </message>
 </context>
 <context>
@@ -4833,19 +4833,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation type="unfinished">Lập luận không hợp lệ</translation>
+        <translation>Lập luận không hợp lệ</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation type="unfinished">Kết nối đã tồn tại</translation>
+        <translation>Kết nối đã tồn tại.</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished">Cùng tên đã tồn tại trong kết nối, bạn có muốn ghi đè lên nó?</translation>
+        <translation>Cùng tên đã tồn tại trong kết nối, bạn có muốn ghi đè lên nó?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation type="unfinished">xóa kết nối</translation>
+        <translation>xóa kết nối</translation>
     </message>
 </context>
 <context>
@@ -4908,7 +4908,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished">Chọn File...</translation>
+        <translation>Chọn File...</translation>
     </message>
 </context>
 <context>
@@ -4966,15 +4966,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO Module</translation>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation type="unfinished">phóng to cửa sổ</translation>
+        <translation>phóng to cửa sổ</translation>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation type="unfinished">Độ phân giải thấp</translation>
+        <translation>Độ phân giải thấp</translation>
     </message>
 </context>
 <context>
@@ -5072,19 +5072,21 @@ Short for &quot;seconds&quot;</extracomment>
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo: Bạn muốn hợp nhất hệ thống với giấy phép START.
+Vì chỉ có 1 giấy phép START phép cho mỗi hệ thống sau khi hợp nhất của bạn, bạn sẽ chỉ có 1 giấy phép BẮT ĐẦU còn lại.
+Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng bấm Merge để tiếp tục.</translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished">thử nghiệm ...</translation>
+        <translation>thử nghiệm ...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation type="unfinished">sáp nhập hệ thống ...</translation>
+        <translation>sáp nhập hệ thống ...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished">Việc tìm thấy hệ thống %1 có một phiên bản không tương thích %2.</translation>
+        <translation>Việc tìm thấy hệ thống %1 có một phiên bản không tương thích %2.</translation>
     </message>
 </context>
 <context>
@@ -5101,11 +5103,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished">lịch trình không hợp lệ</translation>
+        <translation>lịch trình không hợp lệ</translation>
     </message>
     <message>
         <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Phần thứ hai được vô hiệu hóa trên các máy ảnh. Tùy chọn chuyển động + LQ không có hiệu lực. Nhấn &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
     </message>
 </context>
 <context>
@@ -5219,19 +5221,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Sound Files</source>
-        <translation type="unfinished">Lưu trữ âm thanh</translation>
+        <translation>Lưu trữ âm thanh</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished">Chọn File...</translation>
+        <translation>Chọn File...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation type="unfinished">Nhập tiêu đề mới:</translation>
+        <translation>Nhập tiêu đề mới:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation type="unfinished">Xác nhận tập tin Xóa</translation>
+        <translation>Xác nhận tập tin Xóa</translation>
     </message>
 </context>
 <context>
@@ -5304,19 +5306,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Open %1</source>
-        <translation type="unfinished"></translation>
+        <translation>mở %1</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Cài đặt</translation>
     </message>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">cài đặt máy chủ</translation>
+        <translation>cài đặt máy chủ</translation>
     </message>
     <message>
         <source>Open %1 Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở %1 trang Web ...</translation>
     </message>
 </context>
 <context>
@@ -5408,27 +5410,27 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation type="unfinished">Không thể có được từ vị trí camera</translation>
+        <translation>Không thể có được từ vị trí camera.</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation type="unfinished">Bạn không thể thiết lập vị trí camera</translation>
+        <translation>Bạn không thể thiết lập vị trí camera.</translation>
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation type="unfinished">Hủy bỏ các điểm định sẵn</translation>
+        <translation>Hủy bỏ các điểm định sẵn</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
-        <translation type="unfinished">quản lý PTZ %1.</translation>
+        <translation>quản lý PTZ %1.</translation>
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished">PTZ Các giá trị cài đặt không được lưu trữ</translation>
+        <translation>PTZ Các giá trị cài đặt không được lưu trữ.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished">Những thay đổi chưa được lưu. Bạn có chắc chắn muốn lưu chúng?</translation>
+        <translation>Những thay đổi chưa được lưu. Bạn có chắc chắn muốn lưu chúng?</translation>
     </message>
 </context>
 <context>
@@ -5493,19 +5495,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation type="unfinished">du lịch mới %1</translation>
+        <translation>du lịch mới %1</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
-        <translation type="unfinished">lưu trữ Location %1</translation>
+        <translation>lưu trữ Location %1</translation>
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation type="unfinished">Cruise phải chứa ít nhất hai hoặc nhiều vị trí</translation>
+        <translation>Cruise phải chứa ít nhất hai hoặc nhiều vị trí.</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation type="unfinished">thời gian tour：%1</translation>
+        <translation>thời gian tour：%1.</translation>
     </message>
 </context>
 <context>
@@ -5535,11 +5537,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation type="unfinished">Các phím nóng là thời điểm định sẵn &quot;%1&quot; dùng</translation>
+        <translation>Các phím nóng là thời điểm định sẵn &quot;%1&quot; dùng.</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation type="unfinished">Hotkey này đã được bay đường &quot;%1&quot; dùng</translation>
+        <translation>Hotkey này đã được bay đường &quot;%1&quot; dùng.</translation>
     </message>
 </context>
 <context>
@@ -5630,90 +5632,90 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnRecordingStatisticsWidget</name>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Sao chép vào clipboard lựa chọn</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished">Lựa chọn Export to File...</translation>
+        <translation>Lựa chọn Export to File...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished">chọn tất cả</translation>
+        <translation>chọn tất cả</translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation type="unfinished">Xuất khẩu chọn lọc sự kiện để nộp</translation>
+        <translation>Xuất khẩu chọn lọc sự kiện để nộp</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatsModel</name>
     <message numerus="yes">
         <source>%n years</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n năm</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n months</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n tháng</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n ngày</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n giờ</numerusform>
         </translation>
     </message>
     <message>
         <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation type="unfinished"></translation>
+        <translation>Thời gian lưu trữ trong những ngày lịch giữa các bản ghi đầu tiên và thời điểm hiện tại</translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrate trung bình trong khoảng thời gian ghi</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished">Spacebar</translation>
+        <translation>Spacebar</translation>
     </message>
     <message>
         <source>Calendar Days</source>
-        <translation type="unfinished"></translation>
+        <translation>Lịch ngày</translation>
     </message>
     <message>
         <source>less than an hour</source>
-        <translation type="unfinished"></translation>
+        <translation>ít hơn một giờ</translation>
     </message>
     <message>
         <source>%1 Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Mbps</translation>
     </message>
     <message>
         <source>%1 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tb</translation>
     </message>
     <message>
         <source>%1 Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Gb</translation>
     </message>
     <message>
         <source>Total %1</source>
-        <translation type="unfinished"></translation>
+        <translation>tổng số %1</translation>
     </message>
     <message>
         <source>%1 with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 với kho lưu trữ không có sản phẩm nào</translation>
     </message>
     <message>
         <source>Storage space occupied by %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Không gian lưu trữ bị chiếm đóng bởi %1</translation>
     </message>
 </context>
 <context>
@@ -5763,7 +5765,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Live %1</source>
-        <translation type="unfinished"></translation>
+        <translation>LIVE %1</translation>
     </message>
 </context>
 <context>
@@ -5793,15 +5795,15 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation type="unfinished">Chọn người dùng...</translation>
+        <translation>Chọn người dùng...</translation>
     </message>
     <message>
         <source>Select Resources...</source>
-        <translation type="unfinished">Chọn Tài...</translation>
+        <translation>Chọn Tài...</translation>
     </message>
     <message>
         <source>Select %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>lựa chọn %1...</translation>
     </message>
 </context>
 <context>
@@ -5939,90 +5941,90 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>General</source>
-        <translation type="unfinished">chung</translation>
+        <translation>chung</translation>
     </message>
     <message>
         <source>Storage Analytics</source>
-        <translation type="unfinished"></translation>
+        <translation>phân tích lưu trữ</translation>
     </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
     <message>
         <source>Remove Storage</source>
-        <translation type="unfinished">Hủy bỏ các thiết bị lưu trữ</translation>
+        <translation>Hủy bỏ các thiết bị lưu trữ</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Đang tải...</translation>
+        <translation>Đang tải...</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation type="unfinished">không được phép</translation>
+        <translation>không được phép</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">sự phản đối</translation>
+        <translation>sự phản đối</translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation type="unfinished">Bạn muốn khởi động các kho lưu trữ thường xuyên tái đồng bộ hóa.</translation>
+        <translation>Bạn muốn khởi động các kho lưu trữ thường xuyên tái đồng bộ hóa.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished">Chú ý! Sử dụng đĩa cứng của bạn sẽ được tăng lên trong quá trình tái đồng bộ! Tùy thuộc vào kích thước tổng thể của kho lưu trữ có thể mất vài giờ.</translation>
+        <translation>Chú ý! Sử dụng đĩa cứng của bạn sẽ được tăng lên trong quá trình tái đồng bộ! Tùy thuộc vào kích thước tổng thể của kho lưu trữ có thể mất vài giờ.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">Quá trình này chỉ cần thiết nếu các thư mục lưu trữ của bạn đã được di chuyển, đổi tên hoặc thay thế. Bạn có thể xây dựng lại hủy bỏ hoạt động bất cứ lúc nào mà không mất dữ liệu.</translation>
+        <translation>Quá trình này chỉ cần thiết nếu các thư mục lưu trữ của bạn đã được di chuyển, đổi tên hoặc thay thế. Bạn có thể xây dựng lại hủy bỏ hoạt động bất cứ lúc nào mà không mất dữ liệu.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Bạn có chắc muốn tiếp tục không?</translation>
+        <translation>Bạn có chắc muốn tiếp tục không?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">Xây dựng lại chỉ mục lưu trữ để lưu trữ &apos;%1&apos; là trong tiến trình</translation>
+        <translation>Xây dựng lại chỉ mục lưu trữ để lưu trữ &apos;%1&apos; là trong tiến trình</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">Scan lưu trữ nhanh chóng cho việc lưu trữ &apos;%1&apos; là trong tiến trình</translation>
+        <translation>Scan lưu trữ nhanh chóng cho việc lưu trữ &apos;%1&apos; là trong tiến trình</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished">đóng</translation>
+        <translation>đóng</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished">Thư mục hoàn chỉnh xây dựng lại.</translation>
+        <translation>Thư mục hoàn chỉnh xây dựng lại.</translation>
     </message>
     <message>
         <source>At least two servers are required for this feature.</source>
-        <translation type="unfinished">Ít nhất hai máy chủ được yêu cầu cho tính năng này.</translation>
+        <translation>Ít nhất hai máy chủ được yêu cầu cho tính năng này.</translation>
     </message>
     <message>
         <source>Could not load storages from server.</source>
-        <translation type="unfinished">Không thể tải thiết bị lưu trữ từ máy chủ.</translation>
+        <translation>Không thể tải thiết bị lưu trữ từ máy chủ.</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished">Thêm lưu trữ gắn ngoài ...</translation>
+        <translation>Thêm lưu trữ gắn ngoài ...</translation>
     </message>
     <message>
         <source>Enable failover (server will take %1 automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt tính năng chuyển đổi dự phòng (máy chủ sẽ tự động %1 từ server offline)</translation>
     </message>
     <message>
         <source>Max. %1 on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. %1 trên máy chủ này:</translation>
     </message>
     <message>
         <source>This server already has more than max %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ này đã có hơn max %1</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Để tránh sự cố điều chỉnh số lượng tối đa của %1</translation>
     </message>
 </context>
 <context>
@@ -6252,79 +6254,79 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chú ý: Áp dụng hệ thống cập nhật vào cuối tuần này không được khuyến khích.</translation>
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation type="unfinished">Phiên bản mới nhất:</translation>
+        <translation>Phiên bản mới nhất:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation type="unfinished">Phiên bản mục tiêu:</translation>
+        <translation>Phiên bản mục tiêu:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation type="unfinished">Cập nhật xong ... 100%</translation>
+        <translation>Cập nhật xong ... 100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng cập nhật cho khách hàng bằng tay.</translation>
     </message>
     <message>
         <source>Please update the client manually using an installation package.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng cập nhật cho khách hàng bằng tay dùng một gói cài đặt.</translation>
     </message>
     <message>
         <source>Update Succeeded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật Kế nhiệm.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">Quá trình phóng không được tìm thấy</translation>
+        <translation>Quá trình phóng không được tìm thấy.</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation type="unfinished">Cập nhật hủy</translation>
+        <translation>Cập nhật hủy</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished">Cập nhật thành công</translation>
+        <translation>Cập nhật thành công.</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished">Một người nào đó đã bắt đầu cập nhật.</translation>
+        <translation>Một người nào đó đã bắt đầu cập nhật.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished">Vấn đề kết nối Internet</translation>
+        <translation>Vấn đề kết nối Internet</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không như xây dựng sẵn trên máy chủ cập nhật.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished">Không thể bắt đầu cập nhật. Bản cập nhật cho một hoặc nhiều máy chủ đã không được tìm thấy.</translation>
+        <translation>Không thể bắt đầu cập nhật. Bản cập nhật cho một hoặc nhiều máy chủ đã không được tìm thấy.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished">Không thể bắt đầu cập nhật. Bản cập nhật cho khách hàng đã không được tìm thấy.</translation>
+        <translation>Không thể bắt đầu cập nhật. Bản cập nhật cho khách hàng đã không được tìm thấy.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể giải nén tập tin cập nhật.</translation>
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished">Không thể kiểm tra cập nhật thông qua internet.</translation>
+        <translation>Không thể kiểm tra cập nhật thông qua internet.</translation>
     </message>
     <message>
         <source>Available Update:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sẵn có:</translation>
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished">Để cập nhật bằng tay, tải về một kho lưu trữ với các liên kết sau đây:</translation>
+        <translation>Để cập nhật bằng tay, tải về một kho lưu trữ với các liên kết sau đây:</translation>
     </message>
 </context>
 <context>
@@ -6339,58 +6341,58 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation type="unfinished">không thể tìm thấy một watermark</translation>
+        <translation>không thể tìm thấy một watermark</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation type="unfinished">watermark phù hợp</translation>
+        <translation>watermark phù hợp</translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished"></translation>
+        <translation>FPS trị là quá cao</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fps hiện trong lưới lịch là %1. Fps được giảm xuống tối đa %2 camera fps.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đối với chuyển động phần mềm 2 fps được dành riêng cho các dòng thứ cấp. Fps hiện trong lưới lịch là %1. Fps đã giảm xuống %2.</translation>
     </message>
     <message>
         <source>Invalid schedule</source>
-        <translation type="unfinished">lịch trình không hợp lệ</translation>
+        <translation>lịch trình không hợp lệ</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished">Phần thứ hai được vô hiệu hóa trên máy ảnh này. Tùy chọn Chuyển động + LQ không có effect.Press &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
+        <translation>Phần thứ hai được vô hiệu hóa trên máy ảnh này. Tùy chọn Chuyển động + LQ không có effect.Press &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
     </message>
     <message>
         <source>Confirm motion regions reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận vùng chuyển động res</translation>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có chắc chắn muốn thiết lập lại vùng chuyển động để mặc định?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished">Hành động này không thể khôi phục!</translation>
+        <translation>Hành động này không thể khôi phục!</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished">Phần cứng (camera built-in)</translation>
+        <translation>Phần cứng (camera built-in)</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation type="unfinished">Không sử dụng các video chuyển</translation>
+        <translation>Không sử dụng các video chuyển</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Cài đặt</translation>
     </message>
 </context>
 <context>
@@ -6441,23 +6443,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">Đối số không hợp lệ, kiểm tra không thể thực thi.</translation>
+        <translation>Đối số không hợp lệ, kiểm tra không thể thực thi.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">giờ nghĩ giảo lao</translation>
+        <translation>giờ nghĩ giảo lao</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished">E-Mail vô hiệu</translation>
+        <translation>E-Mail vô hiệu</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished">Không cài đặt trước được tìm thấy. Sử dụng tùy chọn &apos;cao cấp&apos;</translation>
+        <translation>Không cài đặt trước được tìm thấy. Sử dụng tùy chọn &apos;cao cấp&apos;.</translation>
     </message>
     <message>
         <source>Support email is not valid.</source>
-        <translation type="unfinished">Hỗ trợ email không hợp lệ</translation>
+        <translation>Hỗ trợ email không hợp lệ.</translation>
     </message>
 </context>
 <context>
@@ -6499,31 +6501,31 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No video stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có dòng video</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished">Chẩn đoán...</translation>
+        <translation>Chẩn đoán...</translation>
     </message>
     <message>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>cho phép</translation>
     </message>
     <message>
         <source>Activate license...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt giấy phép ...</translation>
     </message>
     <message>
         <source>Module is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>mô-đun bị vô hiệu hóa</translation>
     </message>
     <message>
         <source>Server Offline</source>
-        <translation type="unfinished">máy chủ đang ẩn</translation>
+        <translation>máy chủ đang ẩn</translation>
     </message>
     <message>
         <source>Please check authentication information in %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng kiểm tra thông tin xác thực trong cài đặt %1</translation>
     </message>
 </context>
 <context>
@@ -6545,23 +6547,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished">Windows mạng chia sẻ tài nguyên</translation>
+        <translation>Windows mạng chia sẻ tài nguyên</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống có máy chủ khác sử dụng các đường dẫn lưu trữ cùng một mạng. Ghi dữ liệu bằng nhiều máy chủ để chính xác cùng một vị trí không được khuyến cáo.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">sự phản đối</translation>
+        <translation>sự phản đối</translation>
     </message>
     <message>
         <source>Add storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Thêm lưu trữ</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished">Cung cấp đường dẫn lưu trữ không định nghĩa một thiết bị lưu trữ bên ngoài hiệu quả.</translation>
+        <translation>Cung cấp đường dẫn lưu trữ không định nghĩa một thiết bị lưu trữ bên ngoài hiệu quả.</translation>
     </message>
 </context>
 <context>
@@ -6612,18 +6614,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Users</source>
-        <translation type="unfinished">người sử dụng</translation>
+        <translation>người sử dụng</translation>
     </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable %1 and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt tính năng %1 và máy chủ phát hiện tự động</translation>
     </message>
     <message>
         <source>Allow system to optimize %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cho phép hệ thống để tối ưu hóa các thiết lập %1</translation>
     </message>
 </context>
 <context>
@@ -6867,105 +6869,105 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnUserListModel</name>
     <message>
         <source>LDAP user</source>
-        <translation type="unfinished"></translation>
+        <translation>người dùng LDAP</translation>
     </message>
     <message>
         <source>Normal user</source>
-        <translation type="unfinished"></translation>
+        <translation>người dùng bình thường</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Bật</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Edit user</source>
-        <translation type="unfinished"></translation>
+        <translation>chỉnh sửa người dùng</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">tên</translation>
+        <translation>tên</translation>
     </message>
     <message>
         <source>Permissions</source>
-        <translation type="unfinished"></translation>
+        <translation>Quyền</translation>
     </message>
     <message>
         <source>LDAP</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP</translation>
     </message>
 </context>
 <context>
     <name>QnUserListModelPrivate</name>
     <message>
         <source>Owner</source>
-        <translation type="unfinished">chủ nhân</translation>
+        <translation>chủ nhân</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished">giám sát viên</translation>
+        <translation>giám sát viên</translation>
     </message>
     <message>
         <source>View live video</source>
-        <translation type="unfinished"></translation>
+        <translation>Xem video trực tiếp</translation>
     </message>
     <message>
         <source>Use PTZ controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Sử dụng điều khiển PTZ</translation>
     </message>
     <message>
         <source>View video archives</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ Xem video</translation>
     </message>
     <message>
         <source>Export video</source>
-        <translation type="unfinished"></translation>
+        <translation>video và xuất ra</translation>
     </message>
     <message>
         <source>Edit Video Walls</source>
-        <translation type="unfinished"></translation>
+        <translation>chỉnh sửa Video Walls</translation>
     </message>
     <message>
         <source>Adjust %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Điều chỉnh cài đặt %1</translation>
     </message>
 </context>
 <context>
     <name>QnUserManagementWidget</name>
     <message>
         <source>LDAP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt LDAP ...</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation type="unfinished">Lọc...</translation>
+        <translation>Lọc...</translation>
     </message>
     <message>
         <source>New User...</source>
-        <translation type="unfinished">Người dùng mới…</translation>
+        <translation>Người dùng mới…</translation>
     </message>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>Người dùng lấy từ LDAP ...</translation>
     </message>
     <message>
         <source>Enable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Cho phép chọn</translation>
     </message>
     <message>
         <source>Disable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Vô hiệu hoá chọn lọc</translation>
     </message>
     <message>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>xóa chọn</translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation type="unfinished">rõ ràng Selection</translation>
+        <translation>rõ ràng Selection</translation>
     </message>
 </context>
 <context>
@@ -7048,15 +7050,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To modify your password, please enter existing one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Để thay đổi mật khẩu của bạn, xin vui lòng nhập vào một trong hiện tại.</translation>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation type="unfinished">Người dùng được đổi tên. Mật khẩu phải được cập nhật.</translation>
+        <translation>Người dùng được đổi tên. Mật khẩu phải được cập nhật.</translation>
     </message>
     <message>
         <source>Can adjust %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Có thể điều chỉnh cài đặt %1</translation>
     </message>
 </context>
 <context>
@@ -7114,11 +7116,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished">start video wall when the Windows starts</translation>
+        <translation>start video wall when the Windows starts.</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đặt shortcut trên desktop.</translation>
     </message>
 </context>
 <context>
@@ -7332,69 +7334,69 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished">việc bố trí mới</translation>
+        <translation>việc bố trí mới</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished">新佈局 %1</translation>
+        <translation>新佈局 %1</translation>
     </message>
     <message>
         <source>Open File</source>
-        <translation type="unfinished">mở tập tin</translation>
+        <translation>mở tập tin</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished">Tìm kiếm không thể thực thi Preview</translation>
+        <translation>Tìm kiếm không thể thực thi Preview.</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished">Không thể tìm thấy khởi động</translation>
+        <translation>Không thể tìm thấy khởi động...</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation type="unfinished">bức tường video có cùng tên đã tồn tại</translation>
+        <translation>bức tường video có cùng tên đã tồn tại.</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation type="unfinished">nền Đang cập nhật</translation>
+        <translation>nền Đang cập nhật...</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished">Xử lý hình ảnh sẽ tiêu thụ một số thời gian, xin vui lòng chờ đợi.</translation>
+        <translation>Xử lý hình ảnh sẽ tiêu thụ một số thời gian, xin vui lòng chờ đợi.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đây là một phiên bản beta của %1.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">Không thể tìm thấy khởi động</translation>
+        <translation>Không thể tìm thấy khởi động.</translation>
     </message>
     <message>
         <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể di chuyển đến máy chủ %1 %2. Máy chủ không phản hồi.</translation>
     </message>
     <message>
         <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ %1 là không thể tìm và truy cập các %2. Bạn có chắc là bạn muốn di chuyển chúng?</translation>
     </message>
     <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ngoài ra thiết bị đã có trong progress.Are Bạn có chắc chắn bạn muốn hủy bỏ quá trình hiện tại?</translation>
     </message>
     <message>
         <source>These %1 are auto-discovered.</source>
-        <translation type="unfinished"></translation>
+        <translation>Những %1 được tự động phát hiện.</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n trong số này %1 được tự động phát hiện.</numerusform>
         </translation>
     </message>
     <message>
         <source>Do you really want to delete the following %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có thực sự muốn xóa %1 sau đây?</translation>
     </message>
 </context>
 <context>
@@ -7413,19 +7415,19 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation type="unfinished">Bookmark chỉ có thể được thêm vào một máy chủ trực tuyến.</translation>
+        <translation>Bookmark chỉ có thể được thêm vào một máy chủ trực tuyến.</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation type="unfinished">Bookmark chỉ có thể được chỉnh sửa trên một máy chủ trực tuyến.</translation>
+        <translation>Bookmark chỉ có thể được chỉnh sửa trên một máy chủ trực tuyến.</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation type="unfinished">Bookmark chỉ có thể bị xóa khỏi máy chủ trực tuyến.</translation>
+        <translation>Bookmark chỉ có thể bị xóa khỏi máy chủ trực tuyến.</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished">Xác nhận xóa</translation>
+        <translation>Xác nhận xóa</translation>
     </message>
 </context>
 <context>
@@ -7475,15 +7477,15 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation type="unfinished">Video không thể được vì lỗi sau đây：%1</translation>
+        <translation>Video không thể được vì lỗi sau đây：%1</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished">Không thể ghi đè lên tập tin &apos;%1&apos;, Hãy thử một tên khác.</translation>
+        <translation>Không thể ghi đè lên tập tin &apos;%1&apos;, Hãy thử một tên khác.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation type="unfinished">Nhấn phím bất kỳ để ngăn chặn bánh xe hop</translation>
+        <translation>Nhấn phím bất kỳ để ngăn chặn bánh xe hop.</translation>
     </message>
 </context>
 <context>
@@ -7600,71 +7602,71 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>File is in use.</source>
-        <translation type="unfinished">Các tập tin trong sử dụng</translation>
+        <translation>Các tập tin trong sử dụng.</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể xuất file.</translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">sự phản đối</translation>
+        <translation>sự phản đối!</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished">Không có thời gian đóng dấu</translation>
+        <translation>Không có thời gian đóng dấu</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation type="unfinished">Góc trên bên trái (cần phải chuyển mã)</translation>
+        <translation>Góc trên bên trái (cần phải chuyển mã)</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation type="unfinished">Góc trên bên phải (cần phải chuyển mã)</translation>
+        <translation>Góc trên bên phải (cần phải chuyển mã)</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation type="unfinished">Góc dưới bên trái (cần phải chuyển mã)</translation>
+        <translation>Góc dưới bên trái (cần phải chuyển mã)</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation type="unfinished">góc dưới bên phải (cần phải chuyển mã)</translation>
+        <translation>góc dưới bên phải (cần phải chuyển mã)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation type="unfinished">File video xuất ra mà bạn chọn cần chuyển mã, hành động chuyển mã sẽ mất một thời gian dài, bạn có chắc muốn tiếp tục không?</translation>
+        <translation>File video xuất ra mà bạn chọn cần chuyển mã, hành động chuyển mã sẽ mất một thời gian dài, bạn có chắc muốn tiếp tục không?</translation>
     </message>
     <message>
         <source>Export Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>xuất khẩu hoàn chỉnh</translation>
     </message>
     <message>
         <source>Export Successful</source>
-        <translation type="unfinished"></translation>
+        <translation>xuất khẩu thành công</translation>
     </message>
     <message>
         <source>Unable to export layout.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể xuất khẩu bố trí.</translation>
     </message>
     <message>
         <source>Unable to save layout.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể lưu bố trí.</translation>
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation type="unfinished">Lưu bố trí địa phương…</translation>
+        <translation>Lưu bố trí địa phương…</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation type="unfinished">Việc tạo ra tập tin là chế độ một mình</translation>
+        <translation>Việc tạo ra tập tin là chế độ một mình.</translation>
     </message>
     <message>
         <source>Export Successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xuất khẩu thành công.</translation>
     </message>
     <message>
         <source>Unable to export video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể xuất video.</translation>
     </message>
 </context>
 <context>
@@ -7718,23 +7720,25 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo: Bạn muốn hợp nhất hệ thống với giấy phép START.
+Vì chỉ có 1 giấy phép START phép cho mỗi hệ thống sau khi hợp nhất của bạn, bạn sẽ chỉ có 1 giấy phép BẮT ĐẦU còn lại.
+Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng bấm Merge để tiếp tục.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">sự phản đối</translation>
+        <translation>sự phản đối</translation>
     </message>
     <message>
         <source>Merge</source>
-        <translation type="unfinished"></translation>
+        <translation>Hợp nhất</translation>
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished">Xin vui lòng chờ đợi trước khi các máy chủ yêu cầu trước đó sẽ được bổ sung vào hệ thống của bạn.</translation>
+        <translation>Xin vui lòng chờ đợi trước khi các máy chủ yêu cầu trước đó sẽ được bổ sung vào hệ thống của bạn.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation type="unfinished">Các máy chủ đã chọn đã được kết nối thành công với hệ thống của bạn!</translation>
+        <translation>Các máy chủ đã chọn đã được kết nối thành công với hệ thống của bạn!</translation>
     </message>
 </context>
 <context>
@@ -7793,23 +7797,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation type="unfinished">Giao diện đã tồn tại</translation>
+        <translation>Giao diện đã tồn tại.</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation type="unfinished">Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó.</translation>
+        <translation>Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation type="unfinished">Nhập tên bố trí:</translation>
+        <translation>Nhập tên bố trí:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished">Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó?</translation>
+        <translation>Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished">việc bố trí mới %1</translation>
+        <translation>việc bố trí mới %1</translation>
     </message>
 </context>
 <context>
@@ -7836,7 +7840,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>All %1</source>
-        <translation type="unfinished"></translation>
+        <translation>tất cả %1</translation>
     </message>
 </context>
 <context>
@@ -7859,15 +7863,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished">Không thể có được từ vị trí camera</translation>
+        <translation>Không thể có được từ vị trí camera.</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished">無法設定攝影機的位置</translation>
+        <translation>Unable to set position for camera.</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể thiết lập vị trí của camera.</translation>
     </message>
 </context>
 <context>
@@ -7910,35 +7914,35 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished">Không có thời gian đóng dấu</translation>
+        <translation>Không có thời gian đóng dấu</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation type="unfinished">góc trên bên trái</translation>
+        <translation>góc trên bên trái</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation type="unfinished">góc trên bên phải</translation>
+        <translation>góc trên bên phải</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation type="unfinished">góc dưới cùng bên trái</translation>
+        <translation>góc dưới cùng bên trái</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation type="unfinished">góc dưới bên phải</translation>
+        <translation>góc dưới bên phải</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation type="unfinished">Tập tin không thể được ghi đè</translation>
+        <translation>Tập tin không thể được ghi đè.</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation type="unfinished">Không thể lưu ảnh chụp màn hình</translation>
+        <translation>Không thể lưu ảnh chụp màn hình.</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished">Khi một lỗi xảy ra khi lưu trữ Ảnh chụp màn hình &apos;%1&apos;。</translation>
+        <translation>Khi một lỗi xảy ra khi lưu trữ Ảnh chụp màn hình &apos;%1&apos;。</translation>
     </message>
 </context>
 <context>
@@ -7969,15 +7973,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished">Phiên bản mới hơn có sẵn</translation>
+        <translation>Phiên bản mới hơn có sẵn.</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished">Cập nhật được khuyến cáo</translation>
+        <translation>Cập nhật được khuyến cáo.</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished">Không có thông báo về bản cập nhật này.</translation>
+        <translation>Không có thông báo về bản cập nhật này.</translation>
     </message>
 </context>
 <context>
@@ -8079,43 +8083,43 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation type="unfinished">Phiên điều khiển đã chạy</translation>
+        <translation>Phiên điều khiển đã chạy.</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation type="unfinished">Lỗi không mong muốn đã xảy ra. Thay đổi không thể được cứu.</translation>
+        <translation>Lỗi không mong muốn đã xảy ra. Thay đổi không thể được cứu.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation type="unfinished">Không có mục videowall ẩn gắn liền với máy tính này.</translation>
+        <translation>Không có mục videowall ẩn gắn liền với máy tính này.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished">tường video sẽ được bắt đầu ngay bây giờ. Bạn có muốn đóng %1 Khách hàng dụ này?</translation>
+        <translation>tường video sẽ được bắt đầu ngay bây giờ. Bạn có muốn đóng %1 Khách hàng dụ này?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Giấy phép bổ sung cần thiết.</translation>
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished">Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép Video Wall.</translation>
+        <translation>Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép Video Wall.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished">Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép Video Wall.</translation>
+        <translation>Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép Video Wall.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation type="unfinished">bức tường video đã tồn tại</translation>
+        <translation>bức tường video đã tồn tại.</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation type="unfinished">bức tường video có cùng tên đã tồn tại</translation>
+        <translation>bức tường video có cùng tên đã tồn tại.</translation>
     </message>
     <message>
         <source>%n items</source>
-        <translation type="unfinished"></translation>
+        <translation>%n mặt hàng</translation>
     </message>
 </context>
 <context>
@@ -8126,7 +8130,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished">Xin vui lòng chờ trong khi kết nối đang được phục hồi ...</translation>
+        <translation>Xin vui lòng chờ trong khi kết nối đang được phục hồi ...</translation>
     </message>
 </context>
 <context>
@@ -8149,11 +8153,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation type="unfinished">pre-recording:</translation>
+        <translation>pre-recording:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation type="unfinished">bài-ghi âm:</translation>
+        <translation>bài-ghi âm:</translation>
     </message>
 </context>
 <context>
@@ -8260,58 +8264,58 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Một máy tính mạnh mẽ được khuyến khích cho &quot;Best&quot; chất lượng và độ phân giải.</translation>
     </message>
 </context>
 <context>
     <name>RecordingStatisticsWidget</name>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished">Làm mới</translation>
+        <translation>Làm mới</translation>
     </message>
     <message>
         <source>10 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>10 Tb</translation>
     </message>
     <message>
         <source>Forecast for full storage(s) usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Dự báo dung lượng sử dụng đầy đủ</translation>
     </message>
     <message>
         <source>0 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Tb</translation>
     </message>
     <message>
         <source>Additional storage:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bổ sung:</translation>
     </message>
     <message>
         <source>1000 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>1000 Tb</translation>
     </message>
     <message>
         <source>100 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>100 Tb</translation>
     </message>
     <message>
         <source>Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>Tb</translation>
     </message>
     <message>
         <source>1 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tb</translation>
     </message>
     <message>
         <source>Current usage</source>
-        <translation type="unfinished"></translation>
+        <translation>sử dụng hiện tại</translation>
     </message>
     <message>
         <source>Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>dự báo</translation>
     </message>
     <message>
         <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ đang ẩn. Thống kê là không có sẵn.</translation>
     </message>
 </context>
 <context>
@@ -8374,98 +8378,99 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>ServerSettingsDialog</name>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">cài đặt máy chủ</translation>
+        <translation>cài đặt máy chủ</translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">tên:</translation>
+        <translation>tên:</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation type="unfinished">IP :</translation>
+        <translation>IP :</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation type="unfinished">Ping</translation>
+        <translation>Ping</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished">port:</translation>
+        <translation>port:</translation>
     </message>
     <message>
         <source>9000</source>
-        <translation type="unfinished">9000</translation>
+        <translation>9000</translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation type="unfinished">Sao lưu</translation>
+        <translation>Sao lưu</translation>
     </message>
     <message>
         <source>Storages</source>
-        <translation type="unfinished">cửa hàng</translation>
+        <translation>cửa hàng</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation type="unfinished">dùng</translation>
+        <translation>dùng</translation>
     </message>
     <message>
         <source>Protocol</source>
-        <translation type="unfinished"></translation>
+        <translation>Nghị định thư</translation>
     </message>
     <message>
         <source>Path</source>
-        <translation type="unfinished">đường dẫn</translation>
+        <translation>đường dẫn</translation>
     </message>
     <message>
         <source>Capacity</source>
-        <translation type="unfinished">khả năng</translation>
+        <translation>khả năng</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">đăng nhập</translation>
+        <translation>đăng nhập</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">mật khẩu</translation>
+        <translation>mật khẩu</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished">Spacebar</translation>
+        <translation>Spacebar</translation>
     </message>
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bỏ chọn lưu trữ sẽ gây ra gì, nhưng văn bản dừng.
+Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa.</translation>
     </message>
     <message>
         <source>Rebuild archive index</source>
-        <translation type="unfinished">Danh mục hàng Tái thiết</translation>
+        <translation>Danh mục hàng Tái thiết</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished">bắt đầu</translation>
+        <translation>bắt đầu</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">hủy bỏ</translation>
+        <translation>hủy bỏ</translation>
     </message>
 </context>
 <context>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation type="unfinished">watermark</translation>
+        <translation>watermark tra</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation type="unfinished">Kiểm tra các tài liệu lưu trữ:</translation>
+        <translation>Kiểm tra các tài liệu lưu trữ:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation type="unfinished">Kết quả thử nghiệm:</translation>
+        <translation>Kết quả thử nghiệm:</translation>
     </message>
 </context>
 <context>
@@ -8552,47 +8557,47 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>IO ports</source>
-        <translation type="unfinished"></translation>
+        <translation>cổng IO</translation>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished">cho phép âm thanh</translation>
+        <translation>cho phép âm thanh</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished">Máy ảnh này không hỗ trợ phát hiện chuyển động</translation>
+        <translation>Máy ảnh này không hỗ trợ phát hiện chuyển động.</translation>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation type="unfinished">Displacement bộ</translation>
+        <translation>Displacement bộ</translation>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation type="unfinished">phát hiện chuyển động:</translation>
+        <translation>phát hiện chuyển động</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation type="unfinished"></translation>
+        <translation>Phần mềm - tối đa FPS có thể giảm nhẹ trên máy chủ</translation>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished">Không phát hiện di dời (0)</translation>
+        <translation>Không phát hiện di dời (0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished">Máy ảnh trang phát hiện chuyển động:</translation>
+        <translation>Máy ảnh trang phát hiện chuyển động:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished">Thiết lập lại khu vực phát hiện chuyển động</translation>
+        <translation>Thiết lập lại khu vực phát hiện chuyển động</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished">Phần cứng (camera built-in)</translation>
+        <translation>Phần cứng (camera built-in)</translation>
     </message>
     <message>
         <source>Fisheye</source>
-        <translation type="unfinished"></translation>
+        <translation>Fisheye</translation>
     </message>
 </context>
 <context>
@@ -8679,19 +8684,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">Nhập một mô tả ngắn gọn của hệ thống...</translation>
+        <translation>Nhập một mô tả ngắn gọn của hệ thống.</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">Dây không an toàn</translation>
+        <translation>Dây không an toàn</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">dùng TLS kết nối an toàn</translation>
+        <translation>dùng TLS kết nối an toàn.</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">dùng SSL kết nối an toàn</translation>
+        <translation>dùng SSL kết nối an toàn.</translation>
     </message>
 </context>
 <context>
@@ -8732,19 +8737,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
+        <translation>Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation type="unfinished">(đề nghị)</translation>
+        <translation>(đề nghị)</translation>
     </message>
     <message>
         <source>Enable audit trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt tính năng dấu vết kiểm toán</translation>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation type="unfinished"></translation>
+        <translation>Gửi sử dụng và crash thống kê vô danh với các nhà phát triển phần mềm</translation>
     </message>
 </context>
 <context>
@@ -8755,11 +8760,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation type="unfinished">Thời gian hiện tại:</translation>
+        <translation>Thời gian hiện tại:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn một máy chủ có sẵn tại địa phương để hoạt động như một máy chủ thời gian nếu hệ thống không có truy cập Internet:</translation>
     </message>
 </context>
 <context>
@@ -8798,11 +8803,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished">&amp;Email:</translation>
+        <translation>&amp;Email:</translation>
     </message>
     <message>
         <source>Enabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>được kích hoạt:</translation>
     </message>
 </context>
 <context>
@@ -8821,11 +8826,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>lịch trình</translation>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished">Lưu ý: Lịch trình thời gian cho thời gian máy chủ</translation>
+        <translation>Lưu ý: Lịch trình thời gian cho thời gian máy chủ.</translation>
     </message>
 </context>
 </TS>

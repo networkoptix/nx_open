@@ -36,6 +36,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     m_transcodingDisabled = false;
     m_systemIdentityTime = 0;
     m_lowPriorityAdminPassword = false;
+    m_localPeerType = Qn::PT_NotDefined;
 }
 
 QnCommonModule::~QnCommonModule() {
@@ -185,4 +186,14 @@ void QnCommonModule::updateRunningInstanceGuid()
 {
     QMutexLocker lock(&m_mutex);
     m_runUuid = QnUuid::createUuid();
+}
+
+void QnCommonModule::setLocalPeerType(Qn::PeerType peerType)
+{
+    m_localPeerType = peerType;
+}
+
+Qn::PeerType QnCommonModule::localPeerType() const
+{
+    return m_localPeerType;
 }

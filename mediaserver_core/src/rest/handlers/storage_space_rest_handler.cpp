@@ -40,10 +40,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
     for(const QnStorageResourcePtr &storage: qnStorageMan->getStorages()) {
         QString path;
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource>(storage);
-        if (fileStorage != nullptr && !fileStorage->getLocalPath().isEmpty())
+        if (fileStorage != nullptr)
             path = QnStorageResource::toNativeDirPath(fileStorage->getLocalPath());
-        else
-            path = QnStorageResource::toNativeDirPath(storage->getPath());
         
         if (storage->hasFlags(Qn::deprecated))
             continue;

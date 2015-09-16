@@ -193,8 +193,8 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
 
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url) 
 {
-    const QVector<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QVector<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
+    const QVector<QString> mainHardwareIds = qnLicensePool->mainHardwareIds();
+    const QVector<QString> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
 
     if (QnRuntimeInfoManager::instance()->remoteInfo().isNull()) {
         emit showMessageLater(tr("License Activation"),
@@ -220,7 +220,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     }
 
     int hw = 0;
-    foreach (const QByteArray& hwid, mainHardwareIds) {
+    foreach (const QString& hwid, mainHardwareIds) {
         QString name;
         if (hw == 0)
             name = QLatin1String("oldhwid");
@@ -229,7 +229,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         else
             name = QString(QLatin1String("hwid%1")).arg(hw);
 
-        params.addQueryItem(name, QLatin1String(hwid));
+        params.addQueryItem(name, hwid);
 
         hw++;
     }
@@ -237,9 +237,9 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         params.addQueryItem(lit("mode"), lit("info"));
 
     hw = 1;
-    foreach (const QByteArray& hwid, compatibleHardwareIds) {
+    foreach (const QString& hwid, compatibleHardwareIds) {
         QString name = QString(QLatin1String("chwid%1")).arg(hw);
-        params.addQueryItem(name, QLatin1String(hwid));
+        params.addQueryItem(name, hwid);
         hw++;
     }
 
@@ -487,7 +487,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
                 break;
             case QnLicense::InvalidHardwareID:
                 message = tr("This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.")
-                    .arg(QString::fromUtf8(license->hardwareId()));
+                    .arg(license->hardwareId());
                 break;
             case QnLicense::InvalidBrand:
             case QnLicense::InvalidType:
