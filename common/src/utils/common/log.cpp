@@ -17,11 +17,11 @@ const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
+    const QString str = value.toUpper().trimmed();
     //adding "DISABLED" alias for cl_logALWAYS log level to make it more intuitive how to disable logging using rest handler
-    if (value == lit("DISABLED"))
+    if (str == lit("DISABLED"))
         return cl_logALWAYS;
 
-    QString str = value.toUpper().trimmed();
     for (uint i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
         if (str == QLatin1String(qn_logLevelNames[i]))
             return QnLogLevel(i);
