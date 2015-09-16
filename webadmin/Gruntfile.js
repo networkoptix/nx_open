@@ -132,12 +132,20 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '10.0.2.186', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.186', port: 7011}/**/
 
-                // Burbank - test
-                {context: '/api/',      host: '10.0.2.121', port: 7001},
+                // Sasha V
+                /*{context: '/api/',      host: '10.0.2.121', port: 7001},
                 {context: '/ec2/',      host: '10.0.2.121', port: 7001},
                 {context: '/hls/',      host: '10.0.2.121', port: 7001},
                 {context: '/media/',    host: '10.0.2.121', port: 7001},
                 {context: '/proxy/',    host: '10.0.2.121', port: 7001}/**/
+
+                // Gdm
+                /*{context: '/api/',      host: '10.0.2.240', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.240', port: 7001},
+                {context: '/hls/',      host: '10.0.2.240', port: 7001},
+                {context: '/media/',    host: '10.0.2.240', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.240', port: 7001}/**/
+
 
                 // Burbank - test
                 /*{context: '/api/',      host: '10.1.5.126', port: 7001},
@@ -154,7 +162,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '95.31.136.2', port: 7011}/**/
 
                 // Olya
-                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
+                {context: '/api/',      host: '10.0.2.169', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.169', port: 7011},
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
