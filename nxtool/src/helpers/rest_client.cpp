@@ -28,10 +28,7 @@ namespace
     {
         QnMulticast::Request result;
         result.method = (isGetRequest ? "GET" : "POST");
-        /// TODO: remove when Roman fix server
-        const QString tmp = (request.path.isEmpty() || request.path[0] != '/' ? request.path
-            : request.path.right(request.path.length() - 1) + "?" + request.params.toString());
-        result.url = tmp;
+        result.url = request.path;
         result.serverId = request.target->id;
         result.contentType = "application/json";
         result.auth.setUser(rtu::RestClient::adminUserName());
