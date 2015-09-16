@@ -50,7 +50,8 @@ if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then
     mkdir -p $MNTBOOTHDDPART
     mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
     mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
-    if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ]; then HDDNX1=true; else HDDNX1=false; fi
+    HDDMAC=`cat $MNTBOOTHDDPART/var/tmp/mac`
+    if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ] && [ "$HDDMAC" = "$MAC" ]; then HDDNX1=true; else HDDNX1=false; fi
     ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
     ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
     if [ ! -z $ARCHIVE_FILES ] && [ ! -z $ARCHIVE_DB ]; then ARCHIVE=true; else ARCHIVE=false; fi
@@ -137,7 +138,6 @@ reboot_from_sd () {
 }
 
 system_restore () {
-    rm $MNTBOOTHDDPART/restored
     if [ -z $DISK ]; then 
         echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
         echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
@@ -145,9 +145,10 @@ system_restore () {
     fi
     
     if [ "$BOOTDEVICE" = "ata" ]; then
-        fsck.ext4 /dev/mmcblk0p2 -fy
+        rm /restored
+        fsck.ext4 $DATAPART -fy
         mkdir -p $MNTBOOTPART
-        mount -t ext4 $BOOTPART $MNTBOOTPART
+        mount -t vfat $BOOTPART $MNTBOOTPART
         if [ ! -f $MNTBOOTPART/restore ]; then touch $MNTBOOTPART/restore; fi
         umount $BOOTPART
         rm -Rf $MNTBOOTPART
@@ -158,8 +159,13 @@ system_restore () {
     fi    
 
     if [ "$BOOTDEVICE" = "mmc" ] && [ ! -f /restore ]; then 
+        mkdir -p $MNTBOOTHDDPART
+        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
+        rm $MNTBOOTHDDPART/restored         
+        umount $BOOTHDDPART
+        rm -Rf $MNTBOOTHDDPART
         echo "++++++++++++++ REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ REBOOTING FOR RESTORE ++++++++++++++" >> $NX1LOG        
+        echo `date` "++++++++++++++ REBOOTING FOR RESTORE ++++++++++++++" >> $NX1LOG
         touch /restore
         hddboot_indicator_create
         shutdown -rF now
@@ -167,14 +173,14 @@ system_restore () {
     fi
     
     if [ -f /restore ]; then
-        /etc/init.d/nx1led restore
+        /etc/init.d/nx1led restore         
         rm /etc/udev/rules.d/70-persistent-net.rules
         for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $BOOTHDDPART
         for p in $( lsof | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
-        umount $DATAHDDPART        
+        umount $DATAHDDPART    
         if [ "$ARCHIVE" = "false" ]; then 
             echo "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >&2 >/dev/kmsg
             echo `date` "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >> $NX1LOG
@@ -226,22 +232,78 @@ system_restore () {
             shutdown -rF now
             exit 0
         fi        
-        rsync -arx --progress  --delete / $MNTBOOTHDDPART --exclude 'mnt' >&2 >/dev/kmsg
+        for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
+        sleep 2
+        umount $BOOTHDDPART        
+        dd if=$DATAPART of=$BOOTHDDPART bs=4096 conv=notrunc,noerror,sync
+        #rsync -arx --progress  --delete / $MNTBOOTHDDPART --exclude 'mnt' >&2 >/dev/kmsg
         sync
-        echo "/dev/sda2    /mnt/hdd/data    ext4    defaults        0       0" >> $MNTBOOTHDDPART/etc/fstab
+        #echo "/dev/sda2    /mnt/hdd/data    ext4    defaults        0       0" >> $MNTBOOTHDDPART/etc/fstab
+        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
+        rm -Rf $MNTBOOTHDDPART/mnt
+        mkdir $MNTBOOTHDDPART/mnt
         rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
         rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var/
         cp -f /root/tools/nx/mediaserver.conf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc
         cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
+        #restoring saved IP configuration
+        if [ -f /var/tmp/interfaces ] && [ -f /var/tmp/keep_ip ]; then
+            cp -f /var/tmp/interfaces $MNTBOOTHDDPART/etc/network
+        else
+            cp -f /root/tools/network/interfaces $MNTBOOTHDDPART/etc/network
+        fi    
+        delete_saved_ipconfig
+        rm /var/tmp/interfaces
+        rm /var/tmp/keep_ip         
         rm $MNTBOOTHDDPART/restore
         touch $MNTBOOTHDDPART/restored
+        echo $MAC > $MNTBOOTHDDPART/var/tmp/mac
         hddboot_indicator_flush
         umount $BOOTHDDPART
         /etc/init.d/nx1led stop
         shutdown -rF now
         exit 0
+    fi    
+}
+
+save_ipconfig() {
+# saves IP configuration and sets the flag to restore it after reboot (if reboot happened during restore process)
+    echo "++++++++++++++ SAVING IP CONFIG... ++++++++++++++" >&2 >/dev/kmsg
+    if [ "$BOOTDEVICE" = "mmc" ]; then
+        mkdir -p $MNTBOOTHDDPART
+        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART  
+        if [ -f $MNTBOOTHDDPART/etc/network/interfaces ]; then 
+            cp -f $MNTBOOTHDDPART/etc/network/interfaces /var/tmp
+        else
+            cp -f /etc/network/interfaces /var/tmp
+        fi
+        touch /var/tmp/keep_ip
+        umount $BOOTHDDPART    
+    fi
+    if [ "$BOOTDEVICE" = "ata" ]; then
+        mkdir -p $MNTDATAPART
+        mount -t ext4 $DATAPART $MNTDATAPART 
+        cp -f /etc/network/interfaces $MNTDATAPART/var/tmp
+        touch $MNTDATAPART/var/tmp/keep_ip
+        umount $DATAPART
+        rm -Rf $MNTDATAPART  
+    fi    
+}
+
+delete_saved_ipconfig() {
+    if [ "$BOOTDEVICE" = "mmc" ]; then
+        rm /var/tmp/interfaces
+        rm /var/tmp/keep_ip   
+    fi
+    if [ "$BOOTDEVICE" = "ata" ]; then
+        mkdir -p $MNTDATAPART
+        mount -t ext4 $DATAPART $MNTDATAPART 
+        rm $MNTDATAPART/var/tmp/interfaces
+        rm $MNTDATAPART/var/tmp/keep_ip
+        umount $DATAPART
+        rm -Rf $MNTDATAPART  
     fi    
 }
 
@@ -293,6 +355,9 @@ case "$1" in
   stop)
 	# No-op
 	;;
+  reboot)
+	shutdown -rF now 
+	;;     
   boot_sd)
 	reboot_from_sd 
 	;;    
@@ -300,10 +365,15 @@ case "$1" in
 	reboot_from_hdd
 	;;        
   restore)
-	system_restore
-	;;        
+	delete_saved_ipconfig
+    system_restore
+	;;
+  restore_keep_ip)
+	save_ipconfig
+    system_restore
+	;;     
   *)
-	echo "Usage: nx1boot [start|stop|boot_sd|boot_hdd|restore]" >&2
+	echo "Usage: nx1boot [start|stop|reboot|boot_sd|boot_hdd|restore|restore_keep_ip]" >&2
 	exit 3
 	;;
 esac

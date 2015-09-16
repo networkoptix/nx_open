@@ -3134,7 +3134,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             cu.min_archive_days as minArchiveDays,             \
             cu.max_archive_days as maxArchiveDays,             \
             cu.prefered_server_id as preferedServerId,         \
-            cu.license_used as licenseUsed                     \
+            cu.license_used as licenseUsed,                    \
             cu.failover_priority as failoverPriority           \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
