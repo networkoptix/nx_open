@@ -9,7 +9,7 @@
 #include <string>
 
 #include <QtCore/QAtomicInt>
-#include <QtCore/QElapsedTimer>
+#include <QtCore/QDateTime>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QWaitCondition>
@@ -31,14 +31,12 @@ public:
     bool terminated;
     //!ID of task, being executed. 0, if no running task
     quint64 runningTaskID;
-    QElapsedTimer monotonicClock;
 
     TimerManagerImpl()
     :
         terminated( false ),
         runningTaskID( 0 )
     {
-        monotonicClock.restart();
     }
 
     void addTaskNonSafe(
@@ -46,7 +44,7 @@ public:
         std::function<void( quint64 )> taskHandler,
         const unsigned int delayMillis )
     {
-        const qint64 taskTime = monotonicClock.elapsed() + delayMillis;
+        const qint64 taskTime = QDateTime::currentMSecsSinceEpoch() + delayMillis;
 
         if( !timeToTask.insert( make_pair(
                 make_pair( taskTime, timerID ),
@@ -185,7 +183,7 @@ void TimerManager::run()
     {
         try
         {
-            qint64 currentTime = m_impl->monotonicClock.elapsed();
+            qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
             for( ;; )
             {
                 if( m_impl->timeToTask.empty() )
@@ -216,7 +214,7 @@ void TimerManager::run()
                     break;
             }
 
-            currentTime = m_impl->monotonicClock.elapsed();
+            currentTime = QDateTime::currentMSecsSinceEpoch();
             if( m_impl->timeToTask.empty() )
                 m_impl->cond.wait( lk.mutex() );
             else if( m_impl->timeToTask.begin()->first.first > currentTime )

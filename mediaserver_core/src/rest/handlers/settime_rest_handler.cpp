@@ -1,12 +1,10 @@
 #include <QFile>
 
 #include "settime_rest_handler.h"
-#include <api/app_server_connection.h>
 #include <utils/network/tcp_connection_priv.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
-
 
 #ifdef Q_OS_LINUX
 #include <sys/time.h>
@@ -75,11 +73,6 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't set new datetime value"));
         return CODE_OK;
     }
-
 #endif
-
-    //ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    //ec2Connection->getTimeManager()->forceTimeResync();
-
     return CODE_OK;
 }
