@@ -60,7 +60,7 @@ namespace rtu
         QString hostAddress;
         int port;
 
-        bool discoveredByHttp;
+        bool accessibleByHttp;
     };
     
     bool operator == (const BaseServerInfo &first

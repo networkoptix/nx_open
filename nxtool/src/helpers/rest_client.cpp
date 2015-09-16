@@ -120,10 +120,9 @@ rtu::HttpClient::ErrorCallback rtu::RestClient::Impl::makeHttpErrorCallback(cons
     const auto httpTryErrorCallback = 
         [this, request, isGetRequest, data](RequestError errorCode)
     {
-        qDebug() << " --- HTTP error callback " << request.path << " : " << static_cast<int>(errorCode);
         if (errorCode == RequestError::kUnauthorized)
         {
-            request.target->discoveredByHttp = true;
+            request.target->accessibleByHttp = true;
             emit m_owner->accessMethodChanged(request.target->id, true);
 
             if (request.errorCallback)
@@ -165,7 +164,7 @@ rtu::RestClient::SuccessCallback rtu::RestClient::Impl::makeHttpReplyCallback(co
 {
     const auto result = [this, request](const QByteArray &data)
     {
-        request.target->discoveredByHttp = true;
+        request.target->accessibleByHttp = true;
         emit m_owner->accessMethodChanged(request.target->id, true);
         if (request.replyCallback)
             request.replyCallback(data);
@@ -195,23 +194,17 @@ QnMulticast::ResponseCallback rtu::RestClient::Impl::makeCallbackForMulticast(co
         const rtu::RequestError requestError = 
             convertMulticastClientErrorToGlobal(errCode, response.httpResult);
         
-        qDebug() << " --- Multicast callback " << request.path << " : " << static_cast<int>(requestError) << " : " << response.httpResult;
-
         if ((requestError == RequestError::kSuccess) 
             || (requestError == RequestError::kUnauthorized))
         {
-            request.target->discoveredByHttp = false;
+            request.target->accessibleByHttp = false;
             emit m_owner->accessMethodChanged(request.target->id, false);
         }
 
         if (requestError == rtu::RequestError::kSuccess)
         {
-            if (request.path.contains("iflist"))
-                qDebug() << "\n" << response.messageBody << "\n";
-
             if (request.replyCallback)
                 request.replyCallback(response.messageBody);
-
         }
         else if (request.errorCallback)
             request.errorCallback(requestError);
@@ -260,10 +253,7 @@ rtu::RestClient::~RestClient()
 
 void rtu::RestClient::sendGet(const Request &request)
 {
-    qDebug() << "++++ Sending GET [ " << (request.target->discoveredByHttp ? "HTTP" : "MULTICAST") 
-        << " ] : " << request.path << " with password " << request.password;
-
-    if (request.target->discoveredByHttp)
+    if (request.target->accessibleByHttp)
         implInstance().sendHttpGet(request);
     else
         implInstance().sendMulticastGet(request);
@@ -272,7 +262,7 @@ void rtu::RestClient::sendGet(const Request &request)
 void rtu::RestClient::sendPost(const Request &request
     , const QByteArray &data)
 {
-    if (request.target->discoveredByHttp)
+    if (request.target->accessibleByHttp)
         implInstance().sendHttpPost(request, data);
     else
         implInstance().sendMulticastPost(request, data);
@@ -291,8 +281,8 @@ const QStringList &rtu::RestClient::defaultAdminPasswords()
     static QStringList result = []() -> QStringList
     {
         QStringList result;
-        result.push_back("123");
         result.push_back("admin");
+        result.push_back("123");
         return result;
     }();
 

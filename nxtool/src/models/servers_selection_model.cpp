@@ -517,8 +517,12 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kSystemNameRoleId:
             return systemInfo.name;
         case kNameRoleId:
-            return QString("%1 (%2) (%3)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress)
-                .arg(info.baseInfo().discoveredByHttp ? "HTTP" : "MULTICAST");  /// TODO: remove after inner testing
+            if (info.baseInfo().displayAddress.isEmpty())
+                return QString("%1 (%2)").arg(info.baseInfo().name)
+                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST");  /// TODO: remove after inner testing
+            else 
+                return QString("%1 (%2) (%3)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress)
+                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST");  /// TODO: remove after inner testing
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
@@ -1113,7 +1117,6 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
     if (searchInfo.serverInfoIterator->loginState == kServerUnauthorized)
         return;
 
-    qDebug() << "--- Sending update request";
     const ServerInfo &foundInfo = searchInfo.serverInfoIterator->serverInfo;
     ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
         : ServerInfo(baseInfo, foundInfo.extraInfo()));
@@ -1184,7 +1187,6 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     if (!findServer(baseInfo.id, searchInfo))
         return;
     
-    qDebug() << " ----- " << (searchInfo.serverInfoIterator->serverInfo.baseInfo().discoveredByHttp ? " HTTP " : " MULTICAST ");
     unknownRemoved(baseInfo.hostAddress);
     ServerInfo foundServer = searchInfo.serverInfoIterator->serverInfo;
     if ((searchInfo.serverInfoIterator->selectedState == Qt::Checked)
@@ -1280,8 +1282,8 @@ void rtu::ServersSelectionModel::Impl::changeAccessMethod(const QUuid &id
     if (!findServer(id, searchInfo))
         return;
 
-    qDebug() << " ----- SWITCHING TO " << (byHttp ? "HTTP" : "MULTICAST");
-    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().discoveredByHttp = byHttp;
+    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().accessibleByHttp = byHttp;
+    m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);  /// TODO: remove after testing
 }
 
 void rtu::ServersSelectionModel::Impl::removeServers(const IDsVector &removed)

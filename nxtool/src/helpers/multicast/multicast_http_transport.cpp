@@ -25,7 +25,7 @@ static const int MULTICAST_PORT = 7001;
 static const int MAX_SEND_BUFFER_SIZE = 1024 * 8;      // how many bytes we send before socket delay
 static const int SOCKET_RECV_BUFFER_SIZE = 1024 * 128; // socket read buffer size
 static const int SEND_RETRY_COUNT = 2;                 // how many times send all UDP packets
-static const int SEND_BITRATE = 1024*1024 * 2;         // send data at speed 2Mbps
+static const int SEND_BITRATE = 1024*1024 * 8;         // send data at speed 2Mbps
 static const int DELAY_IF_OVERFLOW_MS = 100;           // delay if send buffer overflow
 
 static const int PROCESSED_REQUESTS_CACHE_SZE = 512;  // keep last sessions to ignore UDP duplicates

@@ -57,7 +57,8 @@ namespace rtu
     
     void multicastModuleInformation(const QUuid &id
         , const BaseServerInfoCallback &successCallback
-        , const OperationCallback &failedCallback);
+        , const OperationCallback &failedCallback
+        , int timeout);
 
     void getTime(const BaseServerInfoPtr &baseInfo
         , const QString &password

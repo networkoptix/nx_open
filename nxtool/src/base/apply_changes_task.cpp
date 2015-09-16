@@ -366,9 +366,9 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &in
     };
     
     BaseServerInfo &currentBase = *request.item->first;
-    const bool currentDiscoverByHttp = currentBase.discoveredByHttp;
+    const bool currentDiscoverByHttp = currentBase.accessibleByHttp;
     currentBase = info;
-    currentBase.discoveredByHttp = currentDiscoverByHttp;
+    currentBase.accessibleByHttp = currentDiscoverByHttp;
     request.inProgress = true;
     
     sendIfListRequest(request.item->first, request.item->second.password

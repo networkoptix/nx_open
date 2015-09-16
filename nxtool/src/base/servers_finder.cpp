@@ -15,6 +15,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QRegularExpression>
 
 #include <base/server_info.h>
 #include <base/requests.h>
@@ -28,6 +29,15 @@
 
 namespace
 {
+    const QHostAddress kMulticastGroupAddress = QHostAddress("239.255.11.11");
+    const quint16 kMulticastGroupPort = 5007;
+    
+    const QByteArray kSearchRequestBody("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
+    const int kSearchRequestSize = kSearchRequestBody.size();
+}
+
+namespace
+{
     const QString kMediaServerType = "Media Server";
     
     const QString kApplicationTypeTag = "application";
@@ -38,7 +48,8 @@ namespace
     {
         kUpdateServersInfoInterval = 2000
         , kUnknownHostTimeout = 60 * 1000
-        , kServerAliveTimeout = 12 * 1000
+        , kServerAliveTimeout = 15 * 1000
+        , kMulticastUpdatePeriod = kServerAliveTimeout / 2
     };
 
     enum { kInvalidOpSize = -1 };
@@ -73,16 +84,33 @@ namespace
         const rtu::Constants::ServerFlags secondFlags = (second.flags & ~excludeFlags);
         return (firstFlags != secondFlags);
     }
-
-}
-
-namespace
-{
-    const QHostAddress kMulticastGroupAddress = QHostAddress("239.255.11.11");
-    const quint16 kMulticastGroupPort = 5007;
     
-    const QByteArray kSearchRequestBody("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
-    const int kSearchRequestSize = kSearchRequestBody.size();
+    QUuid extractMulticastId(const QByteArray &data)
+    {
+        enum { kDelimiterSize = 2 };
+
+        if (!data.contains(kSearchRequestBody) || (data.size() <= kSearchRequestSize))
+            return QUuid();
+
+        const QByteArray extraData = data.right(data.size() - (kSearchRequestSize + kDelimiterSize));
+
+        static const char kFieldsDelimiter = ',';
+        static const char kValueDelimiter = ':';
+        static const QByteArray kSeedTag = "seed";
+        
+        const auto fieldsData = extraData.split(kFieldsDelimiter);
+        for (QString field: fieldsData)
+        {
+            if (!field.contains(kSeedTag))
+                continue;
+
+            field.remove(QRegularExpression("[{}\"]"));
+            const auto idValue = field.trimmed().split(kValueDelimiter).back();
+            return QUuid(idValue.trimmed());
+        }
+
+        return QUuid();
+    }
 }
 
 namespace 
@@ -103,13 +131,7 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        if (
-            !jsonObject.value("systemName").toString().contains("000_nx1")
-            )
-            return false;
-        
         rtu::parseModuleInformationReply(jsonObject, info);
-
         return true;
     }
 
@@ -147,7 +169,12 @@ public:
 
 private:
     typedef QSharedPointer<QUdpSocket> SocketPtr;
+    
+    void updateServerByMulticast(const QUuid &id
+        , const QString &address);
 
+    void updateOutdatedByMulticast();
+    
     void checkOutdatedServers();
 
     typedef QHash<QString, qint64> Hosts;
@@ -162,7 +189,7 @@ private:
 
     bool processNewServer(BaseServerInfo info
         , const QString &host
-        , bool discoveredByHttp);
+        , bool accessibleByHttp);
 
     /// Reads incomming "magic" packets
     void readMagicData();
@@ -220,6 +247,25 @@ rtu::ServersFinder::Impl::~Impl()
     }
 }
 
+void rtu::ServersFinder::Impl::updateServerByMulticast(const QUuid &id
+    , const QString &address)
+{
+    const auto successful = [this, address](const BaseServerInfo &info)
+        { processNewServer(info, address, false); };
+
+    multicastModuleInformation(id, successful, OperationCallback(), kMulticastUpdatePeriod / 2);
+}
+void rtu::ServersFinder::Impl::updateOutdatedByMulticast()
+{
+    const qint64 currentTime = m_msecCounter.elapsed();
+    for (ServerDataContainer::const_iterator it = m_infos.begin(); it != m_infos.end(); ++it)
+    {
+        const auto &data = it.value();
+        if ((currentTime - data.timestamp) > kMulticastUpdatePeriod)
+            updateServerByMulticast(it.key(), data.info.hostAddress);
+    }
+}
+
 void rtu::ServersFinder::Impl::checkOutdatedServers()
 {
     const qint64 currentTime = m_msecCounter.elapsed();
@@ -262,6 +308,7 @@ QStringList rtu::ServersFinder::Impl::checkOutdatedHosts(Hosts &targetHostsList
 
 void rtu::ServersFinder::Impl::updateServers()
 {
+    updateOutdatedByMulticast();
     checkOutdatedServers();
     
     checkOutdatedHosts(m_knownHosts, kServerAliveTimeout);
@@ -398,42 +445,26 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
         return true;
 
     const QString &address = sender.toString();
-    if (address.contains("192.168.0.101") || address.contains("192.168.0.200"))
-        qDebug() << data;
-
+    
     const auto &firstTimeProcessor = 
-        [this, address](const Callback &secondTimeProcessor)
+        [this, address, data](const Callback &secondTimeProcessor)
     {
-        /// TODO: # check if contains new multicast header
-        const bool isMulticastServer = false;//(address.contains("192.168.0.145") || address.contains("192.168.0.110")); 
+        const QUuid muticastId = extractMulticastId(data);
         const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
         const bool isUnknown = (m_unknownHosts.find(address) != m_unknownHosts.end());
         const bool notKnown = !isKnown && !isUnknown;
 
-        if (secondTimeProcessor && notKnown)
+        if (notKnown)
         {
-            const auto multicastProcessor = [this, address, secondTimeProcessor]()
+            if (secondTimeProcessor)    /// Called at first time
             {
-                /// TODO: add id extraction
-                const QUuid id = (address.contains("192.168.0.145") ? QUuid("{9a77693a-e9bb-ad43-a913-b12cfc014cd5}") 
-                    : QUuid("{360a8da5-ba7a-a89e-7875-f25cff1fdcd9}")); 
-                const auto successful = [this, address](const BaseServerInfo &info)
-                {
-                    processNewServer(info, address, false);
-                };
-
-                const auto failed = [secondTimeProcessor] (RequestError /* errorCode */, Constants::AffectedEntities /* affected */)
-                {
-                    secondTimeProcessor(); 
-                };
-
-                multicastModuleInformation(id, successful, failed);
-            };
-
-            /// try to add unknown or discover by multicast after period * 3 
-            /// - to have a chance to discover entity as known or by Http first
-            enum { kDelayTimeout = kUpdateServersInfoInterval * 3};
-            QTimer::singleShot(kDelayTimeout, (isMulticastServer ? multicastProcessor : secondTimeProcessor));
+                /// try to add unknown or discover by multicast after period * 3 
+                /// - to have a chance to discover entity as known or by Http first
+                enum { kDelayTimeout = kUpdateServersInfoInterval * 3};
+                QTimer::singleShot(kDelayTimeout, secondTimeProcessor);
+            }
+            else
+                updateServerByMulticast(muticastId, address);
         }
         else if (!isKnown && onEntityDiscovered(address, m_unknownHosts))
             emit m_owner->unknownAdded(address);
@@ -481,10 +512,10 @@ bool rtu::ServersFinder::Impl::readPendingPacket(const SocketPtr &socket
 
 bool rtu::ServersFinder::Impl::processNewServer(rtu::BaseServerInfo info
     , const QString &host
-    , bool discoveredByHttp)
+    , bool accessibleByHttp)
 {
     info.hostAddress = host;
-    info.discoveredByHttp = discoveredByHttp;
+    info.accessibleByHttp = accessibleByHttp;
 
     onEntityDiscovered(host, m_knownHosts);
     if (m_unknownHosts.remove(host))
@@ -498,7 +529,9 @@ bool rtu::ServersFinder::Impl::processNewServer(rtu::BaseServerInfo info
         m_infos.insert(info.id, ServerInfoData(timestamp, info));
         emit m_owner->serverAdded(info);
     }
-    else
+    else if (accessibleByHttp                                      ///< Gives change to http to discover server.
+        || ((timestamp - it->timestamp) > kMulticastUpdatePeriod)) /// Http access method has priority under multicast
+                                                                                            
     {
         it->timestamp = timestamp; /// Update alive info
         BaseServerInfo &oldInfo = it->info;
