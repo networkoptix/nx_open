@@ -277,6 +277,11 @@ system_restore () {
     fi    
 }
 
+check_statistics_warning() {
+    STATISTICS=$(cat /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf | grep statisticsReportAllowed=true)
+    if [[ -z $STATISTICS ]]; then echo "statisticsReportAllowed=true" >> /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf; fi
+}
+
 save_ipconfig() {
 # saves IP configuration and sets the flag to restore it after reboot (if reboot happened during restore process)
     echo "++++++++++++++ SAVING IP CONFIG... ++++++++++++++" >&2 >/dev/kmsg
@@ -321,6 +326,7 @@ default_sequence () {
     echo `date` "++++++++++++++ BOOTED FROM "$BOOTDEVICE" ++++++++++++++" >> $NX1LOG
     ethtweak
     get_serial_number
+    check_statistics_warning
     if [[ -z $(cat /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf | grep systemName) ]]; then echo "systemName=__auto__system_"$MAC >> /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf; else echo true; fi
     if [[ -z $(cat /root/tools/nx/mediaserver.conf | grep systemName) ]]; then echo "systemName=__auto__system_"$MAC >> /root/tools/nx/mediaserver.conf; else echo true; fi
     if [ "$BOOTDEVICE" = "mmc" ]; then    
