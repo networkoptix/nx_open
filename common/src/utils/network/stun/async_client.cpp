@@ -7,7 +7,7 @@
 namespace nx {
 namespace stun {
 
-const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000 };
+const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 20000, 20000 };
 
 AsyncClient::AsyncClient( const SocketAddress& endpoint, bool useSsl, Timeouts timeouts )
     : m_endpoint( endpoint )
@@ -220,6 +220,7 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     if( code != SystemError::noError )
     {
         closeConnectionImpl( &lock, code );
+        m_connectingSocket->cancelAsyncIO();
         m_connectingSocket = nullptr;
         return;
     }

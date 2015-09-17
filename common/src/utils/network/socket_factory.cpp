@@ -10,9 +10,20 @@
 #include "ssl_socket.h"
 
 
-std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket()
+std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket(
+    NatTraversalType natTraversalRequired )
 {
-    return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket() );
+    switch( natTraversalRequired )
+    {
+        case nttAuto:
+        case nttEnabled:
+            return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( true ) );
+
+        case nttDisabled:
+            return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( false ) );
+    };
+
+    return std::unique_ptr< AbstractDatagramSocket >();
 }
 
 std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(

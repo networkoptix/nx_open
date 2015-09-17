@@ -302,7 +302,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket();
+    UDPSocket( bool natTraversal = true );
 
     void setDestPort(unsigned short foreignPort);
 

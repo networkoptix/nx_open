@@ -87,8 +87,7 @@ public:
 #else
             QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
 #endif
-            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData();
-        ostr.flush();
+            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << std::endl;
 
         const std::string& str = ostr.str();
         {
@@ -98,10 +97,12 @@ public:
                 switch (logLevel) {
                 case cl_logERROR:
                 case cl_logWARNING:
-                    std::cerr << str << std::endl;
+                    std::cerr << str;
+                    std::cerr.flush();
                     break;
                 default:
-                    std::cout << str << std::endl;
+                    std::cout << str;
+                    std::cout.flush();
                     break;
                 }
                 return;

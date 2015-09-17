@@ -2,9 +2,8 @@
 
 #include "common/common_globals.h"
 #include "utils/common/log.h"
+#include "utils/network/socket_global.h"
 #include "utils/network/stun/cc/custom_stun.h"
-
-static const SocketAddress MEDIATOR_ADDRESS( lit( "localhost" ) );
 
 static const auto DNS_CACHE_TIME = std::chrono::seconds( 10 );
 static const auto MEDIATOR_CACHE_TIME = std::chrono::minutes( 1 );
@@ -72,7 +71,7 @@ QString AddressEntry::toString() const
 }
 
 AddressResolver::AddressResolver()
-    : m_stunClient( new stun::AsyncClient( MEDIATOR_ADDRESS ) )
+    : m_mediatorAddressFetcher( lit( "hpm" ) )
 {
 }
 
@@ -106,9 +105,10 @@ void AddressResolver::resolveAsync(
         const HostAddress& hostName, ResolveHandler handler,
         bool natTraversal, void* requestId )
 {
-    if( hostName.isResolved() ) return handler(
-        SystemError::noError,
-        std::vector< AddressEntry >( 1, AddressEntry( AddressType::regular, hostName ) ) );
+    if( hostName.isResolved() )
+        return handler( SystemError::noError,
+                        std::vector< AddressEntry >( 1, AddressEntry(
+                            AddressType::regular, hostName ) ) );
 
     QnMutexLocker lk( &m_mutex );
     auto info = m_info.emplace( hostName, HostAddressInfo() ).first;
@@ -200,6 +200,7 @@ bool AddressResolver::isRequestIdKnown( void* requestId ) const
 
 void AddressResolver::resetMediatorAddress( const SocketAddress& newAddress )
 {
+    QnMutexLocker lk( &m_mutex );
     m_stunClient.reset( new stun::AsyncClient( newAddress ) );
 }
 
@@ -301,10 +302,31 @@ void AddressResolver::dnsResolve( HaInfoIterator info )
 
 void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk )
 {
+    info->second.mediatorProgress();
+    if( m_stunClient )
+        return mediatorStunResolve( info, lk );
+
+    if( auto address = SocketGlobals::cloudInfo().mediatorAddress() )
+    {
+        m_stunClient = std::make_unique< stun::AsyncClient >( *address );
+        return mediatorStunResolve( info, lk );
+    }
+
+    NX_LOG( lit( "%1 Mediator address is not resolved yet" )
+            .arg( QString::fromUtf8( Q_FUNC_INFO ) ),
+            cl_logERROR );
+
+    info->second.setMediatorEntries();
+    const auto guards = grabHandlers( SystemError::dnsServerFailure, info );
+    lk->unlock();
+}
+
+void AddressResolver::mediatorStunResolve( HaInfoIterator info, QnMutexLockerBase* lk )
+{
     stun::Message request( stun::Header( stun::MessageClass::request,
                                          stun::cc::methods::connect ) );
-    request.newAttribute< stun::cc::attrs::ClientId >("SomeClientId" ); // TODO
-    request.newAttribute< stun::cc::attrs::HostName >(info->first.toString().toUtf8() );
+    request.newAttribute< stun::cc::attrs::ClientId >( "SomeClientId" ); // TODO
+    request.newAttribute< stun::cc::attrs::HostName >( info->first.toString().toUtf8() );
 
     auto functor = [ = ]( SystemError::ErrorCode code, stun::Message message )
     {
@@ -336,7 +358,6 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
         guards = grabHandlers( code, info );
     };
 
-    info->second.mediatorProgress();
     lk->unlock();
     if( !m_stunClient->sendRequest( std::move( request ), std::move( functor ) ) )
     {
@@ -360,7 +381,7 @@ std::vector< Guard > AddressResolver::grabHandlers(
         bool noPending = ( range.first == range.second );
         for( auto it = range.first; it != range.second; ++it )
         {
-            if( it->second.address != info->first &&
+            if( it->second.address != info->first ||
                 !info->second.isResolved( it->second.natTraversal ) )
             {
                 noPending = false;

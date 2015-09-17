@@ -7,6 +7,8 @@
 #include "utils/network/dns_resolver.h"
 #include "utils/network/stun/async_client.h"
 
+#include "cdb_endpoint_fetcher.h"
+
 // Forward
 namespace nx { class SocketGlobals; }
 
@@ -152,6 +154,7 @@ private:
 
     void dnsResolve( HaInfoIterator info );
     void mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk );
+    void mediatorStunResolve( HaInfoIterator info, QnMutexLockerBase* lk );
 
     std::vector< Guard > grabHandlers( SystemError::ErrorCode lastErrorCode,
                                        HaInfoIterator info );
@@ -163,6 +166,7 @@ private:
     std::multimap< void*, RequestInfo > m_requests;
 
     DnsResolver m_dnsResolver;
+    CloudModuleEndPointFetcher m_mediatorAddressFetcher;
     std::unique_ptr< stun::AsyncClient > m_stunClient;
 };
 

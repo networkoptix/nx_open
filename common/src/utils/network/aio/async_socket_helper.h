@@ -113,7 +113,7 @@ public:
 
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
         std::atomic_thread_fence(std::memory_order_acquire);
-        if( m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId() )
+        if( this->m_socket->impl()->aioThread.load(std::memory_order_relaxed) == QThread::currentThread() )
         {
             nx::SocketGlobals::addressResolver().cancel( this, true );    //TODO #ak must not block here!
 

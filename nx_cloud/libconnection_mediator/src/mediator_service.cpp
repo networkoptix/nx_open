@@ -116,7 +116,7 @@ int MediatorProcess::executeApplication()
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset(
-        new MultiAddressServer<stun::SocketServer>( true, SocketFactory::nttAuto ) );
+        new MultiAddressServer<stun::SocketServer>( false, SocketFactory::nttDisabled ) );
 
     if( !m_multiAddressStunServer->bind( stunAddrToListenList ) )
         return 2;
@@ -125,6 +125,9 @@ int MediatorProcess::executeApplication()
 
     if( !m_multiAddressStunServer->listen() )
         return 4;
+
+    NX_LOG( lit( "STUN Server is listening %1" )
+            .arg( containerString( httpAddrToListenList ) ), cl_logALWAYS );
 
     //TODO #ak remove qt event loop
     //application's main loop

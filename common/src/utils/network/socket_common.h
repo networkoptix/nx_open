@@ -77,9 +77,9 @@ public:
 
 private:
     mutable boost::optional<QString> m_addrStr;
-    struct in_addr m_sinAddr;
+    mutable struct in_addr m_sinAddr;
     //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
-    bool m_addressResolved;
+    mutable bool m_addressResolved;
 
     void initializeFromString(const char* addrStr);
 

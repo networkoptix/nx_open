@@ -1,5 +1,7 @@
 #include "listening_peer_pool.h"
 
+#include <common/common_globals.h>
+#include <utils/common/log.h>
 #include <utils/network/stun/cc/custom_stun.h>
 
 namespace nx {
@@ -40,6 +42,12 @@ void ListeningPeerPool::bind( const ConnectionSharedPtr& connection,
             else
                 peer->endpoints.clear();
 
+            NX_LOG( lit("%1 Peer %2/%3 succesfully bound, endpoints=%4")
+                    .arg( Q_FUNC_INFO )
+                    .arg( QString::fromUtf8( mediaserver->systemId ) )
+                    .arg( QString::fromUtf8( mediaserver->serverId ) )
+                    .arg( containerString( peer->endpoints ) ), cl_logDEBUG1 );
+
             successResponse( connection, message.header );
         }
         else
@@ -58,6 +66,12 @@ void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
         QnMutexLocker lk( &m_mutex );
         if( const auto peer = m_peers.peer( connection, *mediaserver, &m_mutex ) )
         {
+            NX_LOG( lit("%1 Peer %2/%3 started to listen")
+                    .arg( Q_FUNC_INFO )
+                    .arg( QString::fromUtf8( mediaserver->systemId ) )
+                    .arg( QString::fromUtf8( mediaserver->serverId ) ),
+                    cl_logDEBUG1 );
+
             // TODO: configure StunEndpointList
             peer->isListening = true;
             successResponse( connection, message.header );
@@ -95,6 +109,10 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
 
         if( !peer->isListening )
             { /* TODO: StunEndpointList */ }
+
+        NX_LOG( lit("%1 Client %2 connects to %3, endpoints=%4").arg( Q_FUNC_INFO )
+                .arg( QString::fromUtf8( userNameAttr->value ) )
+                .arg( QString::fromUtf8( hostNameAttr->value ) ), cl_logDEBUG2 );
 
         connection->sendMessage( std::move( response ) );
     }
@@ -135,6 +153,11 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
     {
         connection.lock()->registerCloseHandler( [ = ]()
         {
+            NX_LOG( lit("%1 Peer %2/%3 has been desconnected")
+                    .arg( Q_FUNC_INFO )
+                    .arg( QString::fromUtf8( systemIt->first ) )
+                    .arg( QString::fromUtf8( serverIt->first ) ), cl_logDEBUG2 );
+
             QnMutexLocker lk( mutex );
             systemIt->second.erase( serverIt );
             if( systemIt->second.empty() )

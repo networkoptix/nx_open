@@ -71,7 +71,7 @@ HostAddress::HostAddress( const QByteArray& _ipv6 )
 HostAddress::HostAddress( const QString& addrStr )
 :
     m_addrStr( addrStr ),
-    m_addressResolved(false)
+    m_addressResolved( false )
 {
     initializeFromString(addrStr.toLatin1().constData());
 }
@@ -169,8 +169,12 @@ struct in_addr HostAddress::inAddr(bool* ok) const
         const auto addrs = nx::SocketGlobals::addressResolver().resolveSync(
                     m_addrStr.get(), false );
 
-        // TODO: use IpAddress instead
-        *const_cast< HostAddress* >( this) = addrs.at(0).host;
+        if ( !addrs.empty() )
+        {
+            // TODO: use IpAddress instead
+            m_sinAddr = addrs.front().host.m_sinAddr;
+            m_addressResolved = true;
+        }
     }
     if( ok )
         *ok = m_addressResolved;
@@ -181,6 +185,12 @@ void HostAddress::initializeFromString(const char* addrStr)
 {
     memset(&m_sinAddr, 0, sizeof(m_sinAddr));
     //if addrStr is an ip address
+
+    if (strcmp(addrStr, "") == 0 || strcmp(addrStr, "0.0.0.0") == 0)
+    {
+        m_addressResolved = true;
+        return;
+    }
 
     if (strcmp(addrStr, "255.255.255.255") == 0)
     {
