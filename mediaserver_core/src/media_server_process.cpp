@@ -564,7 +564,7 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
                 storageType = QUrl(storage->getUrl()).scheme();
             if (storageType.isEmpty())
             {
-                storageType = "local";
+                storageType = QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition);
                 const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
                 const auto it = std::find_if(partitions.begin(), partitions.end(),
                     [&](const QnPlatformMonitor::PartitionSpace& partition)
