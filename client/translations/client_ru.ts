@@ -2243,7 +2243,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Clear Motion Selection</source>
-        <translation>Очистить область поиска движения</translation>
+        <translation>Очистить регион поиска движения</translation>
     </message>
     <message>
         <source>Toggle Smart Search</source>
@@ -2603,27 +2603,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Move %1</source>
-        <translation>Переместить %1</translation>
+        <translation>Переместить</translation>
     </message>
     <message>
         <source>Check %1 Issues...</source>
-        <translation>Проверить проблемы %1...</translation>
+        <translation>Проверить проблемы...</translation>
     </message>
     <message>
         <source>%1 List...</source>
-        <translation>Список %1...</translation>
+        <translation>Список...</translation>
     </message>
     <message>
         <source>%1 Rules...</source>
-        <translation>Правила %1...</translation>
+        <translation>Правила...</translation>
     </message>
     <message>
         <source>%1 Settings...</source>
-        <translation>Настройки %1...</translation>
+        <translation>Настройки...</translation>
     </message>
     <message>
         <source>Open in %1 Settings Dialog...</source>
-        <translation>Открыть в окне настроек %1...</translation>
+        <translation>Открыть в окне настроек...</translation>
     </message>
     <message>
         <source>Add Device(s)...</source>
@@ -2631,7 +2631,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 List by Server...</source>
-        <translation>Список %1 по серверам...</translation>
+        <translation>Список по серверам...</translation>
     </message>
 </context>
 <context>
@@ -2719,7 +2719,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 actions</source>
-        <translation>Действия %1</translation>
+        <translation>Действия: %1</translation>
     </message>
 </context>
 <context>
@@ -2878,19 +2878,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 updated</source>
-        <translation>%1 обновлен</translation>
+        <translation>%1: Обновление</translation>
     </message>
     <message>
         <source>%1 added</source>
-        <translation>%1 добавлен</translation>
+        <translation>%1: Добавление</translation>
     </message>
     <message>
         <source>%1 removed</source>
-        <translation>%1 удалён</translation>
+        <translation>%1: Удаление</translation>
     </message>
     <message>
         <source>%1 name</source>
-        <translation>Имя %1</translation>
+        <translation>%1: Имя</translation>
     </message>
 </context>
 <context>
@@ -2940,18 +2940,18 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%n of %1</source>
         <translation>
-            <numerusform>%n %1</numerusform>
-            <numerusform>%n %1</numerusform>
-            <numerusform>%n %1</numerusform>
+            <numerusform>%n устройство (%1)</numerusform>
+            <numerusform>%n устройства (%1)</numerusform>
+            <numerusform>%n устройств (%1)</numerusform>
         </translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation>&lt;Любой %1&gt;</translation>
+        <translation>&lt;Любые&gt;</translation>
     </message>
     <message>
         <source>Select at least one %1.</source>
-        <translation>Выберите хотя бы один %1.</translation>
+        <translation>Выберите хотя бы одно устройство.</translation>
     </message>
 </context>
 <context>
@@ -3057,11 +3057,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation>&lt;Любой %1&gt;</translation>
+        <translation>&lt;Любые&gt;</translation>
     </message>
     <message>
         <source>Select at least one %1</source>
-        <translation>Выберите хотя бы один %1.</translation>
+        <translation>Выберите хотя бы одно устойство.</translation>
     </message>
 </context>
 <context>
@@ -3076,11 +3076,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation>&lt;Любой %1&gt;</translation>
+        <translation>&lt;Любые&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one %1&gt;</source>
-        <translation>&lt;Выберите хотя бы один %1&gt;</translation>
+        <translation>&lt;Выберите хотя бы одно устройство&gt;</translation>
     </message>
 </context>
 <context>
@@ -3155,7 +3155,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>filter by %1...</source>
-        <translation>фильтр по %1...</translation>
+        <translation>фильтровать...</translation>
     </message>
 </context>
 <context>
@@ -3446,11 +3446,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <translation>Доступность %1 подтверждена.</translation>
+        <translation>Доступность устройства подтверждена.</translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <translation>%1 передаёт медиа поток.</translation>
+        <translation>Подтверждение: %1 передаёт медиа поток.</translation>
     </message>
 </context>
 <context>
@@ -3487,15 +3487,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 List for &apos;%2&apos; - %3 found</source>
-        <translation>Список %1 для &apos;%2&apos; - найдено %3</translation>
+        <translation>Список устройств на &apos;%2&apos; - найдено: %3</translation>
     </message>
     <message>
         <source>%1 List - %2 found</source>
-        <translation>Список %1 - найдено %2</translation>
+        <translation>Список устройств - найдено: %2</translation>
     </message>
     <message>
         <source>Export selected %1 to a file.</source>
-        <translation>Экспортировать выбранные %1 в файл.</translation>
+        <translation>Экспортировать выбранные в файл.</translation>
     </message>
 </context>
 <context>
@@ -3537,19 +3537,19 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraMotionMaskWidget</name>
     <message>
         <source>Too many motion windows</source>
-        <translation>Слишком много областей детекции движения</translation>
+        <translation>Слишком много регионов детекции движения</translation>
     </message>
     <message>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
-        <translation>Максимальное количество областей детекции движения %1, а выбрано %2.</translation>
+        <translation>Максимальное количество регионов детекции движения %1 , а выбрано %2.</translation>
     </message>
     <message>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
-        <translation>Максимальное количество степеней детекции движения %1, а выбрано %2.</translation>
+        <translation>Максимальное количество степеней детекции движения %1 , а выбрано %2.</translation>
     </message>
     <message>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
-        <translation>Максимальное количество областей детекции движения %1, а выбрано %2.</translation>
+        <translation>Максимальное количество регионов детекции движения %1 , а выбрано %2.</translation>
     </message>
 </context>
 <context>
@@ -3608,11 +3608,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation>Внимание! Высокое минимальное значение может уменьшить длительность записи прочих %1.</translation>
+        <translation>Внимание! Высокое минимальное значение может уменьшить длительность записи прочих устройств.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>Запись по движению отключена или не поддерживается некоторыми из выбранных %1. Перейдите на страницу настроек детектора движения, чтобы убедиться, что он поддерживается и включён.</translation>
+        <translation>Запись по движению отключена или не поддерживается некоторыми из выбранных устройств. Перейдите на страницу настроек детектора движения, чтобы убедиться, что он поддерживается и включён.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this %1.</source>
@@ -3624,7 +3624,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
-        <translation>Запись по движению отключена. Перейдите на страницу настройки движения, чтобы задать зону и чувствительность движения для %1.</translation>
+        <translation>Запись по движению отключена. Перейдите на страницу настройки движения на устройстве, чтобы задать зону и чувствительность движения.</translation>
     </message>
 </context>
 <context>
@@ -3659,27 +3659,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>Настройки %1</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
-        <translation>Диагностика %1</translation>
+        <translation>Диагностика</translation>
     </message>
     <message>
         <source>%1 Rules</source>
-        <translation>Правила %1</translation>
+        <translation>Правила</translation>
     </message>
     <message>
         <source>%1 not saved.</source>
-        <translation>%1 не сохранена.</translation>
+        <translation>Не сохранено.</translation>
     </message>
     <message>
         <source>Save changes to the following %1?</source>
-        <translation>Сохранить изменения для следующих %1?</translation>
+        <translation>Сохранить изменения для следующих устройств?</translation>
     </message>
     <message>
         <source>Could not save the following %1 to Server.</source>
-        <translation>Невозможно сохранить следующие %1 на сервере.</translation>
+        <translation>Невозможно сохранить следующие устройства на сервере.</translation>
     </message>
 </context>
 <context>
@@ -3690,7 +3690,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No %1 selected.</source>
-        <translation>%1 не выбрана.</translation>
+        <translation>Устройство не выбрано.</translation>
     </message>
 </context>
 <context>
@@ -4087,7 +4087,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation>&lt;Любой %1&gt;</translation>
+        <translation>&lt;Любой источник&gt;</translation>
     </message>
 </context>
 <context>
@@ -4141,15 +4141,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Schedule motion type is not supported by some %1.</source>
-        <translation>Тип движения в расписании не поддерживается некоторыми %1.</translation>
+        <translation>Тип движения в расписании не поддерживается некоторыми устройствами.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some %1.</source>
-        <translation>Невозможно включить запись для некоторых %1.</translation>
+        <translation>Невозможно включить запись для некоторых устройств.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some %1.</source>
-        <translation>Настройки расписания несовместимы с некоторыми %1.</translation>
+        <translation>Настройки расписания несовместимы с некоторыми устройствами.</translation>
     </message>
 </context>
 <context>
@@ -4214,11 +4214,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open %1 List</source>
-        <translation>Открыть список %1</translation>
+        <translation>Открыть %1</translation>
     </message>
     <message>
         <source>%1 List</source>
-        <translation>Список %1</translation>
+        <translation>%1</translation>
     </message>
 </context>
 <context>
@@ -4832,7 +4832,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Use licenses for selected %1</source>
-        <translation>Использовать лицензии для выбранных %1</translation>
+        <translation>Использовать лицензии для выбранных устройств</translation>
     </message>
 </context>
 <context>
@@ -5368,11 +5368,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Open %1</source>
-        <translation>Открыть %1</translation>
+        <translation>Открыть</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>Настройки %1</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>Server Settings</source>
@@ -5380,7 +5380,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Open %1 Web Page...</source>
-        <translation>Открыть веб страницу %1...</translation>
+        <translation>Открыть веб страницу...</translation>
     </message>
 </context>
 <context>
@@ -5484,7 +5484,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
-        <translation>Управление PTZ для %1.</translation>
+        <translation>Управление PTZ.</translation>
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
@@ -5793,7 +5793,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Storage space occupied by %1</source>
-        <translation>Пространство занятое %1</translation>
+        <translation>Занятое пространство</translation>
     </message>
 </context>
 <context>
@@ -6096,15 +6096,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Max. %1 on this server:</source>
-        <translation>Макс. %1 на этом сервере:</translation>
+        <translation>Макс. устройств (%1) на этом сервере:</translation>
     </message>
     <message>
         <source>This server already has more than max %1</source>
-        <translation>На сервере превышено максимальное количество %1</translation>
+        <translation>На сервере превышено максимальное количество устройств (%1)</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
-        <translation>Воизбежание неполадок настройте максимальное количесвто %1</translation>
+        <translation>Воизбежание неполадок настройте максимальное количество устройств (%1)</translation>
     </message>
 </context>
 <context>
@@ -6460,7 +6460,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Confirm motion regions reset</source>
-        <translation>Подтвердите сброс областей детектора движения</translation>
+        <translation>Подтвердите сброс регионов детектора движения</translation>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
@@ -6480,7 +6480,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>Настройки %1</translation>
+        <translation>Настройки</translation>
     </message>
 </context>
 <context>
@@ -6613,7 +6613,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please check authentication information in %1 settings</source>
-        <translation>Проверьте настройки авторизации для %1</translation>
+        <translation>Проверьте параметры авторизации в настройках устройства</translation>
     </message>
 </context>
 <context>
@@ -6709,11 +6709,11 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable %1 and servers auto discovery</source>
-        <translation>Включить автоопределение %1 и серверов</translation>
+        <translation>Включить автоопределение устройств и серверов</translation>
     </message>
     <message>
         <source>Allow system to optimize %1 settings</source>
-        <translation>Разрешить системе оптимизировать настройки %1</translation>
+        <translation>Разрешить системе оптимизировать настройки устройств</translation>
     </message>
 </context>
 <context>
@@ -7028,7 +7028,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Adjust %1 settings</source>
-        <translation>Изменить настройки %1</translation>
+        <translation>Настраивать %1</translation>
     </message>
 </context>
 <context>
@@ -7154,7 +7154,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Can adjust %1 settings</source>
-        <translation>Может изменять настроки %1</translation>
+        <translation>Может настраивать %1</translation>
     </message>
 </context>
 <context>
@@ -7481,11 +7481,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation>Невозможно переместить %1 на сервер %2. Сервер не отвечает.</translation>
+        <translation>Невозможно переместить устройство (%1) на сервер %2. Сервер не отвечает.</translation>
     </message>
     <message>
         <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation>Сервер %1 не может найти и получить доступ к данным %2. Вы уверены, что хотите преместить их?</translation>
+        <translation>Сервер %1 не может найти данные %2. Вы уверены, что хотите преместить их?</translation>
     </message>
     <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
@@ -7498,14 +7498,14 @@ If you would like to disable this feature you can do so in the System Settings d
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
         <translation>
-            <numerusform>%n из этих %1 найдено автоматически.</numerusform>
-            <numerusform>%n из этих %1 найдены автоматически.</numerusform>
-            <numerusform>%n из этих %1 найдены автоматически.</numerusform>
+            <numerusform>%n из этих устройств найдено автоматически.</numerusform>
+            <numerusform>%n из этих устройств найдены автоматически.</numerusform>
+            <numerusform>%n из этих устройств найдены автоматически.</numerusform>
         </translation>
     </message>
     <message>
         <source>Do you really want to delete the following %1?</source>
-        <translation>Вы действительно хотите удалить следующие %1?</translation>
+        <translation>Вы действительно хотите удалить следующие устройства?</translation>
     </message>
 </context>
 <context>
@@ -7960,7 +7960,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>All %1</source>
-        <translation>Все %1</translation>
+        <translation>Все</translation>
     </message>
 </context>
 <context>
@@ -8715,7 +8715,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation>Сброс областей детекции движения</translation>
+        <translation>Сброс регионов детекции движения</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>

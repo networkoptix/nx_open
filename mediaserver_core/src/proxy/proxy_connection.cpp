@@ -234,9 +234,17 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     if (itr != d->request.headers.end())
         dstRoute.id = itr->second;
 
-    if (dstRoute.id == qnCommon->moduleGUID() && !cameraGuid.isNull()) {
-        if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
-            dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
+    if (dstRoute.id == qnCommon->moduleGUID()) {
+        if (!cameraGuid.isNull())
+        {
+            if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
+                dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
+        }
+        else
+        {
+            //proxying to ourself
+            dstRoute.addr = SocketAddress(HostAddress::localhost, d->socket->getLocalAddress().port);
+        }
     }
     else if (!dstRoute.id.isNull())
         dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
