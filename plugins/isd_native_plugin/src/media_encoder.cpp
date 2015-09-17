@@ -39,6 +39,7 @@ static QStringList getValues(const QString& line)
 }
 
 
+
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
     unsigned int encoderNum
