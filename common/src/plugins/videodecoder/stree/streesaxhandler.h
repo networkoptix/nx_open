@@ -61,7 +61,7 @@ namespace stree
             skippingNode
         };
 
-        std::stack<std::pair<AbstractNode*, std::unique_ptr<AbstractNode>>> m_nodes;
+        std::stack<AbstractNode*> m_nodes;
         mutable QString m_errorDescription;
         State m_state;
         int m_inlineLevel;

@@ -69,17 +69,20 @@ namespace stree
         auto newNodePtr = newNode.get();
 
         int valuePos = atts.index(lit("value"));
-        if( !m_nodes.empty() )
-            if( !m_nodes.top().first->addChild(
+        if( m_nodes.empty() )
+        {
+            m_root = std::move(newNode);
+        }
+        else if( !m_nodes.top()->addChild(
                     valuePos == -1 ? QVariant() : QVariant(atts.value(valuePos)),
                     std::move(newNode) ) )
-            {
-                m_state = skippingNode;
-                m_inlineLevel = 1;
-                return true;
-            }
+        {
+            m_state = skippingNode;
+            m_inlineLevel = 1;
+            return true;
+        }
 
-        m_nodes.emplace(newNodePtr, std::move(newNode));
+        m_nodes.emplace(newNodePtr);
         return true;
     }
 
@@ -98,8 +101,6 @@ namespace stree
             return true;
         }
 
-        if( m_nodes.size() == 1 )
-            m_root = std::move(m_nodes.top().second); //reached tree root
         m_nodes.pop();
 
         return true;
