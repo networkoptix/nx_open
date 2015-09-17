@@ -537,6 +537,8 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
 
 QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 {
+    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+
     QMap<QnUuid, QnStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
     for(const QnStorageResourcePtr& abstractStorage: mServer->getStorages())
@@ -544,15 +546,37 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
             continue;
+        bool modified = false;
         if (!storage->getUrl().contains("://")) {
             QString updatedURL = QDir::toNativeSeparators(storage->getUrl());
             if (updatedURL.endsWith(QDir::separator()))
                 updatedURL.chop(1);
             if (storage->getUrl() != updatedURL) {
                 storage->setUrl(updatedURL);
-                result.insert(storage->getId(), storage);
+                modified = true;
             }
         }
+
+        QString storageType = storage->getStorageType();
+        if (storageType.isEmpty())
+        {
+            if (storage->getUrl().contains(lit("://")))
+                storageType = QUrl(storage->getUrl()).scheme();
+            if (storageType.isEmpty())
+            {
+                storageType = "local";
+                const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+                const auto it = std::find_if(partitions.begin(), partitions.end(),
+                    [&](const QnPlatformMonitor::PartitionSpace& partition)
+                { return storagePath.startsWith(QnStorageResource::toNativeDirPath(partition.path)); });
+                if (it != partitions.end())
+                    storageType = QnLexical::serialized(it->type);
+            }
+            storage->setStorageType(storageType);
+            modified = true;
+        }
+        if (modified)
+            result.insert(storage->getId(), storage);
     }
 
     return result.values();
