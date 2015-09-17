@@ -290,7 +290,11 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
     CameraMediaStreams supportedStreams = QJson::deserialized<CameraMediaStreams>(m_resource->getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME).toLatin1());
 
     m_nativeResolutions.clear();
+    bool transcodingSupported = false;
     for (const CameraMediaStreamInfo &info: supportedStreams.streams) {
+        if (info.transcodingRequired)
+            transcodingSupported = true;
+
         if (info.transcodingRequired || info.resolution == CameraMediaStreamInfo::anyResolution)
             continue;
 
@@ -303,8 +307,15 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
     if (m_nativeResolutions.size() < 2) /* primary and secondary streams */
         m_nativeStreamIndex = m_nativeResolutions.firstKey();
 
-    if (!m_transcodingSupported)
+    if (m_transcodingSupported != transcodingSupported) {
+        m_transcodingSupported = transcodingSupported;
         emit resolutionsChanged();
+        emit resolutionChanged();
+        emit protocolChanged();
+    } else if (!m_transcodingSupported) {
+        emit resolutionsChanged();
+        emit resolutionChanged();
+    }
 
     updateUrl();
 }
@@ -312,15 +323,6 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
 void QnMediaResourceHelper::at_resource_parentIdChanged(const QnResourcePtr &resource) {
     if (m_resource != resource)
         return;
-
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(resource->getParentId());
-    bool transcodingSupported = !QnMediaServerResource::isEdgeServer(server);
-    if (m_transcodingSupported != transcodingSupported) {
-        m_transcodingSupported = transcodingSupported;
-        emit resolutionChanged();
-        emit resolutionsChanged();
-        emit protocolChanged();
-    }
 
     updateUrl();
 }
