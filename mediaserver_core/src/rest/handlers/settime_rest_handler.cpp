@@ -1,4 +1,6 @@
+
 #include <QFile>
+#include <QtCore/QProcess>
 
 #include "settime_rest_handler.h"
 #include <utils/network/tcp_connection_priv.h>
@@ -30,7 +32,23 @@ bool setDateTime(qint64 value)
     struct timeval tv;
     tv.tv_sec = value / 1000;
     tv.tv_usec = (value % 1000) * 1000;
-    return settimeofday(&tv, 0) == 0;
+    if (settimeofday(&tv, 0) != 0)
+        return false;
+
+    if (QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1")
+    {
+        //on nx1 have to execute hwclock -w to save time. But this command sometimes failes
+        for (int i = 0; i < 3; ++i)
+        {
+            const int resultCode = QProcess::execute("hwclock -w");
+            if (resultCode == 0)
+                return true;
+        }
+        return false;
+    }
+
+    return true;
+
 }
 #endif
 
