@@ -7,6 +7,8 @@
 
 #include "audio_stream_reader.h"
 
+#include <errno.h>
+
 #include <iostream>
 
 #include <QDateTime>
@@ -26,7 +28,8 @@ AudioStreamReader::AudioStreamReader()
     m_prevReceiverID(0),
     m_initializedInitially(false),
     m_ptsMapper(MS_PER_SEC, PTS_BITS, &TimeSynchronizationData::instance()->timeSyncData, AUDIO_ENCODER_ID),
-    m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC)
+    m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC),
+    m_amuxStarted(false)
 {
 }
 
@@ -34,6 +37,8 @@ AudioStreamReader::~AudioStreamReader()
 {
     if( m_pollable )
         aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead, true );
+
+    closeAmux();
 }
 
 bool AudioStreamReader::isAudioAvailable()
@@ -90,12 +95,12 @@ void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType event
     }
 
     aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead );
-    //re-initializing audio
-    m_amux.reset();
-    if( !initializeAmux() )
-        return;
     {
         std::unique_lock<std::mutex> lk( m_mutex );
+        //re-initializing audio
+        closeAmux(&lk);
+        if (!initializeAmux())
+            return;
         if( m_packetReceivers.empty() )
             return;
     }
@@ -111,7 +116,7 @@ int AudioStreamReader::readAudioData()
     if( audioBytesAvailable <= 0 )
     {
         std::cerr<<"ISD plugin: no audio bytes available\n";
-        m_amux.reset();
+        closeAmux();
         return nxcip::NX_IO_ERROR;
     }
 
@@ -125,7 +130,7 @@ int AudioStreamReader::readAudioData()
     if( bytesRead <= 0 )
     {
         std::cerr<<"ISD plugin: failed to read audio packet\n";
-        m_amux.reset();
+        closeAmux();
         return nxcip::NX_IO_ERROR;
     }
 
@@ -211,10 +216,14 @@ bool AudioStreamReader::initializeAmux( bool getFormatOnly )
     if( getFormatOnly )
         return true;
 
-    if( m_amux->StartAudio() )
+    if( !m_amuxStarted )
     {
-        std::cerr << "ISD plugin: can't start audio stream. "<<strerror(errno)<<"\n";
-        return false;
+        if( m_amux->StartAudio() )
+        {
+            std::cerr << "ISD plugin: can't start audio stream. "<<strerror(errno)<<"\n";
+            return false;
+        }
+        m_amuxStarted = true;
     }
 
     //std::cout<<"AMUX initialized. Codec type "<<m_audioFormat.compressionType<<" fd = "<<amux->GetFD()<<"\n";
@@ -222,6 +231,18 @@ bool AudioStreamReader::initializeAmux( bool getFormatOnly )
     m_pollable.reset( new Pollable( m_amux->GetFD() ) );
 
     return true;
+}
+
+void AudioStreamReader::closeAmux()
+{
+    std::unique_lock<std::mutex> lk(m_mutex);
+    closeAmux(&lk);
+}
+
+void AudioStreamReader::closeAmux(std::unique_lock<std::mutex>* const /*lk*/)
+{
+    m_amux.reset();
+    m_amuxStarted = false;
 }
 
 #endif

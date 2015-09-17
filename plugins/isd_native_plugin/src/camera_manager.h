@@ -24,7 +24,12 @@ class CameraManager
     public nxcip::BaseCameraManager2
 {
 public:
-    CameraManager( const nxcip::CameraInfo& info );
+    CameraManager(
+        const nxcip::CameraInfo& info
+#ifndef NO_ISD_AUDIO
+        , const std::unique_ptr<AudioStreamReader>& audioStreamReader
+#endif
+        );
     virtual ~CameraManager();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -78,7 +83,7 @@ private:
     nxcip::Picture* m_motionMask;
     bool m_audioEnabled;
 #ifndef NO_ISD_AUDIO
-    std::unique_ptr<AudioStreamReader> m_audioStreamReader;
+    const std::unique_ptr<AudioStreamReader>& m_audioStreamReader;
 #endif
 };
 
