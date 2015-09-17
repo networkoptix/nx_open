@@ -44,9 +44,9 @@ namespace stree
     {
     public:
         //!Implementation of AbstractNode::get
-        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const;
+        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const override;
         //!Implementation of AbstractNode::addChild
-        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child );
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child ) override;
 
     private:
         std::multimap<int, std::unique_ptr<AbstractNode>> m_children;
@@ -75,7 +75,7 @@ namespace stree
         }
 
         //!Implementation of AbstractNode::get
-        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const
+        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const override
         {
             NX_LOG( lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResID), cl_logDEBUG2 );
 
@@ -99,7 +99,7 @@ namespace stree
         }
 
         //!Implementation of AbstractNode::addChild
-        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child )
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child ) override
         {
             return m_children.emplace( value.value<typename Container::key_type>(), std::move(child) ).second;
         }
@@ -121,9 +121,9 @@ namespace stree
         ResPresenceNode( int matchResID );
 
         //!Implementation of AbstractNode::get
-        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const;
+        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const override;
         //!Implementation of AbstractNode::addChild
-        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child );
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child ) override;
 
     private:
         //[0] - for \a false. [1] - for \a true
@@ -145,9 +145,9 @@ namespace stree
         /*!
             Adds to \a out resource and then calls \a m_child->get() (if \a child exists)
         */
-        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const;
+        virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const override;
         //!Implementation of AbstractNode::addChild
-        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child );
+        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child ) override;
 
     private:
         std::unique_ptr<AbstractNode> m_child;
