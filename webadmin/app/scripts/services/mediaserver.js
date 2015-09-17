@@ -197,6 +197,9 @@ angular.module('webadminApp')
             getTime:function(){
                 return wrapGet(proxy + '/api/gettime');
             },
+            logLevel:function(logId,level){
+                return wrapGet(proxy + '/api/logLevel?id=' + logId + (level?"&value=" + level:''));
+            },
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
                 //console.log("getRecords",serverUrl,physicalId,startTime,endTime,detail,periodsType);

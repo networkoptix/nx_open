@@ -21,7 +21,7 @@ namespace rtu
         typedef std::function<void (const QUuid &id, const ExtraServerInfo &extraInfo
             , const QString &host)> SuccessfulCallback;
         typedef std::function<void (const QUuid &id
-            , int errorCode)> FailedCallback;
+            , RequestError errorCode)> FailedCallback;
 
         ServerInfoManager(QObject *parent = nullptr);
         
