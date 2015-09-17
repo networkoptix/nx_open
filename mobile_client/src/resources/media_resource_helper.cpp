@@ -158,8 +158,9 @@ void QnMediaResourceHelper::updateUrl() {
         if (m_transcodingSupported) {
             url.setPath(lit("/media/%1.%2").arg(camera->getUniqueId()).arg(protocolName(protocol)));
             query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
+            query.addQueryItem(lit("rt"), lit("true"));
         } else {
-            url.setPath(lit("/%1").arg(camera->getPhysicalId()));
+            url.setPath(lit("/%1").arg(camera->getUniqueId()));
             query.addQueryItem(lit("stream"), QString::number(m_nativeStreamIndex));
         }
 
