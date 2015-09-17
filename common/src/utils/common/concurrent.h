@@ -83,6 +83,13 @@ namespace QnConcurrent
                 m_isCancelled = true;
             }
 
+            bool isInProgress() const
+            {
+                QMutexLocker lk( &m_mutex );
+                return (!m_isCancelled && (m_tasksCompleted < m_totalTasksToRun)) ||
+                        (m_isCancelled && (m_startedTaskCount > 0));
+            }
+
             bool isCanceled() const
             {
                 QMutexLocker lk( &m_mutex );
@@ -361,6 +368,7 @@ namespace QnConcurrent
 
         void waitForFinished() { m_impl->waitForFinished(); }
         void cancel() { m_impl->cancel(); }
+        bool isInProgress() const { return m_impl->isInProgress(); }
         bool isCanceled() const { return m_impl->isCanceled(); }
         size_type progressValue() const { return m_impl->progressValue(); }
         size_type progressMinimum() const { return m_impl->progressMinimum(); }

@@ -20,18 +20,20 @@
 static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
 static const QString SERVER_API_COMMAND = lit("crashserver/api/report");
 static const QString LAST_CRASH = lit("statisticsReportLastCrash");
+static const QString SENT_PREFIX = lit("sent_");
+
 static const uint SENDING_MIN_INTERVAL = 24 * 60 * 60; /* secs => a day */
 static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* 30 mb */
 static const uint SCAN_TIMER_CYCLE = 10 * 60 * 1000; /* every 10 minutes */
 
-static QFileInfoList readCrashes()
+static QFileInfoList readCrashes(const QString& prefix = QString())
 {
     #if defined( _WIN32 )
         const QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
-        const auto crashFilter = QString::fromStdString(win32_exception::getCrashPattern());
+        const auto crashFilter = prefix + QString::fromStdString(win32_exception::getCrashPattern());
     #elif defined ( __linux__ )
         const QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
-        const auto crashFilter = QString::fromStdString(linux_exception::getCrashPattern());
+        const auto crashFilter = prefix + QString::fromStdString(linux_exception::getCrashPattern());
     #else
         const QDir crashDir;
         const QString crashFilter;
@@ -111,7 +113,6 @@ bool CrashReporter::scanAndReport(QSettings* settings)
         if (crash.size() < SENDING_MAX_SIZE)
             return CrashReporter::send(url, crash, settings);
 
-        QFile::remove(crash.absoluteFilePath());
         crashes.pop_front();
     }
 
@@ -121,7 +122,15 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 void CrashReporter::scanAndReportAsync(QSettings* settings)
 {
     QMutexLocker lock(&m_mutex);
-    m_activeCollection.waitForFinished();
+    if (m_activeCollection.isInProgress())
+    {
+        NX_LOG(lit("CrashReporter::scanAndReportAsync: Previous report is in progress"),
+               cl_logERROR);
+        return;
+    }
+
+    NX_LOG(lit("CrashReporter::scanAndReportAsync: Start new asyn operation"),
+           cl_logINFO);
 
     m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
         // \class QnConcurrent posts a job to \class Ec2ThreadPool rather than create new
@@ -198,17 +207,24 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
         NX_LOG(lit("CrashReporter::finishReport: sending %1 to %2 has failed")
                .arg(m_crashFile.absoluteFilePath())
                .arg(httpClient->url().toString()), cl_logWARNING);
-        return;
+    }
+    else
+    {
+        NX_LOG(lit("CrashReporter::finishReport: crash %1 has been sent successfully")
+               .arg(m_crashFile.absoluteFilePath()), cl_logDEBUG1);
+
+        const auto now = qnSyncTime->currentDateTime().toUTC();
+        m_settings->setValue(LAST_CRASH, now.toString(Qt::ISODate));
+        m_settings->sync();
+
+        QFile::rename(m_crashFile.absoluteFilePath(),
+                      m_crashFile.absoluteDir().absoluteFilePath(
+                          SENT_PREFIX + m_crashFile.fileName()));
     }
 
-    NX_LOG(lit("CrashReporter::finishReport: crash %1 has been sent successfully")
-           .arg(m_crashFile.absoluteFilePath()), cl_logDEBUG1);
-
-    const auto now = qnSyncTime->currentDateTime().toUTC();
-    m_settings->setValue(LAST_CRASH, now.toString(Qt::ISODate));
-    m_settings->sync();
-
-    for (const auto crash : readCrashes())
+    auto allCrashes = readCrashes(lit("*"));
+    allCrashes.pop_front();
+    for (const auto& crash : allCrashes)
         QFile::remove(crash.absoluteFilePath());
 
     QMutexLocker lock(&m_host.m_mutex);

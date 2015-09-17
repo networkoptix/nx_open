@@ -252,6 +252,8 @@ QString Transport::localAddress() const
 
 void Transport::at_timer()
 {
+    at_socketReadyRead();
+    
     QMutexLocker lock(&m_mutex);
     for (auto itr = m_requests.begin(); itr != m_requests.end();)
     {

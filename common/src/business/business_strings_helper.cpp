@@ -504,7 +504,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(
     return result;
 }
 
-QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool /*isPublic*/) {
+QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
     QnUuid id = params.eventResourceId;
     QnNetworkResourcePtr res = !id.isNull() ? 
                             qnResPool->getResourceById<QnNetworkResource>(id) : 
@@ -512,7 +512,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!res)
         return QString();
 
-    QnResourcePtr mserverRes = res->getParentResource();
+    QnMediaServerResourcePtr mserverRes = res->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!mserverRes)
         return QString();
 
@@ -526,9 +526,17 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
             mserverRes = newServer;
     }
 
-    if (resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
-        QUrl mserverUrl = mserverRes->getUrl();
-        appServerUrl.setHost(mserverUrl.host());
+    if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
+        appServerUrl = mserverRes->getApiUrl();
+        if (isPublic) {
+            QString publicIP = mserverRes->getProperty(Qn::PUBLIC_IP);
+            if (!publicIP.isEmpty()) {
+                QStringList parts = publicIP.split(L':');
+                appServerUrl.setHost(parts[0]);
+                if (parts.size() > 1)
+                    appServerUrl.setPort(parts[1].toInt());
+            }
+        }
     }
 
     QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
