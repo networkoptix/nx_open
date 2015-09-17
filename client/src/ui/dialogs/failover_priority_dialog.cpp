@@ -93,7 +93,7 @@ QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/
     }
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this, [connectToCamera](const QnResourcePtr &resource) {
-        if (QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
+        if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
             connectToCamera(camera);
     });
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {

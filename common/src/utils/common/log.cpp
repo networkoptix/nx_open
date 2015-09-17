@@ -13,11 +13,19 @@ static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
 
+namespace {
+    const QString NONE_LOG_LEVEL_STR(lit("NONE"));
+}
+
 const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
-    QString str = value.toUpper().trimmed();
+    const QString str = value.toUpper().trimmed();
+    //adding "none" alias for cl_logALWAYS log level to make it more intuitive how to disable logging using rest handler
+    if (str == NONE_LOG_LEVEL_STR)
+        return cl_logALWAYS;
+
     for (uint i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
         if (str == QLatin1String(qn_logLevelNames[i]))
             return QnLogLevel(i);

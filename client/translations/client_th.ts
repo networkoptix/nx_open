@@ -423,7 +423,7 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
         <source>Input ID:</source>
-        <translation>Input ID:</translation>
+        <translation>หมายเลข ID:</translation>
     </message>
 </context>
 <context>
@@ -1132,11 +1132,11 @@ Short for &quot;seconds&quot;</extracomment>
     <name>LicensesProposeWidget</name>
     <message>
         <source>Licensing</source>
-        <translation>การออกใบอนุญาต</translation>
+        <translation>อนุญาตให้ใช้สิทธิ์</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation>ต้องการเพิ่มใบอนุญาติ...</translation>
+        <translation>ได้รับสิทธิ์การใช้อื่น ๆ ......</translation>
     </message>
 </context>
 <context>
@@ -1187,7 +1187,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
         <source>Look and Feel</source>
-        <translation>รูปลักษณะและความรู้สึก</translation>
+        <translation>รูปลักษณ์ และ การใช้งาน</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -1203,7 +1203,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Tour sequence cycle time:</source>
-        <translation>ทัวร์รอบเวลาลำดับ:</translation>
+        <translation>รอบเวลาในการทัวร์:</translation>
     </message>
     <message>
         <source>Restart required.</source>
@@ -1251,7 +1251,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
-        <translation>ไม่มีภาพ</translation>
+        <translation>&lt;No image&gt;</translation>
     </message>
     <message>
         <source>Browse...</source>
@@ -1357,11 +1357,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Create Tour</source>
-        <translation>สร้างตำแหน่งทัวร์</translation>
+        <translation>สร้าง ตำแหน่งทัวร์</translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation>เริ่มทัวร์ตามตำแหน่ง</translation>
+        <translation>เริ่มต้น ทัวร์</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1381,11 +1381,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Get Preview</source>
-        <translation>ได้รับตัวอย่างที่แสดง</translation>
+        <translation>แสดง ตัวอย่าง</translation>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation>ทัวร์ ไม่เลือก</translation>
+        <translation>ไม่ได้เลือก ทัวร์</translation>
     </message>
 </context>
 <context>
@@ -1594,15 +1594,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Drop Resources</source>
-        <translation>ลดข้อมูล</translation>
+        <translation>ลดทรพัยากร</translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
-        <translation>เวลาในการเปิด Video Wall</translation>
+        <translation>วีดีโอวอลล์เปิดล่าช้า</translation>
     </message>
     <message>
         <source>Delayed Drop Resources</source>
-        <translation>เวลาในการวางข้อมูล</translation>
+        <translation>ทรัพยากรลดลงล่าช้า</translation>
     </message>
     <message>
         <source>Instant Drop Resources</source>
@@ -1682,7 +1682,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Activate PTZ Tour</source>
-        <translation>เปิดใช้งาน PTZ </translation>
+        <translation>เปิดใช้งานทัวร์ PTZ </translation>
     </message>
     <message>
         <source>Fit in View</source>
@@ -2062,7 +2062,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Maximize Item</source>
-        <translation>เพิ่มรายการ</translation>
+        <translation>ขยายเต็มจอ</translation>
     </message>
     <message>
         <source>Enter</source>
@@ -2074,7 +2074,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Restore Item</source>
-        <translation>เรียกคืนรายการ</translation>
+        <translation>กลับสู่ปรกติ</translation>
     </message>
     <message>
         <source>Show Info</source>
@@ -2122,7 +2122,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Calibrate Fisheye</source>
-        <translation>ปรับเทียบกับ Fisheye</translation>
+        <translation>ปรับเทียบกับ ฟิชอาย</translation>
     </message>
     <message>
         <source>Toggle Resolution Mode</source>
@@ -2366,7 +2366,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Decrement Debug Counter</source>
-        <translation>ลด Debug เคาน์เตอร์</translation>
+        <translation>ลดการแก้ปัญหาตัวนับ</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift+R</source>
@@ -2378,7 +2378,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Calibrate PTZ</source>
-        <translation>ปรับเทียบ PTZ</translation>
+        <translation>การปรับเทียบ PTZ</translation>
     </message>
     <message>
         <source>Get PTZ Position</source>
@@ -2478,7 +2478,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Disable Stream Synchronization</source>
-        <translation>ปิดการใช้งานประสาน สตรีม</translation>
+        <translation>ปิดการใช้งานการประสานข้อมูลสตรีม</translation>
     </message>
     <message>
         <source>Show Thumbnails</source>
@@ -2542,7 +2542,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Disable Background Animation</source>
-        <translation>ปิดการใช้งานภาพพื้นหลัง</translation>
+        <translation>ปิดการใช้งานภาพเคลื่อนไหวพื้นหลัง</translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
@@ -2574,7 +2574,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation>เปิดใช้งานวัตถุ PTZ</translation>
+        <translation>เปิดใช้งาน PTZ</translation>
     </message>
     <message>
         <source>User Management...</source>
@@ -2590,19 +2590,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Check %1 Issues...</source>
-        <translation>ตรวจสอบ %1 ประเด็น ...</translation>
+        <translation>ตรวจสอบเหตุการณ์ของ %1...</translation>
     </message>
     <message>
         <source>%1 List...</source>
-        <translation>%1 รายชื่อ ...</translation>
+        <translation>รายชื่อ %1...</translation>
     </message>
     <message>
         <source>%1 Rules...</source>
-        <translation>%1 กฎ ...</translation>
+        <translation>เงื่อนไขของ %1...</translation>
     </message>
     <message>
         <source>%1 Settings...</source>
-        <translation>%1 การตั้งค่า ...</translation>
+        <translation>การตั้งค่า %1...</translation>
     </message>
     <message>
         <source>Open in %1 Settings Dialog...</source>
@@ -2614,7 +2614,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 List by Server...</source>
-        <translation>%1 รายชื่อโดยเซิร์ฟเวอร์ ...</translation>
+        <translation>รายชื่อโดยเซิร์ฟเวอร์ %1...</translation>
     </message>
 </context>
 <context>
@@ -4206,7 +4206,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnGridWidgetHelper</name>
     <message>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
+        <translation>ไฟล์ HTML (* .html) ;; กระจายแผ่น (CSV) ไฟล์ (*.csv)</translation>
     </message>
     <message>
         <source>Save As</source>
@@ -5028,7 +5028,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The system was not found.</source>
-        <translation>ไม่พบระบบ.</translation>
+        <translation>หาไม่พบ ระบบ.</translation>
     </message>
     <message>
         <source>Could not create a backup of the server database.</source>
@@ -5067,7 +5067,9 @@ Short for &quot;seconds&quot;</extracomment>
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation></translation>
+        <translation>คำเตือน: คุณกำลังจะผสานระบบที่มีใบอนุญาตเริ่มต้น
+ในฐานะที่เป็นเพียง 1 ใบอนุญาตเริ่มต้นที่ได้รับอนุญาตต่อของระบบหลังจากที่ผสานของคุณคุณจะมีใบอนุญาตเริ่มต้น 1 ที่เหลือ
+ถ้าคุณเข้าใจเรื่องนี้และต้องการที่จะดำเนินการต่อไปกรุณาคลิกผสานเพื่อดำเนินการต่อ.</translation>
     </message>
     <message>
         <source>Testing...</source>
@@ -5100,7 +5102,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>กระแสที่สองคือการปิดใช้งานบนกล้องเหล่านี้ ตัวเลือกการเคลื่อนไหว + LQ ไม่มีผล กด &quot;Yes&quot; เพื่อเปลี่ยนประเภทการบันทึก &quot;เสมอ&quot; หรือ &quot;ไม่มี&quot; เพื่อเปิดใช้งานกระแสที่สอง</translation>
+        <translation>กระแสที่สองคือการปิดใช้งานบนกล้องเหล่านี้ ตัวเลือกการเคลื่อนไหว + LQ ไม่มีผล กด &quot;Yes&quot; เพื่อเปลี่ยนประเภทการบันทึก &quot;เสมอ&quot; หรือ &quot;ไม่มี&quot; เพื่อเปิดใช้งานกระแสที่สอง.</translation>
     </message>
 </context>
 <context>
@@ -5263,7 +5265,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnNotificationsCollectionWidget</name>
     <message>
         <source>DEBUG</source>
-        <translation>DEBUG</translation>
+        <translation>ตรวจแก้จุดบกพร่อง</translation>
     </message>
     <message>
         <source>Browse Archive</source>
@@ -5299,7 +5301,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Open %1</source>
-        <translation></translation>
+        <translation>เปิด %1</translation>
     </message>
     <message>
         <source>%1 Settings</source>
@@ -5311,7 +5313,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Open %1 Web Page...</source>
-        <translation>1% เปิดหน้าเว็บ ...</translation>
+        <translation>เปิดหน้าเว็บ %1 ...</translation>
     </message>
 </context>
 <context>
@@ -7493,15 +7495,15 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation>ไฟล์ &apos;%1&apos; ถูกนำมาใช้สำหรับการบันทึกแล้ว กรุณากรอกชื่ออื่น.</translation>
+        <translation>ไฟล์ &apos;%1&apos; ถูกนำมาใช้สำหรับการบันทึกแล้ว กรุณาใส่ชื่ออื่น.</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation>ไม่สามารถเขียนทับไฟล์</translation>
+        <translation>ไม่สามารถเขียนทับ ไฟล์ ได้</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>ไฟล์ &apos;%1&apos; ถูกใช้โดยกระบวนการอื่น กรุณากรอกชื่ออื่น.</translation>
+        <translation>ไฟล์ &apos;%1&apos; ถูกใช้โดยกระบวนการอื่น กรุณาใส่ชื่ออื่น.</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
@@ -7510,7 +7512,7 @@ If you would like to disable this feature you can do so in the System Settings d
     <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
         <translation>
-            <numerusform>หนึ่งรายการที่ต้องเลือกเพื่อการส่งออก แต่%n รายการ n (s) เลือกในปัจจุบัน.</numerusform>
+            <numerusform>หนึ่งรายการที่ต้องเลือกเพื่อการส่งออก แต่ %n รายการ (s) เลือกในปัจจุบัน.</numerusform>
         </translation>
     </message>
     <message>
@@ -8169,7 +8171,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Capture Mode</source>
-        <translation>โหมดจับภาพ</translation>
+        <translation>โหมด จับภาพ</translation>
     </message>
     <message>
         <source>Fullscreen</source>
@@ -8633,7 +8635,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Email:</source>
-        <translation>อีเมล์:</translation>
+        <translation>อีเมล:</translation>
     </message>
     <message>
         <source>P&amp;ort:</source>
