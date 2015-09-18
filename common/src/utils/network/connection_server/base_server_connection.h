@@ -113,7 +113,7 @@ namespace nx_api
             m_connectionCloseHandlers.push_front( std::move(handler) );
         }
 
-        const std::unique_ptr< AbstractCommunicatingSocket >& socket()
+        const std::unique_ptr<AbstractCommunicatingSocket>& socket() const
         {
             return m_streamSocket;
         }

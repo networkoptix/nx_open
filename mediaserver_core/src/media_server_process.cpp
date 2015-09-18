@@ -96,6 +96,7 @@
 
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/business_event_log_rest_handler.h>
+#include "rest/handlers/business_log2_rest_handler.h"
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
@@ -222,7 +223,6 @@ static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
 static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
-static const QByteArray DISABLE_FFMPEG_OPTIMIZATION("disableFfmpegOptimization");
 
 class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
@@ -401,9 +401,6 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 void ffmpegInit()
 {
-    if (MSSettings::roSettings()->value(DISABLE_FFMPEG_OPTIMIZATION, false).toBool())
-        QnFfmpegVideoTranscoder::isOptimizationDisabled = true;
-
     //avcodec_init();
     av_register_all();
 
@@ -1430,7 +1427,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ptz", new QnPtzRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/onEvent", new QnExternalBusinessEventRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/createEvent", new QnExternalBusinessEventRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/gettime", new QnTimeRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
@@ -1442,7 +1439,8 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler()); // deprecated
+    QnRestProcessorPool::instance()->registerHandler("api/businessEvents", new QnBusinessLog2RestHandler()); // new version
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
@@ -1666,6 +1664,9 @@ void MediaServerProcess::run()
 #endif
     if (QnAppInfo::armBox() == "bpi" || compatibilityMode) // check compatibilityMode here for testing purpose
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+#ifdef __arm__
+    serverFlags |= Qn::SF_ArmServer;
+#endif
 
     if (!isLocal)
         serverFlags |= Qn::SF_RemoteEC;
@@ -1769,19 +1770,6 @@ void MediaServerProcess::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    if (!m_publicAddress.isNull())
-    {
-        if (!m_ipDiscovery->publicIP().isNull()) {
-            m_updatePiblicIpTimer.reset(new QTimer());
-            connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
-            connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
-            m_updatePiblicIpTimer->start(60 * 1000 * 2);
-        }
-
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-        localInfo.data.publicIP = m_publicAddress.toString();
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
-    }
     connect( ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged,
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
@@ -1962,6 +1950,20 @@ void MediaServerProcess::run()
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
+    }
+
+    if (!m_publicAddress.isNull())
+    {
+        if (!m_ipDiscovery->publicIP().isNull()) {
+            m_updatePiblicIpTimer.reset(new QTimer());
+            connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
+            connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+            m_updatePiblicIpTimer->start(60 * 1000 * 2);
+        }
+
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        localInfo.data.publicIP = m_publicAddress.toString();
+        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
 
     /* This key means that password should be forcibly changed in the database. */
@@ -2238,7 +2240,12 @@ void MediaServerProcess::run()
     */
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    QnResourceDiscoveryManager::instance()->start();
+    if( !ec2Connection->connectionInfo().ecDbReadOnly )
+        QnResourceDiscoveryManager::instance()->start();
+    //else
+    //    we are not able to add cameras to DB anyway, so no sense to do discover
+
+
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
@@ -2335,7 +2342,6 @@ void MediaServerProcess::run()
     QnBusinessEventConnector::initStaticInstance( NULL );
 
     QnBusinessRuleProcessor::fini();
-    QnEventsDB::fini();
 
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
@@ -2354,6 +2360,9 @@ void MediaServerProcess::run()
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
+    
+    // destroy events db
+    QnEventsDB::fini();
 
     mserverResourceDiscoveryManager.reset();
 

@@ -228,7 +228,7 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
         toSharedPointer(),
         inputNumber,
         isActivated,
-        QDateTime::currentMSecsSinceEpoch() );
+        qnSyncTime->currentUSecsSinceEpoch() );
 }
 
 QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const

@@ -15,7 +15,7 @@
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
-#include "data/cdb_ns.h"
+#include "stree/cdb_ns.h"
 #include "email_manager.h"
 #include "http_handlers/verify_email_address_handler.h"
 #include "settings.h"
@@ -74,7 +74,7 @@ void AccountManager::getAccount(
     std::function<void(api::ResultCode, data::AccountData)> completionHandler )
 {
     QnUuid accountID;
-    if( !authzInfo.get( param::accountID, &accountID ) )
+    if( !authzInfo.get( attr::accountID, &accountID ) )
     {
         completionHandler(api::ResultCode::forbidden, data::AccountData());
         return;

@@ -36,7 +36,7 @@ std::unique_ptr<stree::AbstractConstIterator> DataFilter::begin() const
     return m_rc.begin();
 }
 
-bool DataFilter::getAsVariant(int resID, QVariant* const value) const
+bool DataFilter::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
 {
     //TODO #ak
     return false;
@@ -47,7 +47,7 @@ bool DataFilter::empty() const
     return m_fields.empty();
 }
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter)
+bool loadFromUrlQuery(const QUrlQuery& /*urlQuery*/, DataFilter* const /*dataFilter*/)
 {
     //TODO #ak
     return true;

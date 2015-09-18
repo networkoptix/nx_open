@@ -124,8 +124,10 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
+        //: "Confirming camera is accessible." or "Confirming device is accessible."
         return tr("Confirming %1 is accessible.").arg(getDefaultDevicesName(m_resource, false));
     case CameraDiagnostics::Step::mediaStreamAvailability:
+        //: "Confirming target camera provides media stream." or "Confirming target device provides media stream."
         return tr("Confirming target %1 provides media stream.").arg(getDefaultDevicesName(m_resource, false));
     case CameraDiagnostics::Step::mediaStreamIntegrity: 
         return tr("Evaluating media stream for errors.");

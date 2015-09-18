@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include <condition_variable>
+#include <chrono>
 #include <deque>
 #include <future>
 #include <mutex>
@@ -25,18 +26,12 @@ namespace
     const int SECONDS_TO_WAIT_AFTER_TEST = 5;
 }
 
-class SocketAsyncModeTest
+class SocketHostNameResolveTest
 :
-    public ::testing::Test
-{
-};
-
-class HostNameResolveTest
-:
-    public SocketAsyncModeTest
+    public testing::Test
 {
 public:
-    HostNameResolveTest()
+    SocketHostNameResolveTest()
     :
         m_startedConnectionsCount( 0 ),
         m_completedConnectionsCount( 0 )
@@ -58,7 +53,7 @@ protected:
         ASSERT_TRUE( connectionPtr->setNonBlockingMode( true ) );
         ASSERT_TRUE( connectionPtr->connectAsync(
             SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
-            std::bind( &HostNameResolveTest::onConnectionComplete, this, connectionPtr, std::placeholders::_1 ) ) );
+            std::bind( &SocketHostNameResolveTest::onConnectionComplete, this, connectionPtr, std::placeholders::_1 ) ) );
     }
 
     void onConnectionComplete(
@@ -106,15 +101,16 @@ protected:
 /*!
     This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
 */
-TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
+TEST( Socket, AsyncOperationCancellation )
 {
-    static const int TEST_DURATION_SECONDS = 1;
-    static const int TEST_RUNS = 5;
+    static const std::chrono::milliseconds TEST_DURATION( 200 );
+    //static const int TEST_RUNS = 37;
+    static const int TEST_RUNS = 37;
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
         static const int MAX_SIMULTANEOUS_CONNECTIONS = 100;
-        static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024*1024;
+        static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024;
 
         RandomDataTcpServer server( BYTES_TO_SEND_THROUGH_CONNECTION );
         ASSERT_TRUE( server.start() );
@@ -125,7 +121,7 @@ TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
             BYTES_TO_SEND_THROUGH_CONNECTION );
         ASSERT_TRUE( connectionsGenerator.start() );
 
-        QThread::sleep( TEST_DURATION_SECONDS );
+        std::this_thread::sleep_for(TEST_DURATION);
 
         connectionsGenerator.pleaseStop();
         connectionsGenerator.join();
@@ -138,7 +134,7 @@ TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
     QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
 }
 
-TEST_F( SocketAsyncModeTest, ServerSocketAsyncCancellation )
+TEST( Socket, ServerSocketAsyncCancellation )
 {
     static const int TEST_RUNS = 7;
 
@@ -156,7 +152,7 @@ TEST_F( SocketAsyncModeTest, ServerSocketAsyncCancellation )
     QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
 }
 
-TEST_F( SocketAsyncModeTest, HostNameResolve1 )
+TEST( Socket, HostNameResolve1 )
 {
     std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
     SystemError::ErrorCode connectErrorCode = SystemError::noError;
@@ -184,7 +180,7 @@ TEST_F( SocketAsyncModeTest, HostNameResolve1 )
     ASSERT_TRUE( connectErrorCode == SystemError::noError );
 }
 
-TEST_F( HostNameResolveTest, HostNameResolve2 )
+TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
 {
     HostAddress resolvedAddress;
 
@@ -213,7 +209,7 @@ TEST_F( HostNameResolveTest, HostNameResolve2 )
         lk.unlock();
         if( connectionToCancel )
         {
-            connectionToCancel->cancelAsyncIO();
+            connectionToCancel->terminateAsyncIO(true);
             connectionToCancel.reset();
             ++cancelledConnectionsCount;
         }
@@ -225,7 +221,7 @@ TEST_F( HostNameResolveTest, HostNameResolve2 )
     ASSERT_TRUE( m_connections.empty() );
 }
 
-TEST_F( SocketAsyncModeTest, HostNameResolve3 )
+TEST( Socket, HostNameResolve3 )
 {
     {
         nx_http::HttpClient httpClient;
@@ -239,7 +235,7 @@ TEST_F( SocketAsyncModeTest, HostNameResolve3 )
     }
 }
 
-TEST_F( SocketAsyncModeTest, HostNameResolveCancellation )
+TEST( Socket, HostNameResolveCancellation )
 {
     static const int TEST_RUNS = 100;
 
@@ -261,43 +257,31 @@ TEST_F( SocketAsyncModeTest, HostNameResolveCancellation )
                 done = true;
                 resolvedAddress = connection->getForeignAddress().address;
             } ) );
-        connection->cancelAsyncIO();
+        connection->terminateAsyncIO(true);
     }
 }
 
-TEST_F( SocketAsyncModeTest, BadHostNameResolve )
+TEST( Socket, BadHostNameResolve )
 {
     static const int TEST_RUNS = 10000;
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
-        //SystemError::ErrorCode connectErrorCode = SystemError::noError;
-        //std::condition_variable cond;
-        //std::mutex mutex;
-        //bool done = false;
-        //HostAddress resolvedAddress;
         int iBak = i;
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
         ASSERT_TRUE( connection->connectAsync(
             SocketAddress( QString::fromLatin1( "hx.hz" ), nx_http::DEFAULT_HTTP_PORT ),
-            [&i, iBak/*&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection*/]
+            [&i, iBak]
             ( SystemError::ErrorCode /*errorCode*/ ) mutable {
-                //std::unique_lock<std::mutex> lk( mutex );
-                //connectErrorCode = errorCode;
-                //cond.notify_all();
-                //done = true;
-                //resolvedAddress = connection->getForeignAddress().address;
                 ASSERT_EQ( i, iBak );
-                int x = 0;
-                static_cast< void >( x );
             } ) );
-        connection->cancelAsyncIO();
+        connection->terminateAsyncIO(true);
     }
 }
 
 #if 0
-TEST_F( SocketAsyncModeTest, postCancellation )
+TEST( Socket, postCancellation )
 {
     static const int TEST_RUNS = 200;
 
@@ -326,7 +310,7 @@ TEST_F( SocketAsyncModeTest, postCancellation )
                 } );
 
             for( const auto& sock : sockets )
-                sock->cancelAsyncIO();
+                sock->terminateAsyncIO(true);
 
             //QThread::usleep( 100 );
         }

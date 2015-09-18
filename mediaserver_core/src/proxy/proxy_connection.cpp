@@ -139,7 +139,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             .release());
         d->dstSocket->setRecvTimeout(CONNECT_TIMEOUT);
         d->dstSocket->setSendTimeout(CONNECT_TIMEOUT);
-        if (!d->dstSocket->connect(url.host(), url.port())) {
+        if (!d->dstSocket->connect(SocketAddress(url.host().toLatin1().data(), url.port()))) {
             d->socket->close();
             return QString(); // now answer from destination address
         }

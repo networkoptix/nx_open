@@ -114,8 +114,11 @@ void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInfor
     m_password.clear();
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
-    if (status != 0)
-        emit mergeFinished(InternalError, moduleInformation, handle);
-    else
-        emit mergeFinished(errorStringToErrorCode(errorString), moduleInformation, handle);
+    QnMergeSystemsTool::ErrorCode errCode = InternalError;
+    if (status == QNetworkReply::ContentOperationNotPermittedError)
+        errCode = ForbiddenError;
+    else if (status == 0)
+        errCode = errorStringToErrorCode(errorString);
+
+    emit mergeFinished(errCode, moduleInformation, handle);
 }

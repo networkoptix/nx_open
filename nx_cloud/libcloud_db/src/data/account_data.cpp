@@ -8,7 +8,7 @@
 #include <utils/common/model_functions.h>
 #include <utils/network/buffer.h>
 
-#include "cdb_ns.h"
+#include "stree/cdb_ns.h"
 
 
 namespace nx {
@@ -19,7 +19,7 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
 {
     switch( resID )
     {
-        case param::accountID:
+        case attr::accountID:
             *value = QVariant::fromValue(id);
             return true;
 

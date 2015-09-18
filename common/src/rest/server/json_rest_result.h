@@ -22,6 +22,7 @@ public:
         MissingParameter = 1,
         InvalidParameter = 2,
         CantProcessRequest = 3,
+        Forbidden = 4
     };
 
     Error error;

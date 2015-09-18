@@ -17,7 +17,6 @@
 
 #include <media_server/settings.h>
 
-#include "utils/serialization/sql_functions.h"
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
@@ -136,7 +135,7 @@ namespace {
         return result;
     }
 
-    QnBusinessEventParameters convertOldEventParameters(const QByteArray& value) {
+    QnBusinessEventParameters convertOldEventParameters(const QByteArray& value, QnUuid* actionResourceId) {
         enum Param {
             EventTypeParam,
             EventTimestampParam,
@@ -178,7 +177,7 @@ namespace {
                     result.eventResourceId = QnUuid(field);
                     break;
                 case ActionResourceParam:
-                    result.actionResourceId = QnUuid(field);
+                    *actionResourceId = QnUuid(field);
                     break;
                 case InputPortIdParam:
                     result.inputPortId = QString::fromUtf8(field.data(), field.size());
@@ -187,14 +186,22 @@ namespace {
                     result.reasonCode = (QnBusiness::EventReason) toInt(field);
                     break;
                 case ReasonParamsEncodedParam:
-                    result.reasonParamsEncoded = QString::fromUtf8(field.data(), field.size());
+                {
+                    auto value = QString::fromUtf8(field.data(), field.size());
+                    if (!value.isEmpty())
+                        result.description = value;
                     break;
+                }
                 case SourceParam:
-                    result.source = QString::fromUtf8(field.data(), field.size());
+                    result.caption = QString::fromUtf8(field.data(), field.size());
                     break;
                 case ConflictsParam:
-                    result.conflicts = QString::fromLatin1(field.data(), field.size()).split(QLatin1Char(STRING_LIST_DELIM)); // optimization. mac address list here. UTF is not required
+                {
+                    auto value = QString::fromLatin1(field.data(), field.size());
+                    if (!value.isEmpty())
+                        result.description = value;
                     break;
+                }
                 default:
                     break;
                 }
@@ -274,9 +281,10 @@ bool QnEventsDB::createDatabase()
             return false;
     }
 
+
     if (!applyUpdates(":/mserver_updates"))
         return false;
-
+		
     if (!isObjectExists(lit("table"), lit("audit_log"), m_sdb))
     {
         QSqlQuery ddlQuery(m_sdb);
@@ -410,19 +418,20 @@ bool QnEventsDB::migrateBusinessParams() {
         QByteArray runtimeParams;
     };
 
-    auto convertAction = [](const QByteArray &packed) -> QByteArray {
+    auto convertAction = [](const QByteArray &packed, const QnUuid& actionResourceId) -> QByteArray {
         /* Check if data is in Ubjson already. */
         if (!packed.isEmpty() && packed[0] == L'[')
             return packed;
         QnBusinessActionParameters ap = convertOldActionParameters(packed);
+        ap.actionResourceId = actionResourceId;
         return QnUbjson::serialized(ap);
     };
 
-    auto convertRuntime = [](const QByteArray &packed)-> QByteArray {
+    auto convertRuntime = [](const QByteArray &packed, QnUuid* actionResourceId)-> QByteArray {
         /* Check if data is in Ubjson already. */
         if (!packed.isEmpty() && packed[0] == L'[')
             return packed;
-        QnBusinessEventParameters rp = convertOldEventParameters(packed);
+        QnBusinessEventParameters rp = convertOldEventParameters(packed, actionResourceId);
         return QnUbjson::serialized(rp);
     };
 
@@ -443,8 +452,9 @@ bool QnEventsDB::migrateBusinessParams() {
             QByteArray runtimeData = query.value(2).toByteArray();
 
             RowParams remappedData;
-            remappedData.actionParams = convertAction(actionData);
-            remappedData.runtimeParams = convertRuntime(runtimeData);
+            QnUuid actionResourceId;
+            remappedData.runtimeParams = convertRuntime(runtimeData, &actionResourceId); // move actionResourceId from runtimeParams to actionParams
+            remappedData.actionParams = convertAction(actionData, actionResourceId);
             remapData[id] = remappedData;
         }
     }
@@ -515,20 +525,19 @@ bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
     
-    QnBusinessEventParameters actionRuntime = action->getRuntimeParams();
+    QnBusinessActionParameters actionParams = action->getParams();
     if (actionRes)
-        actionRuntime.actionResourceId = actionRes->getId();
-    int eventType = (int) actionRuntime.eventType;
+        actionParams.actionResourceId = actionRes->getId();
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
-    insQuery.bindValue(":action_params", QnUbjson::serialized(action->getParams()));
-    insQuery.bindValue(":runtime_params", QnUbjson::serialized(actionRuntime));
+    insQuery.bindValue(":action_params", QnUbjson::serialized(actionParams));
+    insQuery.bindValue(":runtime_params", QnUbjson::serialized(action->getRuntimeParams()));
     insQuery.bindValue(":business_rule_guid", action->getBusinessRuleId().toRfc4122());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
-    insQuery.bindValue(":event_type", eventType);
+    insQuery.bindValue(":event_type", (int) action->getRuntimeParams().eventType);
     insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
     insQuery.bindValue(":action_resource_guid", actionRes ? actionRes->getId().toRfc4122() : QByteArray());
 
@@ -594,7 +603,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
     return request;
 }
 
-QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
+QnBusinessActionDataList QnEventsDB::getActions(
     const QnTimePeriod& period,
     const QnResourceList& resList, 
     const QnBusiness::EventType& eventType, 
@@ -605,7 +614,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     QElapsedTimer t;
     t.restart();
 
-    QList<QnAbstractBusinessActionPtr> result;
+    QnBusinessActionDataList result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
     QWriteLocker lock(&m_mutex);
@@ -625,16 +634,16 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
 
     while (query.next()) 
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
-        QnBusinessActionParameters actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(query.value(actionParamIdx).toByteArray());
-        QnBusinessEventParameters runtimeParams = QnUbjson::deserialized<QnBusinessEventParameters>(query.value(runtimeParamIdx).toByteArray());
-        QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
-        action->setParams(actionParams);
-        action->setBusinessRuleId(QnUuid(query.value(businessRuleIdx).toByteArray()));
-        action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
-        action->setAggregationCount(query.value(aggregationCntIdx).toInt());
+        QnBusinessActionData actionData;
 
-        result << action;
+        actionData.actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
+        actionData.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(query.value(actionParamIdx).toByteArray());
+        actionData.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(query.value(runtimeParamIdx).toByteArray());
+        actionData.businessRuleId = QnUuid::fromRfc4122(query.value(businessRuleIdx).toByteArray());
+        //actionData.toggleState = (QnBusiness::EventState) query.value(toggleStateIdx).toInt();
+        actionData.aggregationCount = query.value(aggregationCntIdx).toInt();
+
+        result.push_back(std::move(actionData));
     }
 
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";

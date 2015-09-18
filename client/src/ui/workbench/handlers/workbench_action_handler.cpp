@@ -839,8 +839,9 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Cannot move %1 to server %2. Server is unresponsive.")
-                .arg(getNumericDevicesName(modifiedResources))
+            //: "Cannot move these 5 cameras to server <server_name>. Server is unresponsive."
+            tr("Cannot move these %n %1 to server %2. Server is unresponsive.", "", modifiedResources.size())
+                .arg(getDefaultDevicesName(modifiedResources, false))
                 .arg(server->getName()),
             QDialogButtonBox::Ok
             );
@@ -864,9 +865,10 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 errorResources,
                 Qn::MainWindow_Tree_DragCameras_Help,
                 tr("Error"),
-                tr("Server %1 is unable to find and access these %2. Are you sure you would like to move them?")
+                //: "Server <server_name> is unable to find and access these 5 cameras. Are you sure you would like to move them?"
+                tr("Server %1 is unable to find and access these %n %2. Are you sure you would like to move them?", "", errorResources.size())
                     .arg(server->getName())
-                    .arg(getNumericDevicesName(errorResources, false)),
+                    .arg(getDefaultDevicesName(errorResources, false)),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
                 );
         /* If user is sure, return invalid cameras back to list. */
@@ -1890,7 +1892,8 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* First version of the dialog if all cameras are auto-discovered. */
     if (cameras.size() == onlineAutoDiscoveredCameras.size()) {
         question =
-            tr("These %1 are auto-discovered.").arg(getNumericDevicesName(cameras, false)) + L'\n' 
+            //: "These 5 cameras are auto-discovered."
+            tr("These %n %1 are auto-discovered.").arg(getDefaultDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
@@ -1898,7 +1901,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* Second version - some cameras are auto-discovered, some not. */
     if (!onlineAutoDiscoveredCameras.isEmpty()) {
         question = 
-            tr("%n of these %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getNumericDevicesName(cameras, false)) + L'\n' 
+            tr("%n of these %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getDefaultDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }

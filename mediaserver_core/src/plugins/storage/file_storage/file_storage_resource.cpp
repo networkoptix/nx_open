@@ -366,9 +366,6 @@ QnFileStorageResource::~QnFileStorageResource()
         umount(m_localPath.toLatin1().constData());
         rmdir(m_localPath.toLatin1().constData());
     }
-
-    if (!m_localPath.isEmpty() && m_storageManager)
-        m_storageManager->removeFromLocalPathInUse(m_localPath);
 #endif
 }
 

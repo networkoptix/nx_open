@@ -197,8 +197,7 @@ namespace ec2
     static const size_t MILLIS_PER_SEC = 1000;
     static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 0;
     static const size_t MIN_INTERNET_SYNC_TIME_PERIOD_SEC = 60;
-    static const char* NIST_RFC868_SERVER = "time.nist.gov";
-    static const char* UCLA_RFC868_SERVER = "time1.ucla.edu";
+    static const char* RFC868_SERVERS[] = { "time.nist.gov", "time.ien.it"/*, "time1.ucla.edu"*/ };
 #ifdef _DEBUG
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*MILLIS_PER_SEC;
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*MILLIS_PER_SEC;
@@ -334,10 +333,10 @@ namespace ec2
                     std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                     0 );
                 std::unique_ptr<MultipleInternetTimeFetcher> multiFetcher( new MultipleInternetTimeFetcher() );
-                multiFetcher->addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher>(
-                    new TimeProtocolClient(QLatin1String(NIST_RFC868_SERVER))) );
-                multiFetcher->addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher>(
-                    new TimeProtocolClient(QLatin1String(UCLA_RFC868_SERVER))) );
+
+                for(const char* timeServer: RFC868_SERVERS)
+                    multiFetcher->addTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher>(
+                        new TimeProtocolClient(QLatin1String(timeServer))));
                 m_timeSynchronizer = std::move( multiFetcher );
                 addInternetTimeSynchronizationTask();
             }
@@ -414,6 +413,9 @@ namespace ec2
                         WhileExecutingDirectCall callGuard( this );
                         emit timeChanged( curSyncTime );
                     }
+
+                    //reporting new sync time to everyone we know
+                    syncTimeWithAllKnownServers(&lk);
                 }
             }
             else
@@ -571,8 +573,13 @@ namespace ec2
         const auto timeDifference = remotePeerSyncTime - getSyncTimeNonSafe();
         const bool maxTimeDriftExceeded =
             (std::abs( timeDifference ) >= std::max<qint64>( timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS ));
-        const bool needAdjustClockDueToLargeDrift = maxTimeDriftExceeded && (remotePeerID > qnCommon->moduleGUID());
-        //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
+        const bool needAdjustClockDueToLargeDrift =
+            //taking drift into account if both servers have time with same key
+            (remotePeerTimePriorityKey == m_usedTimeSyncInfo.timePriorityKey) &&
+            maxTimeDriftExceeded &&
+            (remotePeerID > qnCommon->moduleGUID());
+
+        //if there is new maximum remotePeerTimePriorityKey then updating delta and emitting timeChanged
         if( (remotePeerTimePriorityKey <= m_usedTimeSyncInfo.timePriorityKey) &&
             !needAdjustClockDueToLargeDrift )
         {
@@ -621,24 +628,35 @@ namespace ec2
         lock->relock();
 
         //informing all servers we can about time change as soon as possible
-        for( std::pair<const QnUuid, PeerContext>& peerCtx: m_peersToSendTimeSyncTo )
-        {
-            TimerManager::instance()->modifyTimerDelay(
-                peerCtx.second.syncTimerID.get(),
-                0 );
-        }
+        syncTimeWithAllKnownServers(lock);
     }
 
     void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransport* transport )
     {
-        if( !transport->isIncoming() )      //we can connect to the peer
+        using namespace std::placeholders;
+
+        if( transport->isIncoming() )
         {
+            //peer connected to us
+            //using transactions to signal remote peer that it needs to fetch time from us
+            transport->setBeforeSendingChunkHandler(
+                std::bind(&TimeSynchronizationManager::onBeforeSendingTransaction, this, _1, _2));
+        }
+        else
+        {
+            //listening time change signals fom remote peer which cannot connect to us
+            transport->setHttpChunkExtensonHandler(
+                std::bind(&TimeSynchronizationManager::onTransactionReceived, this, _1, _2));
+
+            //we can connect to the peer
             const QUrl remoteAddr = transport->remoteAddr();
             //saving credentials has been used to establish connection
             startSynchronizingTimeWithPeer( //starting sending time sync info to peer
                 transport->remotePeer().id,
                 SocketAddress( remoteAddr.host(), remoteAddr.port() ),
                 transport->authData() );
+
+            using namespace std::placeholders;
         }
     }
 
@@ -1073,5 +1091,45 @@ namespace ec2
             elapsed,
             m_usedTimeSyncInfo.syncTime + elapsed - m_usedTimeSyncInfo.monotonicClockValue,
             m_usedTimeSyncInfo.timePriorityKey );
+    }
+
+    void TimeSynchronizationManager::syncTimeWithAllKnownServers(QnMutexLockerBase* const /*lock*/)
+    {
+        for (std::pair<const QnUuid, PeerContext>& peerCtx : m_peersToSendTimeSyncTo)
+        {
+            TimerManager::instance()->modifyTimerDelay(
+                peerCtx.second.syncTimerID.get(),
+                0);
+        }
+    }
+
+    void TimeSynchronizationManager::onBeforeSendingTransaction(
+        QnTransactionTransport* transport,
+        nx_http::HttpHeaders* const headers)
+    {
+        headers->emplace(
+            QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME,
+            getTimeSyncInfo().toString());
+    }
+
+    void TimeSynchronizationManager::onTransactionReceived(
+        QnTransactionTransport* transport,
+        const nx_http::HttpHeaders& headers)
+    {
+        for (auto header : headers)
+        {
+            if (header.first != QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME)
+                continue;
+
+            const nx_http::StringType& serializedTimeSync = header.second;
+            TimeSyncInfo remotePeerTimeSyncInfo;
+            if (!remotePeerTimeSyncInfo.fromString(serializedTimeSync))
+                continue;
+
+            QnMutexLocker lk(&m_mutex);
+            if (remotePeerTimeSyncInfo.timePriorityKey > m_usedTimeSyncInfo.timePriorityKey)
+                syncTimeWithAllKnownServers(&lk);
+            return;
+        }
     }
 }

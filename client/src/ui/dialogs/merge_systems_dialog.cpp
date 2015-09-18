@@ -235,6 +235,9 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnMod
         case QnMergeSystemsTool::NotFoundError:
             message = tr("System was not found.");
             break;
+        case QnMergeSystemsTool::ForbiddenError:
+            message = tr("Operation is not permitted.");
+            break;
         default:
             break;
         }

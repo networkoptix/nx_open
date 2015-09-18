@@ -1018,6 +1018,12 @@ namespace nx_http
         {
         }
 
+        DigestAuthorization::DigestAuthorization( DigestAuthorization&& right )
+        :
+            Authorization( std::move(right) )
+        {
+        }
+
         void DigestAuthorization::addParam( const BufferType& name, const BufferType& value )
         {
             if( name == "username" )
