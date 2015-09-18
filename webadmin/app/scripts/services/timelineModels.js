@@ -815,7 +815,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
     }
 
     if(oldPosition > this.playedPosition && Config.allowDebugMode){
-        console.error("Position jumped back!");
+        console.error("Position jumped back! ms:" , oldPosition - this.playedPosition);
     }
 
     return this.playedPosition;

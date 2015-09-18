@@ -205,8 +205,15 @@ angular.module('webadminApp')
                         element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                     }
-                    activePlayer = player;
 
+                    if(activePlayer == 'flashls' && player == 'webm'){
+                        // This is hack! When switching from flashls to webm video - webm player stucks. Seems like chrome issue.
+                        activePlayer = player;
+                        return false;
+                    }
+
+                    activePlayer = player;
+                    return true;
                 }
 
                 // TODO: Create common interface for each player, html5 compatible or something
@@ -354,13 +361,16 @@ angular.module('webadminApp')
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
                 var format = null;
 
-                scope.$watch("vgSrc",function(){
+                function srcChanged(){
                     scope.loading = false;
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         format = detectBestFormat();
 
-                        recyclePlayer(format);// Remove or recycle old player.
+                        if(!recyclePlayer(format)){ // Remove or recycle old player.
+                            // Some problem happened. We must reload video here
+                            $timeout(srcChanged);
+                        };
 
                         if(!format){
                             scope.native = false;
@@ -394,7 +404,9 @@ angular.module('webadminApp')
                     //if(scope.vgApi && scope.vgSrc ) {
                     //    scope.vgApi.load(scope.vgSrc[0].src);
                     //}
-                });
+                }
+
+                scope.$watch("vgSrc",srcChanged);
             }
         }
     }]);
