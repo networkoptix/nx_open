@@ -486,14 +486,14 @@ void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
     query.addQueryItem(kTimeZoneTag, timeZoneId);
     
+    enum { kSpecialTimeout = 30 * 1000 }; /// Due to server could apply time changes too long in some cases (Nx1 for example)
     const RestClient::Request request(baseInfo
-        , password, kSetTimeCommand, query, RestClient::kStandardTimeout
+        , password, kSetTimeCommand, query, kSpecialTimeout
         , makeSuccessCallback(callback, affected), makeErrorCallback(callback, affected)); 
     RestClient::sendGet(request);
 }
 
 ///
-#include <qdebug.h>
 void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const QString &systemName
@@ -513,7 +513,6 @@ void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(kSystemNameTag, systemName);
     query.addQueryItem(oldPasswordTag, password);
 
-    qDebug() << query.toString();
     const RestClient::Request request(baseInfo
         , password, kConfigureCommand, query, RestClient::kStandardTimeout
         , makeSuccessCallback(callback, Constants::kSystemNameAffected)

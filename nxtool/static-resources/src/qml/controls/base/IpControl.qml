@@ -24,6 +24,7 @@ FocusScope
 
     property string initialText;
 
+    opacity: (enabled ? 1 : 0.5);
     onInitialTextChanged:
     {
         /// fills octets with initial values

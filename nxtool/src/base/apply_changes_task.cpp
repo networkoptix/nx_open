@@ -20,9 +20,9 @@ namespace
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
-        , kWaitTriesCount = 90
+        , kWaitTriesCount = 150
 
-        /// Accepted wait time is 180 seconds due to restart on network interface parameters change
+        /// Accepted wait time is 300 seconds due to restart on network interface parameters change
         , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
     };
 
@@ -133,12 +133,13 @@ namespace
             , itfUpdateInfo(initItfUpdateInfo)
             , changesCount(changesFromUpdateInfos(initItfUpdateInfo))
         {
-            /// Force send dhcp on every call
+            /// Forces send dhcp on every call
+            /// Forces send old ip if new one hasn't been assigned
             const auto &extraInfo = initItem->second;
             const auto &interfaces = extraInfo.interfaces;
             for (auto &item: itfUpdateInfo)
             {
-                if (!item.useDHCP)
+                if (!item.useDHCP || (item.mask && !item.ip))
                 {
                     ///searching the specified in current existing
                     const auto it = std::find_if(interfaces.begin(), interfaces.end()
@@ -148,7 +149,12 @@ namespace
                     });
 
                     if (it != interfaces.end())
-                        item.useDHCP.reset(new bool(it->useDHCP == Qt::Checked));
+                    {
+                        if (!item.useDHCP)  /// Force dhcp old value
+                            item.useDHCP.reset(new bool(it->useDHCP == Qt::Checked));
+                        else
+                            item.ip.reset(new QString(it->ip));
+                    }
                     else
                         Q_ASSERT_X(true, Q_FUNC_INFO, "Interface name not found!");
                 }

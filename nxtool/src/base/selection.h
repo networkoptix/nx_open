@@ -23,6 +23,7 @@ namespace rtu
         Q_PROPERTY(QString password READ password NOTIFY changed)
         Q_PROPERTY(QDateTime dateTime READ dateTime NOTIFY changed)
         Q_PROPERTY(bool editableInterfaces READ editableInterfaces NOTIFY changed)
+        Q_PROPERTY(bool hasEmptyIps READ hasEmptyIps NOTIFY changed)
         
     public:
         explicit Selection(ServersSelectionModel *selectionModel
@@ -48,6 +49,8 @@ namespace rtu
         const QDateTime &dateTime() const;
         
         bool editableInterfaces() const;
+
+        bool hasEmptyIps() const;
 
     public:
         InterfaceInfoList aggregatedInterfaces();

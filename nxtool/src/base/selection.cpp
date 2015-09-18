@@ -166,10 +166,33 @@ namespace
         const int ipsCount = getSelectionValue<int>(servers, kEmptyIps, kDifferentIpsCount
             , std::equal_to<int>(), [](const rtu::ServerInfo &info) -> int
         {
-            return info.extraInfo().interfaces.size(); 
+            return (info.hasExtraInfo() ? info.extraInfo().interfaces.size() : kEmptyIps);  
         });
         
         return (ipsCount == kSingleIp ? true : false);
+    }
+
+    /// Make sense only if all servers has one interfaces. 
+    /// Calculated value will not be used in other cases
+    bool calcHasEmptyAddresses(const rtu::ServerInfoPtrContainer &servers)
+    {
+        if (servers.empty())
+            return false;
+
+        const bool aggregatedHasEmptyIps = getSelectionValue<bool>(servers, false, true
+            , std::equal_to<bool>(), [](const rtu::ServerInfo &info) -> bool
+        {
+            if (!info.hasExtraInfo())
+                return false;
+
+            const auto &interfaces = info.extraInfo().interfaces;
+            if (interfaces.empty())
+                return false;
+            
+            return interfaces.first().ip.isEmpty();
+        });
+
+        return aggregatedHasEmptyIps;
     }
 
     rtu::InterfaceInfoList calcAggregatedInterfaces(const rtu::ServerInfoPtrContainer &servers)
@@ -228,6 +251,7 @@ struct rtu::Selection::Snapshot
     QString password;
     QDateTime dateTime;
     bool editableInterfaces;
+    bool hasEmptyIps;
     InterfaceInfoList aggregatedInterfaces;
 
     Snapshot(rtu::ServersSelectionModel *model);
@@ -243,6 +267,7 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     , password(calcPassword(model->selectedServers()))
     , dateTime(calcDateTime(model->selectedServers(), flags))
     , editableInterfaces(calcEditableInterfaces(model->selectedServers()))
+    , hasEmptyIps(calcHasEmptyAddresses(model->selectedServers()))
     , aggregatedInterfaces(editableInterfaces ? calcAggregatedInterfaces(model->selectedServers()) : InterfaceInfoList())
 {}
 
@@ -296,6 +321,11 @@ const QDateTime &rtu::Selection::dateTime() const
 bool rtu::Selection::editableInterfaces() const
 {
     return m_snapshot->editableInterfaces;
+}
+
+bool rtu::Selection::hasEmptyIps() const
+{
+    return m_snapshot->hasEmptyIps;
 }
 
 rtu::InterfaceInfoList rtu::Selection::aggregatedInterfaces()

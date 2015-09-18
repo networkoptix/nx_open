@@ -137,9 +137,15 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
         const auto &localSuccessful = 
             [this, base, timestamp, successful](const QUuid &, const ExtraServerInfo &extraInfo)
         {
-            m_lastUpdated[base->id] = timestamp;
-            if (successful)
-                successful(base->id, extraInfo, base->hostAddress);
+            const auto callback = [this, base, timestamp, successful]
+                (const QUuid &id, const ExtraServerInfo &extraInfo, const QString &host)
+            {
+                m_lastUpdated[id] = timestamp;
+                if (successful)
+                    successful(id, extraInfo, host);
+            };
+
+            globalSuccessful(callback, base->id, extraInfo, base->hostAddress);
         };
 
         const auto &localFailed = 

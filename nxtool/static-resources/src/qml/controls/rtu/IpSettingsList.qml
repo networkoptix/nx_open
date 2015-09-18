@@ -89,9 +89,11 @@ Base.Column
 
     property QtObject impl : QtObject
     {
-        readonly property string errorTemplate: 
+        readonly property string errorTemplate:
             qsTr("Invalid %1 for \"%2\" specified. Can't apply changes.");
-        
+        readonly property string errorTemplateServeral:
+            qsTr("Invalid %1 specified. Can't apply changes.");
+
         function tryApplyChanges(warnings)
         {
             if (!thisComponent.changed)
@@ -116,50 +118,102 @@ Base.Column
                 var useDHCPState = item.useDHCPControl.checkedState;
                 var wrongGateway = (!item.gatewayControl.isEmptyAddress && !item.gatewayControl.acceptableInput);
 
-                if (useDHCPState === Qt.Unchecked)   /// do not send address/mask/gateway if dhcp is on
+                if ((useDHCPState === Qt.Unchecked) &&   /// do not send address/mask/gateway if dhcp is on
+                        (item.ipAddressControl.changed || item.subnetMaskControl.changed
+                         || item.gatewayControl.changed || item.useDHCPControl.changed))
                 {
-                    if (item.ipAddressControl.acceptableInput)
+                    var selectedCount = rtuContext.selection.count;
+                    var isSingleSelection = (selectedCount == 1);
+                    var ipAddressChangeAdded = false;
+
+                    if (item.ipAddressControl.acceptableInput
+                        && (!item.lastIpContol.visible || item.lastIpContol.valid))   /// for ranges
                     {
                         rtuContext.changesManager().changeset().addAddressChange(name, item.ipAddressControl.text);
+                        ipAddressChangeAdded = true;
                     }
-                    else
+                    else if (isSingleSelection   /// for single selection empty or wrong ip is not correct anyway
+
+                        /// If there are no non-assigned addresses and current ip control value is empty
+                        /// - we use old addresses (does not change ips)
+                        || (!item.ipAddressControl.isEmptyAddress && (rtuContext.selection.hasEmptyIps || !item.lastIpContol.valid)))
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(interfaceCaption);
+                        if (isSingleSelection)
+                            errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(interfaceCaption);
+                        else
+                            errorDialog.message = errorTemplateServeral.arg(qsTr("range of addresses"));
+
                         errorDialog.show();
             
                         item.ipAddressControl.forceActiveFocus();
                         return false;
                     }
 
-                    if (item.subnetMaskControl.acceptableInput
-                        && rtuContext.isValidSubnetMask(item.subnetMaskControl.text))
+                    var maskText = item.subnetMaskControl.text;
+                    var validMask = rtuContext.isValidSubnetMask(maskText);
+
+                    /// we have to check if start and finish addresses from the range are in the the same subnet
+                    var maskValidWidth = isSingleSelection || item.ipAddressControl.isEmptyAddress
+                        || (validMask && item.ipAddressControl.changed&& rtuContext.isDiscoverableFromNetwork(
+                             item.ipAddressControl.text, item.subnetMaskControl.text, item.lastIpContol.text, item.subnetMaskControl.text));
+
+                    if (item.subnetMaskControl.acceptableInput && validMask && maskValidWidth)
                     {
                         rtuContext.changesManager().changeset().addMaskChange(name, item.subnetMaskControl.text);
                     }
                     else
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(interfaceCaption);
+                        if (!validMask)
+                        {
+                            if (isSingleSelection)
+                                errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(interfaceCaption);
+                            else
+                                errorDialog.message = errorTemplateServeral.arg(qsTr("mask"));
+                        }
+                        else if (!maskValidWidth)
+                        {
+                            errorDialog.message = qsTr("Subnet mask is too narrow. Servers are going to be in different subnets. Can't apply changes");
+                        }
                         errorDialog.show();
                         
                         item.subnetMaskControl.forceActiveFocus();
                         return false;
                     }
 
-                    if (!rtuContext.isDiscoverableFromCurrentNetwork(
-                        item.ipAddressControl.text, item.subnetMaskControl.text))
+                    var startIpDiscoverable = rtuContext.isDiscoverableFromCurrentNetwork(
+                        item.ipAddressControl.text, item.subnetMaskControl.text);
+                    var lastIpDiscoverable = (isSingleSelection || item.lastIpContol.valid && rtuContext.isDiscoverableFromCurrentNetwork(
+                        item.lastIpContol.text, item.subnetMaskControl.text));
+
+                    var showDiffSubnetWarning = (!startIpDiscoverable || !lastIpDiscoverable);
+
+                    if (ipAddressChangeAdded && showDiffSubnetWarning)
                     {
-                        warnings.push(("The IP address of \"%1\" is about to be assigned is in a different subnet. The unit will be unreachable after the changes are made. Proceed?")
-                            .arg(interfaceCaption));
+                        if (isSingleSelection)
+                            warnings.push(("The IP address of \"%1\" is about to be assigned is in a different subnet. The unit will be unreachable after the changes are made. Proceed?").arg(interfaceCaption));
+                        else
+                            warnings.push("Some of IP address are about to be assigned is in a different subnet. The units will be unreachable after the changes are made. Proceed?");
                     }
 
-                    var gatewayDiscoverable = rtuContext.isDiscoverableFromNetwork(
+                    var gatewayDiscoverableFromStartIp = rtuContext.isDiscoverableFromNetwork(
                         item.ipAddressControl.text, item.subnetMaskControl.text
                         , item.gatewayControl.text, item.subnetMaskControl.text);
+                    var gatewayDiscoverableFromLastIp = (isSingleSelection || rtuContext.isDiscoverableFromNetwork(
+                        item.lastIpContol.text, item.subnetMaskControl.text
+                        , item.gatewayControl.text, item.subnetMaskControl.text));
 
-                    if (!wrongGateway && !item.gatewayControl.isEmptyAddress && !gatewayDiscoverable)
+                    var gatewayDiscoverable = (gatewayDiscoverableFromStartIp && gatewayDiscoverableFromLastIp);
+                    if (!wrongGateway && !item.gatewayControl.isEmptyAddress && !gatewayDiscoverable
+                        && (isSingleSelection || !item.ipAddressControl.isEmptyAddress))
                     {
-                        errorDialog.message = ("Default gateway for \"%1\" is not in the same network as IP. Can't apply changes.")
-                            .arg(interfaceCaption);
+                        if (isSingleSelection)
+                        {
+                            errorDialog.message = ("Default gateway for \"%1\" is not in the same network as IP. Can't apply changes.")
+                                .arg(interfaceCaption);
+                        }
+                        else
+                            errorDialog.message = ("Default gateway is not in the same network as IPs. Can't apply changes.")
+
                         errorDialog.show();
 
                         if (item.ipAddressControl.changed)
@@ -174,7 +228,11 @@ Base.Column
                     {
                         if (wrongGateway)
                         {
-                            errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(interfaceCaption);
+                            if (isSingleSelection)
+                                errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(interfaceCaption);
+                            else
+                                errorDialog.message = errorTemplateServeral.arg(qsTr("gateway"));
+
                             errorDialog.show();
 
                             item.gatewayControl.forceActiveFocus();
@@ -191,7 +249,11 @@ Base.Column
                 {
                     if (!item.dnsControl.isEmptyAddress && !item.dnsControl.acceptableInput)
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(interfaceCaption);
+                        if (isSingleSelection)
+                            errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(interfaceCaption);
+                        else
+                            errorDialog.message = errorTemplateServeral.arg(qsTr("dns"));
+
                         errorDialog.show();
                         
                         item.dnsControl.forceActiveFocus();

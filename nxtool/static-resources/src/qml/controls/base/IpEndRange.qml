@@ -11,7 +11,6 @@ Base.IpControl
 
     initialText: impl.addToString(startAddress, addressesCount);
 
-    onInitialTextChanged: console.log("--- init <" + initialText + ">");
     enabled: false;
 
 

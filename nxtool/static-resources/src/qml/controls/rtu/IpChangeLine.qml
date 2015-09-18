@@ -18,6 +18,7 @@ Grid
     readonly property alias subnetMaskControl: subnetMaskField;
     readonly property alias dnsControl: dnsServerField;
     readonly property alias gatewayControl: defaultGatewayField;
+    readonly property alias lastIpContol: lastAddressContol;
 
     property string adapterNameValue;
     property string interfaceCaption;
