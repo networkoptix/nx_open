@@ -233,12 +233,17 @@ void QnCalendarModelPrivate::updateArchiveInfo() {
         }
 
         QDate startDate = QDateTime::fromMSecsSinceEpoch(it->startTimeMs).date();
-        QDate endDate = it->isInfinite() ? days.last().date : QDateTime::fromMSecsSinceEpoch(it->endTimeMs()).date();
+        QDate endDate = it->isInfinite() ? QDateTime::currentDateTime().date() : QDateTime::fromMSecsSinceEpoch(it->endTimeMs()).date();
 
         while (i < days.size() && days[i].date < startDate)
             days[i++].hasArchive = false;
 
         while (i < days.size() && days[i].date <= endDate)
             days[i++].hasArchive = true;
+
+        if (it->isInfinite()) {
+            while (i < days.size())
+                days[i++].hasArchive = false;
+        }
     }
 }
