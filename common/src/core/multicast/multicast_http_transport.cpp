@@ -5,7 +5,6 @@ namespace QnMulticast
 {
 
 const int Packet::MAX_DATAGRAM_SIZE = 1412;
-const int Packet::MAX_PAYLOAD_SIZE = Packet::MAX_DATAGRAM_SIZE - 167;
 
 static const QUuid PROTO_MAGIC("422DEA47-0B0C-439A-B1FA-19644CCBC0BD");
 static const int PROTO_VERSION = 1;
@@ -126,7 +125,7 @@ Packet::Packet():
 
 }
 
-QByteArray Packet::serialize() const
+QByteArray Packet::serializeHeader() const
 {
     QByteArray result;
     result.append(magic.toString()).append(CSV_DELIMITER);             // magic
@@ -137,9 +136,19 @@ QByteArray Packet::serialize() const
     result.append(QByteArray::number((int)messageType)).append(CSV_DELIMITER); // message type
     result.append(QByteArray::number(messageSize)).append(CSV_DELIMITER); // message size
     result.append(QByteArray::number(offset)).append(CSV_DELIMITER); // packet payload offset
-    result.append(payloadData); // message body
-    
     return result;
+}
+
+QByteArray Packet::serialize() const
+{
+    QByteArray result = serializeHeader();
+    result.append(payloadData); // message body
+    return result;
+}
+
+int Packet::maxPayloadSize() const
+{
+    return MAX_DATAGRAM_SIZE - serializeHeader().size();
 }
 
 Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
@@ -405,7 +414,7 @@ Transport::TransportConnection Transport::serializeRequest(const Request& reques
         packet.messageType = MessageType::request;
         packet.messageSize = message.size();
         packet.offset = offset;
-        int payloadSize = qMin(Packet::MAX_PAYLOAD_SIZE, message.size() - offset);
+        int payloadSize = qMin(packet.maxPayloadSize(), message.size() - offset);
         packet.payloadData = message.mid(offset, payloadSize);
         putPacketToTransport(transportRequest, packet);
         offset += payloadSize;
@@ -436,7 +445,7 @@ Transport::TransportConnection Transport::serializeResponse(const QUuid& request
         packet.messageType = MessageType::response;
         packet.messageSize = message.size();
         packet.offset = offset;
-        int payloadSize = qMin(Packet::MAX_PAYLOAD_SIZE, message.size() - offset);
+        int payloadSize = qMin(packet.maxPayloadSize(), message.size() - offset);
         packet.payloadData = message.mid(offset, payloadSize);
         putPacketToTransport(transportConnection, packet);
         offset += payloadSize;
