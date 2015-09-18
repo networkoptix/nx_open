@@ -123,7 +123,7 @@ public:
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
             if( m_remotePeer.peerType == Qn::PT_MobileClient )
-                addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header));
+                addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header) + QByteArray("\r\n"));
             else
                 addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
@@ -310,7 +310,7 @@ private:
     void sendHttpKeepAlive( quint64 taskID );
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
-    void addData(QByteArray&& data);
+    void addData(QByteArray data);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();

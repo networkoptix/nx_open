@@ -21,7 +21,6 @@ namespace rtu
 
     public:
         ChangesManager(RtuContext *context
-            , HttpClient *httpClient
             , ServersSelectionModel *selectionModel
             , ServersFinder *serversFinder
             , QObject *parent);
@@ -45,7 +44,6 @@ namespace rtu
 
     private:
         RtuContext * const m_context;
-        HttpClient * const m_httpClient;
         ServersSelectionModel * const m_selectionModel;
         ServersFinder * const m_serversFinder;
 

@@ -82,6 +82,9 @@ namespace rtu
         void setBusyState(const IDsVector &ids
             , bool isBusy);
 
+        void changeAccessMethod(const QUuid &id
+            , bool byHttp);
+
     signals:
         void layoutChanged();
 

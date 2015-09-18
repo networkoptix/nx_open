@@ -13,6 +13,7 @@ class QnResourceTreeItemDelegate;
 class QnWorkbench;
 class QSortFilterProxyModel;
 class QnResourceTreeSortProxyModel;
+class QnResourcePoolModelCustomColumnDelegate;
 
 namespace Ui {
     class QnResourceTreeWidget;
@@ -114,14 +115,15 @@ public:
 
     bool isSimpleSelectionEnabled() const;
 
+    QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
+    void setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate);
+
     QAbstractItemView* treeView() const;
 
 protected:
     virtual bool eventFilter(QObject *obj, QEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
-
-    void updateCheckboxesVisibility();
 
 signals:
     void activated(const QnResourcePtr &resource);
@@ -146,7 +148,7 @@ private slots:
     void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
     void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
 
-    void updateColumnsSize();
+    void updateColumns();
     void updateFilter();
 
 private:

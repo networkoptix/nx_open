@@ -158,7 +158,7 @@ Window
     
     Component.onCompleted: 
     {
-        selectionSplit.width = mainWindow.width / 3.5;
+        selectionSplit.width = mainWindow.width / 3.4;
         selectionSplit.Layout.minimumWidth = selectionPage.width;
     }
 }

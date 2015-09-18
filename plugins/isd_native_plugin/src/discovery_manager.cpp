@@ -35,6 +35,9 @@ DiscoveryManager::DiscoveryManager()
 :
     m_refManager( IsdNativePlugin::instance()->refManager() )
 {
+#ifndef NO_ISD_AUDIO
+    m_audioStreamReader.reset( new AudioStreamReader() );
+#endif
 }
 
 void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -166,7 +169,12 @@ nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::Ca
     {
         //TODO/IMPL checking, if audio is present at info.url
     }
-    return new CameraManager( infoCopy );
+    return new CameraManager(
+        infoCopy
+#ifndef NO_ISD_AUDIO
+        , m_audioStreamReader
+#endif
+        );
 }
 
 int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )

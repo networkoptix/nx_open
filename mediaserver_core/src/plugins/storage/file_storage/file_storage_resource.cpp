@@ -267,10 +267,14 @@ int QnFileStorageResource::mountTmpDrive() const
     if (!url.isValid())
         return -1;
 
+    QString uncString = url.host() + url.path();
+    uncString.replace(lit("/"), lit("\\"));
+
     QString cifsOptionsString =
-        lit("username=%1,password=%2")
+        lit("username=%1,password=%2,unc=\\\\%3")
             .arg(url.userName())
-            .arg(url.password());
+            .arg(url.password())
+            .arg(uncString);
 
     QString srcString = lit("//") + url.host() + url.path();
 
@@ -290,19 +294,20 @@ int QnFileStorageResource::mountTmpDrive() const
         S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
     );
 
-    retCode = mount(
+    retCode = mount(        
         srcString.toLatin1().constData(),
         m_localPath.toLatin1().constData(),
         "cifs",
-        MS_NOSUID | MS_NODEV | MS_NOEXEC | MS_SILENT,
+        MS_NODEV | MS_NOEXEC | MS_NOSUID,
         cifsOptionsString.toLatin1().constData()
     );
 
-    if (retCode == -1)
+    if (retCode == -1) 
     {
         qWarning()
             << "Mount SMB resource " << srcString
-            << " to local path " << m_localPath << " failed";
+            << " to local path " << m_localPath << " failed"
+            << " retCode: " << retCode << ", errno!: " << errno;
         return -1;
     }
 
@@ -586,10 +591,14 @@ bool QnFileStorageResource::isStorageDirMounted() const
     {
         QUrl url(getUrl());
 
+        QString uncString = url.host() + url.path();
+        uncString.replace(lit("/"), lit("\\"));
+
         QString cifsOptionsString =
-            lit("username=%1,password=%2")
+            lit("username=%1,password=%2,unc=\\\\%3")
                 .arg(url.userName())
-                .arg(url.password());
+                .arg(url.password())
+                .arg(uncString);
 
         QString srcString = lit("//") + url.host() + url.path();
 
@@ -613,7 +622,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
             srcString.toLatin1().constData(),
             tmpPath.toLatin1().constData(),
             "cifs",
-            MS_NOSUID | MS_NODEV | MS_NOEXEC | MS_SILENT,
+            MS_NOSUID | MS_NODEV | MS_NOEXEC,
             cifsOptionsString.toLatin1().constData()
         );
 

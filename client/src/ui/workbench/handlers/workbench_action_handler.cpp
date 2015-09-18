@@ -70,6 +70,7 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/failover_priority_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
@@ -228,6 +229,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
+    connect(action(Qn::OpenFailoverPriorityAction),             &QAction::triggered,    this,   &QnWorkbenchActionHandler::openFailoverPriorityDialog);
     connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
     connect(action(Qn::OpenAuditLogAction),                     SIGNAL(triggered()),    this,   SLOT(at_openAuditLogAction_triggered()));
@@ -1086,6 +1088,12 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
         if (wlayout)
             wlayout->centralizeItems();
     }
+}
+
+void QnWorkbenchActionHandler::openFailoverPriorityDialog() {
+    QScopedPointer<QnFailoverPriorityDialog> dialog(new QnFailoverPriorityDialog(mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {

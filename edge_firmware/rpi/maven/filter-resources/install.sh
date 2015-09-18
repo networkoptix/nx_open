@@ -17,6 +17,7 @@ update () {
   if [[ "${box}" == "bpi" ]]; then /etc/init.d/nx1upgrade; fi
   # TODO: add errorlevel handling
   cat /tmp/mediaserver.conf >> /opt/${deb.customization.company.name}/mediaserver/etc/mediaserver.conf  
+  /etc/init.d/nx1boot start  
   /etc/init.d/$COMPANY_NAME-mediaserver start
   /etc/init.d/cron start
   rm /tmp/$DISTRIB.tar.gz

@@ -1,7 +1,14 @@
 #include "util.h"
 
+/**
+  * Change guid byte order for product_uuid to be compatible with
+  * old versions of linux kernel
+ */
 QString LLUtil::changedGuidByteOrder(const QString& guid)
 {
+    if (guid.length() != 36)
+        return guid;
+
     Q_ASSERT(guid.length() == 36);
 
     QString result(guid);

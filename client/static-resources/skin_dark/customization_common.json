@@ -375,34 +375,16 @@
             "disabledButtonsText":  "#FFFFFF",
             "selectionBackground": "#225377"
         }
-    }
+    },
  
-    
+    "QnFailoverPriorityDialog": {
+        "colors": {
+            "never": "#808080",
+            "low":  "#9eb236",
+            "medium": "#cc853d",
+            "high": "#ff5500"
+        }
+    }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

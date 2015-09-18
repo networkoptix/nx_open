@@ -504,15 +504,23 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
     factory(Qn::OpenBusinessLogAction).
+        mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         icon(qnSkin->icon("events/log.png")).
         text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
+        mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules..."));
+
+    factory(Qn::OpenFailoverPriorityAction).
+        mode(QnActionTypes::DesktopMode).
+        flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Failover Priority..."));
 
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
