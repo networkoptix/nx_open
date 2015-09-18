@@ -900,7 +900,10 @@ angular.module('webadminApp')
                     if(!scope.positionProvider || scope.positionProvider.liveMode){
                         return;
                     }
-
+                    var lastMinute = scope.scaleManager.lastMinute();
+                    if(scope.positionProvider.playedPosition > lastMinute){
+                        scope.goToLive();
+                    }
                     drawMarker(context, scope.positionProvider.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
                 }
 

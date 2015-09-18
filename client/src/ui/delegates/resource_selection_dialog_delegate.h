@@ -33,6 +33,11 @@ public:
 
     virtual bool isValid(const QnResourcePtr &resource) const;
 
+    /**
+     * @brief isFlat                Check if the delegate frame should ne attached to resources list seamlessly;
+     */
+    virtual bool isFlat() const;
+
     virtual QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
 };
 

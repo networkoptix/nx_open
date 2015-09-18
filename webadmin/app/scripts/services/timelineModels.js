@@ -756,8 +756,12 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
 
 ShortCache.prototype.setPlayingPosition = function(position){
     // This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
+
+    var oldPosition =  this.playedPosition;
+
     this.played = position;
     this.playedPosition = 0;
+
 
     if(position < this.lastRequestPosition) { // Somewhere back on timeline
         var lastPosition;
@@ -808,6 +812,10 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(position > this.lastPlayedPosition){
         this.lastPlayedPosition = position; // Save the boundaries of uploaded cache
         this.lastPlayedDate =  this.playedPosition; // Save the boundaries of uploaded cache
+    }
+
+    if(oldPosition > this.playedPosition && Config.allowDebugMode){
+        console.error("Position jumped back!");
     }
 
     return this.playedPosition;
