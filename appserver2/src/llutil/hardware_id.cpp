@@ -30,12 +30,22 @@ namespace LLUtil {
             });
 
         QString storedMac = settings->value("storedMac").toString();
-        if (storedMac.isEmpty() && !devices.empty()) {
-            storedMac = devices.front().mac;
-            settings->setValue("storedMac", storedMac);
 
+        QString result;
+
+        for(auto it = devices.begin(); it != devices.end(); ++it) {
+            if  (it->mac == storedMac) {
+                result = storedMac;
+                break;
+            }
         }
-        return storedMac;
+
+        if (result.isEmpty()) {
+            result = devices.front().mac;
+            settings->setValue("storedMac", result);
+        }
+
+        return result;
     }
 
 
