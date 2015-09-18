@@ -187,6 +187,14 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
 
     QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
 
+    //saving user data before /api/configure call to prevent race condition, 
+    //  when we establish transaction connection to remote server and receive updated 
+    //  saveUser transaction before passing admin to /ec2/saveUser call
+    ec2::ApiUserData userData;
+    ec2::fromResourceToApi(admin, userData);
+    const QByteArray saveUserData = QJson::serialized(userData);
+
+
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     /* Change system name of the selected server */
     CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
@@ -202,12 +210,9 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     }
 
     {   /* Save current admin inside the remote system */
-        ec2::ApiUserData userData;
-        ec2::fromResourceToApi(admin, userData);
-        QByteArray data = QJson::serialized(userData);
 
         client.addHeader("Content-Type", "application/json");
-        CLHttpStatus status = client.doPOST(lit("/ec2/saveUser"), data);
+        CLHttpStatus status = client.doPOST(lit("/ec2/saveUser"), saveUserData);
 
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
