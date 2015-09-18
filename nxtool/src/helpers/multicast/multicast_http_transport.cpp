@@ -403,9 +403,7 @@ void Transport::putPacketToTransport(TransportConnection& transportConnection, c
 
 Transport::TransportConnection Transport::serializeRequest(const Request& request)
 {
-    QString tt6 = request.url.toString();
     TransportConnection transportRequest;
-    QByteArray gg4 = serializeMessage(request);
     QByteArray message = serializeMessage(request).toBase64();
     transportRequest.requestId = QUuid::createUuid();
     for (int offset = 0; offset < message.size();)

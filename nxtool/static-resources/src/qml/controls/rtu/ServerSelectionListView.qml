@@ -30,7 +30,6 @@ ListView
         onLayoutChanged:
         {
             forceLayout();
-//            thisComponent.update()
         }
     }
 
