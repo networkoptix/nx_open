@@ -187,17 +187,25 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
 
     QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
 
+    /* Change system name of the selected server */
+    CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
+
     //saving user data before /api/configure call to prevent race condition, 
     //  when we establish transaction connection to remote server and receive updated 
     //  saveUser transaction before passing admin to /ec2/saveUser call
-    ec2::ApiUserData userData;
-    ec2::fromResourceToApi(admin, userData);
-    const QByteArray saveUserData = QJson::serialized(userData);
+    {   /* Save current admin inside the remote system */
 
+        ec2::ApiUserData userData;
+        ec2::fromResourceToApi(admin, userData);
+        const QByteArray saveUserData = QJson::serialized(userData);
+        client.addHeader("Content-Type", "application/json");
+        CLHttpStatus status = client.doPOST(lit("/ec2/saveUser"), saveUserData);
+
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            return false;
+    }
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    /* Change system name of the selected server */
-    CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
     client.addHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
     if (oneServer) {
         auto authSession = owner->authSession();
@@ -205,15 +213,6 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
             .arg(systemName)
             .arg(qnCommon->systemIdentityTime())
             .arg(ec2Connection->getTransactionLogTime()));
-        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-            return false;
-    }
-
-    {   /* Save current admin inside the remote system */
-
-        client.addHeader("Content-Type", "application/json");
-        CLHttpStatus status = client.doPOST(lit("/ec2/saveUser"), saveUserData);
-
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
