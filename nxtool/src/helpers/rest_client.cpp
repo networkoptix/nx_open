@@ -26,9 +26,11 @@ namespace
     const QnMulticast::Request makeMulticastRequest(const rtu::RestClient::Request &request
         , bool isGetRequest)
     {
+        static const QString kUrlTemplate = "%1?%2";
+
         QnMulticast::Request result;
         result.method = (isGetRequest ? "GET" : "POST");
-        result.url = request.path;
+        result.url = kUrlTemplate.arg(request.path, request.params.toString());
         result.serverId = request.target->id;
         result.contentType = "application/json";
         result.auth.setUser(rtu::RestClient::adminUserName());
