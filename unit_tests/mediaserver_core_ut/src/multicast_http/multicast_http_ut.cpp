@@ -28,6 +28,7 @@ public:
         StateSingleTest,
         StateAuthTest,
         StateTimeoutTest,
+        StatePasswordlTest,
         StateParralelTest,
         StateParralelTestInProgress,
         StateStopping
@@ -39,7 +40,9 @@ public:
         m_processorStarted(false),
         m_state(StateSingleTest),
         m_requests(0),
-        m_firstRequest(0)
+        m_firstRequest(0),
+        oldPassword(lit("admin")),
+        newPassword(lit("0"))
     {
         connect(&processor, &MediaServerProcess::started, this, [this]() { m_processorStarted = true; } );
     }
@@ -122,6 +125,36 @@ public:
         m_runningRequestId = m_client.execRequest(request, std::bind(&MulticastHttpTestWorker::callbackTimeout, this, _1, _2, _3), 50);
     }
 
+    void doPasswordTest()
+    {
+        QnMulticast::Request request;
+        request.method = lit("GET");
+        request.serverId = QUuid(UT_SERVER_GUID);
+        request.url = QUrl(lit("api/configure?password=%1&oldPassword=%2").arg(newPassword).arg(oldPassword));
+        request.auth.setUser(lit("admin"));
+        request.auth.setPassword(oldPassword);
+        
+        auto callback = [this](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
+        {
+            m_runningRequestId = QUuid();
+            ASSERT_TRUE(errCode == QnMulticast::ErrCode::ok);
+            ASSERT_TRUE(response.httpResult == 200); // HTTP OK
+            ASSERT_TRUE(response.contentType.toLower().contains("json"));
+            ASSERT_TRUE(!response.messageBody.isEmpty());
+            QJsonDocument d = QJsonDocument::fromJson(response.messageBody);
+            ASSERT_TRUE(!d.isEmpty());
+            oldPassword = newPassword;
+            if (++m_requests == MT_REQUESTS) 
+            {
+                ASSERT_EQ(m_firstRequest, MT_REQUESTS);
+                m_processor.stopAsync();
+                m_state = StateStopping;
+            }
+            newPassword = QString::number(m_requests);
+        };
+        m_runningRequestId = m_client.execRequest(request, callback, 1000 * 30);
+    }
+
     void doParallelTest()
     {
         m_state = StateParralelTestInProgress;
@@ -151,8 +184,9 @@ public:
                 if (++m_requests == MT_REQUESTS * 2) 
                 {
                     ASSERT_EQ(m_firstRequest, MT_REQUESTS);
-                    m_processor.stopAsync();
-                    m_state = StateStopping;
+                    //m_processor.stopAsync();
+                    m_requests = 0;
+                    m_state = StatePasswordlTest;
                 }
             };
 
@@ -179,6 +213,8 @@ public:
             doTimeoutTest();
         else if (m_state == StateParralelTest)
             doParallelTest();
+        else if (m_state == StatePasswordlTest)
+            doPasswordTest();
     }
 private:
     QnMulticast::HTTPClient m_client;
@@ -188,6 +224,8 @@ private:
     State m_state;
     int m_requests;
     int m_firstRequest;
+    QString newPassword;
+    QString oldPassword;
 };
 
 TEST(MulticastHttpTest, main)
