@@ -595,6 +595,13 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
+        $scope.$watch("activeCamera.status",function(status){
+            if((!$scope.positionProvider || $scope.positionProvider.liveMode) && !(status == 'Offline' || status == 'Unauthorized')){
+                console.log("reload video after offline",status);
+                updateVideoSource();
+            }
+        });
+
         mediaserver.getTime().then(function(result){
             var serverTime = parseInt(result.data.reply.utcTime);
             var clientTime = (new Date()).getTime();
