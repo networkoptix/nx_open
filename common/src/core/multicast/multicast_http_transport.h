@@ -23,7 +23,6 @@ namespace QnMulticast
         Packet();
 
         static const int MAX_DATAGRAM_SIZE;
-        static const int MAX_PAYLOAD_SIZE;
 
         QUuid magic;
         int version;
@@ -35,8 +34,11 @@ namespace QnMulticast
         int offset;
         QByteArray payloadData;
 
+        int maxPayloadSize() const;
         QByteArray serialize() const;
         static Packet deserialize(const QByteArray& deserialize, bool* ok);
+    private:
+        QByteArray serializeHeader() const;
     };
 
 

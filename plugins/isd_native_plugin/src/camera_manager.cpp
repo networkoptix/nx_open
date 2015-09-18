@@ -12,7 +12,12 @@
 #include "media_encoder.h"
 
 
-CameraManager::CameraManager( const nxcip::CameraInfo& info )
+CameraManager::CameraManager(
+    const nxcip::CameraInfo& info
+#ifndef NO_ISD_AUDIO
+    , const std::unique_ptr<AudioStreamReader>& audioStreamReader
+#endif
+    )
 :
     m_refManager( this ),
     m_pluginRef( IsdNativePlugin::instance() ),
@@ -23,10 +28,10 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
         nxcip::BaseCameraManager::hardwareMotionCapability),
     m_motionMask( nullptr ),
     m_audioEnabled( false )
-{
 #ifndef NO_ISD_AUDIO
-    m_audioStreamReader.reset( new AudioStreamReader() );
+    , m_audioStreamReader( audioStreamReader )
 #endif
+{
 }
 
 CameraManager::~CameraManager()

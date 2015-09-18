@@ -58,7 +58,7 @@ if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then
     if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ] && [ "$HDDMAC" = "$MAC" ]; then HDDNX1=true; else HDDNX1=false; fi
     ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
     ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
-    if [ ! -z $ARCHIVE_FILES ] && [ ! -z $ARCHIVE_DB ]; then ARCHIVE=true; else ARCHIVE=false; fi
+    if [[ ! -z $ARCHIVE_FILES ]] && [[ ! -z $ARCHIVE_DB ]]; then ARCHIVE=true; else ARCHIVE=false; fi
     echo "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >&2 >/dev/kmsg
     echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >> $NX1LOG       
     for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
@@ -362,33 +362,33 @@ case "$1" in
     /etc/init.d/cron start
     /etc/init.d/$CUSTOMIZATION-mediaserver start
     exit 0
-	;;
+    ;;
   restart|reload|force-reload)
-	echo "Error: argument '$1' not supported" >&2
-	exit 3
-	;;
+    echo "Error: argument '$1' not supported" >&2    
+    exit 3
+    ;;
   stop)
-	# No-op
-	;;
+    # No-op
+    ;;
   reboot)
-	shutdown -rF now 
-	;;     
+    shutdown -rF now 
+    ;;     
   boot_sd)
-	reboot_from_sd 
-	;;    
+    reboot_from_sd 
+    ;;    
   boot_hdd)
-	reboot_from_hdd
-	;;        
+    reboot_from_hdd
+    ;;        
   restore)
-	delete_saved_ipconfig
+    delete_saved_ipconfig
     system_restore
-	;;
+    ;;
   restore_keep_ip)
-	save_ipconfig
+    save_ipconfig
     system_restore
-	;;     
+    ;;     
   *)
-	echo "Usage: nx1boot [start|stop|reboot|boot_sd|boot_hdd|restore|restore_keep_ip]" >&2
-	exit 3
-	;;
+    echo "Usage: nx1boot [start|stop|reboot|boot_sd|boot_hdd|restore|restore_keep_ip]" >&2
+    exit 3
+    ;;
 esac

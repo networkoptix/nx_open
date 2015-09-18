@@ -706,6 +706,8 @@ void QnProgressiveDownloadingConsumer::run()
 
         QnByteArray emptyChunk((unsigned)0,0);
         sendChunk(emptyChunk);
+        sendData(QByteArray("\r\n"));
+
         dataProvider->removeDataProcessor(&dataConsumer);
         if (camera)
             camera->notInUse(this);
