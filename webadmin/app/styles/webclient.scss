@@ -121,6 +121,10 @@ table.webclient-window>tbody>tr>td.alert{
   overflow: hidden;
 }
 
+
+.videowindow{
+  background-color: #1C2327;
+}
 .videowindow,
 .videowindow .videoplayer
 {
@@ -145,6 +149,7 @@ table.webclient-window>tbody>tr>td.alert{
 
 
 .webclient-panel{
+  white-space: nowrap;
   font-size: 120%;
   min-height: 60px;
   margin: 0px 20px;
@@ -154,10 +159,12 @@ table.webclient-window>tbody>tr>td.alert{
 .webclient-panel>div.text-left,
 .webclient-panel>div.text-right{
   width:40%;
+  white-space: nowrap;
   display:inline-block;
 }
 .webclient-panel>div.text-center{
   width:20%;
+  white-space: nowrap;
   display:inline-block;
 }
 
@@ -170,12 +177,11 @@ table.webclient-window>tbody>tr>td.alert{
   cursor:pointer;
 }
 
-
-.webclient-button.dropdown{
+.dropdown > .webclient-button{
   width:90px;
 }
 
-.webclient-button.dropdown.open{
+.dropdown.open > .webclient-button{
   background-color: rgba(0,0,0,0.1);
 }
 

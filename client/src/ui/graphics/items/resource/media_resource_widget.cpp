@@ -738,8 +738,9 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             updateCurrentTime(kInvalidTime);
         }
 
-        updateInfoTextLater();
+
     }
+	updateInfoTextLater();
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
@@ -953,6 +954,19 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
 // Handlers
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
+
+    auto isIoModule = [this]() {
+        if (!m_resource->toResource()->flags().testFlag(Qn::io_module))
+            return false;
+         
+        if (m_camera 
+            && m_display 
+            && !m_camera->hasVideo(m_display->mediaProvider()))
+                return true;
+
+        return (m_ioModuleOverlayWidget && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
+    };
+
     if (action(Qn::ToggleTourModeAction)->isChecked())
         return Qn::MainWindow_Scene_TourInProgress_Help;
 
@@ -964,6 +978,8 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
     } else if(statusOverlay == Qn::UnauthorizedOverlay) {
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
+    } else if (statusOverlay == Qn::IoModuleDisabledOverlay) {
+        return Qn::IOModules_Help;
     } else if(options() & ControlPtz) {
         if(m_dewarpingParams.enabled) {
             return Qn::MainWindow_MediaItem_Dewarping_Help;
@@ -977,11 +993,14 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::CameraSettings_Motion_Help;
     } else if(options() & DisplayMotion) {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
+    } else if (isIoModule()){
+        return Qn::IOModules_Help;
     } else if(m_resource->toResource()->flags() & Qn::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
     } else if (m_camera && m_camera->isDtsBased()) {
         return Qn::MainWindow_MediaItem_AnalogCamera_Help;
-    } else {
+    }
+    else {
         return Qn::MainWindow_MediaItem_Help;
     }
 }

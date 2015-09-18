@@ -89,7 +89,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
-    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      0),
+    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1),
     LicenseTypeInfo(Qn::LC_Start,           "starter",       0),
     LicenseTypeInfo(Qn::LC_Invalid,         "",              1),
 };
@@ -246,7 +246,7 @@ void QnLicense::setCameraCount(qint32 count) {
     m_cameraCount = count;
 }
 
-QByteArray QnLicense::hardwareId() const
+QString QnLicense::hardwareId() const
 {
     return m_hardwareId;
 }
@@ -472,7 +472,7 @@ void QnLicense::parseLicenseBlock(
             else if (aname == "COUNT")
                 m_cameraCount = avalue.toInt();
             else if (aname == "HWID")
-                m_hardwareId = avalue;
+                m_hardwareId = QString::fromLatin1(avalue);
             else if (aname == "SIGNATURE")
                 m_signature = avalue;
             else if (aname == "CLASS")
@@ -690,18 +690,18 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QVector<QByteArray> QnLicensePool::mainHardwareIds() const {
+QVector<QString> QnLicensePool::mainHardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
 }
 
-QVector<QByteArray> QnLicensePool::compatibleHardwareIds() const {
+QVector<QString> QnLicensePool::compatibleHardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
 }
 
-QByteArray QnLicensePool::currentHardwareId() const {
-    QVector<QByteArray> hwIds = mainHardwareIds();
+QString QnLicensePool::currentHardwareId() const {
+    QVector<QString> hwIds = mainHardwareIds();
     return hwIds.isEmpty() 
-        ? QByteArray() 
+        ? QString() 
         : hwIds.last();
 }
 

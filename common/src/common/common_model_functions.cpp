@@ -34,6 +34,13 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::IODefaultState,
 (Qn::IO_GroundedCircuit, "Grounded circuit")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::FailoverPriority,
+(Qn::FP_Never,      "Never")
+(Qn::FP_Low,        "Low")
+(Qn::FP_Medium,     "Medium")
+(Qn::FP_High,       "High")
+)
+
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTraits,
     (Qn::FourWayPtzTrait,          "FourWayPtz")
     (Qn::EightWayPtzTrait,         "EightWayPtz")

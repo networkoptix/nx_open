@@ -162,6 +162,9 @@ public:
     bool isLicenseUsed() const;
     void setLicenseUsed(bool value);
 
+    Qn::FailoverPriority failoverPriority() const;
+    void setFailoverPriority(Qn::FailoverPriority value);
+
     bool isAudioEnabled() const;
     bool isAudioForced() const;
     void setAudioEnabled(bool value);
@@ -270,6 +273,7 @@ signals:
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
+    void failoverPriorityChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 

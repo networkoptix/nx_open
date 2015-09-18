@@ -183,6 +183,8 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
         updateFailoverLabel();
     });
 
+    connect(ui->failoverPriorityButton, &QPushButton::clicked,  action(Qn::OpenFailoverPriorityAction), &QAction::trigger);
+
     connect(m_server, &QnResource::nameChanged, this, [this](const QnResourcePtr &resource)
     {
         if (ui->nameLineEdit->text() != m_initServerName)   /// Field was changed

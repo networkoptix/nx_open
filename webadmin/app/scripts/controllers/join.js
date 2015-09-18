@@ -41,39 +41,48 @@ angular.module('webadminApp')
         });
 
 
+        function errorHandler(errorToShow){
+            switch(errorToShow){
+                case 'FAIL':
+                    errorToShow = 'System is unreachable or doesn\'t exist.';
+                    break;
+                case 'currentPassword':
+                    errorToShow = 'Incorrect current password';
+                    break;
+                case 'UNAUTHORIZED':
+                case 'password':
+                    errorToShow = 'Wrong password.';
+                    break;
+                case 'INCOMPATIBLE':
+                    errorToShow = 'Found system has incompatible version.';
+                    break;
+                case 'url':
+                    errorToShow = 'Wrong url.';
+                    break;
+                case 'STARTER_LICENSE_ERROR':
+                    errorToShow = 'Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.';
+                    alert(errorToShow);
+                    return false;
+            }
+            return errorToShow;
+        };
+
         $scope.test = function () {
 
             /*if (!$('#mergeSystemForm').valid()) {
                 return;
             }*/
 
-
             mediaserver.pingSystem($scope.settings.url, $scope.settings.password).then(function(r){
                 if(r.data.error!=='0'){
-                    var errorToShow = r.data.errorString;
-                    switch(errorToShow){
-                        case 'FAIL':
-                            errorToShow = 'System is unreachable or doesn\'t exist.';
-                            break;
-                        case 'currentPassword':
-                            errorToShow = 'Incorrect current password';
-                            break;
-                        case 'UNAUTHORIZED':
-                        case 'password':
-                            errorToShow = 'Wrong password.';
-                            break;
-                        case 'INCOMPATIBLE':
-                            errorToShow = 'Found system has incompatible version.';
-                            break;
-                        case 'url':
-                            errorToShow = 'Wrong url.';
-                            break;
+                    var errorToShow = errorHandler(r.data.errorString);
+                    if(errorToShow){
+                        alert("Connection failed: " + errorToShow);
+                        return;
                     }
-                    alert('Connection failed: ' + errorToShow);
-                }else {
-                    $scope.systems.systemFound = true;
-                    $scope.systems.joinSystemName = r.data.reply.systemName;
                 }
+                $scope.systems.systemFound = true;
+                $scope.systems.joinSystemName = r.data.reply.systemName;
             });
         };
 
@@ -82,10 +91,18 @@ angular.module('webadminApp')
             /*if (!$('#mergeSustemForm').valid()) {
                 return;
             }*/
-            $modalInstance.close({url: $scope.settings.url,
-                password: $scope.settings.password,
-                keepMySystem:$scope.settings.keepMySystem,
-                currentPassword:$scope.settings.currentPassword});
+
+            mediaserver.mergeSystems($scope.settings.url,$scope.settings.password,$scope.settings.currentPassword,$scope.settings.keepMySystem).then(function(r){
+                if(r.data.error!=='0') {
+                    var errorToShow = errorHandler(r.data.errorString);
+                    if (errorToShow) {
+                        alert("Merge failed: " + errorToShow);
+                        return;
+                    }
+                }
+                alert('Merge succeed.');
+                window.location.reload();
+            });
         };
 
         $scope.selectSystem = function (system){

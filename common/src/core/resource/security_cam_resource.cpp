@@ -742,6 +742,22 @@ bool QnSecurityCamResource::isLicenseUsed() const {
     return !isScheduleDisabled();
 }
 
+Qn::FailoverPriority QnSecurityCamResource::failoverPriority() const {
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+    return (*userAttributesLock)->failoverPriority;
+}
+
+void QnSecurityCamResource::setFailoverPriority(Qn::FailoverPriority value) {
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if ((*userAttributesLock)->failoverPriority == value)
+            return;
+        (*userAttributesLock)->failoverPriority = value;
+    }
+
+    emit failoverPriorityChanged(::toSharedPointer(this));
+}
+
 void QnSecurityCamResource::setAudioEnabled(bool enabled) {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     (*userAttributesLock)->audioEnabled = enabled;

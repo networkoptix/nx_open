@@ -161,8 +161,9 @@ namespace Qn {
      * Columns in the resource tree model.
      */
     enum ResourceTreeColumn {
-        NameColumn,
-        CheckColumn,
+        NameColumn,     /**< Resource icon and name. */
+        CustomColumn,   /**< Additional column for custom information. */
+        CheckColumn,    /**< Checkbox for resource selection. */
         ColumnCount
     };
 

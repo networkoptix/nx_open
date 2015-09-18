@@ -1,4 +1,5 @@
 #include "abstract_storage_resource.h"
+#include <qcoreapplication.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -7,10 +8,41 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
-test::StorageTestGlobals tg;
+std::unique_ptr<test::StorageTestGlobals> tg;
 
 TEST(AbstractStorageResourceTest, Init)
 {
+    tg.reset(new test::StorageTestGlobals());
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Test helper");
+
+    QCommandLineOption ftpUrlOption(
+        QStringList() << "F" << "ftp-storage-url",
+        QCoreApplication::translate("main", "Ftp storage URL."),
+        QCoreApplication::translate("main", "URL")
+        );
+    parser.addOption(ftpUrlOption);
+
+    QCommandLineOption smbUrlOption(
+        QStringList() << "S" << "smb-storage-url",
+        QCoreApplication::translate("main", "SMB storage URL."),
+        QCoreApplication::translate("main", "URL")
+        );
+    parser.addOption(smbUrlOption);
+
+    parser.process(*QCoreApplication::instance());
+
+    tg->prepare(
+        parser.value(
+        ftpUrlOption
+        ),
+        parser.value(
+        smbUrlOption
+        )
+        );
+
+
     QString fileStorageUrl = qApp->applicationDirPath() + lit("/tmp");
     QnStorageResource *fileStorage = 
         QnStoragePluginFactory::instance()->createStorage(
@@ -19,20 +51,20 @@ TEST(AbstractStorageResourceTest, Init)
     ASSERT_TRUE(fileStorage);
     fileStorage->setUrl(fileStorageUrl);
 
-    tg.storages.push_back(fileStorage);
+    tg->storages.push_back(fileStorage);
 
-    if (!tg.ftpStorageUrl.isEmpty())
+    if (!tg->ftpStorageUrl.isEmpty())
     {
         QnStorageResource *ftpStorage =
             QnStoragePluginFactory::instance()->createStorage(
-                tg.ftpStorageUrl,
+                tg->ftpStorageUrl,
                 false
             );
         EXPECT_TRUE(ftpStorage && ftpStorage->isAvailable());
         if (ftpStorage && ftpStorage->isAvailable())
         {
-            ftpStorage->setUrl(tg.ftpStorageUrl);
-            tg.storages.push_back(ftpStorage);
+            ftpStorage->setUrl(tg->ftpStorageUrl);
+            tg->storages.push_back(ftpStorage);
         }
         else
             std::cout
@@ -40,22 +72,22 @@ TEST(AbstractStorageResourceTest, Init)
                 << std::endl;
     }
 
-    if (!tg.smbStorageUrl.isEmpty())
+    if (!tg->smbStorageUrl.isEmpty())
     {
         QnStorageResource *smbStorage =
             QnStoragePluginFactory::instance()->createStorage(
-                tg.smbStorageUrl
+                tg->smbStorageUrl
             );
         EXPECT_TRUE(smbStorage);
-        smbStorage->setUrl(tg.smbStorageUrl);
+        smbStorage->setUrl(tg->smbStorageUrl);
 
-        tg.storages.push_back(smbStorage);
+        tg->storages.push_back(smbStorage);
     }
 }
 
 TEST(AbstractStorageResourceTest, Capabilities)
 {
-    for (auto storage : tg.storages)
+    for (auto storage : tg->storages)
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
         // storage general functions
@@ -109,7 +141,7 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
         return pathStream.str();
     };
 
-    for (auto storage : tg.storages)
+    for (auto storage : tg->storages)
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -196,7 +228,7 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
 
 TEST(AbstractStorageResourceTest, IODevice)
 {
-    for (auto storage : tg.storages)
+    for (auto storage : tg->storages)
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -280,4 +312,9 @@ TEST(AbstractStorageResourceTest, IODevice)
         ioDevice->close();
         ASSERT_TRUE(storage->removeFile(fileName));
     }
+}
+
+TEST(AbstractStorageResourceTest, fini)
+{
+    tg.reset();
 }

@@ -118,7 +118,7 @@ Base.Column
                 {
                     if (item.ipAddressControl.acceptableInput)
                     {
-                        rtuContext.changesManager().addAddressChange(name, item.ipAddressControl.text);
+                        rtuContext.changesManager().changeset().addAddressChange(name, item.ipAddressControl.text);
                     }
                     else
                     {
@@ -132,7 +132,7 @@ Base.Column
                     if (item.subnetMaskControl.acceptableInput
                         && rtuContext.isValidSubnetMask(item.subnetMaskControl.text))
                     {
-                        rtuContext.changesManager().addMaskChange(name, item.subnetMaskControl.text);
+                        rtuContext.changesManager().changeset().addMaskChange(name, item.subnetMaskControl.text);
                     }
                     else
                     {
@@ -182,7 +182,7 @@ Base.Column
                         return false;
                     }
                     somethingChanged = true;
-                    rtuContext.changesManager().addDNSChange(name
+                    rtuContext.changesManager().changeset().addDNSChange(name
                         , (item.dnsControl.isEmptyAddress ? "" : item.dnsControl.text));
                 }
 
@@ -197,7 +197,7 @@ Base.Column
                         return false;
                     }
                     somethingChanged = true;
-                    rtuContext.changesManager().addGatewayChange(name
+                    rtuContext.changesManager().changeset().addGatewayChange(name
                         , (item.gatewayControl.isEmptyAddress ? "" : item.gatewayControl.text));
                 }
 
@@ -205,7 +205,7 @@ Base.Column
                 {
                     /// Always send dhcp state if some other parameters changed
                     /// due to serialization issue on the server side
-                    rtuContext.changesManager().addDHCPChange(name, useDHCP);
+                    rtuContext.changesManager().changeset().addDHCPChange(name, useDHCP);
                 }
 
             }

@@ -56,6 +56,7 @@ private slots:
     void updateThumbnail(const QModelIndex &index);
 private:
     void init();
+    void initModel();
 private:
     QScopedPointer<Ui::ResourceSelectionDialog> ui;
     QnResourcePoolModel *m_resourceModel;

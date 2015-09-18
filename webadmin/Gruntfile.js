@@ -102,35 +102,57 @@ module.exports = function (grunt) {
                 //'Authorization': 'Basic dXNlcjoxMjM='//user:123
 
                 //Total proxy
-                //{context: '/',host: '192.168.56.101',port: 7002},
+                //{context: '/',        host: '192.168.56.101',port: 7002},
 
                 //Cube
-                /*{context: '/api/',   host: '192.168.0.25', port: 7001},
-                {context: '/ec2/',   host: '192.168.0.25', port: 7001},
-                {context: '/hls/',   host: '192.168.0.25', port: 7001},
-                {context: '/media/', host: '192.168.0.25', port: 7001},
-                {context: '/proxy/', host: '192.168.0.25', port: 7001}/**/
+                /*{context: '/api/',    host: '192.168.0.25', port: 7001},
+                {context: '/ec2/',      host: '192.168.0.25', port: 7001},
+                {context: '/hls/',      host: '192.168.0.25', port: 7001},
+                {context: '/media/',    host: '192.168.0.25', port: 7001},
+                {context: '/proxy/',    host: '192.168.0.25', port: 7001}/**/
 
                 //demo.networkoptix.com
-                /*{context: '/api/', host: 'demo.networkoptix.com', port: 7001},
-                {context: '/ec2/', host: 'demo.networkoptix.com', port: 7001},
-                {context: '/hls/', host: 'demo.networkoptix.com',port: 7001},
-                {context: '/media/', host: 'demo.networkoptix.com', port: 7001},
-                {context: '/proxy/', host: 'demo.networkoptix.com',port: 7001}/**/
+                /*{context: '/api/',    host: 'demo.networkoptix.com', port: 7001},
+                {context: '/ec2/',      host: 'demo.networkoptix.com', port: 7001},
+                {context: '/hls/',      host: 'demo.networkoptix.com',port: 7001},
+                {context: '/media/',    host: 'demo.networkoptix.com', port: 7001},
+                {context: '/proxy/',    host: 'demo.networkoptix.com',port: 7001}/**/
 
                 //Evgeniy
-/*                {context: '/api/', host: '192.168.56.101', port: 9000},
-                {context: '/ec2/', host: '192.168.56.101', port: 9000},
-                {context: '/hls/', host: '192.168.56.101',port: 9000},
-                {context: '/media/', host: '192.168.56.101', port: 9000},
-                {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
+/*                {context: '/api/',    host: '192.168.56.101', port: 9000},
+                {context: '/ec2/',      host: '192.168.56.101', port: 9000},
+                {context: '/hls/',      host: '192.168.56.101',port: 9000},
+                {context: '/media/',    host: '192.168.56.101', port: 9000},
+                {context: '/proxy/',    host: '192.168.56.101',port: 9000}/**/
 
                 // Masha
-                {context: '/api/',      host: '10.0.2.186', port: 7011},
+/*                {context: '/api/',      host: '10.0.2.186', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.186', port: 7011},
                 {context: '/hls/',      host: '10.0.2.186', port: 7011},
                 {context: '/media/',    host: '10.0.2.186', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.186', port: 7011}/**/
+
+                // Sasha V
+                /*{context: '/api/',      host: '10.0.2.121', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.121', port: 7001},
+                {context: '/hls/',      host: '10.0.2.121', port: 7001},
+                {context: '/media/',    host: '10.0.2.121', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.121', port: 7001}/**/
+
+                // Gdm
+                /*{context: '/api/',      host: '10.0.2.240', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.240', port: 7001},
+                {context: '/hls/',      host: '10.0.2.240', port: 7001},
+                {context: '/media/',    host: '10.0.2.240', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.240', port: 7001}/**/
+
+
+                // Burbank - test
+                /*{context: '/api/',      host: '10.1.5.126', port: 7001},
+                {context: '/ec2/',      host: '10.1.5.126', port: 7001},
+                {context: '/hls/',      host: '10.1.5.126', port: 7001},
+                {context: '/media/',    host: '10.1.5.126', port: 7001},
+                {context: '/proxy/',    host: '10.1.5.126', port: 7001}/**/
 
                 // Olya - external
                 /*{context: '/api/',      host: '95.31.136.2', port: 7011},
@@ -140,7 +162,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '95.31.136.2', port: 7011}/**/
 
                 // Olya
-                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
+                {context: '/api/',      host: '10.0.2.169', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.169', port: 7011},
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
@@ -161,11 +183,11 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
 
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*{context: '/api/', host: '10.0.2.244', port: 7002},
-                {context: '/ec2/', host: '10.0.2.244', port: 7002},
-                {context: '/hls/', host: '10.0.2.244', port: 7002},
-                {context: '/media/', host: '10.0.2.244', port: 7002},
-                {context: '/proxy/', host: '10.0.2.244', port: 7002}/**/
+                /*{context: '/api/',    host: '10.0.2.244', port: 7002},
+                {context: '/ec2/',      host: '10.0.2.244', port: 7002},
+                {context: '/hls/',      host: '10.0.2.244', port: 7002},
+                {context: '/media/',    host: '10.0.2.244', port: 7002},
+                {context: '/proxy/',    host: '10.0.2.244', port: 7002}/**/
 
             ],
             livereload: {

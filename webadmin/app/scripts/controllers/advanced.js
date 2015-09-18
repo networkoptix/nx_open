@@ -113,4 +113,37 @@ angular.module('webadminApp')
         $scope.cancel = function(){
             window.location.reload();
         };
+
+        mediaserver.logLevel(0).then(function(data){
+            $scope.mainLogLevel = $scope.oldMainLogLevel = data.data.reply;
+        });
+        mediaserver.logLevel(3).then(function(data){
+            $scope.transLogLevel = $scope.oldTransLogLevel = data.data.reply;
+        });
+
+        function errorLogLevel(error){
+            alert("Error while saving");
+            window.location.reload();
+
+        }
+        function successLogLevel(){
+            alert("Settings saved");
+            window.location.reload();
+        }
+
+        function changeTransactionLogLevel(){
+            if($scope.transLogLevel != $scope.oldTransLogLevel) {
+                mediaserver.logLevel(3, $scope.transLogLevel).then(successLogLevel,errorLogLevel);;
+                return;
+            }
+            successLogLevel();
+        }
+
+        $scope.changeLogLevels = function(){
+            if($scope.mainLogLevel != $scope.oldMainLogLevel) {
+                mediaserver.logLevel(0, $scope.mainLogLevel).then(changeTransactionLogLevel,errorLogLevel);
+                return;
+            }
+            changeTransactionLogLevel();
+        };
     });

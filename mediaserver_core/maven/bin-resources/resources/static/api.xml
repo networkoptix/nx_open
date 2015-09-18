@@ -1548,58 +1548,67 @@
                     </result>
                 </function>
                 <function>
-                    <name>createEvent</name>
-                    <description>Generate user defined event. This event will be processed according to current event rules.</description>
+                    <name>logLevel</name>
+                    <description>Get or set server log level.</description>
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>eventTimestamp</name>
-                            <description>Event date and time. It could be either UTC milliseconds or human readible date and time at ISO 8601 format.
-							If eventTimestamp is absent, current server date and time is used.
-							</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>deviceName</name>
-                            <description> External device name. It could be used as a filter at business rules to math different action with different devices.
-							              Also, user could see device name in the notifications panel. For instance: 'POS terminal 5'.
-							</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>caption</name>
-                            <description> Short event description. It could be used as a filter at business rules to math different action with different events.
-							</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>description</name>
-                            <description> Long event description. It could be used as a filter at business rules to math different action with different events.
-							</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>state</name>
-                            <description> User defined events can be used either with long actions like 'do recording' or instant actions like 'send email'. If you are going to use long actions with user defined events, this parameter should be filled.
-							</description>
+                            <name>id</name>
+                            <description>Log id</description>
                             <optional>true</optional>
                             <values>
                                 <value>
-                                    <name>ActiveState</name>
-                                    <description>Custom user defined event consider as a 'long' event. It goes to the 'active' state. Long actions will continue untill user defined event goes to the inactive state.</description>
+                                    <name>0</name>
+                                    <description>Main server log</description>
                                 </value>
                                 <value>
-                                    <name>InactiveState</name>
-                                    <description>Long action, associated with  user defined event in busiless rules, will stop.</description>
+                                    <name>2</name>
+                                    <description>Http log</description>
+                                </value>
+                                <value>
+                                    <name>3</name>
+                                    <description>Transaction log</description>
+                                </value>                                
+                            </values>
+                        </param>
+                        <param>
+                            <name>value</name>
+                            <description>Target value for log level. More detailed level includes all less detailed levels.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>None</name>
+                                    <description>Disable log.</description>
+                                </value>
+                                <value>
+                                    <name>Always</name>
+                                    <description>Log only the most important messages.</description>
+                                </value>
+                                <value>
+                                    <name>Error</name>
+                                    <description>Log errors.</description>
+                                </value>
+                                <value>
+                                    <name>Warning</name>
+                                    <description>Log warnings.</description>
+                                </value>
+                                <value>
+                                    <name>Info</name>
+                                    <description>Log information messages.</description>
+                                </value>
+                                <value>
+                                    <name>Debug</name>
+                                    <description>Log debug messages.</description>
+                                </value>
+                                <value>
+                                    <name>Debug2</name>
+                                    <description>Log additional debug messages.</description>
                                 </value>
                             </values>
                         </param>
-					</params>
-                    <result>
-                        <caption>Json result with error code.</caption>
-                    </result>
+                    </params>
+                    <result/>
                 </function>
-				
             </functions>
         </group>
 
@@ -1711,6 +1720,13 @@
                             <optional>true</optional>
                         </param>
                         <param>
+                            <name>endPos</name>
+                            <description>If present then specifies archive stream end positions. It used only if 'pos' parameter is present.
+                                         Milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
+                                         </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
                             <name>rotation</name>
                             <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
                             <optional>true</optional>
@@ -1718,6 +1734,11 @@
                         <param>
                             <name>sfd</name>
                             <description>Stand Frame Duration. If parameter is present, video speed is limited by real time.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rt</name>
+                            <description>Turn on realtime optimization. It will drop some frames if not enough CPU for realtime transcoding.</description>
                             <optional>true</optional>
                         </param>
                     </params>

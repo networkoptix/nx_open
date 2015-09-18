@@ -261,6 +261,7 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(const QnMediaServerReso
 
     ui->mainGridLayout->activate();
 
+    setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
 }
 
 QnRecordingStatisticsWidget::~QnRecordingStatisticsWidget()

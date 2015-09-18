@@ -21,8 +21,8 @@ struct QnBusinessEventParameters {
     QnUuid eventResourceId;
     
     /* Resource name with cause a event. 
-    /* resourceName is used if no resource actually registered in our system.
-    /* External custom event can provide some resource name with doesn't match resourceId in our system. At this case resourceName is filled and resourceId stay empty
+    *  resourceName is used if no resource actually registered in our system.
+    *  External custom event can provide some resource name with doesn't match resourceId in our system. At this case resourceName is filled and resourceId stay empty
     */
     QString resourceName;
 

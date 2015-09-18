@@ -603,7 +603,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
 
-
     result = application->exec();
 
 #ifdef _DEBUG

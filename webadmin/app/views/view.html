@@ -74,7 +74,7 @@
                     </div>
                 </td>
                 <td width="100%" >
-                    <div class="view-wrapper">
+                    <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
                         <div class="view-panel" ng-class="{'live-only':liveOnly}">
                             <div class="stick-to-top">
                                 <div class="webclient-panel webclient-bottom-border hidden-mobile">
@@ -97,9 +97,9 @@
                                         <span class="caption-row weblcient-hint">
                                             Resolution:
                                         </span>
-                                        <div class="webclient-button caption-row btn-group dropdown">
+                                        <div class="btn-group dropdown">
                                              <!--ng-click="resolutionExpanded = !resolutionExpanded;$event.preventDefault();"-->
-                                            <span data-toggle="dropdown" >
+                                            <span data-toggle="dropdown" class=" webclient-button caption-row  ">
                                                 {{activeResolution}} <span class="caret"></span>
                                             </span>
                                             <ul class="dropdown-menu" > <!--collapse="!resolutionExpanded"-->

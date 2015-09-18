@@ -292,6 +292,7 @@ private:
     void notifyAboutUpdate();
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
+    void openFailoverPriorityDialog();
 
     QnAdjustVideoDialog* adjustVideoDialog();
 

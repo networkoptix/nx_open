@@ -219,8 +219,12 @@ void QnInstallUpdatesPeerTask::at_pingTimer_timeout() {
 void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<QnModuleInformation> &modules, int handle) {
     Q_UNUSED(handle)
 
-    if (status != 0)
+    if (status != 0) {
+        NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Ping EC failed."), cl_logDEBUG2);
         return;
+    }
+
+    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Ping EC succeed."), cl_logDEBUG2);
 
     for (const QnModuleInformation &moduleInformation: modules) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
@@ -230,9 +234,11 @@ void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<Q
         if (!m_protoProblemDetected && moduleInformation.protoVersion != nx_ec::EC2_PROTO_VERSION) {
             m_protoProblemDetected = true;
             emit protocolProblemDetected();
+            NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Protocol problem found: %1 != %2.").arg(moduleInformation.protoVersion).arg(nx_ec::EC2_PROTO_VERSION), cl_logDEBUG2);
         }
 
         if (server->getVersion() != moduleInformation.version) {
+            NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Ping reply: Updating server version: %1 [%2].").arg(moduleInformation.id.toString()).arg(moduleInformation.version.toString()), cl_logDEBUG2);
             server->setVersion(moduleInformation.version);
             at_resourceChanged(server);
         }

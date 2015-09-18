@@ -886,7 +886,10 @@ QList<QByteArray> RTPSession::getSdpByTrackNum(int trackNum) const
     }
     if (mapNum == -1)
         return rez;
-
+#if 0
+    // match all a= lines like:
+    // a=rtpmap:96 mpeg4-generic/12000/2
+    // a=fmtp:96 profile-level
     for (int i = 0; i < tmp.size(); ++i)
     {
         QByteArray line = tmp[i].trimmed();
@@ -897,6 +900,19 @@ QList<QByteArray> RTPSession::getSdpByTrackNum(int trackNum) const
                 rez << line;
         }
     }
+#else
+    // new version matches more SDP lines
+    // like 'a=x-dimensions:2592,1944'. Previous version didn't match that
+    int currentTrackNum = -1;
+    for (int i = 0; i < tmp.size(); ++i)
+    {
+        QByteArray line = tmp[i].trimmed();
+        if (line.startsWith("m="))
+            currentTrackNum = line.split(' ').last().trimmed().toInt();
+        else if (line.startsWith("a=") && currentTrackNum == mapNum)
+            rez << line;
+    }
+#endif
     return rez;
 }
 

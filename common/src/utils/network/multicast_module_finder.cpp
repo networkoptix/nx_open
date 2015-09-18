@@ -219,12 +219,8 @@ void QnMulticastModuleFinder::run() {
     initSystemThreadId();
     NX_LOG(lit("QnMulticastModuleFinder started"), cl_logDEBUG1);
 
-    const unsigned int searchPacketLength = 64;
-    quint8 searchPacket[searchPacketLength];
-    RevealRequest searchRequest;
-    quint8 *searchPacketBufStart = searchPacket;
-    if (!searchRequest.serialize(&searchPacketBufStart, searchPacket + sizeof(searchPacket)))
-        Q_ASSERT(false);
+
+    QByteArray revealRequest = RevealRequest::serialize();
 
     //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
     if (m_serverSocket) {
@@ -246,7 +242,7 @@ void QnMulticastModuleFinder::run() {
             QnMutexLocker lk( &m_mutex );
 
             for (UDPSocket *socket: m_clientSockets) {
-                if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
+                if (!socket->send(revealRequest.data(), revealRequest.size())) {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
                     NX_LOG(lit("QnMulticastModuleFinder. Failed to send packet to %1. %2").

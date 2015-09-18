@@ -503,7 +503,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(
     return result;
 }
 
-QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool /*isPublic*/) {
+QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
     QnUuid id = params.eventResourceId;
     if (id.isNull())
         return QString();
@@ -516,19 +516,28 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!mserverRes)
         return QString();
     
-    quint64 timeStampMs = params.eventTimestampUsec / 1000;
+    quint64 timeStampUSec = params.eventTimestampUsec;
+	quint64 timeStampMs = params.eventTimestampUsec / 1000;
     QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(camera, timeStampMs);
     if (newServer)
         mserverRes = newServer;
 
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    if (resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
-        QUrl mserverUrl = mserverRes->getUrl();
-        appServerUrl.setHost(mserverUrl.host());
+    if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
+        appServerUrl = mserverRes->getApiUrl();
+        if (isPublic) {
+            QString publicIP = mserverRes->getProperty(Qn::PUBLIC_IP);
+            if (!publicIP.isEmpty()) {
+                QStringList parts = publicIP.split(L':');
+                appServerUrl.setHost(parts[0]);
+                if (parts.size() > 1)
+                    appServerUrl.setPort(parts[1].toInt());
+            }
+        }
     }
 
-    QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getPhysicalId()).arg(timeStampMs);
+    QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
+    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getUniqueId()).arg(timeStampUSec);
 
     return result;
 }

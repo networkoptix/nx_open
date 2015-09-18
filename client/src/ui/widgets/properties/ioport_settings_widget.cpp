@@ -1,7 +1,10 @@
 #include "ioport_settings_widget.h"
 #include "ui_ioport_settings_widget.h"
-#include "ui/models/ioports_view_model.h"
-#include "ui/delegates/ioport_item_delegate.h"
+
+#include <ui/delegates/ioport_item_delegate.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/models/ioports_view_model.h>
 
 namespace {
     const int headerSpacing = 2;
@@ -21,6 +24,8 @@ QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent /* = 0*/):
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
 
     connect(m_model, &QAbstractItemModel::dataChanged, this, &QnIOPortSettingsWidget::dataChanged);
+
+    setHelpTopic(this, Qn::IOModules_Help);
 }
 
 QnIOPortSettingsWidget::~QnIOPortSettingsWidget() 

@@ -99,7 +99,7 @@ namespace {
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
         (TestLdapSettingsObject,   "testLdapSettings")
-        (ModulesInformationObject, "moduleInformationAuthenticated")
+        (ModulesInformationObject, "moduleInformation")
         (ec2CameraHistoryObject,   "ec2/cameraHistory")
         (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
         (ec2BookmarksObject,        "ec2/bookmarks")

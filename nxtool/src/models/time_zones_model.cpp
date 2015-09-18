@@ -1,7 +1,6 @@
 
 #include "time_zones_model.h"
 
-#include <QDebug>
 #include <QTimeZone>
 
 #include <base/server_info.h>

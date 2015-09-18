@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QVariant>
 
+#include <base/types.h>
 #include <base/constants.h>
 
 namespace rtu
@@ -13,10 +14,9 @@ namespace rtu
     {
         Q_OBJECT
         
-        Q_PROPERTY(int currentPage READ currentPage
-            WRITE setCurrentPage NOTIFY currentPageChanged)
+        Q_PROPERTY(int currentPage READ currentPage NOTIFY currentPageChanged)
         Q_PROPERTY(QObject* selection READ selection NOTIFY selectionChanged)
-
+        Q_PROPERTY(QObject* progressTask READ progressTask NOTIFY progressTaskChanged)
         Q_PROPERTY(QString toolDisplayName READ toolDisplayName NOTIFY toolInfoChanged)
 
         Q_PROPERTY(bool isBeta READ isBeta NOTIFY toolInfoChanged)
@@ -33,8 +33,6 @@ namespace rtu
         virtual ~RtuContext();
         
     public:
-        void setCurrentPage(int pageId);
-        
         int currentPage() const;
         
         bool showWarnings() const;
@@ -46,13 +44,28 @@ namespace rtu
         QObject *selection() const;
 
     public slots:
+        /// Changes management
+
+        QObject *changesManager();
+
+        QObject *progressTask();
+
+        void showProgressTask(const ApplyChangesTaskPtr &task);
+
+        void showProgressTaskFromList(int index);
+
+        void hideProgressTask();
+
+        void removeProgressTask(int index);
+
+        void applyTaskCompleted(const ApplyChangesTaskPtr &task);
+
+    public slots:
         QObject *selectionModel();
         
         QObject *ipSettingsModel();
         
         QObject *timeZonesModel(QObject *parent);
-        
-        QObject *changesManager();
         
         bool isValidSubnetMask(const QString &mask) const;
 
@@ -71,7 +84,7 @@ namespace rtu
         
         void tryLoginWith(const QString &primarySystem
             , const QString &password);
-        
+
     public:
         QString toolDisplayName() const;
 
@@ -95,6 +108,8 @@ namespace rtu
         void showWarningsChanged();
 
         void loginOperationFailed(const QString &primarySystem);
+
+        void progressTaskChanged();
         
     private:
         class Impl;
