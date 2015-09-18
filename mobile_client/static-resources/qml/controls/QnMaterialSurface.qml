@@ -3,6 +3,7 @@ import QtQuick 2.4
 Item {
     id: materialSurface
 
+    property bool animated: true
     property color color: "#20ffffff"
     property bool selected: false
     property bool centered: false
@@ -143,9 +144,18 @@ Item {
         onPressed: {
             pressX = mouse.x
             pressY = mouse.y
-            fadeInTimer.restart()
+
+            if (animated)
+                fadeInTimer.restart()
         }
         onReleased: {
+            if (!animated) {
+                fadeInTimer.stop()
+                tapCircle.fadeOut()
+                materialSurface.clicked(mouseArea.pressX, mouseArea.pressY)
+                return
+            }
+
             if (!selected) {
                 if (fadeInTimer.running)
                     tapCircle.fadeIn(pressX, pressY)
@@ -154,9 +164,15 @@ Item {
             }
             fadeInTimer.stop()
             if (!drag.active)
-                clickDelayTimer.start()
+                materialSurface.clicked(mouseArea.pressX, mouseArea.pressY)
         }
         onPressedChanged: {
+            if (!animated) {
+                fadeInTimer.stop()
+                tapCircle.fadeOut()
+                return
+            }
+
             if (!pressed) {
                 if (!fadeInTimer.running && !selected)
                     tapCircle.fadeOut()
@@ -186,16 +202,6 @@ Item {
                 if (!selected)
                     tapCircle.fadeIn(mouseArea.pressX, mouseArea.pressY)
             }
-        }
-
-        Timer {
-            id: clickDelayTimer
-
-            repeat: false
-            running: false
-            interval: opacityAnimation.duration
-
-            onTriggered: materialSurface.clicked(mouseArea.pressX, mouseArea.pressY)
         }
     }
 }

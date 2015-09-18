@@ -6,6 +6,7 @@ Item {
     property alias icon: image.source
     property alias explicitRadius: materialSurface.explicitRadius
     property alias backlight: materialSurface.backlight
+    property alias animated: materialSurface.animated
 
     readonly property alias pressed: materialSurface.pressed
 

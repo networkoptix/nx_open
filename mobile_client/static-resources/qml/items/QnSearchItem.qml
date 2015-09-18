@@ -20,6 +20,7 @@ Item {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         icon: "image://icon/search.png"
+        animated: false
 
         onClicked: open()
     }
