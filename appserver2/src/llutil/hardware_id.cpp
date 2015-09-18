@@ -16,12 +16,7 @@ namespace {
 namespace LLUtil {
     void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings);
 
-    QString getSaveMacAddress(std::vector<DeviceClassAndMac> devices, QSettings *settings) 
-    {
-        QString storedMac = settings->value("storedMac").toString();
-        if (!storedMac.isEmpty())
-            return storedMac;
-
+    QString getSaveMacAddress(std::vector<DeviceClassAndMac> devices, QSettings *settings) {
         if (devices.empty())
             return QString();
 
@@ -33,9 +28,24 @@ namespace LLUtil {
                 else
                     return device1.mac < device2.mac;
             });
-        
-        settings->setValue("storedMac", devices.front().mac);
-        return devices.front().mac;
+
+        QString storedMac = settings->value("storedMac").toString();
+
+        QString result;
+
+        for(auto it = devices.begin(); it != devices.end(); ++it) {
+            if  (it->mac == storedMac) {
+                result = storedMac;
+                break;
+            }
+        }
+
+        if (result.isEmpty()) {
+            result = devices.front().mac;
+            settings->setValue("storedMac", result);
+        }
+
+        return result;
     }
 
 
