@@ -110,9 +110,6 @@ static QByteArray getMacAddress(IWbemServices *pSvc,  QSettings *settings) {
 
     findMacAddresses(pSvc, devices);
 
-    if (devices.empty())
-        return QByteArray();
-
     return getSaveMacAddress(devices, settings).toUtf8();
 }
 
