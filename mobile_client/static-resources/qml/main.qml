@@ -110,21 +110,25 @@ Window {
 
         QnOverlayLayer {
             id: dialogLayer
-            objectName: "dialogLayer"
             z: 10.0
+            color: "#30000000"
         }
 
         QnOverlayLayer {
             id: toastLayer
-            objectName: "toastLayer"
             z: 15.0
             blocking: false
         }
 
         QnOverlayLayer {
             id: popupLayer
-            objectName: "popupLayer"
             z: 20.0
+        }
+
+        QnOverlayLayer {
+            id: widgetLayer
+            z: 25.0
+            color: "#66171c1f"
         }
     }
 

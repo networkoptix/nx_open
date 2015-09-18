@@ -28,13 +28,16 @@ QnPage {
         anchors.rightMargin: dp(8)
         icon: "image://icon/more_vert.png"
         visible: pageStatus == Stack.Active || pageStatus == Stack.Activating
-        onClicked: cameraMenu.open(toolBar.width, dp(4))
+        onClicked: {
+            cameraMenu.updateGeometry(this)
+            cameraMenu.show()
+        }
     }
 
     QnCameraMenu {
         id: cameraMenu
         currentQuality: mediaPlayer.resourceHelper.resolution
-        onSelectQuality: qualityDialog.open()
+        onSelectQuality: qualityDialog.show()
     }
 
     QnQualityDialog {

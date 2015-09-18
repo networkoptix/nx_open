@@ -6,80 +6,72 @@ import "../main.js" as Main
 FocusScope {
     id: popup
 
-    property color overlayColor: "#80000000"
-    property string overlayLayer
-    property bool centered: false
+    property var showAnimation
+    property var hideAnimation
+    property bool hideLayerAfterAnimation: true
 
-    property real padding: dp(4)
+    QtObject {
+        id: d
+        property Item lastFocusedItem
 
-    property Item _lastFocusedItem
+        function finalizeHide() {
+            visible = false
 
-    signal opened()
-    signal closed()
+            if (hideLayerAfterAnimation)
+                parent.hide()
+
+            popup.hidden()
+
+            d.lastFocusedItem.forceActiveFocus()
+        }
+    }
+
+    signal shown()
+    signal hidden()
 
     visible: false
 
-    function open(x, y) {
-        if (x === undefined)
-            x = 0
-
-        if (y === undefined)
-            y = 0
-
-        _lastFocusedItem = Window.activeFocusItem
-
-        parent = Main.findRootChild(popup, overlayLayer)
-
-        if (parent) {
-            parent.color = overlayColor
-            parent.show()
-        }
-
-        if (centered)
-            positionAtCenter()
-        else
-            positionAt(x, y)
-
-        opened()
-        visible = true
-
-        forceActiveFocus()
+    Connections {
+        target: showAnimation ? showAnimation : null
+        ignoreUnknownSignals: true
+        onStopped: popup.shown()
     }
 
-    function positionAt(x, y) {
-        var r = x + width + padding
-        if (r > parent.width)
-            x = Math.max(padding, x - (r - parent.width))
-
-        var b = y + height + padding
-        if (b > parent.height)
-            y = Math.max(padding, y - (b - parent.height))
-
-        popup.x = x
-        popup.y = y
+    Connections {
+        target: hideAnimation ? hideAnimation : null
+        ignoreUnknownSignals: true
+        onStopped: d.finalizeHide()
     }
 
-    function positionAtCenter() {
-        x = (parent.width - width) / 2
-        y = (parent.height - height) / 2
-    }
-
-    function close() {
-        if (!visible)
+    function show() {
+        if (!parent)
             return
 
-        visible = false
-        closed()
+        d.lastFocusedItem = Window.activeFocusItem
 
-        parent.hide()
+        parent.show()
+        popup.visible = true
 
-        _lastFocusedItem.forceActiveFocus()
+        if (showAnimation)
+            showAnimation.start()
+        else
+            popup.shown()
+    }
+
+    function hide() {
+        if (!parent || !visible)
+            return
+
+        if (hideAnimation)
+            hideAnimation.start()
+        else
+            d.finalizeHide()
     }
 
     Connections {
         ignoreUnknownSignals: true
         target: parent
-        onDismiss: close()
+        onCloseRequested: hide()
     }
 
     focus: true

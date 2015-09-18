@@ -5,8 +5,7 @@ import com.networkoptix.qml 1.0
 QnPopup {
     id: dialog
 
-    overlayLayer: "dialogLayer"
-    overlayColor: "#30000000"
+    parent: dialogLayer
 
     property alias title: title.text
 
@@ -17,8 +16,8 @@ QnPopup {
     function ensureVisible(y1, y2) {
         var cy = flickable.contentY
 
-        if (y2 + flickable.height > flickable.contentHeight)
-            cy = flickable.contentHeight - flickable.height
+        if (cy + flickable.height < y2)
+            cy = y2 - flickable.height
 
         if (y1 < cy)
             cy = y1
@@ -29,9 +28,9 @@ QnPopup {
         flickable.contentY = cy
     }
 
-    centered: true
     width: dp(56 * 5)
     height: content.height + dp(32)
+    anchors.centerIn: parent
 
     Rectangle {
         anchors.fill: parent

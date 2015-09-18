@@ -192,7 +192,7 @@ Item {
                     icon: "image://icon/calendar.png"
                     onClicked: {
                         calendarPanel.date = timeline.positionDate
-                        calendarPanel.open()
+                        calendarPanel.show()
                     }
                 }
 
@@ -312,7 +312,7 @@ Item {
 
         chunkProvider: mediaPlayer.chunkProvider
         onDatePicked: {
-            close()
+            hide()
             mediaPlayer.seek(date.getTime())
         }
     }

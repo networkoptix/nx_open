@@ -5,7 +5,7 @@ import "../controls"
 QnPopupMenu {
     id: cameraMenu
 
-    width: content.width + content.x * 2
+    width: content.width
     height: content.height
 
     property string currentQuality
@@ -14,12 +14,11 @@ QnPopupMenu {
 
     Column {
         id: content
-        x: parent.padding
 
         QnPopupMenuItem {
             text: qsTr("Quality") + ": " + (currentQuality ? currentQuality : qsTr("Auto"))
             onClicked: {
-                cameraMenu.close()
+                cameraMenu.hide()
                 cameraMenu.selectQuality()
             }
         }

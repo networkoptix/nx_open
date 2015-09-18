@@ -11,8 +11,7 @@ QnPopup {
 
     property alias mainButton: mainButton
 
-    overlayLayer: "toastLayer"
-    overlayColor: "transparent"
+    parent: toastLayer
 
     width: parent.width
     height: text.lineCount > 1 ? dp(80) : dp(48)
@@ -55,19 +54,30 @@ QnPopup {
         }
     }
 
-    opacity: visible ? 1.0 : 0.0
+    showAnimation: NumberAnimation {
+        target: toast
+        property: "opacity"
+        from: 0.0
+        to: 1.0
+        duration: 300
+    }
 
-    Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+    hideAnimation: NumberAnimation {
+        target: toast
+        property: "opacity"
+        to: 0.0
+        duration: 300
+    }
 
     Timer {
         id: timeout
         interval: 0
         repeat: false
         running: false
-        onTriggered: toast.close()
+        onTriggered: toast.hide()
     }
 
-    onOpened: {
+    onShown: {
         if (timeout.interval > 0)
             timeout.start()
     }

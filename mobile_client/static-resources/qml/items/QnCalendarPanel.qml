@@ -9,21 +9,18 @@ import "../main.js" as Main
 QnPopup {
     id: calendarPanel
 
-    overlayLayer: "popupLayer"
-    overlayColor: "#66171c1f"
+    parent: widgetLayer
 
     signal datePicked(date date)
     property alias date: calendar.date
     property alias chunkProvider: calendar.chunkProvider
 
-    padding: 0
     width: parent.width
     height: calendar.height
+    anchors.bottom: parent.bottom
 
-    visible: opacity > 0.0
     opacity: 0.0
-
-    readonly property real _yAnimationShift: dp(56)
+    hideLayerAfterAnimation: false
 
     Rectangle {
         anchors.fill: calendar
@@ -47,7 +44,7 @@ QnPopup {
         onDatePicked: calendarPanel.datePicked(date)
     }
 
-    SequentialAnimation {
+    showAnimation: SequentialAnimation {
         id: showAnimation
 
         ParallelAnimation {
@@ -60,20 +57,24 @@ QnPopup {
             }
 
             NumberAnimation {
-                target: calendar
-                property: "y"
+                target: calendarPanel
+                property: "anchors.bottomMargin"
                 duration: 150
                 easing.type: Easing.OutCubic
-                from: _yAnimationShift
+                from: -dp(56)
                 to: 0
             }
         }
     }
 
-    SequentialAnimation {
+    hideAnimation: SequentialAnimation {
         id: hideAnimation
 
         ParallelAnimation {
+            ScriptAction {
+                script: calendarPanel.parent.hide()
+            }
+
             NumberAnimation {
                 target: calendarPanel
                 property: "opacity"
@@ -83,28 +84,12 @@ QnPopup {
             }
 
             NumberAnimation {
-                target: calendar
-                property: "y"
+                target: calendarPanel
+                property: "anchors.bottomMargin"
                 duration: 150
                 easing.type: Easing.OutCubic
-                to: _yAnimationShift
+                to: -dp(56)
             }
         }
     }
-
-    onYChanged: console.log(y)
-
-    function show() {
-        y = parent.height - height
-        hideAnimation.stop()
-        showAnimation.start()
-    }
-
-    function hide() {
-        showAnimation.stop()
-        hideAnimation.start()
-    }
-
-    onClosed: hide()
-    onOpened: show()
 }

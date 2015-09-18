@@ -12,21 +12,19 @@ Item {
 
     signal clicked()
 
-    width: content.width + dp(16)
+    width: content.width + content.x * 2
     height: content.height
     clip: true
 
     QnMaterialSurface {
         onClicked: menuItem.clicked()
-        anchors.leftMargin: -dp(8)
-        anchors.rightMargin: -dp(8)
         color: "#30000000"
     }
 
     Row {
         id: content
         height: dp(48)
-        x: dp(8)
+        x: dp(16)
 
         spacing: dp(8)
 

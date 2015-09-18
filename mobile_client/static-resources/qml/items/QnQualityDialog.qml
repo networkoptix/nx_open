@@ -49,7 +49,7 @@ QnDialog {
                 QnMaterialSurface {
                     color: current ? "#30ffffff" : "#30000000"
                     onClicked: {
-                        qualityDialog.close()
+                        qualityDialog.hide()
                         qualityDialog.qualityPicked(modelData)
                     }
                 }
@@ -74,7 +74,7 @@ QnDialog {
         }
     }
 
-    onOpened: {
+    onShown: {
         ensureVisible(content.selectedY, content.selectedY + dp(56))
     }
 }

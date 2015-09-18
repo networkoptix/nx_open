@@ -249,7 +249,7 @@ QnFlickable {
     QnToast {
         id: hiddenCamerasPopup
 
-        property bool shown: d.pendingHiddenItems.length > 0
+        property bool isShown: d.pendingHiddenItems.length > 0
 
         text: qsTr("%n cameras hidden", "", d.pendingHiddenItems.length)
         mainButton {
@@ -258,18 +258,18 @@ QnFlickable {
             onClicked: d.hidePendingItems()
         }
 
-        onShownChanged: {
-            if (shown)
-                open()
+        onIsShownChanged: {
+            if (isShown)
+                show()
             else
-                close()
+                hide()
         }
 
         Connections {
             target: resourcesPage
             onPageStatusChanged: {
                 if (pageStatus != Stack.Active && pageStatus != Stack.Activating)
-                    hiddenCamerasPopup.close()
+                    hiddenCamerasPopup.hide()
             }
         }
     }

@@ -8,7 +8,7 @@ Item {
     property alias color: background.color
     property alias blocking: mouseArea.enabled
 
-    signal dismiss()
+    signal closeRequested()
 
     visible: background.opacity > 0.0
 
@@ -16,13 +16,14 @@ Item {
         id: background
         anchors.fill: parent
         opacity: 0.0
+        color: "transparent"
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
     }
 
     MouseArea {
         id: mouseArea
         anchors.fill: parent
-        onClicked: overlayLayer.dismiss()
+        onClicked: overlayLayer.closeRequested()
     }
 
     function show() {
@@ -30,7 +31,6 @@ Item {
     }
 
     function hide() {
-        dismiss()
         background.opacity = 0.0
     }
 
@@ -42,7 +42,7 @@ Item {
 
         if (event.key === Qt.Key_Back) {
             if (visible) {
-                hide()
+                overlayLayer.closeRequested()
                 event.accepted = true
             }
         }
