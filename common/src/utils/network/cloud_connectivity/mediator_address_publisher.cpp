@@ -78,7 +78,7 @@ void MediatorAddressPublisher::updateAddresses( std::list< SocketAddress > addre
         }
         else
         {
-            m_external.erase( it );
+            it = m_external.erase( it );
             m_isExternalChanged = true;
         }
     }
