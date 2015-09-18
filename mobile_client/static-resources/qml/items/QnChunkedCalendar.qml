@@ -77,6 +77,7 @@ Item {
             monthsModel.append({ "year" : month > 1 ? year : year - 1, "month" : month > 1 ? month - 1 : 12 })
             monthsModel.append({ "year" : year, "month" : month })
             monthsModel.append({ "year" : month < 12 ? year : year + 1, "month" : month < 12 ? month + 1 : 1 })
+            d.ui.monthsList.positionViewAtIndex(1, ListView.Beginning)
         }
     }
 
