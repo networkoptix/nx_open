@@ -517,11 +517,11 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
         return QString();
 
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    quint64 ts = params.eventTimestampUsec;
+    quint64 timeStampMSec = params.eventTimestampUsec / 1000;
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
     if (history) {
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, false);
+        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(timeStampMSec, false);
         if (newServer)
             mserverRes = newServer;
     }
@@ -540,7 +540,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     }
 
     QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getUniqueId()).arg(ts);
+    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getUniqueId()).arg(timeStampMSec);
 
     return result;
 }
