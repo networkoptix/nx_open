@@ -495,12 +495,6 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
     case Qt::AccessibleDescriptionRole:
         if (column == Qn::NameColumn)
             return m_displayName + (m_modified ? QLatin1String("*") : QString());
-
-        if (column == Qn::InfoColumn && m_flags.testFlag(Qn::live_cam)) {
-            if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
-                return QnLexical::serialized(camera->failoverPriority());
-        }
-
         break;
     case Qt::ToolTipRole:
         return m_displayName;
@@ -515,24 +509,6 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
     case Qt::CheckStateRole:
         if (column == Qn::CheckColumn)
             return m_checked;
-        break;
-    case Qt::ForegroundRole:
-        if (column == Qn::InfoColumn && m_flags.testFlag(Qn::live_cam)) {
-            if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
-                switch (camera->failoverPriority()) {
-                case Qn::FP_High:
-                    return QBrush(Qt::red);
-                case Qn::FP_Medium:
-                    return QBrush(Qt::yellow);
-                case Qn::FP_Low:
-                    return QBrush(Qt::green);
-                case Qn::FP_Never:
-                    return QBrush(Qt::gray);
-                default:
-                    break;
-            }
-        }
-            
         break;
     case Qn::ResourceRole:
         if(m_resource)

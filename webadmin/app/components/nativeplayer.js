@@ -36,7 +36,7 @@ var nativePlayer = new (function () {
         }
     };
 
-    this.load = function(url,type){
+    this.destroy = function(){
         if( currentVideo || node.has("video").length){
             try {
                 node.find("video").attr("src", "");
@@ -47,9 +47,15 @@ var nativePlayer = new (function () {
             }
             node.find("video").remove();
         }
-        $currentVideo = $("<video  src='" + url + "' type='" + type + "'>").appendTo(node).html('<source src="' + url + '" type="' + type + '"></source>' );
+    };
+
+    this.load = function(url,type){
+        this.destroy();
+
+        $currentVideo = $('<video  src="' + url + '" type="' + type + '"><source src="' + url + '" type="' + type + '"></source></video>' ).appendTo(node);
 
         currentVideo = $currentVideo.get(0);
+
         currentVideo.load();
 
 

@@ -24,8 +24,7 @@ namespace rtu
 
     public:
         static ApplyChangesTaskPtr create(const ChangesetPointer &changeset
-            , const ServerInfoPtrContainer &target
-            , rtu::HttpClient *httpClient);
+            , const ServerInfoPtrContainer &target);
 
         virtual ~ApplyChangesTask();
 
@@ -84,8 +83,7 @@ namespace rtu
 
     private:
         ApplyChangesTask(const ChangesetPointer &changeset
-            , const ServerInfoPtrContainer &targets
-            , rtu::HttpClient *httpClient);
+            , const ServerInfoPtrContainer &targets);
 
     private:
         class Impl;

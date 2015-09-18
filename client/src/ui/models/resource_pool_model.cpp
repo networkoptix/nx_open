@@ -31,6 +31,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
+#include <ui/delegates/resource_pool_model_custom_column_delegate.h>
 #include <ui/models/resource_pool_model_node.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
@@ -339,6 +340,34 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
     m_rootNodes[rootNodeType]->updateRecursive();
 }
 
+QnResourcePoolModelCustomColumnDelegate* QnResourcePoolModel::customColumnDelegate() const {
+    return m_customColumnDelegate.data();
+}
+
+void QnResourcePoolModel::setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate) {
+    if (m_customColumnDelegate == columnDelegate)
+        return;
+
+    if (m_customColumnDelegate)
+        disconnect(m_customColumnDelegate, nullptr, this, nullptr);
+
+    m_customColumnDelegate = columnDelegate;
+
+    auto notifyCustomColumnChanged = [this](){
+        //TODO: #GDM update only custom column and changed rows
+        Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+        m_rootNodes[rootNodeType]->updateRecursive();
+    };
+
+    if (m_customColumnDelegate)
+        connect(m_customColumnDelegate, &QnResourcePoolModelCustomColumnDelegate::notifyDataChanged,
+                this, notifyCustomColumnChanged);
+
+    notifyCustomColumnChanged();
+
+}
+
+
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: QAbstractItemModel implementation
 // -------------------------------------------------------------------------- //
@@ -370,13 +399,17 @@ int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
     return node(parent)->children().size();
 }
 
-int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
+int QnResourcePoolModel::columnCount(const QModelIndex &parent) const {
     return Qn::ColumnCount;
 }
 
 Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
     if(!index.isValid())
         return Qt::NoItemFlags;
+
+    if (index.column() == Qn::CustomColumn)
+        return m_customColumnDelegate ? m_customColumnDelegate->flags(index) : Qt::NoItemFlags;
+
     return node(index)->flags(index.column());
 }
 
@@ -384,12 +417,19 @@ QVariant QnResourcePoolModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
+    /* Only standard QT roles are subject to reimplement. Otherwise we may go to recursion, getting resource for example. */
+    if (index.column() == Qn::CustomColumn && role <= Qt::UserRole)
+        return m_customColumnDelegate ? m_customColumnDelegate->data(index, role) : QVariant();
+
     return node(index)->data(role, index.column());
 }
 
 bool QnResourcePoolModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(!index.isValid())
         return false;
+
+    if (index.column() == Qn::CustomColumn)
+        return m_customColumnDelegate ? m_customColumnDelegate->setData(index, value, role) : false;
 
     return node(index)->setData(value, role, index.column());
 }
@@ -588,7 +628,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         connect(camera,     &QnVirtualCameraResource::groupIdChanged,   this,   &QnResourcePoolModel::at_resource_parentIdChanged);
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
         connect(camera,     &QnVirtualCameraResource::statusFlagsChanged, this, &QnResourcePoolModel::at_resource_resourceChanged);
-        connect(camera,     &QnVirtualCameraResource::failoverPriorityChanged, this, &QnResourcePoolModel::at_resource_resourceChanged);
         auto updateParent = [this](const QnResourcePtr &resource) {
             /* Automatically update display name of the EDGE server if its camera was renamed. */
             QnResourcePtr parent = resource->getParentResource();

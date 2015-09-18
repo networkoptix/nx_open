@@ -7,6 +7,7 @@
 
 #include <base/server_info.h>
 #include <base/requests.h>
+#include <helpers/rest_client.h>
 #include <helpers/server_info_manager.h>
 #include <helpers/model_change_helper.h>
 
@@ -229,7 +230,7 @@ namespace
         , kLoggedIn
         , kDefaultPassword
         , kBusyStateRoleId
-        
+
         , kLastCustomRoleId
     };
     
@@ -253,6 +254,7 @@ namespace
         result.insert(kLoggedIn, "loggedIn");
         result.insert(kDefaultPassword, "defaultPassword");
         result.insert(kBusyStateRoleId, "isBusy");
+
         return result;
     }();
     
@@ -401,13 +403,16 @@ public:
         , const QString &host);
 
     void updateExtraInfoFailed(const QUuid &id
-        , int errorCode);
+        , RequestError errorCode);
 
     bool findServer(const QUuid &id
         , ItemSearchInfo &searchInfo);
 
     void setBusyState(const IDsVector &ids
         , bool isBusy);
+
+    void changeAccessMethod(const QUuid &id
+        , bool byHttp);
 
 private:
     SystemModelInfo *findSystemModelInfo(const QString &systemName
@@ -449,7 +454,7 @@ rtu::ServersSelectionModel::Impl::Impl(rtu::ServersSelectionModel *owner
 
     , m_updateExtra([this](const QUuid &id, const ExtraServerInfo &extra
         , const QString &host) { updateExtraInfo(id, extra, host); })
-    , m_updateExtraFailed([this](const QUuid &id, int errorCode) { updateExtraInfoFailed(id, errorCode); })
+    , m_updateExtraFailed([this](const QUuid &id, RequestError errorCode) { updateExtraInfoFailed(id, errorCode); })
     , m_unknownEntities()
 
 {
@@ -512,7 +517,12 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kSystemNameRoleId:
             return systemInfo.name;
         case kNameRoleId:
-            return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress);
+            if (info.baseInfo().displayAddress.isEmpty())
+                return QString("%1 (%2)").arg(info.baseInfo().name)
+                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST");  /// TODO: remove after inner testing
+            else 
+                return QString("%1 (%2) (%3)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress)
+                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST");  /// TODO: remove after inner testing
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
@@ -531,7 +541,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
-            return (info.hasExtraInfo() && rtu::defaultAdminPasswords().contains(info.extraInfo().password));
+            return (info.hasExtraInfo() && rtu::RestClient::defaultAdminPasswords().contains(info.extraInfo().password));
         }
     }
     else
@@ -726,7 +736,6 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
         const ServerModelInfo &serverInfo = *searchInfo.serverInfoIterator;
         const bool wasSelected = (serverInfo.selectedState != Qt::Unchecked);
 
-        const int prevSelectedCount = selectedCount();
         if (explicitSelection)
         {
             for(auto &system: m_systems)
@@ -912,14 +921,15 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfo(const QUuid &id
 }
 
 void rtu::ServersSelectionModel::Impl::updateExtraInfoFailed(const QUuid &id
-    , int errorCode)
+    , RequestError errorCode)
 {
     /// Server is not available or can't be logged in
     ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
         return;
 
-    const ServerLoggedState newLoggedState = (errorCode == kUnauthorizedError ? kServerUnauthorized : kDifferentNetwork);
+    const ServerLoggedState newLoggedState = (errorCode == RequestError::kUnauthorized 
+        ? kServerUnauthorized : kDifferentNetwork);
 
     ServerLoggedState &currentLoggedState = searchInfo.serverInfoIterator->loginState;
 
@@ -1094,7 +1104,8 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
     if (!findServer(baseInfo.id, searchInfo))
         return;
 
-    enum { kUpdatePeriod = 20 * 1000};
+    
+    enum { kUpdatePeriod = HttpClient::kDefaultTimeoutMs * 3 };  /// At least x3 because there is http and multicast timeouts can be occured
 
     /// TODO: #ynikitenkov change for QElapsedTimer implementation
     const qint64 now = QDateTime::currentMSecsSinceEpoch();
@@ -1107,7 +1118,7 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
         return;
 
     const ServerInfo &foundInfo = searchInfo.serverInfoIterator->serverInfo;
-    const ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
+    ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
         : ServerInfo(baseInfo, foundInfo.extraInfo()));
 
     m_serverInfoManager->updateServerInfos(ServerInfoContainer(1, tmp)
@@ -1141,6 +1152,7 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
         }
 
         const auto &guard = m_changeHelper->insertRowsGuard(row, row);
+        Q_UNUSED(guard);
         systemModelInfo = m_systems.insert(place, systemInfo);
     }
 
@@ -1261,6 +1273,17 @@ void rtu::ServersSelectionModel::Impl::setBusyState(const IDsVector &ids
     if (selectionChanged)
         emit m_owner->selectionChanged();
 
+}
+
+void rtu::ServersSelectionModel::Impl::changeAccessMethod(const QUuid &id
+    , bool byHttp)
+{
+    ItemSearchInfo searchInfo;
+    if (!findServer(id, searchInfo))
+        return;
+
+    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().accessibleByHttp = byHttp;
+    m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);  /// TODO: remove after testing
 }
 
 void rtu::ServersSelectionModel::Impl::removeServers(const IDsVector &removed)
@@ -1507,6 +1530,12 @@ void rtu::ServersSelectionModel::setBusyState(const IDsVector &ids
     , bool isBusy)
 {
     m_impl->setBusyState(ids, isBusy);
+}
+
+void rtu::ServersSelectionModel::changeAccessMethod(const QUuid &id
+    , bool byHttp)
+{
+    m_impl->changeAccessMethod(id, byHttp);
 }
 
 bool rtu::ServersSelectionModel::selectionOutdated() const

@@ -78,7 +78,7 @@ QString getHardwareId(int version, bool guidCompatibility, QSettings *settings) 
             fillHardwareIds(g_hardwareId, settings, g_hardwareInfo);
             Q_ASSERT(g_hardwareId.size() == 2 * LATEST_HWID_VERSION);
 
-            g_hardwareInfo.date = QDateTime::currentDateTime().toString();
+            g_hardwareInfo.date = QDateTime::currentDateTime().toString(Qt::ISODate);
             NX_LOG(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed(), cl_logINFO);
 
             g_hardwareIdInitialized = true;

@@ -199,6 +199,9 @@ angular.module('webadminApp')
                 var activePlayer = null;
                 function recyclePlayer(player){
                     if(activePlayer != player) {
+                        if(scope.vgApi && scope.vgApi.destroy){
+                            scope.vgApi.destroy(); // try to destroy
+                        }
                         element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                     }
@@ -219,10 +222,10 @@ angular.module('webadminApp')
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
-
                             $timeout(function () {
                                 scope.loading = !!format;
                             });
+
                             scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
                             scope.vgApi.addEventListener("timeupdate", function (event) {
@@ -341,7 +344,6 @@ angular.module('webadminApp')
                         });
 
                         if (scope.vgSrc) {
-                            //console.log('play',scope.vgSrc[2].src);
                             scope.vgApi.play(scope.vgSrc[2].src);
                         }
 
