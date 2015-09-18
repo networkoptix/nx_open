@@ -362,33 +362,33 @@ case "$1" in
     /etc/init.d/cron start
     /etc/init.d/$CUSTOMIZATION-mediaserver start
     exit 0
-	;;
+    ;;
   restart|reload|force-reload)
-	echo "Error: argument '$1' not supported" >&2
-	exit 3
-	;;
+    echo "Error: argument '$1' not supported" >&2    
+    exit 3
+    ;;
   stop)
-	# No-op
-	;;
+    # No-op
+    ;;
   reboot)
-	shutdown -rF now 
-	;;     
+    shutdown -rF now 
+    ;;     
   boot_sd)
-	reboot_from_sd 
-	;;    
+    reboot_from_sd 
+    ;;    
   boot_hdd)
-	reboot_from_hdd
-	;;        
+    reboot_from_hdd
+    ;;        
   restore)
-	delete_saved_ipconfig
+    delete_saved_ipconfig
     system_restore
-	;;
+    ;;
   restore_keep_ip)
-	save_ipconfig
+    save_ipconfig
     system_restore
-	;;     
+    ;;     
   *)
-	echo "Usage: nx1boot [start|stop|reboot|boot_sd|boot_hdd|restore|restore_keep_ip]" >&2
-	exit 3
-	;;
+    echo "Usage: nx1boot [start|stop|reboot|boot_sd|boot_hdd|restore|restore_keep_ip]" >&2
+    exit 3
+    ;;
 esac
