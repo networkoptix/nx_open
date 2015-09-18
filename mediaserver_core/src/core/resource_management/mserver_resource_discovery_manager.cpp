@@ -86,10 +86,15 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     // check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras
     for (auto itr = resources.begin(); itr != resources.end();)
     {
-        QnNetworkResourcePtr existRes = qnResPool->getResourceById<QnNetworkResource>((*itr)->getId());
+        QnSecurityCamResourcePtr camRes = (*itr).dynamicCast<QnSecurityCamResource>();
+        if (!camRes) {
+            ++itr;
+            continue;
+        }
+        QnSecurityCamResourcePtr existRes = qnResPool->getResourceById<QnSecurityCamResource>((*itr)->getId());
         if (existRes && existRes->hasFlags(Qn::foreigner))
         {
-            m_tmpForeignResources.insert((*itr)->getId(), *itr);
+            m_tmpForeignResources.insert(camRes->getId(), camRes);
             itr = resources.erase(itr);
         }
         else {
@@ -102,17 +107,14 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
         auto foreignResources = m_tmpForeignResources.values();
-        std::sort(foreignResources.begin(), foreignResources.end(), [] (const QnResourcePtr& left, const QnResourcePtr& right)
+        const QnUuid ownGuid = qnCommon->moduleGUID();
+        std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid] (const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
         { 
-            QnSecurityCamResourcePtr leftCam = left.dynamicCast<QnSecurityCamResource>();
-            QnSecurityCamResourcePtr rightCam = right.dynamicCast<QnSecurityCamResource>();
-            if (!leftCam || !rightCam)
-                return left->getId() < right->getId();
-
-            QnUuid ownGuid = qnCommon->moduleGUID();
-            if (leftCam->preferedServerId() == ownGuid && rightCam->preferedServerId() != ownGuid)
-                return true; // put own cameras first
-
+            bool leftOwnServer = leftCam->preferedServerId() == ownGuid;
+            bool rightOwnServer = rightCam->preferedServerId() == ownGuid;
+            if (leftOwnServer != rightOwnServer)
+                return leftOwnServer > rightOwnServer;
+            
             // arrange cameras by failover priority order
             return leftCam->failoverPriority() > rightCam->failoverPriority();
         });
