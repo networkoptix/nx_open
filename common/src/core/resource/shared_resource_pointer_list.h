@@ -61,6 +61,16 @@ public:
                 result.push_back(resource);
         return result;
     }
+
+    template<class OtherResource>
+    QnSharedResourcePointerList<OtherResource> filtered(std::function<bool(const QnSharedResourcePointer<OtherResource>&)> filter) const {
+        QnSharedResourcePointerList<OtherResource> result;
+        for(const QnSharedResourcePointer<Resource> &resource: *this)
+            if(QnSharedResourcePointer<OtherResource> derived = resource.template dynamicCast<OtherResource>())
+                if (filter(derived))
+                    result.push_back(derived);
+        return result;
+    }
 };
 
 #endif // QN_SHARED_RESOURCE_POINTER_LIST_H
