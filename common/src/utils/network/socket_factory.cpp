@@ -10,9 +10,20 @@
 #include "ssl_socket.h"
 
 
-std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket()
+std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket(
+    NatTraversalType natTraversalRequired )
 {
-    return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket() );
+    switch( natTraversalRequired )
+    {
+        case nttAuto:
+        case nttEnabled:
+            return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( true ) );
+
+        case nttDisabled:
+            return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( false ) );
+    };
+
+    return std::unique_ptr< AbstractDatagramSocket >();
 }
 
 std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
@@ -25,13 +36,13 @@ std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
         case nttAuto:
         case nttEnabled:
             //TODO #ak nat_traversal MUST be enabled explicitly by instanciating some singletone
-            result = new TCPSocket(); //new HybridStreamSocket();  //that's where hole punching kicks in
+            result = new TCPSocket( true ); //new HybridStreamSocket();  //that's where hole punching kicks in
             break;
         //case nttEnabled:
         //    result = new UdtStreamSocket();   //TODO #ak does it make sense to use UdtStreamSocket only? - yes, but with different SocketFactory::NatTraversalType value
         //    break;
         case nttDisabled:
-            result = new TCPSocket();
+            result = new TCPSocket( false );
             break;
     }
 
@@ -57,6 +68,7 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
         case nttEnabled:
             //TODO #ak cloud_acceptor
             serverSocket = new MixedTcpUdtServerSocket();
+            //serverSocket = new TCPServerSocket();
             break;
         //case nttEnabled:
         //    serverSocket = new UdtStreamServerSocket();

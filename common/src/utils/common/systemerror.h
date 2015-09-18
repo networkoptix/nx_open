@@ -48,6 +48,7 @@ namespace SystemError
     static const ErrorCode ioError = ERROR_GEN_FAILURE;
     static const ErrorCode notSupported = WSAEOPNOTSUPP;
     static const ErrorCode msgTooLarge = WSAEMSGSIZE;
+    static const ErrorCode dnsServerFailure = DNS_ERROR_RCODE_SERVER_FAILURE;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -56,7 +57,7 @@ namespace SystemError
     static const ErrorCode connectionAbort = ECONNABORTED;
     static const ErrorCode connectionReset = ECONNRESET;
     static const ErrorCode connectionRefused = ECONNREFUSED;
-    static const ErrorCode hostNotFound = EAI_NONAME;
+    static const ErrorCode hostNotFound = EHOSTUNREACH;
     static const ErrorCode notConnected = ENOTCONN;
     static const ErrorCode interrupted = EINTR;
     static const ErrorCode again = EAGAIN;
@@ -71,6 +72,7 @@ namespace SystemError
     static const ErrorCode ioError = EIO;
     static const ErrorCode notSupported = EOPNOTSUPP;
     static const ErrorCode msgTooLarge = EMSGSIZE;
+    static const ErrorCode dnsServerFailure = 0x0F000001;
 #endif
 
     //!Returns error code of previous system call

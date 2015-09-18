@@ -1,6 +1,7 @@
 #include "log.h"
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 #include <QtCore/QTextStream>
 #include <QtCore/QThread>
 #include <QtCore/QDateTime>
@@ -86,8 +87,7 @@ public:
 #else
             QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
 #endif
-            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << "\r\n";
-        ostr.flush();
+            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << std::endl;
 
         const std::string& str = ostr.str();
         {
@@ -97,16 +97,13 @@ public:
                 switch (logLevel) {
                 case cl_logERROR:
                 case cl_logWARNING:
-                {
-                    QTextStream out(stderr);
-                    out << str.c_str();
+                    std::cerr << str;
+                    std::cerr.flush();
                     break;
-                }
                 default:
-                {
-                    QTextStream out(stdout);
-                    out << str.c_str();
-                }
+                    std::cout << str;
+                    std::cout.flush();
+                    break;
                 }
                 return;
             }
@@ -194,40 +191,6 @@ private:
 // QnLog
 // -------------------------------------------------------------------------- //
 
-class QnLogs
-{
-public:
-    ~QnLogs()
-    {
-        //no one calls get() anymore
-        for( auto val: m_logs )
-            delete val.second;
-        m_logs.clear();
-    }
-
-    QnLog* get( int logID )
-    {
-        QnMutexLocker lk( &m_mutex );
-        QnLog*& log = m_logs[logID];
-        if( !log )
-            log = new QnLog();
-        return log;
-    }
-
-    bool put( int logID, QnLog* log )
-    {
-        QnMutexLocker lk( &m_mutex );
-        return m_logs.insert( std::make_pair( logID, log ) ).second;
-    }
-
-private:
-    std::map<int, QnLog*> m_logs;
-    QnMutex m_mutex;
-};
-
-Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);
-
-
 QnLog::QnLog()
 :
     d( new QnLogPrivate() )
@@ -239,9 +202,15 @@ QnLog::~QnLog()
     delete d;
 }
 
-QnLog* QnLog::instance( int logID )
+const std::shared_ptr< QnLog::Logs >& QnLog::logs()
 {
-    return qn_logsInstance()->get(logID);
+    std::call_once( s_onceFlag, [](){ s_instance.reset( new Logs ); } );
+    return s_instance;
+}
+
+const std::unique_ptr< QnLog >& QnLog::instance( int logID )
+{
+    return logs()->get( logID );
 }
 
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {
@@ -318,12 +287,38 @@ void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& /*ctx*/, const QS
     NX_LOG(msg, logLevel);
 }
 
+void QnLog::initLog(const QString &logLevelStr, int logID )
+{
+    logs()->init( logID, logLevelStr );
+}
+
+bool QnLog::initLog(QnLog *externalInstance, int logID )
+{
+    return logs()->init( logID, std::unique_ptr< QnLog >( externalInstance ) );
+}
+
 QString QnLog::logFileName( int logID )
 {
     return instance(logID)->d->syncCurrFileName();
 }
 
-void QnLog::initLog(const QString& logLevelStr, int logID) {
+const std::unique_ptr< QnLog >& QnLog::Logs::get( int logID )
+{
+    QnMutexLocker lk( &m_mutex );
+    auto& log = m_logs[logID];
+    if( !log )
+        log.reset( new QnLog );
+    return log;
+}
+
+bool QnLog::Logs::init( int logID, std::unique_ptr< QnLog > log )
+{
+    QnMutexLocker lk( &m_mutex );
+    return m_logs.emplace( logID, std::move( log ) ).second;
+}
+
+bool QnLog::Logs::init( int logID, const QString& logLevelStr )
+{
     bool needWarnLogLevel = false;
     QnLogLevel logLevel = cl_logDEBUG1;
 #ifndef _DEBUG
@@ -337,16 +332,14 @@ void QnLog::initLog(const QString& logLevelStr, int logID) {
         else
             needWarnLogLevel = true;
     }
-    QnLog::instance(logID)->setLogLevel(logLevel);
 
+    get(logID)->setLogLevel(logLevel);
     if (needWarnLogLevel) {
         NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
         NX_LOG(lit("Unknown log level specified. Using level %1").arg(QnLog::logLevelToString(logLevel)), cl_logALWAYS);
     }
-
+    return true;
 }
 
-bool QnLog::initLog( QnLog* externalInstance, int logID )
-{
-    return qn_logsInstance()->put( logID, externalInstance );
-}
+std::once_flag QnLog::s_onceFlag;
+std::shared_ptr< QnLog::Logs > QnLog::s_instance;

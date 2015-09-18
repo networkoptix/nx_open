@@ -19,9 +19,9 @@
 #include <utils/network/http/httpclient.h>
 #include <utils/network/http/multipart_content_parser.h>
 #include <utils/network/http/server/http_stream_socket_server.h>
+#include <utils/network/http/test_http_server.h>
 
 #include "repeating_buffer_sender.h"
-#include "test_http_server.h"
 
 
 namespace nx_http {

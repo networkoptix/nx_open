@@ -60,6 +60,10 @@ namespace Qn
 
     // Storage
     static const QString SPACE = lit("space");
+
+    // Cloud Params (admin)
+    static const QString CLOUD_SYSTEM_ID = lit("cloudSystemId");
+    static const QString CLOUD_AUTH_KEY = lit("cloudAuthorizationKey");
 }
 
 #endif // QN_PARAM_H

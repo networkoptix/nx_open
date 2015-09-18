@@ -816,12 +816,12 @@ void UdtStreamSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion ) {
 
 void UdtStreamSocket::postImpl( std::function<void()>&& handler )
 {
-    aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::SocketGlobals::aioService().post( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 void UdtStreamSocket::dispatchImpl( std::function<void()>&& handler )
 {
-    aio::AIOService::instance()->dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 bool UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
@@ -845,17 +845,17 @@ AbstractSocket::SOCKET_HANDLE UdtStreamSocket::handle() const {
     return impl_->handle();
 }
 
-UdtStreamSocket::UdtStreamSocket()
+UdtStreamSocket::UdtStreamSocket( bool natTraversal )
 :
-    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this))
+    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
 {
     impl_->Open();
 }
 
-UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl )
+UdtStreamSocket::UdtStreamSocket( bool natTraversal, detail::UdtSocketImpl* impl )
 :
     UdtSocket(impl),
-    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this))
+    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
 {
 }
 
@@ -964,12 +964,12 @@ bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) co
 
 void UdtStreamServerSocket::postImpl( std::function<void()>&& handler )
 {
-    aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::SocketGlobals::aioService().post( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 void UdtStreamServerSocket::dispatchImpl( std::function<void()>&& handler )
 {
-    aio::AIOService::instance()->dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 bool UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {
