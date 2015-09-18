@@ -24,9 +24,6 @@
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
      <item>
       <layout class="QVBoxLayout" name="resourcesLayout" stretch="1,0">
-       <property name="spacing">
-        <number>0</number>
-       </property>
        <item>
         <widget class="QnResourceTreeWidget" name="resourcesWidget" native="true"/>
        </item>

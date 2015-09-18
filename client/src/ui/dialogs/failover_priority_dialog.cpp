@@ -13,8 +13,6 @@
 namespace {
 
     const int dialogMinimumWidth = 800;
-    const int controlButtonsHeight = 24;
-
 
     class QnFailoverPriorityDialogDelegate: public QnResourceSelectionDialogDelegate {
         typedef QnResourceSelectionDialogDelegate base_type;
@@ -61,7 +59,6 @@ namespace {
             }
 
             layout->addStretch();
-            layout->addSpacerItem(new QSpacerItem(0, controlButtonsHeight));
         }
 
         virtual bool validate(const QnResourceList &selected) override {
@@ -69,6 +66,10 @@ namespace {
 
             if (m_placeholder)
                 m_placeholder->setVisible(visible);
+            return true;
+        }
+
+        virtual bool isFlat() const override {
             return true;
         }
 
