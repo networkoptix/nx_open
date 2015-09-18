@@ -224,7 +224,7 @@ public:
 
     bool exists( int logID )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_logs.find(logID) != m_logs.cend();
     }
 

@@ -537,7 +537,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     }
 
     QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getUniqueId()).arg(timeStampUSec);
+    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampUSec);
 
     return result;
 }

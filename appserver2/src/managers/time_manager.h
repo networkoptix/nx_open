@@ -294,14 +294,14 @@ namespace ec2
             const QnUuid& peerID,
             nx_http::AsyncHttpClientPtr clientPtr );
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
-        void syncTimeWithAllKnownServers(QnMutexLocker* const lock);
+        void syncTimeWithAllKnownServers(QnMutexLockerBase* const lock);
         void onBeforeSendingTransaction(
             QnTransactionTransport* transport,
             nx_http::HttpHeaders* const headers);
         void onTransactionReceived(
             QnTransactionTransport* transport,
             const nx_http::HttpHeaders& headers);
-        void forgetSynchronizedTimeNonSafe(QMutexLocker* const /*lock*/);
+        void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
         void checkSystemTimeForChange();
 
     private slots:

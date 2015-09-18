@@ -498,7 +498,7 @@ namespace ec2
     void TimeSynchronizationManager::forceTimeResync()
     {
         {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             forgetSynchronizedTimeNonSafe(&lk);
             syncTimeWithAllKnownServers(&lk);
         }
@@ -507,7 +507,7 @@ namespace ec2
         WhileExecutingDirectCall callGuard(this);
         emit timeChanged(curSyncTime);
 
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         //notifying everyone about local time change
         if (!m_terminated)
         {
@@ -1123,7 +1123,7 @@ namespace ec2
             m_usedTimeSyncInfo.timePriorityKey );
     }
 
-    void TimeSynchronizationManager::syncTimeWithAllKnownServers(QnMutexLocker* const /*lock*/)
+    void TimeSynchronizationManager::syncTimeWithAllKnownServers(QnMutexLockerBase* const /*lock*/)
     {
         for (std::pair<const QnUuid, PeerContext>& peerCtx : m_peersToSendTimeSyncTo)
         {
@@ -1163,7 +1163,7 @@ namespace ec2
         }
     }
 
-    void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QMutexLocker* const /*lock*/ )
+    void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QnMutexLockerBase* const /*lock*/ )
     {
         m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
         m_systemTimeByPeer.clear();
@@ -1179,7 +1179,7 @@ namespace ec2
     void TimeSynchronizationManager::checkSystemTimeForChange()
     {
         {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             if (m_terminated)
                 return;
         }
@@ -1207,7 +1207,7 @@ namespace ec2
         m_prevSysTime = curSysTime;
         m_prevMonotonicClock = curMonotonicClock;
 
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         if (m_terminated)
             return;
         m_checkSystemTimeTaskID = TimerManager::instance()->addTimer(

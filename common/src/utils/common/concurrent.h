@@ -85,7 +85,7 @@ namespace QnConcurrent
 
             bool isInProgress() const
             {
-                QMutexLocker lk( &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 return (!m_isCancelled && (m_tasksCompleted < m_totalTasksToRun)) ||
                         (m_isCancelled && (m_startedTaskCount > 0));
             }
