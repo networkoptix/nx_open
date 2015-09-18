@@ -27,7 +27,11 @@ ListView
     Connections
     {
         target: model;
-        onLayoutChanged: { forceLayout(); }
+        onLayoutChanged:
+        {
+            forceLayout();
+//            thisComponent.update()
+        }
     }
 
     header: Rtu.SelectionHeader 

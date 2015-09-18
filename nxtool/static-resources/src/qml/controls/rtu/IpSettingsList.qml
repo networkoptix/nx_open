@@ -35,7 +35,7 @@ Base.Column
         }
         return result;
     }
-    
+
     function tryApplyChanges (warnings) { return impl.tryApplyChanges(warnings); }
     
     anchors.left: (parent ? parent.left : undefined);
@@ -50,6 +50,7 @@ Base.Column
         
         delegate: Rtu.IpChangeLine
         {
+            selectionSize: rtuContext.selection.count;
             useDHCPControl.initialCheckedState: useDHCP;
 
             ipAddressControl.initialText: model.address;
@@ -107,14 +108,15 @@ Base.Column
                     continue;
                 }
 
+                var useRange = item.useIpRangeEnter;
+
                 var name = item.adapterNameValue;
                 var interfaceCaption = item.interfaceCaption;
 
-                var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
+                var useDHCPState = item.useDHCPControl.checkedState;
                 var wrongGateway = (!item.gatewayControl.isEmptyAddress && !item.gatewayControl.acceptableInput);
 
-                var somethingChanged = item.useDHCPControl.changed;
-                if (!useDHCP)   /// do not send address and mask if dhcp is on
+                if (useDHCPState === Qt.Unchecked)   /// do not send address/mask/gateway if dhcp is on
                 {
                     if (item.ipAddressControl.acceptableInput)
                     {
@@ -168,7 +170,21 @@ Base.Column
                         return false;
                     }
 
-                    somethingChanged = true;
+                    if (item.gatewayControl.changed)
+                    {
+                        if (wrongGateway)
+                        {
+                            errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(interfaceCaption);
+                            errorDialog.show();
+
+                            item.gatewayControl.forceActiveFocus();
+                            return false;
+                        }
+                        rtuContext.changesManager().changeset().addGatewayChange(name
+                            , (item.gatewayControl.isEmptyAddress ? "" : item.gatewayControl.text));
+                    }
+
+                    /// TODO: add multiplse address processing
                 }
                 
                 if (item.dnsControl.changed)
@@ -181,30 +197,14 @@ Base.Column
                         item.dnsControl.forceActiveFocus();
                         return false;
                     }
-                    somethingChanged = true;
+
                     rtuContext.changesManager().changeset().addDNSChange(name
                         , (item.dnsControl.isEmptyAddress ? "" : item.dnsControl.text));
                 }
 
-                if (item.gatewayControl.changed)
+                if (item.useDHCPControl.changed)
                 {
-                    if (wrongGateway)
-                    {
-                        errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(interfaceCaption);
-                        errorDialog.show();
-                        
-                        item.gatewayControl.forceActiveFocus();
-                        return false;
-                    }
-                    somethingChanged = true;
-                    rtuContext.changesManager().changeset().addGatewayChange(name
-                        , (item.gatewayControl.isEmptyAddress ? "" : item.gatewayControl.text));
-                }
-
-                if (somethingChanged)
-                {
-                    /// Always send dhcp state if some other parameters changed
-                    /// due to serialization issue on the server side
+                    var useDHCP = (useDHCPState === Qt.Checked);
                     rtuContext.changesManager().changeset().addDHCPChange(name, useDHCP);
                 }
 

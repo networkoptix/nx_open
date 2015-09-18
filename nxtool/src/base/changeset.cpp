@@ -66,14 +66,6 @@ void rtu::Changeset::addPortChange(int port)
     m_port.reset(new int(port));
 }
 
-void rtu::Changeset::turnOnDhcp()
-{
-    static const QString &kAnyName = "turnOnDhcp";
-    /// In this case it is multiple selection. Just add empty interface
-    /// change information to indicate that we should force dhcp on
-    getItfUpdateInfo(kAnyName);
-}
-
 void rtu::Changeset::addDHCPChange(const QString &name
     , bool useDHCP)
 {

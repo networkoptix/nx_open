@@ -243,7 +243,7 @@ namespace /// Parsers stuff
     rtu::RestClient::SuccessCallback makeSuccessCallback(const rtu::OperationCallback &callback
         , rtu::Constants::AffectedEntities affected)
     {
-        return [callback, affected](const QByteArray & /* data */)
+        return [callback, affected](const QByteArray &data)
         {
             if (callback)
                 callback(rtu::RequestError::kSuccess, affected);
@@ -493,7 +493,7 @@ void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
 }
 
 ///
-
+#include <qdebug.h>
 void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const QString &systemName
@@ -513,6 +513,7 @@ void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(kSystemNameTag, systemName);
     query.addQueryItem(oldPasswordTag, password);
 
+    qDebug() << query.toString();
     const RestClient::Request request(baseInfo
         , password, kConfigureCommand, query, RestClient::kStandardTimeout
         , makeSuccessCallback(callback, Constants::kSystemNameAffected)

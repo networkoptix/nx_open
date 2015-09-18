@@ -5,11 +5,12 @@
 #include <QDateTime>
 
 #include <base/constants.h>
+#include <base/server_info.h>
 
 namespace rtu
 {
     class ServersSelectionModel;
-    
+
     class Selection : public QObject
     {
         Q_OBJECT
@@ -29,7 +30,7 @@ namespace rtu
         
         virtual ~Selection();
         
-    private:
+    public:
         /// Getters for properties
         
         int count() const;
@@ -47,7 +48,10 @@ namespace rtu
         const QDateTime &dateTime() const;
         
         bool editableInterfaces() const;
-        
+
+    public:
+        InterfaceInfoList aggregatedInterfaces();
+
     signals:
         void changed();
         

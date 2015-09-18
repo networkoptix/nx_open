@@ -115,7 +115,7 @@ rtu::ServersSelectionModel *rtu::RtuContext::Impl::selectionModel()
 
 QAbstractListModel *rtu::RtuContext::Impl::ipSettingsModel()
 {
-    return new IpSettingsModel(m_selectionModel);
+    return new IpSettingsModel(m_selection.data());
 }
 
 rtu::TimeZonesModel *rtu::RtuContext::Impl::timeZonesModel(QObject *parent)
@@ -396,7 +396,7 @@ void rtu::RtuContext::tryLoginWith(const QString &primarySystem
 
 QString rtu::RtuContext::toolDisplayName() const
 {
-    return QString(QN_APPLICATION_DISPLAY_NAME);
+    return tr("Nx Server Tool");
 }
 
 bool rtu::RtuContext::isBeta() const
