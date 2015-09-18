@@ -1,6 +1,5 @@
 'use strict';
 
-'use strict';
 /**
  * This is smart video-plugin.
  * 1. It gets list of possible video-sources in different formats (each requires mime-type)
