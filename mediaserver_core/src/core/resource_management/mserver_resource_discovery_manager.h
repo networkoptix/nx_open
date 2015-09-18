@@ -41,7 +41,7 @@ private:
     QTime netStateTime;
     CLNetState netState;
     
-    QMap<QnUuid, QnResourcePtr> m_tmpForeignResources;
+    QMap<QnUuid, QnSecurityCamResourcePtr> m_tmpForeignResources;
     int m_foreignResourcesRetryCount;
 };
 
