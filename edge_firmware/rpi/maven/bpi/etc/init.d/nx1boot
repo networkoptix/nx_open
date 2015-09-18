@@ -53,7 +53,7 @@ if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then
     if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ]; then HDDNX1=true; else HDDNX1=false; fi
     ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
     ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
-    if [[ ! -z $ARCHIVE_FILES ]] && [[ ! -z $ARCHIVE_DB ]]; then ARCHIVE=true; else ARCHIVE=false; fi
+    if [[ ! -z "$ARCHIVE_FILES" ]] && [[ ! -z "$ARCHIVE_DB" ]]; then ARCHIVE=true; else ARCHIVE=false; fi
     for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
     sleep 2
     umount $BOOTHDDPART
