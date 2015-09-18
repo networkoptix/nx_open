@@ -1111,11 +1111,11 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
         m_implDelegate.dispatch(
             [this, &cond, &mtx, &cancelled]()
             {
-                aio::AIOService::instance()->cancelPostedCalls(
+                nx::SocketGlobals::aioService().cancelPostedCalls(
                     static_cast<Pollable*>(&m_implDelegate), true);
-                aio::AIOService::instance()->removeFromWatch(
+                nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                aio::AIOService::instance()->removeFromWatch(
+                nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
                 
                 QMutexLocker lk(&mtx);
@@ -1133,11 +1133,11 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
             [this]()
             {
                 //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
-                aio::AIOService::instance()->cancelPostedCalls(
+                nx::SocketGlobals::aioService().cancelPostedCalls(
                     static_cast<Pollable*>(&m_implDelegate), true);
-                aio::AIOService::instance()->removeFromWatch(
+                nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                aio::AIOService::instance()->removeFromWatch(
+                nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
         } );
     }

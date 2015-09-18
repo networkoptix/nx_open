@@ -641,13 +641,13 @@ private:
     void stopPollingSocket(SocketType* sock, const aio::EventType eventType)
     {
         //TODO #ak move this method to aioservice?
-        aio::AIOService::instance()->cancelPostedCalls(sock, true);
+        nx::SocketGlobals::aioService().cancelPostedCalls(sock, true);
         if (eventType == aio::etNone || eventType == aio::etRead)
-            aio::AIOService::instance()->removeFromWatch(sock, aio::etRead, true);
+            nx::SocketGlobals::aioService().removeFromWatch(sock, aio::etRead, true);
         if (eventType == aio::etNone || eventType == aio::etWrite)
-            aio::AIOService::instance()->removeFromWatch(sock, aio::etWrite, true);
+            nx::SocketGlobals::aioService().removeFromWatch(sock, aio::etWrite, true);
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
-            aio::AIOService::instance()->removeFromWatch(sock, aio::etTimedOut, true);
+            nx::SocketGlobals::aioService().removeFromWatch(sock, aio::etTimedOut, true);
     }
 };
 
