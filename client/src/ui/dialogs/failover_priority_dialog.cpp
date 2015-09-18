@@ -6,10 +6,16 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
+#include <ui/common/palette.h>
 #include <ui/delegates/failover_priority_resource_model_delegate.h>
 #include <ui/models/resource_pool_model.h>
 
 namespace {
+
+    const int dialogMinimumWidth = 800;
+    const int controlButtonsHeight = 24;
+
+
     class QnFailoverPriorityDialogDelegate: public QnResourceSelectionDialogDelegate {
         typedef QnResourceSelectionDialogDelegate base_type;
 
@@ -22,40 +28,47 @@ namespace {
             QnFailoverPriorityResourceModelDelegate* customColumnDelegate,
             QWidget* parent):
 
-            base_type(parent),
-            m_callback(callback),
-            m_customColumnDelegate(customColumnDelegate)
+            base_type(parent)
+            , m_placeholder(nullptr)
+            , m_callback(callback)
+            , m_customColumnDelegate(customColumnDelegate)
         {}
 
         ~QnFailoverPriorityDialogDelegate() 
         {}
 
         virtual void init(QWidget* parent) override {
-            QWidget* placeholder = new QWidget(parent);
-            QHBoxLayout* layout = new QHBoxLayout(placeholder);
-            placeholder->setLayout(layout);
+            if (!checkFrame(parent))
+                return;
 
-            layout->addWidget(new QLabel(tr("Set Priority:"), parent));
+            parent->layout()->setSpacing(0);
+            parent->layout()->addWidget(initLine(parent));
+            m_placeholder = initPlacehoder(parent);
+            parent->layout()->addWidget(m_placeholder);
+
+            QHBoxLayout* layout = new QHBoxLayout(m_placeholder);
+            m_placeholder->setLayout(layout);
+
+            QLabel* label = new QLabel(tr("Set Priority:"), parent);
+            layout->addWidget(label);
 
             for (int i = 0; i < Qn::FP_Count; ++i) {
                 Qn::FailoverPriority priority = static_cast<Qn::FailoverPriority>(i);
                 auto button = new QPushButton(QnFailoverPriorityDialog::priorityToString(priority), parent);
-                m_priorityButtons[i] = button;
+                setPaletteColor(button, QPalette::Window, qApp->palette().color(QPalette::Window));
+                connect(button, &QPushButton::clicked, this, [this, priority]() { m_callback(priority); });
                 layout->addWidget(button);
-                if (m_callback)
-                    connect(button, &QPushButton::clicked, this, [this, priority](){
-                        m_callback(priority);
-                });
             }
-            layout->addStretch();
 
-            parent->layout()->addWidget(placeholder);
+            layout->addStretch();
+            layout->addSpacerItem(new QSpacerItem(0, controlButtonsHeight));
         }
 
         virtual bool validate(const QnResourceList &selected) override {
             bool visible = !selected.filtered<QnVirtualCameraResource>().isEmpty();
-            for (auto button: m_priorityButtons)
-                button->setVisible(visible);
+
+            if (m_placeholder)
+                m_placeholder->setVisible(visible);
             return true;
         }
 
@@ -64,7 +77,37 @@ namespace {
         }
 
     private:
-        std::array<QPushButton*, Qn::FP_Count> m_priorityButtons;
+        bool checkFrame(QWidget* parent) {
+            Q_ASSERT_X(m_callback, Q_FUNC_INFO, "Callback must be set here");
+            if (!m_callback)
+                return false;
+
+            Q_ASSERT_X(parent && parent->layout(), Q_FUNC_INFO, "Invalid delegate frame");
+            if (!parent || !parent->layout())
+                return false;
+
+            return true;
+        }
+
+        QWidget* initLine(QWidget* parent) {
+            QFrame* line = new QFrame(parent);
+            line->setFrameShape(QFrame::HLine);
+            line->setFrameShadow(QFrame::Sunken);
+            setPaletteColor(line, QPalette::Window, qApp->palette().color(QPalette::Base));
+            line->setAutoFillBackground(true);
+            return line;
+        }
+
+        QWidget* initPlacehoder(QWidget* parent) {
+            QWidget* placeholder = new QWidget(parent);
+            placeholder->setContentsMargins(0, 0, 0, 0);
+            setPaletteColor(placeholder, QPalette::Window, qApp->palette().color(QPalette::Base));
+            placeholder->setAutoFillBackground(true);
+            return placeholder;
+        }
+
+    private:
+        QWidget* m_placeholder;
         ButtonCallback m_callback;
         QnResourcePoolModelCustomColumnDelegate* m_customColumnDelegate;
     };
@@ -77,6 +120,7 @@ QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/
     , m_customColumnDelegate(new QnFailoverPriorityResourceModelDelegate(this))
 {
     setWindowTitle(tr("Failover Priority"));
+    setMinimumWidth(dialogMinimumWidth);
     setDelegate(new QnFailoverPriorityDialogDelegate([this](Qn::FailoverPriority priority){
             updatePriorityForSelectedCameras(priority);
         },
@@ -93,7 +137,7 @@ QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/
     }
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this, [connectToCamera](const QnResourcePtr &resource) {
-        if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
+        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
             connectToCamera(camera);
     });
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
