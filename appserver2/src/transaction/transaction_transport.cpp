@@ -281,7 +281,7 @@ QnTransactionTransport::~QnTransactionTransport()
         m_ttFinishCallback();
 }
 
-void QnTransactionTransport::addData(QByteArray&& data)
+void QnTransactionTransport::addData(QByteArray data)
 {
     QMutexLocker lock(&m_mutex);
     if( m_base64EncodeOutgoingTransactions )
@@ -1425,7 +1425,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
     header.fillSequence();
     switch (m_remotePeer.dataFormat) {
     case Qn::JsonFormat:
-        addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(serializedTran, header));
+        addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(serializedTran, header) + QByteArray("\r\n"));
         break;
     //case Qn::BnsFormat:
     //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
