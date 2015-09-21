@@ -25,6 +25,7 @@
 #include "media_server/settings.h"
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
+static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 :
@@ -34,6 +35,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
     m_serverOfflineTimeout = MSSettings::roSettings()->value("redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
+    m_foreignResourcesRetryCount = 0;
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -69,6 +71,59 @@ static void printInLogNetResources(const QnResourceList& resources)
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
     QMutexLocker lock(&m_discoveryMutex);
+
+    // fill camera's ID
+
+    for (const auto& resource: resources)
+    {
+        QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
+        if (cameraResource) {
+            QString uniqueId = cameraResource->getUniqueId();
+            cameraResource->setId(cameraResource->uniqueIdToId(uniqueId));
+        }
+    }
+
+    // check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras
+    for (auto itr = resources.begin(); itr != resources.end();)
+    {
+        QnSecurityCamResourcePtr camRes = (*itr).dynamicCast<QnSecurityCamResource>();
+        if (!camRes) {
+            ++itr;
+            continue;
+        }
+        QnSecurityCamResourcePtr existRes = qnResPool->getResourceById<QnSecurityCamResource>((*itr)->getId());
+        if (existRes && existRes->hasFlags(Qn::foreigner))
+        {
+            m_tmpForeignResources.insert(camRes->getId(), camRes);
+            itr = resources.erase(itr);
+        }
+        else {
+            ++itr;
+        }
+    }
+    if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES) 
+    {
+        m_foreignResourcesRetryCount = 0;
+
+        // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
+        auto foreignResources = m_tmpForeignResources.values();
+        const QnUuid ownGuid = qnCommon->moduleGUID();
+        std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid] (const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
+        { 
+            bool leftOwnServer = leftCam->preferedServerId() == ownGuid;
+            bool rightOwnServer = rightCam->preferedServerId() == ownGuid;
+            if (leftOwnServer != rightOwnServer)
+                return leftOwnServer > rightOwnServer;
+            
+            // arrange cameras by failover priority order
+            return leftCam->failoverPriority() > rightCam->failoverPriority();
+        });
+
+        for (const auto& res: foreignResources)
+            resources << res;
+        m_tmpForeignResources.clear();
+    }
+
 
     QnResourceList extraResources;
 

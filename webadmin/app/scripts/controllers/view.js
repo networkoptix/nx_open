@@ -17,6 +17,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
         $scope.activeCamera = null;
+        $scope.searchCams = '';
 
         var isAdmin = false;
         var canViewLive = false;
@@ -147,7 +148,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
             for(var serverId in $scope.cameras) {
                 var cam = _.find($scope.cameras[serverId], function (camera) {
-                    return camera.id === id;
+                    return camera.id === id || camera.physicalId === id;
                 });
                 if(cam){
                     return cam;
@@ -194,10 +195,13 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             var positionMedia = !live ? "&pos=" + (playing) : "";
 
+            var resolution = $scope.activeResolution;
+            var resolutionHls = resolution=='Auto'?'lo':resolution;
+
             // TODO: check resolution ?
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['hls'], transport:'hls'},
-                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes['hls'], transport:'hls'},
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
 
                 // Not supported:
                 // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes['mjpeg'] , transport:'mjpeg'},
@@ -227,7 +231,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectCameraById = function (cameraId, position, silent) {
-            if($scope.activeCamera && $scope.activeCamera.id == cameraId){
+            if($scope.activeCamera && ($scope.activeCamera.id == cameraId || $scope.activeCamera.physicalId === cameraId)){
                 return;
             }
             var oldTimePosition = null;
@@ -322,6 +326,26 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
 
+        function searchCams(){
+            function has(str, substr){
+                return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
+            }
+            _.forEach($scope.mediaServers,function(server){
+                var cameras = $scope.cameras[server.id];
+                var camsVisible = false;
+                _.forEach(cameras,function(camera){
+                    camera.visible = $scope.searchCams == '' ||
+                            has(camera.name, $scope.searchCams) ||
+                            has(camera.url, $scope.searchCams);
+                    camsVisible = camsVisible || camera.visible;
+                });
+
+                server.visible = $scope.searchCams == '' ||
+                    camsVisible ||
+                    has(server.name, $scope.searchCams) ||
+                    has(server.url, $scope.searchCams);
+            });
+        }
 
 
         function extractDomain(url) {
@@ -391,6 +415,10 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                     var mediaStreams = _.find(camera.addParams,findMediaStream);
                     camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
+
+                    if(typeof(camera.visible) == "undefined"){
+                        camera.visible = true;
+                    }
 
                     return objectOrderName(camera);
                 }
@@ -500,6 +528,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             function serverSorter(server){
                 server.url = extractDomain(server.url);
                 server.collapsed = $scope.storage.serverStates[server.id];
+
+
+                if(typeof(server.visible) == "undefined"){
+                    server.visible = true;
+                }
+
                 return objectOrderName(server);
             }
 
@@ -548,9 +582,11 @@ angular.module('webadminApp').controller('ViewCtrl',
                 }
 
                 getCameras().then(function(data){
+                        searchCams();
                         deferred.resolve(data);
                     },
                     function(error){
+                        searchCams();
                         deferred.reject(error);
                     });
 
@@ -589,6 +625,15 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.$watch("positionProvider.liveMode",function(mode){
             if(mode){
                 $scope.positionSelected = false;
+            }
+        });
+
+        $scope.$watch("searchCams",searchCams);
+
+        $scope.$watch("activeCamera.status",function(status){
+            if((!$scope.positionProvider || $scope.positionProvider.liveMode) && !(status == 'Offline' || status == 'Unauthorized')){
+                console.log("reload video after offline",status);
+                updateVideoSource();
             }
         });
 

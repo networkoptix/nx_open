@@ -37,8 +37,14 @@
                 <td class="hidden-mobile">
                     <div class="view-wrapper">
                         <div class="cameras-panel">
+                            <div class="cameras-search">
+                                <label class="input-group input-group">
+                                    <span class="input-group-addon" ><span class="glyphicon glyphicon-search"></span></span>
+                                    <input type="search" class="form-control" placeholder="search" ng-model="searchCams">
+                                </label>
+                            </div>
                             <ul class="tree nav" >
-                                <li ng-repeat="server in mediaServers">
+                                <li ng-repeat="server in mediaServers" ng-if="server.visible">
                                     <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
                                        title="{{server.url}}"
                                        ng-click="toggleServerCollapsed(server)"
@@ -65,6 +71,7 @@
                                         ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy }">
                                         <li ng-repeat="camera in cameras[server.id]"
                                             ng-class="{active:activeCamera===camera}"
+                                            ng-if="camera.visible"
                                             ng-include="camera.isGroup?'views/components/camerasGroupNode.html':'views/components/cameraNode.html'" >
                                         </li>
                                     </ul>

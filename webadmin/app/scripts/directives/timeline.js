@@ -112,8 +112,23 @@ angular.module('webadminApp')
                     dateFormat: 'd mmmm yyyy', // Timemarker format for date
                     timeFormat: 'HH:MM:ss', // Timemarker format for time
 
+
+                    leftRightButtonsColor: [23,28,31,0.8],
+                    leftRightButtonsActiveColor: [23,28,31,1],
+                    leftRightButtonsWidth: 40,
+                    leftRightButtonsHeight: 50/110,
+                    leftRightButtonsArrowLineWidth:2,
+                    leftRightButtonsArrowColor:[255,255,255,0.8],
+                    leftRightButtonsArrowActiveColor:[255,255,255,1],
+                    leftRightButtonsArrow:{
+                        size:20,
+                        width:10
+                    },
+                    scrollSpeed:0.25, // Relative to screen
+                    slowScrollSpeed: 0.25,
+
+
                     scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
-                    scrollingSpeed: 0.25,// Scrolling speed for scroll buttons right-left
 
                     end: 0
                 };
@@ -311,15 +326,15 @@ angular.module('webadminApp')
                 // !!! Drawing and redrawing functions
                 function drawAll(){
                     if(scope.positionProvider) {
-                        scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
+                        scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition,scope.positionProvider.liveMode,(new Date()).getTime());
                     }
                     if(scope.recordsProvider) {
                         scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
                     }
 
-                    scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
 
                     processZooming();
+                    processScrolling();
 
                     var context = clearTimeline();
                     drawTopLabels(context);
@@ -337,6 +352,8 @@ angular.module('webadminApp')
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
+
+                    drawOrCheckLeftRightButtons(context);
 
                     //
                 }
@@ -900,7 +917,10 @@ angular.module('webadminApp')
                     if(!scope.positionProvider || scope.positionProvider.liveMode){
                         return;
                     }
-
+                    var lastMinute = scope.scaleManager.lastMinute();
+                    if(scope.positionProvider.playedPosition > lastMinute && scope.positionProvider.playing){
+                        scope.goToLive();
+                    }
                     drawMarker(context, scope.positionProvider.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
                 }
 
@@ -972,6 +992,59 @@ angular.module('webadminApp')
 
                 }
 
+
+                var mouseOverRightScrollButton = false;
+                var mouseOverLeftScrollButton = false;
+
+                function drawOrCheckLeftRightButtons(context){
+
+                    var canScrollRight = scope.scaleManager.canScroll(false);
+                    var canScrollLeft = scope.scaleManager.canScroll(true);
+
+                    mouseOverRightScrollButton = canScrollRight && mouseCoordinate > scope.viewportWidth - timelineConfig.leftRightButtonsWidth;
+                    mouseOverLeftScrollButton = canScrollLeft && mouseCoordinate < timelineConfig.leftRightButtonsWidth;
+
+                    //console.log("drawOrCheckLeftRightButtons",canScrollRight,canScrollLeft,mouseOverRightScrollButton,mouseOverLeftScrollButton);
+
+                    if(!context){ return; }
+
+                    if(canScrollLeft ) {
+                        drawScrollButton(context, true, mouseOverLeftScrollButton);
+                    }
+                    if(canScrollRight) {
+                        drawScrollButton(context, false, mouseOverRightScrollButton);
+                    }
+                }
+
+                function drawScrollButton(context, left, active){
+
+                    context.fillStyle = active? blurColor(timelineConfig.leftRightButtonsActiveColor,1):blurColor(timelineConfig.leftRightButtonsColor,1);
+
+                    var startCoord = left?0: scope.viewportWidth - timelineConfig.leftRightButtonsWidth;
+                    var height = timelineConfig.leftRightButtonsHeight * scope.viewportHeight;
+
+                    context.fillRect(startCoord, scope.viewportHeight - height, timelineConfig.leftRightButtonsWidth, height );
+
+                    var caption = left?'<':'>';
+
+                    context.lineWidth = timelineConfig.leftRightButtonsArrowLineWidth;
+                    context.strokeStyle =  active? blurColor(timelineConfig.leftRightButtonsArrowActiveColor,1):blurColor(timelineConfig.leftRightButtonsArrowColor,1);
+
+                    var leftCoord = startCoord + ( timelineConfig.leftRightButtonsWidth - timelineConfig.leftRightButtonsArrow.width)/2;
+                    var rightCoord = leftCoord + timelineConfig.leftRightButtonsArrow.width;
+
+                    var topCoord = scope.viewportHeight - (height + timelineConfig.leftRightButtonsArrow.size) / 2;
+                    var bottomCoord = topCoord + timelineConfig.leftRightButtonsArrow.size;
+
+
+                    context.beginPath();
+                    context.moveTo(left?rightCoord:leftCoord, topCoord);
+                    context.lineTo(left?leftCoord:rightCoord, (topCoord + bottomCoord)/2);
+                    context.lineTo(left?rightCoord:leftCoord, bottomCoord);
+                    context.stroke();
+
+                }
+
                 // !!! Mouse events
                 var mouseCoordinate = null;
                 var mouseRow = 0;
@@ -1002,6 +1075,7 @@ angular.module('webadminApp')
 
                     drawOrCheckScrollBar();
                     if( mouseCoordinate >= 0 ) {
+                        drawOrCheckLeftRightButtons();
                         drawOrCheckEvents();
                     }
 
@@ -1044,9 +1118,10 @@ angular.module('webadminApp')
                     },timelineConfig.animationDuration);
                 }
 
-                function animateScroll(targetPosition){
+                function animateScroll(targetPosition,slow){
                     delayWatchingPlayingPosition();
-                    animateScope.animate(scope,"scrollPosition",targetPosition).
+
+                    animateScope.animate(scope,"scrollTarget",targetPosition,slow?"linear":false).
                         then(
                             function(){},
                             function(){},
@@ -1060,20 +1135,71 @@ angular.module('webadminApp')
                 var preventClick = false;
 
 
+
+                var scrollingNow = false;
+                var scrollingLeft = false;
+                function setScroll(value){
+                    scope.scaleManager.scroll(value);
+                }
+                function processScrolling(){
+                    if(scrollingNow) {
+                        var moveScroll = (scrollingLeft ? -1 : 1) * timelineConfig.slowScrollSpeed * scope.viewportWidth;
+                        var scrollTarget = scope.scaleManager.getScrollByPixelsTarget(moveScroll);
+                        animateScroll(scrollTarget,true);
+                    }
+                }
+                scope.stopScroll = function(left) {
+                    if(scrollingNow) {
+                        scrollingNow = false;
+                    }
+                };
+                scope.startScroll = function(left) {
+
+                    console.log("startScroll");
+                    if(!scope.scaleManager.canScroll(left)){
+                        return;
+                    }
+
+                    scope.scrollTarget = scope.scaleManager.scroll();
+
+                    scrollingNow = true;
+                    scrollingLeft = left;
+
+                    processScrolling();
+                };
+                scope.scrollStep = function(left){
+                    scope.scrollTarget = scope.scaleManager.scroll();
+                    var moveScroll = (left ? -1 : 1) * timelineConfig.scrollSpeed * scope.viewportWidth;
+                    var scrollTarget = scope.scaleManager.getScrollByPixelsTarget(moveScroll);
+                    animateScroll(scrollTarget);
+                };
+
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
                     if(preventClick){
                         return;
                     }
+
+                    if(mouseOverLeftScrollButton){
+                        animateScroll(0);
+                        return;
+                    }
+
+                    if(mouseOverRightScrollButton){
+                        animateScroll(1);
+                        return;
+                    }
+
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         scope.zoom(true);
                     }else{
                         if(!mouseInScrollbar){
                             animateScroll((mouseInScrollbarRow>0?1:0));
-
                         }
                     }
+
+
                 };
                 scope.click = function(event){
                     updateMouseCoordinate(event);
@@ -1081,10 +1207,21 @@ angular.module('webadminApp')
                         return;
                     }
 
+                    if(mouseOverRightScrollButton){
+                        scope.scrollStep(false);
+                        //Scroll by percents
+                        return;
+                    }
+                    if(mouseOverLeftScrollButton){
+                        scope.scrollStep(true);
+                        //Scroll by percents
+                        return;
+                    }
+
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         var date = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
-                        
+
                         var lastMinute = scope.scaleManager.lastMinute();
                         if(date > lastMinute){
                             scope.goToLive();
@@ -1103,6 +1240,8 @@ angular.module('webadminApp')
 
                 scope.mouseUp = function(event){
 
+
+                    scope.stopScroll(false);
                     //updateMouseCoordinate(event);
                     //TODO: "set timer for dblclick here";
                     //TODO: "move playing position";
@@ -1120,16 +1259,29 @@ angular.module('webadminApp')
                     }*/
                 };
                 scope.mouseDown = function(event){
-                    // updateMouseCoordinate(event);
-                    // catchScrollBar = mouseInScrollbar;
+
 
                 };
 
                 scope.draginit = function(event){
                     updateMouseCoordinate(event);
+
+                    if(mouseOverLeftScrollButton){
+                        scope.startScroll(true);
+                        return;
+                    }
+
+                    if(mouseOverRightScrollButton){
+                        scope.startScroll(false);
+                        return;
+                    }
+
                     catchScrollBar = mouseInScrollbar;
                     catchTimeline = mouseInTimeline;
-                    scope.scaleManager.stopWatching();
+
+                    if(catchTimeline && catchScrollBar) {
+                        scope.scaleManager.stopWatching();
+                    }
                 };
                 scope.drag = function(event){
                     updateMouseCoordinate(event);
@@ -1144,7 +1296,9 @@ angular.module('webadminApp')
                         scope.scaleManager.scrollByPixels(moveScroll);
                     }
                 };
-                scope.drastart = function(event){};
+                scope.drastart = function(event){
+                    console.log("drastart");
+                };
                 scope.dragend = function(event){
                     catchScrollBar = false;
                     catchTimeline = false;

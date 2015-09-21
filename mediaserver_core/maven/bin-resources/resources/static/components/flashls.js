@@ -162,6 +162,8 @@ var flashlsAPI = new (function(){
 
             if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.browserMajorVersion<=10) { // Force disabling hardware acceleration for IE9, IE10
                 this.playerSetUseHardwareVideoDecoder(false);
+            }else {
+                this.playerSetUseHardwareVideoDecoder(true);
             }
             this.readyHandler(this);
         }
@@ -383,7 +385,7 @@ flashlsAPI.flashlsEvents = {
         flashlsAPI.positionHandler(null);
     },
     error: function(code, url, message) {
-        //console.log("onError():error code:"+ code + " url:" + url + " message:" + message);
+        console.error("flashls error, code:"+ code + " url:" + url + " message:" + message);
     },
     manifest: function(duration, levels, loadmetrics) {
         //console.log("manifest loaded, playlist duration:"+ duration.toFixed(2));
@@ -455,7 +457,7 @@ flashlsAPI.flashlsEvents = {
         var sliding = timemetrics.live_sliding_main;
         var buffer = timemetrics.buffer;
 
-        //console.log("position changed",
+        console.log("position changed",
             (((new Date()).getTime() - timer) / 1000 ).toFixed(2),
             backbuffer.toFixed(2),
             position.toFixed(2),
