@@ -149,6 +149,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
     qnCommon->setLocalSystemName(connection2()->connectionInfo().systemName);
+    qnCommon->setReadOnly(connection2()->connectionInfo().ecDbReadOnly);
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
@@ -427,6 +428,7 @@ void QnWorkbenchConnectHandler::clearConnection() {
 
     qnLicensePool->reset();
     qnCommon->setLocalSystemName(QString());
+    qnCommon->setReadOnly(false);
 }
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
