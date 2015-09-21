@@ -132,6 +132,7 @@ int QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resources
         if(QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
             synchronizer->submit();
 
+    //TODO: #GDM SafeMode
     int handle = connection2()->getLayoutManager()->save(resources, replyProcessor, &QnWorkbenchLayoutReplyProcessor::processReply );
 
     foreach(const QnLayoutResourcePtr &resource, resources)
