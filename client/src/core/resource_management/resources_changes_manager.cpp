@@ -14,8 +14,10 @@
 #include <core/resource/media_server_user_attributes.h>
 
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 
 #include <nx_ec/data/api_user_data.h>
+#include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
@@ -215,6 +217,45 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
             return;
 
         ec2::fromApiToResource(backup, user);
+    } );
+}
+
+/************************************************************************/
+/* VideoWalls block                                                    */
+/************************************************************************/
+
+void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges) {
+    if (!applyChanges)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    ec2::ApiVideowallData backup;
+    ec2::fromResourceToApi(videoWall, backup);
+    QnUuid videoWallId = videoWall->getId();
+
+    applyChanges(videoWall);
+
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    connection->getVideowallManager()->save(videoWall, this, [this, videoWallId, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+        Q_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session or attributes pool was recreated. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(videoWallId);
+        if (!videoWall)
+            return;
+
+        ec2::fromApiToResource(backup, videoWall);
     } );
 }
 
