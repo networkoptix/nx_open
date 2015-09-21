@@ -1095,6 +1095,14 @@ ScaleManager.prototype.getRelativeWidth = function(){
 };
 
 
+
+ScaleManager.prototype.canScroll = function(left){
+    if(left){
+        return this.visibleStart != this.start;
+    }
+    return this.visibleEnd != this.end;
+};
+
 ScaleManager.prototype.scroll = function(value){
     if(typeof (value) == "undefined"){
         return this.getRelativeCenter();
