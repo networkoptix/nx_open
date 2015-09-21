@@ -5,9 +5,11 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
+
 
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
@@ -25,6 +27,18 @@ void QnResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList &c
     if (!applyChanges)
         return;
 
+     auto batchFunction = [cameras, applyChanges]() {
+         for (const QnVirtualCameraResourcePtr &camera: cameras)
+             applyChanges(camera);
+     };
+     saveCamerasBatch(cameras, batchFunction);
+
+}
+
+void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList &cameras, CameraBatchChangesFunction applyChanges, RollbackFunction rollback) {
+    if (!applyChanges)
+        return;
+
     auto idList = idListFromResList(cameras);
 
     QPointer<QnCameraUserAttributePool> pool(QnCameraUserAttributePool::instance());   
@@ -37,14 +51,12 @@ void QnResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList &c
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    for (const QnVirtualCameraResourcePtr &camera: cameras)
-        applyChanges(camera);
-    
+    applyChanges(); 
     auto changes = pool->getAttributesList(idList);   
 
     //TODO: #GDM SafeMode
     QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(changes, this, 
-        [cameras, pool, backup, sessionGuid]( int reqID, ec2::ErrorCode errorCode ) 
+        [cameras, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
     {
         Q_UNUSED(reqID);
 
@@ -66,6 +78,11 @@ void QnResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList &c
             if( const QnResourcePtr& res = qnResPool->getResourceById(cameraAttrs.cameraID) )   //it is OK if resource is missing
                 res->emitModificationSignals( modifiedFields );
         }
+
+        if (rollback)
+            rollback();
     });
 
+    //TODO: #GDM SafeMode values are not rolled back
+    propertyDictionary->saveParamsAsync(idList);  
 }

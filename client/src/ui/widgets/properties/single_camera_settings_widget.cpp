@@ -109,7 +109,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
     connect(ui->motionWebPageLabel,     SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
@@ -260,7 +259,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     if (hasDbChanges()) {
         QString name = ui->nameEdit->text().trimmed();
         if (!name.isEmpty())
-            m_camera->setCameraName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
+            m_camera->setName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 
         //m_camera->setUrl(ui->ipAddressEdit->text());

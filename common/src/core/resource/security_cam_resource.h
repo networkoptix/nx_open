@@ -30,21 +30,6 @@ public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
-    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes) of
-    virtual QString getName() const override;
-    //!Overrides \a QnResource::setName. Just calls \a QnSecurityCamResource::setCameraName
-    /*!
-        TODO get rid of this override, since mediaserver and client must call different methods (setName and setCameraName respectively)
-    */
-    virtual void setName( const QString& name ) override;
-    //!Set camera name (the one is show to the user in client)
-    /*!
-        This name is set by user.
-        Resource name is generally set automatically (e.g., by server)
-        Can differ from resource name
-    */
-    void setCameraName( const QString& newCameraName );
-
     QnMediaServerResourcePtr getParentServer() const;
 
     Qn::MotionTypes supportedMotionType() const;

@@ -17,9 +17,14 @@ public:
     ~QnResourcesChangesManager();
 
     typedef std::function<void (const QnVirtualCameraResourcePtr &)> CameraChangesFunction;
+    typedef std::function<void ()> CameraBatchChangesFunction;
+    typedef std::function<void ()> RollbackFunction;
 
     /** Apply changes to the given list of cameras. */
     void saveCameras(const QnVirtualCameraResourceList &cameras, CameraChangesFunction applyChanges);
+
+    /** Apply changes to the given list of cameras. */
+    void saveCamerasBatch(const QnVirtualCameraResourceList &cameras, CameraBatchChangesFunction applyChanges, RollbackFunction rollback = []{});
 
 };
 

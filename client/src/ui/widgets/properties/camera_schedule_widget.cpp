@@ -9,6 +9,7 @@
 
 #include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -897,9 +898,8 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         return;
 
     const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();
-    QnVirtualCameraResourceList cameras = dialog->selectedResources().filtered<QnVirtualCameraResource>();
-    for(const QnVirtualCameraResourcePtr &camera: cameras) 
-    {
+    
+    auto applyChanges = [this, copyArchiveLength, recordingEnabled](const QnVirtualCameraResourcePtr &camera) {
         if (copyArchiveLength) {
             int maxDays = maxRecordedDays();
             if (maxDays != RecordedDaysDontChange)
@@ -936,9 +936,11 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
 
             camera->setScheduleTasks(tasks);
         }
-    }
+    };
+
+    //TODO: #GDM SafeMode
+    qnResourcesChangesManager->saveCameras(dialog->selectedResources().filtered<QnVirtualCameraResource>(), applyChanges);
     updateLicensesLabelText();
-    emit scheduleExported(cameras);
 }
 
 bool QnCameraScheduleWidget::hasMotionOnGrid() const {

@@ -90,36 +90,6 @@ QnSecurityCamResource::QnSecurityCamResource():
     QnMediaResource::initMediaResource();
 }
 
-QString QnSecurityCamResource::getName() const
-{
-    if( !getId().isNull() )
-    {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-        if( !(*userAttributesLock)->name.isEmpty() )
-            return (*userAttributesLock)->name;
-    }
-    return QnResource::getName();
-}
-
-void QnSecurityCamResource::setName( const QString& name )
-{
-    QString oldName = getName();
-    if (oldName == name)
-        return;
-
-    setCameraName(name);
-    emit nameChanged(toSharedPointer(this));
-}
-
-void QnSecurityCamResource::setCameraName( const QString& newCameraName )
-{
-    {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-        (*userAttributesLock)->name = newCameraName;
-    }
-    QnResource::setName( newCameraName );
-}
-
 QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
     return getParentResource().dynamicCast<QnMediaServerResource>();
 }

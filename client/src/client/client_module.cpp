@@ -32,6 +32,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/resources_changes_manager.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -131,6 +132,8 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnClientMessageProcessor>(new QnClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnServerCameraFactory>(new QnServerCameraFactory());
+
+    common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
 
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
