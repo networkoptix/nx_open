@@ -13,7 +13,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 
+#include <core/resource/user_resource.h>
 
+#include <nx_ec/data/api_user_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
@@ -62,8 +65,12 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     applyChanges(); 
     auto changes = pool->getAttributesList(idList);   
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
     //TODO: #GDM SafeMode
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(changes, this, 
+   connection->getCameraManager()->saveUserAttributes(changes, this, 
         [cameras, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
     {
         Q_UNUSED(reqID);
@@ -135,8 +142,12 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     applyChanges(); 
     auto changes = pool->getAttributesList(idList);   
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
     //TODO: #GDM SafeMode
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveUserAttributes(changes, this, 
+    connection->getMediaServerManager()->saveUserAttributes(changes, this, 
         [servers, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
     {
         Q_UNUSED(reqID);
@@ -167,3 +178,44 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     //TODO: #GDM SafeMode values are not rolled back
     propertyDictionary->saveParamsAsync(idList);  
 }
+
+/************************************************************************/
+/* Users block                                                          */
+/************************************************************************/
+
+void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges) {
+    if (!applyChanges)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    ec2::ApiUserData backup;
+    ec2::fromResourceToApi(user, backup);
+    QnUuid userId = user->getId();
+
+    applyChanges(user);
+
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    connection->getUserManager()->save(user, this, [this, userId, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+        Q_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session or attributes pool was recreated. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(userId);
+        if (!user)
+            return;
+
+        ec2::fromApiToResource(backup, user);
+    } );
+}
+
+

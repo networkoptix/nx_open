@@ -5,6 +5,7 @@
 #include <QtCore/QTimer>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -197,7 +198,7 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users) {
     if (!connection)
         return;
 
-    auto importedUsers = qnResPool->getResources<QnUserResource>().filtered([](const QnUserResourcePtr &user) {
+    auto importedUsers = qnResPool->getResources().filtered<QnUserResource>([](const QnUserResourcePtr &user) {
         return user->isLdap();
     });  
 
@@ -213,9 +214,9 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users) {
         if (existingUser->getEmail() == ldapUser.email)
             continue;
 
-        existingUser->setEmail(ldapUser.email);
-
-        connection->getUserManager()->save(existingUser, this,[] {} );
+        qnResourcesChangesManager->saveUser(existingUser, [ldapUser](const QnUserResourcePtr &user){
+            user->setEmail(ldapUser.email);
+        });
     }
 }
 
@@ -239,7 +240,8 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
         user->setName(ldapUser.login);
         user->setEmail(ldapUser.email);
         user->generateHash();
-        connection->getUserManager()->save(user, this,[] {} );
+
+        qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &user){});
     }
 }
 

@@ -16,8 +16,9 @@ public:
     QnResourcesChangesManager(QObject* parent = nullptr);
     ~QnResourcesChangesManager();
 
-    typedef std::function<void (const QnVirtualCameraResourcePtr &)> CameraChangesFunction;
-    typedef std::function<void (const QnMediaServerResourcePtr &)> ServerChangesFunction;
+    typedef std::function<void (const QnVirtualCameraResourcePtr &)>    CameraChangesFunction;
+    typedef std::function<void (const QnMediaServerResourcePtr &)>      ServerChangesFunction;
+    typedef std::function<void (const QnUserResourcePtr &)>             UserChangesFunction;
 
     typedef std::function<void ()> BatchChangesFunction;
     typedef std::function<void ()> RollbackFunction;
@@ -41,6 +42,8 @@ public:
     /** Apply changes to the given list of servers. */
     void saveServersBatch(const QnMediaServerResourceList &servers, BatchChangesFunction applyChanges, RollbackFunction rollback = []{});
 
+    /** Apply changes to the given user. */
+    void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges);
 };
 
 #define qnResourcesChangesManager QnResourcesChangesManager::instance()

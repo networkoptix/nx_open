@@ -1768,51 +1768,26 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     } else {
         if (!validateResourceName(resource, name))
             return;
-
-        
-
-        // I've removed command "saveResource" because it cause sync issue in p2p mode. The problem because of we have transactions with different hash:
-        // for instance saveServer and saveResource. But result data will depend of transactions order.
-
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        
+      
         auto callback = [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
             at_resources_saved( reqID, errorCode, QnResourceList() << resource );
             if (errorCode != ec2::ErrorCode::ok)
                 resource->setName(oldName);
         };
-/*
-        if (camera && nodeType == Qn::EdgeNode) {
-            const QnMediaServerResourcePtr parentServer = camera->getParentServer();
-            if (!parentServer)
-                return;
 
-            qnResourcesChangesManager->saveServer(parentServer, [name](const QnMediaServerResourcePtr &server) {
+        if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
+            qnResourcesChangesManager->saveServer(server, [name](const QnMediaServerResourcePtr &server) {
                 server->setName(name);
             });
         }
-        */
-
-        if (mServer) 
-            qnResourcesChangesManager->saveServer(mServer, [name](const QnMediaServerResourcePtr &server) {
-                server->setName(name);
-            });
         
-        if (camera)
+        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
             qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) {
                 camera->setName(name);
             });
-
-        if (user) {
-            user->setName(name);
-            //TODO: #GDM SafeMode
-            connection2()->getUserManager()->save( user, this, callback );
         }
 
-        if (layout) {
+        if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
             layout->setName(name);
             //TODO: #GDM SafeMode
             connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this, callback);
@@ -1974,12 +1949,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setId(QnUuid::createUuid());
     user->setTypeByName(lit("User"));
 
-    //TODO: #GDM SafeMode
-    connection2()->getUserManager()->save(
-        user, this,
-        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << user );
-        } );
+    qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &user){});
     user->setPassword(QString()); // forget the password now
 }
 
@@ -2080,17 +2050,12 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if (!(permissions & Qn::SavePermission))
         return;
-       
-    dialog->submitToResource();
-    if (!connection2())
-        return;
+    
+    qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &user) {
+        dialog->submitToResource();
+    });
 
-    //TODO: #GDM SafeMode
-    connection2()->getUserManager()->save(
-        user, this, 
-        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << user );
-    } );
+    //TODO: #GDM SafeMode what to rollback if current password changes cannot be saved?
 
     QString newPassword = user->getPassword();
     user->setPassword(QString());
