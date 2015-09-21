@@ -148,7 +148,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
             for(var serverId in $scope.cameras) {
                 var cam = _.find($scope.cameras[serverId], function (camera) {
-                    return camera.id === id;
+                    return camera.id === id || camera.physicalId === id;
                 });
                 if(cam){
                     return cam;
@@ -231,7 +231,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectCameraById = function (cameraId, position, silent) {
-            if($scope.activeCamera && $scope.activeCamera.id == cameraId){
+            if($scope.activeCamera && ($scope.activeCamera.id == cameraId || $scope.activeCamera.physicalId === cameraId)){
                 return;
             }
             var oldTimePosition = null;
