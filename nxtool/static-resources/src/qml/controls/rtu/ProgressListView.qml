@@ -13,6 +13,8 @@ Item
 {
     id: thisComponent;
 
+    visible: (progressListView.count != 0);
+
     property var model;
     property bool outsideSizeChange: false;
 
