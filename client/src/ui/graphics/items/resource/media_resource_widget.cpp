@@ -1491,7 +1491,6 @@ void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
     if (QnCamLicenseUsageHelper(m_camera, true).isOverflowForCamera(m_camera))
         return;
         
-    //TODO: #GDM SafeMode
     qnResourcesChangesManager->saveCamera(m_camera, [](const QnVirtualCameraResourcePtr &camera){
         camera->setLicenseUsed(true);
     });

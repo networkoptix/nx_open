@@ -27,14 +27,11 @@ public:
 
     virtual QString getUniqueId() const;
 
-    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes) of
+    //!Overrides \a QnResource::getName. Returns camera name from \a QnMediaServerUserAttributes
     virtual QString getName() const override;
-    //!Overrides \a QnResource::setName. Just calls \a QnSecurityCamResource::setCameraName
-    /*!
-        TODO get rid of this override, since mediaserver and client must call different methods (setName and setCameraName respectively)
-    */
+
+    //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
-    void setServerName( const QString& name );
 
     void setApiUrl(const QString& apiUrl);
     QString getApiUrl() const;
@@ -105,20 +102,17 @@ public:
 
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
-    void setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);
-    /*
-    * Return pair of handles of saving requests. first: handle for saving storages, second: handle for remove storages
-    */
-    QPair<int, int> saveUpdatedStorages();
+
+    void setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);   
+    void saveUpdatedStorages();
     bool hasUpdatedStorages() const;
+
     void beforeDestroy();
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
-private:
-    void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
     void apiUrlChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
@@ -127,7 +121,6 @@ signals:
     void versionChanged(const QnResourcePtr &resource);
     void systemNameChanged(const QnResourcePtr &resource);
     void redundancyChanged(const QnResourcePtr &resource);
-    void storageSavingDone(int reqID, ec2::ErrorCode errCode);
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;

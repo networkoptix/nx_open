@@ -938,7 +938,6 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         }
     };
 
-    //TODO: #GDM SafeMode
     qnResourcesChangesManager->saveCameras(dialog->selectedResources().filtered<QnVirtualCameraResource>(), applyChanges);
     updateLicensesLabelText();
 }

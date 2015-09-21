@@ -38,6 +38,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_resource.h>
@@ -893,12 +894,14 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 processor->at_replyReceived(reqID, errorCode, modifiedResources);
         };
 
+        //TODO: #GDM SafeMode
         connection2()->getCameraManager()->save(
             modifiedResources,
             processor,
             completionHandler );
 
         const QList<QnUuid>& idList = idListFromResList(modifiedResources);
+        //TODO: #GDM SafeMode
         connection2()->getCameraManager()->saveUserAttributes(
             QnCameraUserAttributePool::instance()->getAttributesList(idList),
             processor,
@@ -1532,6 +1535,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
             const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
                 { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };
 
+            //TODO: #GDM SafeMode
             connection2()->getMediaServerManager()->saveUserAttributes(serverAttrs, this, handler);
         }
         server->saveUpdatedStorages();
@@ -1754,29 +1758,18 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     } else if (nodeType == Qn::RecorderNode) {
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
-        QnVirtualCameraResourceList modified;
-        foreach(const QnVirtualCameraResourcePtr &cam, qnResPool->getResources<QnVirtualCameraResource>()) {
-            if (!cam || cam->getGroupId() != groupId)
-                continue;
-            cam->setUserDefinedGroupName(name);
-            modified << cam;
-        }
-        if (modified.isEmpty())
-            return; // very strange outcome - at least camera should be in the list
-        connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modified)),
-            this, 
-            [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-                at_resources_saved( reqID, errorCode, modified );
-                if (errorCode != ec2::ErrorCode::ok)
-                    foreach (const QnVirtualCameraResourcePtr &camera, modified)
-                        camera->setUserDefinedGroupName(oldName);
-            } );
+
+        QnVirtualCameraResourceList modified = qnResPool->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera){
+            return camera->getGroupId() == groupId;
+        });
+        qnResourcesChangesManager->saveCameras(modified, [name](const QnVirtualCameraResourcePtr &camera) {
+            camera->setUserDefinedGroupName(name);
+        });
     } else {
         if (!validateResourceName(resource, name))
             return;
 
-        resource->setName(name);
+        
 
         // I've removed command "saveResource" because it cause sync issue in p2p mode. The problem because of we have transactions with different hash:
         // for instance saveServer and saveResource. But result data will depend of transactions order.
@@ -1786,33 +1779,44 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         
-        if (camera && nodeType == Qn::EdgeNode) {
-            if (mServer = camera->getParentServer())
-                mServer->setName(name);
-        }
-
         auto callback = [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
             at_resources_saved( reqID, errorCode, QnResourceList() << resource );
             if (errorCode != ec2::ErrorCode::ok)
                 resource->setName(oldName);
         };
+/*
+        if (camera && nodeType == Qn::EdgeNode) {
+            const QnMediaServerResourcePtr parentServer = camera->getParentServer();
+            if (!parentServer)
+                return;
 
-        if (mServer) {
-            connection2()->getMediaServerManager()->saveUserAttributes(
-                QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(mServer->getId()),
-                this,
-                callback );
+            qnResourcesChangesManager->saveServer(parentServer, [name](const QnMediaServerResourcePtr &server) {
+                server->setName(name);
+            });
         }
+        */
+
+        if (mServer) 
+            qnResourcesChangesManager->saveServer(mServer, [name](const QnMediaServerResourcePtr &server) {
+                server->setName(name);
+            });
+        
         if (camera)
-            connection2()->getCameraManager()->saveUserAttributes(
-                QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << camera)),
-                this,
-                callback);
-        if (user) 
+            qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) {
+                camera->setName(name);
+            });
+
+        if (user) {
+            user->setName(name);
+            //TODO: #GDM SafeMode
             connection2()->getUserManager()->save( user, this, callback );
-        if (layout)
+        }
+
+        if (layout) {
+            layout->setName(name);
+            //TODO: #GDM SafeMode
             connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this, callback);
-        propertyDictionary->saveParamsAsync(resource->getId()); //saving modified properties of resouce
+        }
     }
 }
 
@@ -1970,6 +1974,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setId(QnUuid::createUuid());
     user->setTypeByName(lit("User"));
 
+    //TODO: #GDM SafeMode
     connection2()->getUserManager()->save(
         user, this,
         [this, user]( int reqID, ec2::ErrorCode errorCode ) {
@@ -2080,6 +2085,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if (!connection2())
         return;
 
+    //TODO: #GDM SafeMode
     connection2()->getUserManager()->save(
         user, this, 
         [this, user]( int reqID, ec2::ErrorCode errorCode ) {

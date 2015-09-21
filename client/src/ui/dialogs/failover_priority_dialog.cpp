@@ -178,7 +178,6 @@ void QnFailoverPriorityDialog::updatePriorityForSelectedCameras(Qn::FailoverPrio
     if (modified.isEmpty())
         return;
 
-    //TODO: #GDM SafeMode
     qnResourcesChangesManager->saveCameras(modified, [priority](const QnVirtualCameraResourcePtr &camera) {
         camera->setFailoverPriority(priority);
     });
