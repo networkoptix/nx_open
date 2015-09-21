@@ -22,8 +22,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/camera_user_attributes.h>
-#include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/preset_ptz_controller.h>
@@ -1487,20 +1486,15 @@ void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
         return;
 
     if (m_camera->isLicenseUsed())
+        return;  
+
+    if (QnCamLicenseUsageHelper(m_camera, true).isOverflowForCamera(m_camera))
         return;
-
-    if (!QnCamLicenseUsageHelper(m_camera, true).isOverflowForCamera(m_camera)) {
-        m_camera->setLicenseUsed(true);
-
-        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << m_camera)),
-            this,
-            [this]( int reqID, ec2::ErrorCode errorCode ) {
-                Q_UNUSED(reqID);
-                if (errorCode != ec2::ErrorCode::ok)
-                    m_camera->setLicenseUsed(false);
-        } );
-    }
+        
+    //TODO: #GDM SafeMode
+    qnResourcesChangesManager->saveCamera(m_camera, [](const QnVirtualCameraResourcePtr &camera){
+        camera->setLicenseUsed(true);
+    });
 
     updateIoModuleVisibility(true);
 }

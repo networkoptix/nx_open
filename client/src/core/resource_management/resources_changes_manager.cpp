@@ -23,6 +23,10 @@ QnResourcesChangesManager::~QnResourcesChangesManager()
 
 }
 
+void QnResourcesChangesManager::saveCamera(const QnVirtualCameraResourcePtr &camera, CameraChangesFunction applyChanges) {
+    saveCameras(QnVirtualCameraResourceList() << camera, applyChanges);
+}
+
 void QnResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList &cameras, CameraChangesFunction applyChanges) {
     if (!applyChanges)
         return;

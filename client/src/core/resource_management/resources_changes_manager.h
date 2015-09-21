@@ -21,6 +21,9 @@ public:
     typedef std::function<void ()> RollbackFunction;
 
     /** Apply changes to the given list of cameras. */
+    void saveCamera(const QnVirtualCameraResourcePtr &camera, CameraChangesFunction applyChanges);
+
+    /** Apply changes to the given list of cameras. */
     void saveCameras(const QnVirtualCameraResourceList &cameras, CameraChangesFunction applyChanges);
 
     /** Apply changes to the given list of cameras. */
