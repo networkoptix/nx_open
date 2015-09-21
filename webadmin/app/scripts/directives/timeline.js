@@ -918,7 +918,7 @@ angular.module('webadminApp')
                         return;
                     }
                     var lastMinute = scope.scaleManager.lastMinute();
-                    if(scope.positionProvider.playedPosition > lastMinute){
+                    if(scope.positionProvider.playedPosition > lastMinute && scope.positionProvider.playing){
                         scope.goToLive();
                     }
                     drawMarker(context, scope.positionProvider.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
