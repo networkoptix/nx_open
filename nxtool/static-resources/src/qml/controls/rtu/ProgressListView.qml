@@ -223,9 +223,6 @@ Item
                                 }
 
                                 indeterminate: true;
-                                // TODO: #ynikitenkov decide what is better - just running progress bar or showing stupid progress
-                                // value: model.appliedChangesCount + 1;
-                                // maximumValue: model.totalChangesCount + 1;
                             }
                         }
                     }
@@ -247,6 +244,7 @@ Item
                                 {
                                     left: parent.left;
                                     right: buttonsPanel.left;
+                                    leftMargin: Common.SizeManager.spacing.base;
                                     rightMargin: Common.SizeManager.spacing.base;
                                     verticalCenter: parent.verticalCenter;
                                 }
@@ -271,7 +269,7 @@ Item
                                 {
                                     id: closeButton;
 
-                                    text: qsTr("hide");
+                                    text: qsTr("Hide");
                                     onClicked: {  rtuContext.removeProgressTask(model.index); }
                                 }
 
@@ -279,7 +277,7 @@ Item
                                 {
                                     id: detailsButton;
 
-                                    text: qsTr("changelog");
+                                    text: qsTr("Changelog");
                                     onClicked: { thisComponent.showDetails(model.index); }
                                 }
                             }

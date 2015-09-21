@@ -54,7 +54,8 @@ ScrollView
             buttons: (NxRtu.Buttons.ApplyChanges
                 | NxRtu.Buttons.DiscardChanges | NxRtu.Buttons.Cancel);
             styledButtons: NxRtu.Buttons.ApplyChanges;
-
+            cancelButton: NxRtu.Buttons.Cancel;
+            
             title: qsTr("Confirmation");
             message: qsTr("Configuration changes have not been saved yet");
 

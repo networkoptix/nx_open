@@ -16,6 +16,7 @@ Rectangle
     property real shownY: 0;
     property real hiddenY: -height;
 
+    enabled: show;
     height: panel.height;
     color: "#35A0DA";
 

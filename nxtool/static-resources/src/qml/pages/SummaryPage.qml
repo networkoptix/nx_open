@@ -12,7 +12,7 @@ Item
     id: thisComponent;
     
     anchors.fill: parent;
-    
+
     ScrollView
     {
         anchors
@@ -23,6 +23,7 @@ Item
             bottom: buttonsPanel.top;
         }
         
+        activeFocusOnTab: false;
         Flickable
         {
             id: flickable;
@@ -124,10 +125,8 @@ Item
             }
     
             text: qsTr("Ok");
-            onClicked:
-            {
-                rtuContext.hideProgressTask();
-            }
+            onClicked: { rtuContext.hideProgressTask(); }
+            Component.onCompleted: { forceActiveFocus(); }
         }
     }
     

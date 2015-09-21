@@ -1,46 +1,18 @@
 import QtQuick 2.0;
-import QtQuick.Controls 1.1 as QtControls;
-import QtQuick.Controls.Styles 1.1;
 
 import "." as Base;
-import "../../common" as Common;
 
-QtControls.Button
+Base.Button
 {
-    id: thisComponent;
+    textColor: "#FFFFFF";
 
-    property color textColor: "white";
-    property color buttonColor: "#35A0DA";
-    property color pressedColor: "#00B1EC";
-    property color borderColor: "#CCCCCC";
-    property color borderColorFocus: "#0A0A0A";
+    normalColor: "#2FA2DB";
+    hoveredColor: "#39B2EF";
+    activeColor: "#1B82AD";
+    disabledColor: "#802FA2DB";
 
-    property int fontSize: Common.SizeManager.fontSizes.medium;
-
-    implicitHeight: Common.SizeManager.clickableSizes.base;
-
-    activeFocusOnPress: true;
-
-    style: ButtonStyle
-    {
-        label: Base.Text
-        {
-            id: styleLabel;
-
-            anchors.fill: parent;
-
-            text: thisComponent.text;
-            wrapMode: Text.Wrap;
-            color: thisComponent.textColor;
-            verticalAlignment: Text.AlignVCenter;
-            horizontalAlignment: Text.AlignHCenter;
-            font.pixelSize: thisComponent.fontSize;
-        }
-
-        background: Rectangle
-        {
-            color: (enabled ? (thisComponent.pressed ? pressedColor : buttonColor) : borderColor);
-            border.color: (thisComponent.activeFocus ? borderColorFocus : borderColor);
-        }
-    }
+    normalBorderColor: "#1B82AD";
+    hoveredBorderColor: "#2592C3";
+    activeBorderColor: "#1B82AD";
+    disabledBorderColor: "#A01B82AD";
 }
