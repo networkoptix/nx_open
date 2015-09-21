@@ -38,7 +38,7 @@
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
         <nxtool.name>${company.name} ${display.product.name} Server Configuration Tool</nxtool.name>
-        <nxtool.display.name>${company.name} ${display.product.name} Server Configuration Tool</nxtool.display.name>
+        <nxtool.display.name>Nx Server Tool</nxtool.display.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
         <traytool.name>${product.name} Tray Assistant</traytool.name>
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>

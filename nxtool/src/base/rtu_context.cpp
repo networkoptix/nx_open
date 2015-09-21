@@ -396,7 +396,7 @@ void rtu::RtuContext::tryLoginWith(const QString &primarySystem
 
 QString rtu::RtuContext::toolDisplayName() const
 {
-    return tr("Nx Server Tool");
+    return QString(QN_APPLICATION_DISPLAY_NAME);
 }
 
 bool rtu::RtuContext::isBeta() const

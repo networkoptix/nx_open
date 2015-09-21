@@ -710,6 +710,9 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
                 }
                 else
                 {
+                    if (weak.expired())
+                        return;
+
                     const auto shared = weak.lock();
                     shared->m_itfChanges.insert(id, changeRequest);
 
@@ -744,7 +747,8 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
         return;
     }
 
-    /// Now, there are server with single interface only
+    /// Now, there are servers with single interface only in m_serverCache
+
     Q_ASSERT_X(updateInfos->size() == 1, Q_FUNC_INFO, "Multiple interfaces changes on severals servers");
 
     const auto &updateInfo = updateInfos->front();
@@ -755,6 +759,9 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
         auto &cacheInfo = m_serversCache[i];
         Q_ASSERT_X(cacheInfo.second.interfaces.size() == 1, Q_FUNC_INFO
             , "Can't apply changese on several servers with multiple or empty interfaces");
+        
+        if (cacheInfo.second.interfaces.empty())
+            continue;
 
         ItfUpdateInfo change(updateInfo);
         change.name = cacheInfo.second.interfaces.front().name;
