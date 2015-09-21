@@ -15,11 +15,11 @@
     <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
     <?define clientName = "${product.name}"?>
-    <?define nxtoolName = "${display.product.name} Server Configuration Tool"?>
+    <?define nxtoolName = "${nxtool.company.name} Server Tool"?>
 
     <?define productExeName = "${product_name}"?>
     <?define clientExeName = "${display.product.name}"?>
-    <?define nxtoolExeName = "${display.product.name} Server Configuration Tool"?>
+    <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
 
     <?define mirrorListUrl = "${mirrorListUrl}"?>
     <?define quicksync = "${quicksync}"?>
