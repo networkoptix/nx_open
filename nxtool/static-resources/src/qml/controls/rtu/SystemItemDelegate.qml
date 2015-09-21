@@ -163,6 +163,7 @@ Item
                 right: (visible ? parent.right : undefined);
             }
         
+            activeFocusOnTab: false;
             text: qsTr("enter the password");
             fontSize: Common.SizeManager.fontSizes.base;
             onClicked: { loginDialog.show(); }
