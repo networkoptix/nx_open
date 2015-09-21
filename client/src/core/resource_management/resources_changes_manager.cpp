@@ -16,6 +16,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -103,6 +104,41 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     //TODO: #GDM SafeMode values are not rolled back
     propertyDictionary->saveParamsAsync(idList);  
 }
+
+ void QnResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceList &cameras, CameraChangesFunction applyChanges) {
+     if (!applyChanges)
+         return;
+
+     auto sessionGuid = qnCommon->runningInstanceGUID();
+
+     ec2::ApiCameraDataList backup;
+     ec2::fromResourceListToApi(cameras, backup);
+     for (const QnVirtualCameraResourcePtr &camera: cameras)
+         applyChanges(camera);
+
+     auto connection = QnAppServerConnectionFactory::getConnection2();
+     if (!connection)
+         return;
+
+     connection->getCameraManager()->save(cameras, this, [this, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+         Q_UNUSED(reqID);
+
+         /* Check if all OK */
+         if (errorCode == ec2::ErrorCode::ok)
+             return;
+
+         /* Check if we have already changed session or attributes pool was recreated. */
+         if (qnCommon->runningInstanceGUID() != sessionGuid)
+             return;
+
+         for (const ec2::ApiCameraData &data: backup) {
+             QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(data.id);
+             if (camera)
+                 ec2::fromApiToResource(data, camera);
+         }
+     } );
+}
+
 
 /************************************************************************/
 /* Servers block                                                        */
@@ -258,5 +294,4 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
         ec2::fromApiToResource(backup, videoWall);
     } );
 }
-
 

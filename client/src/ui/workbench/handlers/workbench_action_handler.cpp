@@ -162,25 +162,6 @@ namespace {
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
 // -------------------------------------------------------------------------- //
-// QnResourceStatusReplyProcessor
-// -------------------------------------------------------------------------- //
-detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources):
-    awaitedResponseCount(0),
-    m_handler(handler),
-    m_resources(resources)
-{}
-
-void detail::QnResourceStatusReplyProcessor::at_replyReceived( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
-    Q_UNUSED(handle);
-
-    if(m_handler)
-        m_handler.data()->at_resources_statusSaved(errorCode, resources);
-
-    deleteLater();
-}
-
-
-// -------------------------------------------------------------------------- //
 // QnResourceReplyProcessor
 // -------------------------------------------------------------------------- //
 detail::QnResourceReplyProcessor::QnResourceReplyProcessor(QObject *parent):
@@ -833,7 +814,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     if (!m_awaitingMoveCameras.contains(handle))
         return;
     QnVirtualCameraResourceList modifiedResources = m_awaitingMoveCameras.value(handle).cameras;
-    QnResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
+    QnMediaServerResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
     m_awaitingMoveCameras.remove(handle);
 
     if (status != 0) {
@@ -880,34 +861,13 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     }
 
     const QnUuid serverId = server->getId();
-    for (auto camera: modifiedResources) {
-        camera->setParentId(serverId);
+    qnResourcesChangesManager->saveCameras(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
         camera->setPreferedServerId(serverId);
-    }
+    });
 
-    if(!modifiedResources.empty()) {
-        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources);
-
-        processor->awaitedResponseCount.store( 2 );
-        auto completionHandler = [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
-            if( --processor->awaitedResponseCount == 0 )
-                processor->at_replyReceived(reqID, errorCode, modifiedResources);
-        };
-
-        //TODO: #GDM SafeMode
-        connection2()->getCameraManager()->save(
-            modifiedResources,
-            processor,
-            completionHandler );
-
-        const QList<QnUuid>& idList = idListFromResList(modifiedResources);
-        //TODO: #GDM SafeMode
-        connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idList),
-            processor,
-            completionHandler );
-        propertyDictionary->saveParamsAsync(idList);    //saving modified properties
-    }
+    qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
+        camera->setParentId(serverId);
+    });
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
@@ -1949,7 +1909,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setId(QnUuid::createUuid());
     user->setTypeByName(lit("User"));
 
-    qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &user){});
+    qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
     user->setPassword(QString()); // forget the password now
 }
 
@@ -2051,7 +2011,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if (!(permissions & Qn::SavePermission))
         return;
     
-    qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &user) {
+    qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &) {
         dialog->submitToResource();
     });
 
@@ -2257,11 +2217,6 @@ void QnWorkbenchActionHandler::at_resources_saved( int handle, ec2::ErrorCode er
  
 }
 
-void QnWorkbenchActionHandler::at_resources_properties_saved( int /*handle*/, ec2::ErrorCode /*errorCode */)
-{
-    //TODO/IMPL
-}
-
 void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode errorCode ) {
     Q_UNUSED(handle);
 
@@ -2272,19 +2227,6 @@ void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode e
         tr("Could not delete resource"),
         tr("An error has occurred while trying to delete a resource from Server. ") + L'\n'
       + tr("Error description: '%1'").arg(ec2::toString(errorCode)));
-}
-
-void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources) {
-    if(errorCode == ec2::ErrorCode::ok || resources.isEmpty())
-        return;
-
-    QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
-        tr("Error"),
-        tr("Could not save changes made to the following %n resource(s).", "", resources.size()),
-        QDialogButtonBox::Ok
-    );
 }
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {

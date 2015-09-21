@@ -34,6 +34,10 @@ public:
     /** Apply changes to the given list of cameras. */
     void saveCamerasBatch(const QnVirtualCameraResourceList &cameras, BatchChangesFunction applyChanges, RollbackFunction rollback = []{});
 
+    /** Apply changes to the given camera as a core resource, e.g. change parent id.
+     *  Strongly not recommended to use from client code.
+     */
+    void saveCamerasCore(const QnVirtualCameraResourceList &cameras, CameraChangesFunction applyChanges);
 
     /** Apply changes to the given server. */
     void saveServer(const QnMediaServerResourcePtr &server, ServerChangesFunction applyChanges);

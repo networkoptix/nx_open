@@ -52,21 +52,6 @@ class QnGraphicsMessageBox;
 
 // TODO: #Elric get rid of these processors here
 namespace detail {
-    class QnResourceStatusReplyProcessor: public QObject {
-        Q_OBJECT
-    public:
-        std::atomic<int> awaitedResponseCount;
-
-        QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources);
-
-    public slots:
-        void at_replyReceived(int handle, ec2::ErrorCode errorCode, const QnResourceList& resources);
-
-    private:
-        QPointer<QnWorkbenchActionHandler> m_handler;
-        QnVirtualCameraResourceList m_resources;
-    };
-
     class QnResourceReplyProcessor: public QObject {
         Q_OBJECT
     public:
@@ -259,9 +244,7 @@ protected slots:
     void setCurrentLayoutBackground(const QString &filename);
 
     void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources );
-    void at_resources_properties_saved( int handle, ec2::ErrorCode errorCode );
     void at_resource_deleted( int handle, ec2::ErrorCode errorCode );
-    void at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources);
 
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
@@ -305,8 +288,6 @@ private:
 
     void closeApplication(bool force = false);
 private:
-    friend class detail::QnResourceStatusReplyProcessor;
-
     QPointer<QWidget> m_widget;
     QPointer<QMenu> m_mainMenu;
     QPointer<QMenu> m_currentUserLayoutsMenu;
@@ -336,9 +317,9 @@ private:
     struct CameraMovingInfo 
     {
         CameraMovingInfo() {}
-        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
+        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnMediaServerResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
         QnVirtualCameraResourceList cameras;
-        QnResourcePtr dstServer;
+        QnMediaServerResourcePtr dstServer;
     };
     QMap<int, CameraMovingInfo> m_awaitingMoveCameras;
 };
