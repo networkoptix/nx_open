@@ -40,6 +40,8 @@ class QnMediaServerUserAttributesPool
     Q_OBJECT
 public:
     QnMediaServerUserAttributesPool();
+
+    QnMediaServerUserAttributesList getAttributesList( const QList<QnUuid>& idList );
 };
 
 #endif  //MEDIA_SERVER_USER_ATTRIBUTES_H
