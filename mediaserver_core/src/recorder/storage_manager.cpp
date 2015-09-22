@@ -1432,6 +1432,20 @@ void QnStorageManager::updateStorageStatistics()
     m_warnSended = false;
 }
 
+std::vector<QnStorageResourcePtr> QnStorageManager::getRedundantLiveStorages() const
+{
+    std::vector<QnStorageResourcePtr> result;
+    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
+
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+    {
+        QnStorageResourcePtr storage = *itr;
+        if (storage->isRedundant() && storage->getRedundantSchedule().redundantStartTime == -1)
+            result.push_back(storage);
+    }
+    return result;
+}
+
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
     QnStorageResourcePtr result;
@@ -1447,6 +1461,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr storage = *itr;
+        if (storage->isRedundant())
+            continue;
         qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
         float bitrate = storage->bitrate() / storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);

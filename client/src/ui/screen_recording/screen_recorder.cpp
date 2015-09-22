@@ -74,7 +74,7 @@ void QnScreenRecorder::startRecording() {
     m_dataProvider = dynamic_cast<QnDesktopDataProviderWrapper*> (res->createDataProvider(Qn::CR_Default));
     m_recorder = new QnStreamRecorder(res->toResourcePtr());
     m_dataProvider->addDataProcessor(m_recorder);
-    m_recorder->setFileName(filePath);
+    m_recorder->addRecordingContext(filePath);
     m_recorder->setContainer(lit("avi"));
     m_recorder->setRole(QnStreamRecorder::Role_FileExport);
 

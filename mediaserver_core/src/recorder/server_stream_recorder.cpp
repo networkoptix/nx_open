@@ -21,8 +21,11 @@
 
 static const int MOTION_PREBUFFER_SIZE = 8;
 
-QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider)
-:
+QnServerStreamRecorder::QnServerStreamRecorder(
+    const QnResourcePtr                 &dev, 
+    QnServer::ChunksCatalog             catalog, 
+    QnAbstractMediaStreamDataProvider*  mediaProvider
+) :
     QnStreamRecorder(dev),
     m_maxRecordQueueSizeBytes( MSSettings::roSettings()->value( nx_ms_conf::MAX_RECORD_QUEUE_SIZE_BYTES, nx_ms_conf::DEFAULT_MAX_RECORD_QUEUE_SIZE_BYTES ).toULongLong() ),
     m_maxRecordQueueSizeElements( MSSettings::roSettings()->value( nx_ms_conf::MAX_RECORD_QUEUE_SIZE_ELEMENTS, nx_ms_conf::DEFAULT_MAX_RECORD_QUEUE_SIZE_ELEMENTS ).toULongLong() ),
@@ -36,7 +39,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServe
     m_queuedSize(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_diskErrorWarned(false),
-    m_rebuildBlocked(false)
+    m_rebuildBlocked(false),
+    m_recordRedundant(true)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -91,7 +95,19 @@ void QnServerStreamRecorder::at_recordingFinished(int status, const QString &fil
     Q_ASSERT(m_mediaServer);
     if (m_mediaServer) {
         if (!m_diskErrorWarned)
-            emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIoErrorReason ,m_storage);
+        {
+            // TODO: temporary! refactor!
+            if (!m_recordingContextVector.empty() && 
+                m_recordingContextVector[0].storage)
+            {
+                emit storageFailure(
+                    m_mediaServer, 
+                    qnSyncTime->currentUSecsSinceEpoch(), 
+                    QnBusiness::StorageIoErrorReason ,
+                    m_recordingContextVector[0].storage
+                );
+            }
+        }
         m_diskErrorWarned = true;
     }
 }
@@ -138,7 +154,18 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
 
     bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
     if (!rez) {
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
+         // TODO: temporary! refactor!
+        if (!m_recordingContextVector.empty() && 
+            m_recordingContextVector[0].storage)
+        {
+            emit storageFailure(
+                m_mediaServer, 
+                qnSyncTime->currentUSecsSinceEpoch(), 
+                QnBusiness::StorageTooSlowReason,
+                m_recordingContextVector[0].storage
+            );
+        }
+        //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
 
         qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
@@ -489,7 +516,7 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 {
     QnMutexLocker lock( &m_scheduleMutex );
     m_schedule = cameraRes->getScheduleTasks();
-    Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "DialStreaming helper must be defined!");
+    Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "DualStreaming helper must be defined!");
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
@@ -500,19 +527,34 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
     }
 }
 
-QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
 {
-    if (m_fixedFileName.isEmpty())
+    if (m_fixedFileName)
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        m_storage = qnStorageMan->getOptimalStorageRoot(provider);
-        if (m_storage)
+        m_recordingContextVector.clear();
+        std::vector<QnStorageResourcePtr> storages;
+        
+        if (m_recordRedundant)
+            storages = qnStorageMan->getRedundantLiveStorages();
+        storages.push_back(qnStorageMan->getOptimalStorageRoot(provider));
+
+        if (!storages.empty())
             setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
-        return qnStorageMan->getFileName(m_startDateTime/1000, m_currentTimeZone, netResource, DeviceFileCatalog::prefixByCatalog(m_catalog), m_storage);
-    }
-    else {
-        return m_fixedFileName;
+        for (size_t i = 0; i < storages.size(); ++i)
+        {
+            m_recordingContextVector.emplace_back(
+                qnStorageMan->getFileName(
+                    m_startDateTime/1000, 
+                    m_currentTimeZone, 
+                    netResource, 
+                    DeviceFileCatalog::prefixByCatalog(m_catalog), 
+                    storages[i]
+                ),
+                storages[i]
+            );
+        }
     }
 }
 

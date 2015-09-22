@@ -12,6 +12,13 @@ class QnStorageResource
 
     Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
     Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
+public:
+    struct RedundantSchedule
+    {
+        int redundantStartTime; // seconds from 00:00, -1 if not set
+        int redundantDuration;  // seconds
+        int redundantPeriod;    // seconds, period between starts
+    };
 
 public:
     QnStorageResource();
@@ -58,6 +65,20 @@ public:
 
     static QString toNativeDirPath(const QString &dirPath);
 
+    void setRedundant(bool v);
+    bool isRedundant() const;
+
+    void setRedundantSchedule(
+        const RedundantSchedule &schedule
+    );
+
+    void setRedundantSchedule(
+        int rStart = -1, 
+        int rDuration = -1, 
+        int rPeriod = -1
+    );
+
+    const RedundantSchedule &getRedundantSchedule() const;
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -73,6 +94,9 @@ private:
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
+
+    bool                m_redundant;
+    RedundantSchedule   m_redundantSchedule;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

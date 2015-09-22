@@ -51,6 +51,22 @@ public:
         LastError
     };
 
+    struct RecordingContext
+    {
+        QString                 fileName;
+        AVFormatContext         *formatCtx;
+        QnStorageResourcePtr    storage;
+
+        RecordingContext(
+            const QString               &fname, 
+            const QnStorageResourcePtr  &st
+        ) :
+            fileName(fname),
+            formatCtx(nullptr),
+            storage(st)
+        {}
+    };
+
     static QString errorString(int errCode);
 
     QnStreamRecorder(const QnResourcePtr& dev);
@@ -61,7 +77,15 @@ public:
     */
     void setTruncateInterval(int seconds);
 
-    void setFileName(const QString& fileName);
+    void addRecordingContext(
+        const QString               &fileName, 
+        const QnStorageResourcePtr  &storage
+    );
+
+    // Sets default file name and tries to get relevant 
+    // storage.
+    bool addRecordingContext(const QString &fileName);
+
     QString getFileName() const;
     
     /*
@@ -99,8 +123,6 @@ public:
 
     void setRole(Role role);
 
-    void setStorage(const QnStorageResourcePtr& storage);
-
     void setContainer(const QString& container);
     void setNeedReopen();
     bool isAudioPresent() const;
@@ -117,6 +139,7 @@ public:
     void setServerTimeZoneMs(qint64 value);
 
     void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
+
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
@@ -138,36 +161,35 @@ protected:
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
         Q_UNUSED(startTimeMs) Q_UNUSED(timeZone) Q_UNUSED(fileName) Q_UNUSED(provider)
     }
-    virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
+    virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider*);
 
     bool addSignatureFrame();
     void markNeedKeyData();
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
 private:
-    void updateSignatureAttr();
+    void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
     qint64 m_truncateInterval;
-    QString m_fixedFileName;
+    bool m_fixedFileName;
     qint64 m_endDateTime;
     qint64 m_startDateTime;
     bool m_stopOnWriteError;
-    QnStorageResourcePtr m_storage;
     int m_currentTimeZone;
+    std::vector<RecordingContext> m_recordingContextVector;
+
 private:
     bool m_waitEOF;
 
     bool m_forceDefaultCtx;
-    AVFormatContext* m_formatCtx;
     bool m_packetWrited;
     int  m_lastError;
     qint64 m_currentChunkLen;
 
-    QString m_fileName;
     qint64 m_startOffset;
     int m_prebufferingUsec;
     QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
@@ -184,7 +206,6 @@ private:
 #endif
     QString m_container;
     QnCodecAudioFormat m_prevAudioFormat;
-    AVIOContext* m_ioContext;
     bool m_needReopen;
     bool m_isAudioPresent;
     QnConstCompressedVideoDataPtr m_lastIFrame;

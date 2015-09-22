@@ -79,6 +79,7 @@ public:
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
+    std::vector<QnStorageResourcePtr> getRedundantLiveStorages() const;
 
     QnStorageResourceList getStorages() const;
     QnStorageResourceList getStoragesInLexicalOrder() const;

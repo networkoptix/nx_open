@@ -534,6 +534,12 @@ void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
     dst.storageType = src->getStorageType();
+    dst.redundant = src->isRedundant();
+
+    const QnStorageResource::RedundantSchedule& rs = src->getRedundantSchedule();
+    dst.redundantStartTime = rs.redundantStartTime;
+    dst.redundantDuration = rs.redundantDuration;
+    dst.redundantPeriod = rs.redundantPeriod;
 }
 
 void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
@@ -552,6 +558,12 @@ void fromApiToResource(const ApiStorageData &src, QnStorageResourcePtr &dst) {
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
     dst->setStorageType(src.storageType);
+    dst->setRedundant(src.redundant);
+    dst->setRedundantSchedule(
+        src.redundantStartTime, 
+        src.redundantDuration, 
+        src.redundantPeriod
+    );
 }
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst) {

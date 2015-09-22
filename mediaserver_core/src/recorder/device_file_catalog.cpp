@@ -187,8 +187,12 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     QnArchiveStreamReader* reader = new QnArchiveStreamReader(res);
     reader->setArchiveDelegate(avi);
     QnStreamRecorder recorder(res);
-    recorder.setFileName(fileName + ".new");
-    recorder.setStorage(storage);
+    //recorder.setFileName(fileName + ".new");
+    //recorder.setStorage(storage);
+    recorder.addRecordingContext(
+        fileName + ".new",
+        storage
+    );
     recorder.setStartOffset(startTimeMs*1000);
 
     QnAbstractMediaDataPtr packet;

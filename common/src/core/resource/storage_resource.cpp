@@ -156,3 +156,37 @@ QString QnStorageResource::toNativeDirPath(const QString &dirPath)
         result.append(QDir::separator());
     return result;
 }
+
+void QnStorageResource::setRedundant(bool v) 
+{
+    m_redundant = v; 
+}
+
+bool QnStorageResource::isRedundant() const 
+{ 
+    return m_redundant; 
+}
+
+void QnStorageResource::setRedundantSchedule(
+    const RedundantSchedule &schedule
+)
+{
+    m_redundantSchedule = schedule;
+}
+
+void QnStorageResource::setRedundantSchedule(
+    int rStart, 
+    int rDuration, 
+    int rPeriod
+)
+{ 
+    m_redundantSchedule.redundantStartTime = rStart; 
+    m_redundantSchedule.redundantDuration = rDuration;
+    m_redundantSchedule.redundantPeriod = rPeriod;
+}
+
+const QnStorageResource::RedundantSchedule &
+QnStorageResource::getRedundantSchedule() const 
+{ 
+    return m_redundantSchedule; 
+}

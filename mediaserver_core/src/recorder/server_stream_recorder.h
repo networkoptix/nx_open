@@ -19,7 +19,12 @@ class QnServerStreamRecorder: public QnStreamRecorder
 {
     Q_OBJECT
 public:
-    QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider);
+    QnServerStreamRecorder(
+        const QnResourcePtr                 &dev, 
+        QnServer::ChunksCatalog             catalog, 
+        QnAbstractMediaStreamDataProvider*  mediaProvider
+    );
+
     ~QnServerStreamRecorder();
 
     void updateCamera(const QnSecurityCamResourcePtr& cameraRes);
@@ -44,6 +49,10 @@ public:
 
     int getFRAfterThreshold() const;
     bool needConfigureProvider() const;
+
+    void setRecordRedundant(bool v) { m_recordRedundant = v; }
+    bool recordRedundant() const { return m_recordRedundant; }
+
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
@@ -58,7 +67,7 @@ protected:
 
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;
-    virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
+    virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
@@ -107,6 +116,7 @@ private:
     bool m_rebuildBlocked;
     bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
+    bool m_recordRedundant;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

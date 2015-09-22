@@ -14,10 +14,14 @@ namespace ec2
         qint64          spaceLimit;
         bool            usedForWriting;
         QString         storageType;
+        bool            redundant;          // is storage redundant
+        int             redundantStartTime; // seconds from 00:00, -1 if not set
+        int             redundantDuration;  // seconds
+        int             redundantPeriod;    // seconds, period between starts
 
         std::vector<ApiResourceParamData> addParams;
     };
-#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)(storageType)(addParams)
+#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)(storageType)(redundant)(redundantStartTime)(redundantDuration)(redundantPeriod)(addParams)
 
 
     struct ApiMediaServerData: ApiResourceData
