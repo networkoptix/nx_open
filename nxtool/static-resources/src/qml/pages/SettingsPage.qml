@@ -125,6 +125,22 @@ FocusScope
         }
     }
     
+    Connections
+    {
+        property var model: rtuContext.selectionModel();
+
+        target: model;
+        onSelectionOutdatedChanged:
+        {
+            if (model.selectionOutdated
+                &&!ipPortSettings.warned && !dateTimeSettings.warned
+                && !systemAndPasswordSettings.warned)
+            {
+                model.selectionChanged();
+            }
+        }
+    }
+
     Rtu.OutdatedWarningPanel
     {
         id: outdatedWarning;

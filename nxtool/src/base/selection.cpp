@@ -254,6 +254,7 @@ struct rtu::Selection::Snapshot
     bool hasEmptyIps;
     InterfaceInfoList aggregatedInterfaces;
 
+    QElapsedTimer m_timer;
     Snapshot(rtu::ServersSelectionModel *model);
 };
 
@@ -269,7 +270,9 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     , editableInterfaces(calcEditableInterfaces(model->selectedServers()))
     , hasEmptyIps(calcHasEmptyAddresses(model->selectedServers()))
     , aggregatedInterfaces(editableInterfaces ? calcAggregatedInterfaces(model->selectedServers()) : InterfaceInfoList())
-{}
+{
+    m_timer.start();
+}
 
 ///
 
@@ -313,9 +316,13 @@ const QString &rtu::Selection::password() const
     return m_snapshot->password;
 }
 
-const QDateTime &rtu::Selection::dateTime() const
+QDateTime rtu::Selection::dateTime() const
 {
-    return m_snapshot->dateTime;
+    if (!m_snapshot->dateTime.isValid())
+        return m_snapshot->dateTime;
+    
+    const auto elapsed = m_snapshot->m_timer.elapsed();
+    return m_snapshot->dateTime.addMSecs(elapsed);
 }
 
 bool rtu::Selection::editableInterfaces() const

@@ -879,6 +879,9 @@ bool rtu::ServersSelectionModel::Impl::selectionOutdated()
 
 void rtu::ServersSelectionModel::Impl::setSelectionOutdated(bool outdated)
 {
+    if (m_selectionOutdated == outdated)
+        return;
+
     m_selectionOutdated = outdated;
     emit m_owner->selectionOutdatedChanged();
 }
@@ -1187,11 +1190,8 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     
     unknownRemoved(baseInfo.hostAddress);
     ServerInfo foundServer = searchInfo.serverInfoIterator->serverInfo;
-    if ((searchInfo.serverInfoIterator->selectedState == Qt::Checked)
-        && outdate && (foundServer.baseInfo() != baseInfo))
-    {
-        setSelectionOutdated(true);
-    }
+    const bool selectionOutdated = (searchInfo.serverInfoIterator->selectedState == Qt::Checked)
+        && outdate && (foundServer.baseInfo() != baseInfo);
 
     if (foundServer.baseInfo().systemName != baseInfo.systemName)
     {
@@ -1219,6 +1219,9 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
         searchInfo.serverInfoIterator->serverInfo.setBaseInfo(baseInfo);
         m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
     }
+
+    if (selectionOutdated)
+        setSelectionOutdated(true);
 }
 
 bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id

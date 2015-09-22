@@ -46,7 +46,7 @@ namespace rtu
 
         const QString &password() const;
 
-        const QDateTime &dateTime() const;
+        QDateTime dateTime() const;
         
         bool editableInterfaces() const;
 
