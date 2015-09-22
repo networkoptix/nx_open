@@ -42,24 +42,23 @@ Item {
             drag.maximumY: navigationPanel.height + cursorTickMargin
             drag.filterChildren: true
 
-            property real _prevY
+            property real prevY
 
-            onPressed: _prevY = mouse.y
-            onMouseYChanged: _prevY = mouse.y
-
+            onPressed: prevY = drag.target.y
+            onMouseYChanged: prevY = drag.target.y
             onReleased: {
-                var dir = mouse.y - _prevY
+                var dir = drag.target.y - prevY
 
                 if (dir > dp(1)) {
-                    navigator.y = drag.minimumY
+                    drag.target.y = drag.maximumY
                 } else if (dir < -dp(1)) {
-                    navigator.y = drag.maximumY
+                    drag.target.y = drag.minimumY
                 } else {
                     var mid = (drag.minimumY + drag.maximumY) / 2
-                    if (navigator.y < mid)
-                        navigator.y = drag.minimumY
+                    if (drag.target.y < mid)
+                        drag.target.y = drag.minimumY
                     else
-                        navigator.y = drag.maximumY
+                        drag.target.y = drag.maximumY
                 }
             }
 
