@@ -201,6 +201,7 @@ Item {
                     anchors.horizontalCenterOffset: -width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/minus.png"
+                    onClicked: timeline.zoomOut()
                 }
 
                 QnIconButton {
@@ -209,6 +210,7 @@ Item {
                     anchors.horizontalCenterOffset: width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/plus.png"
+                    onClicked: timeline.zoomIn()
                 }
 
                 Timer {
