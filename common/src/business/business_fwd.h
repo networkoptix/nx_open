@@ -108,6 +108,7 @@ public:
 
         /** System health message. */
         SystemHealthEvent = 500,
+        MaxSystemHealthEvent = 599,
 
         /** Event group. */
         AnyCameraEvent = 600,

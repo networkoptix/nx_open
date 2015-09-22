@@ -44,6 +44,8 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
         businessParams.caption = params["caption"];
     if (params.contains("description"))
         businessParams.description = params["description"];
+    if (params.contains("metadata"))
+        businessParams.metadata = QJson::deserialized<QnEventMetaData>(params["metadata"].toUtf8());
     
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();

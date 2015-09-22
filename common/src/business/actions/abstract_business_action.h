@@ -93,7 +93,7 @@ public:
     };
 
     QnBusinessActionData(): actionType(QnBusiness::UndefinedAction), flags(0) {}
-    bool hasFlags(int flags) const { return flags & flags; }
+    bool hasFlags(int value) const { return flags & value; }
 
     QnBusiness::ActionType actionType;
     QnBusinessActionParameters actionParams;

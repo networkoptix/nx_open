@@ -161,17 +161,16 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     QString result;
     result += tr("Event: %1").arg(eventName(eventType));
 
-    result += delimiter;
-    result += tr("Source: %1").arg(getFullResourceName(eventSource(params), useIp));
+    QString sourceText = getFullResourceName(eventSource(params), useIp);
+    if (!sourceText.isEmpty()) {
+        result += delimiter;
+        result += tr("Source: %1").arg(sourceText);
+    }
 
     if (eventType == QnBusiness::UserDefinedEvent) {
         if (!params.caption.isEmpty()) {
             result += delimiter;
             result += tr("Caption: %1").arg(params.caption);
-        }
-        if (!params.description.isEmpty()) {
-            result += delimiter;
-            result += tr("Description: %1").arg(params.description);
         }
     }
 
@@ -262,7 +261,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case ServerStartEvent: 
         break;
     case UserDefinedEvent:
-        result += params.description.isEmpty() ? params.caption : params.description;
+        result += !params.description.isEmpty() ? params.description : params.caption;
         break;
     default:
         break;

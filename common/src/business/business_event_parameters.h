@@ -8,6 +8,15 @@
 #include <utils/common/model_functions_fwd.h>
 #include <utils/common/uuid.h>
 
+struct QnEventMetaData
+{
+    //! Cameras list which associated with event. EventResourceId may be POS terminal, but this is a camera list which should be shown with this event
+    std::vector<QnUuid> cameraLinks;
+};
+#define QnEventMetaData_Fields (cameraLinks)
+QN_FUSION_DECLARE_FUNCTIONS(QnEventMetaData, (ubjson)(json)(eq)(xml)(csv_record));
+
+
 struct QnBusinessEventParameters {
 
     QnBusinessEventParameters();
@@ -44,13 +53,15 @@ struct QnBusinessEventParameters {
     //! long event description. Used for camera/server conflict as long description (conflict list). Used in ReasonedEvents as reason description. Used in custom events as long description
     QString description;
 
+    //! Cameras list which associated with event. EventResourceId may be POS terminal, but this is a camera list which should be shown with this event
+    QnEventMetaData metadata;
 
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
 };
 
 #define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId)\
-    (reasonCode)(inputPortId)(caption)(description)
+    (reasonCode)(inputPortId)(caption)(description)(metadata)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
