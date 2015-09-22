@@ -10,7 +10,7 @@
 
 namespace
 {
-    const QString kUserAgent = QString("%1 / %2").arg(
+    const QString kUserAgent = QString("%1/%2").arg(
         QLatin1String(QN_APPLICATION_DISPLAY_NAME), QLatin1String(QN_APPLICATION_VERSION));
 
     QUrl makeHttpUrl(const rtu::RestClient::Request &request)
