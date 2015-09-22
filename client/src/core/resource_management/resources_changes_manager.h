@@ -55,6 +55,10 @@ public:
 
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges);
+
+signals:
+    /** This signal is emitted every time when changes cannot be saved. */
+    void saveChangesFailed(const QnResourceList &resources);
 };
 
 #define qnResourcesChangesManager QnResourcesChangesManager::instance()

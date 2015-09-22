@@ -72,9 +72,8 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     if (!connection)
         return;
 
-    //TODO: #GDM SafeMode
    connection->getCameraManager()->saveUserAttributes(changes, this, 
-        [cameras, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
+        [this, cameras, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
     {
         Q_UNUSED(reqID);
 
@@ -99,6 +98,8 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
 
         if (rollback)
             rollback();
+
+        emit saveChangesFailed(cameras);
     });
 
     //TODO: #GDM SafeMode values are not rolled back
@@ -120,7 +121,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
      if (!connection)
          return;
 
-     connection->getCameraManager()->save(cameras, this, [this, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+     connection->getCameraManager()->save(cameras, this, [this, cameras, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
          Q_UNUSED(reqID);
 
          /* Check if all OK */
@@ -136,6 +137,8 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
              if (camera)
                  ec2::fromApiToResource(data, camera);
          }
+
+         emit saveChangesFailed(cameras);
      } );
 }
 
@@ -184,9 +187,8 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     if (!connection)
         return;
 
-    //TODO: #GDM SafeMode
     connection->getMediaServerManager()->saveUserAttributes(changes, this, 
-        [servers, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
+        [this, servers, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
     {
         Q_UNUSED(reqID);
 
@@ -211,6 +213,8 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 
         if (rollback)
             rollback();
+
+        emit saveChangesFailed(servers);
     });
 
     //TODO: #GDM SafeMode values are not rolled back
@@ -229,15 +233,14 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
 
     ec2::ApiUserData backup;
     ec2::fromResourceToApi(user, backup);
-    QnUuid userId = user->getId();
-
+    
     applyChanges(user);
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;
 
-    connection->getUserManager()->save(user, this, [this, userId, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    connection->getUserManager()->save(user, this, [this, user, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
         Q_UNUSED(reqID);
 
         /* Check if all OK */
@@ -248,11 +251,12 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(userId);
-        if (!user)
-            return;
+        QnUuid userId = user->getId();
+        QnUserResourcePtr existingUser = qnResPool->getResourceById<QnUserResource>(userId);
+        if (existingUser)
+            ec2::fromApiToResource(backup, existingUser);
 
-        ec2::fromApiToResource(backup, user);
+        emit saveChangesFailed(QnResourceList() << user);
     } );
 }
 
@@ -268,7 +272,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
 
     ec2::ApiVideowallData backup;
     ec2::fromResourceToApi(videoWall, backup);
-    QnUuid videoWallId = videoWall->getId();
+    
 
     applyChanges(videoWall);
 
@@ -276,7 +280,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
     if (!connection)
         return;
 
-    connection->getVideowallManager()->save(videoWall, this, [this, videoWallId, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    connection->getVideowallManager()->save(videoWall, this, [this, videoWall, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
         Q_UNUSED(reqID);
 
         /* Check if all OK */
@@ -287,11 +291,12 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(videoWallId);
-        if (!videoWall)
-            return;
+        QnUuid videoWallId = videoWall->getId();
+        QnVideoWallResourcePtr existingVideoWall = qnResPool->getResourceById<QnVideoWallResource>(videoWallId);
+        if (existingVideoWall)
+            ec2::fromApiToResource(backup, existingVideoWall);
 
-        ec2::fromApiToResource(backup, videoWall);
+        emit saveChangesFailed(QnResourceList() << videoWall);
     } );
 }
 
