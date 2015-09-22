@@ -49,12 +49,12 @@ Item
             thisComponent.height = Layout.minimumHeight;
     }
 
-    Column
+    Item
     {
         id: header;
 
         width: parent.width;
-        spacing: Common.SizeManager.spacing.base;
+        height: delimiter.y + delimiter.height;
 
         Base.ThickDelimiter
         {
@@ -69,9 +69,17 @@ Item
 
         Item
         {
+            id: summaryPanel;
+
             width: parent.width;
             height: Math.max(changesSummary.height, stateButton.height)
                 + Common.SizeManager.spacing.base;
+
+            anchors
+            {
+                top: topDelimiter.bottom;
+                topMargin: Common.SizeManager.spacing.base;
+            }
 
             Base.Text
             {
@@ -126,8 +134,8 @@ Item
 
             anchors
             {
-                leftMargin: Common.SizeManager.spacing.base;
-                rightMargin: Common.SizeManager.spacing.base;
+                top: summaryPanel.bottom;
+                margins: Common.SizeManager.spacing.base;
             }
         }
     }
@@ -171,7 +179,7 @@ Item
             delegate: Column
             {
                 id: column;
-                spacing: Common.SizeManager.spacing.base;
+                spacing: Common.SizeManager.spacing.small;
 
                 anchors
                 {
@@ -180,6 +188,8 @@ Item
                     leftMargin: Common.SizeManager.spacing.base;
                     rightMargin: Common.SizeManager.spacing.base;
                 }
+
+                Base.EmptyCell {}
 
                 Loader
                 {

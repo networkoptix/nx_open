@@ -50,8 +50,7 @@ namespace rtu
         
         Roles roleNames() const;
 
-        void taskStateChanged(const ApplyChangesTask *task
-            , int role);
+        void taskStateChanged(const ApplyChangesTask *task);
 
     private:
         typedef std::vector<ApplyChangesTaskPtr> TasksContainer;

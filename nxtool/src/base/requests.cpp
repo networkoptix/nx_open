@@ -42,7 +42,7 @@ namespace
         url.setScheme("http");
         url.setHost(host);
         url.setPort(port);
-        url.setUserName(rtu::RestClient::adminUserName());
+        url.setUserName(rtu::RestClient::defaultAdminUserName());
         url.setPassword(password);
         url.setPath(command);
         return url;
@@ -243,7 +243,7 @@ namespace /// Parsers stuff
     rtu::RestClient::SuccessCallback makeSuccessCallback(const rtu::OperationCallback &callback
         , rtu::Constants::AffectedEntities affected)
     {
-        return [callback, affected](const QByteArray &data)
+        return [callback, affected](const QByteArray & /* data */)
         {
             if (callback)
                 callback(rtu::RequestError::kSuccess, affected);
@@ -265,7 +265,7 @@ namespace /// Parsers stuff
     void checkAuth(const rtu::BaseServerInfoPtr &baseInfo
         , const QString &password
         , const rtu::OperationCallback &callback
-        , int timeout = rtu::HttpClient::kUseDefaultTimeout)
+        , int timeout = rtu::RestClient::kUseStandardTimeout)
     {
         static const rtu::Constants::AffectedEntities affected = rtu::Constants::kNoEntitiesAffected;
 
@@ -514,7 +514,7 @@ void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, password);
 
     const RestClient::Request request(baseInfo
-        , password, kConfigureCommand, query, RestClient::kStandardTimeout
+        , password, kConfigureCommand, query, RestClient::kUseStandardTimeout
         , makeSuccessCallback(callback, Constants::kSystemNameAffected)
         , makeErrorCallback(callback, Constants::kSystemNameAffected)); 
     RestClient::sendGet(request);
@@ -545,7 +545,7 @@ void rtu::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, authPass);
     
     const RestClient::Request request(baseInfo
-        , authPass, kConfigureCommand, query, RestClient::kStandardTimeout
+        , authPass, kConfigureCommand, query, RestClient::kUseStandardTimeout
         , makeSuccessCallback(callback, Constants::kPasswordAffected)
         , makeErrorCallback(callback, Constants::kPasswordAffected)); 
     RestClient::sendGet(request);
@@ -572,7 +572,7 @@ void rtu::sendSetPortRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, password);
 
     const RestClient::Request request(baseInfo
-        , password, kConfigureCommand, query, RestClient::kStandardTimeout
+        , password, kConfigureCommand, query, RestClient::kUseStandardTimeout
         , makeSuccessCallback(callback, Constants::kPortAffected)
         , makeErrorCallback(callback, Constants::kPortAffected)); 
     RestClient::sendGet(request);
@@ -632,7 +632,7 @@ void rtu::sendChangeItfRequest(const BaseServerInfoPtr &baseInfo
     }
 
     const RestClient::Request request(baseInfo, password, kIfConfigCommand, QUrlQuery()
-        , RestClient::kStandardTimeout, makeSuccessCallback(callback, affected)
+        , RestClient::kUseStandardTimeout, makeSuccessCallback(callback, affected)
         , makeErrorCallback(callback, affected));
     RestClient::sendPost(request, QJsonDocument(jsonInfoChanges).toJson());
 }

@@ -64,13 +64,13 @@ namespace rtu
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
-        , int timeout = HttpClient::kUseDefaultTimeout);
+        , int timeout = RestClient::kUseStandardTimeout);
 
     void getIfList(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
-        , int timeout = HttpClient::kUseDefaultTimeout);
+        , int timeout = RestClient::kUseStandardTimeout);
 
     /// Sends getTime and getIfList consequentially. 
     /// If getTime is successful, calls successfull callback anyway
@@ -78,13 +78,13 @@ namespace rtu
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
-        , int timeout = HttpClient::kUseDefaultTimeout);
+        , int timeout = RestClient::kUseStandardTimeout);
 
     void sendIfListRequest(const BaseServerInfoPtr &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
-        , int timeout = HttpClient::kUseDefaultTimeout);
+        , int timeout = RestClient::kUseStandardTimeout);
 
     ///
 

@@ -3,24 +3,20 @@
 
 #include <functional>
 
-#include <QObject>
-
 #include <base/types.h>
+#include <helpers/rest_client.h>
 
 class QUrl;
 class QByteArray;
 
 namespace rtu
 {
-    class HttpClient : public QObject
+    class HttpClient
     {
     public:
         typedef std::function<void (const QByteArray &data)> ReplyCallback;
         typedef std::function<void (RequestError errorCode)> ErrorCallback;
         
-        enum { kUseDefaultTimeout = -1 };
-        enum { kDefaultTimeoutMs = 10 * 1000 };
-
         enum
         {
             kHttpSuccessCodeFirst = 200
@@ -28,7 +24,7 @@ namespace rtu
             , kHttpUnauthorized = 401
         };
 
-        HttpClient(QObject *parent);
+        HttpClient(int defaultTimeoutMs);
         
         virtual ~HttpClient();
         
@@ -43,7 +39,7 @@ namespace rtu
         void sendGet(const QUrl &url
             , const ReplyCallback &sucessfullCallback = ReplyCallback()
             , const ErrorCallback &errorCallback = ErrorCallback()
-            , qint64 timeoutMs = HttpClient::kUseDefaultTimeout);
+            , qint64 timeoutMs = RestClient::kUseStandardTimeout);
         
         /** Send post request to the given url.
          * @param url                   Target url.
@@ -58,10 +54,12 @@ namespace rtu
             , const QByteArray &data = QByteArray()
             , const ReplyCallback &successfullCallback = ReplyCallback()
             , const ErrorCallback &errorCallback = ErrorCallback()
-            , qint64 timeoutMs = HttpClient::kUseDefaultTimeout);
+            , qint64 timeoutMs = RestClient::kUseStandardTimeout);
         
     private:
         class Impl;
-        Impl * const m_impl;
+        typedef std::unique_ptr<Impl> ImplPtr;
+
+        const ImplPtr m_impl;
     };
 }

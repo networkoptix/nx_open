@@ -51,7 +51,7 @@ namespace
 class rtu::HttpClient::Impl : public QObject
 {
 public:
-    Impl(QObject *parent);
+    Impl(int defaultTimeoutMs);
     
     virtual ~Impl();
     
@@ -83,12 +83,14 @@ private:
     };
     typedef QMap<QNetworkReply *, ReplyInfo> RepliesMap;
     
+    const int m_defaultTimeoutMs;
     QNetworkAccessManager * const m_manager;
     RepliesMap m_replies;
 };
 
-rtu::HttpClient::Impl::Impl(QObject *parent)
-    : QObject(parent)
+rtu::HttpClient::Impl::Impl(int defaultTimeoutMs)
+    : QObject()
+    , m_defaultTimeoutMs(defaultTimeoutMs)
     , m_manager(new QNetworkAccessManager(this))
     , m_replies()
 {
@@ -125,11 +127,11 @@ void rtu::HttpClient::Impl::sendPost(const QUrl &url
 }
 
 void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs) {
-    if (timeoutMs < kUseDefaultTimeout)
+    if (timeoutMs < 0)
         return;
 
-    if (timeoutMs == kUseDefaultTimeout)
-        timeoutMs = HttpClient::kDefaultTimeoutMs;
+    if (timeoutMs == RestClient::kUseStandardTimeout)
+        timeoutMs = m_defaultTimeoutMs;
 
     QPointer<QNetworkReply> replyPtr(reply);
     QTimer::singleShot(timeoutMs, [replyPtr] {
@@ -162,13 +164,6 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
         const ErrorCallback &errorCallback = it->error;
         if (errorCallback)
         {
-            const QVariant &httpErrorVar = 
-                reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute);
-            const QString &httpError = (httpErrorVar.isValid() ? 
-                httpErrorVar.toString() : QString());
-
-            RequestError resultErrorCode = RequestError::kSuccess;
-
             switch(errorCode)
             {
             case QNetworkReply::AuthenticationRequiredError:
@@ -203,9 +198,8 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
 
 ///
 
-rtu::HttpClient::HttpClient(QObject *parent)
-    : QObject(parent)
-    , m_impl(new Impl(this))
+rtu::HttpClient::HttpClient(int defaultTimeoutMs)
+    : m_impl(new Impl(defaultTimeoutMs))
 {
 }
 
