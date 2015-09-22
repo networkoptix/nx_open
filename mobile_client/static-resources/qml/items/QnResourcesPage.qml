@@ -4,6 +4,7 @@ import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
 import "../controls"
+import "../icons"
 
 QnPage {
     id: resourcesPage
@@ -54,11 +55,25 @@ QnPage {
         color: QnTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
 
-        Text {
+        Column {
             anchors.centerIn: parent
-            text: connectionManager.connected ? qsTr("Loading...") : qsTr("Connecting...")
-            font.pixelSize: sp(14)
-            color: QnTheme.loadingText
+            anchors.verticalCenterOffset: -dp(28)
+
+            spacing: dp(16)
+
+            QnCirclesPreloader {
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: dp(56)
+                verticalAlignment: Qt.AlignVCenter
+
+                text: connectionManager.connected ? qsTr("Loading...") : qsTr("Connecting...")
+                font.pixelSize: sp(32)
+                color: QnTheme.loadingText
+            }
         }
     }
 

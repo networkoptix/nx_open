@@ -76,6 +76,7 @@ QtObject {
     property color attentionBackground
     property color loadingText
     property color preloaderDot
+    property color preloaderCircle
     property color scrollIndicator
 
     function loadColors() {
@@ -137,6 +138,7 @@ QtObject {
         attentionBackground     = colorTheme.color("other.attentionBackground")
         loadingText             = colorTheme.color("other.loadingText")
         preloaderDot            = colorTheme.color("other.preloaderDot")
+        preloaderCircle         = colorTheme.color("other.preloaderCircle")
         scrollIndicator         = colorTheme.color("other.scrollIndicator")
     }
 
