@@ -14,4 +14,5 @@ public:
 
 private:
     void showWarningDialog(const QnResourceList &resources);
+    void showDeleteErrorDialog(const QnResourceList &resources);
 };

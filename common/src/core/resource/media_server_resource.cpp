@@ -231,28 +231,6 @@ QnStorageResourceList QnMediaServerResource::getStorages() const
     return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
 }
 
-void QnMediaServerResource::setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storagesToRemove)
-{
-    m_storagesToUpdate = storagesToUpdate;
-    m_storagesToRemove = storagesToRemove;
-}
-
-bool QnMediaServerResource::hasUpdatedStorages() const
-{
-    return m_storagesToUpdate.size() + m_storagesToRemove.size() > 0;
-}
-
-void QnMediaServerResource::saveUpdatedStorages()
-{
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    if (!conn)
-        return;
-
-    //TODO: #GDM SafeMode
-    conn->getMediaServerManager()->saveStorages(m_storagesToUpdate, this, []{});
-    conn->getMediaServerManager()->removeStorages(m_storagesToRemove, this, []{});
-}
-
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
 {
     QString apiScheme = QUrl(getApiUrl()).scheme();

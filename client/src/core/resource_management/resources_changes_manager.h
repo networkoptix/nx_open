@@ -20,10 +20,14 @@ public:
     typedef std::function<void (const QnMediaServerResourcePtr &)>      ServerChangesFunction;
     typedef std::function<void (const QnUserResourcePtr &)>             UserChangesFunction;
     typedef std::function<void (const QnVideoWallResourcePtr &)>        VideoWallChangesFunction;
+    typedef std::function<void (const QnLayoutResourcePtr &)>           LayoutChangesFunction;
     
 
     typedef std::function<void ()> BatchChangesFunction;
     typedef std::function<void ()> RollbackFunction;
+
+    /** Generic function to delete resources. */
+    void deleteResources(const QnResourceList &resources);
 
     /** Apply changes to the given camera. */
     void saveCamera(const QnVirtualCameraResourcePtr &camera, CameraChangesFunction applyChanges);
@@ -56,9 +60,15 @@ public:
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges);
 
+    /** Apply changes to the given layout. */
+    void saveLayout(const QnLayoutResourcePtr &layout, LayoutChangesFunction applyChanges);
+
 signals:
     /** This signal is emitted every time when changes cannot be saved. */
     void saveChangesFailed(const QnResourceList &resources);
+
+    /** This signal is emitted every time when we cannot delete resources. */
+    void resourceDeletingFailed(const QnResourceList &resources);
 };
 
 #define qnResourcesChangesManager QnResourcesChangesManager::instance()

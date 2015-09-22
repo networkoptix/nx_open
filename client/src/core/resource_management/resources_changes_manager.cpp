@@ -9,16 +9,16 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
-
+#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_videowall_data.h>
+#include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
@@ -27,6 +27,45 @@ QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr
 
 QnResourcesChangesManager::~QnResourcesChangesManager()
 {}
+
+/************************************************************************/
+/* Generic block                                                        */
+/************************************************************************/
+
+void QnResourcesChangesManager::deleteResources(const QnResourceList &resources) {
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    QVector<QnUuid> idToDelete;
+    for(const QnResourcePtr& resource: resources) {
+        // if we are deleting an edge camera, also delete its server
+        QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
+            QnMediaServerResource::isHiddenServer(resource->getParentResource())
+            ? resource->getParentId()
+            : QnUuid();
+        if (!parentToDelete.isNull())
+            idToDelete << parentToDelete;
+        idToDelete << resource->getId();
+    }
+    
+    connection->getResourceManager()->remove( idToDelete, this, [this, resources, sessionGuid](int reqID, ec2::ErrorCode errorCode) {
+        Q_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session or attributes pool was recreated. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        emit resourceDeletingFailed(resources);
+    });
+}
+
 
 /************************************************************************/
 /* Cameras block                                                        */
@@ -261,7 +300,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
 }
 
 /************************************************************************/
-/* VideoWalls block                                                    */
+/* VideoWalls block                                                     */
 /************************************************************************/
 
 void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges) {
@@ -297,6 +336,45 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
             ec2::fromApiToResource(backup, existingVideoWall);
 
         emit saveChangesFailed(QnResourceList() << videoWall);
+    } );
+}
+
+/************************************************************************/
+/* Layouts block                                                        */
+/************************************************************************/
+
+void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr &layout, LayoutChangesFunction applyChanges) {
+    if (!applyChanges)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    ec2::ApiLayoutData backup;
+    ec2::fromResourceToApi(layout, backup);
+
+    applyChanges(layout);
+
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    connection->getLayoutManager()->save(QnLayoutResourceList() << layout, this, [this, layout, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+        Q_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session or attributes pool was recreated. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        QnUuid layoutId = layout->getId();
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceById<QnLayoutResource>(layoutId);
+        if (existingLayout)
+            ec2::fromApiToResource(backup, existingLayout);
+
+        emit saveChangesFailed(QnResourceList() << layout);
     } );
 }
 

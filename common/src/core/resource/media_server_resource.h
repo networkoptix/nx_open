@@ -103,10 +103,6 @@ public:
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
 
-    void setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);   
-    void saveUpdatedStorages();
-    bool hasUpdatedStorages() const;
-
     void beforeDestroy();
 private slots:
     void onNewResource(const QnResourcePtr &resource);
@@ -138,10 +134,6 @@ private:
     QString m_authKey;
 
     QnUuid m_originalGuid;
-
-    // used for client purpose only. Can be moved to separete class
-    QnStorageResourceList m_storagesToUpdate;
-    ec2::ApiIdDataList m_storagesToRemove;
 
     CachedValue<Qn::PanicMode> m_panicModeCache;
 

@@ -14,8 +14,11 @@
 #include <QtGui/QMouseEvent>
 
 #include <api/model/storage_space_reply.h>
+#include <api/app_server_connection.h>
+
 #include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -258,12 +261,12 @@ void QnServerSettingsWidget::updateFromSettings() {
 
     m_hasStorageChanges = false;
     m_maxCamerasAdjusted = false;
+    m_storagesToRemove.clear();
 
     updateFailoverLabel();
 }
 
 void QnServerSettingsWidget::submitToSettings() {
-    m_server->setStorageDataToUpdate(QnStorageResourceList(), ec2::ApiIdDataList());
     if(m_hasStorageChanges) {
         QnStorageResourceList newStorages;
         foreach(const QnStorageSpaceData &item, tableItems()) 
@@ -292,12 +295,23 @@ void QnServerSettingsWidget::submitToSettings() {
                 newStorages.push_back(storage);
             }
         }
-        m_server->setStorageDataToUpdate(newStorages, m_storagesToRemove);
+        ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+        if (!conn)
+            return;
+
+        //TODO: #GDM SafeMode
+        conn->getMediaServerManager()->saveStorages(newStorages, this, []{});
+        conn->getMediaServerManager()->removeStorages(m_storagesToRemove, this, []{});
+    
     }
 
-    m_server->setName(ui->nameLineEdit->text());
-    m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
-    m_server->setRedundancy(ui->failoverCheckBox->isChecked());
+    qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
+        server->setName(ui->nameLineEdit->text());
+        server->setMaxCameras(ui->maxCamerasSpinBox->value());
+        server->setRedundancy(ui->failoverCheckBox->isChecked());
+    });
+
+
 }
 
 void QnServerSettingsWidget::addTableItem(const QnStorageSpaceData &item) {
@@ -670,4 +684,5 @@ void QnServerSettingsWidget::at_replyReceived(int status, const QnStorageSpaceRe
     }
 
     m_hasStorageChanges = false;
+    m_storagesToRemove.clear();
 }

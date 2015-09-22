@@ -20,7 +20,6 @@ namespace
 }
 
 void QnServerSettingsDialog::showNonModal(const QnMediaServerResourcePtr &server
-    , const AcceptCallback &callback
     , QWidget *parent)
 {
     auto it = std::find_if(g_currentShowingDialogs.begin(), g_currentShowingDialogs.end()
@@ -30,18 +29,16 @@ void QnServerSettingsDialog::showNonModal(const QnMediaServerResourcePtr &server
     });
 
     if (it == g_currentShowingDialogs.end())
-        it = g_currentShowingDialogs.insert(server->getId(), new QnServerSettingsDialog(server, callback, parent));
+        it = g_currentShowingDialogs.insert(server->getId(), new QnServerSettingsDialog(server, parent));
 
     QnShowDialogHelper::showNonModalDialog(it.value());
 }
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server
-    , const AcceptCallback &callback
     , QWidget *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
     , ui(new Ui::ServerSettingsDialog)
-    , m_onAcceptClickedCallback(callback)
     , m_server(server)
     , m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
 {
@@ -70,8 +67,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 
-{
-}
+{}
 
 bool QnServerSettingsDialog::tryClose(bool force)
 {
@@ -82,13 +78,6 @@ bool QnServerSettingsDialog::tryClose(bool force)
     deleteLater();
 
     return true;
-}
-
-void QnServerSettingsDialog::submitData()
-{
-    base_type::submitData();
-    if (m_onAcceptClickedCallback)
-        m_onAcceptClickedCallback();
 }
 
 void QnServerSettingsDialog::accept()
