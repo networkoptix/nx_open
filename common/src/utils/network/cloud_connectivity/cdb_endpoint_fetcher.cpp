@@ -91,6 +91,8 @@ void CloudModuleEndPointFetcher::onHttpClientDone(
 
     parseCloudXml(client->fetchMessageBodyBuffer());
 
+    //TODO #ak selecting endpoint we're able to connect to
+
     QnMutexLocker lk(&m_mutex);
     auto endpoint = m_endpoint;
     lk.unlock();

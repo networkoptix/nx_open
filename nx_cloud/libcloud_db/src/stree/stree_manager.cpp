@@ -21,8 +21,8 @@ namespace nx {
 namespace cdb {
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(StreeOperation,
-    ((int)StreeOperation::authentication, "authentication")
-    )
+    (StreeOperation::authentication, "authentication")
+)
 
 
 StreeManager::StreeManager() throw(std::runtime_error)

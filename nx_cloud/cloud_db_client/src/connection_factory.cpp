@@ -45,6 +45,11 @@ std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
         password);
 }
 
+std::string ConnectionFactory::toString(api::ResultCode resultCode) const
+{
+    return QnLexical::serialized(resultCode).toStdString();
+}
+
 void ConnectionFactory::setCloudEndpoint(
     const std::string& host,
     unsigned short port)

@@ -72,6 +72,8 @@ public:
     virtual std::unique_ptr<api::Connection> createConnection(
         const std::string& login,
         const std::string& password) = 0;
+    //!Returns text description of \a resultCode
+    virtual std::string toString(api::ResultCode resultCode) const = 0;
 
     //!Explicitely specify endpoint of cloud module. If this method not called, endpoint is detected automatically
     /*!

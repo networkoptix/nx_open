@@ -5,6 +5,8 @@
 
 #include "types.h"
 
+#include <utils/common/model_functions.h>
+
 
 namespace nx {
 namespace cdb {
@@ -51,6 +53,18 @@ ResultCode httpStatusCodeToResultCode(nx_http::StatusCode::Value statusCode)
             return ResultCode::unknownError;
     }
 }
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
+    (ResultCode::ok, "ok")
+    (ResultCode::notAuthorized, "notAuthorized")
+    (ResultCode::forbidden, "forbidden")
+    (ResultCode::notFound, "notFound")
+    (ResultCode::alreadyExists, "alreadyExists")
+    (ResultCode::dbError, "dbError")
+    (ResultCode::networkError, "networkError")
+    (ResultCode::notImplemented, "notImplemented")
+    (ResultCode::unknownError, "unknownError")
+);
 
 
 }   //api

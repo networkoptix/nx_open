@@ -137,6 +137,7 @@
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
 #include <rest/handlers/camera_history_rest_handler.h>
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
+#include <rest/handlers/save_cloud_system_credentials.h>
 #include <rest/server/rest_connection_processor.h>
 
 #include <rtsp/rtsp_connection.h>
@@ -1464,6 +1465,8 @@ bool MediaServerProcess::initTcpListener()
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
+    QnRestProcessorPool::instance()->registerHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler());
+
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
 

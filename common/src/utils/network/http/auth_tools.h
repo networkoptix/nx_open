@@ -34,6 +34,10 @@ namespace nx_http
         const QString& userName,
         const QString& realm,
         const QString& userPassword );
+    BufferType calcHa1(
+        const char* userName,
+        const char* realm,
+        const char* userPassword);
 
     BufferType calcHa2(
         const StringType& method,

@@ -230,6 +230,17 @@ public:
 
     int recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot);
     int getBookmarksAsync(const QnBookmarkRequestData &request, QObject *target, const char *slot);
+
+    //!Report system cloud credentials to mediaserver
+    /*!
+        \param slot (int status, int handle)
+    */
+    int saveCloudSystemCredentials(
+        const QString& cloudSystemID,
+        const QString& cloudAuthKey,
+        QObject *target,
+        const char *slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
     virtual bool isReady() const override;
@@ -239,6 +250,5 @@ private:
     int m_proxyPort;
     bool m_enableOfflineRequests;
 };
-
 
 #endif // __VIDEO_SERVER_CONNECTION_H_

@@ -104,6 +104,7 @@ namespace {
         (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
         (ec2BookmarksObject,        "ec2/bookmarks")
         (MergeLdapUsersObject,     "mergeLdapUsers")
+        (SaveCloudSystemCredentialsObject,  "saveCloudSystemCredentials")
     );
 #if 0
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -285,6 +286,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnLdapUsers>(this, response, handle);
         break;
     case MergeLdapUsersObject:
+        processJsonReply(this, response, handle);
+        break;
+    case SaveCloudSystemCredentialsObject:
         processJsonReply(this, response, handle);
         break;
     default:
@@ -881,4 +885,17 @@ int QnMediaServerConnection::recordedTimePeriods(const QnChunksRequestData &requ
 
 int QnMediaServerConnection::getBookmarksAsync(const QnBookmarkRequestData &request, QObject *target, const char *slot) {
     return sendAsyncGetRequest(ec2BookmarksObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
+}
+
+int QnMediaServerConnection::saveCloudSystemCredentials(
+    const QString& cloudSystemID,
+    const QString& cloudAuthKey,
+    QObject* target,
+    const char* slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("cloudSystemID", cloudSystemID);
+    params << QnRequestParam("cloudAuthKey", cloudAuthKey);
+
+    return sendAsyncGetRequest(SaveCloudSystemCredentialsObject, params, NULL, target, slot);
 }

@@ -15,6 +15,7 @@
 #include <QtCore/QFile>
 
 #include <utils/common/cpp14.h>
+#include <utils/common/sync_call.h>
 #include <utils/network/http/auth_tools.h>
 
 #include <cdb/connection.h>
@@ -27,33 +28,6 @@
 namespace nx {
 namespace cdb {
 namespace cl {
-
-
-template<typename ResultType>
-std::tuple<ResultType> makeSyncCall(
-    std::function<void(std::function<void(ResultType)>)> function)
-{
-    std::promise<ResultType> promise;
-    auto future = promise.get_future();
-    function([&promise](ResultType resCode){ promise.set_value(resCode); });
-    future.wait();
-    return std::make_tuple(future.get());
-}
-
-template<typename ResultType, typename OutArg1>
-std::tuple<ResultType, OutArg1> makeSyncCall(
-    std::function<void(std::function<void(ResultType, OutArg1)>)> function)
-{
-    std::promise<ResultType> promise;
-    auto future = promise.get_future();
-    OutArg1 result;
-    function([&promise, &result](ResultType resCode, OutArg1 outArg1) {
-        result = std::move(outArg1);
-        promise.set_value(resCode);
-    });
-    future.wait();
-    return std::make_tuple(future.get(), std::move(result));
-}
 
 
 class CdbFunctionalTest

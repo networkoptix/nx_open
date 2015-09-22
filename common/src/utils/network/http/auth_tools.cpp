@@ -73,6 +73,14 @@ namespace nx_http
         return calcHa1( userName.toUtf8(), realm.toUtf8(), userPassword.toUtf8() );
     }
 
+    BufferType calcHa1(
+        const char* userName,
+        const char* realm,
+        const char* userPassword)
+    {
+        return calcHa1(StringType(userName), StringType(realm), StringType(userPassword));
+    }
+
     /*!
         \note HA2 in case of qop=auth-int is not supported
     */

@@ -56,7 +56,8 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
         case nttAuto:
         case nttEnabled:
             //TODO #ak cloud_acceptor
-            serverSocket = new MixedTcpUdtServerSocket();
+            serverSocket = new TCPServerSocket();
+            //serverSocket = new MixedTcpUdtServerSocket();
             break;
         //case nttEnabled:
         //    serverSocket = new UdtStreamServerSocket();

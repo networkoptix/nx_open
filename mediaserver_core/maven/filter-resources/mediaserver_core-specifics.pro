@@ -8,6 +8,7 @@ exists( ${libdir}/libcreateprocess.pri ) {
 }
 
 INCLUDEPATH += ${root.dir}/appserver2/src/
+INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
 
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug

@@ -141,7 +141,7 @@ private:
     {
         detail::processHttpResponse(
             std::move(this->m_handler),
-            client->response() ? SystemError::noError : SystemError::connectionReset,
+            client->failed() ? client->lastSysErrorCode() : SystemError::noError,
             client->response() ? client->response()->statusLine.statusCode : 0,
             client->fetchMessageBodyBuffer());
     }
@@ -169,7 +169,7 @@ private:
     {
         detail::processHttpResponse(
             std::move(this->m_handler),
-            client->response() ? SystemError::noError : SystemError::connectionReset,
+            client->failed() ? client->lastSysErrorCode() : SystemError::noError,
             client->response() ? client->response()->statusLine.statusCode : 0,
             client->fetchMessageBodyBuffer());
     }
@@ -206,7 +206,7 @@ private:
                     client->response()->statusLine.statusCode));
         else
             handler(
-                SystemError::connectionReset,   //TODO #ak take error code from client
+                client->lastSysErrorCode(),
                 nx_http::StatusCode::internalServerError);
     }
 };
@@ -239,7 +239,7 @@ private:
                     client->response()->statusLine.statusCode));
         else
             handler(
-                SystemError::connectionReset,   //TODO #ak take error code from client
+                client->lastSysErrorCode(),
                 nx_http::StatusCode::internalServerError);
     }
 };

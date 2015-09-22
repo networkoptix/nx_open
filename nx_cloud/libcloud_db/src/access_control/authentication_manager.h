@@ -40,7 +40,6 @@ public:
         const QnAuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 
-    //!Implementation of nx_http::AuthenticationManager::authenticate
     virtual bool authenticate(
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,

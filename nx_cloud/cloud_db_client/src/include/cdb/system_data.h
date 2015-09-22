@@ -58,6 +58,7 @@ enum SystemStatus
 class SystemData
 {
 public:
+    //!Globally unique ID of system assigned by cloud
     QnUuid id;
     //!Not unique system name
     std::string name;
