@@ -163,8 +163,12 @@ class CommunicatingSocket
     public Socket
 {
 public:
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, PollableSystemSocketImpl* sockImpl = nullptr );
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, PollableSystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr,
+                         bool natTraversal, int type, int protocol,
+                         PollableSystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr,
+                         bool natTraversal, int newConnSD,
+                         PollableSystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 
@@ -220,7 +224,7 @@ public:
     /**
      *   Construct a TCP socket with no connection
      */
-    TCPSocket() ;
+    TCPSocket( bool natTraversal );
 
     //!User by \a TCPServerSocket class
     TCPSocket( int newConnSD );
@@ -298,7 +302,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket() ;
+    UDPSocket( bool natTraversal = true );
 
     void setDestPort(unsigned short foreignPort);
 

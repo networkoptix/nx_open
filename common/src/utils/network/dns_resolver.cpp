@@ -1,9 +1,4 @@
-/**********************************************************
-* 20 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#include "host_address_resolver.h"
+#include "dns_resolver.h"
 
 #ifdef Q_OS_UNIX
 #include <stdlib.h>
@@ -15,56 +10,43 @@
 #include <algorithm>
 #include <atomic>
 
+namespace nx {
 
-HostAddressResolver::ResolveTask::ResolveTask(
+DnsResolver::ResolveTask::ResolveTask(
     HostAddress _hostAddress,
     std::function<void(SystemError::ErrorCode, const HostAddress&)> _completionHandler,
     RequestID _reqID,
     size_t _sequence )
 :
-    hostAddress( _hostAddress ),
+    hostAddress( std::move( _hostAddress ) ),
     completionHandler( _completionHandler ),
     reqID( _reqID ),
     sequence( _sequence )
 {
 }
 
-static std::atomic<HostAddressResolver*> HostAddressResolver_instance( nullptr );
-
-HostAddressResolver::HostAddressResolver()
+DnsResolver::DnsResolver()
 :
     m_terminated( false ),
     m_runningTaskReqID( nullptr ),
     m_currentSequence( 0 )
 {
     start();
-
-    Q_ASSERT( HostAddressResolver_instance.load() == nullptr );
-    HostAddressResolver_instance = this;
 }
 
-HostAddressResolver::~HostAddressResolver()
+DnsResolver::~DnsResolver()
 {
-    Q_ASSERT( HostAddressResolver_instance == this );
-    HostAddressResolver_instance = nullptr;
-
     stop();
 }
 
-HostAddressResolver* HostAddressResolver::instance()
-{
-    SocketGlobalRuntime::instance();    //instanciates socket-related globals in correct order
-    return HostAddressResolver_instance.load( std::memory_order_relaxed );
-}
-
-void HostAddressResolver::pleaseStop()
+void DnsResolver::pleaseStop()
 {
     QnMutexLocker lk( &m_mutex );
     m_terminated = true;
     m_cond.wakeAll();
 }
 
-bool HostAddressResolver::resolveAddressAsync(
+void DnsResolver::resolveAddressAsync(
     const HostAddress& addressToResolve,
     std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
     RequestID reqID )
@@ -72,10 +54,9 @@ bool HostAddressResolver::resolveAddressAsync(
     QnMutexLocker lk( &m_mutex );
     m_taskQueue.push_back( ResolveTask( addressToResolve, completionHandler, reqID, ++m_currentSequence ) );
     m_cond.wakeAll();
-    return true;
 }
 
-bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress )
+bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress )
 {
     if( hostName.isEmpty() )
     {
@@ -109,12 +90,12 @@ bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddre
     return true;
 }
 
-bool HostAddressResolver::isAddressResolved( const HostAddress& addr ) const
+bool DnsResolver::isAddressResolved( const HostAddress& addr ) const
 {
     return addr.m_addressResolved;
 }
 
-void HostAddressResolver::cancel( RequestID reqID, bool waitForRunningHandlerCompletion )
+void DnsResolver::cancel( RequestID reqID, bool waitForRunningHandlerCompletion )
 {
     QnMutexLocker lk( &m_mutex );
     //TODO #ak improve search complexity
@@ -124,7 +105,7 @@ void HostAddressResolver::cancel( RequestID reqID, bool waitForRunningHandlerCom
         m_cond.wait( &m_mutex ); //waiting for completion
 }
 
-bool HostAddressResolver::isRequestIDKnown( RequestID reqID ) const
+bool DnsResolver::isRequestIDKnown( RequestID reqID ) const
 {
     QnMutexLocker lk( &m_mutex );
     //TODO #ak improve search complexity
@@ -134,7 +115,7 @@ bool HostAddressResolver::isRequestIDKnown( RequestID reqID ) const
                [reqID]( const ResolveTask& task ){ return task.reqID == reqID; } ) != m_taskQueue.cend();
 }
 
-void HostAddressResolver::run()
+void DnsResolver::run()
 {
     QnMutexLocker lk( &m_mutex );
     while( !m_terminated )
@@ -171,3 +152,5 @@ void HostAddressResolver::run()
         m_cond.wakeAll();
     }
 }
+
+} // namespace nx

@@ -1,13 +1,5 @@
-/**********************************************************
-* 30 aug 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "socket_common.h"
-
-#include "host_address_resolver.h"
-#include "aio/aioservice.h"
-
+#include "socket_global.h"
 
 const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
 const HostAddress HostAddress::anyHost( (uint32_t)INADDR_ANY );
@@ -79,7 +71,7 @@ HostAddress::HostAddress( const QByteArray& _ipv6 )
 HostAddress::HostAddress( const QString& addrStr )
 :
     m_addrStr( addrStr ),
-    m_addressResolved(false)
+    m_addressResolved( false )
 {
     initializeFromString(addrStr.toLatin1().constData());
 }
@@ -174,9 +166,15 @@ struct in_addr HostAddress::inAddr(bool* ok) const
     if( !m_addressResolved )
     {
         Q_ASSERT( m_addrStr );
-        //resolving address
-        //TODO #ak remove const_cast
-        HostAddressResolver::instance()->resolveAddressSync( m_addrStr.get(), const_cast<HostAddress*>(this) );
+        const auto addrs = nx::SocketGlobals::addressResolver().resolveSync(
+                    m_addrStr.get(), false );
+
+        if ( !addrs.empty() )
+        {
+            // TODO: use IpAddress instead
+            m_sinAddr = addrs.front().host.m_sinAddr;
+            m_addressResolved = true;
+        }
     }
     if( ok )
         *ok = m_addressResolved;
@@ -187,6 +185,12 @@ void HostAddress::initializeFromString(const char* addrStr)
 {
     memset(&m_sinAddr, 0, sizeof(m_sinAddr));
     //if addrStr is an ip address
+
+    if (strcmp(addrStr, "") == 0 || strcmp(addrStr, "0.0.0.0") == 0)
+    {
+        m_addressResolved = true;
+        return;
+    }
 
     if (strcmp(addrStr, "255.255.255.255") == 0)
     {
@@ -275,35 +279,4 @@ void SocketAddress::initializeFromString( const QString& str )
         address = HostAddress(str.mid( 0, sepPos ));
         port = str.mid( sepPos+1 ).toInt();
     }
-}
-
-
-///////////////////////////////////////////////////
-//   class SocketGlobalRuntimeInternal
-///////////////////////////////////////////////////
-
-class SocketGlobalRuntimeInternal
-{
-public:
-    HostAddressResolver hostAddressResolver;
-    aio::AIOService aioService;
-};
-
-SocketGlobalRuntime::SocketGlobalRuntime()
-:
-    m_data( new SocketGlobalRuntimeInternal() )
-{
-}
-
-SocketGlobalRuntime::~SocketGlobalRuntime()
-{
-    delete m_data;
-    m_data = nullptr;
-}
-
-Q_GLOBAL_STATIC( SocketGlobalRuntime, socketGlobalRuntimeInstance )
-
-SocketGlobalRuntime* SocketGlobalRuntime::instance()
-{
-    return socketGlobalRuntimeInstance();
 }

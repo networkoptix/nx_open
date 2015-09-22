@@ -15,13 +15,14 @@ int main( int argc, char **argv )
 #if 0
     QCoreApplication app( argc, argv );
 
-    QnLog::initLog("DEBUG2");
     cl_log.create(
         "C:\\tmp\\ut\\log_file",
         10*1024*1024,
         25,
         QnLogLevel::cl_logDEBUG2 );
 #endif
+
+    QnLog::initLog("DEBUG2");
 
     ::testing::InitGoogleTest(&argc, argv);
     const int result = RUN_ALL_TESTS();

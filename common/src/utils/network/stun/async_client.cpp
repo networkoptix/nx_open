@@ -7,7 +7,7 @@
 namespace nx {
 namespace stun {
 
-const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000 };
+const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 20000, 20000 };
 
 AsyncClient::AsyncClient( const SocketAddress& endpoint, bool useSsl, Timeouts timeouts )
     : m_endpoint( endpoint )
@@ -180,10 +180,8 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
         auto transactionId = request.header.transactionId;
         m_requestQueue.pop_front();
 
-        const bool ret = true;
         m_baseConnection->sendMessage(
             std::move( request ),
-            // TODO: #c++14 [ transactionId{ std::move( transactionId ) }, handler ]
             [ = ]( SystemError::ErrorCode code ) mutable
             {
                 if( code != SystemError::noError )
@@ -202,10 +200,6 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
 
                 dispatchRequestsInQueue( &lock );
             } );
-
-        if( !ret )
-            m_baseConnection->socket()->post(
-                [ = ] () { handler( SystemError::nomem, Message() ); } );
     }
 }
 
@@ -226,6 +220,7 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     if( code != SystemError::noError )
     {
         closeConnectionImpl( &lock, code );
+        m_connectingSocket->cancelAsyncIO();
         m_connectingSocket = nullptr;
         return;
     }

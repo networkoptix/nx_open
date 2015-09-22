@@ -105,8 +105,10 @@ void QnMulticastModuleFinder::updateInterfaces() {
             if (m_serverSocket)
                 m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString());
 
-            if (!m_pollSet.add(it.value()->implementationDelegate(), aio::etRead, it.value()))
-                Q_ASSERT(false);
+            if (!m_pollSet.add(it.value()->implementationDelegate(), aio::etRead, it.value())) {
+                const auto error = SystemError::getLastOSErrorText();
+                Q_ASSERT_X(false, Q_FUNC_INFO, error.toUtf8().data());
+            }
         } catch(const std::exception &e) {
             NX_LOG(lit("Failed to create socket on local address %1. %2").arg(address.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR);
         }
@@ -233,8 +235,10 @@ void QnMulticastModuleFinder::run() {
 
     //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
     if (m_serverSocket) {
-        if (!m_pollSet.add(m_serverSocket->implementationDelegate(), aio::etRead, m_serverSocket))
-            Q_ASSERT(false);
+        if (!m_pollSet.add(m_serverSocket->implementationDelegate(), aio::etRead, m_serverSocket)) {
+            const auto error = SystemError::getLastOSErrorText();
+            Q_ASSERT_X(false, Q_FUNC_INFO, error.toUtf8().data());
+        }
     }
 
     while (!needToStop()) {

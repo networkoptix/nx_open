@@ -41,6 +41,13 @@ void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
         endpoints.remove_if( [ & ]( const SocketAddress& addr )
             { return !pingServer( addr, mediaserver->serverId ); } );
 
+        NX_LOG( lit("%1 Peer %2/%3 succesfully pinged %4 of %5")
+                .arg( Q_FUNC_INFO )
+                .arg( QString::fromUtf8( mediaserver->systemId ) )
+                .arg( QString::fromUtf8( mediaserver->serverId ) )
+                .arg( containerString( endpoints ) )
+                .arg( containerString( endpointsAttr->get() ) ), cl_logDEBUG1 );
+
         stun::Message response( stun::Header(
             stun::MessageClass::successResponse, message.header.method,
             std::move( message.header.transactionId ) ) );
@@ -59,15 +66,13 @@ MediaserverApi::MediaserverApi( stun::MessageDispatcher* dispatcher )
 
 bool MediaserverApi::pingServer( const SocketAddress& address, const String& expectedId )
 {
-    QUrl url( address.address.toString() );
-    url.setPort( address.port );
-    url.setPath( lit("/api/ping") );
-
+    // TODO: Async implementation
+    const auto url = lit( "http://%1/api/ping" ).arg( address.toString() );
     nx_http::HttpClient client;
     if( !client.doGet( url ) )
     {
         NX_LOG( lit("%1 Url %2 is unaccesible")
-                .arg( Q_FUNC_INFO ).arg( url.toString() ), cl_logDEBUG1 )
+                .arg( Q_FUNC_INFO ).arg( url ), cl_logDEBUG1 )
         return false;
     }
 
@@ -77,7 +82,7 @@ bool MediaserverApi::pingServer( const SocketAddress& address, const String& exp
     if( !QJson::deserialize( buffer, &result ) )
     {
         NX_LOG( lit("%1 Url %2 response is a bad REST result: %3")
-                .arg( Q_FUNC_INFO ).arg( url.toString() )
+                .arg( Q_FUNC_INFO ).arg( url )
                 .arg( QString::fromUtf8( buffer ) ), cl_logDEBUG1 );
         return false;
     }
@@ -86,14 +91,14 @@ bool MediaserverApi::pingServer( const SocketAddress& address, const String& exp
     if( !QJson::deserialize( result.reply, &reply ) )
     {
         NX_LOG( lit("%1 Url %2 response is a bad REST result: %3")
-                .arg( Q_FUNC_INFO ).arg( url.toString() )
+                .arg( Q_FUNC_INFO ).arg( url )
                 .arg( result.reply.toString() ), cl_logDEBUG1 );
         return false;
     }
 
     if( reply.moduleGuid.toSimpleString().toUtf8() != expectedId ) {
         NX_LOG( lit("%1 Url %2 moduleGuid '%3' doesnt match expectedId '%4'")
-                .arg( Q_FUNC_INFO ).arg( url.toString() )
+                .arg( Q_FUNC_INFO ).arg( url )
                 .arg( reply.moduleGuid.toString() )
                 .arg( QString::fromUtf8( expectedId ) ), cl_logDEBUG1 );
         return false;

@@ -1,10 +1,5 @@
-/**********************************************************
-* 20 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef HOST_ADDRESS_RESOLVER_H
-#define HOST_ADDRESS_RESOLVER_H
+#ifndef DNS_RESOLVER_H
+#define DNS_RESOLVER_H
 
 #include <atomic>
 #include <functional>
@@ -17,21 +12,20 @@
 
 #include "socket_common.h"
 
+namespace nx {
 
 /*!
     \note Thread-safe
 */
-class HostAddressResolver
+class DnsResolver
 :
     public QnLongRunnable
 {
 public:
     typedef void* RequestID;
 
-    HostAddressResolver();
-    virtual ~HostAddressResolver();
-
-    static HostAddressResolver* instance();
+    DnsResolver();
+    virtual ~DnsResolver();
 
     //!Implementation of QnLongRunnable::pleaseStop
     virtual void pleaseStop() override;
@@ -39,10 +33,9 @@ public:
     /*!
         \param completionHandler MUST not block
         \param reqID Used to cancel request. Multiple requests can be started using same request id
-        \return false if failed to start asynchronous resolve operation
         \note It is garanteed that \a reqID is set before \a completionHandler is called
     */
-    bool resolveAddressAsync(
+    void resolveAddressAsync(
         const HostAddress& addressToResolve,
         std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
         RequestID reqID );
@@ -86,5 +79,7 @@ private:
     RequestID m_runningTaskReqID;
     size_t m_currentSequence;
 };
+
+} // namespace nx
 
 #endif  //HOST_ADDRESS_RESOLVER_H

@@ -39,9 +39,13 @@ bool CloudStreamSocket::connectAsyncImpl(
 
     using namespace std::placeholders;
     m_connectHandler = std::move(handler);
-    std::vector<DnsEntry> dnsEntries;
+    std::vector<AddressEntry> dnsEntries;
     const int remotePort = addr.port;
-    const DnsTable::ResolveResult result = DnsTable::instance()->resolveAsync(
+
+    return true;
+    // TODO: rework later for cloud socket
+    /*
+    const AddressResolver::ResolveResult result = AddressResolver::instance()->resolveAsync(
         addr.address,
         &dnsEntries,
         [this, remotePort]( std::vector<DnsEntry> dnsEntries )
@@ -54,14 +58,14 @@ bool CloudStreamSocket::connectAsyncImpl(
         } );
     switch( result )
     {
-        case DnsTable::ResolveResult::done:
+        case AddressResolver::ResolveResult::done:
             break;  //operation completed
 
-        case DnsTable::ResolveResult::startedAsync:
+        case AddressResolver::ResolveResult::startedAsync:
             //async resolve has been started
             return true;
 
-        case DnsTable::ResolveResult::failed:
+        case AddressResolver::ResolveResult::failed:
             //resetting handler, since it may hold some resources
             m_connectHandler = std::function<void( SystemError::ErrorCode )>();
             SystemError::setLastErrorCode( SystemError::hostUnreach );
@@ -74,6 +78,9 @@ bool CloudStreamSocket::connectAsyncImpl(
     //resetting handler, since it may hold some resources
     m_connectHandler = std::function<void( SystemError::ErrorCode )>();
     return false;
+    */
+
+    return true;
 }
 
 void CloudStreamSocket::applyCachedAttributes()
@@ -81,7 +88,7 @@ void CloudStreamSocket::applyCachedAttributes()
     //TODO #ak applying cached attributes to socket m_socketDelegate
 }
 
-void CloudStreamSocket::onResolveDone( std::vector<DnsEntry> dnsEntries )
+void CloudStreamSocket::onResolveDone( std::vector<AddressEntry> dnsEntries )
 {
     //TODO #ak which port shell we actually use???
     int port = 0;
@@ -93,7 +100,7 @@ void CloudStreamSocket::onResolveDone( std::vector<DnsEntry> dnsEntries )
 }
 
 bool CloudStreamSocket::startAsyncConnect(
-    std::vector<DnsEntry>&& dnsEntries,
+    std::vector<AddressEntry>&& dnsEntries,
     int port )
 {
     if( dnsEntries.empty() )
@@ -102,9 +109,12 @@ bool CloudStreamSocket::startAsyncConnect(
         return false;
     }
 
+    return true;
+    // TODO: rework
+    /*
     //TODO #ak should prefer regular address to a cloud one
-    DnsEntry& dnsEntry = dnsEntries[0];
-    switch( dnsEntry.addressType )
+    AddressEntry& dnsEntry = dnsEntries[0];
+    switch( dnsEntry.type )
     {
         case AddressType::regular:
             //using tcp connection
@@ -142,6 +152,7 @@ bool CloudStreamSocket::startAsyncConnect(
             SystemError::setLastErrorCode( SystemError::hostUnreach );
             return false;
     }
+    */
 }
 
 void CloudStreamSocket::cloudConnectDone(

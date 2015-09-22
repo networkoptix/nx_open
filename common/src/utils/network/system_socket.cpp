@@ -2,7 +2,6 @@
 
 #include <atomic>
 #include <memory>
-
 #include <boost/type_traits/is_same.hpp>
 
 #include <platform/win32_syscall_resolver.h>
@@ -507,13 +506,14 @@ namespace
 
 CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
-    int type,
-    int protocol,
+    bool natTraversal, int type, int protocol,
     PollableSystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr ) ),
+            new AsyncSocketImplHelper<Pollable>( this,
+                                                 abstractSocketPtr,
+                                                 natTraversal ) ),
         type,
         protocol,
         sockImpl ),
@@ -525,12 +525,14 @@ CommunicatingSocket::CommunicatingSocket(
 
 CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
-    int newConnSD,
+    bool natTraversal, int newConnSD,
     PollableSystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr ) ),
+            new AsyncSocketImplHelper<Pollable>( this,
+                                                 abstractSocketPtr,
+                                                 natTraversal ) ),
         newConnSD,
         sockImpl ),
     m_aioHelper( nullptr ),
@@ -723,8 +725,9 @@ SocketAddress CommunicatingSocket::getForeignAddress() const
     sockaddr_in addr;
     unsigned int addr_len = sizeof(addr);
 
-    if (getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        qnWarning("Fetch of foreign address failed (getpeername()).");
+    const auto ret = getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len);
+    if (ret < 0) {
+        qnWarning("Fetch of foreign address failed (getpeername() = %1).", ret);
         return SocketAddress();
     }
     return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
@@ -739,7 +742,7 @@ bool CommunicatingSocket::isConnected() const
 void CommunicatingSocket::close()
 {
     //checking that socket is not registered in aio
-    assert( !aio::AIOService::instance()->isSocketBeingWatched( static_cast<Pollable*>(this) ) );
+    assert( !nx::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
 
     m_connected = false;
     Socket::close();
@@ -803,9 +806,10 @@ public:
 };
 #endif
 
-TCPSocket::TCPSocket()
+TCPSocket::TCPSocket( bool natTraversal )
 :
     base_type(
+        natTraversal,
         SOCK_STREAM,
         IPPROTO_TCP
 #ifdef _WIN32
@@ -815,9 +819,10 @@ TCPSocket::TCPSocket()
 {
 }
 
-TCPSocket::TCPSocket(int newConnSD)
+TCPSocket::TCPSocket( int newConnSD )
 :
     base_type(
+        false, // in TCPSocket nat traversal only helps to resolve public address
         newConnSD
 #ifdef _WIN32
         , new Win32TcpSocketImpl()
@@ -1106,11 +1111,11 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
         m_implDelegate.dispatch(
             [this, &cond, &mtx, &cancelled]()
             {
-                aio::AIOService::instance()->cancelPostedCalls(
+                nx::SocketGlobals::aioService().cancelPostedCalls(
                     static_cast<Pollable*>(&m_implDelegate), true);
-                aio::AIOService::instance()->removeFromWatch(
+                nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                aio::AIOService::instance()->removeFromWatch(
+                nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
                 
                 QMutexLocker lk(&mtx);
@@ -1128,11 +1133,11 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
             [this]()
             {
                 //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
-                aio::AIOService::instance()->cancelPostedCalls(
+                nx::SocketGlobals::aioService().cancelPostedCalls(
                     static_cast<Pollable*>(&m_implDelegate), true);
-                aio::AIOService::instance()->removeFromWatch(
+                nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                aio::AIOService::instance()->removeFromWatch(
+                nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
         } );
     }
@@ -1168,9 +1173,9 @@ bool TCPServerSocket::setListen(int queueLen)
 
 // UDPSocket Code
 
-UDPSocket::UDPSocket()
+UDPSocket::UDPSocket( bool natTraversal )
 :
-    base_type(SOCK_DGRAM, IPPROTO_UDP)
+    base_type(natTraversal, SOCK_DGRAM, IPPROTO_UDP)
 {
     memset( &m_destAddr, 0, sizeof(m_destAddr) );
     setBroadcast();

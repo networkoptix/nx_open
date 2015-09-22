@@ -15,12 +15,11 @@
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/http/httpclient.h>
 #include <utils/network/http/server/http_stream_socket_server.h>
-
-#include "test_http_server.h"
+#include <utils/network/http/test_http_server.h>
 
 namespace nx_http {
 
-class HttpClientTest
+class HttpClientServerTest
 :
     public ::testing::Test
 {
@@ -35,13 +34,34 @@ protected:
         testHttpServer.reset();
     }
 
-private:
     static std::unique_ptr<TestHttpServer> testHttpServer;
 };
 
-std::unique_ptr<TestHttpServer> HttpClientTest::testHttpServer;
+std::unique_ptr<TestHttpServer> HttpClientServerTest::testHttpServer;
 
-//TODO #ak introduce built-in http server to automate AsyncHttpClient tests
+TEST_F( HttpClientServerTest, SimpleTest )
+{
+    ASSERT_TRUE( testHttpServer->registerStaticProcessor( "/test", "SimpleTest" ) );
+    ASSERT_TRUE( testHttpServer->bindAndListen() );
+
+    nx_http::HttpClient client;
+    const QUrl url( lit("http://127.0.0.1:%1/test")
+                    .arg( testHttpServer->serverAddress().port) );
+
+    ASSERT_TRUE( client.doGet( url ) );
+    ASSERT_TRUE( client.response() );
+    ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
+    ASSERT_EQ( client.fetchMessageBodyBuffer(), "SimpleTest" );
+}
+
+/*!
+    This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
+*/
+TEST_F( HttpClientServerTest, KeepAliveConnection )
+{
+}
+
+//TODO #ak refactor these tests using HttpClientServerTest
 
 TEST( HttpClientTest, DISABLED_KeepAlive )
 {
@@ -115,13 +135,6 @@ TEST( HttpClientTest, DISABLED_KeepAlive3 )
         else
             ASSERT_EQ( msgBody, newMsgBody );
     }
-}
-
-/*!
-    This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
-*/
-TEST_F( HttpClientTest, KeepAliveConnection )
-{
 }
 
 } // namespace nx_http

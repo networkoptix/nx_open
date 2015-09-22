@@ -6,7 +6,7 @@
 #include "../abstract_socket.h"
 #include "cc_common.h"
 #include "cloud_tunnel.h"
-#include "dns_table.h"
+#include "address_resolver.h"
 
 namespace nx {
 namespace cc {
@@ -40,10 +40,10 @@ private:
     std::function<void( SystemError::ErrorCode )> m_connectHandler;
 
     void applyCachedAttributes();
-    bool instanciateSocket( const DnsEntry& dnsEntry );
-    void onResolveDone( std::vector<DnsEntry> dnsEntries );
+    bool instanciateSocket( const AddressEntry& dnsEntry );
+    void onResolveDone( std::vector<AddressEntry> dnsEntries );
     bool startAsyncConnect(
-        std::vector<DnsEntry>&& dnsEntries,
+        std::vector<AddressEntry>&& dnsEntries,
         int port );
     void cloudConnectDone(
         std::shared_ptr<CloudTunnel> tunnel,

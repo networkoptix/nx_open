@@ -11,7 +11,7 @@
 #include <memory>
 
 #include "mutex.h"
-
+#include "limits.h"
 
 class QnWaitConditionImpl;
 

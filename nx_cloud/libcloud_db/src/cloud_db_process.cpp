@@ -21,7 +21,7 @@
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
-#include <utils/network/aio/aioservice.h>
+#include <utils/network/socket_global.h>
 #include <utils/network/http/server/http_message_dispatcher.h>
 
 #include "access_control/authentication_manager.h"
