@@ -304,7 +304,7 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
             m_nativeResolutions.insert(info.encoderIndex, info.resolution);
         }
     }
-    if (m_nativeResolutions.size() < 2) /* primary and secondary streams */
+    if (m_nativeResolutions.size() < 2 && !m_nativeResolutions.isEmpty()) /* primary and secondary streams */
         m_nativeStreamIndex = m_nativeResolutions.firstKey();
 
     if (m_transcodingSupported != transcodingSupported) {
