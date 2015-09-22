@@ -23,6 +23,7 @@ namespace
     const QString kGetTimeCommand = kApiNamespaceTag + "gettime";
     const QString kIfListCommand = kApiNamespaceTag + "iflist";
     const QString kGetServerExtraInfoCommand = kApiNamespaceTag + "aggregator";
+    const QString kRestartCommand = kApiNamespaceTag + "restart";
 
     const QString kIDTag = "id";
     const QString kSeedTag = "seed";
@@ -460,6 +461,20 @@ void rtu::sendIfListRequest(const BaseServerInfoPtr &info
         , password, Constants::kAllAddressFlagsAffected, parser);
     const RestClient::Request request(info, password, kIfListCommand, QUrlQuery(), timeout
         , localSuccessful, makeErrorCallback(failed, Constants::kAllAddressFlagsAffected));
+    RestClient::sendGet(request);
+}
+
+///
+
+void rtu::sendRestartRequest(const BaseServerInfoPtr &info
+    , const QString &password
+    , const OperationCallback &callback)
+{ 
+    const RestClient::Request request(info, password, kRestartCommand
+        , QUrlQuery(), RestClient::kUseStandardTimeout
+        , makeSuccessCallback(callback, Constants::kNoEntitiesAffected)
+        , makeErrorCallback(callback, Constants::kNoEntitiesAffected));
+
     RestClient::sendGet(request);
 }
 

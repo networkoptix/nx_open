@@ -86,6 +86,9 @@ namespace rtu
         , const OperationCallback &failed
         , int timeout = RestClient::kUseStandardTimeout);
 
+    void sendRestartRequest(const BaseServerInfoPtr &info
+        , const QString &password
+        , const OperationCallback &callback);
     ///
 
     void sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
