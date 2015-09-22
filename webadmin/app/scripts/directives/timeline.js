@@ -996,13 +996,18 @@ angular.module('webadminApp')
                 var mouseOverRightScrollButton = false;
                 var mouseOverLeftScrollButton = false;
 
+                var mouseNearLeftBorder = false;
+                var mouseNearRightBorder = false;
+
                 function drawOrCheckLeftRightButtons(context){
 
                     var canScrollRight = scope.scaleManager.canScroll(false);
-                    var canScrollLeft = scope.scaleManager.canScroll(true);
+                    mouseNearRightBorder = mouseCoordinate > scope.viewportWidth - timelineConfig.leftRightButtonsWidth;
+                    mouseOverRightScrollButton = canScrollRight && mouseNearRightBorder;
 
-                    mouseOverRightScrollButton = canScrollRight && mouseCoordinate > scope.viewportWidth - timelineConfig.leftRightButtonsWidth;
-                    mouseOverLeftScrollButton = canScrollLeft && mouseCoordinate < timelineConfig.leftRightButtonsWidth;
+                    var canScrollLeft = scope.scaleManager.canScroll(true);
+                    mouseNearLeftBorder = mouseCoordinate < timelineConfig.leftRightButtonsWidth;
+                    mouseOverLeftScrollButton = canScrollLeft && mouseNearLeftBorder;
 
                     //console.log("drawOrCheckLeftRightButtons",canScrollRight,canScrollLeft,mouseOverRightScrollButton,mouseOverLeftScrollButton);
 
@@ -1099,10 +1104,10 @@ angular.module('webadminApp')
                         }
 
                         var zoomDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
-                        if(mouseOverRightScrollButton){
+                        if(mouseNearRightBorder){
                             zoomDate = scope.scaleManager.end;
                         }
-                        if(mouseOverLeftScrollButton){
+                        if(mouseNearLeftBorder){
                             zoomDate = scope.scaleManager.start;
                         }
 
