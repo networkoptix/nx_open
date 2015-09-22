@@ -52,8 +52,6 @@ QnPage {
 
         anchors.fill: parent
         anchors.topMargin: -toolBar.fullHeight
-        anchors.bottomMargin: videoNavigation.videoBottomMargin
-        Behavior on anchors.bottomMargin { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
         source: mediaPlayer.mediaPlayer
 
@@ -86,8 +84,6 @@ QnPage {
     function hideUi() {
         videoNavigation.opacity = 0.0
         toolBar.opacity = 0.0
-        video.anchors.bottomMargin = Qt.binding(function() { return -navigationBarPlaceholder.height })
-        video.anchors.rightMargin = Qt.binding(function() { return -navigationBarPlaceholder.width })
         if (Main.isMobile())
             enterFullscreen()
     }
@@ -96,8 +92,6 @@ QnPage {
         exitFullscreen()
         videoNavigation.opacity = 1.0
         toolBar.opacity = 1.0
-        video.anchors.bottomMargin = Qt.binding(function() { return videoNavigation.videoBottomMargin })
-        video.anchors.rightMargin = 0
     }
 
     focus: true

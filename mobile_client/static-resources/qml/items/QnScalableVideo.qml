@@ -12,75 +12,34 @@ QnZoomableFlickable {
 
     minContentWidth: width
     minContentHeight: height
-    maxContentWidth: d.sourceWidth * maxZoomFactor
-    maxContentHeight: d.sourceHeight * maxZoomFactor
+    maxContentWidth: video.sourceRect.width * maxZoomFactor
+    maxContentHeight: video.sourceRect.height * maxZoomFactor
 
     clip: true
-
-    QtObject {
-        id: d
-
-        property bool stick: true
-        property bool initialized: false
-
-        property int sourceWidth: video.sourceRect.width
-        property int sourceHeight: video.sourceRect.height
-
-        onSourceWidthChanged: updateSize()
-        onSourceHeightChanged: updateSize()
-
-        function updateStick() {
-            if (!d.initialized) {
-                if (!updateSize())
-                    return
-
-                d.initialized = true
-            }
-
-            var ar = zf.width / zf.height
-            var car = zf.contentWidth / zf.contentHeight
-
-            if (car > ar)
-                d.stick = Math.abs(zf.contentWidth - zf.width) < dp(56)
-            else
-                d.stick = Math.abs(zf.contentHeight - zf.height) < dp(56)
-        }
-
-        function updateSize() {
-            if (zf.width <= 0 || zf.height <= 0 || d.sourceWidth <= 0 || d.sourceHeight <= 0)
-                return false
-
-            if (d.stick) {
-                zf.contentWidth = zf.width
-                zf.contentHeight = zf.width / d.sourceWidth * d.sourceHeight
-            } else {
-                zf.contentWidth = d.sourceWidth
-                zf.contentHeight = d.sourceHeight
-            }
-
-            return true
-        }
-
-        function autoSize() {
-            if (!d.stick)
-                return
-
-            zf.fitToBounds()
-        }
-    }
 
     VideoOutput {
         id: video
 
         width: zf.contentWidth
         height: zf.contentHeight
+
+        onSourceRectChanged: {
+            var w = sourceRect.width
+            var h = sourceRect.height
+
+            if (w < 0 || h < 0)
+                return
+
+            var scale = Math.min(zf.width / w, zf.height / h)
+            w *= scale
+            h *= scale
+
+            animateToSize(w, h, true)
+        }
     }
 
-    onContentWidthChanged: d.updateStick()
-    onContentHeightChanged: d.updateStick()
-
-    onWidthChanged: d.autoSize()
-    onHeightChanged: d.autoSize()
+    onWidthChanged: zf.fitToBounds()
+    onHeightChanged: zf.fitToBounds()
 
     function fitToBounds() {
         animateToSize(zf.width, zf.height)

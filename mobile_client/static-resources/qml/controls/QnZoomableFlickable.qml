@@ -21,8 +21,8 @@ Item {
     signal clicked()
     signal doubleClicked()
 
-    function animateToSize(width, height) {
-        flick.animateToSize(width, height)
+    function animateToSize(width, height, forceSize) {
+        flick.animateToSize(width, height, forceSize)
     }
 
     QnFlickable {
@@ -32,7 +32,7 @@ Item {
 
         topMargin: 0
         leftMargin: 0
-        bottomMargin: topMargin
+        bottomMargin: topMargin * 2
         rightMargin: leftMargin
 
         flickableDirection: Flickable.HorizontalAndVerticalFlick
@@ -64,7 +64,7 @@ Item {
 
         function updateMargins() {
             leftMargin = Qt.binding(function() { return Math.max(0, (width - contentWidth) / 2) })
-            topMargin = Qt.binding(function() { return Math.max(0, (height - contentHeight) / 2) })
+            topMargin = Qt.binding(function() { return Math.max(0, (height - contentHeight) / 3) })
         }
 
         function animateToBounds() {
@@ -90,7 +90,7 @@ Item {
             */
         }
 
-        function animateToSize(cw, ch) {
+        function animateToSize(cw, ch, forceSize) {
             boundsAnimation.stop()
 
             var w = contentWidth
@@ -98,7 +98,7 @@ Item {
             var x = contentX
             var y = contentY
 
-            if (w > 0 && h > 0) {
+            if (w > 0 && h > 0 && forceSize != true) {
                 var scale = Math.min(cw / w, ch / h)
                 w *= scale
                 h *= scale
@@ -108,14 +108,14 @@ Item {
             }
 
             var xMargin = Math.max(0, (width - w) / 2)
-            var yMargin = Math.max(0, (height - h) / 2)
+            var yMargin = Math.max(0, (height - h) / 3)
 
             if (-x + w < width - xMargin)
                 x = w - width + xMargin
             if (x < xMargin)
                 x = -xMargin
-            if (-y + h < height - yMargin)
-                y = h - height + yMargin
+            if (-y + h < height - yMargin * 2)
+                y = h - height + yMargin * 2
             if (y < yMargin)
                 y = -yMargin
 
