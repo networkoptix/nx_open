@@ -6,7 +6,7 @@ Item {
     id: toolbar
 
     property alias title: label.text
-    property bool useShadeSize: Qt.platform.os == "android"
+    property bool useShadeSize: Qt.platform.os == "android" || Qt.platform.os == "ios"
     property alias statusBarHeight: statusBarShade.height
 
     readonly property real fullHeight: height + (useShadeSize ? statusBarHeight : 0)

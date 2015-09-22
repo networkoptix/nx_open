@@ -39,4 +39,8 @@ android {
 ios {
     QMAKE_INFO_PLIST = ${basedir}/${arch}/Info.plist
     OTHER_FILES += $${QMAKE_INFO_PLIST}
+    OBJECTIVE_SOURCES += \
+        ${basedir}/src/ui/window_utils_ios.mm
+    QMAKE_LFLAGS += \
+        ${ios.oslibs}
 }
