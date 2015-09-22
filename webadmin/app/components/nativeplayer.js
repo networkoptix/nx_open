@@ -52,7 +52,8 @@ var nativePlayer = new (function () {
     this.load = function(url,type){
         this.destroy();
 
-        $currentVideo = $('<video  src="' + url + '" type="' + type + '"><source src="' + url + '" type="' + type + '"></source></video>' ).appendTo(node);
+        var videoClass = window.jscd.browser == 'Microsoft Internet Explorer'?'':'class="fullsize"';
+        $currentVideo = $('<video ' + videoClass + ' src="' + url + '" type="' + type + '"><source src="' + url + '" type="' + type + '"></source></video>' ).appendTo(node);
 
         currentVideo = $currentVideo.get(0);
 
