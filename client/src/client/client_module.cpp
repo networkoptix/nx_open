@@ -51,8 +51,7 @@ namespace
     typedef std::unique_ptr<QnClientTranslationManager> QnClientTranslationManagerPtr;
 
     QnClientTranslationManagerPtr initializeTranslations(QnClientSettings *settings
-        , const QString &dynamicTranslationPath
-        , bool forceLocalSettings)
+        , const QString &dynamicTranslationPath)
     {
         QnClientTranslationManagerPtr translationManager(new QnClientTranslationManager());
 
@@ -97,7 +96,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
     /// We should load translations before major client's services are started to prevent races
     QnClientTranslationManagerPtr translationManager(initializeTranslations(
-        clientSettings.data(),  startupParams.dynamicTranslationPath, startupParams.forceLocalSettings));
+        clientSettings.data(),  startupParams.dynamicTranslationPath));
 
     /* Init singletons. */
 
