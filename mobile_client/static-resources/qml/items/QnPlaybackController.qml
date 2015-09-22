@@ -174,8 +174,9 @@ Item {
 
         QnPlayPauseIcon {
             anchors.centerIn: circle
-            width: circle.width * 0.4
-            height: circle.height * 0.4
+            width: circle.width * 0.4 / iconScale()
+            height: circle.height * 0.4 / iconScale()
+            scale: iconScale()
             pauseState: rootItem.paused
             color: rootItem.color
         }

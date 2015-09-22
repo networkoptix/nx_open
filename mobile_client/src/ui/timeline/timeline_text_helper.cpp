@@ -11,19 +11,23 @@ namespace {
 class QnTimelineTextHelperPrivate {
 public:
     QImage texture;
+    QFont font;
     QFontMetrics fm;
     int lineHeight;
     int digitWidth;
     QHash<QString, QRect> strings;
     int maxCharWidth;
     int spaceWidth;
+    qreal pixelRatio;
 
-    QnTimelineTextHelperPrivate(const QFont &font) :
-        fm(font),
-        lineHeight(fm.height()),
-        digitWidth(fm.size(Qt::TextSingleLine, lit("0")).width()),
-        maxCharWidth(fm.size(Qt::TextSingleLine, lit("m")).width()),
-        spaceWidth(fm.size(Qt::TextSingleLine, lit(" ")).width())
+    QnTimelineTextHelperPrivate(QFont font, qreal pixelRatio)
+        : font((font.setPixelSize(font.pixelSize() * pixelRatio), font))
+        , fm(this->font)
+        , lineHeight(fm.height())
+        , digitWidth(fm.size(Qt::TextSingleLine, lit("0")).width())
+        , maxCharWidth(fm.size(Qt::TextSingleLine, lit("m")).width())
+        , spaceWidth(fm.size(Qt::TextSingleLine, lit(" ")).width())
+        , pixelRatio(pixelRatio)
     {}
 
     void drawNumbers(QPainter *painter) {
@@ -53,8 +57,8 @@ public:
     }
 };
 
-QnTimelineTextHelper::QnTimelineTextHelper(const QFont &font, const QColor &color, const QStringList &strings) :
-    d(new QnTimelineTextHelperPrivate(font))
+QnTimelineTextHelper::QnTimelineTextHelper(const QFont &font, qreal pixelRatio, const QColor &color, const QStringList &strings) :
+    d(new QnTimelineTextHelperPrivate(font, pixelRatio))
 {
     int textureSize = 128;
     int desiredSize = charsPerLine * maxCharWidth();
@@ -66,7 +70,7 @@ QnTimelineTextHelper::QnTimelineTextHelper(const QFont &font, const QColor &colo
 
     {
         QPainter painter(&d->texture);
-        painter.setFont(font);
+        painter.setFont(d->font);
         painter.setPen(color);
         painter.setBrush(color);
 
@@ -103,11 +107,11 @@ QRectF QnTimelineTextHelper::stringCoordinates(const QString &string) const {
 }
 
 QSize QnTimelineTextHelper::stringSize(const QString &string) const {
-    return d->strings.value(string).size();
+    return d->strings.value(string).size() / pixelRatio();
 }
 
 QSize QnTimelineTextHelper::digitSize() const {
-    return QSize(d->digitWidth, d->lineHeight);
+    return QSize(d->digitWidth, d->lineHeight) / pixelRatio();
 }
 
 QImage QnTimelineTextHelper::texture() const {
@@ -115,13 +119,17 @@ QImage QnTimelineTextHelper::texture() const {
 }
 
 int QnTimelineTextHelper::maxCharWidth() const {
-    return d->maxCharWidth;
+    return d->maxCharWidth / d->pixelRatio;
 }
 
 int QnTimelineTextHelper::lineHeight() const {
-    return d->lineHeight;
+    return d->lineHeight / d->pixelRatio;
 }
 
 int QnTimelineTextHelper::spaceWidth() const {
-    return d->spaceWidth;
+    return d->spaceWidth / d->pixelRatio;
+}
+
+qreal QnTimelineTextHelper::pixelRatio() const {
+    return d->pixelRatio;
 }

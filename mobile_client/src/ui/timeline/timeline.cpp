@@ -12,6 +12,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QDebug>
 
+#include <ui/resolution_util.h>
 #include "timeline_text_helper.h"
 #include "timeline_zoom_level.h"
 #include "timeline_chunk_painter.h"
@@ -115,8 +116,6 @@ public:
     QSGTexture *textTexture;
     QScopedPointer<QnTimelineTextHelper> textHelper;
 
-    qreal dpMultiplier;
-
     int prevZoomIndex;
     qreal zoomLevel;
     qreal targetZoomLevel;
@@ -165,7 +164,6 @@ public:
         timeZoneShift(0),
         chunkProvider(nullptr)
     {
-        dpMultiplier = 2;
         chunkBarHeight = 48;
         textY = -1;
 
@@ -217,7 +215,11 @@ public:
     }
 
     int dp(qreal dpix) {
-        return qRound(dpMultiplier * dpix);
+        QnResolutionUtil *resolutionUtil = QnResolutionUtil::instance();
+        if (!resolutionUtil)
+            return dpix;
+
+        return resolutionUtil->dp(dpix);
     }
 
     void updateZoomLevel() {
@@ -300,7 +302,11 @@ public:
         if (!window)
             return;
 
-        textHelper.reset(new QnTimelineTextHelper(textFont, textColor, suffixList));
+        qreal pixelRatio = 1.0;
+        if (QnResolutionUtil *resolutionUtil = QnResolutionUtil::instance())
+            pixelRatio = resolutionUtil->pixelRatio();
+
+        textHelper.reset(new QnTimelineTextHelper(textFont, pixelRatio, textColor, suffixList));
         textTexture = window->createTextureFromImage(textHelper->texture());
     }
 
