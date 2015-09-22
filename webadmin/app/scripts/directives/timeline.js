@@ -124,8 +124,9 @@ angular.module('webadminApp')
                         size:20,
                         width:10
                     },
-                    scrollingSpeed:0.1,
-                    slowScrollSpeed: 0.01,
+                    scrollSpeed:0.25, // Relative to screen
+                    slowScrollSpeed: 0.25,
+
 
                     scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
 
@@ -325,13 +326,12 @@ angular.module('webadminApp')
                 // !!! Drawing and redrawing functions
                 function drawAll(){
                     if(scope.positionProvider) {
-                        scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
+                        scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition,scope.positionProvider.liveMode,(new Date()).getTime());
                     }
                     if(scope.recordsProvider) {
                         scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
                     }
 
-                    scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
 
                     processZooming();
                     processScrolling();
@@ -997,13 +997,14 @@ angular.module('webadminApp')
                 var mouseOverLeftScrollButton = false;
 
                 function drawOrCheckLeftRightButtons(context){
-                    return;
 
-                    var canScrollRight = scope.scaleManager.canScroll(true);
-                    var canScrollLeft = scope.scaleManager.canScroll(false);
+                    var canScrollRight = scope.scaleManager.canScroll(false);
+                    var canScrollLeft = scope.scaleManager.canScroll(true);
 
                     mouseOverRightScrollButton = canScrollRight && mouseCoordinate > scope.viewportWidth - timelineConfig.leftRightButtonsWidth;
                     mouseOverLeftScrollButton = canScrollLeft && mouseCoordinate < timelineConfig.leftRightButtonsWidth;
+
+                    //console.log("drawOrCheckLeftRightButtons",canScrollRight,canScrollLeft,mouseOverRightScrollButton,mouseOverLeftScrollButton);
 
                     if(!context){ return; }
 
@@ -1096,7 +1097,16 @@ angular.module('webadminApp')
                             zoomTarget -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
                             zoomTarget = scope.scaleManager.boundZoom(zoomTarget);
                         }
-                        scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
+
+                        var zoomDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
+                        if(mouseOverRightScrollButton){
+                            zoomDate = scope.scaleManager.end;
+                        }
+                        if(mouseOverLeftScrollButton){
+                            zoomDate = scope.scaleManager.start;
+                        }
+
+                        scope.zoomTo(zoomTarget, zoomDate, window.jscd.touch);
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
                         delayWatchingPlayingPosition();
@@ -1117,9 +1127,10 @@ angular.module('webadminApp')
                     },timelineConfig.animationDuration);
                 }
 
-                function animateScroll(targetPosition){
+                function animateScroll(targetPosition,slow){
                     delayWatchingPlayingPosition();
-                    animateScope.animate(scope,"scrollPosition",targetPosition).
+
+                    animateScope.animate(scope,"scrollTarget",targetPosition,slow?"linear":false).
                         then(
                             function(){},
                             function(){},
@@ -1136,43 +1147,68 @@ angular.module('webadminApp')
 
                 var scrollingNow = false;
                 var scrollingLeft = false;
+                function setScroll(value){
+                    scope.scaleManager.scroll(value);
+                }
                 function processScrolling(){
                     if(scrollingNow) {
-                        //TODO: Do scrolling here - like zooming
+                        var moveScroll = (scrollingLeft ? -1 : 1) * timelineConfig.slowScrollSpeed * scope.viewportWidth;
+                        var scrollTarget = scope.scaleManager.getScrollByPixelsTarget(moveScroll);
+                        animateScroll(scrollTarget,true);
                     }
                 }
                 scope.stopScroll = function(left) {
                     if(scrollingNow) {
                         scrollingNow = false;
-                        // TODO: some code to finalize scrolling, maybe
                     }
                 };
                 scope.startScroll = function(left) {
+
+                    console.log("startScroll");
                     if(!scope.scaleManager.canScroll(left)){
                         return;
                     }
+
+                    scope.scrollTarget = scope.scaleManager.scroll();
 
                     scrollingNow = true;
                     scrollingLeft = left;
 
                     processScrolling();
                 };
-
+                scope.scrollStep = function(left){
+                    scope.scrollTarget = scope.scaleManager.scroll();
+                    var moveScroll = (left ? -1 : 1) * timelineConfig.scrollSpeed * scope.viewportWidth;
+                    var scrollTarget = scope.scaleManager.getScrollByPixelsTarget(moveScroll);
+                    animateScroll(scrollTarget);
+                };
 
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
                     if(preventClick){
                         return;
                     }
+
+                    if(mouseOverLeftScrollButton){
+                        animateScroll(0);
+                        return;
+                    }
+
+                    if(mouseOverRightScrollButton){
+                        animateScroll(1);
+                        return;
+                    }
+
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         scope.zoom(true);
                     }else{
                         if(!mouseInScrollbar){
                             animateScroll((mouseInScrollbarRow>0?1:0));
-
                         }
                     }
+
+
                 };
                 scope.click = function(event){
                     updateMouseCoordinate(event);
@@ -1181,10 +1217,14 @@ angular.module('webadminApp')
                     }
 
                     if(mouseOverRightScrollButton){
+                        console.log("scrollStep right");
+                        scope.scrollStep(false);
                         //Scroll by percents
                         return;
                     }
                     if(mouseOverLeftScrollButton){
+                        console.log("scrollStep left");
+                        scope.scrollStep(true);
                         //Scroll by percents
                         return;
                     }
@@ -1203,7 +1243,9 @@ angular.module('webadminApp')
 
                     }else{
                         if(!mouseInScrollbar){
-                            scope.scrollPosition = scope.scaleManager.scroll() ;
+
+                            console.log("animateScroll");
+                            scope.scrollTarget = scope.scaleManager.scroll() ;
                             animateScroll(mouseCoordinate / scope.viewportWidth);
                         }
                     }
@@ -1230,9 +1272,12 @@ angular.module('webadminApp')
                     }*/
                 };
                 scope.mouseDown = function(event){
-                    updateMouseCoordinate(event);
-                    // catchScrollBar = mouseInScrollbar;
 
+
+                };
+
+                scope.draginit = function(event){
+                    updateMouseCoordinate(event);
 
                     if(mouseOverLeftScrollButton){
                         scope.startScroll(true);
@@ -1244,16 +1289,12 @@ angular.module('webadminApp')
                         return;
                     }
 
-                    if(mouseInScrollbar && mouseInScrollbarRow){
-                        scope.startScroll( scope.scaleManager.scroll() > mouseCoordinate / scope.viewportWidth);
-                    }
-                };
-
-                scope.draginit = function(event){
-                    updateMouseCoordinate(event);
                     catchScrollBar = mouseInScrollbar;
                     catchTimeline = mouseInTimeline;
-                    scope.scaleManager.stopWatching();
+
+                    if(catchTimeline && catchScrollBar) {
+                        scope.scaleManager.stopWatching();
+                    }
                 };
                 scope.drag = function(event){
                     updateMouseCoordinate(event);
@@ -1268,7 +1309,9 @@ angular.module('webadminApp')
                         scope.scaleManager.scrollByPixels(moveScroll);
                     }
                 };
-                scope.drastart = function(event){};
+                scope.drastart = function(event){
+                    console.log("drastart");
+                };
                 scope.dragend = function(event){
                     catchScrollBar = false;
                     catchTimeline = false;

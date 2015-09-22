@@ -960,13 +960,15 @@ ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
     }
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
+ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode,end){
     if(this.anchorDate == date){
         return;
     }
 
-    if(date > this.end){
+    if(date > this.end && liveMode){
         this.setEnd(date);
+    }else if(end>this.end){
+        this.setEnd(end);
     }
 
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
@@ -1100,6 +1102,7 @@ ScaleManager.prototype.canScroll = function(left){
     if(left){
         return this.visibleStart != this.start;
     }
+
     return this.visibleEnd != this.end;
 };
 
@@ -1113,6 +1116,10 @@ ScaleManager.prototype.scroll = function(value){
     var achcorDate = this.anchorDate; //Save anchorDate
     this.setAnchorDateAndPoint(this.start + value * (this.end-this.start),0.5); //Move viewport
     this.tryToRestoreAnchorDate(achcorDate); //Try to restore anchorDate
+};
+
+ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
+    return this.bound(0,this.scroll() +pixels / this.viewportWidth * this.getRelativeWidth(),1);
 };
 
 ScaleManager.prototype.scrollByPixels = function(pixels){
