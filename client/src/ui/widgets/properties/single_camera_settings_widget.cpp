@@ -506,6 +506,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     setReadOnly(ui->cameraMotionButton, readOnly);
     if(m_motionWidget)
         setReadOnly(m_motionWidget, readOnly);
+    setReadOnly(ui->imageControlWidget, readOnly);
     setReadOnly(ui->advancedSettingsWidget, readOnly);
     setReadOnly(ui->ioPortSettingsWidget, readOnly);
     m_readOnly = readOnly;
