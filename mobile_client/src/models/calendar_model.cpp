@@ -20,9 +20,10 @@ namespace {
 }
 
 class QnCalendarModelPrivate {
+    Q_DECLARE_PUBLIC(QnCalendarModel)
 public:
     QnCalendarModelPrivate(QnCalendarModel *parent) :
-        parent(parent),
+        q_ptr(parent),
         populated(false),
         mondayIsFirstDay(true),
         chunkProvider(nullptr)
@@ -33,7 +34,7 @@ public:
         populate();
     }
 
-    QnCalendarModel *parent;
+    QnCalendarModel *q_ptr;
 
     bool populated;
 
@@ -54,7 +55,7 @@ public:
 
 QnCalendarModel::QnCalendarModel(QObject *parent) :
     QAbstractListModel(parent),
-    d(new QnCalendarModelPrivate(this))
+    d_ptr(new QnCalendarModelPrivate(this))
 {
 }
 
@@ -63,12 +64,15 @@ QnCalendarModel::~QnCalendarModel() {
 
 int QnCalendarModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent)
+    Q_D(const QnCalendarModel);
     return d->days.size();
 }
 
 QVariant QnCalendarModel::data(const QModelIndex &index, int role) const {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
+
+    Q_D(const QnCalendarModel);
 
     const CalendarDay &day = d->days[index.row()];
 
@@ -95,10 +99,13 @@ QHash<int, QByteArray> QnCalendarModel::roleNames() const {
 }
 
 int QnCalendarModel::year() const {
+    Q_D(const QnCalendarModel);
     return d->year;
 }
 
 void QnCalendarModel::setYear(int year) {
+    Q_D(QnCalendarModel);
+
     if (d->year == year)
         return;
 
@@ -113,10 +120,13 @@ void QnCalendarModel::setYear(int year) {
 }
 
 int QnCalendarModel::month() const {
+    Q_D(const QnCalendarModel);
     return d->month;
 }
 
 void QnCalendarModel::setMonth(int month) {
+    Q_D(QnCalendarModel);
+
     if (d->month == month)
         return;
 
@@ -131,10 +141,13 @@ void QnCalendarModel::setMonth(int month) {
 }
 
 bool QnCalendarModel::mondayIsFirstDay() const {
+    Q_D(const QnCalendarModel);
     return d->mondayIsFirstDay;
 }
 
 void QnCalendarModel::setMondayIsFirstDay(bool mondayIsFirstDay) {
+    Q_D(QnCalendarModel);
+
     if (d->mondayIsFirstDay == mondayIsFirstDay)
         return;
 
@@ -150,10 +163,13 @@ void QnCalendarModel::setMondayIsFirstDay(bool mondayIsFirstDay) {
 }
 
 QnCameraChunkProvider *QnCalendarModel::chunkProvider() const {
+    Q_D(const QnCalendarModel);
     return d->chunkProvider;
 }
 
 void QnCalendarModel::setChunkProvider(QnCameraChunkProvider *chunkProvider) {
+    Q_D(QnCalendarModel);
+
     if (d->chunkProvider == chunkProvider)
         return;
 
@@ -162,11 +178,21 @@ void QnCalendarModel::setChunkProvider(QnCameraChunkProvider *chunkProvider) {
 
     d->chunkProvider = chunkProvider;
 
-    if (d->chunkProvider)
-        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated, this, [this](){ d->updateArchiveInfo(); });
+    if (d->chunkProvider) {
+        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated, this, [this, d](){
+            beginResetModel();
+            d->updateArchiveInfo();
+            endResetModel();
+            // emit dataChanged(index(0), index(rowCount()), QVector<int>() << HasArchiveRole);
+        });
+    }
 
+    /* For some reason QML does not react to model changes :(
+     * So we have to reset model. */
+    beginResetModel();
     d->updateArchiveInfo();
-    emit dataChanged(index(0), index(rowCount()), QVector<int>() << HasArchiveRole);
+    endResetModel();
+    // emit dataChanged(index(0), index(rowCount()), QVector<int>() << HasArchiveRole);
 
     emit chunkProviderChanged();
 }

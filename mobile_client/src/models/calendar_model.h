@@ -51,5 +51,6 @@ signals:
     void chunkProviderChanged();
 
 private:
-    QScopedPointer<QnCalendarModelPrivate> d;
+    Q_DECLARE_PRIVATE(QnCalendarModel)
+    QScopedPointer<QnCalendarModelPrivate> d_ptr;
 };
