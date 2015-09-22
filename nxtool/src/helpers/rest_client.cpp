@@ -1,12 +1,17 @@
 
 #include "rest_client.h"
 
+#include <QString>
+
+#include <version.h>
+
 #include <helpers/http_client.h>
 #include <helpers/multicast/multicast_http_client.h>
 
 namespace
 {
-    const QString kUserAgent = "NX Tool";
+    const QString kUserAgent = QString("%1 / %2").arg(
+        QLatin1String(QN_APPLICATION_DISPLAY_NAME), QLatin1String(QN_APPLICATION_VERSION));
 
     QUrl makeHttpUrl(const rtu::RestClient::Request &request)
     {
@@ -16,7 +21,7 @@ namespace
         url.setScheme("http");
         url.setHost(info.hostAddress);
         url.setPort(info.port);
-        url.setUserName(rtu::RestClient::adminUserName());
+        url.setUserName(rtu::RestClient::defaultAdminUserName());
         url.setPassword(request.password);
         url.setPath(request.path);
         url.setQuery(request.params);
@@ -33,7 +38,7 @@ namespace
         result.url = kUrlTemplate.arg(request.path, request.params.toString());
         result.serverId = request.target->id;
         result.contentType = "application/json";
-        result.auth.setUser(rtu::RestClient::adminUserName());
+        result.auth.setUser(rtu::RestClient::defaultAdminUserName());
         result.auth.setPassword(request.password);
         return result;
     }
@@ -101,11 +106,10 @@ private:
 
 rtu::RestClient::Impl::Impl(RestClient *owner)
     : m_owner(owner)
-    , m_httpClient(nullptr)
+    , m_httpClient(kDefaultTimeoutMs)
     , m_multicastClient(kUserAgent)
 {
-    enum { kDefaultTimeout = 10 * 1000 };   /// move http client timeout initialization here
-    m_multicastClient.setDefaultTimeout(kDefaultTimeout);
+    m_multicastClient.setDefaultTimeout(kDefaultTimeoutMs);
 }
 
 rtu::RestClient::Impl::~Impl()
@@ -247,7 +251,6 @@ rtu::RestClient::RestClient()
 
 rtu::RestClient::~RestClient()
 {
-    QObject::disconnect(nullptr, nullptr, nullptr, nullptr);
 }
 
 void rtu::RestClient::sendGet(const Request &request)
@@ -267,9 +270,9 @@ void rtu::RestClient::sendPost(const Request &request
         implInstance().sendMulticastPost(request, data);
 }
         
-const QString &rtu::RestClient::adminUserName()
+const QString &rtu::RestClient::defaultAdminUserName()
 {
-    static QString result("admin");
+    static const QString result = QStringLiteral("admin");
     return result;
 }
 

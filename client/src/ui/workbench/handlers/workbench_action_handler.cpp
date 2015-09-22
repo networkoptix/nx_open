@@ -38,6 +38,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_resource.h>
@@ -159,42 +160,6 @@ namespace {
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
-
-// -------------------------------------------------------------------------- //
-// QnResourceStatusReplyProcessor
-// -------------------------------------------------------------------------- //
-detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources):
-    awaitedResponseCount(0),
-    m_handler(handler),
-    m_resources(resources)
-{}
-
-void detail::QnResourceStatusReplyProcessor::at_replyReceived( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
-    Q_UNUSED(handle);
-
-    if(m_handler)
-        m_handler.data()->at_resources_statusSaved(errorCode, resources);
-
-    deleteLater();
-}
-
-
-// -------------------------------------------------------------------------- //
-// QnResourceReplyProcessor
-// -------------------------------------------------------------------------- //
-detail::QnResourceReplyProcessor::QnResourceReplyProcessor(QObject *parent):
-    QObject(parent),
-    m_handle(0),
-    m_status(0)
-{}
-
-void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QnResourceList &resources, int handle) {
-    m_status = status;
-    m_resources = resources;
-    m_handle = handle;
-
-    emit finished(status, resources, handle);
-}
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
@@ -832,7 +797,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     if (!m_awaitingMoveCameras.contains(handle))
         return;
     QnVirtualCameraResourceList modifiedResources = m_awaitingMoveCameras.value(handle).cameras;
-    QnResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
+    QnMediaServerResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
     m_awaitingMoveCameras.remove(handle);
 
     if (status != 0) {
@@ -879,32 +844,13 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     }
 
     const QnUuid serverId = server->getId();
-    for (auto camera: modifiedResources) {
-        camera->setParentId(serverId);
+    qnResourcesChangesManager->saveCameras(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
         camera->setPreferedServerId(serverId);
-    }
+    });
 
-    if(!modifiedResources.empty()) {
-        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources);
-
-        processor->awaitedResponseCount.store( 2 );
-        auto completionHandler = [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
-            if( --processor->awaitedResponseCount == 0 )
-                processor->at_replyReceived(reqID, errorCode, modifiedResources);
-        };
-
-        connection2()->getCameraManager()->save(
-            modifiedResources,
-            processor,
-            completionHandler );
-
-        const QList<QnUuid>& idList = idListFromResList(modifiedResources);
-        connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idList),
-            processor,
-            completionHandler );
-        propertyDictionary->saveParamsAsync(idList);    //saving modified properties
-    }
+    qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
+        camera->setParentId(serverId);
+    });
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
@@ -1519,25 +1465,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QnMediaServerResourcePtr server = servers.first();
-    QnMediaServerUserAttributes oldAttrValue = *QnMediaServerUserAttributesPool::instance()->get(server->getId());
-    const auto acceptCallback = [this, server, oldAttrValue]()
-    {
-        if (!server->resourcePool())    /// Wrong server status - it could be deleted from the system, for example
-            return;
-
-        // TODO: #Elric move submitToResources here.
-        QnMediaServerUserAttributesPtr newAttrValue = QnMediaServerUserAttributesPool::instance()->get(server->getId());
-        if (!(*newAttrValue == oldAttrValue) || server->hasUpdatedStorages()) {
-            const auto serverAttrs = QnMediaServerUserAttributesList() << newAttrValue;
-            const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
-                { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };
-
-            connection2()->getMediaServerManager()->saveUserAttributes(serverAttrs, this, handler);
-        }
-        server->saveUpdatedStorages();
-    };
-
-    QnServerSettingsDialog::showNonModal(server, acceptCallback, mainWindow());
+    QnServerSettingsDialog::showNonModal(server, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
@@ -1754,65 +1682,25 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     } else if (nodeType == Qn::RecorderNode) {
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
-        QnVirtualCameraResourceList modified;
-        foreach(const QnVirtualCameraResourcePtr &cam, qnResPool->getResources<QnVirtualCameraResource>()) {
-            if (!cam || cam->getGroupId() != groupId)
-                continue;
-            cam->setUserDefinedGroupName(name);
-            modified << cam;
-        }
-        if (modified.isEmpty())
-            return; // very strange outcome - at least camera should be in the list
-        connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modified)),
-            this, 
-            [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-                at_resources_saved( reqID, errorCode, modified );
-                if (errorCode != ec2::ErrorCode::ok)
-                    foreach (const QnVirtualCameraResourcePtr &camera, modified)
-                        camera->setUserDefinedGroupName(oldName);
-            } );
+
+        QnVirtualCameraResourceList modified = qnResPool->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera){
+            return camera->getGroupId() == groupId;
+        });
+        qnResourcesChangesManager->saveCameras(modified, [name](const QnVirtualCameraResourcePtr &camera) {
+            camera->setUserDefinedGroupName(name);
+        });
     } else {
-        if (!validateResourceName(resource, name))
-            return;
-
-        resource->setName(name);
-
-        // I've removed command "saveResource" because it cause sync issue in p2p mode. The problem because of we have transactions with different hash:
-        // for instance saveServer and saveResource. But result data will depend of transactions order.
-
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
+            qnResourcesChangesManager->saveServer(server, [name](const QnMediaServerResourcePtr &server) {
+                server->setName(name);
+            });
+        }
         
-        if (camera && nodeType == Qn::EdgeNode) {
-            if (mServer = camera->getParentServer())
-                mServer->setName(name);
+        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
+            qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) {
+                camera->setName(name);
+            });
         }
-
-        auto callback = [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << resource );
-            if (errorCode != ec2::ErrorCode::ok)
-                resource->setName(oldName);
-        };
-
-        if (mServer) {
-            connection2()->getMediaServerManager()->saveUserAttributes(
-                QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(mServer->getId()),
-                this,
-                callback );
-        }
-        if (camera)
-            connection2()->getCameraManager()->saveUserAttributes(
-                QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << camera)),
-                this,
-                callback);
-        if (user) 
-            connection2()->getUserManager()->save( user, this, callback );
-        if (layout)
-            connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this, callback);
-        propertyDictionary->saveParamsAsync(resource->getId()); //saving modified properties of resouce
     }
 }
 
@@ -1839,30 +1727,23 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
     };
 
-    auto deleteResources = [this](const QnResourceList& resources)
-    {
-        QVector<QnUuid> idToDelete;
-        foreach(const QnResourcePtr& resource, resources) 
-        {
-            if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) 
-            {
-                if(snapshotManager()->isLocal(layout)) {
-                    resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
-                    return;
-                }
-            }
-            QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
-                QnMediaServerResource::isHiddenServer(resource->getParentResource())
-                ? resource->getParentId()
-                : QnUuid();
-            if (!parentToDelete.isNull())
-                idToDelete << parentToDelete;
-            idToDelete << resource->getId();
+    auto deleteResources = [this](const QnResourceList &resources) {
+
+        QnLayoutResourceList localLayouts = resources.filtered<QnLayoutResource>([this](const QnLayoutResourcePtr &layout){
+            return snapshotManager()->isLocal(layout);
+        });
+
+        QnResourceList remoteResources = resources;
+
+        /* These can be simply deleted from resource pool. */
+        for (const QnLayoutResourcePtr &layout: localLayouts) {
+            remoteResources.removeOne(layout);
+            qnResPool->removeResource(layout); 
         }
 
-        // if we are deleting an edge camera, also delete its server
-        connection2()->getResourceManager()->remove( idToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
+        qnResourcesChangesManager->deleteResources(remoteResources);
     };
+
 
     /* Check if it's OK to delete something without asking. */
     QnResourceList autoDeleting;
@@ -1885,18 +1766,14 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
 
     /* Check that we are deleting online auto-found cameras */ 
-    QnVirtualCameraResourceList onlineAutoDiscoveredCameras;
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
-        if (!camera ||
-            camera->getStatus() == Qn::Offline || 
-            camera->isManuallyAdded()) 
-                continue;
-        onlineAutoDiscoveredCameras << camera;
-    } 
+    QnVirtualCameraResourceList onlineAutoDiscoveredCameras = cameras.filtered([](const QnVirtualCameraResourcePtr &camera){
+        return camera->getStatus() != Qn::Offline 
+            && !camera->isManuallyAdded();
+    });
 
     QString question;
-    /* First version of the dialog if all cameras are auto-discovered. */
-    if (cameras.size() == onlineAutoDiscoveredCameras.size()) {
+    /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
+    if (resources.size() == onlineAutoDiscoveredCameras.size()) {
         question =
             //: "These 5 cameras are auto-discovered."
             tr("These %n %1 are auto-discovered.").arg(getDefaultDevicesName(cameras, false)) + L'\n' 
@@ -1970,11 +1847,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setId(QnUuid::createUuid());
     user->setTypeByName(lit("User"));
 
-    connection2()->getUserManager()->save(
-        user, this,
-        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << user );
-        } );
+    qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
     user->setPassword(QString()); // forget the password now
 }
 
@@ -2075,16 +1948,12 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if (!(permissions & Qn::SavePermission))
         return;
-       
-    dialog->submitToResource();
-    if (!connection2())
-        return;
+    
+    qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &) {
+        dialog->submitToResource();
+    });
 
-    connection2()->getUserManager()->save(
-        user, this, 
-        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << user );
-    } );
+    //TODO: #GDM SafeMode what to rollback if current password changes cannot be saved?
 
     QString newPassword = user->getPassword();
     user->setPassword(QString());
@@ -2267,53 +2136,6 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
         }
     }
     layout->setBackgroundSize(QSize(w, h));
-}
-
-void QnWorkbenchActionHandler::at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
-    Q_UNUSED(handle);
-    Q_ASSERT(!resources.isEmpty());
-
-    if( errorCode == ec2::ErrorCode::ok )
-        return;
-
-    QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
-        tr("Error"),
-        tr("Could not save the following %n items.", "", resources.size()),
-        QDialogButtonBox::Ok
-        );
- 
-}
-
-void QnWorkbenchActionHandler::at_resources_properties_saved( int /*handle*/, ec2::ErrorCode /*errorCode */)
-{
-    //TODO/IMPL
-}
-
-void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode errorCode ) {
-    Q_UNUSED(handle);
-
-    if( errorCode == ec2::ErrorCode::ok )
-        return;
-
-    QMessageBox::critical(mainWindow(), 
-        tr("Could not delete resource"),
-        tr("An error has occurred while trying to delete a resource from Server. ") + L'\n'
-      + tr("Error description: '%1'").arg(ec2::toString(errorCode)));
-}
-
-void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources) {
-    if(errorCode == ec2::ErrorCode::ok || resources.isEmpty())
-        return;
-
-    QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
-        tr("Error"),
-        tr("Could not save changes made to the following %n resource(s).", "", resources.size()),
-        QDialogButtonBox::Ok
-    );
 }
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {

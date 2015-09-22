@@ -1,10 +1,8 @@
 #include "failover_priority_dialog.h"
 
-#include <api/app_server_connection.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 
 #include <ui/common/palette.h>
 #include <ui/delegates/failover_priority_resource_model_delegate.h>
@@ -173,27 +171,14 @@ void QnFailoverPriorityDialog::setColors(const QnFailoverPriorityColors &colors)
 
 
 void QnFailoverPriorityDialog::updatePriorityForSelectedCameras(Qn::FailoverPriority priority) {
-    QMap<QnVirtualCameraResourcePtr, Qn::FailoverPriority> backup;
-
-    auto cameras = selectedResources().filtered<QnVirtualCameraResource>();
-    QnVirtualCameraResourceList modified;
-    for (auto camera: cameras) {
-        if (camera->failoverPriority() == priority)
-            continue;
-        backup[camera] = camera->failoverPriority();
-        camera->setFailoverPriority(priority);
-        modified << camera;
-    }
+    auto modified = selectedResources().filtered<QnVirtualCameraResource>([priority](const QnVirtualCameraResourcePtr &camera) {
+        return camera->failoverPriority() != priority;
+    });
 
     if (modified.isEmpty())
         return;
 
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
-        QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modified)), this, [backup]( int reqID, ec2::ErrorCode errorCode ) {
-            Q_UNUSED(reqID);
-            if (errorCode == ec2::ErrorCode::ok)
-                return;
-            for (auto iter = backup.cbegin(); iter != backup.cend(); ++iter) 
-                iter.key()->setFailoverPriority(iter.value());
+    qnResourcesChangesManager->saveCameras(modified, [priority](const QnVirtualCameraResourcePtr &camera) {
+        camera->setFailoverPriority(priority);
     });
 }

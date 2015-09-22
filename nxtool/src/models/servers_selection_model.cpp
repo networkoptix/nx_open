@@ -1105,7 +1105,7 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
         return;
 
     
-    enum { kUpdatePeriod = HttpClient::kDefaultTimeoutMs * 3 };  /// At least x3 because there is http and multicast timeouts can be occured
+    enum { kUpdatePeriod = RestClient::kUseStandardTimeout * 3 };  /// At least x3 because there is http and multicast timeouts can be occured
 
     /// TODO: #ynikitenkov change for QElapsedTimer implementation
     const qint64 now = QDateTime::currentMSecsSinceEpoch();

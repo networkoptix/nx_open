@@ -4,6 +4,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <ui/common/checkbox_utils.h>
+#include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -22,6 +23,7 @@ namespace {
 QnImageControlWidget::QnImageControlWidget(QWidget* parent /* = 0*/):
     QWidget(parent),
     ui(new Ui::ImageControlWidget)
+    , m_readOnly(false)
 {
     ui->setupUi(this);
 
@@ -69,6 +71,9 @@ void QnImageControlWidget::updateFromResources(const QnVirtualCameraResourceList
 }
 
 void QnImageControlWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
+    if (m_readOnly)
+        return;
+
     bool allCamerasHasVideo = boost::algorithm::all_of(cameras, [](const QnVirtualCameraResourcePtr &camera) {
         return camera->hasVideo(0); 
     });
@@ -104,6 +109,25 @@ void QnImageControlWidget::submitToResources(const QnVirtualCameraResourceList &
 bool QnImageControlWidget::isFisheye() const {
     return ui->fisheyeCheckBox->isChecked();
 }
+
+bool QnImageControlWidget::isReadOnly() const {
+    return m_readOnly;
+}
+
+void QnImageControlWidget::setReadOnly(bool readOnly) {
+    if (m_readOnly == readOnly)
+        return;
+
+    using ::setReadOnly;
+    setReadOnly(ui->fisheyeCheckBox, readOnly);
+    setReadOnly(ui->forceArCheckBox, readOnly);
+    setReadOnly(ui->forceArComboBox, readOnly);
+    setReadOnly(ui->forceRotationCheckBox, readOnly);
+    setReadOnly(ui->forceRotationComboBox, readOnly);
+
+    m_readOnly = readOnly;
+}
+
 
 void QnImageControlWidget::updateAspectRatioFromResources(const QnVirtualCameraResourceList &cameras) {
     qreal arOverride = cameras.empty() ? 0 : cameras.front()->customAspectRatio();

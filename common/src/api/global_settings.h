@@ -26,8 +26,6 @@ public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
 
-    ec2::ApiResourceParamDataList allSettings() const;
-
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;
     void setDisabledVendors(QString disabledVendors);
@@ -52,7 +50,6 @@ public:
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
-
 signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();

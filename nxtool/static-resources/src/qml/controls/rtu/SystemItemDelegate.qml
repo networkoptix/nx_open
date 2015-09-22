@@ -154,8 +154,7 @@ Item
             id: loginButton;
             
             visible: (thisComponent.loggedState !== NxRtu.Constants.LoggedToAllServers);
-            height: (visible ? Common.SizeManager.clickableSizes.base : 0);
-            
+
             anchors
             {
                 verticalCenter: parent.verticalCenter;
@@ -163,7 +162,10 @@ Item
                 right: (visible ? parent.right : undefined);
             }
         
-            text: qsTr("enter the password");
+            activeFocusOnTab: false;
+            activeFocusOnPress: false;
+
+            text: qsTr("Enter the Password");
             fontSize: Common.SizeManager.fontSizes.base;
             onClicked: { loginDialog.show(); }
             

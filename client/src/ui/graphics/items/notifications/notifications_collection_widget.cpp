@@ -502,6 +502,10 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         );
         break;
     }
+    case QnSystemHealth::SystemIsReadOnly:
+    {
+        break;
+    }
     case QnSystemHealth::EmailSendError:
         item->addActionButton(
             qnSkin->icon("events/email.png"),

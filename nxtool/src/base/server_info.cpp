@@ -10,15 +10,6 @@ rtu::InterfaceInfo::InterfaceInfo()
     , useDHCP()
 {}
 
-rtu::InterfaceInfo::InterfaceInfo(bool initUseDHCP)
-    : name()
-    , ip()
-    , macAddress()
-    , mask()
-    , gateway()
-    , useDHCP(initUseDHCP ? Qt::Checked : Qt::Unchecked)
-{}
-
 bool rtu::operator == (const rtu::InterfaceInfo &first
     , const rtu::InterfaceInfo &second)
 {

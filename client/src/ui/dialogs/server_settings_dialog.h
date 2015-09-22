@@ -23,24 +23,17 @@ public:
 
         PageCount
     };
-
-    typedef std::function<void()> AcceptCallback;
-    
+   
     /// @brief Prevents wrong using of dialog
-    static void showNonModal(const QnMediaServerResourcePtr &server
-        , const AcceptCallback &callback
-        , QWidget *parent = nullptr);
+    static void showNonModal(const QnMediaServerResourcePtr &server , QWidget *parent = nullptr);
 
     bool tryClose(bool force);
 
 private:
     QnServerSettingsDialog(const QnMediaServerResourcePtr &server
-        , const AcceptCallback &callback
         , QWidget *parent);
 
     virtual ~QnServerSettingsDialog();
-
-    void submitData() override;
 
     void accept() override;
 
@@ -48,7 +41,6 @@ private:
     Q_DISABLE_COPY(QnServerSettingsDialog)
 
     QScopedPointer<Ui::ServerSettingsDialog> ui;
-    const AcceptCallback m_onAcceptClickedCallback;
     QnMediaServerResourcePtr m_server;
 
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;

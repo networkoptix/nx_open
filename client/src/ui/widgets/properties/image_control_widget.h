@@ -11,8 +11,9 @@ namespace Ui {
 
 class QnImageControlWidget : public QWidget {
     Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
-    typedef QWidget base_type;
+    typedef QWidget base_type;   
 public:
     QnImageControlWidget(QWidget* parent = 0);
     virtual ~QnImageControlWidget();
@@ -22,6 +23,8 @@ public:
 
     bool isFisheye() const;
 
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
 private:
     void updateAspectRatioFromResources(const QnVirtualCameraResourceList &cameras);
     void updateRotationFromResources(const QnVirtualCameraResourceList &cameras);
@@ -33,4 +36,5 @@ signals:
 
 private:
     QScopedPointer<Ui::ImageControlWidget> ui;
+    bool m_readOnly;
 };

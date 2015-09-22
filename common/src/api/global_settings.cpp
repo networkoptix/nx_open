@@ -205,13 +205,6 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
         adaptor->setResource(QnResourcePtr());
 }
 
-ec2::ApiResourceParamDataList QnGlobalSettings::allSettings() const {
-    if (!m_admin)
-        return ec2::ApiResourceParamDataList();
-
-    return m_admin->getProperties();
-}
-
 QnLdapSettings QnGlobalSettings::ldapSettings() const {
     QnLdapSettings result;
     result.uri = m_ldapUriAdaptor->value();

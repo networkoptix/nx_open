@@ -37,6 +37,7 @@
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resources_changes_manager.h>
 
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
@@ -1262,21 +1263,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     videoWall->setName(proposedName);
     videoWall->setTypeByName(lit("Videowall"));
 
-    connection2()->getVideowallManager()->save(videoWall,  this, 
-        [this, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
-            Q_UNUSED(reqID);
-            if (errorCode == ec2::ErrorCode::ok)
-                return;
-
-            //TODO: #GDM #VW make common place to call this dialog from different handlers
-            QnResourceListDialog::exec(
-                mainWindow(),
-                QnResourceList() << videoWall,
-                tr("Error"),
-                tr("Could not save the following %n items to Server.", "", 1),
-                QDialogButtonBox::Ok
-                );
-    } );
+    qnResourcesChangesManager->saveVideoWall(videoWall, [](const QnVideoWallResourcePtr &videoWall){});
 }
 
 void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
@@ -2331,6 +2318,7 @@ void QnWorkbenchVideoWallHandler::saveVideowall(const QnVideoWallResourcePtr& vi
     if (saveLayout && QnWorkbenchLayout::instance(videowall) )
         saveVideowallAndReviewLayout(videowall);
     else
+        //TODO: #GDM SafeMode 
         connection2()->getVideowallManager()->save(videowall, this, [] {});
 }
 
@@ -2369,6 +2357,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout( QnWorkbenchLayout *layout, s
     }
 
     //TODO: #GDM #VW sometimes saving is not required
+    //TODO: #GDM SafeMode 
     foreach (const QnVideoWallResourcePtr &videowall, videowalls){
         connection2()->getVideowallManager()->save(videowall, this, 
             [this, callback]( int reqID, ec2::ErrorCode errorCode ) {
@@ -2638,6 +2627,7 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
         if (workbenchResource)
             snapshotManager()->setFlags(workbenchResource, snapshotManager()->flags(workbenchResource) | Qn::ResourceIsBeingSaved);
     } else { // e.g. workbench layout is empty
+        //TODO: #GDM SafeMode 
         connection2()->getVideowallManager()->save(videowall, this, callback);
     }
 }

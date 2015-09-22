@@ -24,12 +24,13 @@ FocusScope
 
     property string initialText;
 
+    opacity: (enabled ? 1 : 0.5);
     onInitialTextChanged:
     {
         /// fills octets with initial values
         var arr = initialText.split(".");
         if (arr.length != 4)    /// should be 4 octets
-            return;
+            arr = ['', '', '', ''];
 
         firstOctet.initialText = arr[0];
         secondOctet.initialText = arr[1];

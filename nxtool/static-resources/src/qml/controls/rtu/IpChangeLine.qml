@@ -10,11 +10,15 @@ Grid
     property bool changed: (useDHCPCheckBox.changed || ipControlField.changed
         || subnetMaskField.changed || dnsControl.changed || gatewayControl.changed);
 
+    property int selectionSize: 0;
+
+    readonly property bool useIpRangeEnter: (selectionSize > 1);
     readonly property alias useDHCPControl: useDHCPCheckBox;
     readonly property alias ipAddressControl: ipControlField;
     readonly property alias subnetMaskControl: subnetMaskField;
     readonly property alias dnsControl: dnsServerField;
     readonly property alias gatewayControl: defaultGatewayField;
+    readonly property alias lastIpContol: lastAddressContol;
 
     property string adapterNameValue;
     property string interfaceCaption;
@@ -32,26 +36,26 @@ Grid
         id: adapterName;
 
         thin: false;
-        text: interfaceCaption;
+        text: (useIpRangeEnter ? qsTr("Static IP Range") : interfaceCaption);
     }
 
-    Base.EmptyCell {}
+    Base.EmptyCell {}   /// Address column holder
 
-    Base.EmptyCell {}
+    Base.EmptyCell {}   /// Use DHCP column holder
 
     ///
     Base.Text
     {
         id: ipAddressText;
 
-        text: qsTr("IP");
+        text: (useIpRangeEnter ? qsTr("Start IP") : qsTr("IP"));
     }
 
     Base.IpControl
     {
         id: ipControlField
 
-        enabled: !useDHCPCheckBox.checked;
+        enabled: (useDHCPCheckBox.checkedState == Qt.Unchecked);
 
         KeyNavigation.tab: subnetMaskField;
         KeyNavigation.backtab: thisComponent.KeyNavigation.backtab;
@@ -73,6 +77,32 @@ Grid
 
     ///
 
+    /// row for range ip entering
+
+    Base.Text
+    {
+        id: lastAddressText;
+        visible: useIpRangeEnter;
+
+        text: qsTr("End IP (auto)");
+    }
+
+    Base.IpEndRange
+    {
+        id: lastAddressContol;
+
+        visible: useIpRangeEnter;
+        addressesCount: selectionSize;
+        startAddress: ipControlField.text;
+    }
+
+    Base.EmptyCell /// Use DHCP column holder
+    {
+        visible: useIpRangeEnter;
+    }
+
+    ///
+
     Base.Text
     {
         id: subnetMaskCaption;
@@ -85,13 +115,13 @@ Grid
     {
         id: subnetMaskField;
 
-        enabled: !useDHCPCheckBox.checked;
+        enabled: (useDHCPCheckBox.checkedState == Qt.Unchecked);
 
         KeyNavigation.tab: defaultGatewayField;
         KeyNavigation.backtab: ipControlField;
     }
 
-    Base.EmptyCell {}
+    Base.EmptyCell {}   /// Use DHCP column holder
 
     ///
 
@@ -106,13 +136,13 @@ Grid
     {
         id: defaultGatewayField;
 
-        enabled: !useDHCPCheckBox.checked;
+        enabled: (useDHCPCheckBox.checkedState == Qt.Unchecked);
 
         KeyNavigation.tab: dnsServerField;
         KeyNavigation.backtab: subnetMaskField;
     }
 
-    Base.EmptyCell {}
+    Base.EmptyCell {}   /// Use DHCP column holder
 
     ///
 
@@ -132,5 +162,5 @@ Grid
             ? defaultGatewayField : thisComponent.KeyNavigation.backtab);
     }
 
-    Base.EmptyCell {}
+    Base.EmptyCell {}   /// Use DHCP column holder
 }

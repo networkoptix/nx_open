@@ -2,6 +2,7 @@
 #include "apply_changes_task.h"
 
 #include <QTimer>
+#include <QHostAddress>
 
 #include <base/types.h>
 #include <base/requests.h>
@@ -19,9 +20,9 @@ namespace
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
-        , kWaitTriesCount = 90
+        , kWaitTriesCount = 150
 
-        /// Accepted wait time is 180 seconds due to restart on network interface parameters change
+        /// Accepted wait time is 300 seconds due to restart on network interface parameters change
         , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
     };
 
@@ -131,7 +132,34 @@ namespace
             , item(initItem)
             , itfUpdateInfo(initItfUpdateInfo)
             , changesCount(changesFromUpdateInfos(initItfUpdateInfo))
-        {}
+        {
+            /// Forces send dhcp on every call
+            /// Forces send old ip if new one hasn't been assigned
+            const auto &extraInfo = initItem->second;
+            const auto &interfaces = extraInfo.interfaces;
+            for (auto &item: itfUpdateInfo)
+            {
+                if (!item.useDHCP || (item.mask && !item.ip))
+                {
+                    ///searching the specified in current existing
+                    const auto it = std::find_if(interfaces.begin(), interfaces.end()
+                        , [item](const rtu::InterfaceInfo &itf)
+                    {
+                        return (itf.name == item.name);
+                    });
+
+                    if (it != interfaces.end())
+                    {
+                        if (!item.useDHCP)  /// Force dhcp old value
+                            item.useDHCP.reset(new bool(it->useDHCP == Qt::Checked));
+                        else
+                            item.ip.reset(new QString(it->ip));
+                    }
+                    else
+                        Q_ASSERT_X(true, Q_FUNC_INFO, "Interface name not found!");
+                }
+            }
+        }
     };
 
 }
@@ -674,7 +702,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
             };
 
             const auto &callback = 
-                [failedCallback](const RequestError errorCode, Constants::AffectedEntities affected)
+                [weak, id, changeRequest, failedCallback](const RequestError errorCode, Constants::AffectedEntities affected)
             {
                 if (errorCode != RequestError::kSuccess)
                 {
@@ -682,6 +710,12 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
                 }
                 else
                 {
+                    if (weak.expired())
+                        return;
+
+                    const auto shared = weak.lock();
+                    shared->m_itfChanges.insert(id, changeRequest);
+
                     /* In case of success we need to wait more until server is rediscovered. */
                     QTimer::singleShot(kTotalIfConfigTimeout, [failedCallback, affected]() 
                     {
@@ -691,8 +725,6 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
                 
             };
 
-            const auto shared = weak.lock();
-            shared->m_itfChanges.insert(id, changeRequest);
             sendChangeItfRequest(changeRequest.item->first, changeRequest.item->second.password
                 , changes, callback);
         };
@@ -705,33 +737,42 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
         shared->m_requests.push_back(RequestData(kNonBlockingRequest, request));
     };
 
+    const auto &updateInfos = m_changeset->itfUpdateInfo();
+
     enum { kSingleSelection = 1 };
     if (m_serversCache.size() == 1)
     {
-        const ItfUpdateInfoContainerPointer &itf = m_changeset->itfUpdateInfo();
-        if (!itf)
-            return;
-
-        addRequest(m_serversCache.first(), *itf);
+        /// Allow multiple interface changes on single server
+        addRequest(m_serversCache.first(), *updateInfos);
         return;
     }
 
-    /// In case of multiple selection, it is allowed to turn on DHCP only
-    for (auto &info: m_serversCache)
-    {
-        ItfUpdateInfoContainer changes;
-        for (const InterfaceInfo &itfInfo: info.second.interfaces)
-        {
-            if (itfInfo.useDHCP)   /// Do not switch DHCP "ON" where it has turned on already
-                continue;
+    /// Now, there are servers with single interface only in m_serverCache
 
-            ItfUpdateInfo turnOnDhcpUpdate(itfInfo.name);
-            turnOnDhcpUpdate.useDHCP.reset(new bool(true));
-            changes.push_back(turnOnDhcpUpdate);
+    Q_ASSERT_X(updateInfos->size() == 1, Q_FUNC_INFO, "Multiple interfaces changes on severals servers");
+
+    const auto &updateInfo = updateInfos->front();
+
+    quint32 initAddr = (updateInfo.ip ? QHostAddress(*updateInfo.ip).toIPv4Address() : 0);
+    for (int i = 0; i != m_serversCache.size(); ++i)
+    {
+        auto &cacheInfo = m_serversCache[i];
+        Q_ASSERT_X(cacheInfo.second.interfaces.size() == 1, Q_FUNC_INFO
+            , "Can't apply changese on several servers with multiple or empty interfaces");
+        
+        if (cacheInfo.second.interfaces.empty())
+            continue;
+
+        ItfUpdateInfo change(updateInfo);
+        change.name = cacheInfo.second.interfaces.front().name;
+
+        if (updateInfo.ip)
+        {
+            const QString newAddr = QHostAddress(initAddr + i).toString();
+            change.ip.reset(new QString(newAddr));
         }
 
-        if (!changes.empty())
-            addRequest(info, changes);
+        addRequest(cacheInfo, ItfUpdateInfoContainer(1, change));
     }
 }
 

@@ -91,19 +91,33 @@ QString QnCommonModule::localSystemName() const
     return moduleInformation().systemName;
 }
 
+void QnCommonModule::setReadOnly(bool value) {
+    QnModuleInformation info = moduleInformation();
+    info.ecDbReadOnly = value;
+    setModuleInformation(info);
+}
+
+bool QnCommonModule::isReadOnly() const {
+    return moduleInformation().ecDbReadOnly;
+}
+
 void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation)
 {
     bool isSystemNameChanged = false;
+    bool isReadOnlyChanged = false;
     {
         QMutexLocker lk(&m_mutex);
         if (m_moduleInformation == moduleInformation)
             return;
 
         isSystemNameChanged = m_moduleInformation.systemName != moduleInformation.systemName;
+        isReadOnlyChanged = m_moduleInformation.ecDbReadOnly != moduleInformation.ecDbReadOnly;
         m_moduleInformation = moduleInformation;
     }
     if (isSystemNameChanged)
         emit systemNameChanged(moduleInformation.systemName);
+    if (isReadOnlyChanged)
+        emit readOnlyChanged(moduleInformation.ecDbReadOnly);
     emit moduleInformationChanged();
 }
 

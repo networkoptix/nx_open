@@ -1,10 +1,10 @@
-import QtQuick 2.3;
+import QtQuick 2.4;
 
 import "../../common" as Common;
 
 import networkoptix.rtu 1.0 as NxRtu;
 
-FocusScope
+Item
 {
     id: thisComponent;
 
@@ -13,6 +13,8 @@ FocusScope
     
     property real buttonHeight: Common.SizeManager.clickableSizes.base;
     property real spacing: Common.SizeManager.spacing.base;
+
+    property alias firstButton: repeater.firstButton;
 
     signal buttonClicked(int id);
     
@@ -44,6 +46,11 @@ FocusScope
 
         Repeater
         {
+            id: repeater;
+
+            property Item firstButton: null;
+            property Item lastButton: null;
+
             model: NxRtu.Buttons 
             {
                 buttons: thisComponent.buttons;
@@ -62,6 +69,10 @@ FocusScope
                     item.height = thisComponent.buttonHeight;
                     item.width = item.height * model.aspect;
                     item.text = model.caption;
+
+                    if (!index)
+                        repeater.firstButton = item;
+
                 }
                 
                 Connections
@@ -86,5 +97,4 @@ FocusScope
 
         StyledButton {}
     }
-
 }
