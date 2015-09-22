@@ -61,6 +61,10 @@ namespace rtu
 
         void unknownRemoved(const QString &address);
 
+        void updateExtraInfo(const QUuid &id
+            , const ExtraServerInfo &extraInfo
+            , const QString &hostName);
+
         void updateTimeDateInfo(const QUuid &id
             , qint64 utcDateTimeMs
             , const QByteArray &timeZoneId

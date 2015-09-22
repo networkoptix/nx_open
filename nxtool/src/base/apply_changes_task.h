@@ -61,9 +61,9 @@ namespace rtu
 
         void errorsCountChanged();
 
-        void itfUpdated(const QUuid &id
-            , const QString &hostAddress
-            , const InterfaceInfoList &itf);
+        void extraInfoUpdated(const QUuid &id
+            , const ExtraServerInfo &extraInfo
+            , const QString &hostAddress);
 
         void dateTimeUpdated(const QUuid &id
             , qint64 utcMsecs

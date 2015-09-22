@@ -344,7 +344,10 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &in
         const auto shared = weak.lock();
         const auto &it = shared->m_itfChanges.find(id);
         if (it == shared->m_itfChanges.end())
+        {
+
             return;
+        }
         
         ItfChangeRequest &request = it.value();
         request.inProgress = false;
@@ -372,8 +375,8 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &in
         if (successful && totalApplied)
         {
             const BaseServerInfo &inf = *request.item->first;
-            emit shared->m_owner->itfUpdated(inf.id
-                , inf.hostAddress, newInterfaces);
+            emit shared->m_owner->extraInfoUpdated(inf.id
+                , extraInfo, inf.hostAddress);
         }
         
         const int changesCount = request.changesCount;
@@ -399,7 +402,7 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &in
     currentBase.accessibleByHttp = currentDiscoverByHttp;
     request.inProgress = true;
     
-    sendIfListRequest(request.item->first, request.item->second.password
+    getServerExtraInfo(request.item->first, request.item->second.password
         , successful, failed, kIfListRequestsPeriod);
 }
 
@@ -704,18 +707,18 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
             const auto &callback = 
                 [weak, id, changeRequest, failedCallback](const RequestError errorCode, Constants::AffectedEntities affected)
             {
+                if (weak.expired())
+                    return;
+
+                const auto shared = weak.lock();
+                shared->m_itfChanges.insert(id, changeRequest);
+
                 if (errorCode != RequestError::kSuccess)
                 {
                     failedCallback(errorCode , affected);
                 }
                 else
                 {
-                    if (weak.expired())
-                        return;
-
-                    const auto shared = weak.lock();
-                    shared->m_itfChanges.insert(id, changeRequest);
-
                     /* In case of success we need to wait more until server is rediscovered. */
                     QTimer::singleShot(kTotalIfConfigTimeout, [failedCallback, affected]() 
                     {

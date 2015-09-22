@@ -1066,9 +1066,7 @@ void rtu::ServersSelectionModel::Impl::updatePasswordInfo(
         , searchInfo.systemRowIndex + searchInfo.systemInfoIterator->servers.size());
 
     if (searchInfo.serverInfoIterator->selectedState == Qt::Checked)
-    {
         setSelectionOutdated(true);
-    }
 }
 
 void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
@@ -1479,6 +1477,13 @@ void rtu::ServersSelectionModel::unknownAdded(const QString &address)
 void rtu::ServersSelectionModel::unknownRemoved(const QString &address)
 {
     m_impl->unknownRemoved(address);
+}
+
+void rtu::ServersSelectionModel::updateExtraInfo(const QUuid &id
+    , const ExtraServerInfo &extraInfo
+    , const QString &hostName)
+{
+    m_impl->updateExtraInfo(id, extraInfo, hostName);
 }
 
 void rtu::ServersSelectionModel::updateTimeDateInfo(const QUuid &id

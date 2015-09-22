@@ -42,8 +42,8 @@ namespace
             , selectionModel, &rtu::ServersSelectionModel::updatePasswordInfo);
         QObject::connect(task.get(), &rtu::ApplyChangesTask::dateTimeUpdated
             , selectionModel, &rtu::ServersSelectionModel::updateTimeDateInfo);
-        QObject::connect(task.get(), &rtu::ApplyChangesTask::itfUpdated
-            , selectionModel, &rtu::ServersSelectionModel::updateInterfacesInfo);
+        QObject::connect(task.get(), &rtu::ApplyChangesTask::extraInfoUpdated
+            , selectionModel, &rtu::ServersSelectionModel::updateExtraInfo);
 
         QObject::connect(serversFinder, &rtu::ServersFinder::serverDiscovered
             , task.get(), &rtu::ApplyChangesTask::serverDiscovered);
