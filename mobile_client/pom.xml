@@ -22,6 +22,7 @@
         <!--Specific os libs used-->
         <linux.oslibs>${ffmpeg.libs} -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
         <android.oslibs/>
+        <ios.oslibs>-lturbojpeg</ios.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
