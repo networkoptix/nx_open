@@ -40,6 +40,9 @@ private:
     QMap<QString, int> m_disconnectSended;
     QTime netStateTime;
     CLNetState netState;
+    
+    QMap<QnUuid, QnSecurityCamResourcePtr> m_tmpForeignResources;
+    int m_foreignResourcesRetryCount;
 };
 
 #endif //QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H

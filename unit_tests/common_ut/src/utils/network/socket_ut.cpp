@@ -224,14 +224,20 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
 TEST( Socket, HostNameResolve3 )
 {
     {
-        nx_http::HttpClient httpClient;
-        ASSERT_TRUE( httpClient.doGet( QUrl( "http://ya.ru" ) ) );
-        ASSERT_TRUE( httpClient.response() != nullptr );
+        HostAddress resolvedAddress;
+        ASSERT_TRUE(
+            HostAddressResolver::instance()->resolveAddressSync(
+                QLatin1String("ya.ru"),
+                &resolvedAddress) );
+        ASSERT_TRUE(resolvedAddress.ipv4() != 0);
     }
 
     {
-        nx_http::HttpClient httpClient;
-        ASSERT_TRUE( !httpClient.doGet( QUrl( "http://hren2349jf234.ru" ) ) );
+        HostAddress resolvedAddress;
+        ASSERT_FALSE(
+            HostAddressResolver::instance()->resolveAddressSync(
+                QLatin1String("hren2349jf234.ru"),
+                &resolvedAddress));
     }
 }
 

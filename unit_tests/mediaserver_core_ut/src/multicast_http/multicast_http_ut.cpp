@@ -41,8 +41,8 @@ public:
         m_state(StateSingleTest),
         m_requests(0),
         m_firstRequest(0),
-        oldPassword(lit("admin")),
-        newPassword(lit("0"))
+        newPassword(lit("0")),
+        oldPassword(lit("admin"))
     {
         connect(&processor, &MediaServerProcess::started, this, [this]() { m_processorStarted = true; } );
     }
