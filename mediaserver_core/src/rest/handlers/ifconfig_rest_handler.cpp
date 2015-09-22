@@ -298,14 +298,16 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't write network settings file"));
     }
 
-#ifndef Q_OS_WIN
     if (m_modified)
     {
         IfconfigReply reply;
+#ifdef Q_OS_WIN
+        reply.rebootNeeded = false;
+#else
         reply.rebootNeeded = true;
+#endif
         result.setReply(reply);
     }
-#endif
 
     return CODE_OK;
 }
