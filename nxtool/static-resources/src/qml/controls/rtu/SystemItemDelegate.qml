@@ -165,7 +165,7 @@ Item
             activeFocusOnTab: false;
             activeFocusOnPress: false;
 
-            text: qsTr("Enter The Password");
+            text: qsTr("Enter the Password");
             fontSize: Common.SizeManager.fontSizes.base;
             onClicked: { loginDialog.show(); }
             
