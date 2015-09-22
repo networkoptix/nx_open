@@ -33,8 +33,10 @@
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/warning_style.h>
+#include <ui/common/read_only.h>
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 
@@ -121,6 +123,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
     QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsWidget),
     m_server(server),
+    m_removeAction(nullptr),
     m_hasStorageChanges(false),
     m_maxCamerasAdjusted(false),
     m_rebuildWasCanceled(false),
@@ -147,14 +150,19 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
 
-    /* Edge servers cannot be renamed. */
-    ui->nameLineEdit->setReadOnly(QnMediaServerResource::isEdgeServer(server));
+    bool readOnly = serverIsReadOnly();
 
-    m_removeAction = new QAction(tr("Remove Storage"), this);
+    /* Edge servers cannot be renamed. */
+    ui->nameLineEdit->setReadOnly(readOnly || QnMediaServerResource::isEdgeServer(server));
+
+    if (!readOnly)
+        m_removeAction = new QAction(tr("Remove Storage"), this);
 
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
     signalizer->setEventType(QEvent::ContextMenu);
     ui->storagesTable->installEventFilter(signalizer);
+    setReadOnly(ui->storagesTable, readOnly);
+
     connect(signalizer, &QnAbstractEventSignalizer::activated,  this,   &QnServerSettingsWidget::at_storagesTable_contextMenuEvent);
     connect(m_server,   &QnMediaServerResource::statusChanged,  this,   &QnServerSettingsWidget::at_updateRebuildInfo);
     connect(m_server,   &QnMediaServerResource::apiUrlChanged,  this,   &QnServerSettingsWidget::at_updateRebuildInfo);
@@ -170,16 +178,25 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->rebuildGroupBox,                                         Qn::ServerSettings_ArchiveRestoring_Help);
     setHelpTopic(ui->failoverGroupBox,                                        Qn::ServerSettings_Failover_Help);
 
-    connect(ui->storagesTable,          &QTableWidget::cellChanged, this,   &QnServerSettingsWidget::at_storagesTable_cellChanged);
+    if (!readOnly)
+        connect(ui->storagesTable,          &QTableWidget::cellChanged, this,   &QnServerSettingsWidget::at_storagesTable_cellChanged);
+
     connect(ui->pingButton,             &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_pingButton_clicked);
 
-    connect(ui->rebuildStartButton,     &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_rebuildButton_clicked);
-    connect(ui->rebuildStopButton,      &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_rebuildButton_clicked);
+    if (!readOnly) {
+        connect(ui->rebuildStartButton,     &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_rebuildButton_clicked);
+        connect(ui->rebuildStopButton,      &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_rebuildButton_clicked);
+    } else {
+        ui->rebuildGroupBox->setVisible(false);
+    }
 
+    setReadOnly(ui->failoverCheckBox, readOnly);
     connect(ui->failoverCheckBox,       &QCheckBox::stateChanged,       this,   [this] {
         ui->maxCamerasWidget->setEnabled(ui->failoverCheckBox->isChecked());
         updateFailoverLabel();
     });
+
+    setReadOnly(ui->maxCamerasSpinBox, readOnly);
     connect(ui->maxCamerasSpinBox,      QnSpinboxIntValueChanged,       this,   [this] {
         m_maxCamerasAdjusted = true;
         updateFailoverLabel();
@@ -204,6 +221,9 @@ QnServerSettingsWidget::~QnServerSettingsWidget()
 
 
 bool QnServerSettingsWidget::hasChanges() const {
+    if (serverIsReadOnly())
+        return false;
+
     if (m_hasStorageChanges)
         return true;
 
@@ -267,6 +287,9 @@ void QnServerSettingsWidget::updateFromSettings() {
 }
 
 void QnServerSettingsWidget::submitToSettings() {
+    if (serverIsReadOnly())
+        return;
+
     if(m_hasStorageChanges) {
         QnStorageResourceList newStorages;
         foreach(const QnStorageSpaceData &item, tableItems()) 
@@ -319,9 +342,13 @@ void QnServerSettingsWidget::addTableItem(const QnStorageSpaceData &item) {
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
-    Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    Qt::ItemFlags flags = Qt::ItemIsSelectable;
+    if (!serverIsReadOnly())
+        flags |= Qt::ItemIsUserCheckable;
+
     if (item.isWritable)
         flags |= Qt::ItemIsEnabled;
+
     checkBoxItem->setFlags(flags);
     checkBoxItem->setCheckState(item.isUsedForWriting ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, QVariant::fromValue<QnUuid>(item.storageId));
@@ -480,6 +507,10 @@ int QnServerSettingsWidget::dataRowCount() const {
     return rowCount;
 }
 
+bool QnServerSettingsWidget::serverIsReadOnly() const {
+    return !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -520,10 +551,11 @@ void QnServerSettingsWidget::at_storagesTable_contextMenuEvent(QObject *, QEvent
         return;
 
     QScopedPointer<QMenu> menu(new QMenu(this));
-    menu->addAction(m_removeAction);
+    if (m_removeAction)
+        menu->addAction(m_removeAction);
 
     QAction *action = menu->exec(QCursor::pos());
-    if(action == m_removeAction) {
+    if(action && action == m_removeAction) {
         m_storagesToRemove.push_back(item.storageId);
         ui->storagesTable->removeRow(row);
         m_hasStorageChanges = true;
@@ -676,11 +708,12 @@ void QnServerSettingsWidget::at_replyReceived(int status, const QnStorageSpaceRe
     setTableItems(items);
 
     m_storageProtocols = reply.storageProtocols;
-    if(m_storageProtocols.isEmpty()) {
+    if (m_storageProtocols.isEmpty() || serverIsReadOnly()) 
+    {
         setBottomLabelText(QString());
     } else {
         const QString linkText = lit("<a href='1'>%1</a>").arg(tr("Add external Storage..."));
-        setBottomLabelText(linkText);
+        setBottomLabelText(linkText);        
     }
 
     m_hasStorageChanges = false;
