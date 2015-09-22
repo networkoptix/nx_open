@@ -1824,18 +1824,14 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
 
     /* Check that we are deleting online auto-found cameras */ 
-    QnVirtualCameraResourceList onlineAutoDiscoveredCameras;
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
-        if (!camera ||
-            camera->getStatus() == Qn::Offline || 
-            camera->isManuallyAdded()) 
-                continue;
-        onlineAutoDiscoveredCameras << camera;
-    } 
+    QnVirtualCameraResourceList onlineAutoDiscoveredCameras = cameras.filtered([](const QnVirtualCameraResourcePtr &camera){
+        return camera->getStatus() != Qn::Offline 
+            && !camera->isManuallyAdded();
+    });
 
     QString question;
-    /* First version of the dialog if all cameras are auto-discovered. */
-    if (cameras.size() == onlineAutoDiscoveredCameras.size()) {
+    /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
+    if (resources.size() == onlineAutoDiscoveredCameras.size()) {
         question =
             //: "These 5 cameras are auto-discovered."
             tr("These %n %1 are auto-discovered.").arg(getDefaultDevicesName(cameras, false)) + L'\n' 
