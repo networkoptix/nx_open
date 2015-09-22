@@ -1009,8 +1009,6 @@ angular.module('webadminApp')
                     mouseNearLeftBorder = mouseCoordinate < timelineConfig.leftRightButtonsWidth;
                     mouseOverLeftScrollButton = canScrollLeft && mouseNearLeftBorder;
 
-                    //console.log("drawOrCheckLeftRightButtons",canScrollRight,canScrollLeft,mouseOverRightScrollButton,mouseOverLeftScrollButton);
-
                     if(!context){ return; }
 
                     if(canScrollLeft ) {
@@ -1168,8 +1166,6 @@ angular.module('webadminApp')
                     }
                 };
                 scope.startScroll = function(left) {
-
-                    console.log("startScroll");
                     if(!scope.scaleManager.canScroll(left)){
                         return;
                     }
@@ -1222,15 +1218,11 @@ angular.module('webadminApp')
                     }
 
                     if(mouseOverRightScrollButton){
-                        console.log("scrollStep right");
                         scope.scrollStep(false);
-                        //Scroll by percents
                         return;
                     }
                     if(mouseOverLeftScrollButton){
-                        console.log("scrollStep left");
                         scope.scrollStep(true);
-                        //Scroll by percents
                         return;
                     }
 
@@ -1248,8 +1240,6 @@ angular.module('webadminApp')
 
                     }else{
                         if(!mouseInScrollbar){
-
-                            console.log("animateScroll");
                             scope.scrollTarget = scope.scaleManager.scroll() ;
                             animateScroll(mouseCoordinate / scope.viewportWidth);
                         }
@@ -1297,7 +1287,7 @@ angular.module('webadminApp')
                     catchScrollBar = mouseInScrollbar;
                     catchTimeline = mouseInTimeline;
 
-                    if(catchTimeline && catchScrollBar) {
+                    if(catchTimeline || catchScrollBar) {
                         scope.scaleManager.stopWatching();
                     }
                 };
@@ -1315,7 +1305,6 @@ angular.module('webadminApp')
                     }
                 };
                 scope.drastart = function(event){
-                    console.log("drastart");
                 };
                 scope.dragend = function(event){
                     catchScrollBar = false;
