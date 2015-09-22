@@ -80,11 +80,14 @@ private:
     /** Some nodes can have deleting node set as parent, but this node will not
      ** have them as children because of their 'bastard' flag.*/
     void deleteNode(QnResourcePoolModelNode *node);
+
+    /** Fully rebuild resources tree. */
+    void rebuildTree();
+
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
-    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resPool_resourceRemoved(const QnResourcePtr &resource); 
 
-    void at_context_userChanged();
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
     void at_accessController_permissionsChanged(const QnResourcePtr &resource);
 

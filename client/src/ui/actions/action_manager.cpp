@@ -1376,7 +1376,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         //: "Cameras Settings..." or "Devices Settings..."
         dynamicText(new QnDevicesNameActionTextFactory(tr("%1 Settings..."), this)).
-        requiredPermissions(Qn::WritePermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
              new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
              new QnPreviewSearchModeCondition(true, this),
@@ -1450,7 +1450,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
-        requiredPermissions(Qn::WritePermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditServersPermissions).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),

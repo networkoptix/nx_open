@@ -101,14 +101,12 @@ signals:
 
 protected slots:
     void updatePermissions(const QnResourcePtr &resource);
-    void updatePermissions(const QnLayoutResourcePtr &layout);
-    void updatePermissions(const QnResourceList &resources);
-
-    void at_context_userChanged(const QnUserResourcePtr &user);
     
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 private:
+    void recalculateAllPermissions();
+
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
     Qn::Permissions calculatePermissions(const QnResourcePtr &resource) const;
@@ -129,6 +127,7 @@ private:
 
     QnUserResourcePtr m_user;
     Qn::Permissions m_userPermissions;
+    bool m_readOnlyMode;
     mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };
 
