@@ -118,6 +118,19 @@ public:
     {
     }
 
+    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
+    AbstractSocketImplementationEmbeddingDelegate(
+        AbstractCommunicatingSocket* abstractSocketPtr,
+        const Param1Type& param1,
+        const Param2Type& param2,
+        const Param3Type& param3,
+        const Param4Type& param4)
+    :
+        base_type([this](){ return &m_implDelegate; }),
+        m_implDelegate(abstractSocketPtr, param1, param2, param3, param4)
+    {
+    }
+
     AbstractSocketImplementorType* implementationDelegate() { return &m_implDelegate; }
     const AbstractSocketImplementorType* implementationDelegate() const { return &m_implDelegate; }
 
@@ -155,6 +168,13 @@ public:
     AbstractCommunicatingSocketImplementationDelegate(const Param1Type& param1, const Param2Type& param2, const Param3Type& param3)
     :
         base_type( this, param1, param2, param3 )
+    {
+    }
+
+    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
+    AbstractCommunicatingSocketImplementationDelegate(const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4)
+    :
+        base_type( this, param1, param2, param3, param4 )
     {
     }
 

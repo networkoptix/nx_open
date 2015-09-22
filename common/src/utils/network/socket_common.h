@@ -109,10 +109,6 @@ private:
     void initializeFromString(const QString& str);
 };
 
-inline bool operator!=( const SocketAddress& lhs, const SocketAddress& rhs ) {
-    return !( lhs == rhs );
-}
-
 inline uint qHash(const SocketAddress &address) {
     return qHash(address.address.toString(), address.port);
 }

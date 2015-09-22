@@ -761,10 +761,10 @@ QString toString( const T& t ) { return t.toString(); }
 
 template<typename Container>
 QString containerString(const Container& container,
-                        const QString& delimiter = lit(", "),
-                        const QString& prefix = lit("{ "),
-                        const QString& suffix = lit(" }"),
-                        const QString& empty = lit("none"))
+                        const QString& delimiter = QString::fromLatin1(", "),
+                        const QString& prefix = QString::fromLatin1("{ "),
+                        const QString& suffix = QString::fromLatin1(" }"),
+                        const QString& empty = QString::fromLatin1("none"))
 {
     if (container.begin() == container.end())
         return empty;

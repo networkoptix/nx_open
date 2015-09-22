@@ -2146,7 +2146,7 @@ void MediaServerProcess::run()
     auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
     {
         auto cloudSystemId = admin->getProperty(Qn::CLOUD_SYSTEM_ID);
-        auto cloudAuthKey = admin->getProperty(Qn::CLOUD_AUTH_KEY);
+        auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
         if (m_mediatorAddressPublisher &&
             !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
         {
@@ -2174,7 +2174,7 @@ void MediaServerProcess::run()
         //       for (const auto& param : { stats::SR_TIME_CYCLE, ... })
         const QString* statParams[] = {
             &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API,
-            &Qn::CLOUD_SYSTEM_ID, &Qn::CLOUD_AUTH_KEY };
+            &Qn::CLOUD_SYSTEM_ID, &Qn::CLOUD_SYSTEM_AUTH_KEY };
         for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
             const QString& param = **it;
