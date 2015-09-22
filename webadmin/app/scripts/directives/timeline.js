@@ -1104,10 +1104,10 @@ angular.module('webadminApp')
                         }
 
                         var zoomDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
-                        if(mouseNearRightBorder){
+                        if(mouseNearRightBorder && !mouseOverRightScrollButton){
                             zoomDate = scope.scaleManager.end;
                         }
-                        if(mouseNearLeftBorder){
+                        if(mouseNearLeftBorder && !mouseOverLeftScrollButton){
                             zoomDate = scope.scaleManager.start;
                         }
 
