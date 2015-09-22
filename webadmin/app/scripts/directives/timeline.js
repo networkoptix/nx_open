@@ -1097,7 +1097,16 @@ angular.module('webadminApp')
                             zoomTarget -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
                             zoomTarget = scope.scaleManager.boundZoom(zoomTarget);
                         }
-                        scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
+
+                        var zoomDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
+                        if(mouseOverRightScrollButton){
+                            zoomDate = scope.scaleManager.end;
+                        }
+                        if(mouseOverLeftScrollButton){
+                            zoomDate = scope.scaleManager.start;
+                        }
+
+                        scope.zoomTo(zoomTarget, zoomDate, window.jscd.touch);
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
                         delayWatchingPlayingPosition();
@@ -1208,11 +1217,13 @@ angular.module('webadminApp')
                     }
 
                     if(mouseOverRightScrollButton){
+                        console.log("scrollStep right");
                         scope.scrollStep(false);
                         //Scroll by percents
                         return;
                     }
                     if(mouseOverLeftScrollButton){
+                        console.log("scrollStep left");
                         scope.scrollStep(true);
                         //Scroll by percents
                         return;
@@ -1232,7 +1243,9 @@ angular.module('webadminApp')
 
                     }else{
                         if(!mouseInScrollbar){
-                            scope.scrollPosition = scope.scaleManager.scroll() ;
+
+                            console.log("animateScroll");
+                            scope.scrollTarget = scope.scaleManager.scroll() ;
                             animateScroll(mouseCoordinate / scope.viewportWidth);
                         }
                     }
