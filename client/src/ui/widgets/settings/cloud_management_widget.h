@@ -62,16 +62,27 @@ private:
         decltype(&destroyConnectionFactory)> m_connectionFactory;
     std::unique_ptr<nx::cdb::api::Connection> m_cloudConnection;
     int m_mserverReqHandle;
+    bool m_boundToCloud;
 
-    void updateView(bool bindedToCloud);
+    void updateView(bool boundToCloud);
+
+    void cloudOperationCompleted(
+        int requestHandle,
+        bool ok,
+        bool boundToCloud,
+        const QString& messageTitle,
+        const QString& messageText);
 
 private slots:
-    void onBindSystemClicked();
-    void onUnbindSystemClicked();
+    void onToggleBindSystemClicked();
+    void doBindSystem();
+    void doUnbindSystem();
     void onUserChanged(QnResourcePtr resource);
     
-    void onBindingDone(QnBindToCloudResponse response);
+    void onBindDone(QnBindToCloudResponse response);
+    void onUnbindDone(int resultCode);
     void onCloudCredentialsSaved(int status, int handle);
+    void onResourcePropertiesSaved(int recId, ec2::ErrorCode errorCode);
 };
 
 #endif // QN_TIME_SERVER_SELECTION_WIDGET_H
