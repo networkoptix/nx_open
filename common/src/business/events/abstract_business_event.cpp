@@ -105,10 +105,10 @@ namespace QnBusiness
     QList<EventState> allowedEventStates(EventType eventType)
     {
         QList<EventState> result;
-        if (hasToggleState(eventType))
-            result << QnBusiness::ActiveState << QnBusiness::InactiveState;
         if (!hasToggleState(eventType) || eventType == UserDefinedEvent)
             result << QnBusiness::UndefinedState;
+        if (hasToggleState(eventType))
+            result << QnBusiness::ActiveState << QnBusiness::InactiveState;
         return result;
     }
 

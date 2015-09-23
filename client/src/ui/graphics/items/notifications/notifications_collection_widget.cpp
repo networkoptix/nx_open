@@ -284,7 +284,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnUuid resourceId = params.eventResourceId;
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
-    if (!resource && params.resourceName.isEmpty())
+    if (!resource && params.eventType != QnBusiness::UserDefinedEvent)
         return;
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
 
