@@ -15,6 +15,7 @@
 #include "common/common_module.h"
 #include "utils/common/model_functions.h"
 #include "watchers/user_watcher.h"
+#include <network/authenticate_helper.h>
 #include <mobile_client/mobile_client_settings.h>
 
 namespace {
@@ -44,9 +45,12 @@ namespace {
         return lit("http");
     }
 
-    QString getAuth(const QnUserResourcePtr &user) {
-        QString auth = user->getName() + lit(":0:") + QString::fromLatin1(user->getDigest());
-        return QString::fromLatin1(auth.toUtf8().toBase64());
+    QByteArray methodForProtocol(QnMediaResourceHelper::Protocol protocol) {
+        return protocol == QnMediaResourceHelper::Rtsp ? "PLAY" : "GET";
+    }
+
+    QString getAuth(const QnUserResourcePtr &user, QnMediaResourceHelper::Protocol protocol) {
+        return QString::fromLatin1(QnAuthHelper::createHttpQueryAuthParam(user->getName(), user->getDigest(), methodForProtocol(protocol)));
     }
 
     qint64 convertPosition(qint64 position, QnMediaResourceHelper::Protocol protocol) {
@@ -168,7 +172,7 @@ void QnMediaResourceHelper::updateUrl() {
             query.addQueryItem(lit("pos"), QString::number(convertPosition(m_position, protocol)));
 
         if (user)
-            query.addQueryItem(lit("auth"), getAuth(user));
+            query.addQueryItem(lit("auth"), getAuth(user, protocol));
     }
 
     url.setQuery(query);
