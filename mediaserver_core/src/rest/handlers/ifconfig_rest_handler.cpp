@@ -3,10 +3,32 @@
 #include "ifconfig_rest_handler.h"
 #include "utils/network/http/linesplitter.h"
 #include <utils/network/tcp_connection_priv.h>
+#include <utils/common/model_functions.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "utils/common/app_info.h"
+
+
+class IfconfigReply
+{
+public:
+    bool rebootNeeded;
+
+    IfconfigReply()
+        :
+        rebootNeeded(false)
+    {
+    }
+};
+
+#define IfconfigReply_Fields (rebootNeeded)
+
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (IfconfigReply),
+    (json),
+    _Fields);
 
 
 namespace 
@@ -275,6 +297,18 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
     if (!writeNetworSettings(currentSettings)) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't write network settings file"));
     }
+
+    if (m_modified)
+    {
+        IfconfigReply reply;
+#ifdef Q_OS_WIN
+        reply.rebootNeeded = false;
+#else
+        reply.rebootNeeded = true;
+#endif
+        result.setReply(reply);
+    }
+
     return CODE_OK;
 }
 
