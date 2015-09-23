@@ -3,7 +3,6 @@
 #include "utils/common/synctime.h"
 #include "core/resource/resource.h"
 
-
 namespace QnBusiness
 {
 

@@ -47,6 +47,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include "business/events/conflict_business_event.h"
+#include "utils/multi_image_provider.h"
 
 namespace {
     const qreal widgetHeight = 24;
@@ -55,6 +56,7 @@ namespace {
     /** We limit the maximal number of notification items to prevent crashes due
      * to reaching GDI resource limit. */
     const int maxNotificationItems = 128;
+    const int multiThumbnailSpacing = 4;
 
 
     const char *itemResourcePropertyName = "_qn_itemResource";
@@ -265,6 +267,19 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
     item->setImageProvider(loader);
 }
 
+void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, 
+                                                           const QnVirtualCameraResourceList &cameraList,
+                                                           const QnMediaServerResourcePtr &server, 
+                                                           qint64 msecSinceEpoch) 
+{
+    QnMultiImageProvider::Providers providers;
+    for (const auto& camera: cameraList) {
+        std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(camera, server, msecSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat));
+        providers.push_back(std::move(provider));
+    }
+    item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, multiThumbnailSpacing, item));
+}
+
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnUuid resourceId = params.eventResourceId;
@@ -393,6 +408,23 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             tr("Licenses..."),
             Qn::PreferencesLicensesTabAction
             );
+        break;
+    }
+    case QnBusiness::UserDefinedEvent: 
+    {
+        QnVirtualCameraResourceList camList = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+        if (!camList.isEmpty()) 
+        {
+            qint64 timestampMs = params.eventTimestampUsec / 1000;
+            QIcon icon = qnSkin->icon("events/camera.png");
+            item->addActionButton(
+                icon,
+                tr("Browse Archive"),
+                Qn::OpenInNewLayoutAction,
+                QnActionParameters(camList).withArgument(Qn::ItemTimeRole, timestampMs)
+                );
+            loadThumbnailForItem(item, camList, source, timestampMs);
+        }
         break;
     }
 

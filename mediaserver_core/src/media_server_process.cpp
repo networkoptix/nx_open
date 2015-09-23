@@ -1568,6 +1568,19 @@ void MediaServerProcess::run()
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
 #ifdef __arm__
     serverFlags |= Qn::SF_ArmServer;
+
+    auto partitions = qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+        QnPlatformMonitor::LocalDiskPartition);
+    for (const auto& partition: partitions)
+    {
+        if (partition.devName.startsWith(lit("/dev/sd")))
+        {
+            serverFlags |= Qn::SF_Has_HDD;
+            break;
+        }
+    }
+#else
+    serverFlags |= Qn::SF_Has_HDD;
 #endif
 
     if (!isLocal)

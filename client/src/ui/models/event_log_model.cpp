@@ -271,33 +271,41 @@ QModelIndex QnEventLogModel::parent(const QModelIndex &) const {
     return QModelIndex();
 }
 
-QVariant QnEventLogModel::fontData(const Column& column, const QnBusinessActionData &action) const {
-    if (column == DescriptionColumn) {
-        QnBusiness::EventType eventType = action.eventParams.eventType;
+bool QnEventLogModel::hasVideoLink(const QnBusinessActionData &action)
+{
+    QnBusiness::EventType eventType = action.eventParams.eventType;
+    if (action.hasFlags(QnBusinessActionData::MotionExists)) 
+    {
         if (eventType == QnBusiness::CameraMotionEvent)
-            return m_linkFont;
+            return true;
     }
+    else if (eventType >= QnBusiness::UserDefinedEvent) 
+    {
+        for (const QnUuid& id: action.eventParams.metadata.cameraRefs) 
+        {
+            if (qnResPool->getResourceById(id))
+                return true;
+        }
+    }
+    return false;
+}
+
+QVariant QnEventLogModel::fontData(const Column& column, const QnBusinessActionData &action) const {
+    if (column == DescriptionColumn && hasVideoLink(action))
+        return m_linkFont;
 
     return QVariant();
 }
 
 QVariant QnEventLogModel::foregroundData(const Column& column, const QnBusinessActionData &action) const {
-    if (column == DescriptionColumn) {
-        QnBusiness::EventType eventType = action.eventParams.eventType;
-        if (eventType == QnBusiness::CameraMotionEvent)
-            return m_linkBrush;
-    }
-
+    if (column == DescriptionColumn && hasVideoLink(action))
+        return m_linkBrush;
     return QVariant();
 }
 
 QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusinessActionData &action) {
-    if (column == DescriptionColumn && action.hasFlags(QnBusinessActionData::MotionExists)) {
-        QnBusiness::EventType eventType = action.eventParams.eventType;
-        if (eventType == QnBusiness::CameraMotionEvent)
-            return QVariant::fromValue<int>(Qt::PointingHandCursor);
-    }
-
+    if (column == DescriptionColumn && hasVideoLink(action)) 
+        return QVariant::fromValue<int>(Qt::PointingHandCursor);
     return QVariant();
 }
 
@@ -459,9 +467,23 @@ QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& ac
     return QnBusinessStringsHelper::motionUrl(action.eventParams, true);
 }
 
-bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const {
+QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const
+{
+    QnResourceList result;
     if (!index.isValid() || index.column() != DescriptionColumn)
-        return false;
+        return QnResourceList();
+    const QnBusinessActionData &action = m_index->at(index.row());
+    if (action.hasFlags(QnBusinessActionData::MotionExists)) {
+        QnResourcePtr resource = eventResource(index.row());
+        if (resource)
+            result << resource;
+    }
+    result = qnResPool->getResources<QnResource>(action.eventParams.metadata.cameraRefs);
+    return result;
+}
+
+/*
+bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const {
 
     const QnBusinessActionData &action = m_index->at(index.row());
     if (!action.hasFlags(QnBusinessActionData::MotionExists))
@@ -471,6 +493,7 @@ bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const {
 
     return true;
 }
+*/
 
 int QnEventLogModel::columnCount(const QModelIndex &parent) const {
     if(!parent.isValid())

@@ -85,6 +85,20 @@ public:
     }
 
     template <class Resource>
+    QnSharedResourcePointerList<Resource> getResources(const std::vector<QnUuid>& idList) const {
+        QMutexLocker locker(&m_resourcesMtx);
+        QnSharedResourcePointerList<Resource> result;
+        for (const auto& id: idList) {
+            const auto itr = m_resources.find(id);
+            if (itr != m_resources.end()) {
+                if(QnSharedResourcePointer<Resource> derived = itr.value().template dynamicCast<Resource>())
+                    result.push_back(derived);
+            }
+        }
+        return result;
+    }
+
+    template <class Resource>
     QnSharedResourcePointer<Resource> getResourceByUniqueId(const QString &id) const {
         QnMutexLocker locker(&m_resourcesMtx);
         auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&id](const QnResourcePtr &resource) { return resource->getUniqueId() == id; });

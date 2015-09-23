@@ -345,7 +345,8 @@ public:
         SF_IfListCtrl   = 0x8,
         SF_timeCtrl     = 0x10,
         SF_AutoSystemName = 0x20,
-        SF_ArmServer      = 0x40
+        SF_ArmServer      = 0x40,
+        SF_Has_HDD      = 0x80,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 

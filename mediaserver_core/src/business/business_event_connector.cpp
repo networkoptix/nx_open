@@ -122,9 +122,10 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
     );
 }
 
-void QnBusinessEventConnector::at_customEvent(const QString &resourceName, const QString& caption, const QString& description, QnBusiness::EventState eventState, qint64 timeStampUsec)
+void QnBusinessEventConnector::at_customEvent(const QString &resourceName, const QString& caption, const QString& description, 
+                                              const QnEventMetaData& metadata, QnBusiness::EventState eventState, qint64 timeStampUsec)
 {
-    QnCustomBusinessEvent* customEvent = new QnCustomBusinessEvent(eventState, timeStampUsec, resourceName, caption, description);
+    QnCustomBusinessEvent* customEvent = new QnCustomBusinessEvent(eventState, timeStampUsec, resourceName, caption, description, metadata);
     qnBusinessRuleProcessor->processBusinessEvent(QnCustomBusinessEventPtr(customEvent));
 }
 
@@ -159,7 +160,7 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
     {
         if (params.resourceName.isEmpty() && params.caption.isEmpty() &&  params.description.isEmpty())
             return false;
-        at_customEvent(params.resourceName, params.caption, params.description, eventState, params.eventTimestampUsec);
+        at_customEvent(params.resourceName, params.caption, params.description, params.metadata, eventState, params.eventTimestampUsec);
         return true;
     }
 
