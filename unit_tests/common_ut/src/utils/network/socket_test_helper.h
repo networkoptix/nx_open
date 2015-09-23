@@ -9,6 +9,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <set>
 
 #include <utils/common/joinable.h>
@@ -113,6 +114,7 @@ public:
     virtual void pleaseStop() override;
     virtual void join() override;
 
+    void enableErrorEmulation(int errorPercent);
     bool start();
 
     size_t totalConnectionsEstablished() const;
@@ -132,6 +134,10 @@ private:
     size_t m_totalBytesReceived;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
+    std::random_device m_randomDevice;
+    std::default_random_engine m_randomEngine;
+    std::uniform_int_distribution<int> m_errorEmulationDistribution;
+    int m_errorEmulationPercent;
 
     void onConnectionFinished( int id, ConnectionsContainer::iterator connectionIter );
 };
