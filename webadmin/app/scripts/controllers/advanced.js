@@ -4,8 +4,8 @@ angular.module('webadminApp')
     .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location) {
 
 
-        mediaserver.checkAdmin().then(function(isAdmin){
-            if(!isAdmin){
+        mediaserver.getUser().then(function(user){
+            if(!user.isAdmin){
                 $location.path('/info'); //no admin rights - redirect
             }
         });

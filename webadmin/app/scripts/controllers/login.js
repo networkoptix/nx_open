@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('LoginCtrl', function ($scope, mediaserver, ipCookie) {
+    .controller('LoginCtrl', function ($scope, mediaserver, ipCookie,$sessionStorage) {
 
 
         // Login digest: http://en.wikipedia.org/wiki/Digest_access_authentication
@@ -15,10 +15,11 @@ angular.module('webadminApp')
                 password:""
             }
         }
-
+        $scope.session = $sessionStorage;
         function reload(){
             $scope.authorized = true;
             $scope.authorizing = false;
+            $scope.session.serverInfoAlertHidden = false;
             setTimeout(function(){
                 window.location.reload();
             },20);
