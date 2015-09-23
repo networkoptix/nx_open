@@ -7,6 +7,7 @@
 #include <base/types.h>
 #include <base/requests.h>
 #include <base/changeset.h>
+#include <base/selection.h>
 
 #include <helpers/time_helper.h>
 #include <helpers/qml_helpers.h>
@@ -156,7 +157,7 @@ namespace
                             item.ip.reset(new QString(it->ip));
                     }
                     else
-                        Q_ASSERT_X(true, Q_FUNC_INFO, "Interface name not found!");
+                        Q_ASSERT_X(false, Q_FUNC_INFO, "Interface name not found!");
                 }
             }
         }
@@ -176,6 +177,8 @@ public:
     void apply(const ApplyChangesTaskPtr &owner);
 
     rtu::IDsVector targetServerIds() const;
+
+    const QUuid &id() const;
 
     ChangesSummaryModel *successfulModel();
 
@@ -226,6 +229,8 @@ private:
     typedef QPair<bool, Request> RequestData;
     typedef QVector<RequestData>  RequestContainer;
     typedef std::weak_ptr<Impl> ThisWeakPtr;
+
+    const QUuid m_id;
     const ChangesetPointer m_changeset;
     ApplyChangesTaskPtr m_owner;
 
@@ -252,6 +257,7 @@ rtu::ApplyChangesTask::Impl::Impl(const ChangesetPointer &changeset
     : std::enable_shared_from_this<ApplyChangesTask::Impl>()
     , QObject()
 
+    , m_id(QUuid::createUuid())
     , m_changeset(changeset)
     , m_owner()
 
@@ -295,6 +301,10 @@ rtu::IDsVector rtu::ApplyChangesTask::Impl::targetServerIds() const
     return m_targetServerIds;
 }
 
+const QUuid &rtu::ApplyChangesTask::Impl::id() const
+{
+    return m_id;
+}
 
 rtu::ChangesSummaryModel *rtu::ApplyChangesTask::Impl::successfulModel()
 {
@@ -742,8 +752,15 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
 
     const auto &updateInfos = m_changeset->itfUpdateInfo();
 
+    const bool isForMultipleSelection =  std::any_of(updateInfos->begin(), updateInfos->end()
+        , [](const ItfUpdateInfo &info)
+    {
+        return (info.name == Selection::kMultipleSelectionItfName);
+    });
+
     enum { kSingleSelection = 1 };
-    if (m_serversCache.size() == 1)
+
+    if (!isForMultipleSelection && (m_serversCache.size() == 1))
     {
         /// Allow multiple interface changes on single server
         addRequest(m_serversCache.first(), *updateInfos);
@@ -861,6 +878,8 @@ bool rtu::ApplyChangesTask::Impl::addSummaryItem(const ServerInfoCacheItem &item
             return tr("Request Timeout");
         case RequestError::kUnauthorized:
             return tr("Unauthorized");
+        case RequestError::kInternalAppError:
+            return tr("Internal error");
         default:
             return tr("Unknown error");
         }
@@ -950,6 +969,11 @@ rtu::ApplyChangesTask::~ApplyChangesTask()
 rtu::IDsVector rtu::ApplyChangesTask::targetServerIds() const
 {
     return m_impl->targetServerIds();
+}
+
+const QUuid &rtu::ApplyChangesTask::id() const
+{
+    return m_impl->id();
 }
 
 QObject *rtu::ApplyChangesTask::successfulModel()

@@ -30,6 +30,8 @@ namespace rtu
 
         IDsVector targetServerIds() const;
 
+        const QUuid &id() const;
+
     public:
         /// Property getters
 

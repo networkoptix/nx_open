@@ -20,14 +20,15 @@ namespace
             rtu::ApplyChangesTask::create(changeset, selectionModel->selectedServers());
 
         const auto ids = task->targetServerIds();
-        selectionModel->setBusyState(ids, true);
+        const auto locker = task->id();
+        selectionModel->setLockedState(ids, locker, true);
 
         typedef std::weak_ptr<rtu::ApplyChangesTask> TaskWeak;
         const TaskWeak weak = task;
         QObject::connect(task.get(), &rtu::ApplyChangesTask::changesApplied
-            , context, [ids, context, weak, selectionModel]() 
+            , context, [ids, locker, context, weak, selectionModel]() 
         {
-            selectionModel->setBusyState(ids, false);
+            selectionModel->setLockedState(ids, locker, false);
 
             if (weak.expired())
                 return;

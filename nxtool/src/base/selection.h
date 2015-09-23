@@ -39,6 +39,8 @@ namespace rtu
 
         void updateSelection(ServersSelectionModel *selectionModel);
 
+        static const QString kMultipleSelectionItfName;
+
     public:
         /// Getters for properties
         

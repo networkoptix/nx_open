@@ -243,10 +243,9 @@ namespace
         const auto dns = getSelectionValue<QString>(servers, kEmptyAddress, kEmptyAddress
             , std::equal_to<QString>(), dnsGetter);
 
-        static const QString kFakeItfName = QLatin1String("no_matter");
         rtu::InterfaceInfoList addresses;
 
-        addresses.push_back(rtu::InterfaceInfo(kFakeItfName
+        addresses.push_back(rtu::InterfaceInfo(rtu::Selection::kMultipleSelectionItfName
             , kEmptyAddress, kEmptyAddress              /// Ip and Mac case: addresses are always different for servers
             , mask, gateway, dns, dhcpCheckedState ));
         
@@ -278,6 +277,8 @@ namespace
 }
 
 ///
+
+const QString rtu::Selection::kMultipleSelectionItfName = QStringLiteral("no_matter");
 
 struct rtu::Selection::Snapshot
 {
