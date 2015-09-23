@@ -525,7 +525,9 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     if (result.id.isNull())
         result.id = QnUuid::createUuid();
 
-    result.userHost = d->socket->getForeignAddress().address.toString();
+    result.userHost = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::USER_HOST_HEADER_NAME));
+    if (result.userHost.isEmpty())
+        result.userHost = d->socket->getForeignAddress().address.toString();
     result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, "User-Agent"));
 
     int trimmedPos = result.userAgent.indexOf(lit("/"));

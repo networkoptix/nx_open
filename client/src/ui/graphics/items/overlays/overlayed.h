@@ -26,6 +26,7 @@ namespace detail {
         enum OverlayLayer {
             BaseLayer = 0,
             StatusLayer,
+            InfoLayer,
             HudLayer,
             TopControlsLayer
         };
@@ -45,6 +46,8 @@ namespace detail {
         OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
         void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
         void updateOverlayWidgetsVisibility(bool animate = true);
+
+        static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible = true, bool animate = true);
     private:
         template<class Base>
         friend class ::Overlayed; 

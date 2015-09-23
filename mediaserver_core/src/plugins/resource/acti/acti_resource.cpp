@@ -365,6 +365,26 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
+bool QnActiResource::SetupAudioInput()
+{
+    if (!isAudioSupported())
+        return true;
+    bool value = isAudioEnabled();
+    QMutexLocker lock(&m_audioCfgMutex);
+    if (value == m_audioInputOn)
+        return true;
+    CLHttpStatus status;
+    makeActiRequest(QLatin1String("system"), lit("V2_AUDIO_ENABLED=%1").arg(value ? lit("1") : lit("0")), status);
+    if (status == CL_HTTP_SUCCESS) {
+        m_audioInputOn = value;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
 bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     if( hasFlags(Qn::foreigner) ||      //we do not own camera

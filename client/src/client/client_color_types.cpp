@@ -183,6 +183,12 @@ QnServerUpdatesColors::QnServerUpdatesColors() {
     error = Qt::red;
 }
 
+QnFailoverPriorityColors::QnFailoverPriorityColors() {
+    never   = QColor(0x808080);
+    low     = QColor(0x9eb236);
+    medium  = QColor(0xcc853d);
+    high    = QColor(0xff5500);
+}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

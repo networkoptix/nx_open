@@ -20,11 +20,11 @@
     <name>QnElevationChecker</name>
     <message>
         <source>Insufficient rights to manage services.</source>
-        <translation type="unfinished">Thiếu Rights Management Services</translation>
+        <translation>Quyền không đủ để quản lý dịch vụ.</translation>
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished">UAC phải được phép yêu cầu sự cho phép để không sử dụng</translation>
+        <translation>UAC phải được phép yêu cầu sự cho phép để không sử dụng.</translation>
     </message>
 </context>
 <context>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>Media server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Phương tiện truyền thông máy chủ sẽ được ngừng lại. Tiếp tục?</translation>
     </message>
 </context>
 </TS>

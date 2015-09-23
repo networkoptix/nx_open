@@ -55,7 +55,7 @@ namespace
         enum
         {
             kShortButtonAspect = 3
-            , kMediumButtonAspect = 5
+            , kMediumButtonAspect = 6
         };
         
         AvailableButtons result;

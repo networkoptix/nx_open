@@ -15,38 +15,8 @@ class QString;
 
 namespace rtu
 {
-    class HttpClient;
-    
-    const QString &adminUserName();
-    const QStringList &defaultAdminPasswords();
-    
-    void parseModuleInformationReply(const QJsonObject &reply
+    bool parseModuleInformationReply(const QJsonObject &reply
         , rtu::BaseServerInfo &baseInfo);
-
-    /// TODO: #ynikitenkov think about usage and rename if necessary to "invalid entity"
-    enum AffectedEntity
-    {
-        kNoEntitiesAffected         = 0x0
-        , kPortAffected             = 0x1
-        , kPasswordAffected         = 0x2
-        , kSystemNameAffected       = 0x4
-
-        , kIpAddressAffected        = 0x10
-        , kMaskAffected             = 0x20
-        , kDHCPUsageAffected        = 0x30
-        , kDNSAffected              = 0x40
-        , kGatewayAffected          = 0x80
-        , kAllAddressFlagsAffected  = kIpAddressAffected | kMaskAffected | kDHCPUsageAffected
-            | kDNSAffected | kGatewayAffected
-
-        , kDateTimeAffected         = 0x100
-        , kTimeZoneAffected         = 0x200
-        
-        , kAllEntitiesAffected      = 0xFFF
-    };
-    
-    Q_DECLARE_FLAGS(AffectedEntities, AffectedEntity)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(AffectedEntities)
 
     ///
 
@@ -70,36 +40,33 @@ namespace rtu
     };
 
     typedef QVector<ItfUpdateInfo> ItfUpdateInfoContainer;
+    typedef std::shared_ptr<ItfUpdateInfoContainer> ItfUpdateInfoContainerPointer;
     
-    typedef std::function<void (const int errorCode
-        , const QString &errorReason
-        , AffectedEntities affectedEntities)> OperationCallback; 
+    typedef std::function<void (const RequestError errorCode
+        , Constants::AffectedEntities affectedEntities)> OperationCallback; 
     
     typedef std::function<void (const QUuid &serverId
         , const QDateTime &utcServerTime
         , const QTimeZone &timeZone
         , const QDateTime &timestamp)> DateTimeCallbackType;
     
-    enum 
-    {
-        kNoErrorReponse = 0 
-        , kUnspecifiedError = -1
+    typedef std::function<void (BaseServerInfo &info)> BaseServerInfoCallback;
 
-        , kUnauthorizedError = 401
-    };
-    
     typedef std::function<void (const QUuid &id
-        , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
+        , const ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
     
-    void getTime(HttpClient *client
-        , const BaseServerInfo &baseInfo
+    void multicastModuleInformation(const QUuid &id
+        , const BaseServerInfoCallback &successCallback
+        , const OperationCallback &failedCallback
+        , int timeout);
+
+    void getTime(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
         , int timeout = HttpClient::kUseDefaultTimeout);
 
-    void getIfList(HttpClient *client
-        , const BaseServerInfo &baseInfo
+    void getIfList(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
@@ -107,15 +74,13 @@ namespace rtu
 
     /// Sends getTime and getIfList consequentially. 
     /// If getTime is successful, calls successfull callback anyway
-    void getServerExtraInfo(HttpClient *client
-        , const BaseServerInfo &baseInfo
+    void getServerExtraInfo(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
         , int timeout = HttpClient::kUseDefaultTimeout);
 
-    void sendIfListRequest(HttpClient *client
-        , const BaseServerInfo &info
+    void sendIfListRequest(const BaseServerInfoPtr &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
@@ -123,32 +88,30 @@ namespace rtu
 
     ///
 
-    void sendSetTimeRequest(HttpClient *client
-        , const ServerInfo &info
+    void sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
+        , const QString &password
         , qint64 utcDateTimeMs
         , const QByteArray &timeZoneId
         , const OperationCallback &callback);
 
-    ///
-
-    void sendSetSystemNameRequest(HttpClient *client
-        , const ServerInfo &info
+    void sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
+        , const QString &password
         , const QString &systemName
         , const OperationCallback &callback);
     
-    void sendSetPasswordRequest(HttpClient *client
-        , const ServerInfo &info
+    void sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
+        , const QString &currentPassword
         , const QString &password
         , bool useNewPassword
         , const OperationCallback &callback);
 
-    void sendSetPortRequest(HttpClient *client
-        , const ServerInfo &info
+    void sendSetPortRequest(const BaseServerInfoPtr &baseInfo
+        , const QString &password
         , int port
         , const OperationCallback &callback);
 
-    void sendChangeItfRequest(HttpClient *client
-        , const ServerInfo &infos
+    void sendChangeItfRequest(const rtu::BaseServerInfoPtr &baseInfo
+        , const QString &password
         , const ItfUpdateInfoContainer &updateInfo
         , const OperationCallback &callback);
 }

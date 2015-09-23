@@ -199,6 +199,9 @@ angular.module('webadminApp')
                 var activePlayer = null;
                 function recyclePlayer(player){
                     if(activePlayer != player) {
+                        if(scope.vgApi && scope.vgApi.destroy){
+                            scope.vgApi.destroy(); // try to destroy
+                        }
                         element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                     }
@@ -219,13 +222,13 @@ angular.module('webadminApp')
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
-
                             $timeout(function () {
                                 scope.loading = !!format;
                             });
+
                             scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
-                            scope.vgApi.addEventListener("timeupdate", function (event, arg2, arg3) {
+                            scope.vgApi.addEventListener("timeupdate", function (event) {
                                 var video = event.srcElement || event.originalTarget;
                                 scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 if (scope.loading) {
@@ -233,6 +236,11 @@ angular.module('webadminApp')
                                         scope.loading = false;
                                     });
                                 }
+                            });
+
+                            scope.vgApi.addEventListener("ended",function(event){
+                                scope.vgUpdateTime({$currentTime: null, $duration: null});
+
                             });
                         }
 
@@ -336,7 +344,6 @@ angular.module('webadminApp')
                         });
 
                         if (scope.vgSrc) {
-                            //console.log('play',scope.vgSrc[2].src);
                             scope.vgApi.play(scope.vgSrc[2].src);
                         }
 

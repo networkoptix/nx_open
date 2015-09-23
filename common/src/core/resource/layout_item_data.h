@@ -15,10 +15,7 @@
 
 class QnLayoutItemData {
 public:
-    QnLayoutItemData():
-        flags(0),
-        rotation(0)
-    {}
+    QnLayoutItemData();
 
     struct {
         QnUuid id;
@@ -31,26 +28,14 @@ public:
     QnUuid zoomTargetUuid;
     QRectF zoomRect;
     qreal rotation;
+    bool displayInfo;
+
     ImageCorrectionParams contrastParams;
     QnItemDewarpingParams dewarpingParams;
 
     QHash<int, QVariant> dataByRole;
 
-    friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
-        /* Checking all fields but dataByRole. */
-        return (
-               l.uuid == r.uuid 
-            && l.resource.id == r.resource.id
-            && l.resource.path == r.resource.path
-            && l.flags == r.flags 
-            && l.zoomTargetUuid == r.zoomTargetUuid 
-            && qFuzzyEquals(l.combinedGeometry, r.combinedGeometry)
-            && qFuzzyEquals(l.zoomRect, r.zoomRect)
-            && qFuzzyEquals(l.rotation, r.rotation) 
-            && l.contrastParams == r.contrastParams
-            && l.dewarpingParams == r.dewarpingParams
-               );
-    }
+    friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) ;
 };
 
 Q_DECLARE_METATYPE(QnLayoutItemData);

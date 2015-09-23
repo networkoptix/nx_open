@@ -15,7 +15,7 @@ Base.Column
         if (!forceUseDHCPCheckBox.changed)
             return true;
 
-        rtuContext.changesManager().addDHCPChange("doesn't matter for multiple selection", true);
+        rtuContext.changesManager().changeset().addDHCPChange("doesn't matter for multiple selection", true);
         return true;
     }
 

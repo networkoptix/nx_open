@@ -5,6 +5,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <ui/models/resource_pool_model.h>
+
 
 // -------------------------------------------------------------------------- //
 // QnResourceSelectionDialogDelegate
@@ -28,8 +30,12 @@ bool QnResourceSelectionDialogDelegate::validate(const QnResourceList &selectedR
     return true;
 }
 
-bool QnResourceSelectionDialogDelegate::isValid(const QnResourcePtr &resource) {
+bool QnResourceSelectionDialogDelegate::isValid(const QnResourcePtr &resource) const {
     Q_UNUSED(resource)
     return true;
+}
+
+QnResourcePoolModelCustomColumnDelegate* QnResourceSelectionDialogDelegate::customColumnDelegate() const {
+    return nullptr;
 }
 

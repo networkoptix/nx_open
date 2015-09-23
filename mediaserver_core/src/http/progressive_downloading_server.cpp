@@ -61,6 +61,7 @@ public:
         m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),
         m_rtStartTime( AV_NOPTS_VALUE ),
         m_lastRtTime( 0 ),
+        m_endTimeUsec( AV_NOPTS_VALUE ),
         m_liveMode(liveMode),
         m_needKeyData(false)
     {
@@ -106,6 +107,8 @@ public:
         m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
     }
 
+    void setEndTimeUsec(qint64 value) { m_endTimeUsec = value; }
+
 protected:
 
     virtual bool canAcceptData() const override
@@ -149,6 +152,12 @@ protected:
         if (media->dataType == QnAbstractMediaData::EMPTY_DATA) {
             if (media->timestamp == DATETIME_NOW)
                 m_needStop = true; // EOF reached
+            return true;
+        }
+
+        if (m_endTimeUsec != AV_NOPTS_VALUE && media->timestamp > m_endTimeUsec)
+        {
+            m_needStop = true; // EOF reached
             return true;
         }
 
@@ -261,6 +270,7 @@ private:
     QnAdaptiveSleep m_adaptiveSleep;
     qint64 m_rtStartTime;
     qint64 m_lastRtTime;
+    qint64 m_endTimeUsec;
     bool m_liveMode;
     bool m_needKeyData;
     AuditHandle m_auditHandle;
@@ -547,6 +557,7 @@ void QnProgressiveDownloadingConsumer::run()
 
 
         QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
+        QByteArray endPosition = decodedUrlQuery.queryItemValue( StreamingParams::END_POS_PARAM_NAME ).toLatin1();
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
         auto camera = qnCameraPool->getVideoCamera(resource);
 
@@ -647,6 +658,10 @@ void QnProgressiveDownloadingConsumer::run()
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(Qn::CR_Archive)));
             d->archiveDP->open();
             d->archiveDP->jumpTo( timeUSec, timeUSec );
+
+            if (!endPosition.isEmpty())
+                dataConsumer.setEndTimeUsec(parseDateTime(endPosition));
+
             d->archiveDP->start();
             dataProvider = d->archiveDP;
         }
@@ -691,6 +706,8 @@ void QnProgressiveDownloadingConsumer::run()
 
         QnByteArray emptyChunk((unsigned)0,0);
         sendChunk(emptyChunk);
+        sendData(QByteArray("\r\n"));
+
         dataProvider->removeDataProcessor(&dataConsumer);
         if (camera)
             camera->notInUse(this);

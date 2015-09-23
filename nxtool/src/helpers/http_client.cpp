@@ -46,8 +46,6 @@ namespace
 #else
 #define logReply(...)
 #endif
-
-    const qint64 defaultRequestTimeoutMs = 10 * 1000;
 }
 
 class rtu::HttpClient::Impl : public QObject
@@ -131,7 +129,7 @@ void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs)
         return;
 
     if (timeoutMs == kUseDefaultTimeout)
-        timeoutMs = defaultRequestTimeoutMs;
+        timeoutMs = HttpClient::kDefaultTimeoutMs;
 
     QPointer<QNetworkReply> replyPtr(reply);
     QTimer::singleShot(timeoutMs, [replyPtr] {
@@ -152,12 +150,6 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
         return;
     }
     
-    enum
-    {
-        kHttpSuccessCodeFirst = 200
-        , kHttpSuccessCodeLast = 299
-    };
-    
     const QNetworkReply::NetworkError errorCode = reply->error();
     const int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     const bool isRequestError = (errorCode != QNetworkReply::NoError);
@@ -175,10 +167,31 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
             const QString &httpError = (httpErrorVar.isValid() ? 
                 httpErrorVar.toString() : QString());
 
-            //TODO: #tr #ynikitenkov Strings must be generated in the UI class, not in the network one
-            const QString &errorReason = (!httpError.isEmpty()? httpError 
-                : QString("Network Error: %1").arg(errorCodeToString(errorCode)));
-            errorCallback(errorReason, httpCode);
+            RequestError resultErrorCode = RequestError::kSuccess;
+
+            switch(errorCode)
+            {
+            case QNetworkReply::AuthenticationRequiredError:
+                errorCallback(RequestError::kUnauthorized);
+                break;
+            case QNetworkReply::OperationCanceledError:
+            case QNetworkReply::TimeoutError:
+                errorCallback(RequestError::kRequestTimeout);
+                break;
+            case QNetworkReply::NoError:
+            {
+                if (!isHttpError)
+                    errorCallback(RequestError::kSuccess);
+                else if (httpCode == kHttpUnauthorized)
+                    errorCallback(RequestError::kUnauthorized);
+                else 
+                    errorCallback(RequestError::kUnspecified);
+
+                break;
+            }
+            default:
+                errorCallback(RequestError::kUnspecified);
+            }
         }
     }
     else if (const ReplyCallback &successCallback = it->success)

@@ -59,7 +59,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     });
 
     connect(webPageButton, &QPushButton::clicked, this, [this] {
-        menu()->trigger(Qn::WebClientAction);
+        menu()->trigger(Qn::WebClientAction, m_server);
     });
 
 

@@ -10,7 +10,7 @@ namespace ec2
 
     struct ApiLayoutItemData: ApiData 
     {
-        ApiLayoutItemData(): ApiData(), flags(0), left(0), top(0), right(0), bottom(0), rotation(0.0), zoomLeft(0.0), zoomTop(0.0), zoomRight(0.0), zoomBottom(0.0) {}
+        ApiLayoutItemData();
 
         QnUuid id;
         qint32 flags;
@@ -28,9 +28,11 @@ namespace ec2
         QnUuid zoomTargetId;
         QnLatin1Array contrastParams; // TODO: #API I'll think about this one.
         QnLatin1Array dewarpingParams;
+        bool displayInfo;                   /**< Should info be displayed on the item. */
     };
 #define ApiLayoutItemData_Fields (id)(flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \
-                                    (zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId)(contrastParams)(dewarpingParams)
+                                    (zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId)(contrastParams)(dewarpingParams) \
+                                    (displayInfo)
 
 
     struct ApiLayoutItemWithRefData: ApiLayoutItemData {

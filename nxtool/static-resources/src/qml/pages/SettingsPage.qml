@@ -250,7 +250,11 @@ FocusScope
                 width: height * 3;
                 
                 enabled: applyButton.enabled;
-                onClicked: rtuContext.selectionChanged();
+                onClicked:
+                {
+                    rtuContext.selectionChanged();
+                    rtuContext.changesManager().clearChanges();
+                }
             }
         }
     }

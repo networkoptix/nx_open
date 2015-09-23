@@ -26,7 +26,7 @@ angular.module('webadminApp')
         $scope.confirmPassword = '';
 
         $scope.openJoinDialog = function () {
-            var modalInstance = $modal.open({
+            $modal.open({
                 templateUrl: 'views/join.html',
                 controller: 'JoinCtrl',
                 resolve: {
@@ -34,36 +34,6 @@ angular.module('webadminApp')
                         return $scope.settings;
                     }
                 }
-            });
-
-            modalInstance.result.then(function (settings) {
-                $log.info(settings);
-                mediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
-                    if(r.data.error!=='0'){
-                        var errorToShow = r.data.errorString;
-                        switch(errorToShow){
-                            case 'FAIL':
-                                errorToShow = 'System is unreachable or doesn\'t exist.';
-                                break;
-                            case 'UNAUTHORIZED':
-                            case 'password':
-                            case 'PASSWORD':
-                                errorToShow = 'Wrong password.';
-                                break;
-                            case 'INCOMPATIBLE':
-                                errorToShow = 'Found system has incompatible version.';
-                                break;
-                            case 'url':
-                            case 'URL':
-                                errorToShow = 'Wrong url.';
-                                break;
-                        }
-                        alert('Merge failed: ' + errorToShow);
-                    }else {
-                        alert('Merge succeed.');
-                        window.location.reload();
-                    }
-                });
             });
         };
 

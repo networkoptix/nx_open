@@ -40,6 +40,7 @@ public:
     QString name;
     QString groupName;
     QnMediaDewarpingParams dewarpingParams;
+    Qn::FailoverPriority failoverPriority;
 
     QnCameraUserAttributes();
 

@@ -558,7 +558,10 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
 
     if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
     {
-        *dbDirectory = storageUrl;
+        if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+            *dbDirectory = fileStorage->getLocalPath(); // todo: need refactor it
+        else
+            *dbDirectory = storageUrl;
         return true;
     }
     else

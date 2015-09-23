@@ -47,3 +47,11 @@ QString rtu::timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &
     const QString baseName(timeZone.id());      
     return tzTemplate.arg(timeZone.displayName(atDateTime, QTimeZone::OffsetName), baseName);
 }
+
+rtu::DateTime::DateTime(qint64 utcDateTimeMs
+    , const QByteArray &timeZoneId)
+
+    : utcDateTimeMs(utcDateTimeMs)
+    , timeZoneId(timeZoneId)
+{
+}

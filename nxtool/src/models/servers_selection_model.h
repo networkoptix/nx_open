@@ -23,6 +23,10 @@ namespace rtu
         virtual ~ServersSelectionModel();
         
     public slots:
+
+        /// Sets items with specified ids selected
+        void setSelectedItems(const IDsVector &ids);
+
         void changeItemSelectedState(int rowIndex);
         
         void setItemSelected(int rowIndex);
@@ -74,6 +78,12 @@ namespace rtu
 
         void updatePasswordInfo(const QUuid &id
             , const QString &password);
+
+        void setBusyState(const IDsVector &ids
+            , bool isBusy);
+
+        void changeAccessMethod(const QUuid &id
+            , bool byHttp);
 
     signals:
         void layoutChanged();

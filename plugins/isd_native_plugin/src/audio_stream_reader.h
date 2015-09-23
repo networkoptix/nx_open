@@ -54,10 +54,13 @@ private:
     bool m_initializedInitially;
     PtsToClockMapper m_ptsMapper;
     int m_framesSinceTimeResync;
+    bool m_amuxStarted;
 
     virtual void eventTriggered( Pollable* obj, aio::EventType eventType ) throw();
 
     bool initializeAmux( bool getFormatOnly = false );
+    void closeAmux();
+    void closeAmux(std::unique_lock<std::mutex>* const /*lk*/);
     int readAudioData();
     void fillAudioFormat();
 };

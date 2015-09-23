@@ -343,7 +343,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
     if (m_firstTime)
     {
-        if (vd == 0 &&  mediaDev->hasVideo(m_mediaProvider))
+        if (vd == 0 &&  mediaDev->hasVideo(md->dataProvider))
             return true; // skip audio packets before first video packet
         if (!initFfmpegContainer(md))
         {

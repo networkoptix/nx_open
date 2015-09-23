@@ -380,7 +380,7 @@ flashlsAPI.flashlsEvents = {
         //console.log("videoSize",width, height);
     },
     complete: function() {
-        //console.log("onComplete(), playback completed");
+        flashlsAPI.positionHandler(null);
     },
     error: function(code, url, message) {
         //console.log("onError():error code:"+ code + " url:" + url + " message:" + message);

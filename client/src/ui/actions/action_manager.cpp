@@ -513,9 +513,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
+        mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules..."));
+
+    factory(Qn::OpenFailoverPriorityAction).
+        mode(QnActionTypes::DesktopMode).
+        flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Failover Priority..."));
 
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
@@ -814,7 +821,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::WebClientAction).
-        flags(Qn::Tree | Qn::NoTarget).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
         text(tr("Open Web Client...")).
         autoRepeat(false).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).

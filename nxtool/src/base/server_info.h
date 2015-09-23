@@ -59,6 +59,8 @@ namespace rtu
         QString systemName;
         QString hostAddress;
         int port;
+
+        bool accessibleByHttp;
     };
     
     bool operator == (const BaseServerInfo &first

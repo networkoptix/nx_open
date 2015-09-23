@@ -73,7 +73,7 @@ public:
     qint32 cameraCount() const;
     void setCameraCount(qint32 count);
 
-    QByteArray hardwareId() const;
+    QString hardwareId() const;
     QByteArray signature() const;
 
     QString xclass() const;
@@ -131,7 +131,7 @@ private:
     QString m_name;
     QByteArray m_key;
     qint32 m_cameraCount;
-    QByteArray m_hardwareId;
+    QString m_hardwareId;
     QByteArray m_signature;
 
     QString m_class;
@@ -196,9 +196,9 @@ public:
     void reset();
     bool isEmpty() const;
 
-    QVector<QByteArray> mainHardwareIds() const;
-    QVector<QByteArray> compatibleHardwareIds() const;
-    QByteArray currentHardwareId() const;
+    QVector<QString> mainHardwareIds() const;
+    QVector<QString> compatibleHardwareIds() const;
+    QString currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
     void licensesChanged();

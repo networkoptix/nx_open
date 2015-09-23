@@ -21,7 +21,7 @@ namespace ec2
     {
         QString name;
         qint32 cameraCount;
-        QByteArray hardwareId;
+        QString hardwareId;
         QString licenseType;
         QString version;
         QString brand;

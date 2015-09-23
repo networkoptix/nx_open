@@ -73,6 +73,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
 
     serverConnection->testLdapSettingsAsync(settings, this, SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
 
+    setHelpTopic(this, Qn::UserSettings_LdapFetch_Help);
 }
 
 QnLdapUsersDialog::~QnLdapUsersDialog() {}

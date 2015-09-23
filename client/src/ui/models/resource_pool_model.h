@@ -3,14 +3,14 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QScopedPointer>
-#include <utils/common/uuid.h>
 
-#include <utils/common/id.h>
+#include <client/client_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <client/client_globals.h>
 
+#include <utils/common/id.h>
 #include <utils/common/connective.h>
 
 class QnResourceModelPrivate;
@@ -21,6 +21,7 @@ class QnVideoWallMatrix;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 class QnResourcePoolModelNode;
+class QnResourcePoolModelCustomColumnDelegate;
 
 class QnResourcePoolModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -59,6 +60,9 @@ public:
 
     bool isUrlsShown();
     void setUrlsShown(bool urlsShown);
+
+    QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
+    void setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate);
 private:
     QnResourcePoolModelNode *node(const QnResourcePtr &resource);
     QnResourcePoolModelNode *node(const QnUuid &uuid);
@@ -139,6 +143,9 @@ private:
 
     /** Full list of all created nodes. */
     QList<QnResourcePoolModelNode *> m_allNodes;
+
+    /** Delegate for custom column data. */
+    QPointer<QnResourcePoolModelCustomColumnDelegate> m_customColumnDelegate;
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;

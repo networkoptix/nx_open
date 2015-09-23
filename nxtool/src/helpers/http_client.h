@@ -5,6 +5,8 @@
 
 #include <QObject>
 
+#include <base/types.h>
+
 class QUrl;
 class QByteArray;
 
@@ -14,10 +16,17 @@ namespace rtu
     {
     public:
         typedef std::function<void (const QByteArray &data)> ReplyCallback;
-        typedef std::function<void (const QString &errorReason
-            , int errorCode)> ErrorCallback;
+        typedef std::function<void (RequestError errorCode)> ErrorCallback;
         
-        enum { kUseDefaultTimeout = 0 };
+        enum { kUseDefaultTimeout = -1 };
+        enum { kDefaultTimeoutMs = 10 * 1000 };
+
+        enum
+        {
+            kHttpSuccessCodeFirst = 200
+            , kHttpSuccessCodeLast = 299
+            , kHttpUnauthorized = 401
+        };
 
         HttpClient(QObject *parent);
         

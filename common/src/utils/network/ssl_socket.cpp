@@ -165,6 +165,10 @@ static BIO_METHOD Proxy_server_socket =
 
 namespace {
 
+
+class OpenSSLGlobalLockManager;
+static std::unique_ptr<OpenSSLGlobalLockManager> openSSLGlobalLockManagerInstance;
+
 // SSL global lock. This is a must even if the compilation has configured with THREAD for OpenSSL.
 // Based on the documentation of OpenSSL, it internally uses lots of global data structure. Apart
 // from this, I have suffered the wired access violation when not give OpenSSL lock callback. The
@@ -172,29 +176,54 @@ namespace {
 // must since OpenSSL configured with thread support will give default version. Additionally, the
 // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
-    static std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
-    void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
-        Q_UNUSED(file);
-        Q_UNUSED(line);
-        Q_ASSERT( kOpenSSLGlobalLock.get() != nullptr );
-        if( mode & CRYPTO_LOCK ) {
-            kOpenSSLGlobalLock.get()[type].lock();
-        } else {
-            kOpenSSLGlobalLock.get()[type].unlock();
-        }
-    }
-    static std::once_flag kOpenSSLGlobalLockFlag;
+class OpenSSLGlobalLockManager
+{
+public:
+    typedef void(*OpenSSLLockingCallbackType)(int mode, int type, const char *file, int line);
 
-    void OpenSSLInitGlobalLock() {
+    std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
+
+    OpenSSLGlobalLockManager()
+    :
+        m_initialLockingCallback(CRYPTO_get_locking_callback())
+    {
         Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
         // not safe here, new can throw exception 
-        kOpenSSLGlobalLock.reset( new std::mutex[CRYPTO_num_locks()] );
-        CRYPTO_set_locking_callback(OpenSSLGlobalLock);
+        kOpenSSLGlobalLock.reset(new std::mutex[CRYPTO_num_locks()]);
+        CRYPTO_set_locking_callback(&OpenSSLGlobalLockManager::openSSLGlobalLock);
     }
+
+    ~OpenSSLGlobalLockManager()
+    {
+        CRYPTO_set_locking_callback(m_initialLockingCallback);
+        m_initialLockingCallback = nullptr;
+    }
+
+    static void openSSLGlobalLock(int mode, int type, const char* file, int line)
+    {
+        Q_UNUSED(file);
+        Q_UNUSED(line);
+        Q_ASSERT(openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get() != nullptr);
+        if (mode & CRYPTO_LOCK)
+            openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].lock();
+        }
+        else
+        {
+            openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].unlock();
+        }
+private:
+    OpenSSLLockingCallbackType m_initialLockingCallback;
+};
+
+static std::once_flag kOpenSSLGlobalLockFlag;
+
+void initOpenSSLGlobalLock()
+{
+    std::call_once(
+        kOpenSSLGlobalLockFlag,
+        []() { openSSLGlobalLockManagerInstance.reset(new OpenSSLGlobalLockManager()); });
 }
 
-void InitOpenSSLGlobalLock() {
-    std::call_once(kOpenSSLGlobalLockFlag,OpenSSLInitGlobalLock);
 }
 
 SystemError::ErrorCode kSSLInternalError = 100;

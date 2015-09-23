@@ -20,11 +20,11 @@
     <name>QnElevationChecker</name>
     <message>
         <source>Insufficient rights to manage services.</source>
-        <translation type="unfinished">サービスを管理するための権限が不十分です</translation>
+        <translation>サービスを管理するための権限が不十分です.</translation>
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished">UAC・管理者以外のユーザーの権限を有効にする必要があります</translation>
+        <translation>UAC・管理者以外のユーザーの権限を有効にする必要があります.</translation>
     </message>
 </context>
 <context>
@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>Media Server Web Page</source>
-        <translation>メディアアーバーウェブページ</translation>
+        <translation>メディアサーバーウェブページ</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>Media server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアサーバーは低sされます　宜しいですか？</translation>
     </message>
 </context>
 </TS>

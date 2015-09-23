@@ -21,7 +21,10 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    setHelpTopic(ui->autoDiscoveryCheckBox, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
+    setHelpTopic(ui->autoDiscoveryCheckBox,     Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
+    setHelpTopic(ui->auditTrailCheckBox,        Qn::AuditTrail_Help);
+    setHelpTopic(ui->statisticsReportCheckBox,  Qn::SystemSettings_General_AnonymousUsage_Help);
+
     setWarningStyle(ui->settingsWarningLabel);
 
     QnCheckbox::autoCleanTristate(ui->autoDiscoveryCheckBox);

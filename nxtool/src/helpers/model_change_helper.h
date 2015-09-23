@@ -32,15 +32,15 @@ namespace rtu
         virtual ~ModelChangeHelper();
         
         Guard insertRowsGuard(int startIndex
-            , int finishIndex);
+            , int finishIndex) const;
         
         Guard removeRowsGuard(int startIndex
-            , int finishIndex);
+            , int finishIndex) const;
         
-        Guard resetModelGuard();
+        Guard resetModelGuard() const;
         
         void dataChanged(int startIndex
-            , int finishIndex);
+            , int finishIndex) const;
         
     private:
         const RowsActionFunction m_beginInsertRows;

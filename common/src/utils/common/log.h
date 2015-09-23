@@ -8,7 +8,15 @@
 #include <mutex>
 
 // TODO: #Elric #enum
-enum QnLogLevel { cl_logUNKNOWN, cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
+enum QnLogLevel {
+    cl_logUNKNOWN,
+    cl_logALWAYS,
+    cl_logERROR,
+    cl_logWARNING,
+    cl_logINFO,
+    cl_logDEBUG1,
+    cl_logDEBUG2
+};
 
 class QnLogPrivate;
 
@@ -18,6 +26,7 @@ public:
     static const int CUSTOM_LOG_BASE_ID = 1;
     static const int HTTP_LOG_INDEX = CUSTOM_LOG_BASE_ID + 1;
     static const int EC2_TRAN_LOG = CUSTOM_LOG_BASE_ID + 2;
+    static const int HWID_LOG = CUSTOM_LOG_BASE_ID + 3;
 
     QnLog();
     ~QnLog();

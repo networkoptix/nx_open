@@ -16,6 +16,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/models/user_list_model.h>
 #include <ui/style/globals.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
@@ -76,6 +78,12 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
 
     connect(m_sortModel, &QAbstractItemModel::rowsInserted, this, &QnUserManagementWidget::updateSelection);
     connect(m_sortModel, &QAbstractItemModel::rowsRemoved, this, &QnUserManagementWidget::updateSelection);
+
+    setHelpTopic(this,                                                  Qn::SystemSettings_UserManagement_Help);
+    setHelpTopic(ui->enableSelectedButton, ui->disableSelectedButton,   Qn::UserSettings_DisableUser_Help);
+    setHelpTopic(ui->ldapSettingsButton,                                Qn::UserSettings_LdapIntegration_Help);
+    setHelpTopic(ui->fetchButton,                                       Qn::UserSettings_LdapFetch_Help);
+
 }
 
 QnUserManagementWidget::~QnUserManagementWidget() {

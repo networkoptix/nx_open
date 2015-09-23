@@ -14,11 +14,19 @@ static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
 
+namespace {
+    const QString NONE_LOG_LEVEL_STR(lit("NONE"));
+}
+
 const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
-    QString str = value.toUpper().trimmed();
+    const QString str = value.toUpper().trimmed();
+    //adding "none" alias for cl_logALWAYS log level to make it more intuitive how to disable logging using rest handler
+    if (str == NONE_LOG_LEVEL_STR)
+        return cl_logALWAYS;
+
     for (uint i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
         if (str == QLatin1String(qn_logLevelNames[i]))
             return QnLogLevel(i);
@@ -56,7 +64,7 @@ public:
         m_file.setFileName(currFileName());
 
         bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered);
-        if (rez)
+        if (rez && m_file.size() == 0)
             m_file.write(UTF8_BOM);
         return rez;
     }
@@ -190,6 +198,46 @@ private:
 // -------------------------------------------------------------------------- //
 // QnLog
 // -------------------------------------------------------------------------- //
+
+class QnLogs
+{
+public:
+    ~QnLogs()
+    {
+        //no one calls get() anymore
+        for( auto val: m_logs )
+            delete val.second;
+        m_logs.clear();
+    }
+
+    QnLog* get( int logID )
+    {
+        QnMutexLocker lk( &m_mutex );
+        QnLog*& log = m_logs[logID];
+        if( !log )
+            log = new QnLog();
+        return log;
+    }
+
+    bool exists( int logID )
+    {
+        QnMutexLocker lk( &m_mutex );
+        return m_logs.find(logID) != m_logs.cend();
+    }
+
+    bool put( int logID, QnLog* log )
+    {
+        QnMutexLocker lk( &m_mutex );
+        return m_logs.insert( std::make_pair( logID, log ) ).second;
+    }
+
+private:
+    std::map<int, QnLog*> m_logs;
+    QnMutex m_mutex;
+};
+
+Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);
+
 
 QnLog::QnLog()
 :

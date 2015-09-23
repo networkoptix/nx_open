@@ -1,10 +1,14 @@
+
 #include <QFile>
+#include <QtCore/QProcess>
 
 #include "settime_rest_handler.h"
+#include <api/app_server_connection.h>
 #include <utils/network/tcp_connection_priv.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
+
 
 #ifdef Q_OS_LINUX
 #include <sys/time.h>
@@ -30,7 +34,23 @@ bool setDateTime(qint64 value)
     struct timeval tv;
     tv.tv_sec = value / 1000;
     tv.tv_usec = (value % 1000) * 1000;
-    return settimeofday(&tv, 0) == 0;
+    if (settimeofday(&tv, 0) != 0)
+        return false;
+
+    if (QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1")
+    {
+        //on nx1 have to execute hwclock -w to save time. But this command sometimes failes
+        for (int i = 0; i < 3; ++i)
+        {
+            const int resultCode = QProcess::execute("hwclock -w");
+            if (resultCode == 0)
+                return true;
+        }
+        return false;
+    }
+
+    return true;
+
 }
 #endif
 
@@ -73,6 +93,11 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't set new datetime value"));
         return CODE_OK;
     }
+
 #endif
+
+    //ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    //ec2Connection->getTimeManager()->forceTimeResync();
+
     return CODE_OK;
 }
