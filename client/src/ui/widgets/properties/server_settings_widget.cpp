@@ -271,17 +271,19 @@ void QnServerSettingsWidget::retranslateUi() {
 
 
 void QnServerSettingsWidget::updateFromSettings() {
+    updateRebuildUi(QnStorageScanData());
+    setTableItems(QList<QnStorageSpaceData>());
+
     if (!m_server)
         return;
 
     sendStorageSpaceRequest();
-    updateRebuildUi(QnStorageScanData());
-
-    if (m_server->getStatus() == Qn::Online)
+    if (m_server->getStatus() == Qn::Online) {
         sendNextArchiveRequest();
-
-    setTableItems(QList<QnStorageSpaceData>());
-    setBottomLabelText(tr("Loading..."));
+        setBottomLabelText(tr("Loading..."));
+    } else {
+        setBottomLabelText(tr("Server is unavailable"));
+    }
 
     m_initServerName = m_server->getName();
     ui->nameLineEdit->setText(m_initServerName);
@@ -292,15 +294,15 @@ void QnServerSettingsWidget::updateFromSettings() {
         maxCameras = ARM_SERVER_MAX_CAMERAS;   //generic ARM based servre
     else
         maxCameras = PC_SERVER_MAX_CAMERAS;    //PC server
+    ui->maxCamerasSpinBox->setMaximum(maxCameras);
+
     int currentMaxCamerasValue = m_server->getMaxCameras();
     if( currentMaxCamerasValue == 0 )
         currentMaxCamerasValue = maxCameras;
 
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
-    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
-
-    ui->maxCamerasSpinBox->setMaximum(maxCameras);
+    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());   
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -595,8 +597,10 @@ void QnServerSettingsWidget::at_storagesTable_contextMenuEvent(QObject *, QEvent
     }
 }
 
-void QnServerSettingsWidget::at_rebuildButton_clicked()
-{
+void QnServerSettingsWidget::at_rebuildButton_clicked() {
+    if (!m_server)
+        return;
+
     RebuildAction action;
     if (m_rebuildState.state > Qn::RebuildState_None) {
         action = RebuildAction_Cancel;
@@ -636,12 +640,13 @@ void QnServerSettingsWidget::updateRebuildInfo() {
 }
 
 void QnServerSettingsWidget::sendStorageSpaceRequest() {
-    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    if (m_server)
+        m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
 }
 
-void QnServerSettingsWidget::sendNextArchiveRequest()
-{
-    m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
+void QnServerSettingsWidget::sendNextArchiveRequest() {
+    if (m_server)
+        m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
 }
 
 void QnServerSettingsWidget::updateRebuildUi(const QnStorageScanData& reply) {
