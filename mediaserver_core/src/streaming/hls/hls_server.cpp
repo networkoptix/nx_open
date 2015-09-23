@@ -195,13 +195,19 @@ namespace nx_hls
         const QString& path = request.requestLine.url.path();
         int fileNameStartIndex = path.lastIndexOf(QChar('/'));
         if( fileNameStartIndex == -1 )
+        {
+            NX_LOG(lit("HLS. Not found file name in path %1").arg(path), cl_logDEBUG1);
             return StatusCode::notFound;
+        }
         QStringRef fileName;
         if( fileNameStartIndex == path.size()-1 )   //path ends with /. E.g., /hls/camera1.m3u/. Skipping trailing /
         {
             int newFileNameStartIndex = path.midRef(0, path.size()-1).lastIndexOf(QChar('/'));
             if( newFileNameStartIndex == -1 )
+            {
+                NX_LOG(lit("HLS. Not found file name (2) in path %1").arg(path), cl_logDEBUG1);
                 return StatusCode::notFound;
+            }
             fileName = path.midRef( newFileNameStartIndex+1, fileNameStartIndex-(newFileNameStartIndex+1) );
         }
         else
@@ -306,6 +312,7 @@ namespace nx_hls
             }
         }
 
+        NX_LOG(lit("HLS. Unknown file type has been requested: \"%1\"").arg(extension.toString()), cl_logDEBUG1);
         return StatusCode::notFound;
     }
 

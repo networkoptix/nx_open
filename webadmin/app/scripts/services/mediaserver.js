@@ -126,14 +126,14 @@ angular.module('webadminApp')
             hasProxy:function(){
                 return proxy !=='';
             },
-            checkAdmin:function(){
+            getUser:function(){
                 var deferred = $q.defer();
                 if(this.hasProxy()){ // Proxy means read-only
                     deferred.resolve(false);
                 }
                 this.getCurrentUser().then(function(result){
                     var isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
-                    deferred.resolve(isAdmin);
+                    deferred.resolve({isAdmin:isAdmin,name:result.data.reply.name});
                 });
                 return deferred.promise;
             },

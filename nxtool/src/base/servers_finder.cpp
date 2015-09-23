@@ -131,6 +131,9 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
+//        if (!jsonObject.value("systemName").toString().contains("000_nx1_"))
+//            return false;
+
         rtu::parseModuleInformationReply(jsonObject, info);
         return true;
     }

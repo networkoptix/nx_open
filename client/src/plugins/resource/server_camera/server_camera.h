@@ -19,6 +19,12 @@ public:
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override;
 
+    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes)
+    virtual QString getName() const override;
+
+    //!Overrides \a QnResource::setName. Writes target name to \a QnCameraUserAttributes instead of resource field.
+    virtual void setName( const QString& name ) override;
+
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 

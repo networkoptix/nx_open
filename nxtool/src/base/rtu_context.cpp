@@ -115,7 +115,7 @@ rtu::ServersSelectionModel *rtu::RtuContext::Impl::selectionModel()
 
 QAbstractListModel *rtu::RtuContext::Impl::ipSettingsModel()
 {
-    return new IpSettingsModel(m_selectionModel);
+    return new IpSettingsModel(m_selection.data());
 }
 
 rtu::TimeZonesModel *rtu::RtuContext::Impl::timeZonesModel(QObject *parent)

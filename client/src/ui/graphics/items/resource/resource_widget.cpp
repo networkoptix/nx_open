@@ -290,7 +290,11 @@ void QnResourceWidget::addMainOverlay() {
     m_overlayWidgets.mainOverlay->setLayout(overlayLayout);
     m_overlayWidgets.mainOverlay->setAcceptedMouseButtons(0);
 
-    addOverlayWidget(m_overlayWidgets.mainOverlay, AutoVisible, true, true, InfoLayer);
+    OverlayVisibility visibility = options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
+        ? OverlayVisibility::Invisible
+        : OverlayVisibility::AutoVisible;
+
+    addOverlayWidget(m_overlayWidgets.mainOverlay, visibility, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, false, false);
 }
 
@@ -801,7 +805,10 @@ void QnResourceWidget::updateHud(bool animate) {
 
     m_buttonBar->setVisible(buttonsVisible);
 
-    setOverlayWidgetVisible(m_overlayWidgets.infoOverlay,   detailsVisible && !m_mouseInWidget, animate);
+    bool visible = options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
+        ? false
+        : detailsVisible && !m_mouseInWidget;
+    setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, visible, animate);
 }
 
 bool QnResourceWidget::isHovered() const {
@@ -948,7 +955,16 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags){
         (changedFlags.testFlag(DisplayInfo) && visibleButtons().testFlag(InfoButton))
         || changedFlags.testFlag(DisplayButtons)
         )
-        updateHud();
+        updateHud(false);
+
+    if (changedFlags.testFlag(InfoOverlaysForbidden)) {
+        bool forbidden = options().testFlag(InfoOverlaysForbidden);
+
+        OverlayVisibility mainVisibility = forbidden ? OverlayVisibility::Invisible : OverlayVisibility::AutoVisible;
+        setOverlayWidgetVisibility(m_overlayWidgets.mainOverlay, mainVisibility);
+        updateHud(false);
+    }
+
 }
 
 void QnResourceWidget::at_itemDataChanged(int role) {

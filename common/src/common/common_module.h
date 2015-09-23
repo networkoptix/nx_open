@@ -67,6 +67,9 @@ public:
     void setLocalSystemName(const QString& value);
     QString localSystemName() const;
 
+    void setReadOnly(bool value);
+    bool isReadOnly() const;
+
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
 
@@ -104,6 +107,7 @@ public:
 
 signals:
     void systemNameChanged(const QString &systemName);
+    void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);

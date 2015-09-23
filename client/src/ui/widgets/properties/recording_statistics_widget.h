@@ -83,22 +83,23 @@ private:
     // forecast related data
     struct ForecastDataPerCamera
     {
-        ForecastDataPerCamera(): expand(false), maxDays(0), bytesPerStep(0), usageCoeff(0.0) {}
+        ForecastDataPerCamera(): expand(false), minDays(0), maxDays(0), byterate(0) {}
 
         QnCamRecordingStatsData stats;         // forecasted statistics
         bool expand;                           // do expand archive for that camera in the forecast
+        int minDays;                           // cached camera 'minDays' value
         int maxDays;                           // cached camera 'maxDays' value
-        qint64 bytesPerStep;                   // how may bytes camera gives per calendar hour
-        qreal usageCoeff;                      // how many time camera is actually recording in range [0..1]
+        qint64 byterate;                       // how may bytes camera gives per second (bytes/second)
     };
 
     struct ForecastData
     {
-        ForecastData(): extraSpace(0) {}
-        qint64 extraSpace; // extra space in bytes 
+        ForecastData(): totalSpace(0) {}
+        qint64 totalSpace; // total space for all storages
         QVector<ForecastDataPerCamera> cameras; // camera list by server
     };
 
 private:
-    QnRecordingStatsReply doForecastMainStep(ForecastData& forecastData, qint64 forecastStep);
+    QnRecordingStatsReply doForecast(ForecastData forecastData);
+    void spendData(ForecastData& forecastData, qint64 needSeconds, std::function<bool (const ForecastDataPerCamera& stats)> predicate);
 };
