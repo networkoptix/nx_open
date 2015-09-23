@@ -51,6 +51,7 @@ public:
     }
 
     Q_INVOKABLE int dp(qreal dpix) const;
+    Q_INVOKABLE int dps(qreal dpix) const;
     Q_INVOKABLE int sp(qreal dpix) const;
     Q_INVOKABLE qreal iconScale() const;
 

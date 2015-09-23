@@ -53,27 +53,28 @@ Item {
         border.width: dp(2)
         radius: dp(2)
 
-        Item {
+        Canvas {
             id: check
             opacity: checked ? 1.0 : 0.0
 
-            Rectangle {
-                x: dp(5.25)
-                y: dp(7.5)
-                width: dp(12)
-                height: dp(2)
-                color: QnTheme.windowBackground
-                radius: dp(1)
-                rotation: -45
-            }
-            Rectangle {
-                x: dp(1.5)
-                y: dp(10)
-                width: dp(6)
-                height: dp(2)
-                color: QnTheme.windowBackground
-                radius: dp(1)
-                rotation: 45
+            anchors.centerIn: parent
+            width: parent.width
+            height: parent.height
+
+            renderStrategy: Canvas.Cooperative
+            scale: iconScale()
+
+            onPaint: {
+                var ctx = check.getContext('2d')
+                ctx.reset()
+
+                ctx.lineWidth = dps(2.5)
+                ctx.strokeStyle = QnTheme.windowBackground
+
+                ctx.moveTo(dps(2.5), dps(8.5))
+                ctx.lineTo(dps(7), dps(12.5))
+                ctx.lineTo(dps(15.5), dps(4))
+                ctx.stroke()
             }
         }
     }
