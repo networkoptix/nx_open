@@ -1084,7 +1084,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         /* Do not show time for regular media files. */
         timeString = m_display->camDisplay()->isRealTimeSource() 
             ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(currentTime).toString(lit("yyyy-MM-dd hh:mm:ss"));
+            : QDateTime::fromMSecsSinceEpoch(m_currentTime).toString(lit("yyyy-MM-dd hh:mm:ss"));
         
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
