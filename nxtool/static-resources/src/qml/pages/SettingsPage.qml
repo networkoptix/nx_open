@@ -127,28 +127,28 @@ FocusScope
     
     Connections
     {
-        property var model: rtuContext.selectionModel();
+        target: rtuContext.selection;
 
-        target: model;
-        onSelectionOutdatedChanged:
+        function processChanges(item)
         {
-            if (model.selectionOutdated
-                &&!ipPortSettings.warned && !dateTimeSettings.warned
-                && !systemAndPasswordSettings.warned)
-            {
-                model.selectionChanged();
-            }
+            var updateFunc = function() { item.recreate(); }
+
+            if (item.warned && !item.changed)
+                updateFunc();
+            else
+                outdatedWarning.addOnUpdateAction(updateFunc);
         }
+
+        onInterfaceSettingsChanged: { processChanges(ipPortSettings); }
+        onDateTimeSettingsChanged: { processChanges(dateTimeSettings); }
+        onSystemSettingsChanged: { processChanges(systemAndPasswordSettings); }
     }
 
     Rtu.OutdatedWarningPanel
     {
         id: outdatedWarning;
 
-        show: rtuContext.selectionModel().selectionOutdated;
         width: parent.width;
-
-        onUpdateClicked: { rtuContext.selectionModel().selectionChanged(); }
     }
 
     ScrollView

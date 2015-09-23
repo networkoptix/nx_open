@@ -19,18 +19,20 @@ namespace
         const rtu::ApplyChangesTaskPtr task = 
             rtu::ApplyChangesTask::create(changeset, selectionModel->selectedServers());
 
-        selectionModel->setBusyState(task->targetServerIds(), true);
+        const auto ids = task->targetServerIds();
+        selectionModel->setBusyState(ids, true);
 
         typedef std::weak_ptr<rtu::ApplyChangesTask> TaskWeak;
         const TaskWeak weak = task;
         QObject::connect(task.get(), &rtu::ApplyChangesTask::changesApplied
-            , context, [context, weak, selectionModel]() 
+            , context, [ids, context, weak, selectionModel]() 
         {
+            selectionModel->setBusyState(ids, false);
+
             if (weak.expired())
                 return;
 
             const rtu::ApplyChangesTaskPtr task = weak.lock();
-            selectionModel->setBusyState(task->targetServerIds(), false);
             context->applyTaskCompleted(task); 
         });
 

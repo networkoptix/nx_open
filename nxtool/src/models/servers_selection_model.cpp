@@ -354,12 +354,6 @@ public:
     void tryLoginWith(const QString &primarySystem
         , const QString &password
         , const Callback &callback);
-    
-    ///
-
-    bool selectionOutdated();
-
-    void setSelectionOutdated(bool outdated);
 
     ///
     
@@ -433,7 +427,6 @@ private:
     
     SystemModelInfosVector m_systems;
     rtu::ServerInfoManager *m_serverInfoManager;
-    bool m_selectionOutdated;
 
     const ServerInfoManager::SuccessfulCallback m_updateExtra;
     const ServerInfoManager::FailedCallback m_updateExtraFailed;
@@ -450,7 +443,6 @@ rtu::ServersSelectionModel::Impl::Impl(rtu::ServersSelectionModel *owner
     , m_systems()
 
     , m_serverInfoManager(new ServerInfoManager(this))
-    , m_selectionOutdated(false)
 
     , m_updateExtra([this](const QUuid &id, const ExtraServerInfo &extra
         , const QString &host) { updateExtraInfo(id, extra, host); })
@@ -458,10 +450,6 @@ rtu::ServersSelectionModel::Impl::Impl(rtu::ServersSelectionModel *owner
     , m_unknownEntities()
 
 {
-    QObject::connect(m_owner, &ServersSelectionModel::selectionChanged, this, [this]()
-    {
-        setSelectionOutdated(false);
-    });
 }
 
 rtu::ServersSelectionModel::Impl::~Impl() {}
@@ -872,20 +860,6 @@ void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &primarySystem
     }
 }
 
-bool rtu::ServersSelectionModel::Impl::selectionOutdated()
-{
-    return m_selectionOutdated;
-}
-
-void rtu::ServersSelectionModel::Impl::setSelectionOutdated(bool outdated)
-{
-    if (m_selectionOutdated == outdated)
-        return;
-
-    m_selectionOutdated = outdated;
-    emit m_owner->selectionOutdatedChanged();
-}
-
 rtu::ExtraServerInfo& rtu::ServersSelectionModel::Impl::getExtraInfo(ItemSearchInfo &searchInfo)
 {
     ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
@@ -999,7 +973,7 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(
     }
 
     if ((searchInfo.serverInfoIterator->selectedState == Qt::Checked) && (diffTime || diffTimeZone))
-        setSelectionOutdated(true);
+        emit m_owner->updateSelectionData();
 }
 
 void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(
@@ -1039,7 +1013,7 @@ void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(
     }
 
     if ((searchInfo.serverInfoIterator->selectedState == Qt::Checked) && hasChanges)
-        setSelectionOutdated(true);
+        emit m_owner->updateSelectionData();
 }
 
 void rtu::ServersSelectionModel::Impl::updatePasswordInfo(
@@ -1069,7 +1043,7 @@ void rtu::ServersSelectionModel::Impl::updatePasswordInfo(
         , searchInfo.systemRowIndex + searchInfo.systemInfoIterator->servers.size());
 
     if (searchInfo.serverInfoIterator->selectedState == Qt::Checked)
-        setSelectionOutdated(true);
+        emit m_owner->updateSelectionData();
 }
 
 void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
@@ -1221,7 +1195,7 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     }
 
     if (selectionOutdated)
-        setSelectionOutdated(true);
+        emit m_owner->updateSelectionData();
 }
 
 bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id
@@ -1544,11 +1518,6 @@ void rtu::ServersSelectionModel::changeAccessMethod(const QUuid &id
     , bool byHttp)
 {
     m_impl->changeAccessMethod(id, byHttp);
-}
-
-bool rtu::ServersSelectionModel::selectionOutdated() const
-{
-    return m_impl->selectionOutdated();
 }
 
 int rtu::ServersSelectionModel::selectedCount() const

@@ -7,6 +7,8 @@
 
 namespace rtu
 {
+    class ModelChangeHelper;
+
     class TimeZonesModel : public QAbstractListModel
     {
         Q_OBJECT
@@ -22,7 +24,12 @@ namespace rtu
         
     public:
         int initIndex() const;       
-        int currentTimeZoneIndex();
+
+        int currentTimeZoneIndex() const;
+
+        virtual QVariant data(const QModelIndex &index , int role = Qt::DisplayRole) const override;
+
+        void resetTo(TimeZonesModel *source);
 
     public slots:
         bool isValidValue(int index);
@@ -36,10 +43,12 @@ namespace rtu
     private:
         virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-        virtual QVariant data(const QModelIndex &index , int role = Qt::DisplayRole) const override;
-
     private:
         class Impl;
-        Impl * const m_impl;
+        typedef std::unique_ptr<Impl> ImplPtr;
+        typedef std::unique_ptr<ModelChangeHelper> HelperPtr;
+
+        const HelperPtr m_helper;
+        ImplPtr m_impl;
     };
 }

@@ -20,7 +20,7 @@ Expandable.MaskedSettingsPanel
 
     onMaskedAreaChanged:
     {
-        if (!warned)
+        if (!warned || !maskedArea)
             return;
 
         var flagged = maskedArea.flaggedArea;

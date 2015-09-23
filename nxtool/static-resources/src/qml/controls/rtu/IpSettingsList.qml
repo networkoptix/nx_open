@@ -46,7 +46,7 @@ Base.Column
     {
         id: repeater;
         
-        model: rtuContext.ipSettingsModel();
+        model: rtuContext.selection.itfSettingsModel;
         
         delegate: Rtu.IpChangeLine
         {
