@@ -35,6 +35,8 @@ protected:
 
     virtual bool hasChanges() const;
 
+    virtual QString confirmMessageTitle() const;
+    virtual QString confirmMessageText() const;
 private:
     void initializeTabWidget();
 

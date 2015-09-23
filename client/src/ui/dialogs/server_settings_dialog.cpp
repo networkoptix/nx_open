@@ -8,6 +8,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/server_settings_widget.h>
 #include <ui/widgets/properties/recording_statistics_widget.h>
+
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
@@ -53,20 +55,15 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
 QnServerSettingsDialog::~QnServerSettingsDialog() 
 {}
 
-bool QnServerSettingsDialog::tryClose(bool force)
-{
-    if (!base_type::tryClose(force))
-        return false;
-
-    return true;
-}
-
 QnMediaServerResourcePtr QnServerSettingsDialog::server() const {
     return m_server;
 }
 
 void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
     if (m_server == server)
+        return;
+
+    if (!tryClose(false))
         return;
 
     m_generalPage->setServer(server);
@@ -88,4 +85,29 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
     loadData();
 }
 
+void QnServerSettingsDialog::loadData() {
+    base_type::loadData();
+    
+    if (m_server) {
+        bool readOnly = !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
+        setWindowTitle(readOnly
+            ? tr("Server Settings - %1 (readonly)").arg(m_server->getName())
+            : tr("Server Settings - %1").arg(m_server->getName())
+            );
 
+    } else {
+        setWindowTitle(tr("Server Settings"));
+    }
+
+}
+
+QString QnServerSettingsDialog::confirmMessageTitle() const {
+    return tr("Server not saved");
+}
+
+QString QnServerSettingsDialog::confirmMessageText() const {
+    Q_ASSERT_X(m_server, Q_FUNC_INFO, "Server must exist here");
+    return tr("Apply changes to the server %1?").arg(m_server
+        ? m_server->getName()
+        : QString());    
+}

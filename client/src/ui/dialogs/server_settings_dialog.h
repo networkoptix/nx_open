@@ -29,11 +29,14 @@ public:
     QnServerSettingsDialog(QWidget *parent = NULL);
     virtual ~QnServerSettingsDialog();
    
-    bool tryClose(bool force);
-
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
 
+protected:
+    virtual void loadData() override;
+
+    virtual QString confirmMessageTitle() const override;
+    virtual QString confirmMessageText() const override;
 private:
     Q_DISABLE_COPY(QnServerSettingsDialog)
 
