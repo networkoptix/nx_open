@@ -146,7 +146,8 @@ table.webclient-window>tbody>tr>td.alert{
 }
 
 
-.videowindow video.fullsize{
+.videowindow video.fullsize,
+.videowindow.fullscreen video{
   height:100%;
   width:100%
 }

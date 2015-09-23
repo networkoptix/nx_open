@@ -322,8 +322,12 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
                 screenfull.request($('.videowindow').get(0));
+                $('.videowindow').addClass("fullscreen");
             }
         };
+        document.addEventListener("fullscreenchange",function(){
+            $('.videowindow').removeClass("fullscreen");
+        });
 
 
 
