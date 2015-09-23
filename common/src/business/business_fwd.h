@@ -183,11 +183,10 @@ public:
 
 #define QN_BUSINESS_ENUM_TYPES \
     (QnBusiness::EventReason)\
-    (QnBusiness::EventState)\
     (QnBusiness::EventType)\
     (QnBusiness::ActionType)\
     (QnBusiness::UserGroup)\
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES, (metatype)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES(QnBusiness::EventState), (metatype)(lexical))
 
 #endif // QN_BUSINESS_FWD_H

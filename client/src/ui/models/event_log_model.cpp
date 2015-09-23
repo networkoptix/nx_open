@@ -281,7 +281,7 @@ bool QnEventLogModel::hasVideoLink(const QnBusinessActionData &action)
     }
     else if (eventType >= QnBusiness::UserDefinedEvent) 
     {
-        for (const QnUuid& id: action.eventParams.metadata.cameraLinks) 
+        for (const QnUuid& id: action.eventParams.metadata.cameraRefs) 
         {
             if (qnResPool->getResourceById(id))
                 return true;
@@ -478,11 +478,7 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
         if (resource)
             result << resource;
     }
-    for (const QnUuid& id: action.eventParams.metadata.cameraLinks) {
-        QnResourcePtr resource = qnResPool->getResourceById(id);
-        if (resource)
-            result << resource;
-    }
+    result = qnResPool->getResources<QnResource>(action.eventParams.metadata.cameraRefs);
     return result;
 }
 

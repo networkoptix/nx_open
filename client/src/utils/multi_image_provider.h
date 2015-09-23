@@ -20,7 +20,8 @@ public:
 protected:
     virtual void doLoadAsync() override;
 private:
-    Providers m_providers;
+    const Providers m_providers;
+    QMap<std::ptrdiff_t, QRect> m_imageRects;
     QImage m_image;
 };
 

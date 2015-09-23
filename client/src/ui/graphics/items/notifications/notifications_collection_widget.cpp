@@ -56,7 +56,7 @@ namespace {
     /** We limit the maximal number of notification items to prevent crashes due
      * to reaching GDI resource limit. */
     const int maxNotificationItems = 128;
-    const int MULTI_THUMBNAILS_SPACING = 4;
+    const int multiThumbnailSpacing = 4;
 
 
     const char *itemResourcePropertyName = "_qn_itemResource";
@@ -277,7 +277,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
         std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(camera, server, msecSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat));
         providers.push_back(std::move(provider));
     }
-    item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, MULTI_THUMBNAILS_SPACING, item));
+    item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, multiThumbnailSpacing, item));
 }
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -412,11 +412,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case QnBusiness::UserDefinedEvent: 
     {
-        QnVirtualCameraResourceList camList;
-        for (const QnUuid& id:params.metadata.cameraLinks) {
-            if (auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>(id))
-                camList << camRes;
-        }
+        QnVirtualCameraResourceList camList = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
         if (!camList.isEmpty()) 
         {
             qint64 timestampMs = params.eventTimestampUsec / 1000;

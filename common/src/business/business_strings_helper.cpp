@@ -65,7 +65,7 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     using namespace QnBusiness;
 
     if (value >= UserDefinedEvent) {
-        QString result = tr("User Defined");
+        QString result = tr("Generic Event");
         if (value > UserDefinedEvent)
             result += tr(" (%1)").arg((int)value - (int)UserDefinedEvent); // reserved for future use
         return result;
@@ -162,6 +162,8 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     result += tr("Event: %1").arg(eventName(eventType));
 
     QString sourceText = getFullResourceName(eventSource(params), useIp);
+    if (sourceText.isNull())
+        sourceText = params.resourceName;
     if (!sourceText.isEmpty()) {
         result += delimiter;
         result += tr("Source: %1").arg(sourceText);
@@ -551,7 +553,7 @@ QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState stat
     case QnBusiness::InactiveState:
         return tr("stop");
     case QnBusiness::UndefinedState:
-        return tr("undefined");
+        return QString();
     default:
         break;
     }
