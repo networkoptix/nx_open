@@ -38,6 +38,7 @@ public:
     void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
+    virtual int finalizeInternal(QnByteArray* const result) override;
 
 private:
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
