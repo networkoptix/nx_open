@@ -1,4 +1,4 @@
-import QtQuick 2.1;
+import QtQuick 2.4;
 import QtQuick.Controls 1.1 as QtControls;
 import QtQuick.Controls.Styles 1.1;
 
@@ -9,29 +9,71 @@ QtControls.Button
 {
     id: thisComponent;
 
+    property color textColor: "#000000";
+
+    property color normalColor: "#FFFFFF";
+    property color hoveredColor: "#FFFFFF";
+    property color activeColor: "#E9E9E9";
+    property color disabledColor: "#80FFFFFF";
+
+    property color normalBorderColor: "#D7D7D7";
+    property color hoveredBorderColor: "#AEAEAE";
+    property color activeBorderColor: "#AEAEAE";
+    property color disabledBorderColor: normalBorderColor;
+
     property int fontSize: Common.SizeManager.fontSizes.medium;
-    
-    implicitHeight: Common.SizeManager.clickableSizes.base;
-    opacity: (enabled ? 1.0 : 0.5);
-   
+
     activeFocusOnPress: true;
-    
+    activeFocusOnTab: true;
+
+    implicitWidth: metrics.width + Common.SizeManager.spacing.base * 3;
+    implicitHeight: metrics.height + Common.SizeManager.spacing.base;
+
+    TextMetrics
+    {
+        id: metrics;
+
+        text: thisComponent.text;
+        font.pixelSize: thisComponent.fontSize;
+    }
+
+    Keys.onReturnPressed: { clicked(); }
+    Keys.onEnterPressed: { clicked(); }
+    Keys.priority: Keys.BeforeItem;
+
     style: ButtonStyle
     {
         label: Base.Text
         {
             id: styleLabel;
 
+            thin: false;
             text: thisComponent.text;
-
-            wrapMode: Text.Wrap;
+            color: thisComponent.textColor;
             verticalAlignment: Text.AlignVCenter;
             horizontalAlignment: Text.AlignHCenter;
             font.pixelSize: thisComponent.fontSize;
-            
-            visible: thisComponent.visible;
-            anchors.fill: parent;
+
+            opacity: (thisComponent.enabled ? 1.0 : 0.5);
+        }
+
+        function getColor(forBackground)
+        {
+            if (!enabled)
+                return (forBackground ? thisComponent.disabledColor : thisComponent.disabledBorderColor);
+            else if (thisComponent.pressed)
+                return (forBackground ? thisComponent.activeColor : thisComponent.activeBorderColor);
+            else if (thisComponent.hovered || thisComponent.activeFocus)
+                return (forBackground ? thisComponent.hoveredColor : thisComponent.hoveredBorderColor);
+            else
+                return (forBackground ? thisComponent.normalColor : thisComponent.normalBorderColor);
+        }
+
+        background: Rectangle
+        {
+            radius: 2;
+            color: { getColor(true); }
+            border.color: { getColor(false); }
         }
     }
 }
-

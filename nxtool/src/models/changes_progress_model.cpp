@@ -60,10 +60,10 @@ bool rtu::ChangesProgressModel::addChangeProgress(const ApplyChangesTaskPtr &tas
 
     ApplyChangesTask * const taskPointer = task.get();
     QObject::connect(taskPointer, &ApplyChangesTask::totalChangesCountChanged
-        , this, [this, taskPointer]() { taskStateChanged(taskPointer, kTotalChangesCount); });
+        , this, [this, taskPointer]() { taskStateChanged(taskPointer); });
 
     QObject::connect(taskPointer, &ApplyChangesTask::appliedChangesCountChanged
-        , this, [this, taskPointer]() { taskStateChanged(taskPointer, kAppliedChagnesCount); });
+        , this, [this, taskPointer]() { taskStateChanged(taskPointer); });
 
     QObject::connect(taskPointer, &ApplyChangesTask::errorsCountChanged
         , this, [this, taskPointer]()
@@ -177,8 +177,7 @@ rtu::Roles rtu::ChangesProgressModel::roleNames() const
     return kRoles;
 }
 
-void rtu::ChangesProgressModel::taskStateChanged(const ApplyChangesTask *task
-    , int role)
+void rtu::ChangesProgressModel::taskStateChanged(const ApplyChangesTask *task)
 {
     const auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [task](const ApplyChangesTaskPtr &taskVal)
         { return (taskVal.get() == task); });
@@ -198,8 +197,6 @@ void rtu::ChangesProgressModel::taskStateChanged(const ApplyChangesTask *task
     if ((itInsert == m_tasks.end()) || (itInsert < it))
     {
         /// Move completed task up
-        const int removeIndex = (it - m_tasks.begin());
-        
         const auto tmp = *it;
         m_tasks.erase(it);
 
@@ -217,7 +214,7 @@ void rtu::ChangesProgressModel::taskStateChanged(const ApplyChangesTask *task
 rtu::ChangesProgressModel::TasksContainer::iterator rtu::ChangesProgressModel::findInsertPosition()
 {
     const auto itInsert = std::lower_bound(m_tasks.begin(), m_tasks.end(), true
-        , [this](const ApplyChangesTaskPtr &item, bool value) { return !item->inProgress(); });
+        , [this](const ApplyChangesTaskPtr &item, bool /* value */) { return !item->inProgress(); });
 
     return itInsert;
 }

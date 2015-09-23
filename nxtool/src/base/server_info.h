@@ -29,8 +29,6 @@ namespace rtu
 
         InterfaceInfo();
 
-        InterfaceInfo(bool initUseDHCP);
-
         InterfaceInfo(const QString &initName
             , const QString &initIp
             , const QString &initMacAddress

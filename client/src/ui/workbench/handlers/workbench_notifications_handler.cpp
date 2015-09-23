@@ -34,19 +34,35 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,     this,   &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
     connect(context(),          &QnWorkbenchContext::userChanged,                           this,   &QnWorkbenchNotificationsHandler::at_context_userChanged);
-    connect(qnLicensePool,      &QnLicensePool::licensesChanged,                            this,   &QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged);
+
+    connect(qnLicensePool,      &QnLicensePool::licensesChanged,                            this,   [this] {
+        checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
+    });
+
+    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, [this] {
+        checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
+    });
+
 
     QnCommonMessageProcessor *messageProcessor = QnCommonMessageProcessor::instance();
     connect(messageProcessor,   &QnCommonMessageProcessor::connectionOpened,                this,   &QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened);
     connect(messageProcessor,   &QnCommonMessageProcessor::connectionClosed,                this,   &QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed);
     connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived,          this,   &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
-    connect(messageProcessor,   &QnCommonMessageProcessor::timeServerSelectionRequired,     this,   &QnWorkbenchNotificationsHandler::at_timeServerSelectionRequired);
+
+    connect(messageProcessor,   &QnCommonMessageProcessor::timeServerSelectionRequired,     this,   [this] {
+        setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, true);
+    });
+    connect( action( Qn::SelectTimeServerAction ), &QAction::triggered,                     this,   [this] {
+        setSystemHealthEventVisible( QnSystemHealth::NoPrimaryTimeServer, false ); 
+    } );
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged,          this,   &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
 
-    connect( action( Qn::SelectTimeServerAction ), &QAction::triggered, this, [this](){ setSystemHealthEventVisible( QnSystemHealth::NoPrimaryTimeServer, false ); } );
+
+
+    
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
@@ -118,6 +134,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::NoPrimaryTimeServer:
+    case QnSystemHealth::SystemIsReadOnly:
         return true;
 
     default:
@@ -139,7 +156,9 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible ) {
     bool canShow = true;
 
-    if (!context()->user()) {
+    bool connected = !qnCommon->remoteGUID().isNull();
+
+    if (!connected) {
         canShow = (message == QnSystemHealth::ConnectionLost);
         if (visible)
             Q_ASSERT_X(canShow, Q_FUNC_INFO, "No events but 'Connection lost' should be displayed if we are disconnected");
@@ -160,9 +179,10 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSys
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    at_licensePool_licensesChanged();
-
     m_adaptor->setResource(context()->user());
+
+    checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);    
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
@@ -171,6 +191,11 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     case QnSystemHealth::ConnectionLost:
     case QnSystemHealth::EmailSendError:
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::NoPrimaryTimeServer:
+        return;
+
+    case QnSystemHealth::SystemIsReadOnly:
+        setSystemHealthEventVisible(QnSystemHealth::SystemIsReadOnly, context()->user() && qnCommon->isReadOnly());
         return;
 
     case QnSystemHealth::EmailIsEmpty:
@@ -182,11 +207,8 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         m_userEmailWatcher->forceCheckAll();
         return;
 
-    case QnSystemHealth::NoPrimaryTimeServer:
-        return;
-
     case QnSystemHealth::NoLicenses:
-        at_licensePool_licensesChanged();
+        setSystemHealthEventVisible(QnSystemHealth::NoLicenses, context()->user() && qnLicensePool->isEmpty());
         return;
 
     case QnSystemHealth::SmtpIsNotSet:
@@ -220,9 +242,6 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
     }
 }
 
-void QnWorkbenchNotificationsHandler::at_timeServerSelectionRequired() {
-    setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, true);
-}
 
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, false);
@@ -272,10 +291,6 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
     default:
         break;
     }
-}
-
-void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {
-    setSystemHealthEventVisible(QnSystemHealth::NoLicenses, context()->user() && qnLicensePool->isEmpty());
 }
 
 void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {

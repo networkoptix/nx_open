@@ -8,7 +8,7 @@
 
 namespace rtu
 {
-    class ServersSelectionModel;
+    class Selection;
     
     class IpSettingsModel : public QAbstractListModel
     {
@@ -17,7 +17,7 @@ namespace rtu
         Q_PROPERTY(bool isSingleSelection READ isSingleSelection NOTIFY isSingleSelectionChanged)
         
     public:
-        IpSettingsModel(ServersSelectionModel *selectionModel
+        IpSettingsModel(Selection *selection
             , QObject *parent = nullptr);
         
         virtual ~IpSettingsModel();

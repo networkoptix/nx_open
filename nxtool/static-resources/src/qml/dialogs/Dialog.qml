@@ -12,6 +12,7 @@ Window
 
     property int buttons: 0;
     property int styledButtons: 0;
+    property int cancelButton: 0;
 
     property Component areaDelegate;
     property alias area: loader.item;
@@ -24,14 +25,43 @@ Window
     flags: Qt.WindowTitleHint | Qt.MSWindowsFixedSizeDialogHint;
     modality: Qt.WindowModal;
 
-    height: loader.height + buttonsPanel.height;
-    width: Math.max(buttonsPanel.width, loader.width);
+    height: spacer.height + buttonsPanel.height;
+    width: Math.max(buttonsPanel.width, spacer.width);
 
-    Loader
+    onActiveFocusItemChanged:
     {
-        id: loader;
+        if (activeFocusItem)
+            activeFocusItem.Keys.forwardTo = [spacer];
+    }
 
-        sourceComponent: areaDelegate;
+    onVisibleChanged:
+    {
+        if (visible && buttonsPanel.firstButton)
+            buttonsPanel.firstButton.forceActiveFocus();
+    }
+
+    Item
+    {
+        id: spacer;
+
+        Keys.onEscapePressed:
+        {
+            if (cancelButton)
+                buttonsPanel.buttonClicked(cancelButton);
+            else
+                event.accepted = false;
+        }
+
+        width: loader.width + Common.SizeManager.spacing.base * 2;
+        height: loader.height + Common.SizeManager.spacing.base * 2;
+
+        Loader
+        {
+            id: loader;
+
+            anchors.centerIn: spacer;
+            sourceComponent: areaDelegate;
+        }
     }
 
     Base.ButtonsPanel
@@ -49,7 +79,6 @@ Window
             thisComponent.close();
             thisComponent.buttonClicked(id);
         }
-
     }
 
     Base.CheckBox
