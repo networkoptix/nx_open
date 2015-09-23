@@ -92,10 +92,10 @@ bool AuthenticationManager::authenticate(
 
     nx::Buffer ha1;
     if (!findHa1(
-        authResult,
-        authzHeader->userid(),
-        &ha1,
-        authProperties))
+            authResult,
+            authzHeader->userid(),
+            &ha1,
+            authProperties))
     {
         addWWWAuthenticateHeader(wwwAuthenticate);
         return false;

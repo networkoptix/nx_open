@@ -25,7 +25,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
 bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
 {
     accountData->id = QnUuid(urlQuery.queryItemValue("id"));
-    accountData->login = urlQuery.queryItemValue("login").toStdString();
     accountData->email = urlQuery.queryItemValue("email").toStdString();
     accountData->passwordHa1 = urlQuery.queryItemValue("passwordHa1").toStdString();
     accountData->fullName = urlQuery.queryItemValue("fullName").toStdString();
@@ -40,7 +39,6 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData
 void serializeToUrlQuery(const AccountData& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem("id", data.id.toString());
-    urlQuery->addQueryItem("login", QString::fromStdString(data.login));
     urlQuery->addQueryItem("email", QString::fromStdString(data.email));
     urlQuery->addQueryItem("passwordHa1", QString::fromStdString(data.passwordHa1));
     urlQuery->addQueryItem("fullName", QString::fromStdString(data.fullName));
