@@ -18,7 +18,7 @@ public:
     /*!
         Takes ownership of \a handler
     */
-    void registerHandler( const QString& path, QnRestRequestHandler* handler );
+    void registerHandler( const QString& path, QnRestRequestHandler* handler, RestPermissions permissions = RestPermissions::anyUser);
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
 
