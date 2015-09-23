@@ -435,7 +435,8 @@ table.webclient-window>tbody>tr>td.alert{
   margin-bottom: 20px;
 }
 
-.camera-view-informer .camera-view-message{
+
+.camera-view-message{
   font-weight: 300;
   color: #3F545F;
   font-size: 40px;
@@ -474,8 +475,12 @@ table.webclient-window>tbody>tr>td.alert{
   font-size: 75%
 }
 
-.not-supported .camera-view-message{
+.not-supported.camera-view-message{
   line-height:40px;
+  text-align: center;
+  height:100%;
+
+  padding-top: 10px;
 }
 
 .visible-mobile{
