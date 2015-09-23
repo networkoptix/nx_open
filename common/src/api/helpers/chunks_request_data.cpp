@@ -8,6 +8,7 @@
 
 #include <utils/serialization/lexical.h>
 #include <utils/common/util.h>
+#include <utils/common/string.h>
 
 namespace {
     const QString startTimeKey(lit("startTime"));
@@ -21,6 +22,7 @@ namespace {
     const QString macKey(lit("mac"));
     const QString idKey(lit("id"));
     const QString limitKey(lit("limit"));
+    const QString flatKey(lit("flat"));
 }
 
 
@@ -31,7 +33,8 @@ QnChunksRequestData::QnChunksRequestData() :
     detailLevel(1), 
     isLocal(false), 
     format(Qn::JsonFormat),
-    limit(INT_MAX)
+    limit(INT_MAX),
+    flat(false)
 {
 
 }
@@ -39,13 +42,15 @@ QnChunksRequestData::QnChunksRequestData() :
 
 QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& params)
 {
+    static const qint64 USEC_PER_MS = 1000;
+
     QnChunksRequestData request;
 
     if (params.contains(startTimeKey))
-        request.startTimeMs = parseDateTime(params.value(startTimeKey));
+        request.startTimeMs = parseDateTime(params.value(startTimeKey)) / USEC_PER_MS;
 
     if (params.contains(endTimeKey))
-        request.endTimeMs = parseDateTime(params.value(endTimeKey));
+        request.endTimeMs = parseDateTime(params.value(endTimeKey)) / USEC_PER_MS;
 
     if (params.contains(detailKey))
         request.detailLevel = params.value(detailKey).toLongLong();
@@ -55,6 +60,8 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
 
     if (params.contains(limitKey))
         request.limit = qMax(0LL, params.value(limitKey).toLongLong());
+
+    request.flat = params.contains(flatKey);
 
     request.filter = params.value(filterKey);
     request.isLocal = params.contains(localKey);

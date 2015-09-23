@@ -89,7 +89,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     if (target && slot) {
         QByteArray signal;
         if(replyTypeName == NULL) {
-            signal = SIGNAL(finished(int, int));
+            signal = SIGNAL(finished(int, int, QString));
         } else {
             signal = lit("%1finished(int, const %2 &, int, const QString &)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
         }

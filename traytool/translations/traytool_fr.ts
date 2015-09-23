@@ -9,22 +9,22 @@
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il n&apos;y a pas de zone de notifications sur ce système.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;application va maintenant fermer.</translation>
     </message>
 </context>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient privileges to manage services</source>
-        <translation>Droits insuffisants pour la gestion des services</translation>
+        <source>Insufficient rights to manage services.</source>
+        <translation>Droits insuffisants pour la gestion des services.</translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>Le contrôle UAC doit être activé pour une demande de privilèges avec un usager sans droit administrateur</translation>
+        <source>UAC must be enabled to request privileges for non-admin users.</source>
+        <translation>Le contrôle UAC doit être activé pour une demande de privilèges avec un usager sans droit administrateur.</translation>
     </message>
 </context>
 <context>
@@ -74,10 +74,6 @@
         <translation>Le serveur média a été démarré</translation>
     </message>
     <message>
-        <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>Le serveur média va être arrêté. Êtes-vous sûr?</translation>
-    </message>
-    <message>
         <source>Access denied.</source>
         <translation>Accès refusé.</translation>
     </message>
@@ -111,7 +107,11 @@
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue en essayant d&apos;accéder aux services installés:</translation>
+    </message>
+    <message>
+        <source>Media server will be stopped. Continue?</source>
+        <translation>Le service &apos;Media Serveur&apos; va s&apos;arrêter. Continuer ?</translation>
     </message>
 </context>
 </TS>

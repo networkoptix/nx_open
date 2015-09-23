@@ -51,8 +51,8 @@ public:
 
     virtual bool open(const QnResourcePtr &resource) = 0;
     virtual void close() = 0;
-    virtual qint64 startTime() = 0;
-    virtual qint64 endTime() = 0;
+    virtual qint64 startTime() const = 0;
+    virtual qint64 endTime() const = 0;
     virtual QnAbstractMediaDataPtr getNextData() = 0;
     // If findIFrame=true, jump to position before time to a nearest IFrame.
     /*!

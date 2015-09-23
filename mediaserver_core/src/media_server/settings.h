@@ -12,7 +12,7 @@ namespace nx_ms_conf
 
     static const QLatin1String MIN_STORAGE_SPACE( "minStorageSpace" );
 #ifdef __arm__
-    static const qint64 DEFAULT_MIN_STORAGE_SPACE =    100*1024*1024; // 100MB
+    static const qint64 DEFAULT_MIN_STORAGE_SPACE = 100*1024*1024; // 100MB
 #else
     static const qint64 DEFAULT_MIN_STORAGE_SPACE = 5*1024*1024*1024ll; // 5gb
 #endif
@@ -55,7 +55,7 @@ namespace nx_ms_conf
 
     //!If no one uses HLS for thid time period (in seconds), than live media cache is stopped and cleaned. It will be restarted with next HLS request
     static const QLatin1String HLS_INACTIVITY_PERIOD( "hlsInactivityPeriod" );
-    static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
+    static const int DEFAULT_HLS_INACTIVITY_PERIOD = 10;
 
     static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
     static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 32;
@@ -79,6 +79,10 @@ namespace nx_ms_conf
 
     static const QLatin1String HTTP_MSG_LOG_LEVEL( "http-log-level" );
     static const QLatin1String DEFAULT_HTTP_MSG_LOG_LEVEL( "none" );
+
+    //!If set to \a true, EC DB is opened in read-only mode. So, any data modification operation except license activation will fail
+    static const QLatin1String EC_DB_READ_ONLY( "ecDbReadOnly" );
+    static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
 }
 
 /*!

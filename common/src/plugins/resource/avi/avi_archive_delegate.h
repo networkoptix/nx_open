@@ -45,8 +45,8 @@ public:
 
     virtual bool open(const QnResourcePtr &resource);
     virtual void close();
-    virtual qint64 startTime();
-    virtual qint64 endTime();
+    virtual qint64 startTime() const;
+    virtual qint64 endTime() const;
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
@@ -69,13 +69,14 @@ public:
     const char* getTagValue( const char* tagName );
 
 protected:
-    void packetTimestamp(QnCompressedAudioData* audio, const AVPacket& packet);
+    qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     void initLayoutStreams();
     AVFormatContext* getFormatContext();
 private:
     bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
     QnMediaContextPtr getCodecContext(AVStream* stream);
+    bool reopen();
 protected:
     AVFormatContext* m_formatContext;
     QnResourcePtr m_resource;
@@ -103,6 +104,7 @@ private:
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
     bool m_hasVideo;
+    qint64 m_lastSeekTime;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

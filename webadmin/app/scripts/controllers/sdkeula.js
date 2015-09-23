@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SdkeulaCtrl', function ($scope) {
+    .controller('SdkeulaCtrl', function ($scope,$routeParams) {
         $scope.agree = false;
         $scope.next = function(){
-            window.open('sdk.zip');
+            window.open($routeParams.sdkFile + '.zip');
             return false;
         };
     });

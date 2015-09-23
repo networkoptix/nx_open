@@ -83,12 +83,14 @@ QN_HELP_TOPIC(SystemSettings_General_Logs_Help,                 "collecting_logs
 QN_HELP_TOPIC(SystemSettings_General_AutoPause_Help,            "cpu_and_bandwidth_saving_durin.htm")
 QN_HELP_TOPIC(SystemSettings_General_AutoStartWithSystem_Help,  "Run_VMS_when_.htm")
 QN_HELP_TOPIC(SystemSettings_General_DoubleBuffering_Help,      "double_buffering.htm")
+QN_HELP_TOPIC(SystemSettings_General_AnonymousUsage_Help,       "sending_anonymous_usage_and_cr.htm")
 QN_HELP_TOPIC(SystemSettings_ScreenRecording_Help,              "setting_up_screen_recording.htm")
 QN_HELP_TOPIC(SystemSettings_Licenses_Help,                     "obtaining_and_Activating_VMS_Licenses.htm")
 QN_HELP_TOPIC(SystemSettings_Server_Mail_Help,                  "configuring_mail_server_for_e-.htm")
 QN_HELP_TOPIC(SystemSettings_Server_Backup_Help,                "backing_up_and_restoring_produ.htm")
 QN_HELP_TOPIC(SystemSettings_Server_CameraAutoDiscovery_Help,   "disabling_automatic_discovery.htm")
 QN_HELP_TOPIC(SystemSettings_Notifications_Help,                "notifications.htm")
+QN_HELP_TOPIC(SystemSettings_UserManagement_Help,               "user_management_form.htm")
 
 QN_HELP_TOPIC(Administration_Help,                              "system-wide_configurations.htm")
 QN_HELP_TOPIC(Administration_General_CamerasList_Help,          "viewing_full_cameras_list.htm")
@@ -103,10 +105,14 @@ QN_HELP_TOPIC(ServerSettings_Storages_Help,                     "configuring_med
 QN_HELP_TOPIC(ServerSettings_ArchiveRestoring_Help,             "restoring_broken_archive.htm")
 QN_HELP_TOPIC(ServerSettings_WebClient_Help,                    "using_media_servers_web_interf.htm")
 QN_HELP_TOPIC(ServerSettings_Failover_Help,                     "configuring_failover.htm")
+QN_HELP_TOPIC(ServerSettings_StorageAnalitycs_Help,             "analyzingandanticipatingstorageusage.htm")
 
 QN_HELP_TOPIC(UserSettings_UserRoles_Help,						"introducing_user_roles.htm")
 QN_HELP_TOPIC(UserSettings_Help,                                "changing_user_settings.htm")
 QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_user_(admin_only).htm")
+QN_HELP_TOPIC(UserSettings_DisableUser_Help,                    "disabling_user.htm")
+QN_HELP_TOPIC(UserSettings_LdapIntegration_Help,                "setting_up_ldap_integration.htm")
+QN_HELP_TOPIC(UserSettings_LdapFetch_Help,                      "importing_users_from_ldap_serv.htm")
 
 QN_HELP_TOPIC(ManualCameraAddition_Help,                        "adding_cameras_manually.htm")
 
@@ -174,6 +180,7 @@ QN_HELP_TOPIC(PtzManagement_HomePosition_Help,                  "home_positions_
 QN_HELP_TOPIC(EventLog_Help,									"viewing_events_log.htm")
 
 QN_HELP_TOPIC(CameraList_Help,									"viewing_full_cameras_list.htm")
+QN_HELP_TOPIC(AuditTrail_Help,									"viewing_users_actions_log_audi.htm")
 
 QN_HELP_TOPIC(ImageEnhancement_Help,							"color_correction.htm")
 
@@ -182,6 +189,8 @@ QN_HELP_TOPIC(CameraDiagnostics_Help,							"diagnosing_offline_cameras.htm")
 QN_HELP_TOPIC(VersionMismatch_Help,								"launching_product_name_in_comp.htm")
 
 QN_HELP_TOPIC(RemoveItems_Help,									"removing_item(s)_from_layouts.htm")
+
+QN_HELP_TOPIC(IOModules_Help,                                   "setting_up_i_o_modules.htm")
 
 QN_HELP_TOPIC(SaveLayout_Help,									"saving_layouts_(admin_only).htm")
 

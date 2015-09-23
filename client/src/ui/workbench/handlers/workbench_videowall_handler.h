@@ -53,7 +53,7 @@ private:
     /** Updates item's layout with provided value. Provided layout should be saved. */
     void updateItemsLayout(const QnVideoWallItemIndexList &items, const QnUuid &layoutId);
 
-    bool canStartVideowall(const QnVideoWallResourcePtr &videowall);
+    bool canStartVideowall(const QnVideoWallResourcePtr &videowall) const;
 
     void startVideowallAndExit(const QnVideoWallResourcePtr &videoWall);
 
@@ -75,11 +75,6 @@ private:
 
     QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
     void cleanupUnusedLayouts();
-
-    static QString shortcutPath();
-    bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
-    bool createShortcut(const QnVideoWallResourcePtr &videowall);
-    bool deleteShortcut(const QnVideoWallResourcePtr &videowall);
 
     void setItemOnline(const QnUuid &instanceGuid, bool online);
     void setItemControlledBy(const QnUuid &layoutId, const QnUuid &controllerId, bool on);

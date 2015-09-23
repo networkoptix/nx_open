@@ -135,7 +135,7 @@ void QnArecontPanoramicResource::updateFlipState()
     }
 }
 
-//=======================================================================
+// =======================================================================
 bool QnArecontPanoramicResource::setResolution(bool full)
 {
     int value = full ? 15 : 0; // all sensors to full/half resolution

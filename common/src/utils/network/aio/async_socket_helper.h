@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <functional>
+#include <future>
 
 #include <QtCore/QThread>
 
@@ -31,20 +32,20 @@ public:
 
     virtual ~BaseAsyncSocketImplHelper() {}
 
-    bool post( std::function<void()>&& handler )
+    void post( std::function<void()>&& handler )
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
-            return true;
+            return;
 
-        return aio::AIOService::instance()->post( m_socket, std::move(handler) );
+        aio::AIOService::instance()->post( m_socket, std::move(handler) );
     }
 
-    bool dispatch( std::function<void()>&& handler )
+    void dispatch( std::function<void()>&& handler )
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
-            return true;
+            return;
 
-        return aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
+        aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
     }
     
     //!This call stops async I/O on socket and it can never be resumed!
@@ -110,8 +111,7 @@ public:
         //TODO #ak what's the difference of this method from cancelAsyncIO( aio::etNone ) ?
 
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
-        std::atomic_thread_fence(std::memory_order_acquire);
-        if( m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId() )
+        if( this->m_socket->impl()->aioThread.load() == QThread::currentThread() )
         {
             HostAddressResolver::instance()->cancel( this, true );    //TODO #ak must not block here!
 
@@ -232,53 +232,57 @@ public:
             timeoutMs );
     }
 
-    void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
+    void cancelAsyncIO( const aio::EventType eventType, bool waitForRunningHandlerCompletion )
     {
-        if( eventType == aio::etWrite || eventType == aio::etNone )
-            HostAddressResolver::instance()->cancel( this, waitForRunningHandlerCompletion );
+        if (eventType == aio::etWrite || eventType == aio::etNone)
+            HostAddressResolver::instance()->cancel(this, waitForRunningHandlerCompletion);
 
-        if( eventType == aio::etNone )
+        if (waitForRunningHandlerCompletion)
         {
-            //TODO #ak underlying loop is a work-around. 
-            //  Must add method to aio::AIOService which cancels all operation atomically
-            while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) ||
-                   HostAddressResolver::instance()->isRequestIDKnown(this) )
-            {
-                cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
-                cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
-                cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
-            }
-            //NOTE: isSocketBeingWatched does not check for posted async calls
-            aio::AIOService::instance()->cancelPostedCalls(
+            QMutex mtx;
+            QWaitCondition cond;
+            bool done = false;
+            aio::AIOService::instance()->dispatch(
                 this->m_socket,
-                waitForRunningHandlerCompletion );
-            return;
+                [this, &mtx, &cond, &done, eventType]() {
+                    stopPollingSocket(this->m_socket, eventType);
+                    QMutexLocker lk(&mtx);
+                    done = true;
+                    cond.wakeAll();
+                });
+
+            QMutexLocker lk(&mtx);
+            while(!done)
+                cond.wait(lk.mutex());
+        }
+        else
+        {
+            aio::AIOService::instance()->dispatch(
+                this->m_socket,
+                [this, eventType]() {
+                    stopPollingSocket(this->m_socket, eventType);
+                } );
         }
 
-        //NOTE have to cancel async resolve two times, 
-        //    since it can be added be some socket handler before it has been cancelled
-        if( eventType == aio::etWrite || eventType == aio::etNone )
-            HostAddressResolver::instance()->cancel( this, waitForRunningHandlerCompletion );
+        if (eventType == aio::etWrite || eventType == aio::etNone)
+            HostAddressResolver::instance()->cancel(this, waitForRunningHandlerCompletion);
 
-        aio::AIOService::instance()->removeFromWatch(
-            this->m_socket,
-            eventType,
-            waitForRunningHandlerCompletion );
-        std::atomic_thread_fence( std::memory_order_acquire );
-        if( m_threadHandlerIsRunningIn.load( std::memory_order_relaxed ) == QThread::currentThreadId() )
+        std::atomic_thread_fence(std::memory_order_acquire);
+        if (m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId())
         {
             //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-            if( eventType == aio::etRead )
+            //  avoiding unnecessary removeFromWatch calls in eventTriggered
+            if (eventType == aio::etRead || eventType == aio::etNone)
                 ++m_recvAsyncCallCounter;
-            else if( eventType == aio::etWrite )
+            if (eventType == aio::etWrite || eventType == aio::etNone)
                 ++m_connectSendAsyncCallCounter;
-            else if( eventType == aio::etTimedOut )
+            if (eventType == aio::etTimedOut || eventType == aio::etNone)
                 ++m_registerTimerCallCounter;
         }
         else
         {
             //TODO #ak AIO engine does not support truely async cancellation yet
-            assert( waitForRunningHandlerCompletion );
+            assert(waitForRunningHandlerCompletion);
         }
     }
 
@@ -587,6 +591,19 @@ private:
         QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
+    }
+
+    //!Call this from within aio thread only
+    void stopPollingSocket(SocketType* sock, const aio::EventType eventType)
+    {
+        //TODO #ak move this method to aioservice?
+        aio::AIOService::instance()->cancelPostedCalls(sock, true);
+        if (eventType == aio::etNone || eventType == aio::etRead)
+            aio::AIOService::instance()->removeFromWatch(sock, aio::etRead, true);
+        if (eventType == aio::etNone || eventType == aio::etWrite)
+            aio::AIOService::instance()->removeFromWatch(sock, aio::etWrite, true);
+        if (eventType == aio::etNone || eventType == aio::etTimedOut)
+            aio::AIOService::instance()->removeFromWatch(sock, aio::etTimedOut, true);
     }
 };
 

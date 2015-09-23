@@ -26,7 +26,6 @@ public:
     /**
      * Constructor.
      * 
-     * \param connection                Video server connection to use.
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */

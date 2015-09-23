@@ -134,6 +134,12 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
         //we can't be sure the way input image scale affects output, so adding a loop...
 
         const QSize resultResolution = updatedResolution( result, srcResolution );
+        if( resultResolution.width() <= resolutionLimit.width() &&
+            resultResolution.height() <= resolutionLimit.height() )
+        {
+            break;  //resolution is OK
+        }
+
         qreal resizeRatio = 1.0;
 
         Q_ASSERT( resultResolution.width() > 0 && resultResolution.height() > 0 );

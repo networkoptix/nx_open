@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
+#include <QtConcurrent>
 
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
@@ -22,18 +23,17 @@
 #include "mustache/mustache_helper.h"
 
 #include <utils/common/synctime.h>
-#include <utils/common/email.h>
 #include <utils/common/log.h>
-#include "business/business_strings_helper.h"
 #include <utils/common/app_info.h>
 #include <utils/common/timermanager.h>
+#include <utils/email/email.h>
+#include <utils/email/email_manager_impl.h>
 
+#include "business/business_strings_helper.h"
 #include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "email_manager_impl.h"
-#include <QtConcurrent>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));

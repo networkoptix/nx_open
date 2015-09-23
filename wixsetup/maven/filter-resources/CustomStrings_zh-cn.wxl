@@ -48,7 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">系统优化设置</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统优化摄像机配置(不推荐)</String>     
-    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send anonymous usage and crash statistics to software developers</String>   
+    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">发送匿名使用和异常统计至开发者(推荐)</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${display.product.name}</String>
@@ -56,6 +56,10 @@
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">快捷方式</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">请创建桌面快捷方式。</String>    
+
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">快捷方式</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">请创建桌面快捷方式。</String>    
 
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">已安装 [ProductName]软件的一个版本.</String> 
@@ -126,6 +130,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">当 ${display.product.name} 安装成后自动运行.</String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">当 ${nxtool.name} 安装成后自动运行.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">这个包是专为32位操作系统.安装程序将无法继续.</String> 
 
     <!-- SelectionWarningDlg -->

@@ -4,10 +4,13 @@
 #include <QtCore/QString>
 #include <QtCore/QSet>
 
+#include <network/authenticate_helper.h>
+#include <utils/common/app_info.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <utils/common/id.h>
 #include <utils/common/model_functions_fwd.h>
+
 
 struct QnModuleInformation {
     QString type;
@@ -23,8 +26,12 @@ struct QnModuleInformation {
     int protoVersion;
     QnUuid runtimeId;
     Qn::ServerFlags flags;
+    QString realm;
+    bool ecDbReadOnly;
 
-    QnModuleInformation() : port(0), sslAllowed(false), protoVersion(0), flags(0) {}
+    QnModuleInformation()
+        : port(0), sslAllowed(false), protoVersion(0), flags(0), realm(QnAppInfo::realm()), ecDbReadOnly(false)
+    {}
 
     bool isCompatibleToCurrentSystem() const;
     bool hasCompatibleVersion() const;
@@ -43,7 +50,7 @@ struct QnModuleInformationWithAddresses : QnModuleInformation {
     {}
 };
 
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(id)(sslAllowed)(authHash)(protoVersion)(runtimeId)(flags)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(id)(sslAllowed)(authHash)(protoVersion)(runtimeId)(flags)(realm)(ecDbReadOnly)
 #define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(metatype)(eq))

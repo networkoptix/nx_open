@@ -36,7 +36,8 @@ class StreamingChunkTranscoder
 :
     public QObject,
     public TimerEventHandler,
-    public Singleton<StreamingChunkTranscoder>
+    public Singleton<StreamingChunkTranscoder>,
+    public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
@@ -120,6 +121,7 @@ private slots:
         bool result,
         const StreamingChunkCacheKey& key,
         DataSourceContextPtr data );
+    void onResourceRemoved( const QnResourcePtr& resource );
 };
 
 #endif  //STREAMINGCHUNKTRANSCODER_H

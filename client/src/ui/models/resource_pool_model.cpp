@@ -31,6 +31,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
+#include <ui/delegates/resource_pool_model_custom_column_delegate.h>
 #include <ui/models/resource_pool_model_node.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
@@ -93,13 +94,14 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
     connect(resourcePool(),     &QnResourcePool::resourceRemoved,                   this,   &QnResourcePoolModel::at_resPool_resourceRemoved, Qt::QueuedConnection);
     connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnResourcePoolModel::at_snapshotManager_flagsChanged);
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourcePoolModel::at_accessController_permissionsChanged);
-    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::at_context_userChanged, Qt::QueuedConnection);
+    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourcePoolModel::at_commonModule_systemNameChanged);
+    connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
     connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged);
 
     QnResourceList resources = resourcePool()->getResources(); 
 
-    at_context_userChanged();
+    rebuildTree();
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
     foreach(const QnResourcePtr &resource, resources)
@@ -214,11 +216,12 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
         return;
 
     case Qn::ResourceNode:
+    case Qn::EdgeNode:
         m_resourceNodeByResource.remove(node->resource());
         break;
     case Qn::ItemNode:
         m_itemNodeByUuid.remove(node->uuid());
-        if (node->resource())
+        if (node->resource() && m_itemNodesByResource.contains(node->resource()))
             m_itemNodesByResource[node->resource()].removeAll(node);
         break;
     case Qn::RecorderNode:
@@ -226,7 +229,7 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
     case Qn::SystemNode:
         break;  //nothing special
     default:
-        assert(false); //should never come here
+        Q_ASSERT_X(false, Q_FUNC_INFO, "should never get here");
     }
 
     deleteNode(node);
@@ -263,11 +266,14 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
             return m_rootNodes[Qn::BastardNode];
 
         //TODO: #GDM non-admin scope?
-        if(!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission)) {
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission))
             return m_rootNodes[Qn::RootNode];
-        } else {
-            return m_rootNodes[Qn::UsersNode];
-        }
+
+        QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>();
+        if (user && !user->isEnabled())
+            return m_rootNodes[Qn::BastardNode];
+
+        return m_rootNodes[Qn::UsersNode];
     }
 
     /* In UsersScope all other nodes should be hidden. */
@@ -335,6 +341,34 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
     m_rootNodes[rootNodeType]->updateRecursive();
 }
 
+QnResourcePoolModelCustomColumnDelegate* QnResourcePoolModel::customColumnDelegate() const {
+    return m_customColumnDelegate.data();
+}
+
+void QnResourcePoolModel::setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate) {
+    if (m_customColumnDelegate == columnDelegate)
+        return;
+
+    if (m_customColumnDelegate)
+        disconnect(m_customColumnDelegate, nullptr, this, nullptr);
+
+    m_customColumnDelegate = columnDelegate;
+
+    auto notifyCustomColumnChanged = [this](){
+        //TODO: #GDM update only custom column and changed rows
+        Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+        m_rootNodes[rootNodeType]->updateRecursive();
+    };
+
+    if (m_customColumnDelegate)
+        connect(m_customColumnDelegate, &QnResourcePoolModelCustomColumnDelegate::notifyDataChanged,
+                this, notifyCustomColumnChanged);
+
+    notifyCustomColumnChanged();
+
+}
+
+
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: QAbstractItemModel implementation
 // -------------------------------------------------------------------------- //
@@ -366,13 +400,17 @@ int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
     return node(parent)->children().size();
 }
 
-int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
+int QnResourcePoolModel::columnCount(const QModelIndex &parent) const {
     return Qn::ColumnCount;
 }
 
 Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
     if(!index.isValid())
         return Qt::NoItemFlags;
+
+    if (index.column() == Qn::CustomColumn)
+        return m_customColumnDelegate ? m_customColumnDelegate->flags(index) : Qt::NoItemFlags;
+
     return node(index)->flags(index.column());
 }
 
@@ -380,12 +418,19 @@ QVariant QnResourcePoolModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
+    /* Only standard QT roles are subject to reimplement. Otherwise we may go to recursion, getting resource for example. */
+    if (index.column() == Qn::CustomColumn && role <= Qt::UserRole)
+        return m_customColumnDelegate ? m_customColumnDelegate->data(index, role) : QVariant();
+
     return node(index)->data(role, index.column());
 }
 
 bool QnResourcePoolModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(!index.isValid())
         return false;
+
+    if (index.column() == Qn::CustomColumn)
+        return m_customColumnDelegate ? m_customColumnDelegate->setData(index, value, role) : false;
 
     return node(index)->setData(value, role, index.column());
 }
@@ -553,7 +598,9 @@ Qt::DropActions QnResourcePoolModel::supportedDropActions() const {
 // QnResourcePoolModel :: handlers
 // -------------------------------------------------------------------------- //
 void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
-    assert(resource);
+    Q_ASSERT(resource);
+    if (!resource)
+        return;
 
     connect(resource,       &QnResource::parentIdChanged,                this,  &QnResourcePoolModel::at_resource_parentIdChanged);
     connect(resource,       &QnResource::nameChanged,                    this,  &QnResourcePoolModel::at_resource_resourceChanged);
@@ -601,6 +648,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
             connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
     }
 
+    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+    if (user) {
+        connect(user, &QnUserResource::enabledChanged, this, &QnResourcePoolModel::at_user_enabledChanged);
+    }
+
     QnResourcePoolModelNode *node = this->node(resource);
     node->setResource(resource);
 
@@ -628,25 +680,30 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
-    disconnect(resource, NULL, this, NULL);
-
     if (!resource)
         return;
 
-    if (!m_resourceNodeByResource.contains(resource))
-        return;
+    disconnect(resource, NULL, this, NULL);
 
-    QnResourcePoolModelNode *node = m_resourceNodeByResource.take(resource);
-    QnResourcePoolModelNode *parent = node->parent();
+    QList<QPointer<QnResourcePoolModelNode> > nodesToDelete;
+    for (QnResourcePoolModelNode* node: m_allNodes) {
+        if (node->resource() == resource)
+            nodesToDelete << QPointer<QnResourcePoolModelNode>(node);
+    }
 
-    deleteNode(node);
+    for (auto node: nodesToDelete) {
+        if (node.isNull())
+            continue;
+        removeNode(node.data());
+    }
 
-    if (parent)
-        parent->update();
+    m_itemNodesByResource.remove(resource);
+    m_recorderHashByResource.remove(resource);
+    Q_ASSERT(!m_resourceNodeByResource.contains(resource));
 }
 
 
-void QnResourcePoolModel::at_context_userChanged() {
+void QnResourcePoolModel::rebuildTree() {
     m_rootNodes[Qn::LocalNode]->update();
     m_rootNodes[Qn::ServersNode]->update();
     m_rootNodes[Qn::UsersNode]->update();
@@ -668,6 +725,8 @@ void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResource
 
 void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
     node(resource)->update();
+    if (resource == context()->user())
+        rebuildTree();
 }
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
@@ -702,8 +761,9 @@ void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
     node->update();
 
-    foreach(QnResourcePoolModelNode *node, m_itemNodesByResource[resource])
-        node->update();
+    if (m_itemNodesByResource.contains(resource))
+        foreach(QnResourcePoolModelNode *node, m_itemNodesByResource[resource])
+            node->update();
 }
 
 void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {
@@ -803,6 +863,11 @@ void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resou
 
 void QnResourcePoolModel::at_commonModule_systemNameChanged() {
     m_rootNodes[Qn::ServersNode]->update();
+}
+
+void QnResourcePoolModel::at_user_enabledChanged(const QnResourcePtr &resource) {
+    QnResourcePoolModelNode *node = this->node(resource);
+    node->setParent(expectedParent(node));
 }
 
 void QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged() {

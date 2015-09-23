@@ -24,6 +24,8 @@ public:
      * \returns                         Resource data for the given camera.
      */
     QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
+    QnResourceData data(const QString& _vendor, const QString& model, const QString& firmware = QString()) const;
+
     
     bool load(const QString &fileName);
 

@@ -10,6 +10,7 @@
 
 #include "action_conditions.h"
 #include "action_factories.h"
+#include "action_text_factories.h"
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -160,6 +161,12 @@ public:
 
     void setChildFactory(QnActionFactory *childFactory);
 
+    QnActionTextFactory *textFactory() const {
+        return m_textFactory.data();
+    }
+
+    void setTextFactory(QnActionTextFactory *textFactory);
+
     /**
      * \returns                         Child actions. These action will appear
      *                                  in a submenu for this action.
@@ -226,9 +233,18 @@ private:
     QString m_toolTipFormat, m_toolTipMarker;
     QPointer<QnActionCondition> m_condition;
     QPointer<QnActionFactory> m_childFactory;
+    QPointer<QnActionTextFactory> m_textFactory;
 
     QList<QnAction *> m_children;
-    QHash<QnActionCondition *, QString> m_textConditions;
+
+    struct ConditionalText {
+        QnActionCondition * condition;
+        QString text;
+        ConditionalText(){}
+        ConditionalText(QnActionCondition * condition, const QString &text):
+            condition(condition), text(text) {}
+    };
+    QList<ConditionalText> m_conditionalTexts;
 };
 
 Q_DECLARE_METATYPE(QnAction *)

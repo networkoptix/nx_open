@@ -15,7 +15,7 @@
 class RevealRequest
 {
 public:
-    bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
+    static QByteArray serialize();
     static bool isValid(const quint8 *bufStart, const quint8 *bufEnd);
 };
 

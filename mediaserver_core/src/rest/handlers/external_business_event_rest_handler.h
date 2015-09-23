@@ -2,23 +2,15 @@
 #define QN_EXTERNAL_BUSINESS_EVENT_REST_HANDLER_H
 
 #include <core/resource/resource_fwd.h>
-#include "rest/server/request_handler.h"
-#include <business/events/reasoned_business_event.h>
+#include "rest/server/json_rest_handler.h"
 
-#include <core/resource/resource_fwd.h>
-
-class QnExternalBusinessEventRestHandler: public QnRestRequestHandler
+class QnExternalBusinessEventRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 public:
     QnExternalBusinessEventRestHandler();
 
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, 
-                            QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
-
-signals:
-    void mserverFailure(const QnResourcePtr &resource, qint64 time, QnBusiness::EventReason reason, const QString& reasonText);
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 };
 
 #endif // QN_FILE_SYSTEM_HANDLER_H

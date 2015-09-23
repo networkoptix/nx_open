@@ -154,7 +154,7 @@ bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     }
 
     bool rez = startIOMonitor(Qn::PT_Input, m_ioHttpMonitor[0]);
-    if (hasCameraCapabilities(Qn::IOModuleCapability))
+    if (isIOModule())
         startIOMonitor(Qn::PT_Output, m_ioHttpMonitor[1]);
 
     QnMutexLocker lk( &m_inputPortMutex );
@@ -245,7 +245,7 @@ bool QnPlAxisResource::isInputPortMonitored() const
 bool QnPlAxisResource::isInitialized() const
 {
     QnMutexLocker lock( &m_mutex );
-    return hasCameraCapabilities(Qn::IOModuleCapability) ? base_type::isInitialized() : !m_resolutionList.isEmpty();
+    return isIOModule() ? base_type::isInitialized() : !m_resolutionList.isEmpty();
 }
 
 void QnPlAxisResource::clear()
@@ -878,8 +878,8 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
             if (params.size() == 2) {
                 int portIndex = portDisplayNameToIndex(QString::fromLatin1(params[0]));
                 QString portId = portIndexToId(portIndex);
-                qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-                updateIOState(portId, params[1] == "active", timestamp, false);
+                qint64 timestampMs = qnSyncTime->currentMSecsSinceEpoch();
+                updateIOState(portId, params[1] == "active", timestampMs, false);
             }
         }
     }
@@ -1027,7 +1027,7 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const 
             if (newValue.outputName != currentValue.outputName)
                 changedParams.insert(paramNamePrefix + lit("Output.Name"), newValue.outputName);
             if (newValue.oDefaultState != currentValue.oDefaultState)
-                changedParams.insert(paramNamePrefix + lit("Output.Trig"), newValue.oDefaultState == Qn::IO_OpenCircuit ? lit("closed") : lit("open"));
+                changedParams.insert(paramNamePrefix + lit("Output.Active"), newValue.oDefaultState == Qn::IO_OpenCircuit ? lit("closed") : lit("open"));
 
             if (newValue.autoResetTimeoutMs != currentValue.autoResetTimeoutMs)
                 changedParams.insert(paramNamePrefix + lit("Output.PulseTime"), QString::number(newValue.autoResetTimeoutMs));
@@ -1069,7 +1069,7 @@ QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& camer
 
 bool QnPlAxisResource::ioPortErrorOccured()
 {
-    if (getCameraCapabilities() & Qn::IOModuleCapability) {
+    if (isIOModule()) {
         return false; // it's error if can't read IO state for IO module
     }
     else {
@@ -1094,9 +1094,6 @@ void QnPlAxisResource::readPortIdLIst()
 bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 {
     readPortIdLIst();
-
-    if (getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0)
-        setCameraCapability(Qn::IOModuleCapability, true);
 
     QnIOPortDataList cameraPorts;
     if (!readPortSettings(http, cameraPorts))
@@ -1131,10 +1128,10 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     //startInputPortMonitoring();
 }
 
-void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist)
+void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint64 timestampMs, bool overrideIfExist)
 {
     QnMutexLocker lock(&m_mutex);
-    QnIOStateData newValue(portId, isActive, timestamp);
+    QnIOStateData newValue(portId, isActive, timestampMs);
     bool found = false;
     for (auto& ioState: m_ioStates) {
         if (ioState.id == portId) 
@@ -1158,7 +1155,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
                     toSharedPointer(),
                     portId,
                     isActive,
-                    timestamp );
+                    timestampMs * 1000ll);
             }
             else if (port.portType == Qn::PT_Output) {
                 lock.unlock();
@@ -1166,7 +1163,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
                     toSharedPointer(),
                     portId,
                     isActive,
-                    timestamp );
+                    timestampMs * 1000ll );
             }
             break;
         }
@@ -1204,6 +1201,10 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
 
     QString portDisplayName = QString::fromLatin1(notification.mid(0, sepPos));
     int portIndex = portDisplayNameToIndex(portDisplayName);
+    if (portIndex == -1) {
+        NX_LOG( lit("Error parsing Axis notification message %1. Camera: %2").arg(QString::fromLatin1(notification)).arg(getUrl()), cl_logDEBUG1 );
+        return;
+    }
     QString portId = portIndexToId(portIndex);
     const char portType = notification[portTypePos];
     NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
@@ -1213,8 +1214,22 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
         return; // skip unknown event
 
     bool isOnState = (eventType == '/') || (eventType == 'H');
-    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    updateIOState(portId, isOnState, timestamp, true);
+
+    // Axis camera sends inversed output port state for 'grounded circuit' ports (seems like it sends physical state instead of logical state)
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (auto& port: m_ioPorts) {
+            if (port.id == portId)
+            {
+                if (port.portType == Qn::PT_Output && port.oDefaultState == Qn::IO_GroundedCircuit)
+                    isOnState = !isOnState;
+                break;
+            }
+        }
+    }
+
+    qint64 timestampMs = qnSyncTime->currentMSecsSinceEpoch();
+    updateIOState(portId, isOnState, timestampMs, true);
 }
 
 QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
@@ -1306,9 +1321,9 @@ void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
         setStatus(Qn::Offline); // reinit
 }
 
-void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QString & key)
 {
-    if (key == Qn::IO_SETTINGS_PARAM_NAME)
+    if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
         QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
 }
 

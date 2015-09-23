@@ -77,7 +77,7 @@ private:
     quint8 *m_proxyBuffer;
     int m_proxyBufferLen;
     bool m_deinitialized;
-
+    bool m_paused;
 private:
     void internalClear();
 

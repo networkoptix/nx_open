@@ -1,4 +1,4 @@
-import QtQuick 2.0;
+import QtQuick 2.4;
 
 import "../../common" as Common;
 
@@ -14,11 +14,20 @@ Item
     property real buttonHeight: Common.SizeManager.clickableSizes.base;
     property real spacing: Common.SizeManager.spacing.base;
 
+    property alias firstButton: repeater.firstButton;
+
     signal buttonClicked(int id);
-    
     
     width: row.width + row.anchors.rightMargin * 2;
     height: buttonHeight + spacing * 2;
+
+    activeFocusOnTab: false;
+
+    onActiveFocusChanged:
+    {
+        if (activeFocus && enabled)
+            nextItemInFocusChain(false).forceActiveFocus();
+    }
 
     Row
     {
@@ -37,6 +46,11 @@ Item
 
         Repeater
         {
+            id: repeater;
+
+            property Item firstButton: null;
+            property Item lastButton: null;
+
             model: NxRtu.Buttons 
             {
                 buttons: thisComponent.buttons;
@@ -55,6 +69,10 @@ Item
                     item.height = thisComponent.buttonHeight;
                     item.width = item.height * model.aspect;
                     item.text = model.caption;
+
+                    if (!index)
+                        repeater.firstButton = item;
+
                 }
                 
                 Connections
@@ -79,5 +97,4 @@ Item
 
         StyledButton {}
     }
-
 }

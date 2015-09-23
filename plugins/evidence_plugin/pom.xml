@@ -16,7 +16,7 @@
 
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>1.5.0-SNAPSHOT</version>
-    <artifactId>evidencecamplugin</artifactId>
+    <artifactId>evidence_plugin</artifactId>
     <packaging>pom</packaging>
     <name>HD Witness Evidence camera integration plugin</name>	
 

@@ -396,7 +396,7 @@ bool QnDesktopDataProvider::init()
     }
 
     if (m_grabber->width() % 8 != 0) {
-        m_lastErrorStr = tr("Screen width must be a multiplier of 8.");
+        m_lastErrorStr = tr("Screen width must be a multiple of 8.");
         return false;
     }
 

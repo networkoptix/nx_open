@@ -109,7 +109,7 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) con
     return createArchiveResource(filename);
 }
 
-//=============================================================================================
+// =============================================================================================
 void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResourceList *result) {
     NX_LOG(lit("Checking %1").arg(directory), cl_logDEBUG1);
 

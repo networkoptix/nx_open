@@ -505,7 +505,7 @@ private:
         DeviceSoapWrapper* const soapWrapper,
         CapabilitiesResp* const response );
     void fillFullUrlInfo( const CapabilitiesResp& response );
-
+    CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;

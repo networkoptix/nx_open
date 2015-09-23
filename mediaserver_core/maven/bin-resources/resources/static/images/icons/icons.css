@@ -1,0 +1,151 @@
+
+.glyphicon.glyphicon-play {
+    background: url(icons_sprite.png) 0 0;
+    width: 20px;
+    height: 20px;
+}
+
+.glyphicon.glyphicon-pause {
+    background: url(icons_sprite.png)  -20px 0;
+    width: 20px;
+    height: 20px;
+}
+
+.glyphicon.glyphicon-minus {
+    background: url(icons_sprite.png) -40px 0;
+    width: 20px;
+    height: 20px;
+}
+
+.glyphicon.glyphicon-plus {
+    background: url(icons_sprite.png) -60px 0;
+    width: 20px;
+    height: 20px;
+}
+
+.glyphicon.glyphicon-fullscreen {
+    background: url(icons_sprite.png) -80px 0;
+    width: 20px;
+    height: 20px;
+}
+
+.glyphicon.glyphicon-chevron-up {
+    background: url(icons_sprite.png)  -140px 0;
+    width: 20px;
+    height: 20px;
+}
+
+.glyphicon.glyphicon-chevron-down {
+    background: url(icons_sprite.png)  -160px 0;
+    width: 20px;
+    height: 20px;
+}
+
+.small-camera-recorded {
+background: url(icons_sprite.png) 0px -120px;
+}
+
+.small-camera-not-recorded {
+background: url(icons_sprite.png) -10px -120px;
+}
+
+.small-camera-offline {
+background: url(icons_sprite.png) -20px -120px;
+}
+
+
+.glyphicon-server-ok {
+    background: url(icons_sprite.png) 0px -20px;
+    width: 30px !important;
+    height: 30px;
+}
+
+.glyphicon-server-current {
+    background: url(icons_sprite.png) -30px -20px;
+    width: 30px !important;
+    height: 30px;
+}
+
+.glyphicon-server-offline {
+    background: url(icons_sprite.png) -60px -20px;
+    width: 30px !important;
+    height: 30px;
+}
+.glyphicon-server-unauthorized {
+    background: url(icons_sprite.png) -60px -20px;
+    width: 30px !important;
+    height: 30px;
+}
+
+
+
+.camera-node.Unauthorized .camera-preview-image{
+    background: url(icons_sprite.png) -90px -20px !important;
+    width:30px;
+    height: 30px;
+}
+.camera-node.Offline .camera-preview-image{
+    background: url(icons_sprite.png) -120px -20px !important;
+    width:30px;
+    height: 30px;
+}
+
+
+
+
+.camera-view-preloader {
+    background: url(camera_view_preloader.gif) 0px 0px;
+    width: 100px;
+    height: 100px;
+}
+
+.camera-view-unauthorized {
+    background: url(icons_sprite.png) 0px -60px;
+    width: 100px;
+    height: 100px;
+}
+
+.camera-view-offline {
+    background: url(icons_sprite.png) -100px -60px;
+    width: 100px;
+    height: 100px;
+}
+
+.camera-view-error {
+    background: url(icons_sprite.png) -200px -60px;
+    width: 100px;
+    height: 100px;
+}
+
+
+
+
+@media 
+only screen and (-webkit-min-device-pixel-ratio: 1.5),
+only screen and (min--moz-device-pixel-ratio: 1.5),
+only screen and (min-resolution: 240dpi) {
+    .glyphicon.glyphicon-play, .glyphicon.glyphicon-pause, .glyphicon.glyphicon-minus, .glyphicon.glyphicon-plus, .glyphicon.glyphicon-fullscreen, .exit-fullscreen, .info, .arrow-up, .arrow-down, .arrow-left, .arrow-right, .camera-recorded, .camera-not-recorded, .glyphicon.glyphicon-chevron-up, .glyphicon.glyphicon-chevron-down, .small-camera-recorded, .small-camera-not-recorded, .small-camera-offline {
+        background-image: url(icons_sprite@2x.png);
+        background-size: 300px 160px;
+    }
+
+    .camera-vew-preloader {
+        background-image: url(camera_view_preloader@2x.gif);
+        background-size: 100px 100px;
+    }
+
+}
+
+.glyphicon.glyphicon-play:before,
+.glyphicon.glyphicon-pause:before,
+.glyphicon.glyphicon-minus:before,
+.glyphicon.glyphicon-plus:before,
+.glyphicon.glyphicon-fullscreen:before,
+/*.exit-fullscreen, .info, .arrow-up, .arrow-down, .arrow-left, .arrow-right, .camera-recorded, .camera-not-recorded,*/
+.glyphicon.glyphicon-chevron-up:before,
+.glyphicon.glyphicon-chevron-down:before,
+/*.small-camera-recorded, .small-camera-not-recorded, .small-camera-offline*/
+.glyphicon.glyphicon-chevron-up:before,
+.glyphicon.glyphicon-chevron-down:before{
+    display:none;
+}

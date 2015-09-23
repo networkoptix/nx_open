@@ -37,11 +37,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client</artifactId>
+            <artifactId>clientexe</artifactId>
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/client/pom.xml</systemPath>
+            <systemPath>${root.dir}/clientexe/pom.xml</systemPath>
         </dependency>			
     </dependencies>			
 

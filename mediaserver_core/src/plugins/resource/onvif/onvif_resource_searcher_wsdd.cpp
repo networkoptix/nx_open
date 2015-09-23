@@ -578,6 +578,9 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
         manufacturer = lit("ISD");
         name = name.mid(4);
     }
+    else if (name == lit("ISD")) {
+        qSwap(name, manufacturer);
+    }
     else if (lowerName == lit("networkcamera") && manufacturer.isEmpty()) {
         name.clear(); // some DW cameras report invalid model in multicast and empty vendor
     }
@@ -607,6 +610,10 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
     }
     else if(lowerName == lit("vivotek") && manufacturer.toLower().startsWith(lit("sd"))) {
         qSwap(name, manufacturer);
+    }
+    else if(lowerName.startsWith(lit("acti"))) {
+        name = manufacturer;
+        manufacturer = lit("ACTi");
     }
 }
 

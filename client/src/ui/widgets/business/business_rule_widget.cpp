@@ -13,12 +13,8 @@
 #include <QtGui/QDragEnterEvent>
 
 #include <business/business_resource_validation.h>
-//#include <business/events/motion_business_event.h>
-//#include <business/events/camera_input_business_event.h>
-//#include <business/actions/recording_business_action.h>
-//#include <business/actions/camera_output_business_action.h>
-//#include <business/actions/sendmail_business_action.h>
 
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -39,25 +35,6 @@
 
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
-
-namespace {
-    QString toggleStateToString(QnBusiness::EventState value, bool prolonged) {
-        switch( value )
-        {
-            case QnBusiness::InactiveState:
-                return QObject::tr("Stops");
-            case QnBusiness::ActiveState:
-                return QObject::tr("Starts");
-            case QnBusiness::UndefinedState:
-            if (prolonged)
-                return QObject::tr("Starts/Stops");
-            else
-                return QObject::tr("Occurs");
-        }
-        return QString();
-    }
-
-} // namespace
 
 QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
@@ -88,11 +65,19 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     connect(ui->aggregationWidget,          SIGNAL(valueChanged()),             this, SLOT(updateModelAggregationPeriod()));
 
     connect(ui->commentsLineEdit,           SIGNAL(textChanged(QString)),       this, SLOT(at_commentsLineEdit_textChanged(QString)));
+
+    retranslateUi();
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
 {
 }
+
+void QnBusinessRuleWidget::retranslateUi() {
+    ui->eventResourcesHolder->setText(tr("<Any %1>").arg(getDefaultDeviceNameUpper()));
+    ui->actionResourcesHolder->setText(tr("<Select at least one %1>").arg(getDefaultDeviceNameLower()));
+}
+
 
 QnBusinessRuleViewModel* QnBusinessRuleWidget::model() const {
     return m_model;
@@ -306,7 +291,7 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
 }
 
 void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index) {
-    if (!m_model || m_updating)
+    if (!m_model || m_updating || index == -1)
         return;
 
     bool prolonged = QnBusiness::hasToggleState(m_model->eventType()) && !QnBusiness::hasToggleState(m_model->actionType());
@@ -390,5 +375,3 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked() {
         return;
     m_model->setSchedule(dialog->scheduleTasks());
 }
-
-

@@ -21,6 +21,7 @@
     <name>HD Witness Media Server Core</name>
 
     <properties>
+        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>
@@ -51,6 +52,14 @@
             <type>zip</type>
             <classifier>archive</classifier>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_storage_sdk</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>archive</classifier>
+        </dependency>
+
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -96,20 +105,29 @@
                                     <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
                                     <destFileName>sdk.zip</destFileName>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>nx_storage_sdk</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>archive</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
+                                    <destFileName>storage_sdk.zip</destFileName>
+                                </artifactItem>
                             </artifactItems>
                             <stripVersion>true</stripVersion>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
                 <executions>
                     <execution>
                         <id>copy-mediaserver-resources</id>
-                        <!-- This variable is for Android. Resources for all modules should be copied on the "generate-sources" phase. However Android should copy resources at "validate" -->
                         <phase>${resources.phase}</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -126,7 +144,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> -->
         </plugins>
     </build>
 

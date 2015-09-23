@@ -17,7 +17,9 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_resource.h>
 
+#include <network/authenticate_helper.h>
 #include <utils/common/log.h>
+#include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/media_stream_cache.h>
@@ -26,6 +28,7 @@
 #include "camera/camera_pool.h"
 #include "hls_archive_playlist_manager.h"
 #include "hls_live_playlist_manager.h"
+#include "hls_playlist_manager_proxy.h"
 #include "hls_session_pool.h"
 #include "hls_types.h"
 #include "media_server/settings.h"
@@ -61,7 +64,6 @@ namespace nx_hls
         m_useChunkedTransfer( false ),
         m_bytesSent( 0 )
     {
-        m_readBuffer.reserve( READ_BUFFER_SIZE );
         setObjectName( "QnHttpLiveStreamingProcessor" );
     }
 
@@ -85,13 +87,24 @@ namespace nx_hls
 
     void QnHttpLiveStreamingProcessor::run()
     {
+        Q_D( QnTCPConnectionProcessor );
+
         while( !needToStop() )
         {
             switch( m_state )
             {
                 case sReceiving:
-                    if( !receiveRequest() )
+                    if( !readSingleRequest() )
+                    {
+                        NX_LOG( lit( "Error reading/parsing request from %1 (%2). Terminating connection..." ).
+                            arg( remoteHostAddress().toString() ), cl_logWARNING );
                         m_state = sDone;
+                        break;
+                    }
+
+                    m_state = sProcessingMessage;
+                    m_useChunkedTransfer = false;
+                    processRequest( d->request );
                     break;
 
                 case sProcessingMessage:
@@ -109,7 +122,7 @@ namespace nx_hls
                         bytesSent = sendData( m_writeBuffer ) ? m_writeBuffer.size() : -1;
                     if( bytesSent < 0 )
                     {
-                        NX_LOG( QString::fromLatin1("Error sending data to %1 (%2). Sent %3 bytes total. Terminating connection...").
+                        NX_LOG( lit("Error sending data to %1 (%2). Sent %3 bytes total. Terminating connection...").
                             arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()).arg(m_bytesSent), cl_logWARNING );
                         m_state = sDone;
                         break;
@@ -126,7 +139,7 @@ namespace nx_hls
                         break;  //continuing sending
                     if( !prepareDataToSend() )
                     {
-                        NX_LOG( QString::fromLatin1("Finished uploading %1 data to %2. Sent %3 bytes total. Closing connection...").
+                        NX_LOG( lit("Finished uploading %1 data to %2. Sent %3 bytes total. Closing connection...").
                             arg(m_currentFileName).arg(remoteHostAddress().toString()).arg(m_bytesSent), cl_logDEBUG1 );
                         //sending empty chunk to signal EOF
                         if( m_useChunkedTransfer )
@@ -142,72 +155,6 @@ namespace nx_hls
                         arg(remoteHostAddress().toString()).arg(m_bytesSent), cl_logDEBUG1 );
                     return;
             }
-        }
-    }
-
-    bool QnHttpLiveStreamingProcessor::receiveRequest()
-    {
-        Q_D(QnTCPConnectionProcessor);
-        if( !d->clientRequest.isEmpty() )
-            m_readBuffer = std::move(d->clientRequest);
-
-        if( m_readBuffer.isEmpty() )
-        {
-            m_readBuffer.resize( READ_BUFFER_SIZE );
-            int bytesRead = readSocket( (quint8*)m_readBuffer.data(), m_readBuffer.size() );
-            if( bytesRead < 0 )
-            {
-                NX_LOG( QString::fromLatin1("Error reading socket from %1 (%2). Terminating connection...").
-                    arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
-                return false;
-            }
-            if( bytesRead == 0 )
-            {
-                NX_LOG( QString::fromLatin1("Client %1 closed connection").arg(remoteHostAddress().toString()), cl_logINFO );
-                return false; 
-            }
-            m_readBuffer.resize( bytesRead );
-        }
-
-        size_t bytesProcessed = 0;
-        if( !m_httpStreamReader.parseBytes( m_readBuffer, m_readBuffer.size(), &bytesProcessed ) )
-        {
-            NX_LOG( QString::fromLatin1("Error parsing http message from %1 (%2). Terminating connection...").
-                arg(remoteHostAddress().toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
-            return false;
-        }
-        m_readBuffer.remove( 0, bytesProcessed );
-
-        switch( m_httpStreamReader.state() )
-        {
-            case HttpStreamReader::readingMessageHeaders:
-                //continuing reading
-                return true;
-
-            case HttpStreamReader::messageDone:
-            case HttpStreamReader::pullingLineEndingBeforeMessageBody:
-            case HttpStreamReader::readingMessageBody:
-            case HttpStreamReader::waitingMessageStart:
-                if( m_httpStreamReader.message().type != MessageType::request )
-                {
-                    NX_LOG( QString::fromLatin1("Received %1 from %2 while expecting request. Terminating connection...").
-                        arg(MessageType::toString(m_httpStreamReader.message().type)).arg(remoteHostAddress().toString()), cl_logWARNING );
-                    return false;
-                }
-                m_state = sProcessingMessage;
-                m_useChunkedTransfer = false;
-                processRequest( *m_httpStreamReader.message().request );
-                return true;
-
-            case HttpStreamReader::parseError:
-                //bad request format, terminating connection...
-                NX_LOG( QString::fromLatin1("Error parsing http message from %1 (%2). Terminating connection...").
-                    arg(remoteHostAddress().toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
-                return false;
-
-            default:
-                Q_ASSERT( false );
-                return false;
         }
     }
 
@@ -234,6 +181,8 @@ namespace nx_hls
                     response.headers.find("Content-Length") != response.headers.end() ? "identity" : "chunked") );
             response.headers.emplace( "Connection", "close" ); //no persistent connections support
         }
+        if( response.statusLine.statusCode == nx_http::StatusCode::notFound )
+            nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader( "Content-Length", "0" ) );
 
         sendResponse( response );
     }
@@ -246,13 +195,19 @@ namespace nx_hls
         const QString& path = request.requestLine.url.path();
         int fileNameStartIndex = path.lastIndexOf(QChar('/'));
         if( fileNameStartIndex == -1 )
+        {
+            NX_LOG(lit("HLS. Not found file name in path %1").arg(path), cl_logDEBUG1);
             return StatusCode::notFound;
+        }
         QStringRef fileName;
         if( fileNameStartIndex == path.size()-1 )   //path ends with /. E.g., /hls/camera1.m3u/. Skipping trailing /
         {
             int newFileNameStartIndex = path.midRef(0, path.size()-1).lastIndexOf(QChar('/'));
             if( newFileNameStartIndex == -1 )
+            {
+                NX_LOG(lit("HLS. Not found file name (2) in path %1").arg(path), cl_logDEBUG1);
                 return StatusCode::notFound;
+            }
             fileName = path.midRef( newFileNameStartIndex+1, fileNameStartIndex-(newFileNameStartIndex+1) );
         }
         else
@@ -268,8 +223,10 @@ namespace nx_hls
         //searching for requested resource
         QnResourcePtr resource = qnResPool->getResourceByUniqueId( shortFileName.toString() );
         if( !resource )
+            resource = QnResourcePool::instance()->getResourceByMacAddress( shortFileName.toString() );
+        if( !resource )
         {
-            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 not found").
+            NX_LOG( lit("HLS. Requested resource %1 not found").
                 arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
@@ -277,16 +234,16 @@ namespace nx_hls
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )
         {
-            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 is not camera").
+            NX_LOG( lit("HLS. Requested resource %1 is not camera").
                 arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
 
         //checking resource stream type. Only h.264 is OK for HLS
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera( camResource );
+        QnVideoCameraPtr camera = qnCameraPool->getVideoCamera( camResource );
         if( !camera )
         {
-            NX_LOG( QString::fromLatin1("Error. HLS request to resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
+            NX_LOG( lit("Error. HLS request to resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
             return nx_http::StatusCode::forbidden;
         }
 
@@ -294,7 +251,7 @@ namespace nx_hls
         if( lastVideoFrame && (lastVideoFrame->compressionType != CODEC_ID_H264) && (lastVideoFrame->compressionType != CODEC_ID_NONE) )
         {
             //video is not in h.264 format
-            NX_LOG( QString::fromLatin1("Error. HLS request to resource %1 with codec %2").
+            NX_LOG( lit("Error. HLS request to resource %1 with codec %2").
                 arg(camResource->getUniqueId()).arg(codecIDToString(lastVideoFrame->compressionType)), cl_logWARNING );
             return nx_http::StatusCode::forbidden;
         }
@@ -355,6 +312,7 @@ namespace nx_hls
             }
         }
 
+        NX_LOG(lit("HLS. Unknown file type has been requested: \"%1\"").arg(extension.toString()), cl_logDEBUG1);
         return StatusCode::notFound;
     }
 
@@ -368,7 +326,7 @@ namespace nx_hls
         response.serialize( &m_writeBuffer );
         m_bytesSent = (size_t)0 - m_writeBuffer.size();
 
-        NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
+        NX_LOG( QnLog::HTTP_LOG_INDEX, lit("Sending response to %1:\n%2\n-------------------\n\n\n").
             arg(remoteHostAddress().toString()).
             arg(QString::fromLatin1(m_writeBuffer)), cl_logDEBUG1 );
 
@@ -418,7 +376,7 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
         const nx_http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
@@ -457,11 +415,11 @@ namespace nx_hls
                     : MEDIA_Quality_Low;
             }
 
-            if( !camResource->hasDualStreaming() )
+            if( !camResource->hasDualStreaming2() )
             {
                 if( streamQuality == MEDIA_Quality_Low )
                 {
-                    NX_LOG( QString::fromLatin1("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                    NX_LOG( lit("Got request to unavailable low quality of camera %2").arg(camResource->getUniqueId()), cl_logDEBUG1 );
                     return nx_http::StatusCode::notFound;
                 }
                 else if( streamQuality == MEDIA_Quality_Auto )
@@ -471,6 +429,7 @@ namespace nx_hls
             }
 
             const nx_http::StatusCode::Value result = createSession(
+                request.requestLine.url.path(),
                 sessionID,
                 requestParams,
                 camResource,
@@ -497,22 +456,13 @@ namespace nx_hls
         HLSSession* session,
         const nx_http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& /*requestParams*/,
         nx_http::Response* const response )
     {
         nx_hls::VariantPlaylist playlist;
 
         QUrl baseUrl;
-        nx_http::HttpHeaders::const_iterator hostIter = request.headers.find( "Host" );
-        if( hostIter != request.headers.end() )
-        {
-            SocketAddress sockAddress( hostIter->second );
-            baseUrl.setHost( sockAddress.address.toString() );
-            if( sockAddress.port > 0 )
-                baseUrl.setPort( sockAddress.port );
-            baseUrl.setScheme( QLatin1String("http") );
-        }
 
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
@@ -545,10 +495,12 @@ namespace nx_hls
                 ++it;
         }
         QUrlQuery playlistDataQuery;
+        queryItems.push_front( session->playlistAuthenticationQueryItem() );
         playlistDataQuery.setQueryItems( queryItems );
         playlistDataQuery.addQueryItem( StreamingParams::CHUNKED_PARAM_NAME, QString() );
         playlistDataQuery.addQueryItem( StreamingParams::SESSION_ID_PARAM_NAME, session->id() );
 
+        //adding hi stream playlist
         if( session->streamQuality() == MEDIA_Quality_High || session->streamQuality() == MEDIA_Quality_Auto )
         {
             playlistData.bandwidth = estimateStreamBitrate(
@@ -561,6 +513,7 @@ namespace nx_hls
             playlist.playlists.push_back(playlistData);
         }
 
+        //adding lo stream playlist
         if( (session->streamQuality() == MEDIA_Quality_Low || session->streamQuality() == MEDIA_Quality_Auto) && camResource->hasDualStreaming() )
         {
             playlistData.bandwidth = estimateStreamBitrate(
@@ -604,7 +557,7 @@ namespace nx_hls
         const nx_hls::AbstractPlaylistManagerPtr& playlistManager = session->playlistManager(streamQuality);
         if( !playlistManager )
         {
-            NX_LOG( QString::fromLatin1("Got request to not available %1 quality of camera %2").
+            NX_LOG( lit("Got request to not available %1 quality of camera %2").
                 arg(QLatin1String(streamQuality == MEDIA_Quality_High ? "hi" : "lo")).arg(camResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::notFound;
         }
@@ -612,11 +565,11 @@ namespace nx_hls
         const size_t chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
         if( chunkList.empty() )   //no chunks generated
         {
-            NX_LOG( QString::fromLatin1("Failed to get chunks of resource %1").arg(camResource->getUniqueId()), cl_logWARNING );
+            NX_LOG( lit("Failed to get chunks of resource %1").arg(camResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::noContent;
         }
 
-        NX_LOG( QString::fromLatin1("Prepared playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
+        NX_LOG( lit("Prepared playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
 
         nx_hls::Playlist playlist;
         assert( !chunkList.empty() );
@@ -641,15 +594,6 @@ namespace nx_hls
         }
 
         QUrl baseChunkUrl;
-        nx_http::HttpHeaders::const_iterator hostIter = request.headers.find( "Host" );
-        if( hostIter != request.headers.end() )
-        {
-            SocketAddress sockAddress( hostIter->second );
-            baseChunkUrl.setHost( sockAddress.address.toString() );
-            if( sockAddress.port > 0 )
-                baseChunkUrl.setPort( sockAddress.port );
-            baseChunkUrl.setScheme( QLatin1String("http") );
-        }
         baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
 
         //if needed, adding proxy information to playlist url
@@ -668,6 +612,7 @@ namespace nx_hls
             }
         }
 
+        const auto chunkAuthenticationQueryItem = session->chunkAuthenticationQueryItem();
         for( std::vector<nx_hls::AbstractPlaylistManager::ChunkData>::size_type
             i = 0;
             i < chunkList.size();
@@ -677,6 +622,9 @@ namespace nx_hls
             hlsChunk.duration = chunkList[i].duration / (double)USEC_IN_SEC;
             hlsChunk.url = baseChunkUrl;
             QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
+            hlsChunkUrlQuery.addQueryItem(
+                chunkAuthenticationQueryItem.first,
+                chunkAuthenticationQueryItem.second );
             for( RequestParamsType::value_type param: commonChunkParams )
                 hlsChunkUrlQuery.addQueryItem( param.first, param.second );
             if( chunkList[i].alias )
@@ -744,12 +692,21 @@ namespace nx_hls
         }
         else
         {
-            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(QLatin1String(StreamingParams::START_DATETIME_PARAM_NAME));
+            std::multimap<QString, QString>::const_iterator startDatetimeIter =
+                requestParams.find(QLatin1String(StreamingParams::START_POS_PARAM_NAME));
             if( startDatetimeIter != requestParams.end() )
             {
                 //converting startDatetime to startTimestamp
                     //this is secondary functionality, not used by this HLS implementation (since all chunks are referenced by npt timestamps)
-                startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
+                startTimestamp = parseDateTime( startDatetimeIter->second );
+            }
+            else
+            {
+                //trying compatibility parameter "startDatetime"
+                std::multimap<QString, QString>::const_iterator startDatetimeIter =
+                    requestParams.find( QLatin1String( StreamingParams::START_DATETIME_PARAM_NAME ) );
+                if( startDatetimeIter != requestParams.end() )
+                    startTimestamp = parseDateTime( startDatetimeIter->second );
             }
         }
         quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
@@ -766,8 +723,10 @@ namespace nx_hls
                 : HLSSessionPool::generateUniqueID();
             HLSSessionPool::ScopedSessionIDLock lk( HLSSessionPool::instance(), sessionID );
             HLSSession* session = HLSSessionPool::instance()->find( sessionID );
-            if( session )
+            if( session ) {
+                session->updateAuditInfo(startTimestamp);
                 session->getChunkByAlias( streamQuality, aliasIter->second, &startTimestamp, &chunkDuration );
+            }
         }
 
         StreamingChunkCacheKey currentChunkKey(
@@ -786,7 +745,7 @@ namespace nx_hls
         StreamingChunkPtr chunk;
         if( !StreamingChunkCache::instance()->takeForUse( currentChunkKey, &chunk ) )
         {
-            NX_LOG( QString::fromLatin1("Could not get chunk %1 of resource %2 requested by %3").
+            NX_LOG( lit("Could not get chunk %1 of resource %2 requested by %3").
                 arg(request.requestLine.url.query()).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
@@ -865,10 +824,11 @@ namespace nx_hls
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
+        const QString& requestedPlaylistPath,
         const QString& sessionID,
         const std::multimap<QString, QString>& requestParams,
         const QnSecurityCamResourcePtr& camResource,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         MediaQuality streamQuality,
         HLSSession** session )
     {
@@ -876,8 +836,11 @@ namespace nx_hls
         requiredQualities.reserve( 2 );
         if( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Auto )
             requiredQualities.push_back( MEDIA_Quality_High );
-        if( streamQuality == MEDIA_Quality_Low || streamQuality == MEDIA_Quality_Auto )
+        if( (streamQuality == MEDIA_Quality_Low) || 
+            (streamQuality == MEDIA_Quality_Auto && camResource->hasDualStreaming2()) )
+        {
             requiredQualities.push_back( MEDIA_Quality_Low );
+        }
 
         boost::optional<quint64> startTimestamp;
         std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME);
@@ -887,9 +850,19 @@ namespace nx_hls
         }
         else
         {
-            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_DATETIME_PARAM_NAME);
+            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_POS_PARAM_NAME);
             if( startDatetimeIter != requestParams.end() )
-                startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
+            {
+                startTimestamp = parseDateTime( startDatetimeIter->second );
+            }
+            else
+            {
+                //trying compatibility parameter "startDatetime"
+                std::multimap<QString, QString>::const_iterator startDatetimeIter =
+                    requestParams.find( StreamingParams::START_DATETIME_PARAM_NAME );
+                if( startDatetimeIter != requestParams.end() )
+                    startTimestamp = parseDateTime( startDatetimeIter->second );
+            }
         }
 
         std::unique_ptr<HLSSession> newHlsSession(
@@ -898,7 +871,8 @@ namespace nx_hls
                 MSSettings::roSettings()->value( nx_ms_conf::HLS_TARGET_DURATION_MS, nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt(),
                 !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
-                videoCamera ) );
+                videoCamera,
+                authSession()) );
         if( newHlsSession->isLive() )
         {
             //LIVE session
@@ -907,11 +881,14 @@ namespace nx_hls
             {
                 if( !videoCamera->ensureLiveCacheStarted(quality, newHlsSession->targetDurationMS() * USEC_IN_MSEC) )
                 {
-                    NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
+                    NX_LOG( lit("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
                     return nx_http::StatusCode::noContent;
                 }
                 assert( videoCamera->hlsLivePlaylistManager(quality) );
-                newHlsSession->setPlaylistManager( quality, videoCamera->hlsLivePlaylistManager(quality) );
+                newHlsSession->setPlaylistManager(
+                    quality,
+                    std::make_shared<nx_hls::HlsPlayListManagerWeakRefProxy>(
+                        videoCamera->hlsLivePlaylistManager(quality)) );
             }
         }
         else
@@ -929,7 +906,7 @@ namespace nx_hls
                         quality );
                 if( !archivePlaylistManager->initialize() )
                 {
-                    NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Failed to initialize archive playlist for camera %1").
+                    NX_LOG( lit("QnHttpLiveStreamingProcessor::getPlaylist. Failed to initialize archive playlist for camera %1").
                         arg(camResource->getUniqueId()), cl_logDEBUG1 );
                     return nx_http::StatusCode::internalServerError;
                 }
@@ -938,6 +915,16 @@ namespace nx_hls
             }
         }
 
+        const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
+            HLS_PREFIX + camResource->getUniqueId(),
+            QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
+        newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
+
+        const auto& playlistAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
+            requestedPlaylistPath,
+            QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
+        newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );
+
         *session = newHlsSession.release();
         return nx_http::StatusCode::ok;
     }
@@ -945,7 +932,7 @@ namespace nx_hls
     int QnHttpLiveStreamingProcessor::estimateStreamBitrate(
         HLSSession* const session,
         QnSecurityCamResourcePtr camResource,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         MediaQuality streamQuality )
     {
         int bandwidth = session->playlistManager(streamQuality)->getMaxBitrate();

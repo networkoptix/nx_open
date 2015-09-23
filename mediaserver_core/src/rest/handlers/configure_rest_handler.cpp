@@ -18,6 +18,8 @@
 #include "utils/crypt/linux_passwd_crypt.h"
 #include "utils/network/tcp_listener.h"
 #include "server/host_system_password_synchronizer.h"
+#include "audit/audit_manager.h"
+#include "settings.h"
 
 
 namespace {
@@ -31,6 +33,11 @@ namespace {
 int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
 {
     Q_UNUSED(path)
+
+    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
+        return nx_http::StatusCode::forbidden;
+    }
 
     bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
     QString systemName = params.value(lit("systemName"));
@@ -50,29 +57,42 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     /* set system name */
+    QString oldSystemName = qnCommon->localSystemName();
     int changeSystemNameResult = changeSystemName(systemName, sysIdTime, wholeSystem, tranLogTime);
     if (changeSystemNameResult == ResultFail) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("SYSTEM_NAME"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
     }
 
     /* reset connections if systemName is changed */
-    if (changeSystemNameResult == ResultOk && !wholeSystem)
-        resetConnections();
+    if (changeSystemNameResult == ResultOk) {
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemNameChanged);
+        QString description = lit("%1 -> %2").arg(oldSystemName).arg(systemName);
+        auditRecord.addParam("description", description.toUtf8());
+        qnAuditManager->addAuditRecord(auditRecord);
+        
+        if (!wholeSystem)
+            resetConnections();
+    }
 
     /* set port */
     int changePortResult = changePort(port);
     if (changePortResult == ResultFail) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Port is busy"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Port is busy"));
         port = 0;   //not switching port
     }
 
     /* set password */
     int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, cryptSha512Hash, oldPassword);
     if (changeAdminPasswordResult == ResultFail) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("PASSWORD"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
+    }
+    else {
+        auto adminUser = qnResPool->getAdministrator();
+        if (adminUser) {
+            QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_UserUpdate);
+            auditRecord.resources.push_back(adminUser->getId());
+            qnAuditManager->addAuditRecord(auditRecord);
+        }
     }
 
     QnConfigureReply reply;

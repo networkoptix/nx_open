@@ -9,6 +9,7 @@
 #include <QList>
 #include <QString>
 
+#include <core/resource/resource_fwd.h>
 
 //!Holds types related to performing camera availability diagnostics
 namespace CameraDiagnostics
@@ -76,8 +77,16 @@ namespace CameraDiagnostics
         };
 
         //!Returns textual description of error with  parameters
-        QString toString( Value val, const QList<QString>& errorParams = QList<QString>() );
-        QString toString( int val, const QList<QString>& errorParams = QList<QString>() );
+
+        typedef QList<QString> ErrorParams;
+
+        QString toString(Value val
+            , const QnVirtualCameraResourcePtr &device
+            , const ErrorParams& errorParams = ErrorParams());
+
+        QString toString(int val
+            , const QnVirtualCameraResourcePtr &device
+            , const ErrorParams& errorParams = ErrorParams());
     }
 
     /*!

@@ -7,9 +7,10 @@
 #include <api/app_server_connection.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resources_changes_manager.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -23,8 +24,16 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <utils/common/delayed.h>
 #include <utils/license_usage_helper.h>
-#include "core/resource_management/resource_properties.h"
+
+namespace {
+
+    /* Update selection no more often than once in 50 ms */
+    const int selectionUpdateTimeoutMs = 50;
+
+}
+
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
@@ -32,8 +41,6 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_selectionScope(Qn::SceneScope),
     m_ignoreAccept(false)
 {
-    setWindowTitle(tr("Camera settings"));
-
     m_settingsWidget = new QnCameraSettingsWidget(this);
 
     m_buttonBox = new QDialogButtonBox(this);
@@ -44,10 +51,10 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_openButton = new QPushButton(tr("Open in New Tab"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
-    m_diagnoseButton = new QPushButton(tr("Camera Diagnostics"));
+    m_diagnoseButton = new QPushButton();
     m_buttonBox->addButton(m_diagnoseButton, QDialogButtonBox::HelpRole);
 
-    m_rulesButton = new QPushButton(tr("Camera Rules"));
+    m_rulesButton = new QPushButton();
     m_buttonBox->addButton(m_rulesButton, QDialogButtonBox::HelpRole);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -63,20 +70,32 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     connect(m_diagnoseButton,   &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_diagnoseButton_clicked);
     connect(m_rulesButton,      &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_rulesButton_clicked);
 
-    connect(m_settingsWidget,   &QnCameraSettingsWidget::scheduleExported, this,    &QnCameraSettingsDialog::saveCameras);
     connect(m_settingsWidget,   &QnCameraSettingsWidget::resourcesChanged, this,   &QnCameraSettingsDialog::updateReadOnly);
     
     connect(context(),          &QnWorkbenchContext::userChanged,          this,   &QnCameraSettingsDialog::updateReadOnly);
 
     connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
 
-    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, &QnCameraSettingsDialog::at_cameras_properties_saved);
-
     at_settingsWidget_hasChangesChanged();
+    retranslateUi();
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 }
+
+void QnCameraSettingsDialog::retranslateUi() {
+    auto cameras = m_settingsWidget->cameras();
+
+    //: "Cameras settings" or "Devices settings" or "IO Module Settings", etc
+    setWindowTitle(tr("%1 Settings").arg(getDefaultDevicesName(cameras)));
+
+    //: "Cameras Diagnostics" or "Devices Diagnostics" or "IO Module Diagnostics", etc
+    m_diagnoseButton->setText(tr("%1 Diagnostics").arg(getDefaultDevicesName(cameras)));
+
+    //: "Cameras Rules" or "Devices Rules" or "IO Module Rules", etc
+    m_rulesButton->setText(tr("%1 Rules").arg(getDefaultDevicesName(cameras)));
+}
+
 
 bool QnCameraSettingsDialog::tryClose(bool force) {
     setCameras(QnVirtualCameraResourceList(), force);
@@ -112,9 +131,9 @@ void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     m_okButton->setEnabled(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_openButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
+    m_openButton->setVisible(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
     m_diagnoseButton->setVisible(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
+    m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement
 }
 
 void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
@@ -144,7 +163,7 @@ void QnCameraSettingsDialog::updateReadOnly() {
     m_settingsWidget->setReadOnly(!(permissions & Qn::WritePermission));
 }
 
-void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &cameras, bool force /*= false*/) {
+void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &cameras, bool force /* = false*/) {
 
     bool askConfirmation = 
            !force
@@ -154,11 +173,13 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
         &&  (m_settingsWidget->hasDbChanges());
 
     if (askConfirmation) {
+        auto notSavedCameras = m_settingsWidget->cameras();
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             this,
-            m_settingsWidget->cameras(),
-            tr("Camera(s) not Saved"),
-            tr("Save changes to the following %n camera(s)?", "", m_settingsWidget->cameras().size()),
+            notSavedCameras,
+            tr("%1 not saved.").arg(getDefaultDevicesName(notSavedCameras)),
+            //: "Apply changes to the following 5 cameras?" or "Apply changes to the following IO module?", etc
+            tr("Apply changes to the following %1?").arg(getNumericDevicesName(notSavedCameras, false)),
             QDialogButtonBox::Yes | QDialogButtonBox::No
             );
         if(button == QDialogButtonBox::Yes)
@@ -166,14 +187,15 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
     }
 
     m_settingsWidget->setCameras(cameras);
+    retranslateUi();
 }
 
-void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
+void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) {
     bool hasDbChanges = m_settingsWidget->hasDbChanges();
 
     if (checkControls && m_settingsWidget->hasScheduleControlsChanges()){
-        QString message = tr("Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
-        int button = QMessageBox::warning(this, tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
+        QString message = tr("Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.");
+        int button = QMessageBox::warning(this, tr("Changes have not been applied."), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             m_ignoreAccept = true;
             return;
@@ -181,8 +203,8 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
             m_settingsWidget->clearScheduleControlsChanges();
         }
     } else if (checkControls && m_settingsWidget->hasMotionControlsChanges()){
-        QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
-        int button = QMessageBox::warning(this, tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
+        QString message = tr("Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.");
+        int button = QMessageBox::warning(this, tr("Changes have not been applied."), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
             m_ignoreAccept = true;
             return;
@@ -217,56 +239,45 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
         QnCamLicenseUsageHelper helper(cameras, m_settingsWidget->isScheduleEnabled());
         if (!helper.isValid())
         {
-            QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
-            QMessageBox::warning(this, tr("Could not apply changes"), message);
+            QString message = tr("License limit exceeded. Changes have been saved, but will not be applied.");
+            QMessageBox::warning(this, tr("Could not apply changes."), message);
             m_settingsWidget->setScheduleEnabled(false);
         }
     }
 
     /* Submit and save it. */
-    m_settingsWidget->submitToResources();
-        saveCameras(cameras);
-}
-
-void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList& cameras) {
-    if( errorCode == ec2::ErrorCode::ok )
-        return;
-
-    QnResourceListDialog::exec(this, cameras,
-        tr("Error"),
-        tr("Could not save the following %n cameras to Server.", "", cameras.size()),
-        QDialogButtonBox::Ok);
-}
-
-void QnCameraSettingsDialog::at_cameras_properties_saved(int requestId, ec2::ErrorCode errorCode) 
-{
-    QN_UNUSED(requestId);
-    if( errorCode == ec2::ErrorCode::ok )
-        return;
+    saveCameras(cameras);
 }
 
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras) {
     if (cameras.isEmpty())
         return;
-    QList<QnUuid> idList = idListFromResList(cameras);
-    for( const QnVirtualCameraResourcePtr& camera: cameras )
-        if( camera->preferedServerId().isNull() )
-            camera->setPreferedServerId( camera->getParentId() );
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
-        QnCameraUserAttributePool::instance()->getAttributesList(idList),
-        this,
-        [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
-            Q_UNUSED(reqID);
-            at_cameras_saved(errorCode, cameras); 
-    } );
-    propertyDictionary->saveParamsAsync(idList);
+
+    auto applyChanges = [this, cameras] {
+        m_settingsWidget->submitToResources();
+        for (const QnVirtualCameraResourcePtr &camera: cameras)
+            if( camera->preferedServerId().isNull() )
+                camera->setPreferedServerId( camera->getParentId() );
+    };
+
+    auto rollback = [this, cameras](){
+        if (!isVisible())
+            return;
+
+        if (m_settingsWidget->cameras() != cameras)
+            return;
+
+        m_settingsWidget->updateFromResources();
+    };
+
+    qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges, rollback);   
 }
 
 void QnCameraSettingsDialog::at_openButton_clicked() {
     QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
     menu()->trigger(Qn::OpenInNewLayoutAction, cameras);
     m_settingsWidget->setCameras(cameras);
-
+    retranslateUi();
     m_selectionUpdatePending = false;
 }
 
@@ -290,7 +301,7 @@ void QnCameraSettingsDialog::updateCamerasFromSelection() {
         m_selectionScope = scope;
     }
 
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentParameters(scope));
+    setCameras(provider->currentParameters(scope).resources().filtered<QnVirtualCameraResource>());
 }
 
 void QnCameraSettingsDialog::at_selectionChangeAction_triggered() {
@@ -298,11 +309,5 @@ void QnCameraSettingsDialog::at_selectionChangeAction_triggered() {
         return;
 
     m_selectionUpdatePending = true;
-    QTimer::singleShot(50, this, SLOT(updateCamerasFromSelection()));
+    executeDelayed([this]{updateCamerasFromSelection();}, selectionUpdateTimeoutMs);
 }
-
-void QnCameraSettingsDialog::at_camera_settings_saved(
-        int /*httpStatusCode*/, const QList<QPair<QString, bool> >& /*operationResult*/) {
-
-}
-

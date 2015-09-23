@@ -135,7 +135,7 @@ namespace {
         return result;
     }
 
-    QnBusinessEventParameters convertOldEventParameters(const QByteArray& value) {
+    QnBusinessEventParameters convertOldEventParameters(const QByteArray& value, QnUuid* actionResourceId) {
         enum Param {
             EventTypeParam,
             EventTimestampParam,
@@ -177,7 +177,7 @@ namespace {
                     result.eventResourceId = QnUuid(field);
                     break;
                 case ActionResourceParam:
-                    result.actionResourceId = QnUuid(field);
+                    *actionResourceId = QnUuid(field);
                     break;
                 case InputPortIdParam:
                     result.inputPortId = QString::fromUtf8(field.data(), field.size());
@@ -186,14 +186,22 @@ namespace {
                     result.reasonCode = (QnBusiness::EventReason) toInt(field);
                     break;
                 case ReasonParamsEncodedParam:
-                    result.reasonParamsEncoded = QString::fromUtf8(field.data(), field.size());
+                {
+                    auto value = QString::fromUtf8(field.data(), field.size());
+                    if (!value.isEmpty())
+                        result.description = value;
                     break;
+                }
                 case SourceParam:
-                    result.source = QString::fromUtf8(field.data(), field.size());
+                    result.caption = QString::fromUtf8(field.data(), field.size());
                     break;
                 case ConflictsParam:
-                    result.conflicts = QString::fromLatin1(field.data(), field.size()).split(QLatin1Char(STRING_LIST_DELIM)); // optimization. mac address list here. UTF is not required
+                {
+                    auto value = QString::fromLatin1(field.data(), field.size());
+                    if (!value.isEmpty())
+                        result.description = value;
                     break;
+                }
                 default:
                     break;
                 }
@@ -207,12 +215,13 @@ namespace {
     }
 }
 
-static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
+static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
 QnEventsDB* QnEventsDB::m_instance = 0;
 
 QnEventsDB::QnEventsDB():
     m_lastCleanuptime(0),
+    m_auditCleanuptime(0),
     m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
     m_tran(m_sdb, m_mutex)
 {
@@ -272,10 +281,118 @@ bool QnEventsDB::createDatabase()
             return false;
     }
 
+
     if (!applyUpdates(":/mserver_updates"))
         return false;
+		
+    if (!isObjectExists(lit("table"), lit("audit_log"), m_sdb))
+    {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE TABLE \"audit_log\" ("
+            "id INTEGER NOT NULL PRIMARY KEY autoincrement,"
+            "createdTimeSec INTEGER NOT NULL,"
+            "rangeStartSec INTEGER NOT NULL,"
+            "rangeEndSec INTEGER NOT NULL,"
+            "eventType SMALLINT NOT NULL,"
+            "resources BLOB,"
+            "params TEXT,"
+            "authSession TEXT)"
+        );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+    if (!isObjectExists(lit("index"), lit("auditTimeIdx"), m_sdb)) {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE INDEX \"auditTimeIdx\" ON \"audit_log\" (createdTimeSec)"
+            );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
 
     return true;
+}
+
+int QnEventsDB::addAuditRecord(const QnAuditRecord& data)
+{
+    QWriteLocker lock(&m_mutex);
+
+    Q_ASSERT(data.eventType != Qn::AR_NotDefined);
+    Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
+
+    if (!m_sdb.isOpen())
+        return false;
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO audit_log"
+        "(createdTimeSec, rangeStartSec, rangeEndSec, eventType, resources, params, authSession)"
+        "VALUES"
+        "(:createdTimeSec, :rangeStartSec, :rangeEndSec, :eventType, :resources, :params, :authSession)"
+        );
+    QnSql::bind(data, &insQuery);
+
+    if (!insQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return -1;
+    }
+    int result = insQuery.lastInsertId().toInt();
+    cleanupAuditLog();
+    return result;
+}
+
+int QnEventsDB::updateAuditRecord(int internalId, const QnAuditRecord& data)
+{
+    QWriteLocker lock(&m_mutex);
+
+    if (!m_sdb.isOpen())
+        return false;
+    Q_ASSERT(data.eventType != Qn::AR_NotDefined);
+    Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
+
+    QSqlQuery updQuery(m_sdb);
+    updQuery.prepare("UPDATE audit_log SET "
+        "createdTimeSec = :createdTimeSec, rangeStartSec = :rangeStartSec, rangeEndSec = :rangeEndSec, eventType = :eventType, resources = :resources, "
+        "params = :params, authSession = :authSession WHERE id = :id"
+        );
+    QnSql::bind(data, &updQuery);
+    updQuery.bindValue(":id", internalId);
+
+    if (!updQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << updQuery.lastError().text();
+        return -1;
+    }
+    return internalId;
+}
+
+QnAuditRecordList QnEventsDB::getAuditData(const QnTimePeriod& period, const QnUuid& sessionId)
+{
+    QnAuditRecordList result;
+    QString request = QString::fromLatin1(
+        "SELECT * "
+        "FROM audit_log "
+        "WHERE createdTimeSec BETWEEN ? and ? ");
+    if (!sessionId.isNull())
+        request += lit("AND authSession like '%1%'").arg(sessionId.toString());
+    request += lit("ORDER BY createdTimeSec");
+
+        
+
+    QWriteLocker lock(&m_mutex);
+    QSqlQuery query(m_sdb);
+    query.prepare(request);
+    query.addBindValue(period.startTimeMs / 1000);
+    query.addBindValue(period.endTimeMs() == DATETIME_NOW ? INT_MAX : period.endTimeMs() / 1000);
+    
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return result;
+    }
+    QnSql::fetch_many(query, &result);
+
+    return result;
 }
 
 bool QnEventsDB::cleanupEvents()
@@ -283,11 +400,11 @@ bool QnEventsDB::cleanupEvents()
     bool rez = true;
 
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTime - m_lastCleanuptime > EVENTS_CLEANUP_INTERVAL)
+    if (currentTime - m_lastCleanuptime > CLEANUP_INTERVAL)
     {
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp;");
+        delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
         int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
         delQuery.bindValue(":timestamp", utc);
         rez = delQuery.exec();
@@ -301,19 +418,20 @@ bool QnEventsDB::migrateBusinessParams() {
         QByteArray runtimeParams;
     };
 
-    auto convertAction = [](const QByteArray &packed) -> QByteArray {
+    auto convertAction = [](const QByteArray &packed, const QnUuid& actionResourceId) -> QByteArray {
         /* Check if data is in Ubjson already. */
         if (!packed.isEmpty() && packed[0] == L'[')
             return packed;
         QnBusinessActionParameters ap = convertOldActionParameters(packed);
+        ap.actionResourceId = actionResourceId;
         return QnUbjson::serialized(ap);
     };
 
-    auto convertRuntime = [](const QByteArray &packed)-> QByteArray {
+    auto convertRuntime = [](const QByteArray &packed, QnUuid* actionResourceId)-> QByteArray {
         /* Check if data is in Ubjson already. */
         if (!packed.isEmpty() && packed[0] == L'[')
             return packed;
-        QnBusinessEventParameters rp = convertOldEventParameters(packed);
+        QnBusinessEventParameters rp = convertOldEventParameters(packed, actionResourceId);
         return QnUbjson::serialized(rp);
     };
 
@@ -334,28 +452,57 @@ bool QnEventsDB::migrateBusinessParams() {
             QByteArray runtimeData = query.value(2).toByteArray();
 
             RowParams remappedData;
-            remappedData.actionParams = convertAction(actionData);
-            remappedData.runtimeParams = convertRuntime(runtimeData);
+            QnUuid actionResourceId;
+            remappedData.runtimeParams = convertRuntime(runtimeData, &actionResourceId); // move actionResourceId from runtimeParams to actionParams
+            remappedData.actionParams = convertAction(actionData, actionResourceId);
             remapData[id] = remappedData;
         }
     }
+    
 
+    {  
+        QnDbTransactionLocker tran(getTransaction());
 
-    for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
         QSqlQuery query(m_sdb);
         query.prepare("UPDATE runtime_actions SET action_params = :action, runtime_params = :runtime WHERE rowid = :rowid");
-        query.bindValue(":rowid", iter.key());
-        query.bindValue(":action", iter->actionParams);
-        query.bindValue(":runtime", iter->runtimeParams);
-        if (!query.exec()) {
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
+        for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
+            query.bindValue(":rowid", iter.key());
+            query.bindValue(":action", iter->actionParams);
+            query.bindValue(":runtime", iter->runtimeParams);
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return false;
+            }
+        }
+
+        if( !tran.commit() )
+        {
+            qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
             return false;
         }
+
     }
 
     return true;
 }
 
+
+bool QnEventsDB::cleanupAuditLog()
+{
+    bool rez = true;
+
+    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
+    if (currentTime - m_auditCleanuptime > CLEANUP_INTERVAL)
+    {
+        m_auditCleanuptime = currentTime;
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
+        int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
+        delQuery.bindValue(":timestamp", utc);
+        rez = delQuery.exec();
+    }
+    return rez;
+}
 
 bool QnEventsDB::removeLogForRes(QnUuid resId)
 {
@@ -389,20 +536,19 @@ bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
     
-    QnBusinessEventParameters actionRuntime = action->getRuntimeParams();
+    QnBusinessActionParameters actionParams = action->getParams();
     if (actionRes)
-        actionRuntime.actionResourceId = actionRes->getId();
-    int eventType = (int) actionRuntime.eventType;
+        actionParams.actionResourceId = actionRes->getId();
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
-    insQuery.bindValue(":action_params", QnUbjson::serialized(action->getParams()));
-    insQuery.bindValue(":runtime_params", QnUbjson::serialized(actionRuntime));
+    insQuery.bindValue(":action_params", QnUbjson::serialized(actionParams));
+    insQuery.bindValue(":runtime_params", QnUbjson::serialized(action->getRuntimeParams()));
     insQuery.bindValue(":business_rule_guid", action->getBusinessRuleId().toRfc4122());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
-    insQuery.bindValue(":event_type", eventType);
+    insQuery.bindValue(":event_type", (int) action->getRuntimeParams().eventType);
     insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
     insQuery.bindValue(":action_resource_guid", actionRes ? actionRes->getId().toRfc4122() : QByteArray());
 
@@ -468,7 +614,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
     return request;
 }
 
-QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
+QnBusinessActionDataList QnEventsDB::getActions(
     const QnTimePeriod& period,
     const QnResourceList& resList, 
     const QnBusiness::EventType& eventType, 
@@ -479,10 +625,10 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     QElapsedTimer t;
     t.restart();
 
-    QList<QnAbstractBusinessActionPtr> result;
+    QnBusinessActionDataList result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QReadLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.prepare(request);
@@ -499,16 +645,16 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
 
     while (query.next()) 
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
-        QnBusinessActionParameters actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(query.value(actionParamIdx).toByteArray());
-        QnBusinessEventParameters runtimeParams = QnUbjson::deserialized<QnBusinessEventParameters>(query.value(runtimeParamIdx).toByteArray());
-        QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
-        action->setParams(actionParams);
-        action->setBusinessRuleId(QnUuid(query.value(businessRuleIdx).toByteArray()));
-        action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
-        action->setAggregationCount(query.value(aggregationCntIdx).toInt());
+        QnBusinessActionData actionData;
 
-        result << action;
+        actionData.actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
+        actionData.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(query.value(actionParamIdx).toByteArray());
+        actionData.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(query.value(runtimeParamIdx).toByteArray());
+        actionData.businessRuleId = QnUuid::fromRfc4122(query.value(businessRuleIdx).toByteArray());
+        //actionData.toggleState = (QnBusiness::EventState) query.value(toggleStateIdx).toInt();
+        actionData.aggregationCount = query.value(aggregationCntIdx).toInt();
+
+        result.push_back(std::move(actionData));
     }
 
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
@@ -541,7 +687,7 @@ void QnEventsDB::getAndSerializeActions(
 
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QReadLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     QSqlQuery actionsQuery(m_sdb);
     actionsQuery.prepare(request);

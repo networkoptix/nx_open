@@ -59,7 +59,7 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) 
 }
 
 
-//=============================================================================
+// =============================================================================
 
 QStringList QnAbstractFileResourceSearcher::getPathCheckList() const
 {

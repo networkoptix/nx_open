@@ -95,16 +95,16 @@ void QnRecordingManager::stopRecorder(const Recorders& recorders)
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
 {
-	QnVideoCamera* camera = 0;
+    QnVideoCameraPtr camera;
     if (recorders.recorderHiRes) {
         recorders.recorderHiRes->stop();
-		camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
-	}
+        camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+    }
     if (recorders.recorderLowRes) {
         recorders.recorderLowRes->stop();
         if (!camera)
             camera = qnCameraPool->getVideoCamera(recorders.recorderLowRes->getResource());
-	}
+    }
     if (camera)
     {
         if (recorders.recorderHiRes) {
@@ -198,7 +198,7 @@ bool QnRecordingManager::updateCameraHistory() {
 bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
     updateCamera(camRes); // ensure recorders are created
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
+    auto camera = qnCameraPool->getVideoCamera(camRes);
     if (!camera)
         return false;
 
@@ -225,7 +225,7 @@ bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& ca
 bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck)
 {
     updateCamera(camRes); // ensure recorders are created
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
+    auto camera = qnCameraPool->getVideoCamera(camRes);
     if (!camera)
         return false;
 
@@ -257,7 +257,9 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
     return true;
 }
 
-bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
+bool QnRecordingManager::startOrStopRecording(
+    const QnResourcePtr& res, const QnVideoCameraPtr& camera, 
+    QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     updateCameraHistory();
 
@@ -313,7 +315,6 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
                     recorderLowRes->pleaseStop();
                     camera->notInUse(recorderLowRes);
                 }
-                camera->updateActivity();
             }
         }
     }
@@ -334,8 +335,6 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
             camera->notInUse(recorderLowRes);
         }
 
-        camera->updateActivity();
-
         if (needStopHi) {
             NX_LOG(QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()), cl_logINFO);
         }
@@ -344,6 +343,9 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
                 res->setStatus(Qn::Online); // may be recording thread was not runned, so reset status to online
         }
     }
+
+    //doing anyway to stop internal cache, etc...
+    camera->stopIfNoActivity();
 
     return someRecordingIsPresent;
 }
@@ -355,7 +357,7 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     if (cameraRes->hasFlags(Qn::foreigner) && !m_recordMap.contains(cameraRes))
         return;
 
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(cameraRes);
+    auto camera = qnCameraPool->getVideoCamera(cameraRes);
     if (!camera)
         return;
 
@@ -490,11 +492,11 @@ void QnRecordingManager::onTimer()
     bool someRecordingIsPresent = false;
     for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
     {
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(itrRec.key());
+        auto camera = qnCameraPool->getVideoCamera(itrRec.key());
         const Recorders& recorders = itrRec.value();
 
         if (!recorders.recorderHiRes && !recorders.recorderLowRes)
-            return; // no recorders are created now
+            continue; // no recorders are created now
 
         if (recorders.recorderHiRes)
             recorders.recorderHiRes->updateScheduleInfo(time);
@@ -510,6 +512,8 @@ void QnRecordingManager::onTimer()
         if (stopTime <= time*1000ll)
             stopForcedRecording(itrDelayedStop.key(), false);
     }
+    qnCameraPool->updateActivity();
+
 }
 
 QnVirtualCameraResourceList QnRecordingManager::getLocalControlledCameras() const
@@ -579,7 +583,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 {
     QnCamLicenseUsageHelper helper;
 
-    QString disabledCameras;
+    QStringList disabledCameras;
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
     const QnVirtualCameraResourceList& ownCameras = getLocalControlledCameras();
@@ -601,7 +605,7 @@ void QnRecordingManager::at_licenseMutexLocked()
                 continue;
             }
             propertyDictionary->saveParams( camera->getId() );
-            disabledCameras += QString(lit("%1 (%2)")).arg(camera->getName()).arg(camera->getHostAddress());
+            disabledCameras << camera->getId().toString();
             helper.invalidate();
         }
     }
@@ -611,7 +615,8 @@ void QnRecordingManager::at_licenseMutexLocked()
 
     if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
-        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras);
+        //TODO: #gdm move (de)serializing of encoded reason params to common place
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras.join(L';')); 
     }
 }
 

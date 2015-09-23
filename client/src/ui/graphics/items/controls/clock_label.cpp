@@ -89,9 +89,9 @@ void QnClockLabel::init(const QString &format) {
     connect( m_provider, &QnClockDataProvider::timeChanged, this, &GraphicsLabel::setText );
 
 
-    m_serverTimeAction = new QAction( tr( "Server time" ), this );
+    m_serverTimeAction = new QAction( tr( "Server Time" ), this );
     addAction( m_serverTimeAction );
-    m_localTimeAction = new QAction( tr( "Local system time" ), this );
+    m_localTimeAction = new QAction( tr( "Local System Time" ), this );
     addAction( m_localTimeAction );
 }
 

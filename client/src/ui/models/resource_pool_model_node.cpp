@@ -160,7 +160,8 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
         return;
 
     if(m_resource && (m_type == Qn::ItemNode || m_type == Qn::VideoWallItemNode))
-        m_model->m_itemNodesByResource[m_resource].removeOne(this);
+        if (m_model->m_itemNodesByResource.contains(m_resource))
+            m_model->m_itemNodesByResource[m_resource].removeOne(this);
 
     m_resource = resource;
 
@@ -556,6 +557,8 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::MainWindow_Tree_Local_Help;
         } else if(m_flags & Qn::server) {
             return Qn::MainWindow_Tree_Servers_Help;
+        } else if(m_flags & Qn::io_module) {
+            return Qn::IOModules_Help;
         } else if(m_flags & Qn::live_cam) {
             return Qn::MainWindow_Tree_Camera_Help;
         } else if(m_flags & Qn::videowall) {
@@ -688,5 +691,3 @@ void QnResourcePoolModelNode::changeInternal() {
     QModelIndex index = this->index(Qn::NameColumn);
     emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
 }
-
-

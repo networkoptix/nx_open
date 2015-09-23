@@ -12,6 +12,8 @@
 
 #include <plugins/plugin_tools.h>
 
+#include "audio_stream_reader.h"
+
 
 //!Represents defined (in settings) image directories as cameras with dts archive storage
 class DiscoveryManager
@@ -54,6 +56,9 @@ private:
     nxpt::CommonRefManager m_refManager;
     QByteArray m_firmwareVersion;
     QByteArray m_modelName;
+#ifndef NO_ISD_AUDIO
+    std::unique_ptr<AudioStreamReader> m_audioStreamReader;
+#endif
 };
 
 #endif  //ILP_DISCOVERY_MANAGER_H

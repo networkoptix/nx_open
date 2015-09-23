@@ -39,7 +39,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const MultiServerCam
     }
 
     std::vector< QnCameraBookmarkList::const_iterator > minIndices(nonEmptyLists.size());
-    for (int i = 0; i < nonEmptyLists.size(); ++i)
+    for (size_t i = 0; i < nonEmptyLists.size(); ++i)
         minIndices[i] = nonEmptyLists[i].cbegin();
 
     QnCameraBookmarkList result;

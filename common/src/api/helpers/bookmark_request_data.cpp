@@ -8,6 +8,7 @@
 #include <utils/common/model_functions.h>
 //#include <utils/serialization/lexical.h>
 #include <utils/common/util.h>
+#include <utils/common/string.h>
 
 
 namespace {

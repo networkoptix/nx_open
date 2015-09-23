@@ -28,14 +28,10 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
     m_size(size),
     m_format(format)
 {
-    if(!server)
-        qnNullWarning(server);
+    Q_ASSERT_X(camera, Q_FUNC_INFO, "Camera must exist here");
 
-    if(!server->apiConnection())
-        qnNullWarning(server->apiConnection());
-
-    if(!camera)
-        qnNullWarning(camera);
+    if (!m_server && camera)
+        m_server = camera->getParentServer();
 }
 
 QImage QnSingleThumbnailLoader::image() const {
@@ -43,7 +39,10 @@ QImage QnSingleThumbnailLoader::image() const {
 }
 
 void QnSingleThumbnailLoader::doLoadAsync() {
-    if (!m_server || !m_server->apiConnection())
+    if (    !m_server 
+        ||  !m_server->apiConnection() 
+        ||  !m_camera
+        )
         return;
 
     m_server->apiConnection()->getThumbnailAsync(

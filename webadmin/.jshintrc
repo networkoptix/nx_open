@@ -25,6 +25,9 @@
     "_": false,
       "Config":true,
       "alert":false,
-      "confirm":false
+      "confirm":false,
+      "CameraRecordsProvider":true,
+      "RulerModel":true,
+      "dateFormat":true
   }
 }

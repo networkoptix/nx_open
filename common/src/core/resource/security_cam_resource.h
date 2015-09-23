@@ -30,25 +30,11 @@ public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
-    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes) of
-    virtual QString getName() const override;
-    //!Overrides \a QnResource::setName. Just calls \a QnSecurityCamResource::setCameraName
-    /*!
-        TODO get rid of this override, since mediaserver and client must call different methods (setName and setCameraName respectively)
-    */
-    virtual void setName( const QString& name ) override;
-    //!Set camera name (the one is show to the user in client)
-    /*!
-        This name is set by user.
-        Resource name is generally set automatically (e.g., by server)
-        Can differ from resource name
-    */
-    void setCameraName( const QString& newCameraName );
-
     QnMediaServerResourcePtr getParentServer() const;
 
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
+    bool isIOModule() const;
     Qn::MotionType getCameraBasedMotionType() const;
     Qn::MotionType getDefaultMotionType() const;
     int motionWindowCount() const;
@@ -157,6 +143,13 @@ public:
     void setScheduleDisabled(bool value);
     bool isScheduleDisabled() const;
 
+    /** Check if a license is used for the current camera. */
+    bool isLicenseUsed() const;
+    void setLicenseUsed(bool value);
+
+    Qn::FailoverPriority failoverPriority() const;
+    void setFailoverPriority(Qn::FailoverPriority value);
+
     bool isAudioEnabled() const;
     bool isAudioForced() const;
     void setAudioEnabled(bool value);
@@ -247,6 +240,8 @@ public:
     
     virtual Qn::BitratePerGopType bitratePerGopType() const;
 
+    // Allow getting multi video layout directly from a RTSP SDP info
+    virtual bool allowRtspVideoLayout() const { return true; }
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -262,6 +257,8 @@ signals:
     void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
+    void licenseUsedChanged(const QnResourcePtr &resource);
+    void failoverPriorityChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -331,6 +328,7 @@ private:
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
+    mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
 

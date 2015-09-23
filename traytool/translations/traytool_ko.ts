@@ -19,12 +19,12 @@
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient privileges to manage services</source>
-        <translation>서비스를 관리할 수 있는 권한이 불충분함</translation>
+        <source>Insufficient rights to manage services.</source>
+        <translation type="unfinished">서비스를 관리할 수 있는 권한이 불충분함</translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>UAC 기능은 관리자가 아닌 일반 사용자에 대한 권한의 요청에 의해 사용되어야 함</translation>
+        <source>UAC must be enabled to request privileges for non-admin users.</source>
+        <translation type="unfinished">UAC 기능은 관리자가 아닌 일반 사용자에 대한 권한의 요청에 의해 사용되어야 함</translation>
     </message>
 </context>
 <context>
@@ -94,10 +94,6 @@
         <translation>저장 서버 웹페이지</translation>
     </message>
     <message>
-        <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>저장 서버를 정지합니다. 진행하시겠습니까?</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;나가기</translation>
     </message>
@@ -112,6 +108,10 @@
     <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>설치된 서비스에 접근하는 동안 오류가 발생하였음:</translation>
+    </message>
+    <message>
+        <source>Media server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

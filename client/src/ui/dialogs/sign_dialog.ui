@@ -20,7 +20,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Watermark check</string>
+   <string>Watermark Check</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -34,14 +34,14 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Checked file:</string>
+        <string>Checked File:</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Check result:</string>
+        <string>Check Result:</string>
        </property>
       </widget>
      </item>

@@ -91,6 +91,8 @@ public:
     static void setEventPort(int eventPort);
     static int eventPort();
 
+    virtual bool allowRtspVideoLayout() const override { return false; }
+    bool SetupAudioInput();
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -158,6 +160,8 @@ private:
     int m_outputCount;
     int m_inputCount;
     bool m_inputMonitored;
+    QMutex m_audioCfgMutex;
+    boost::optional<bool> m_audioInputOn;
 };
 
 #endif // #ifdef ENABLE_ACTI

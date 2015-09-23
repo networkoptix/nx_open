@@ -4,7 +4,7 @@
 ***********************************************************/
 
 #include "media_server_user_attributes.h"
-
+#include <utils/common/model_functions.h>
 
 QnMediaServerUserAttributes::QnMediaServerUserAttributes()
 :
@@ -33,3 +33,13 @@ QnMediaServerUserAttributesPool::QnMediaServerUserAttributesPool()
         userAttributes->serverID = serverID;
     } );
 }
+
+QnMediaServerUserAttributesList QnMediaServerUserAttributesPool::getAttributesList(const QList<QnUuid>& idList) {
+    QnMediaServerUserAttributesList valList;
+    valList.reserve( idList.size() );
+    for( const QnUuid id: idList )
+        valList.push_back( get(id) );
+    return valList;
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnMediaServerUserAttributes), (eq), _Fields)

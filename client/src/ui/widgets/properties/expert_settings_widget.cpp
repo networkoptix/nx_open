@@ -323,7 +323,7 @@ bool QnCameraExpertSettingsWidget::isSecondStreamEnabled() const {
     return quality != Qn::SSQualityDontUse;
 }
 
-void QnCameraExpertSettingsWidget::setSecondStreamEnabled(bool value /*= true*/) {
+void QnCameraExpertSettingsWidget::setSecondStreamEnabled(bool value /* = true*/) {
     if (!m_qualityEditable)
         return;
 

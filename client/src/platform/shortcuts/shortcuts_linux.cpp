@@ -1,6 +1,6 @@
 #include "shortcuts_linux.h"
 
-QnLinuxShortcuts::QnLinuxShortcuts(QObject *parent /*= NULL*/):
+QnLinuxShortcuts::QnLinuxShortcuts(QObject *parent /* = NULL*/):
     QnPlatformShortcuts(parent)
 {
 

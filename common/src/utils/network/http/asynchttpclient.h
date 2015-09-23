@@ -228,6 +228,7 @@ namespace nx_http
         QString m_userName;
         QString m_userPassword;
         bool m_authorizationTried;
+        bool m_ha1RecalcTried;
         bool m_terminated;
         mutable QnMutex m_mutex;
         quint64 m_totalBytesRead;
@@ -262,6 +263,9 @@ namespace nx_http
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
+        void doSomeCustomLogic(
+            const nx_http::Response& response,
+            Request* const request );
 
         AsyncHttpClient( const AsyncHttpClient& );
         AsyncHttpClient& operator=( const AsyncHttpClient& );
@@ -363,6 +367,8 @@ namespace nx_http
         bool operator<=( const AsyncHttpClientPtr& right ) const { return m_obj <= right.m_obj; }
         bool operator>( const AsyncHttpClientPtr& right ) const { return m_obj > right.m_obj; }
         bool operator>=( const AsyncHttpClientPtr& right ) const { return m_obj >= right.m_obj; }
+        bool operator==( const AsyncHttpClientPtr& right ) const { return m_obj == right.m_obj; }
+        bool operator!=( const AsyncHttpClientPtr& right ) const { return m_obj != right.m_obj; }
 
     private:
         std::shared_ptr<AsyncHttpClient> m_obj;
@@ -381,7 +387,7 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-        const QAuthenticator &auth = QAuthenticator());
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,

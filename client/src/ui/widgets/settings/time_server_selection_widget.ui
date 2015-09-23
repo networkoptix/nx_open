@@ -22,7 +22,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Current system time:</string>
+        <string>Current System Time:</string>
        </property>
       </widget>
      </item>
@@ -51,7 +51,7 @@
    <item>
     <widget class="QLabel" name="descriptionLabel">
      <property name="text">
-      <string>Choose the server which is going to be used as a time server if the system has no internet access:</string>
+      <string>Choose a locally available server to act as the time server if the system has no Internet access:</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

@@ -57,6 +57,9 @@ namespace nx_hls
 
         QByteArray toString() const;
     };
+
+    //!iOS device starts playing first chunk when downloading third one
+    static const int MIN_CHUNKS_REQUIRED_TO_START_PLAYBACK = 3;
 }
 
 #endif  //HLS_TYPES_H

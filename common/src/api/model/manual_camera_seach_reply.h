@@ -43,19 +43,20 @@ struct QnManualCameraSearchSingleCamera {
     QString url;
     QString manufacturer;
     QString vendor;
+    QString uniqueId;
     bool existsInPool;
 
-    QnManualCameraSearchSingleCamera(){}
+    QnManualCameraSearchSingleCamera(): existsInPool(false) {}
 
-    QnManualCameraSearchSingleCamera(const QString &name, const QString &url, const QString &manufacturer, const QString &vendor, bool existsInPool):
-        name(name), url(url), manufacturer(manufacturer), vendor(vendor), existsInPool(existsInPool) {}
+    QnManualCameraSearchSingleCamera(const QString &name, const QString &url, const QString &manufacturer, const QString &vendor, const QString& uniqueId, bool existsInPool):
+        name(name), url(url), manufacturer(manufacturer), vendor(vendor), uniqueId(uniqueId), existsInPool(existsInPool) {}
 
     QString toString() const {
         return QString(QLatin1String("%1 (%2 - %3)")).arg(name).arg(url).arg(vendor);
     }
 };
 
-#define QnManualCameraSearchSingleCamera_Fields (name)(url)(manufacturer)(vendor)(existsInPool)
+#define QnManualCameraSearchSingleCamera_Fields (name)(url)(manufacturer)(vendor)(existsInPool)(uniqueId)
 
 typedef QList<QnManualCameraSearchSingleCamera> QnManualCameraSearchCameraList;
 

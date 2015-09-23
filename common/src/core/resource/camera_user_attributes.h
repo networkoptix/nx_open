@@ -30,6 +30,7 @@ public:
     QList<QnMotionRegion> motionRegions;
     bool scheduleDisabled;
     bool audioEnabled;
+    bool licenseUsed; /* Is not used for now --gdm*/
     bool cameraControlDisabled;
     QnScheduleTaskList scheduleTasks;
     Qn::SecondStreamQuality secondaryQuality;
@@ -40,6 +41,7 @@ public:
     QString name;
     QString groupName;
     QnMediaDewarpingParams dewarpingParams;
+    Qn::FailoverPriority failoverPriority;
 
     QnCameraUserAttributes();
 

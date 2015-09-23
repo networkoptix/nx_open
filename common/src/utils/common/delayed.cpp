@@ -2,18 +2,42 @@
 
 #include <QtCore/QTimer>
 
-void executeDelayed(std::function<void()> callback, int delayMs, QThread *targetThread) {
-    QTimer *timer = new QTimer();
-    timer->setInterval(delayMs);
-    timer->setSingleShot(true);
+namespace
+{
+    void executeDelayedImpl(const Callback &callback
+        , int delayMs
+        , QThread *targetThread
+        , QObject *parent)
+    {
+        Q_ASSERT_X(!(targetThread && parent), Q_FUNC_INFO, "Invalid thread and parent parameters");
 
-    if (targetThread)
-        timer->moveToThread(targetThread);
+        QTimer *timer = new QTimer(parent);
+        timer->setInterval(delayMs);
+        timer->setSingleShot(true);
 
-    /* Set timer as context so if timer is destroyed, callback is also destroyed. */
-    QObject::connect(timer, &QTimer::timeout, timer, callback);
-    QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+        if (targetThread)
+            timer->moveToThread(targetThread);
 
-    /* Workaround for windows. QTimer cannot be started from a different thread in windows. */
-    QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection);
+        /* Set timer as context so if timer is destroyed, callback is also destroyed. */
+        QObject::connect(timer, &QTimer::timeout, timer, callback);
+        QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+
+        /* Workaround for windows. QTimer cannot be started from a different thread in windows. */
+        QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection);
+    }
 }
+
+void executeDelayed(const Callback &callback
+    , int delayMs
+    , QThread *targetThread)
+{
+    executeDelayedImpl(callback, delayMs, targetThread, nullptr);
+}
+
+void executeDelayedParented(const Callback &callback
+    , int delayMs
+    , QObject *parent)
+{
+    executeDelayedImpl(callback, delayMs, nullptr, parent);
+}
+

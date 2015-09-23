@@ -36,7 +36,10 @@ public:
     virtual unsigned int getCurrentAudioChannel() const;
     virtual bool setAudioChannel(unsigned int num);
     virtual bool isReverseMode() const { return m_reverseMode;}
-    virtual bool isNegativeSpeedSupported() const;
+
+    /** Is not used and not implemented. */
+    virtual bool isNegativeSpeedSupported() const; 
+
     virtual bool isSingleShotMode() const;
 
 

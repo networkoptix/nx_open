@@ -9,8 +9,10 @@ class QnMergeSystemsRestHandler : public QnJsonRestHandler {
 public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) override;
 private:
-    bool applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin, bool oneServer);
-    bool applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin);
+    bool applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin, bool oneServer,
+                              const QnRestConnectionProcessor* owner);
+    bool applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin,
+                             const QnRestConnectionProcessor* owner);
 };
 
 #endif // MERGE_SYSTEMS_REST_HANDLER_H

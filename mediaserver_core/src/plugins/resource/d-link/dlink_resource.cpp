@@ -115,7 +115,7 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 }
 
 
-//=======================================================================================
+// =======================================================================================
 
 QnPlDlinkResource::QnPlDlinkResource()
 {
@@ -333,7 +333,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
 
-    //=======remove elements with diff aspect ratio
+    // =======remove elements with diff aspect ratio
     if (m_camInfo.resolutions.size() < 2)
         return CameraDiagnostics::UnknownErrorResult();
 

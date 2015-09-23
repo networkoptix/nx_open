@@ -21,7 +21,16 @@
      </property>
      <widget class="QWidget" name="configurationPage">
       <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -89,11 +98,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="errorLabel">
-            <property name="text">
-             <string notr="true"/>
-            </property>
-           </widget>
+           <widget class="QnWordWrappedLabel" name="errorLabel" native="true"/>
           </item>
          </layout>
         </widget>
@@ -105,9 +110,6 @@
            <widget class="QLabel" name="currentSystemLabel">
             <property name="text">
              <string notr="true">You are about to merge the current system &lt;system name&gt; with the system</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -131,9 +133,6 @@
            <widget class="QLabel" name="newSystemLabel">
             <property name="text">
              <string>The new system will have password and name from the system:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -189,9 +188,6 @@ The servers from the remote system should appear in your system soon.</string>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
         </widget>
        </item>
       </layout>
@@ -216,6 +212,12 @@ The servers from the remote system should appear in your system soon.</string>
    <extends>QDialogButtonBox</extends>
    <header location="global">ui/widgets/dialog_button_box.h</header>
   </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>urlComboBox</tabstop>
@@ -225,38 +227,5 @@ The servers from the remote system should appear in your system soon.</string>
   <tabstop>remoteSystemRadioButton</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>QnMergeSystemsDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>QnMergeSystemsDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

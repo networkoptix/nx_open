@@ -134,8 +134,12 @@ namespace nx_http
                 }
 
                 case readingUnsizedBinaryData:
-                    readUnsizedBinaryData( data, &offset );
+                {
+                    size_t localOffset = 0;
+                    readUnsizedBinaryData( data.mid(offset), &localOffset );
+                    offset += localOffset;
                     break;
+                }
 
                 default:
                     return false;
@@ -150,6 +154,8 @@ namespace nx_http
         if( m_currentFrame.isEmpty() )
             return 0;
 
+        m_currentFrame += std::move(m_supposedBoundary);
+        m_supposedBoundary.clear();
         m_nextFilter->processData( m_currentFrame );
         const size_t frameSizeBak = m_currentFrame.size();
         m_currentFrame.clear();
@@ -198,7 +204,8 @@ namespace nx_http
         while( !m_boundary.isEmpty() && m_boundary[m_boundary.size() - 1] == '"' )
             m_boundary.remove( m_boundary.size() - 1, 1 );
         m_startBoundaryLine = "--" + m_boundary/*+"\r\n"*/; //--boundary\r\n
-        m_boundaryForUnsizedBinaryParsing = "\r\n"+m_startBoundaryLine+"\r\n";
+        m_boundaryForUnsizedBinaryParsing = "\r\n" + m_startBoundaryLine + "\r\n";
+        m_boundaryForUnsizedBinaryParsingWOTrailingCRLF = "\r\n"+m_startBoundaryLine;
         m_endBoundaryLine = "--"+m_boundary+"--" /*"\r\n"*/;
     }
 
@@ -208,27 +215,30 @@ namespace nx_http
     }
 
     bool MultipartContentParser::readUnsizedBinaryData(
-        const QnByteArrayConstRef& data,
+        QnByteArrayConstRef data,
         size_t* const offset )
     {
+        //TODO #ak move this function (splitting byte stream by a pattern) to a separate file
+
         switch( m_chunkParseState )
         {
             case waitingEndOfLine:
             {
-                const char* slashRPos = (const char*)memchr(
-                    data.constData()+*offset,
-                    '\r',
-                    data.size()-*offset );
-                if( slashRPos == NULL )
+                const auto slashRPos = data.indexOf('\r');
+                if( slashRPos == -1 )
                 {
-                    m_currentFrame += data.mid( *offset );
+                    m_currentFrame += data;
                     *offset = data.size();
                     return true;
                 }
                 //saving data up to found \r
-                m_currentFrame += data.mid( *offset, (slashRPos-data.constData())-*offset );
-                *offset = slashRPos - data.constData();
+                m_currentFrame += data.mid( 0, slashRPos );
+                *offset = slashRPos;
                 m_chunkParseState = checkingForBoundaryAfterEndOfLine;
+                data.pop_front( slashRPos );
+                m_supposedBoundary += '\r';
+                data.pop_front();
+                *offset += 1;
                 //*offset points to \r
             }
 
@@ -236,13 +246,28 @@ namespace nx_http
             {
                 if( !m_supposedBoundary.isEmpty() )
                 {
+                    //if we are here, then m_supposedBoundary does not contain full boundary yet
+
                     //saving supposed boundary in local buffer
                     const size_t bytesNeeded = m_boundaryForUnsizedBinaryParsing.size() - m_supposedBoundary.size();
-                    const size_t bytesToCopy = (data.size() - *offset > bytesNeeded)
+                    const int slashRPos = data.indexOf( '\r' );
+                    if( (slashRPos != -1) &&
+                        (slashRPos < bytesNeeded) &&    //checking within potential boundary
+                        ((m_supposedBoundary + data.mid( 0, slashRPos )) != m_boundaryForUnsizedBinaryParsingWOTrailingCRLF) )
+                    {
+                        //boundary not found, resetting boundary check
+                        m_currentFrame += m_supposedBoundary;
+                        m_supposedBoundary.clear();
+                        m_chunkParseState = waitingEndOfLine;
+                        return true;
+                    }
+
+                    const size_t bytesToCopy = (data.size() > bytesNeeded)
                         ? bytesNeeded
-                        : QnByteArrayConstRef::npos;
-                    m_supposedBoundary += data.mid( *offset, bytesToCopy );
+                        : data.size();
+                    m_supposedBoundary += data.mid( 0, bytesToCopy );
                     *offset += bytesToCopy;
+                    data.pop_front( bytesToCopy );
                 }
 
                 QnByteArrayConstRef supposedBoundary;
@@ -250,16 +275,17 @@ namespace nx_http
                 {
                     supposedBoundary = QnByteArrayConstRef( m_supposedBoundary );
                 }
-                else if( m_supposedBoundary.isEmpty() && (data.size() - *offset >= (size_t)m_boundaryForUnsizedBinaryParsing.size()) )   //supposed boundary is in the source data
+                else if( m_supposedBoundary.isEmpty() && (data.size() >= (size_t)m_boundaryForUnsizedBinaryParsing.size()) )   //supposed boundary is in the source data
                 {
-                    supposedBoundary = data.mid( *offset, m_boundaryForUnsizedBinaryParsing.size() );
+                    supposedBoundary = data.mid( 0, m_boundaryForUnsizedBinaryParsing.size() );
                     *offset += m_boundaryForUnsizedBinaryParsing.size();
+                    data.pop_front( m_boundaryForUnsizedBinaryParsing.size() );
                 }
                 else
                 {
                     //waiting for more data
-                    m_supposedBoundary += data.mid( *offset );
-                    *offset = data.size();
+                    m_supposedBoundary += data;
+                    *offset += data.size();
                     return true;
                 }
 

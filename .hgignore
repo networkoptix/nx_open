@@ -299,6 +299,7 @@ image_library_plugin/arm
 
 
 nx_sdk/nx_sdk
+nx_storage_sdk/nx_storage_sdk
 holepuncher/x86
 holepuncher/x64
 holepuncher/arm

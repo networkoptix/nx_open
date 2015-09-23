@@ -7,6 +7,7 @@
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
 #include "utils/common/byte_array.h"
+#include "api/model/audit/auth_session.h"
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
@@ -60,7 +61,7 @@ public:
     void releaseSocket();
 
     int redirectTo(const QByteArray& page, QByteArray& contentType);
-
+    QnAuthSession authSession() const;
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);

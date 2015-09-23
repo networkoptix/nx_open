@@ -44,6 +44,6 @@ void QnBuildNumberDialog::accept() {
     if (checkPassword(buildNumber(), password())) {
         base_type::accept();
     } else {
-        QMessageBox::critical(this, tr("Error"), tr("The password you have entered is invalid"));
+        QMessageBox::critical(this, tr("Error"), tr("The password you have entered is not valid."));
     }
 }

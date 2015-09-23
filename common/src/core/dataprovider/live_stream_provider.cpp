@@ -4,6 +4,7 @@
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_properties.h"
+#include "utils/media/ffmpeg_helper.h"
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
 

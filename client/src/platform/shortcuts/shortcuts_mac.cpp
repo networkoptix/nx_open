@@ -1,6 +1,6 @@
 #include "shortcuts_mac.h"
 
-QnMacShortcuts::QnMacShortcuts(QObject *parent /*= NULL*/):
+QnMacShortcuts::QnMacShortcuts(QObject *parent /* = NULL*/):
     QnPlatformShortcuts(parent)
 {
 

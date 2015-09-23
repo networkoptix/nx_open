@@ -93,7 +93,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,      this, [&](){ m_frameColorAnimator->animateTo(0.0); if (!m_infoVisible) setOverlayVisible(false); });
 
     /* Status overlay. */
-    m_statusOverlayWidget = new QnStatusOverlayWidget(this);
+    m_statusOverlayWidget = new QnStatusOverlayWidget(m_videowall, this);
     addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
 
     initInfoOverlay();

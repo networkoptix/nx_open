@@ -26,20 +26,21 @@ namespace rtu
             , const ActionFunction &beginResetModel
             , const ActionFunction &endResetModel
             , const RowsActionFunction &dataChangedFunction
+            , const ActionFunction &layoutChanged
             , QObject *parent);
         
         virtual ~ModelChangeHelper();
         
         Guard insertRowsGuard(int startIndex
-            , int finishIndex);
+            , int finishIndex) const;
         
         Guard removeRowsGuard(int startIndex
-            , int finishIndex);
+            , int finishIndex) const;
         
-        Guard resetModelGuard();
+        Guard resetModelGuard() const;
         
         void dataChanged(int startIndex
-            , int finishIndex);
+            , int finishIndex) const;
         
     private:
         const RowsActionFunction m_beginInsertRows;
@@ -49,6 +50,7 @@ namespace rtu
         const ActionFunction m_beginResetModel;
         const ActionFunction m_endResetModel;
         const RowsActionFunction m_dataChangedFunction;
+        const ActionFunction m_layoutChanged;
     };
 
 }
@@ -65,4 +67,5 @@ namespace rtu
         , [this]() { endResetModel(); }                                         \
         , [this](int startIndex, int finishIndex)                               \
             { emit dataChanged(index(startIndex), index(finishIndex)); }        \
+        , [this]() { emit layoutChanged(); }                                    \
         , parent)

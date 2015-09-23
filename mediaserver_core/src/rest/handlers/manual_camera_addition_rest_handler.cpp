@@ -13,6 +13,9 @@
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/tcp_connection_priv.h>
 #include <utils/serialization/json_functions.h>
+#include "audit/audit_manager.h"
+#include "rest/server/rest_connection_processor.h"
+#include "core/resource/network_resource.h"
 
 
 class ManualSearchThreadPoolHolder
@@ -137,7 +140,7 @@ int QnManualCameraAdditionRestHandler::searchStopAction(const QnRequestParams &p
 }
 
 
-int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result)
+int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QAuthenticator auth;
     auth.setUser(params.value("user"));
@@ -152,6 +155,7 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
             skipped++;
             continue;
         }
+        QString uniqueId = params.value("uniqueId" + QString::number(i));
 
         QUrl url( urlStr );
         if( url.host().isEmpty() && !url.path().isEmpty() )
@@ -162,6 +166,7 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
         }
 
         QnManualCameraInfo info(url, auth, manufacturer);
+        info.uniqueId = uniqueId;
         if(info.resType.isNull()) {
             result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid camera manufacturer '%1'.").arg(manufacturer));
             return CODE_INVALID_PARAMETER;
@@ -171,11 +176,23 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
     }
 
     bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infos);
+    if (registered) 
+    {
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
+        for (const QnManualCameraInfo& info: infos)
+        {
+            if (!info.uniqueId.isEmpty())
+                auditRecord.resources.push_back(QnNetworkResource::uniqueIdToId(info.uniqueId));
+        }
+        qnAuditManager->addAuditRecord(auditRecord);
+    }
+
+
     result.setReply(registered);
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
-int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
 {
     QString action = extractAction(path);
     if (action == "search")
@@ -185,7 +202,7 @@ int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnR
     else if (action == "stop")
         return searchStopAction(params, result);
     else if (action == "add")
-        return addCamerasAction(params, result);
+        return addCamerasAction(params, result, owner);
     else
         return CODE_NOT_FOUND;
 }

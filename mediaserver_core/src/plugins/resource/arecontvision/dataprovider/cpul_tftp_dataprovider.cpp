@@ -18,7 +18,7 @@
 #include "av_client_pull.h"
 
 
-//======================================================
+// ======================================================
 
 extern int create_sps_pps(
                    int frameWidth,
@@ -37,7 +37,7 @@ AVLastPacketSize ExtractSize(const unsigned char* arr)
     return size;
 }
 
-//=========================================================
+// =========================================================
 
 AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(const QnResourcePtr& res):
 QnPlAVClinetPullStreamReader(res),
@@ -115,7 +115,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
                 //return QnAbstractMediaDataPtr(0);
             }
 
-            //=========
+            // =========
             left = m_streamParam.value("image_left").toInt();
             top = m_streamParam.value("image_top").toInt();
             right = m_streamParam.value("image_right").toInt();
@@ -173,7 +173,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
                 //bitrate = m_streamParam.value("Bitrate").toInt();
                 bitrate = getBitrateMbps();
             }
-            //=========
+            // =========
 
     }
 
@@ -227,7 +227,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     
     QnByteArray& img = m_videoFrameBuff;
 
-    //==========================================
+    // ==========================================
     int expectable_header_size = 0;
     if (h264)
     {
@@ -255,7 +255,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         // we will write header based on last packet information
     }
 
-    //==========================================
+    // ==========================================
 
     int readed = m_tftp_client->read(request, img);
     {
@@ -337,7 +337,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         if (last_packet[iframe_index-1] == 0)
             iFrame = false;
 
-        //==========================================
+        // ==========================================
         //put unit delimetr at the end of the frame
 
         char  c = 0;
@@ -350,7 +350,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         c = (iFrame) ? 0x10 : 0x30;
         img.write(&c,1); // 0x10
 
-        //==========================================
+        // ==========================================
         char* dst = img.data();
         if (iFrame) // only if I frame we need SPS&PPS
         {

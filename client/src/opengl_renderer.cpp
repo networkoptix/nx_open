@@ -192,7 +192,7 @@ void QnOpenGLRenderer::popModelViewMatrix() {
     m_modelViewMatrix = m_modelViewMatrixStack.pop();
 }
 
-//=================================================================================================
+// =================================================================================================
 
 Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_openGlRenderManager_instance)
 
@@ -209,7 +209,7 @@ QnOpenGLRenderer* QnOpenGLRendererManager::instance(const QGLContext* a_context)
     return *(manager->m_container.find(a_context));
 }
 
-QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /*= NULL*/):
+QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /* = NULL*/):
     QObject(parent)
 {
 }
@@ -221,8 +221,8 @@ QnOpenGLRendererManager::~QnOpenGLRendererManager() {
 
 void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )
 {
-    static_cast<void>(texture_wigth);
-    static_cast<void>(gl_bytes_per_pixel);
+    Q_UNUSED(texture_wigth);
+    Q_UNUSED(gl_bytes_per_pixel);
 
     // if ( texture_wigth >= image_width )
     {

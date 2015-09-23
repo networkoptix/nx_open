@@ -1,9 +1,6 @@
 #ifndef CHECK_UPDATE_PEER_TASK_H
 #define CHECK_UPDATE_PEER_TASK_H
 
-#include <memory>
-#include <unordered_set>
-
 #include <update/task/network_peer_task.h>
 #include <update/updates_common.h>
 
@@ -44,13 +41,24 @@ private:
     void cleanUp();
 
     void finishTask(QnCheckForUpdateResult::Value result);
+
+    void loadServersFromSettings();
+    bool tryNextServer();
+
 private slots:
     void at_updateReply_finished(QnAsyncHttpClientReply *reply);
     void at_buildReply_finished(QnAsyncHttpClientReply *reply);
     void at_zipExtractor_finished(int error);
 
 private:
-    QUrl m_updatesUrl;
+    struct UpdateServerInfo {
+        QUrl url;
+    };
+
+    QUrl m_mainUpdateUrl;
+    QUrl m_currentUpdateUrl;
+    QList<UpdateServerInfo> m_updateServers;
+
     QnUpdateTarget m_target;
 
     QString m_updateLocationPrefix;

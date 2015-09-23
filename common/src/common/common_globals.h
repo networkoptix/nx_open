@@ -34,7 +34,8 @@ namespace Qn
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
-            ServerFlag CameraStatusFlag IOPortType IODefaultState)
+            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            FailoverPriority)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -87,8 +88,7 @@ public:
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        ShareIpCapability                   = 0x020,
-        IOModuleCapability                  = 0x040,
+        ShareIpCapability                   = 0x020
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -344,7 +344,9 @@ public:
         SF_HasPublicIP  = 0x4,
         SF_IfListCtrl   = 0x8,
         SF_timeCtrl     = 0x10,
-        SF_AutoSystemName = 0x20
+        SF_AutoSystemName = 0x20,
+        SF_ArmServer      = 0x40,
+        SF_Has_HDD      = 0x80,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -361,6 +363,34 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(IOPortTypes)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IOPortType)
 
+    enum AuditRecordType
+    {
+        AR_NotDefined        = 0x0000,
+        AR_UnauthorizedLogin = 0x0001,
+        AR_Login             = 0x0002,
+        AR_UserUpdate        = 0x0004,
+        AR_ViewLive          = 0x0008,
+        AR_ViewArchive       = 0x0010,
+        AR_ExportVideo       = 0x0020,
+        AR_CameraUpdate      = 0x0040,
+        AR_SystemNameChanged = 0x0080,
+        AR_SystemmMerge      = 0x0100,
+        AR_SettingsChange    = 0x0200,
+        AR_ServerUpdate      = 0x0400,
+        AR_BEventUpdate      = 0x0800,
+        AR_EmailSettings     = 0x1000,
+        AR_CameraRemove      = 0x2000,
+        AR_ServerRemove      = 0x4000,
+        AR_BEventRemove      = 0x8000,
+        AR_UserRemove        = 0x10000,
+        AR_BEventReset       = 0x20000,
+        AR_DatabaseRestore   = 0x40000,
+        AR_CameraInsert      = 0x80000
+    };
+
+    Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(AuditRecordTypes)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuditRecordType)
     
     enum IODefaultState {
         IO_OpenCircuit,
@@ -442,6 +472,7 @@ public:
         ItemFrameDistinctionColorRole,              /**< Role for item's frame distinction color. Value of type QColor. */
         ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
+        ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
@@ -492,6 +523,7 @@ public:
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
         DisplayHtmlRole,                            /**< Same as Display role, but use HTML format. */
+        DisplayHtmlHoveredRole,                     /**< Same as DisplayHtmlRole role, but used if mouse over a element */
 
         ModifiedRole,                               /**< Role for modified state. Value of type bool. */
         DisabledRole,                               /**< Role for disabled state. Value of type bool. */
@@ -514,6 +546,13 @@ public:
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
         RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
+        RecordingStatColorsDataRole,                /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
+        
+        AuditRecordDataRole,                        /**< Return QnAuditRecord object */
+        ColumnDataRole,                             /**< convert index col count to column enumerator */
+        DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
+        AlternateColorRole,                         /**< Use alternate color in painting */
+        AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
 
         LastItemDataRole,
 
@@ -581,11 +620,11 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 
     enum PeerType {
+        PT_NotDefined = -1,
         PT_Server = 0,
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
         PT_MobileClient = 3,
-
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -636,6 +675,25 @@ public:
         LC_AnalogEncoder,
         LC_VideoWall,
 
+        /** 
+         * I/O Modules license.
+         * Needs to be activated to enable I/O module features. One license channel per one module.
+         */
+        LC_IO,                  
+
+        /**
+         * Like a professional license.
+         * Could not be activated on ARM devices.
+         * Only one license key per system (not server). If systems are merged and each of them had some start licenses originally, 
+         * new merged system will only take one start license( the one with bigger channels). Other start licenses will become invalid. 
+         */
+        LC_Start,
+
+        /** 
+         * Invalid license. Required when the correct license type is not known in current version.
+         */
+        LC_Invalid,
+
         LC_Count
     };
 
@@ -645,6 +703,33 @@ public:
         LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
         LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
     };
+
+    /**
+    * Authentication error code
+    */
+    enum AuthResult
+    {
+        Auth_OK,            // OK
+        Auth_WrongLogin,    // invalid login
+        Auth_WrongInternalLogin, // invalid login used for internal auth scheme
+        Auth_WrongDigest,   // invalid or empty digest
+        Auth_WrongPassword, // invalid password
+        Auth_Forbidden,     // no auth mehod found or custom auth scheme without login/password is failed
+        Auth_PasswordExpired, // Password is expired
+        Auth_ConnectError   // can't connect to the external system to authenticate
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
+
+    enum FailoverPriority {
+        FP_Never,
+        FP_Low,
+        FP_Medium,
+        FP_High,
+
+        FP_Count
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
+    static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -696,7 +781,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
         (Qn::BookmarkSearchStrategy)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState),
+        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
+        (Qn::FailoverPriority)
+        ,
     (metatype)(lexical)
 )
 
@@ -718,6 +805,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::IOPortTypes),
     (metatype)(numeric)(lexical)
+
 )
 
 #endif // QN_COMMON_GLOBALS_H

@@ -90,6 +90,8 @@ public:
     QnTransactionTransport( const ApiPeerData& localPeer );
     ~QnTransactionTransport();
 
+    void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
+
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,
@@ -122,7 +124,7 @@ public:
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
             if( m_remotePeer.peerType == Qn::PT_MobileClient )
-                addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header));
+                addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header) + QByteArray("\r\n"));
             else
                 addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
@@ -162,6 +164,9 @@ public:
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
     QUrl remoteAddr() const;
+    SocketAddress remoteSocketAddr() const;
+
+    nx_http::AuthInfoCache::AuthorizationCacheItem authData() const;
 
     ApiPeerData remotePeer() const { return m_remotePeer; }
 
@@ -207,7 +212,7 @@ public:
 
     QnUuid connectionGuid() const;
     void setIncomingTransactionChannelSocket(
-        const QSharedPointer<AbstractStreamSocket>& socket,
+        QSharedPointer<AbstractStreamSocket> socket,
         const nx_http::Request& request,
         const QByteArray& requestBuf );
     //!Blocks till connection is ready to accept new transactions
@@ -221,6 +226,7 @@ public:
     void connectionFailure();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
+    static void fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey );
 
 private:
     struct DataToSend
@@ -298,13 +304,14 @@ private:
     //!Number of threads waiting on \a QnTransactionTransport::waitForNewTransactionsReady
     int m_waiterCount;
     QnWaitCondition m_cond;
+    std::function<void ()> m_ttFinishCallback;
 
 private:
     void default_initializer();
     void sendHttpKeepAlive( quint64 taskID );
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
-    void addData(QByteArray&& data);
+    void addData(QByteArray data);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
@@ -315,7 +322,6 @@ private:
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
-    void fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey );
     /*!
         \note MUST be called with \a m_mutex locked
     */

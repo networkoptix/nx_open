@@ -6,7 +6,9 @@
 #include "common/common_module.h"
 #include "api/app_server_connection.h"
 
-QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &resource) {
+QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &resource, QnMediaServerResourcePtr* const via) {
+    Q_UNUSED(via)
+
     QnMediaServerResourcePtr server;
 
     if (resource.dynamicCast<QnSecurityCamResource>())

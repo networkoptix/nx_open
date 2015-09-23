@@ -183,6 +183,11 @@ namespace Qn {
         OpenBusinessRulesAction,
 
         /**
+         * Opens the Failover Priority dialog.
+         */
+        OpenFailoverPriorityAction,
+
+        /**
          * Opens videowall control layouts for all items in the provided QnVideoWallItemIndexList.
          */
         StartVideoWallControlAction,
@@ -353,11 +358,6 @@ namespace Qn {
         OpenBookmarksSearchAction,
 
         /**
-         * Opens recording statistics dialog.
-         */
-        RecordingStatisticsAction,
-
-        /**
          * Opens camera list dialog.
          */
         CameraListAction,
@@ -371,6 +371,11 @@ namespace Qn {
          * System administration dialog - updates page.
          */
         SystemUpdateAction,
+
+        /**
+         * System administration dialog - users page.
+         */
+        UserManagementAction,
 
         /* Tab bar actions. */
 
@@ -980,8 +985,6 @@ namespace Qn {
 
         /* Playback actions. */
         PlayPauseAction,
-        SpeedDownAction,
-        SpeedUpAction,
         PreviousFrameAction,
         NextFrameAction,
         JumpToStartAction,
@@ -1027,9 +1030,9 @@ namespace Qn {
         DebugControlPanelAction,
 
         /**
-         * open IO monitor for IO module
+         * Opens the Audit Log dialog.
          */
-        OpenIOMonitorAction,
+        OpenAuditLogAction,
 
         ActionCount,
 

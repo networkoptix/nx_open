@@ -14,6 +14,10 @@ QString QnAppInfo::linuxOrganizationName() {
     return QStringLiteral("${deb.customization.company.name}");
 }
 
+QString QnAppInfo::realm() {
+    return QStringLiteral("${deb.customization.company.name}");
+}
+
 QString QnAppInfo::applicationVersion() {
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
 }

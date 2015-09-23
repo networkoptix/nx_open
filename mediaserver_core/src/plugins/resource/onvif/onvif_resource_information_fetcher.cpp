@@ -15,6 +15,9 @@
 #include "plugins/resource/axis/axis_onvif_resource.h"
 #include "plugins/resource/avigilon/avigilon_resource.h"
 #include "../vista/vista_resource.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
@@ -34,6 +37,7 @@ static const char* IGNORE_VENDORS[][2] =
     {"IP*", "*networkcamera*"}, // DLINK
     {"ISD", "*"},              // ISD
     {"spartan-6*", "*"},       // ArecontVision
+    {"Arecont Vision*", "*"},  // ArecontVision
     {"acti*", "*"},       // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
     {"*", "KCM*"},        // ACTi
     {"*", "DWCA-*"},      // NEW ISD cameras rebrended to DW
@@ -107,6 +111,10 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 
 bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, name);
+    if (resourceData.value<bool>(lit("forceONVIF")))
+        return false;
+
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
         QRegExp rxVendor(QLatin1String((const char*)IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);
@@ -164,7 +172,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         soapWrapper.setPassword(info.defaultPassword);
     }
     else if (discoveryMode != DiscoveryMode::partiallyEnabled)
-        soapWrapper.fetchLoginPassword(info.manufacturer);
+        soapWrapper.fetchLoginPassword(info.manufacturer, info.name);
 
     if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
         return; //ignoring unknown cameras

@@ -1,15 +1,17 @@
-#include <QUrlQuery>
-#include <QWaitCondition>
-#include <QMutex>
 
 #include "iomonitor_tcp_server.h"
+
+#include <QUrlQuery>
+#include <QWaitCondition>
 #include <QtCore/QCoreApplication>
-#include "utils/network/tcp_connection_priv.h"
+
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
+#include "common/common_module.h"
+#include <http/custom_headers.h>
+#include "utils/network/tcp_connection_priv.h"
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
-#include "common/common_module.h"
 
 class QnIOMonitorConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -29,6 +31,8 @@ QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<Ab
 
 QnIOMonitorConnectionProcessor::~QnIOMonitorConnectionProcessor()
 {
+    directDisconnectAll();
+
     stop();
 }
 
@@ -44,15 +48,15 @@ void QnIOMonitorConnectionProcessor::run()
     if (ready)
     {
         parseRequest();
-        QString uniqueId = QUrlQuery(getDecodedUrl().query()).queryItemValue(lit("physicalId"));
+        QString uniqueId = QUrlQuery(getDecodedUrl().query()).queryItemValue(Qn::CAMERA_UNIQUE_ID_HEADER_NAME);
         QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(uniqueId);
         if (!camera) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
         }
-        connect(camera.data(), &QnSecurityCamResource::initializedChanged, this, &QnIOMonitorConnectionProcessor::at_cameraInitDone, Qt::DirectConnection);
-        connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged, Qt::DirectConnection);
-        connect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged, Qt::DirectConnection);
+        Qn::directConnect(camera.data(), &QnSecurityCamResource::initializedChanged, this, &QnIOMonitorConnectionProcessor::at_cameraInitDone);
+        Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
+        Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
 
         if (camera->getParentId() != qnCommon->moduleGUID()) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
@@ -77,11 +81,9 @@ void QnIOMonitorConnectionProcessor::run()
             sendMultipartData();
             d->waitCond.wait(&d->waitMutex);
         }
-		// todo: it's still have minor race condition because of Qt::DirectConnection isn't safe
-		// qt calls unlock/relock signalSlot mutex before method invocation
         disconnect( camera.data(), nullptr, this, nullptr );
-        camera->inputPortListenerDetached();
         lock.unlock();
+        camera->inputPortListenerDetached();
         d->socket->terminateAsyncIO(true);
     }
 }

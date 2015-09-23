@@ -1,5 +1,4 @@
-#ifndef QN_MEDIA_SERVER_UPDATE_TOOL_H
-#define QN_MEDIA_SERVER_UPDATE_TOOL_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -36,10 +35,10 @@ public:
     /** Generate url for download update file, depending on actual targets list. */
     QUrl generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion) const;
 
-    void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false, std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
+    void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion(), std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
     void checkForUpdates(const QString &fileName, std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
 
-    void startUpdate(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false);
+    void startUpdate(const QnSoftwareVersion &version = QnSoftwareVersion());
     void startUpdate(const QString &fileName);
     void startOnlineClientUpdate(const QnSoftwareVersion &version);
 
@@ -77,5 +76,3 @@ private:
     
     bool m_enableClientUpdates;
 };
-
-#endif // QN_MEDIA_SERVER_UPDATE_TOOL_H

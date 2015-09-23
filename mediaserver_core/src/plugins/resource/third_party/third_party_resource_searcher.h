@@ -8,6 +8,8 @@
 
 #ifdef ENABLE_THIRD_PARTY
 
+#include <list>
+
 #include <QtCore/QList>
 #include <QtCore/QVector>
 
@@ -68,7 +70,7 @@ protected:
     virtual QnResourceList findResources() override;
 
 private:
-    QList<nxcip_qt::CameraDiscoveryManager> m_thirdPartyCamPlugins;
+    std::list<nxcip_qt::CameraDiscoveryManager> m_thirdPartyCamPlugins;
 
     //!Searchers resources using custom search method
     QnResourceList doCustomSearch();

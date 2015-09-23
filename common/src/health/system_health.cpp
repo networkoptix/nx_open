@@ -14,12 +14,14 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         return tr("Connection to server lost");
     case QnSystemHealth::NoPrimaryTimeServer:
         return tr("Select server for others to synchronize time with");
+    case QnSystemHealth::SystemIsReadOnly:
+        return tr("System is in safe mode");
     case QnSystemHealth::EmailSendError:
         return tr("Error while sending email");
     case QnSystemHealth::StoragesAreFull:
-        return tr("Storages are full");
+        return tr("Storage is full");
     case QnSystemHealth::StoragesNotConfigured:
-        return tr("Storages are not configured");
+        return tr("Storage is not configured");
     case QnSystemHealth::ArchiveRebuildFinished:
         return tr("Rebuilding archive index is completed");
     default:
@@ -53,7 +55,10 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive system notifications via email.");
         break;
     case QnSystemHealth::NoPrimaryTimeServer:
-        messageParts << tr("Multiple servers have different time and correct time could not be detected automatically." );
+        messageParts << tr("Server times are not synchronized and a common time could not be detected automatically." );
+        break;
+    case QnSystemHealth::SystemIsReadOnly:         
+        messageParts << tr("The system is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
         break;
     case QnSystemHealth::StoragesAreFull:
         messageParts << tr("Storages are full on the following Server:") << resourceName;

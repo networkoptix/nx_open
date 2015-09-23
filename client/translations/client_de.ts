@@ -80,6 +80,77 @@
     </message>
 </context>
 <context>
+    <name>AuditLogDialog</name>
+    <message>
+        <source>From</source>
+        <translation>Von</translation>
+    </message>
+    <message>
+        <source>till</source>
+        <translation>bis</translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation>Aktualisieren</translation>
+    </message>
+    <message>
+        <source>User actions</source>
+        <translation>Benutzer-Aktionen</translation>
+    </message>
+    <message>
+        <source>Watching archive</source>
+        <translation>Archiv wird angesehen</translation>
+    </message>
+    <message>
+        <source>Exporting video</source>
+        <translation>Video wird exportiert</translation>
+    </message>
+    <message>
+        <source>Watching live</source>
+        <translation>Live wird angesehen</translation>
+    </message>
+    <message>
+        <source>Login/logout</source>
+        <translation>Einloggen/Ausloggen</translation>
+    </message>
+    <message>
+        <source>Event rules</source>
+        <translation>Ereignis-Regeln</translation>
+    </message>
+    <message>
+        <source>Server actions</source>
+        <translation>Server-Aktionen</translation>
+    </message>
+    <message>
+        <source>E-mail settings</source>
+        <translation>E-Mail-Einstellungen</translation>
+    </message>
+    <message>
+        <source>System actions</source>
+        <translation>System-Aktionen</translation>
+    </message>
+    <message>
+        <source>Select all</source>
+        <translation>Alles markieren</translation>
+    </message>
+    <message>
+        <source>Sessions</source>
+        <translation>Sitzungen</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation>Details</translation>
+    </message>
+    <message>
+        <source>All Servers are offline.  Audit data are not available.</source>
+        <translation>Alle Server Offline. Überwachungsdaten sind nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>Audit Trail</source>
+        <translation>Überwachungspfad</translation>
+    </message>
+</context>
+<context>
     <name>BusinessRuleWidget</name>
     <message>
         <source>Event</source>
@@ -90,21 +161,12 @@
         <translation>auf</translation>
     </message>
     <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;jede Kamera&gt;</translation>
-    </message>
-    <message>
         <source>Schedule...</source>
         <translation>Planen...</translation>
     </message>
     <message>
         <source>Action</source>
         <translation>Aktion</translation>
-    </message>
-    <message>
-        <source>&lt;Select at least one camera&gt;</source>
-        <translatorcomment>Linguist show the first work in magenta - I do not know why?</translatorcomment>
-        <translation>&lt;Mindestens eine Kamera wählen&gt;</translation>
     </message>
     <message>
         <source>Comments:</source>
@@ -142,10 +204,6 @@
         <translation>Erweitert...</translation>
     </message>
     <message>
-        <source>Filter by cameras...</source>
-        <translation>Filtern nach Kameras ...</translation>
-    </message>
-    <message>
         <source>X</source>
         <translation></translation>
     </message>
@@ -153,20 +211,8 @@
 <context>
     <name>CameraAdditionDialog</name>
     <message>
-        <source>Add cameras...</source>
-        <translation>Kameras hinzufügen...</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>Ausgewählter Server:</translation>
-    </message>
-    <message>
         <source>Server is offline</source>
         <translation>Server ist offline</translation>
-    </message>
-    <message>
-        <source>Ca&amp;mera Address:</source>
-        <translation>Ka&amp;mera Adresse:</translation>
     </message>
     <message>
         <source>IP, hostname, RTSP link...</source>
@@ -181,20 +227,12 @@
         <translation>&amp;End IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>S&amp;ubnet scan</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;Login:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Passwort:</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translation>auto</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -204,15 +242,6 @@
         <source>&amp;Discovery Port:</source>
         <translatorcomment>no idea how to translate that‽</translatorcomment>
         <translation>&amp;Discovery Port:</translation>
-    </message>
-    <message>
-        <source>Manuf.</source>
-        <translatorcomment>manufacturer = Hersteller</translatorcomment>
-        <translation>Herst.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
     </message>
     <message>
         <source>Address</source>
@@ -235,12 +264,36 @@
         <translation>&amp;Ausgewählte hinzufügen</translation>
     </message>
     <message>
-        <source>New scan...</source>
+        <source>Selected Server:</source>
+        <translation>Ausgewählte Server:</translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation>S&amp;ubnetz Scan</translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation>Marke</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modell</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
         <translation>Scanne erneut...</translation>
     </message>
     <message>
-        <source>Discovered Cameras:</source>
-        <translation>Gefundenen Kameras:</translation>
+        <source>Add device(s)...</source>
+        <translation>Gerät(e) hinzufügen...</translation>
+    </message>
+    <message>
+        <source>Device Address:</source>
+        <translation>Adresse des Geräts:</translation>
+    </message>
+    <message>
+        <source>Discovered Devices:</source>
+        <translation>Gefundene Geräte:</translation>
     </message>
 </context>
 <context>
@@ -250,14 +303,6 @@
         <translation>Erweiterte Einstellungen können für diese Kamera nicht geladen werden</translation>
     </message>
     <message>
-        <source>This camera has no advanced settings</source>
-        <translation>Diese Kamera verfügt über keine erweiterten Einstellungen</translation>
-    </message>
-    <message>
-        <source>Warning: all changes are applied instantly</source>
-        <translation>Warnung: Alle Änderungen werden sofort angewendet</translation>
-    </message>
-    <message>
         <source>Category</source>
         <translation>Kategorie</translation>
     </message>
@@ -265,30 +310,20 @@
         <source>about:blank</source>
         <translation>about:blank</translation>
     </message>
+    <message>
+        <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
+        <translation>Erweiterte Einstellungen sind nicht verfügbar für diese Kamera. Für weitere Optionen öffnen Sie die Kamera Weboberfläche.</translation>
+    </message>
+    <message>
+        <source>Note: Any changes made will be applied instantly!</source>
+        <translation>Hinweis: Alle Änderungen werden sofort angewandt!</translation>
+    </message>
 </context>
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
         <source>No connection to Server %1.</source>
         <translation>Keine Verbindung zu Server %1.</translation>
-    </message>
-</context>
-<context>
-    <name>CameraDiagnosticsDialog</name>
-    <message>
-        <source>Camera Diagnostics</source>
-        <translation>Kameradiagnose</translation>
-    </message>
-    <message>
-        <source>Diagnostics for camera</source>
-        <translation>Diagnose von Kamera</translation>
-    </message>
-</context>
-<context>
-    <name>CameraDisconnectedBusinessEventWidget</name>
-    <message>
-        <source>Event will be raised when any camera goes offline</source>
-        <translation>Ereignis wird ausgelöst, wenn eine Kamera offline geht</translation>
     </message>
 </context>
 <context>
@@ -306,20 +341,12 @@
         <translation>Stream-Einstellungen und Profile behalten</translation>
     </message>
     <message>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Achtung: Die Einstellungen FPS und Aufnahmequalität funktionieren nicht im Aufnahmeplan!</translation>
-    </message>
-    <message>
         <source>Secondary Stream Control</source>
         <translation>Sekundäre Stream-Einstellungen</translation>
     </message>
     <message>
         <source>Override secondary stream quality</source>
         <translation>Qualitätseinstellung des sekundären Streams überschreiben</translation>
-    </message>
-    <message>
-        <source>Don&apos;t use</source>
-        <translation>Minderwertige Qualität</translation>
     </message>
     <message>
         <source>Low quality</source>
@@ -332,10 +359,6 @@
     <message>
         <source>High quality</source>
         <translation>Hohe Qualität</translation>
-    </message>
-    <message utf8="true">
-        <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
-        <translation>Die Einstellung Hohe Qualität kann eine Serverüberlastung oder Netzwerk-Kapazitätsprobleme zur Folge haben.</translation>
     </message>
     <message>
         <source>Archive control</source>
@@ -370,10 +393,6 @@
         <translation>UDP</translation>
     </message>
     <message>
-        <source>Warning! Please read documentation before changing these settings!</source>
-        <translation>Lesen Sie unbedingt das Handbuch, bevor Sie diese Einstellungen ändern!</translation>
-    </message>
-    <message>
         <source>Restore Defaults</source>
         <translation>Standardeinstellungen wiederherstellen</translation>
     </message>
@@ -389,6 +408,22 @@
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
         <translation>Berechnen der Bitrate pro GOP anstatt Bitrate pro Sekunde (Die Bitrate für Kameras wird erhöht)</translation>
     </message>
+    <message>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation>Warnung! Dadurch werden die Qualität- und Framerate-Einstellungen (FPS) im Aufnahme-Zeitplan irrelevant.</translation>
+    </message>
+    <message>
+        <source>Do not use</source>
+        <translation>Nicht verwenden</translation>
+    </message>
+    <message>
+        <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
+        <translation>Warnung! Wenn Hohe Qualität ausgewählt wird kann Ihre CPU überlastet und die Netzwerkperformance eingeschränkt werden.</translation>
+    </message>
+    <message>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+        <translation>Warnung! Diese Einstellungen sollten Sie nur ändern, wenn Sie absolut sicher sind, dass Ihre Systemperformance nicht negativ beeinflußt wird.</translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -400,31 +435,8 @@
 <context>
     <name>CameraListDialog</name>
     <message>
-        <source>Camera list</source>
-        <translation>Kamera-Liste</translation>
-    </message>
-    <message>
         <source>Filter:</source>
         <translation>Filter:</translation>
-    </message>
-</context>
-<context>
-    <name>CameraManagementWidget</name>
-    <message>
-        <source>Allow system to optimize camera settings (Recommended)</source>
-        <translation>Optimierung der Kamera-Einstellungen erlauben (Empfohlen)</translation>
-    </message>
-    <message>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Achtung! Die Einstellungen FPS und Aufnahmequalität funktionieren nicht im Aufnahmeplan!</translation>
-    </message>
-    <message>
-        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation>Senden von anonymen Nutzungs- und Absturzstatistiken an die Software Entwickler (Empfohlen)</translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation>Automatische Suche nach Kameras und Servern aktivieren</translation>
     </message>
 </context>
 <context>
@@ -441,10 +453,6 @@
 <context>
     <name>CameraScheduleWidget</name>
     <message>
-        <source>Camera Schedule Editor</source>
-        <translation>Aufnahme-Planer</translation>
-    </message>
-    <message>
         <source>Enable Recording</source>
         <translation>Aufnahme aktivieren</translation>
     </message>
@@ -453,20 +461,8 @@
         <translation>Lizenzen hinzufügen...</translation>
     </message>
     <message>
-        <source>Schedule Grid</source>
-        <translation>Aufnahmeplan-Übersicht</translation>
-    </message>
-    <message>
-        <source>Display Quality on Grid</source>
-        <translation>Qualitätseinstellung in der Übersicht anzeigen</translation>
-    </message>
-    <message>
         <source>Panic Mode: </source>
         <translation>Panik Modus:</translation>
-    </message>
-    <message>
-        <source>Display FPS on Grid</source>
-        <translation>FPS-Einstellung in Übersicht anzeigen</translation>
     </message>
     <message>
         <source>Note: Recording Schedule is based on Server Time</source>
@@ -494,33 +490,12 @@
         <translation>Nur bei Bewegung</translation>
     </message>
     <message>
-        <source>Motion+ Lo-Res Always</source>
-        <translatorcomment>Bei Bewegung, und mit niedriger Qualität immer aufnehmen</translatorcomment>
-        <translation>Bei Bewegung; Lo-Res immer</translation>
-    </message>
-    <message>
-        <source>Do not Record</source>
-        <translation>Nicht aufnehmen</translation>
-    </message>
-    <message>
         <source>Fixed Archive Length</source>
         <translation>Feste Archiv Länge</translation>
     </message>
     <message>
         <source>Auto</source>
         <translation>Auto</translation>
-    </message>
-    <message>
-        <source>Warning! High value may prevent other cameras from recording!</source>
-        <translation>Hohe Werte können die Aufnahme bei einigen Kameras verhindern!</translation>
-    </message>
-    <message>
-        <source>Min days:</source>
-        <translation>Min Tage:</translation>
-    </message>
-    <message>
-        <source>Max days:</source>
-        <translation>Max Tage:</translation>
     </message>
     <message>
         <source>Motion Recording</source>
@@ -551,6 +526,34 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Copy Schedule...</source>
         <translatorcomment>Additional spaces are required to make place for the long &quot;Motion Recording&quot; caption</translatorcomment>
         <translation>Planung kopieren...</translation>
+    </message>
+    <message>
+        <source>Recording Schedule</source>
+        <translation>Aufnahme-Zeitplan</translation>
+    </message>
+    <message>
+        <source>Show Quality on Schedule</source>
+        <translation>Qualität im Zeitplan anzeigen</translation>
+    </message>
+    <message>
+        <source>Show FPS on Schedule</source>
+        <translation>FPS im Zeitplan anzeigen</translation>
+    </message>
+    <message>
+        <source>Motion + Low-Res </source>
+        <translation>Motion + Low Res</translation>
+    </message>
+    <message>
+        <source>Do Not Record</source>
+        <translation>Nicht aufnehmen</translation>
+    </message>
+    <message>
+        <source>Min. Days</source>
+        <translation>Min Tage</translation>
+    </message>
+    <message>
+        <source>Max. Days</source>
+        <translation>Max Tage</translation>
     </message>
 </context>
 <context>
@@ -603,6 +606,37 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>CustomHorizontalHeader</name>
+    <message>
+        <source>5 minutes</source>
+        <translation>5 Minuten</translation>
+    </message>
+    <message>
+        <source>Hour</source>
+        <translation>Stunde</translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation>Tag</translation>
+    </message>
+    <message>
+        <source>Week</source>
+        <translation>Woche</translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation>Monat</translation>
+    </message>
+    <message>
+        <source>All data</source>
+        <translation>Alle Daten</translation>
+    </message>
+    <message>
+        <source>Bitrate for the last recorded:</source>
+        <translation>Bitrate für die zuletzt aufgenommenen:</translation>
+    </message>
+</context>
+<context>
     <name>DatabaseManagementWidget</name>
     <message>
         <source>Create Backup...</source>
@@ -616,24 +650,12 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>EventLogDialog</name>
     <message>
-        <source>Event log</source>
-        <translation>Ereignisprotokoll</translation>
-    </message>
-    <message>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <source>Clear filter</source>
-        <translation>Filter zurücksetzen</translation>
-    </message>
-    <message>
         <source>Refresh</source>
         <translation>Aktualisieren</translation>
-    </message>
-    <message>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;jede Kamera&gt;</translation>
     </message>
     <message>
         <source>Alarm/Event Rules</source>
@@ -643,28 +665,36 @@ Short for &quot;seconds&quot;</extracomment>
         <source>All Servers are offline. Logs are not available.</source>
         <translation>Alle Server sind offline. Protokolle sind nicht verfügbar.</translation>
     </message>
+    <message>
+        <source>Event Log</source>
+        <translation>Ereignisprotokoll</translation>
+    </message>
+    <message>
+        <source>Clear Filter</source>
+        <translation>Filter zurücksetzen</translation>
+    </message>
 </context>
 <context>
     <name>FisheyeSettingsWidget</name>
     <message>
-        <source>Vertical mount (camera on the ceiling)</source>
-        <translation>Deckenmontage</translation>
-    </message>
-    <message>
-        <source>Horizontal mount (camera on the wall)</source>
-        <translation>Wandmontage</translation>
-    </message>
-    <message>
-        <source>Vertical mount (camera on the floor)</source>
-        <translation>Bodenmontage</translation>
-    </message>
-    <message>
-        <source>Camera view angle correction:</source>
-        <translation>Kamera-Sichtwinkelkorrektur:</translation>
-    </message>
-    <message>
         <source>Calibration</source>
         <translation>Kalibrierung</translation>
+    </message>
+    <message>
+        <source>Ceiling Mount</source>
+        <translation>Deckenhalterung</translation>
+    </message>
+    <message>
+        <source>Wall Mount</source>
+        <translation>Wandhalterung</translation>
+    </message>
+    <message>
+        <source>Floor/Table Mount</source>
+        <translation>Boden/Tisch-Halterung</translation>
+    </message>
+    <message>
+        <source>Camera View Angle Correction</source>
+        <translation>Kamera-Sichtwinkelkorrektur</translation>
     </message>
 </context>
 <context>
@@ -694,41 +724,40 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Sonstige Einstellungen</translation>
     </message>
     <message>
-        <source>Downmix audio from 5.1 to 2.1:</source>
-        <translation>Konvertiere 5.1 auf 2.1:</translation>
-    </message>
-    <message>
-        <source>Auto pause video:</source>
-        <translation>Pausiere Video automatisch:</translation>
-    </message>
-    <message>
         <source>after</source>
         <translation>nach</translation>
     </message>
     <message>
-        <source>minutes of inactivity</source>
-        <translatorcomment>part of a rule definition: Do XY after # minutes of inactivity</translatorcomment>
+        <source>Restart required</source>
+        <translation>Neustart erforderlich</translation>
+    </message>
+    <message>
+        <source>Downmix Audio from 5.1 to 2.1</source>
+        <translation>Konvertiere 5.1 auf 2.1</translation>
+    </message>
+    <message>
+        <source>Auto Pause Video</source>
+        <translation>Pausiere Video automatisch</translation>
+    </message>
+    <message>
+        <source>Minutes of Inactivity</source>
         <translation>Minuten ohne Aktivität</translation>
     </message>
     <message>
-        <source>Run application when PC boots up:</source>
+        <source>Run Application when PC Boots:</source>
         <translation>Anwendung bei Systemstart laden:</translation>
     </message>
     <message>
-        <source>Double buffering:</source>
+        <source>Double Buffering:</source>
         <translation>Pufferung:</translation>
     </message>
     <message>
-        <source>Browse logs</source>
+        <source>Browse Logs</source>
         <translation>Logs ansehen</translation>
     </message>
     <message>
-        <source>Clear local cache</source>
+        <source>Clear Local Cache</source>
         <translation>Lokalen Cache leeren</translation>
-    </message>
-    <message>
-        <source>Restart required</source>
-        <translation>Neustart erforderlich</translation>
     </message>
 </context>
 <context>
@@ -754,10 +783,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Strg+L</translation>
     </message>
     <message>
-        <source>&amp;Camera List</source>
-        <translation>&amp;Kamera-Liste</translation>
-    </message>
-    <message>
         <source>Ctrl+M</source>
         <translation>Strg+M</translation>
     </message>
@@ -766,71 +791,98 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&amp;Verfügbarkeitsanalyse</translation>
     </message>
     <message>
-        <source>Open all servers statistics on one layout</source>
-        <translation>Öffne alle Server-Statistiken in einem Layout</translation>
-    </message>
-    <message>
-        <source>System Configuration Backup and Restore</source>
-        <translation>Systemkonfiguration sichern und wiederherstellen</translation>
-    </message>
-    <message>
         <source>System Settings</source>
         <translation>Systemeinstellungen</translation>
+    </message>
+    <message>
+        <source>Open audit trail log</source>
+        <translation>Öffne Überwachungsprotokoll</translation>
+    </message>
+    <message>
+        <source>Monitor All Servers on a Single Layout</source>
+        <translation>Alle Server auf einem einzigen Layout überwachen</translation>
+    </message>
+    <message>
+        <source>System Backup and Restore</source>
+        <translation>System Backup und Wiederherstellung</translation>
+    </message>
+    <message>
+        <source>Audit Trail</source>
+        <translation>Überwachungspfad</translation>
     </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
     <message>
-        <source>Scroll here</source>
-        <translation>Scrollen Sie hier</translation>
-    </message>
-    <message>
-        <source>Left edge</source>
-        <translation>Linker Rand</translation>
-    </message>
-    <message>
         <source>Top</source>
         <translation>Oben</translation>
-    </message>
-    <message>
-        <source>Right edge</source>
-        <translation>Rechter Rand</translation>
     </message>
     <message>
         <source>Bottom</source>
         <translation>Unten</translation>
     </message>
     <message>
-        <source>Page left</source>
+        <source>Scroll Here</source>
+        <translation>Scrollen Sie hier</translation>
+    </message>
+    <message>
+        <source>Left Edge</source>
+        <translation>Linker Rand</translation>
+    </message>
+    <message>
+        <source>Right Edge</source>
+        <translation>Rechter Rand</translation>
+    </message>
+    <message>
+        <source>Page Left</source>
         <translation>Seite nach links</translation>
     </message>
     <message>
-        <source>Page up</source>
+        <source>Page Up</source>
         <translation>Seite nach oben</translation>
     </message>
     <message>
-        <source>Page right</source>
+        <source>Page Right</source>
         <translation>Seite nach rechts</translation>
     </message>
     <message>
-        <source>Page down</source>
+        <source>Page Down</source>
         <translation>Seite nach unten</translation>
     </message>
     <message>
-        <source>Scroll left</source>
+        <source>Scroll Left</source>
         <translation>Nach links scrollen</translation>
     </message>
     <message>
-        <source>Scroll up</source>
+        <source>Scroll Up</source>
         <translation>Nach oben scrollen</translation>
     </message>
     <message>
-        <source>Scroll right</source>
+        <source>Scroll Right</source>
         <translation>Nach rechts scrollen</translation>
     </message>
     <message>
-        <source>Scroll down</source>
+        <source>Scroll Down</source>
         <translation>Nach unten scrollen</translation>
+    </message>
+</context>
+<context>
+    <name>ImageControlWidget</name>
+    <message>
+        <source>Image Control</source>
+        <translation>Bildeinstellungen</translation>
+    </message>
+    <message>
+        <source>Force aspect ratio to:</source>
+        <translation>Seitenverhältnis erzwingen im Format:</translation>
+    </message>
+    <message>
+        <source>Default rotation:</source>
+        <translation>Standardeinstellung Rotation:</translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens camera</source>
+        <translation>Dies ist eine Fischaugenobjektiv-Kamera</translation>
     </message>
 </context>
 <context>
@@ -840,12 +892,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Bildansicht</translation>
     </message>
     <message>
-        <source>Loading image... Please wait.</source>
-        <translation>Bild wird geladen... Bitte warten.</translation>
-    </message>
-    <message>
         <source>&lt;No image&gt;</source>
         <translation>&lt;Kein Bild&gt;</translation>
+    </message>
+    <message>
+        <source>Loading Image...Please Wait.</source>
+        <translation>Bild wird geladen... Bitte warten.</translation>
     </message>
 </context>
 <context>
@@ -857,10 +909,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>General Settings</source>
         <translation>Allgemeine Einstellungen</translation>
-    </message>
-    <message>
-        <source>Layout is locked</source>
-        <translation>Layout ist geschützt</translation>
     </message>
     <message>
         <source>Background</source>
@@ -877,10 +925,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Clear</source>
         <translation>Zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Processing image... Please wait.</source>
-        <translation>Verarbeite Bild... Bitte warten.</translation>
     </message>
     <message>
         <source>&amp;Crop to monitor aspect ratio</source>
@@ -907,8 +951,78 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>%</translation>
     </message>
     <message>
-        <source>Keep aspect ratio</source>
+        <source>Layout is Locked</source>
+        <translation>Layout ist geschützt</translation>
+    </message>
+    <message>
+        <source>Processing Image...Please Wait.</source>
+        <translation>Verarbeite Bild... Bitte warten.</translation>
+    </message>
+    <message>
+        <source>Keep Aspect Ratio</source>
         <translation>Seitenverhältnis beibehalten</translation>
+    </message>
+</context>
+<context>
+    <name>LdapSettingsDialog</name>
+    <message>
+        <source>Server UR&amp;L:</source>
+        <translation>Server UR&amp;L:</translation>
+    </message>
+    <message>
+        <source>ldap(s)://host:port</source>
+        <translation>ldap(s)://host:port</translation>
+    </message>
+    <message>
+        <source>Ad&amp;min DN:</source>
+        <translation>Ad&amp;min DN:</translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation>&amp;Passwort:</translation>
+    </message>
+    <message>
+        <source>Search Base:</source>
+        <translation>Suchbasis:</translation>
+    </message>
+    <message>
+        <source>Search Filter:</source>
+        <translation>Suchfilter:</translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation>Optional</translation>
+    </message>
+    <message>
+        <source>Testing...</source>
+        <translation>Teste...</translation>
+    </message>
+    <message>
+        <source>LDAP Settings</source>
+        <translation>LDAP-Einstellungen</translation>
+    </message>
+</context>
+<context>
+    <name>LdapUsersDialog</name>
+    <message>
+        <source>Fetch Users from LDAP...</source>
+        <translation>Benutzer von LDAP abrufen...</translation>
+    </message>
+    <message>
+        <source>Select users to import</source>
+        <translation>Benutzer zum Importieren auswählen</translation>
+    </message>
+    <message>
+        <source>Filter...</source>
+        <translation>Filter...</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Lade...</translation>
+    </message>
+    <message>
+        <source>Connection error</source>
+        <translation>Verbindungsfehler</translation>
     </message>
 </context>
 <context>
@@ -936,6 +1050,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Features</source>
         <translation>Funktionen</translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation>Dieser Lizenztyp benötigt eine höhere Softwareversion.</translation>
     </message>
 </context>
 <context>
@@ -983,10 +1101,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Aus Zwischenablage einfügen</translation>
     </message>
     <message>
-        <source>License key is invalid</source>
-        <translation>Lizenz Schlüssel ist ungültig</translation>
-    </message>
-    <message>
         <source>Hardware ID:</source>
         <translation>Hardware-ID:</translation>
     </message>
@@ -997,10 +1111,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Activation Key File:</source>
         <translation>Aktivierungsschlüssel-Datei:</translation>
-    </message>
-    <message>
-        <source>Select license file...</source>
-        <translation>Lizenz-Datei auswählen...</translation>
     </message>
     <message>
         <source>Browse...</source>
@@ -1018,6 +1128,25 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Activate License</source>
         <translation>Lizenz aktivieren</translation>
     </message>
+    <message>
+        <source>License Key is Invalid</source>
+        <translation>Lizenz-Schlüssel ist ungültig</translation>
+    </message>
+    <message>
+        <source>Select License File...</source>
+        <translation>Lizenz-Datei auswählen...</translation>
+    </message>
+</context>
+<context>
+    <name>LicensesProposeWidget</name>
+    <message>
+        <source>Licensing</source>
+        <translation>Lizenzierung</translation>
+    </message>
+    <message>
+        <source>Get More Licenses...</source>
+        <translation>Lizenzen hinzufügen...</translation>
+    </message>
 </context>
 <context>
     <name>LoginDialog</name>
@@ -1033,10 +1162,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Delete</source>
         <translation>Löschen</translation>
-    </message>
-    <message>
-        <source>&amp;Connection options:</source>
-        <translation>&amp;Verbindungsangaben:</translation>
     </message>
     <message>
         <source>&amp;Host:</source>
@@ -1062,6 +1187,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>&amp;Auto-Login</source>
         <translation>&amp;Auto-Login</translation>
     </message>
+    <message>
+        <source>&amp;Connection Options:</source>
+        <translation>&amp;Verbindungsoptionen:</translation>
+    </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>
@@ -1069,11 +1198,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Look and Feel</source>
         <translatorcomment>https://de.wikipedia.org/wiki/Look_and_Feel</translatorcomment>
         <translation>Look and Feel</translation>
-    </message>
-    <message>
-        <source>Timeline mode:</source>
-        <translatorcomment>assuming: mode of the timeline</translatorcomment>
-        <translation>Zeitachsen-Modus:</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -1148,6 +1272,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Mode:</source>
         <translation>Modus:</translation>
     </message>
+    <message>
+        <source>Timeline Mode:</source>
+        <translation>Zeitachsen-Modus:</translation>
+    </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
@@ -1168,44 +1296,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Login:</translation>
     </message>
     <message>
-        <source>Image Control</source>
-        <translation>Bildeinstellungen</translation>
-    </message>
-    <message>
-        <source>Force aspect ratio to:</source>
-        <translation>Seitenverhältnis erzwingen im Format:</translation>
-    </message>
-    <message>
-        <source>Default rotation:</source>
-        <translation>Standardeinstellung Rotation:</translation>
-    </message>
-    <message>
-        <source>Licensing</source>
-        <translation>Lizenzierung</translation>
-    </message>
-    <message>
-        <source>Use an analog license to view this camera</source>
-        <translation>Analog-Lizenz für diese Kamera verwenden</translation>
-    </message>
-    <message>
-        <source>Get More Licenses...</source>
-        <translation>Lizenzen hinzufügen...</translation>
-    </message>
-    <message>
-        <source>Enable audio</source>
-        <translation>Audio aktivieren</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Das ist eine Kamera mit Fischaugenobjektiv</translation>
-    </message>
-    <message>
         <source>Recording</source>
         <translation>Aufnahme</translation>
     </message>
     <message>
         <source>Expert</source>
         <translation>Erweitert</translation>
+    </message>
+    <message>
+        <source>Enable Audio</source>
+        <translation>Audio aktivieren</translation>
     </message>
 </context>
 <context>
@@ -1226,12 +1326,12 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>PopupBusinessActionWidget</name>
     <message>
-        <source>Show to Administrators only</source>
-        <translation>Ansicht auf Admins beschränken</translation>
-    </message>
-    <message>
         <source>Global Notification Settings...</source>
         <translation>Globale Benachrichtigungseinstellungen...</translation>
+    </message>
+    <message>
+        <source>Show to administrators only</source>
+        <translation>Ansicht auf Admins beschränken</translation>
     </message>
 </context>
 <context>
@@ -1283,10 +1383,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Details</translation>
     </message>
     <message>
-        <source>No tour selected</source>
-        <translation>Keine Kamerafahrt ausgewählt</translation>
-    </message>
-    <message>
         <source>Preview</source>
         <translation>Vorschau</translation>
     </message>
@@ -1297,6 +1393,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Get Preview</source>
         <translation>Vorschau abrufen</translation>
+    </message>
+    <message>
+        <source>No Tour Selected</source>
+        <translation>Keine Kamerafahrt ausgewählt</translation>
     </message>
 </context>
 <context>
@@ -1329,16 +1429,16 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>PtzPresetDialog</name>
     <message>
-        <source>Save position</source>
-        <translation>Position speichern</translation>
-    </message>
-    <message>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
         <source>Hotkey:</source>
         <translation>Hotkey:</translation>
+    </message>
+    <message>
+        <source>Save Position</source>
+        <translation>Position speichern</translation>
     </message>
 </context>
 <context>
@@ -1517,10 +1617,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ressourcen ablegen</translation>
     </message>
     <message>
-        <source>Drop Resources into a New Layout</source>
-        <translation>Ressourcen in neuem Layout ablegen</translation>
-    </message>
-    <message>
         <source>Delayed Open Video Wall</source>
         <translation>Video-Wand verzögert öffnen</translation>
     </message>
@@ -1531,10 +1627,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Instant Drop Resources</source>
         <translation>Ressourcen sofort ablegen</translation>
-    </message>
-    <message>
-        <source>Move Cameras</source>
-        <translation>Bewege Kameras</translation>
     </message>
     <message>
         <source>Next Layout</source>
@@ -1585,10 +1677,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <source>Check Camera Issues...</source>
-        <translation>Kamerazustand prüfen...</translation>
-    </message>
-    <message>
         <source>Event Log...</source>
         <translation>Ereignisprotokoll...</translation>
     </message>
@@ -1609,20 +1697,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Anwendung neu starten</translation>
     </message>
     <message>
-        <source>Select time server</source>
-        <translation>Zeitserver auswählen</translation>
-    </message>
-    <message>
         <source>Go To Saved Position</source>
         <translation>Zu gespeicherter Position gehen</translation>
     </message>
     <message>
         <source>Activate PTZ Tour</source>
         <translation>PTZ-Kamerafahrt aktivieren</translation>
-    </message>
-    <message>
-        <source>Activate PTZ object</source>
-        <translation>PTZ-Objekt aktivieren</translation>
     </message>
     <message>
         <source>Fit in View</source>
@@ -1851,10 +1931,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Ctrl+L</source>
         <translation>Strg+L</translation>
-    </message>
-    <message>
-        <source>Camera List...</source>
-        <translation>Kamera-Liste...</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
@@ -2169,32 +2245,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Benutzereinstellungen...</translation>
     </message>
     <message>
-        <source>Camera Rules...</source>
-        <translation>Kamera Regeln...</translation>
-    </message>
-    <message>
-        <source>Camera Settings...</source>
-        <translation>Kamera Einstellungen...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>Layout Einstellungen...</translation>
     </message>
     <message>
         <source>Video Wall Settings...</source>
         <translation>Video-Wand Einstellungen...</translation>
-    </message>
-    <message>
-        <source>Open in Camera Settings Dialog</source>
-        <translation>Im Einstellungsdialog der Kamera öffnen</translation>
-    </message>
-    <message>
-        <source>Add Camera(s)...</source>
-        <translation>Kamera(s) hinzufügen...</translation>
-    </message>
-    <message>
-        <source>Camera(s) List by Server...</source>
-        <translation>Kamera(s) je Server zeigen...</translation>
     </message>
     <message>
         <source>Ping...</source>
@@ -2359,22 +2415,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Pause</source>
         <translation>Pause</translation>
-    </message>
-    <message>
-        <source>Ctrl+-</source>
-        <translation>Strg+-</translation>
-    </message>
-    <message>
-        <source>Speed Down</source>
-        <translation>langsamer</translation>
-    </message>
-    <message>
-        <source>Ctrl++</source>
-        <translation>Strg++</translation>
-    </message>
-    <message>
-        <source>Speed Up</source>
-        <translation>schneller</translation>
     </message>
     <message>
         <source>Ctrl+Left</source>
@@ -2544,6 +2584,58 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Ask About Statistics Reporting</source>
         <translation>Fragen rund um die Statistiken</translation>
     </message>
+    <message>
+        <source>Drop Resources into New Layout</source>
+        <translation>Ressourcen in neuem Layout ablegen</translation>
+    </message>
+    <message>
+        <source>Select Time Server</source>
+        <translation>Zeitserver auswählen</translation>
+    </message>
+    <message>
+        <source>Activate PTZ Object</source>
+        <translation>PTZ-Objekt aktivieren</translation>
+    </message>
+    <message>
+        <source>User Management...</source>
+        <translation>Benutzerverwaltung...</translation>
+    </message>
+    <message>
+        <source>Audit Trail...</source>
+        <translation>Überwachungspfad...</translation>
+    </message>
+    <message>
+        <source>Move %1</source>
+        <translation>Bewege %1</translation>
+    </message>
+    <message>
+        <source>Check %1 Issues...</source>
+        <translation>%1 Probleme überprüfen...</translation>
+    </message>
+    <message>
+        <source>%1 List...</source>
+        <translation>%1 auflisten...</translation>
+    </message>
+    <message>
+        <source>%1 Rules...</source>
+        <translation>%1 Regeln...</translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <translation>%1 Einstellungen...</translation>
+    </message>
+    <message>
+        <source>Open in %1 Settings Dialog...</source>
+        <translation>Öffne Einstellungsdialog in %1...</translation>
+    </message>
+    <message>
+        <source>Add Device(s)...</source>
+        <translation>Gerät(e) hinzufügen...</translation>
+    </message>
+    <message>
+        <source>%1 List by Server...</source>
+        <translation>%1 auflisten vom Server...</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2587,11 +2679,224 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnBlinkingImageButtonWidget</name>
+    <name>QnAuditLogDialog</name>
     <message>
-        <source>You have new notifications</source>
-        <translation>Sie haben neue Benachrichtigungen</translation>
+        <source>Play this</source>
+        <translation>Abspielen</translation>
     </message>
+    <message>
+        <source>Copy Selection to Clipboard</source>
+        <translation>Auswahl in Zwischenablage kopieren</translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation>Auswahl in Datei exportieren...</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>Alle auswählen</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Suche</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Information</translation>
+    </message>
+    <message>
+        <source>No archive data for that position left</source>
+        <translation>Keine Archivdaten für diese Position vorhanden</translation>
+    </message>
+    <message>
+        <source>This resources already removed from the system</source>
+        <translation>Diese Ressourcen wurden bereits aus dem System entfernt</translation>
+    </message>
+    <message>
+        <source>Export selected records to a file</source>
+        <translation>Exportiere ausgewählte Aufnahmen</translation>
+    </message>
+    <message>
+        <source>Audit log replay</source>
+        <translation>Überwachungsprotokoll wiedergeben</translation>
+    </message>
+    <message>
+        <source>%1 actions</source>
+        <translation>%1 Aktionen</translation>
+    </message>
+</context>
+<context>
+    <name>QnAuditLogModel</name>
+    <message>
+        <source>%1d </source>
+        <translation>%1Tag </translation>
+    </message>
+    <message>
+        <source>%1h </source>
+        <translation>%1Std </translation>
+    </message>
+    <message>
+        <source>%1m </source>
+        <translation>%1Min </translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Unbekannt</translation>
+    </message>
+    <message>
+        <source>Unsuccessful login</source>
+        <translation>Anmeldung nicht erfolgreich</translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation>Login</translation>
+    </message>
+    <message>
+        <source>User updated</source>
+        <translation>Benutzer aktualisiert</translation>
+    </message>
+    <message>
+        <source>Watching live</source>
+        <translation>Live wird angesehen</translation>
+    </message>
+    <message>
+        <source>Watching archive</source>
+        <translation>Archiv wird angesehen</translation>
+    </message>
+    <message>
+        <source>Exporting video</source>
+        <translation>Video wird exportiert</translation>
+    </message>
+    <message>
+        <source>System name changed</source>
+        <translation>Systemname wurde geändert</translation>
+    </message>
+    <message>
+        <source>System merge</source>
+        <translation>System zusammenfügen</translation>
+    </message>
+    <message>
+        <source>General settings updated</source>
+        <translation>Allgemeine Einstellungen wurden aktualisiert</translation>
+    </message>
+    <message>
+        <source>Server updated</source>
+        <translation>Server wurde aktualisiert</translation>
+    </message>
+    <message>
+        <source>Business rule updated</source>
+        <translation>Geschäftsregel wurde aktualisiert</translation>
+    </message>
+    <message>
+        <source>Server removed</source>
+        <translation>Server wurde entfernt</translation>
+    </message>
+    <message>
+        <source>Business rule removed</source>
+        <translation>Geschäftsregel wurde entfernt</translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation>Benutzer wurde entfernt</translation>
+    </message>
+    <message>
+        <source>Business rule reseted</source>
+        <translation>Geschäftsregel wurde zurückgesetzt</translation>
+    </message>
+    <message>
+        <source>Database restored</source>
+        <translation>Datenbank wurde zurückgesetzt</translation>
+    </message>
+    <message>
+        <source>Play this</source>
+        <translation>Abspielen</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Einstellungen</translation>
+    </message>
+    <message>
+        <source>%1 - %2, </source>
+        <translation>%1 - %2, </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n action(s)</source>
+        <translation>
+            <numerusform>%n Aktion</numerusform>
+            <numerusform>%n Aktionen</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Session begins</source>
+        <translation>Beginn der Sitzung</translation>
+    </message>
+    <message>
+        <source>Session ends</source>
+        <translation>Ende der Sitzung</translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation>Dauer</translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation>Benutzer</translation>
+    </message>
+    <message>
+        <source>IP</source>
+        <translation>IP</translation>
+    </message>
+    <message>
+        <source>Activity</source>
+        <translation>Aktivität</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation>Zeit</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
+    </message>
+    <message>
+        <source>View it</source>
+        <translation>Ansehen</translation>
+    </message>
+    <message>
+        <source>Click to expand</source>
+        <translation>Klicken zum Erweitern</translation>
+    </message>
+    <message>
+        <source>Red mark means that an archive is still available</source>
+        <translation>Die rote Markierung bedeutet, dass ein Archiv noch verfügbar ist</translation>
+    </message>
+    <message>
+        <source>E-mail settings changed</source>
+        <translation>E-Mail Einstellungen wurden geändert</translation>
+    </message>
+    <message>
+        <source>%1 updated</source>
+        <translation>%1 wurde aktualisiert</translation>
+    </message>
+    <message>
+        <source>%1 added</source>
+        <translation>%1 wurde hinzugefügt</translation>
+    </message>
+    <message>
+        <source>%1 removed</source>
+        <translation>%1 wurde entfernt</translation>
+    </message>
+    <message>
+        <source>%1 name</source>
+        <translation>%1 Name</translation>
+    </message>
+</context>
+<context>
+    <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
         <source>You have %n notifications</source>
         <translation>
@@ -2599,17 +2904,13 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>Sie haben %n Benachrichtigungen</numerusform>
         </translation>
     </message>
+    <message>
+        <source>You have new notifications.</source>
+        <translation>Sie haben neue Benachrichtigungen.</translation>
+    </message>
 </context>
 <context>
     <name>QnBuildNumberDialog</name>
-    <message>
-        <source>Install specific build</source>
-        <translation>Installiere spezielle Version</translation>
-    </message>
-    <message>
-        <source>Build number:</source>
-        <translation>Versionsnummer:</translation>
-    </message>
     <message>
         <source>99990</source>
         <translation>99990</translation>
@@ -2623,33 +2924,34 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Fehler</translation>
     </message>
     <message>
-        <source>The password you have entered is invalid</source>
-        <translation>Das eingegebene Passwort ist ungültig</translation>
+        <source>Install a specific build.</source>
+        <translation>Installiere eine spezielle Version.</translation>
+    </message>
+    <message>
+        <source>Build Number:</source>
+        <translation>Versionsnummer:</translation>
+    </message>
+    <message>
+        <source>The password you have entered is not valid.</source>
+        <translation>Das eingegebene Passwort ist ungültig.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;jede Kamera&gt;</translation>
-    </message>
-    <message>
-        <source>Select at least one camera</source>
-        <translation>Mindestens eine Kamera wählen</translation>
-    </message>
     <message numerus="yes">
-        <source>%n Camera(s)</source>
+        <source>%n of %1</source>
         <translation>
-            <numerusform>%n Kamera</numerusform>
-            <numerusform>%n Kameras</numerusform>
+            <numerusform>%n von %1</numerusform>
+            <numerusform>%n von %1</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n of %1 cameras</source>
-        <translation>
-            <numerusform>%n von %1 Kameras</numerusform>
-            <numerusform>%n von %1 Kameras</numerusform>
-        </translation>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation>&lt;Jede %1&gt;</translation>
+    </message>
+    <message>
+        <source>Select at least one %1.</source>
+        <translation>Wählen Sie mindestens eine %1.</translation>
     </message>
 </context>
 <context>
@@ -2683,37 +2985,6 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>%n Server</numerusform>
             <numerusform>%n Server</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;jede Kamera&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Camera(s)</source>
-        <translation>
-            <numerusform>%n Kamera</numerusform>
-            <numerusform>%n Kameras</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Administrators only</source>
-        <translation>Nur Administratoren</translation>
-    </message>
-    <message>
-        <source>All users</source>
-        <translation>Alle Benutzer</translation>
-    </message>
-    <message>
-        <source>Select a sound</source>
-        <translation>Ton auswählen</translation>
-    </message>
-    <message>
-        <source>Enter text</source>
-        <translation>Text eingeben</translation>
-    </message>
-    <message>
-        <source>Select at least one camera</source>
-        <translation>Mindestens eine Kamera wählen</translation>
     </message>
     <message>
         <source>Not Applied</source>
@@ -2764,20 +3035,28 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Starts/Stops</translation>
     </message>
     <message>
-        <source>start</source>
-        <translation>starten</translation>
+        <source>Administrators Only</source>
+        <translation>Nur Administratoren</translation>
     </message>
     <message>
-        <source>stop</source>
-        <translation>stoppen</translation>
+        <source>All Users</source>
+        <translation>Alle Benutzer</translation>
     </message>
     <message>
-        <source>While %1</source>
-        <translation>Während %1</translation>
+        <source>Select Sound</source>
+        <translation>Ton auswählen</translation>
     </message>
     <message>
-        <source>On %1 %2</source>
-        <translation>An %1 %2</translation>
+        <source>Enter Text</source>
+        <translation>Text eingeben</translation>
+    </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation>&lt;Jede %1&gt;</translation>
+    </message>
+    <message>
+        <source>Select at least one %1</source>
+        <translation>Wählen Sie mindestens eine %1</translation>
     </message>
 </context>
 <context>
@@ -2791,16 +3070,20 @@ Short for &quot;seconds&quot;</extracomment>
         <source>at</source>
         <translation>an</translation>
     </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation>&lt;Jede %1&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Select at least one %1&gt;</source>
+        <translation>&lt;Wählen Sie mindestens eine %1&gt;</translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRulesDialog</name>
     <message>
         <source>Reset Default Rules</source>
         <translation>Standard Regeln wiederherstellen</translation>
-    </message>
-    <message>
-        <source>Confirm rules reset</source>
-        <translation>Regel-Reset bestätigen</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2813,10 +3096,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Error while saving rule.</source>
         <translation>Fehler beim Speichern der Regeln.</translation>
-    </message>
-    <message>
-        <source>Error while deleting rule</source>
-        <translation>Fehler beim Löschen der Regeln</translation>
     </message>
     <message>
         <source>Hide Advanced</source>
@@ -2839,16 +3118,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&amp;Planen...</translation>
     </message>
     <message>
-        <source>Confirm save</source>
-        <translation>Speichern bestätigen</translation>
-    </message>
-    <message>
         <source>Some rules are not valid. Should they be disabled?</source>
         <translation>Einige Regeln sind ungültig. Sollen diese deaktiviert werden?</translation>
-    </message>
-    <message>
-        <source>Confirm exit</source>
-        <translation>Beenden bestätigen</translation>
     </message>
     <message>
         <source>Unsaved changes will be lost. Save?</source>
@@ -2861,6 +3132,26 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>This action CANNOT be undone!</source>
         <translation>Diese Aktion kann NICHT widerrufen werden!</translation>
+    </message>
+    <message>
+        <source>Confirm Rules Reset</source>
+        <translation>Regel-Reset bestätigen</translation>
+    </message>
+    <message>
+        <source>Error while deleting rule.</source>
+        <translation>Fehler beim Löschen der Regeln.</translation>
+    </message>
+    <message>
+        <source>Confirm Save</source>
+        <translation>Speichern bestätigen</translation>
+    </message>
+    <message>
+        <source>Confirm Exit</source>
+        <translation>Beenden bestätigen</translation>
+    </message>
+    <message>
+        <source>filter by %1...</source>
+        <translation>Filtern nach %1...</translation>
     </message>
 </context>
 <context>
@@ -2913,48 +3204,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Startadresse des Bereichs ist größer als die Endadresse.</translation>
     </message>
     <message>
-        <source>Specified IP address range contains more than 255 addresses.</source>
-        <translation>Der definierte Adressbereich umfasst mehr als 255 Adressen.</translation>
-    </message>
-    <message>
-        <source>Camera address field must contain valid URL, IP address or RTSP link.</source>
-        <translation>Kamera-Adressfeld muss gültige URL, IP-Adresse oder RTSP-Link enthalten.</translation>
-    </message>
-    <message>
-        <source>Finishing search...</source>
-        <translation>Suche abschließen...</translation>
-    </message>
-    <message>
-        <source>No cameras selected</source>
-        <translation>Keine Kameras ausgewählt</translation>
-    </message>
-    <message>
-        <source>Please select at least one camera</source>
-        <translation>Bitte wählen Sie mindestens eine Kamera</translation>
-    </message>
-    <message>
         <source>Success</source>
         <translation>Aktion erfolgreich</translation>
-    </message>
-    <message>
-        <source>Server went offline, search aborted.</source>
-        <translation>Server ging offline. Suche abgebrochen.</translation>
-    </message>
-    <message>
-        <source>Server went offline, cameras can be added when the server will be available.</source>
-        <translation>Server ging offline. Kameras können hinzugefügt werden, sobald der Server wieder verfügbar ist.</translation>
-    </message>
-    <message>
-        <source>Server was removed, search aborted.</source>
-        <translation>Server wurde entfernt. Suche abgebrochen.</translation>
-    </message>
-    <message>
-        <source>Server was removed, cameras cannot be added anymore.</source>
-        <translation>Server wurde entfernt. Hinzufügen von Kameras ist nicht mehr möglich.</translation>
-    </message>
-    <message>
-        <source>Error while searching cameras.</source>
-        <translation>Bei der Kamerasuche ist ein Fehler aufgetreten.</translation>
     </message>
     <message>
         <source>Scanning online hosts...</source>
@@ -2967,32 +3218,9 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>Scanne Server... (%1)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n cameras found</source>
-        <translation>
-            <numerusform>Kamera gefunden</numerusform>
-            <numerusform>%n Kameras gefunden</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Finished</source>
         <translation>Beendet</translation>
-    </message>
-    <message>
-        <source>All cameras are already in the resource tree.</source>
-        <translation>Alle Kameras befinden sich bereits in der Objektleiste.</translation>
-    </message>
-    <message>
-        <source>No cameras found.</source>
-        <translation>Keine Kameras gefunden.</translation>
-    </message>
-    <message>
-        <source>Add cameras to %1</source>
-        <translation>Kameras zu %1 hinzufügen</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translation>Kameras hinzufügen...</translation>
     </message>
     <message>
         <source>Select target server...</source>
@@ -3007,45 +3235,96 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Server ist offline.</translation>
     </message>
     <message>
-        <source>Camera addition is possible for online servers only.</source>
-        <translation>Kameras können nur bei Servern hinzugefügt werden, die online sind.</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n cameras added successfully.</source>
-        <translation>
-            <numerusform>%n Kamera erfolgreich hinzugefügt.</numerusform>
-            <numerusform>%n Kameras erfolgreich hinzugefügt.</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>It might take a few moments to populate them in the tree.</source>
         <translation>Es kann etwas dauern, bis sie in der Objektleiste erscheinen.</translation>
     </message>
+    <message>
+        <source>The specified IP address range has more than 255 addresses.</source>
+        <translation>Der definierte Adressbereich umfasst mehr als 255 Adressen.</translation>
+    </message>
+    <message>
+        <source>Finished searching...</source>
+        <translation>Suche abschließen...</translation>
+    </message>
+    <message>
+        <source>Server went offline - search aborted.</source>
+        <translation>Server ging offline. Suche abgebrochen.</translation>
+    </message>
+    <message>
+        <source>Server has been removed - search aborted.</source>
+        <translation>Server wurde entfernt. Suche abgebrochen.</translation>
+    </message>
+    <message>
+        <source>Device addition is possible for online servers only.</source>
+        <translation>Hinzufügen der Geräte ist nur möglich, wenn Server online ist.</translation>
+    </message>
+    <message>
+        <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
+        <translation>Das Geräte Adressfeld musst eine gültige URL, IP-Adresse oder RTSP-Link beinhalten.</translation>
+    </message>
+    <message>
+        <source>No devices selected.</source>
+        <translation>Keine Geräte ausgewählt.</translation>
+    </message>
+    <message>
+        <source>Please select at least one device</source>
+        <translation>Wählen Sie bitte mindestens ein Gerät aus</translation>
+    </message>
     <message numerus="yes">
-        <source>Error while adding %n cameras.</source>
+        <source>%n devices added successfully.</source>
         <translation>
-            <numerusform>Fehler beim Versuch %n Kamera hinzuzufügen.</numerusform>
-            <numerusform>Fehler beim Versuch %n Kameras hinzuzufügen.</numerusform>
+            <numerusform>%n Gerät wurde erfolgreich hinzugefügt.</numerusform>
+            <numerusform>%n Geräte wurden erfolgreich hinzugefügt.</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n devices.</source>
+        <translation>
+            <numerusform>Fehler beim Hinzufügen von %n Gerät.</numerusform>
+            <numerusform>Fehler beim Hinzufügen von %n Geräten.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server is offline, devices can only be added to an online server.</source>
+        <translation>Server ist offline, Geräte können nur hinzugefügt werden, wenn der Server online ist.</translation>
+    </message>
+    <message>
+        <source>Server has been removed - cannot add devices.</source>
+        <translation>Server wurden entfernt - Geräte können nicht hinzugefügt werden.</translation>
+    </message>
+    <message>
+        <source>Error while searching for device(s).</source>
+        <translation>Fehler beim Suchen von Geräten.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n devices found</source>
+        <translation>
+            <numerusform>%n Gerät gefunden</numerusform>
+            <numerusform>%n Geräte gefunden</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>All devices are already in the resource tree.</source>
+        <translation>Alle Geräte sind bereits in der Objektleiste.</translation>
+    </message>
+    <message>
+        <source>No devices found.</source>
+        <translation>Keine Geräte gefunden.</translation>
+    </message>
+    <message>
+        <source>Add devices to %1</source>
+        <translation>Füge Geräte zu %1 hinzu</translation>
+    </message>
+    <message>
+        <source>Add devices...</source>
+        <translation>Geräte hinzufügen...</translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
-        <source>Applying settings...</source>
-        <translation>Einstellungen werden angewendet...</translation>
-    </message>
-    <message>
-        <source>Possibly, appropriate camera&apos;s service is unavailable now</source>
-        <translation>Eventuell ist der entsprechende Kamera-Service derzeit nicht verfügbar</translation>
-    </message>
-    <message>
         <source>Server returned the following error code : </source>
         <translation>Server antwortete mit folgendem Fehler-Code: </translation>
-    </message>
-    <message>
-        <source>Could not save parameters</source>
-        <translation>Konnte die Parameter nicht speichern</translation>
     </message>
     <message>
         <source>Failed to save the following parameters (%1):
@@ -3060,6 +3339,18 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>This can take a lot of time.</source>
         <translation>Das kann eine ganze Weile dauern.</translation>
+    </message>
+    <message>
+        <source>Applying Settings...</source>
+        <translation>Einstellungen werden angewendet...</translation>
+    </message>
+    <message>
+        <source>Target camera&apos;s service is unavailable. Try again.</source>
+        <translation>Dienst der Zielkamera ist nicht erreichbar. Versuchen Sie es erneut.</translation>
+    </message>
+    <message>
+        <source>Could not save paramaters.</source>
+        <translation>Konnte die Parameter nicht speichern.</translation>
     </message>
 </context>
 <context>
@@ -3085,14 +3376,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>T&amp;ags</translation>
     </message>
     <message>
-        <source>List of tags divided by commas or spaces</source>
-        <translation>Komma oder Leerzeichen getrennte Liste von Tags</translation>
-    </message>
-    <message>
-        <source>Do not lock archive</source>
-        <translation>Archiv nicht sperren</translation>
-    </message>
-    <message>
         <source>1 month</source>
         <translation>1 Monat</translation>
     </message>
@@ -3108,32 +3391,20 @@ Short for &quot;seconds&quot;</extracomment>
         <source>year</source>
         <translation>Jahr</translation>
     </message>
+    <message>
+        <source>Do not lock archive.</source>
+        <translation>Archiv nicht sperren.</translation>
+    </message>
+    <message>
+        <source>List of tags divided by commas or spaces.</source>
+        <translation>Komma oder Leerzeichen getrennte Liste von Tags.</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
         <source>Copy to Clipboard</source>
         <translation>In Zwischenablage kopieren</translation>
-    </message>
-    <message>
-        <source>Diagnostics for camera %1.</source>
-        <translation>Diagnose von Kamera %1.</translation>
-    </message>
-    <message>
-        <source>Checking Server availability</source>
-        <translation>Prüfe Serververfügbarkeit</translation>
-    </message>
-    <message>
-        <source>Checking that camera is accessible</source>
-        <translation>Prüfe Kameraverfügbarkeit</translation>
-    </message>
-    <message>
-        <source>Checking that camera provides media stream</source>
-        <translation>Prüfe ob Kamerastream verfügbar</translation>
-    </message>
-    <message>
-        <source>Checking media stream for errors</source>
-        <translation>Prüfe Media-Stream auf Fehler</translation>
     </message>
     <message>
         <source>OK</source>
@@ -3144,8 +3415,34 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>FEHLER: %1</translation>
     </message>
     <message>
-        <source>Diagnostics finished</source>
-        <translation>Diagnose beendet</translation>
+        <source>Confirming server availability.</source>
+        <translation>Prüfe Serververfügbarkeit.</translation>
+    </message>
+    <message>
+        <source>Evaluating media stream for errors.</source>
+        <translation>Prüfe Media-Stream auf Fehler.</translation>
+    </message>
+    <message>
+        <source>Diagnostics complete!</source>
+        <translation>Diagnose fertiggestellt!</translation>
+    </message>
+    <message>
+        <source>Diagnostics for %1 %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
+        <translation>Diagnose für %1 %2.</translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
+        <translation>%1 Diagnose</translation>
+    </message>
+    <message>
+        <source>Confirming %1 is accessible.</source>
+        <translation>Bestätigung %1 ist verfügbar.</translation>
+    </message>
+    <message>
+        <source>Confirming target %1 provides media stream.</source>
+        <translation>Bestätigung der Ziel %1 bietet Medienstream.</translation>
     </message>
 </context>
 <context>
@@ -3179,23 +3476,17 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Select All</source>
         <translation>Alle auswählen</translation>
     </message>
-    <message numerus="yes">
-        <source>Camera List - %n camera(s) found</source>
-        <translation>
-            <numerusform>Kamera-Liste - Eine Kamera gefunden</numerusform>
-            <numerusform>Kamera-Liste - %n Kameras gefunden</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
-        <translation>
-            <numerusform>Kamera-Liste von %1 - Eine Kamera gefunden</numerusform>
-            <numerusform>Kamera-Liste von %1 - %n Kameras gefunden</numerusform>
-        </translation>
+    <message>
+        <source>%1 List for &apos;%2&apos; - %3 found</source>
+        <translation>%1 auflisten für &apos;%2&apos; - %3 gefunden</translation>
     </message>
     <message>
-        <source>Export selected cameras to file</source>
-        <translation>Ausgewählte Kameras in Datei exportieren</translation>
+        <source>%1 List - %2 found</source>
+        <translation>%1 auflisten - %2 gefunden</translation>
+    </message>
+    <message>
+        <source>Export selected %1 to a file.</source>
+        <translation>Ausgewählte %1 exportieren.</translation>
     </message>
 </context>
 <context>
@@ -3304,81 +3595,79 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Warnung</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation>Bewegungsgesteuerte Aufnahme ist deaktiviert oder wird von einigen der ausgewählten Kameras nicht unterstützt. Bitte überprüfen Sie bei den Motion-Einstellungen der Kamera, ob bewegungsgesteuerte Aufnahmen unterstützt werden und ob diese aktiviert sind.</translation>
+        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
+        <translation>Warnung! Höhere Minimalwerte könnten die Aufnahmezeit anderer %1 verkürzen.</translation>
     </message>
     <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>Der Dual-Stream wird von dieser Kamera nicht unterstützt.</translation>
+        <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation>Bewegungserkennung ist deaktiviert oder wird nicht unterstützt für einige ausgewählte %1. Begeben Sie sich bitte in die Bewegungserkennungseinstellungen und prüfen Sie, ob es unterstützt und aktiviert ist.</translation>
     </message>
     <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>Der Dual-Stream und die Bewegungserkennung sind auf dieser Kamera nicht verfügbar.</translation>
+        <source>Dual-Streaming is not supported by this %1.</source>
+        <translation>Dual-Stream wird nicht unterstützt von %1.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
-        <translation>Bewegungsgesteuerte Aufnahme ist deaktiviert. Bitte stellen Sie in den Kamera-Einstellungen zur bewegungsgesteuerten Aufnahme das Erkennungsfeld und die Empfindlichkeit ein.</translation>
+        <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
+        <translation>Dual-Stream und Bewegungserkennung sind nicht verfügbar für %1.</translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
+        <translation>Bewegungserkennungsaufnahmen sind deaktiviert. Begeben Sie sich bitte in die Bewegungserkennungseinstellungen, um die %1 Bewegungserkennungsfenster und Empfindlichkeit einzustellen.</translation>
     </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
     <message>
-        <source>Camera settings</source>
-        <translation>Kamera Einstellungen</translation>
-    </message>
-    <message>
         <source>Open in New Tab</source>
         <translation>In neuem Tab öffnen</translation>
-    </message>
-    <message>
-        <source>Camera Diagnostics</source>
-        <translation>Kameradiagnose</translation>
-    </message>
-    <message>
-        <source>Camera Rules</source>
-        <translation>Kamera Regeln</translation>
-    </message>
-    <message>
-        <source>Camera(s) not Saved</source>
-        <translation>Kamera(s) nicht gespeichert</translation>
-    </message>
-    <message numerus="yes">
-        <source>Save changes to the following %n camera(s)?</source>
-        <translation>
-            <numerusform>Änderungen bei der folgenden Kamera speichern?</numerusform>
-            <numerusform>Änderungen bei den folgenden %n Kameras speichern?</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation>Aufnahme Änderungen wurden nicht gespeichert. Bitte wählen Sie Aufnahme-Typ, FPS, Qualität und markieren Sie die Verändungen im Aufnahmeplan.</translation>
-    </message>
-    <message>
-        <source>Changes are not applied</source>
-        <translation>Änderungen wurden nicht angewendet</translation>
-    </message>
-    <message>
-        <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
-        <translation>Bewegungsempfindlichkeit wurde nicht verändert. Änderung durch das Zeichnen von Rechtecken im Bild.</translation>
-    </message>
-    <message>
-        <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation>Lizenzlimit erreicht. Änderungen werden gespeichert, aber nicht umgesetzt.</translation>
-    </message>
-    <message>
-        <source>Could not apply changes</source>
-        <translation>Änderungen konnten nicht angewendet werden</translation>
     </message>
     <message>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
-    <message numerus="yes">
-        <source>Could not save the following %n cameras to Server.</source>
-        <translation>
-            <numerusform>Konnte diese Kamera nicht auf dem Server speichern.</numerusform>
-            <numerusform>Konnte die folgenden %n Kameras nicht auf dem Server speichern.</numerusform>
-        </translation>
+    <message>
+        <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
+        <translation>Aufnahme Änderungen wurden nicht gespeichert. Bitte wählen Sie Aufnahme-Typ, FPS, Qualität und markieren Sie die Verändungen im Aufnahmeplan.</translation>
+    </message>
+    <message>
+        <source>Changes have not been applied.</source>
+        <translation>Änderungen wurden nicht angewendet.</translation>
+    </message>
+    <message>
+        <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
+        <translation>Bewegungsempfindlichkeit wurde nicht verändert. Änderung durch das Zeichnen von Rechtecken im Bild.</translation>
+    </message>
+    <message>
+        <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
+        <translation>Lizenzlimit erreicht. Änderungen werden gespeichert, aber nicht umgesetzt.</translation>
+    </message>
+    <message>
+        <source>Could not apply changes.</source>
+        <translation>Änderungen konnten nicht angewendet werden.</translation>
+    </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation>%1 Einstellungen</translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics</source>
+        <translation>%1 Diagnose</translation>
+    </message>
+    <message>
+        <source>%1 Rules</source>
+        <translation>%1 Regeln</translation>
+    </message>
+    <message>
+        <source>%1 not saved.</source>
+        <translation>%1 nicht gespeichert.</translation>
+    </message>
+    <message>
+        <source>Save changes to the following %1?</source>
+        <translation>Änderungen Speichern für %1?</translation>
+    </message>
+    <message>
+        <source>Could not save the following %1 to Server.</source>
+        <translation>Konnte folgendes  %1 nicht auf dem Server speichern.</translation>
     </message>
 </context>
 <context>
@@ -3388,8 +3677,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Eigenschaften unterschiedlicher Objekte können nicht zusammen bearbeitet werden.</translation>
     </message>
     <message>
-        <source>No cameras selected.</source>
-        <translation>Keine Kameras ausgewählt.</translation>
+        <source>No %1 selected.</source>
+        <translation>Kein %1 ausgewählt.</translation>
     </message>
 </context>
 <context>
@@ -3409,38 +3698,30 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnClockLabel</name>
     <message>
-        <source>Server time</source>
+        <source>Server Time</source>
         <translation>Server Zeit</translation>
     </message>
     <message>
-        <source>Local system time</source>
+        <source>Local System Time</source>
         <translation>Lokale Systemzeit</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
-        <source>Configuring server(s)</source>
+        <source>Configuring Server(s)</source>
         <translation>Konfiguriere Server</translation>
     </message>
     <message>
-        <source>Updating server(s)</source>
+        <source>Updating Server(s)</source>
         <translation>Server werden aktualisiert</translation>
     </message>
 </context>
 <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
-        <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation>Eingegebener Login oder Passwort ungültig. Bitte versuchen Sie es erneut.</translation>
-    </message>
-    <message>
         <source>You are trying to connect to incompatible Server.</source>
         <translation>Sie versuchen auf einen inkompatiblen Server zuzugreifen.</translation>
-    </message>
-    <message>
-        <source>Could not connect to Server</source>
-        <translation>Verbindung zum Server gescheitert</translation>
     </message>
     <message>
         <source>Server</source>
@@ -3449,10 +3730,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Client</source>
         <translation>Client</translation>
-    </message>
-    <message>
-        <source>Launcher process is not found</source>
-        <translation>Ladeprozess nicht gefunden</translation>
     </message>
     <message>
         <source>Failure</source>
@@ -3542,28 +3819,40 @@ Short for &quot;seconds&quot;</extracomment>
         <source>You will be asked to update your %1</source>
         <translation>Bitte aktualisieren Sie %1</translation>
     </message>
+    <message>
+        <source>The username or password you have entered is incorrect. Please try again.</source>
+        <translation>Eingegebener Login oder Passwort ungültig. Bitte versuchen Sie es erneut.</translation>
+    </message>
+    <message>
+        <source>Unable to connect to the server</source>
+        <translation>Nicht imstande mit Server zu verbinden</translation>
+    </message>
+    <message>
+        <source>Launcher process not found.</source>
+        <translation>Ladeprozess nicht gefunden</translation>
+    </message>
+    <message>
+        <source>LDAP Server connection timed out.</source>
+        <translation>Zeitüberschreitung bei LDAP Server.</translation>
+    </message>
 </context>
 <context>
     <name>QnConnectionTestingDialog</name>
-    <message>
-        <source>Request timed out.</source>
-        <translation>Zeitüberschreitung der Anforderung.</translation>
-    </message>
     <message>
         <source>Success</source>
         <translation>Aktion erfolgreich</translation>
     </message>
     <message>
-        <source>Failed</source>
-        <translation>Fehlschlag</translation>
+        <source>Request timeout</source>
+        <translation>Zeitüberschreitung der Anforderung.</translation>
+    </message>
+    <message>
+        <source>Test Failed</source>
+        <translation>Test fehlgeschlagen</translation>
     </message>
 </context>
 <context>
     <name>QnCredentialsDialog</name>
-    <message>
-        <source>Enter user name and password...</source>
-        <translation>Geben Sie Benutzername und Passwort an...</translation>
-    </message>
     <message>
         <source>User:</source>
         <translation>Benutzername:</translation>
@@ -3571,6 +3860,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Password:</source>
         <translation>Passwort:</translation>
+    </message>
+    <message>
+        <source>Enter a valid username and password...</source>
+        <translation>Geben Sie Benutzername und Passwort an...</translation>
     </message>
 </context>
 <context>
@@ -3608,10 +3901,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Information</translation>
     </message>
     <message>
-        <source>Failed to dump Server database to &apos;%1&apos;</source>
-        <translation>Fehler beim Server-Datenbank Dump nach &apos;%1&apos;</translation>
-    </message>
-    <message>
         <source>Database was successfully backed up into file &apos;%1&apos;.</source>
         <translation>Datenbank wurde erfolgreich in die Datei &apos;%1&apos; gesichert.</translation>
     </message>
@@ -3628,10 +3917,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Warnung</translation>
     </message>
     <message>
-        <source>Are you sure you want to start restoring database? All current data will be lost.</source>
-        <translation>Sind Sie sicher, dass Sie die Datenbank wiederherstellen wollen? Alle aktuellen Daten gehen verloren.</translation>
-    </message>
-    <message>
         <source>Restoring Database Backup</source>
         <translation>Stelle Datenbank-Sicherung wieder her</translation>
     </message>
@@ -3640,16 +3925,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Datenbank-Sicherung wird zum Server hochgeladen. Bitte um etwas Geduld.</translation>
     </message>
     <message>
-        <source>You need to connect to a server before doing backup</source>
-        <translation>Sie müssen sich mit einem Server verbinden um eine Datensicherung erstellen zu können</translation>
-    </message>
-    <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
         <translation>Datenbank wurde erfolgreich aus Datei &apos;%1&apos; wiederhergestellt. Der Media-Server wird neu gestartet.</translation>
     </message>
     <message>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
         <translation>Beim Versuch die Datenbank aus Datei &apos;%1&apos; wiederherzustellen ereignete sich ein Fehler.</translation>
+    </message>
+    <message>
+        <source>Failed to dump server database to %1.</source>
+        <translation>Fehler beim Server-Datenbank Dump nach %1.</translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
+        <translation>Datenbank wirklich zurücksetzen? Alle Daten werden dabei gelöscht.</translation>
+    </message>
+    <message>
+        <source>You need to connect to a server prior to performing a backup.</source>
+        <translation>Sie müssen sich mit einem Server verbinden um eine Datensicherung erstellen zu können.</translation>
     </message>
 </context>
 <context>
@@ -3661,10 +3954,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>Video-Encoder %1 konnte nicht gefunden werden.</translation>
-    </message>
-    <message>
-        <source>Screen width must be a multiplier of 8.</source>
-        <translation>Bildschirmbreite muss ein Vielfaches von 8 sein.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
@@ -3685,6 +3974,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Could not start primary audio device.</source>
         <translation>Primäres Audio-Device konnte nicht gestartet werden.</translation>
+    </message>
+    <message>
+        <source>Screen width must be a multiple of 8.</source>
+        <translation>Bildschirmbreite muss ein Vielfaches von 8 sein.</translation>
     </message>
 </context>
 <context>
@@ -3737,10 +4030,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnEventLogDialog</name>
     <message>
-        <source>Any action</source>
-        <translation>Jede Aktion</translation>
-    </message>
-    <message>
         <source>Filter Similar Rows</source>
         <translation>Identische Zeilen ausfiltern</translation>
     </message>
@@ -3775,27 +4064,20 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>&lt;Any camera&gt;</source>
-        <translation>&lt;jede Kamera&gt;</translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation>
-            <numerusform>&lt;%n Kamera&gt;</numerusform>
-            <numerusform>&lt;%n Kameras&gt;</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Export selected events to file</source>
         <translation>Ausgewählte Ereignisse  in Datei exportieren</translation>
+    </message>
+    <message>
+        <source>Any Action</source>
+        <translation>Jede Aktion</translation>
+    </message>
+    <message>
+        <source>&lt;Any %1&gt;</source>
+        <translation>&lt;Jede %1&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnEventLogModel</name>
-    <message>
-        <source>All users</source>
-        <translation>Alle Benutzer</translation>
-    </message>
     <message>
         <source>Administrators Only</source>
         <translation>Nur Administratoren</translation>
@@ -3832,6 +4114,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%1 times</source>
         <translation>%1 mal</translation>
     </message>
+    <message>
+        <source>All Users</source>
+        <translation>Alle Benutzer</translation>
+    </message>
 </context>
 <context>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
@@ -3840,12 +4126,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Kopiere Einstellungen der Archiv Länge</translation>
     </message>
     <message>
-        <source>Schedule motion type is not supported by some cameras</source>
-        <translation>Schedule motion type wird von einigen Kameras nicht unterstützt</translation>
+        <source>Schedule motion type is not supported by some %1.</source>
+        <translation>Dieser Bewegungszeitplan wird nicht von allen %1 unterstützt.</translation>
     </message>
     <message>
-        <source>Recording cannot be enabled for some cameras</source>
-        <translation>Aufnahme kann für einige Kameras nicht aktiviert werden</translation>
+        <source>Recording cannot be enabled for some %1.</source>
+        <translation>Aufnahme kann nicht aktiviert werden für einige %1.</translation>
+    </message>
+    <message>
+        <source>Schedule settings are not compatible with some %1.</source>
+        <translation>Zeitplan Einstellungen sind nicht kompatibel mit einigen %1.</translation>
     </message>
 </context>
 <context>
@@ -3878,14 +4168,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ordner wählen...</translation>
     </message>
     <message>
-        <source>Folder is already added</source>
-        <translation>Ordner wurde bereits hinzugefügt</translation>
-    </message>
-    <message>
-        <source>This folder is already added.</source>
-        <translation>Dieser Ordner wurde bereits hinzugefügt.</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -3896,6 +4178,14 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Disable only if the client takes too much CPU</source>
         <translation>Nur deaktivieren, wenn der Client zu viel CPU Zeit verbraucht</translation>
+    </message>
+    <message>
+        <source>Folder has already been added.</source>
+        <translation>Ordner wurde bereits hinzugefügt.</translation>
+    </message>
+    <message>
+        <source>This folder has already been added.</source>
+        <translation>Dieser Ordner wurde bereits hinzugefügt.</translation>
     </message>
 </context>
 <context>
@@ -3909,8 +4199,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Öffne Ereignisprotokoll</translation>
     </message>
     <message>
-        <source>Open Camera List</source>
-        <translation>Öffne Kamera-Liste</translation>
+        <source>Open %1 List</source>
+        <translation>Öffne %1 Liste</translation>
+    </message>
+    <message>
+        <source>%1 List</source>
+        <translation>%1 Liste</translation>
     </message>
 </context>
 <context>
@@ -3985,22 +4279,149 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnIOPortItemDelegate</name>
+    <message>
+        <source>Disabled</source>
+        <translation>Deaktiviert</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation>Eingabe</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Ausgabe</translation>
+    </message>
+    <message>
+        <source>Open circuit</source>
+        <translation>Öffne Schaltkreis</translation>
+    </message>
+    <message>
+        <source>Grounded circuit</source>
+        <translation>Geerdeter Schaltkreis</translation>
+    </message>
+</context>
+<context>
+    <name>QnIOPortSettingsWidget</name>
+    <message>
+        <source>Form</source>
+        <translation>Formular</translation>
+    </message>
+</context>
+<context>
+    <name>QnIOPortsViewModel</name>
+    <message>
+        <source>#</source>
+        <translation>#</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Typ</translation>
+    </message>
+    <message>
+        <source>Default state</source>
+        <translation>Standardstatus</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Pulse time(ms)</source>
+        <translation>Impulsdauer(ms)</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <comment>IO Port Type</comment>
+        <translation>Unbekannt</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <comment>IO Port Type</comment>
+        <translation>Deaktiviert</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <comment>IO Port Type</comment>
+        <translation>Eingabe</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <comment>IO Port Type</comment>
+        <translation>Ausgabe</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <comment>IO Port Type</comment>
+        <translation>Ungültig</translation>
+    </message>
+    <message>
+        <source>Open Circuit</source>
+        <comment>IO Port State</comment>
+        <translation>Öffne Schaltkreis</translation>
+    </message>
+    <message>
+        <source>Grounded circuit</source>
+        <comment>IO Port State</comment>
+        <translation>Geerdeter Schaltkreis</translation>
+    </message>
+    <message>
+        <source>Invalid state</source>
+        <comment>IO Port State</comment>
+        <translation>Ungültiger Status</translation>
+    </message>
+</context>
+<context>
+    <name>QnImageControlWidget</name>
+    <message>
+        <source>4:3</source>
+        <translation>4:3</translation>
+    </message>
+    <message>
+        <source>16:9</source>
+        <translation>16:9</translation>
+    </message>
+    <message>
+        <source>1:1</source>
+        <translation>1:1</translation>
+    </message>
+    <message>
+        <source>%1 degrees</source>
+        <translation>%1 Grad</translation>
+    </message>
+</context>
+<context>
+    <name>QnIoModuleOverlayWidgetPrivate</name>
+    <message>
+        <source>Failed to turn on IO port &apos;%1&apos;</source>
+        <translation>Fehler beim Einschalten von IO Port &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Failed to turn off IO port &apos;%1&apos;</source>
+        <translation>Fehler beim Ausschalten von IO Port &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>IO port error</source>
+        <translation>IO Port Fehler</translation>
+    </message>
+</context>
+<context>
     <name>QnLayoutExportTool</name>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
         <translation>Datei &apos;%1&apos; wird von einem anderen Prozess verwendet. Bitte verwenden Sie einen anderen Namen.</translation>
     </message>
     <message>
-        <source>Could not create output file %1</source>
-        <translation>Konnte die Ausgabedatei %1 nicht anlegen</translation>
-    </message>
-    <message>
-        <source>Could not export camera %1</source>
-        <translation>Konnte Kamera %1 nicht exportieren</translation>
-    </message>
-    <message>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation>Exportiere nach &quot;%1&quot;...</translation>
+    </message>
+    <message>
+        <source>Could not create output file %1.</source>
+        <translation>Konnte die Ausgabedatei %1. nicht anlegen.</translation>
+    </message>
+    <message>
+        <source>Could not export %1 %2.</source>
+        <translation>Konnte %1 %2 nicht exportieren.</translation>
     </message>
 </context>
 <context>
@@ -4037,6 +4458,97 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;Bild kann nicht geladen werden&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapSettingsDialog</name>
+    <message>
+        <source>Test</source>
+        <translation>Test</translation>
+    </message>
+    <message>
+        <source>Test failed</source>
+        <translation>Test fehlgeschlagen</translation>
+    </message>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation>
+            <numerusform>Test erfolgreich beendet: %n Benutzer gefunden.</numerusform>
+            <numerusform>Test erfolgreich beendet: %n Benutzer gefunden.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapSettingsDialogPrivate</name>
+    <message>
+        <source>The provided settings are not valid.</source>
+        <translation>Die Einstellungen sind ungültig.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation>Test konnte nicht ausgeführt werden.</translation>
+    </message>
+    <message>
+        <source>None of your servers is connected to the Internet.</source>
+        <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
+    </message>
+    <message>
+        <source>Timed out</source>
+        <translation>Zeitüberschreitung</translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapUserListModel</name>
+    <message>
+        <source>Login</source>
+        <translation>Login</translation>
+    </message>
+    <message>
+        <source>Full Name</source>
+        <translation>Vollständiger Name</translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation>Email</translation>
+    </message>
+    <message>
+        <source>DN</source>
+        <translation>DN</translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapUsersDialog</name>
+    <message>
+        <source>The provided settings are not valid.</source>
+        <translation>Die Einstellungen sind ungültig.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation>Test konnte nicht ausgeführt werden.</translation>
+    </message>
+    <message>
+        <source>None of your servers is connected to the Internet.</source>
+        <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
+    </message>
+    <message>
+        <source>Could not load users.</source>
+        <translation>Benutzer konnten nicht geladen werden.</translation>
+    </message>
+    <message>
+        <source>Import users</source>
+        <translation>Benutzer importieren</translation>
+    </message>
+    <message>
+        <source>Timed out</source>
+        <translation>Zeitüberschreitung</translation>
+    </message>
+    <message>
+        <source>Error while loading users.</source>
+        <translation>Fehler beim Laden der Benutzer.</translation>
+    </message>
+    <message>
+        <source>No new users found.</source>
+        <translation>Keine neuen Benutzer gefunden.</translation>
     </message>
 </context>
 <context>
@@ -4143,10 +4655,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Die Software ist lizensiert auf:</translation>
     </message>
     <message>
-        <source>Obtaining licenses from Server...</source>
-        <translation>Beschaffe Lizenzen von Server ...</translation>
-    </message>
-    <message>
         <source>Copy to Clipboard</source>
         <translation>In Zwischenablage kopieren</translation>
     </message>
@@ -4159,14 +4667,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Sie haben versucht eine inkompatible Lizenz zu aktivieren. Bitte kontaktieren Sie das Support-Team, um einen gültigen Lizenzschlüssel zu erhalten.</translation>
     </message>
     <message>
-        <source>The license is already activated.</source>
-        <translation>Diese Lizenz wurde bereits aktiviert.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. Network error has occurred.</source>
-        <translation>Ein Netzwerkfehler ist bei der Lizenzaktivierung aufgetreten.</translation>
-    </message>
-    <message>
         <source>License was successfully activated.</source>
         <translation>Die Lizenz wurde erfolgreich aktiviert.</translation>
     </message>
@@ -4175,37 +4675,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Lizenz Aktivierung</translation>
     </message>
     <message>
-        <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation>Ein Netzwerkfehler ist bei der automatischen Lizenzaktivierung aufgetreten. Kontaktieren Sie das Support Team um Ihren Lizenzschlüssel manuell zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>License activation</source>
-        <translation>Lizenz Aktivierung</translation>
-    </message>
-    <message>
-        <source>Can&apos;t activate license:  %1</source>
-        <translation>Lizenz kann nicht aktiviert werden: %1</translation>
-    </message>
-    <message>
         <source>Remove license</source>
         <translation>Lizenz entfernen</translation>
-    </message>
-    <message>
-        <source>Can&apos;t remove license from server:  %1</source>
-        <translation>Lizenz kann nicht vom Server entfernt werden: %1</translation>
-    </message>
-    <message>
-        <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation>Die ausgewählte manuelle Aktivierungsdatei für diese Schlüssel ist ungültig. Wählen Sie die richtige manuelle Aktivierungsdatei aus. Wenn das Problem bestehen bleibt, wenden Sie sich bitte an das Support-Team.</translation>
-    </message>
-    <message>
-        <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
-        <translation>Dieser Lizenzschlüssel wurde bereits für eine andere Hardware-ID aktiviert: %1. Bitte kontaktieren Sie das Support-Team, um einen gültigen Lizenzschlüssel zu erhalten.</translation>
-    </message>
-    <message>
-        <source>%1 %2</source>
-        <translatorcomment>Add a developer comment please. What is this?</translatorcomment>
-        <translation>%1% {%2}</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>
@@ -4241,6 +4712,38 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Try to activate your license manually.</source>
         <translation>Versuchen Sie die Lizenz manuell zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Obtaining licenses from server...</source>
+        <translation>Beschaffe Lizenzen von Server ...</translation>
+    </message>
+    <message>
+        <source>License has arleady been activated.</source>
+        <translation>Lizenz wurde bereits aktiviert.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. A network error has occurred.</source>
+        <translation>Ein Netzwerkfehler ist bei der Lizenzaktivierung aufgetreten.</translation>
+    </message>
+    <message>
+        <source>Unable to activate license:  %1</source>
+        <translation>Lizenz kann nicht aktiviert werden: %1</translation>
+    </message>
+    <message>
+        <source>Unable to remove license from server:  %1</source>
+        <translation>Lizenz kann nicht vom Server entfernt werden: %1</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
+        <translation>Dieser Lizenzschlüssel wurde bereits für eine andere Hardware-ID aktiviert: %1. Bitte kontaktieren Sie das Support-Team, um einen gültigen Lizenzschlüssel zu erhalten.</translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
+        <translation>Ein Netzwerkfehler ist bei der automatischen Lizenzaktivierung aufgetreten. Kontaktieren Sie das Support Team um Ihren Lizenzschlüssel manuell zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
+        <translation>Die ausgewählte manuelle Aktivierungsdatei für diese Schlüssel ist ungültig. Wählen Sie die richtige manuelle Aktivierungsdatei aus. Wenn das Problem bestehen bleibt, wenden Sie sich bitte an das Support-Team.</translation>
     </message>
 </context>
 <context>
@@ -4302,6 +4805,20 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnLicensesProposeWidget</name>
+    <message numerus="yes">
+        <source>Use analog licenses to view these %n cameras</source>
+        <translation>
+            <numerusform>Benutze entsprechende Lizenzen, um diese Kamera %n anzusehen</numerusform>
+            <numerusform>Benutze entsprechende Lizenzen, um diese Kameras %n anzusehen</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Use licenses for selected %1</source>
+        <translation>Benutze Lizenzen für ausgewählte %1</translation>
+    </message>
+</context>
+<context>
     <name>QnLoginDialog</name>
     <message>
         <source>Connect to Server...</source>
@@ -4336,10 +4853,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&lt;keine&gt;</translation>
     </message>
     <message>
-        <source>Invalid parameters</source>
-        <translation>Ungültige Parameter</translation>
-    </message>
-    <message>
         <source>The information you have entered is not valid.</source>
         <translation>Die eingegebene Information ist nicht gültig.</translation>
     </message>
@@ -4356,28 +4869,28 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>%1 bei %2</translation>
     </message>
     <message>
-        <source>Connection already exists</source>
-        <translation>Verbindung existiert bereits</translation>
+        <source>Are you sure you want to delete this connection: %1?</source>
+        <translation>Wollen Sie die Verbindung %1 wirklich löschen?</translation>
     </message>
     <message>
-        <source>Connection with this name already exists. Do you want to overwrite it?</source>
+        <source>Invalid Paramaters</source>
+        <translation>Ungültige Parameter</translation>
+    </message>
+    <message>
+        <source>Connection already exists.</source>
+        <translation>Verbindung existiert bereits.</translation>
+    </message>
+    <message>
+        <source>A connection with this name already exists. Do you want to overwrite it?</source>
         <translation>Verbindung mit diesem Namen existiert bereits. Möchten Sie diese überschreiben?</translation>
     </message>
     <message>
-        <source>Delete connections</source>
-        <translation>Verbindung löschen</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this connection: %1?</source>
-        <translation>Wollen Sie die Verbindung %1 wirklich löschen?</translation>
+        <source>Delete Connections</source>
+        <translation>Verbindungen löschen</translation>
     </message>
 </context>
 <context>
     <name>QnLookAndFeelPreferencesWidget</name>
-    <message>
-        <source>Select file...</source>
-        <translation>Datei wählen...</translation>
-    </message>
     <message>
         <source>Pictures %1</source>
         <translation>Bilder %1</translation>
@@ -4434,6 +4947,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
         <translation>Diese Option hat keine Auswirkung auf den Aufnahmezeitplan, welcher immer auf der Serverzeit basiert.</translation>
     </message>
+    <message>
+        <source>Select File...</source>
+        <translation>Datei wählen...</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -4477,14 +4994,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Bildverbesserung</translation>
     </message>
     <message>
-        <source>Zoom window</source>
-        <translation>Zoom-Fenster</translation>
-    </message>
-    <message>
-        <source>Lo-Res</source>
-        <translation>Lo-Res</translation>
-    </message>
-    <message>
         <source>Hi-Res</source>
         <translation>Hi-Res</translation>
     </message>
@@ -4495,6 +5004,18 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
         <translation>%1 (Tour &quot;%2&quot; ist aktiviert)</translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation>IO Modul</translation>
+    </message>
+    <message>
+        <source>Zoom Window</source>
+        <translation>Zoom-Fenster</translation>
+    </message>
+    <message>
+        <source>Low-Res</source>
+        <translation>Low-Res</translation>
     </message>
 </context>
 <context>
@@ -4536,14 +5057,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Das Passwort darf nicht leer sein.</translation>
     </message>
     <message>
-        <source>testing...</source>
-        <translation>Teste...</translation>
-    </message>
-    <message>
-        <source>merging systems...</source>
-        <translation>Systeme zusammenführen...</translation>
-    </message>
-    <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
         <translation>Verwenden Sie einen auflösbaren Servernamen oder eine IP Adresse anstelle von %1.</translation>
     </message>
@@ -4558,10 +5071,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The password is invalid.</source>
         <translation>Das Passwort ist ungültig.</translation>
-    </message>
-    <message>
-        <source>The found system %1 has an incompatible version %2.</source>
-        <translation>Das gefundene System %1 läuft mit der inkompatiblen Version %2.</translation>
     </message>
     <message>
         <source>The system was not found.</source>
@@ -4599,45 +5108,30 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Check</source>
         <translation>Überprüfen</translation>
     </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.
+As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
+If you understand this and would like to proceed please click Merge to continue.
+</source>
+        <translation>Warnung: Sie sind dabei Systeme mit START Lizenzen zusammenzufügen.
+Da nur eine START Lizenz pro System erlaubt ist, wird Ihnen nach dem Zusammenfügen nur eine START Lizenz verbleiben.
+Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zusammenfügen.</translation>
+    </message>
+    <message>
+        <source>Testing...</source>
+        <translation>Teste...</translation>
+    </message>
+    <message>
+        <source>Merging Systems...</source>
+        <translation>Systeme zusammenführen...</translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <translation>Das gefundene System %1 läuft mit der inkompatiblen Version %2.</translation>
+    </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
-    <message>
-        <source>4:3</source>
-        <translation>4:3</translation>
-    </message>
-    <message>
-        <source>16:9</source>
-        <translation>16:9</translation>
-    </message>
-    <message>
-        <source>1:1</source>
-        <translation>1:1</translation>
-    </message>
-    <message>
-        <source>0 degrees</source>
-        <translation>0 Grad</translation>
-    </message>
-    <message>
-        <source>90 degrees</source>
-        <translation>90 Grad</translation>
-    </message>
-    <message>
-        <source>180 degrees</source>
-        <translation>180 Grad</translation>
-    </message>
-    <message>
-        <source>270 degrees</source>
-        <translation>270 Grad</translation>
-    </message>
-    <message>
-        <source>Invalid schedule</source>
-        <translation>Ungültiger Aufnahmeplan</translation>
-    </message>
-    <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Der sekundäre Stream ist bei dieser Kamera deaktiviert. Die Motion und LQ-Option bleiben ohne Effekt. Drücken Sie &quot;Ja&quot; um den Aufnahmetyp auf &quot;Immer&quot; zu setzen oder &quot;Nein&quot; um den Sekundär Stream zu reaktivieren.</translation>
-    </message>
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
@@ -4647,6 +5141,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
         <translation>&lt;unterschiedliche Werte&gt;</translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation>Ungültiger Aufnahmeplan</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation>Der zweite Stream ist deaktiviert auf diesen Kameras. Die Motion + LQ Option hat keinen Auswirkungen. Drücke &quot;Ja&quot;, um den Aufnahmetyp auf &quot;Immer&quot; zu ändern oder &quot;Nein&quot;, um den zweiten Stream zu aktivieren.</translation>
     </message>
 </context>
 <context>
@@ -4732,14 +5234,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&amp;Löschen...</translation>
     </message>
     <message>
-        <source>Sound files</source>
-        <translation>Audiodateien</translation>
-    </message>
-    <message>
-        <source>Select file...</source>
-        <translation>Datei wählen...</translation>
-    </message>
-    <message>
         <source>Clip sound up to %1 seconds</source>
         <translation>Sound auf bis zu %1 Sekunden kürzen</translation>
     </message>
@@ -4756,16 +5250,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ton umbenennen</translation>
     </message>
     <message>
-        <source>Enter new title:</source>
-        <translation>Neuen Titel eingeben:</translation>
-    </message>
-    <message>
         <source>New title could not be set.</source>
         <translation>Neuer Titel konnte nicht gesetzt werden.</translation>
-    </message>
-    <message>
-        <source>Confirm file deletion</source>
-        <translation>Dateilöschung bestätigen</translation>
     </message>
     <message>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -4774,6 +5260,22 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Custom title:</source>
         <translation>Titel anpassen:</translation>
+    </message>
+    <message>
+        <source>Sound Files</source>
+        <translation>Audiodateien</translation>
+    </message>
+    <message>
+        <source>Select File...</source>
+        <translation>Datei wählen...</translation>
+    </message>
+    <message>
+        <source>Enter New Title:</source>
+        <translation>Neuen Titel eingeben:</translation>
+    </message>
+    <message>
+        <source>Confirm File Deletion</source>
+        <translation>Dateilöschung bestätigen</translation>
     </message>
 </context>
 <context>
@@ -4817,20 +5319,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Archiv durchsuchen</translation>
     </message>
     <message>
-        <source>Open Camera</source>
-        <translation>Kamera-öffnen</translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation>Kamera Einstellungen</translation>
-    </message>
-    <message>
         <source>Server settings</source>
         <translation>Server Einstellungen</translation>
-    </message>
-    <message>
-        <source>Open camera web page...</source>
-        <translation>Webseite der Kamera öffnen...</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -4855,6 +5345,22 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>SMTP Settings</source>
         <translation>SMTP Einstellungen</translation>
+    </message>
+    <message>
+        <source>Open %1</source>
+        <translation>Öffne %1</translation>
+    </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation>%1 Einstellungen</translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation>Server Einstellungen</translation>
+    </message>
+    <message>
+        <source>Open %1 Web Page...</source>
+        <translation>Öffne %1 Weboberfläche...</translation>
     </message>
 </context>
 <context>
@@ -4921,32 +5427,8 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnPtzManageDialog</name>
     <message>
-        <source>Could not get position from camera</source>
-        <translation>Positionsabfrage bei Kamera gescheitert</translation>
-    </message>
-    <message>
-        <source>Could not set position for camera</source>
-        <translation>Konnte Position der Kamera nicht setzen</translation>
-    </message>
-    <message>
-        <source>Remove preset</source>
-        <translation>Voreinstellung löschen</translation>
-    </message>
-    <message>
         <source>Do not show again.</source>
         <translation>Nicht mehr anzeigen.</translation>
-    </message>
-    <message>
-        <source>Manage PTZ for %1</source>
-        <translation>PTZ für %1 steuern</translation>
-    </message>
-    <message>
-        <source>PTZ configuration is not saved</source>
-        <translation>PTZ Konfiguration wurde nicht gespeichert</translation>
-    </message>
-    <message>
-        <source>Changes are not saved. Do you want to save them?</source>
-        <translation>Änderungen wurden nicht gespeichert. Möchten Sie jetzt speichern?</translation>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
@@ -4968,17 +5450,33 @@ Short for &quot;seconds&quot;</extracomment>
         <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation>Beim Versuch die Position von Kamera %1 zu setzen, ereignete sich ein Fehler.</translation>
     </message>
+    <message>
+        <source>Could not get position from camera.</source>
+        <translation>Positionsabfrage bei Kamera gescheitert.</translation>
+    </message>
+    <message>
+        <source>Could not set position for camera.</source>
+        <translation>Konnte Position der Kamera nicht setzen.</translation>
+    </message>
+    <message>
+        <source>Remove Preset</source>
+        <translation>Voreinstellung löschen</translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1.</source>
+        <translation>PTZ für %1. steuern.</translation>
+    </message>
+    <message>
+        <source>PTZ configuration has not been saved.</source>
+        <translation>PTZ Konfiguration wurde nicht gespeichert.</translation>
+    </message>
+    <message>
+        <source>Changes have not been saved. Would you like to save them?</source>
+        <translation>Änderungen wurden nicht gespeichert. Möchten Sie jetzt speichern?</translation>
+    </message>
 </context>
 <context>
     <name>QnPtzManageModel</name>
-    <message>
-        <source>New tour %1</source>
-        <translation>Neue Tour %1</translation>
-    </message>
-    <message>
-        <source>Saved position %1</source>
-        <translation>Gespeicherte Position %1</translation>
-    </message>
     <message>
         <source>#</source>
         <translation>#</translation>
@@ -5018,20 +5516,12 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>Diese Voreinstellung wird aktiviert nach %n Minuten ohne Aktivität</numerusform>
         </translation>
     </message>
-    <message>
-        <source>Tour should contain at least 2 positions</source>
-        <translation>Die Tour sollte mindests zwei Positionen enthalten</translation>
-    </message>
     <message numerus="yes">
         <source>Tour has %n identical positions</source>
         <translation>
             <numerusform>Die Tour hat eine identische Position</numerusform>
             <numerusform>Die Tour hat %n identische Positionen</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Tour time: %1</source>
-        <translation>Zeit der Tour: %1</translation>
     </message>
     <message>
         <source>less than a minute</source>
@@ -5047,6 +5537,22 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Invalid tour</source>
         <translation>Ungültige Tour</translation>
+    </message>
+    <message>
+        <source>New Tour %1</source>
+        <translation>Neue Tour %1</translation>
+    </message>
+    <message>
+        <source>Saved Position %1</source>
+        <translation>Gespeicherte Position %1</translation>
+    </message>
+    <message>
+        <source>Tour should contain at least 2 positions.</source>
+        <translation>Die Tour sollte mindests zwei Positionen enthalten.</translation>
+    </message>
+    <message>
+        <source>Tour Time: %1.</source>
+        <translation>Zeit der Tour: %1.</translation>
     </message>
 </context>
 <context>
@@ -5067,20 +5573,20 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Keine</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation>Dieser Hotkey wird von Voreinstellung &quot;%1&quot; verwendet</translation>
-    </message>
-    <message>
-        <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation>Dieser Hotkey wird von Tour &quot;%1&quot; verwendet</translation>
-    </message>
-    <message>
         <source>Change hotkey</source>
         <translation>Hotkey ändern</translation>
     </message>
     <message>
         <source>Reassign</source>
         <translation>Neu zuordnen</translation>
+    </message>
+    <message>
+        <source>This hotkey is used by preset &quot;%1&quot;.</source>
+        <translation>Dieser Hotkey wird von Voreinstellung &quot;%1&quot; verwendet.</translation>
+    </message>
+    <message>
+        <source>This hotkey is used by tour &quot;%1&quot;.</source>
+        <translation>Dieser Hotkey wird von Tour &quot;%1&quot; verwendet.</translation>
     </message>
 </context>
 <context>
@@ -5169,6 +5675,100 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnRecordingStatisticsWidget</name>
+    <message>
+        <source>Copy Selection to Clipboard</source>
+        <translation>Auswahl in Zwischenablage kopieren</translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation>Auswahl in Datei exportieren...</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>Alle auswählen</translation>
+    </message>
+    <message>
+        <source>Export selected events to file</source>
+        <translation>Ausgewählte Ereignisse  in Datei exportieren</translation>
+    </message>
+</context>
+<context>
+    <name>QnRecordingStatsModel</name>
+    <message numerus="yes">
+        <source>%n years</source>
+        <translation>
+            <numerusform>%n Jahr</numerusform>
+            <numerusform>%n Jahre</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n months</source>
+        <translation>
+            <numerusform>%n Monat</numerusform>
+            <numerusform>%n Monate</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n days</source>
+        <translation>
+            <numerusform>%n Tag</numerusform>
+            <numerusform>%n Tage</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hours</source>
+        <translation>
+            <numerusform>%n Stunde</numerusform>
+            <numerusform>%n Stunden</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days between the first record and the current moment</source>
+        <translation>Archivierte Laufzeit in Kalendertagen zwischen dem ersten Datensatz und dem aktuellen Zeitpunkt</translation>
+    </message>
+    <message>
+        <source>Average bitrate for the recorded period</source>
+        <translation>Durchschnittliche Bitrate für den aufgezeichneten Zeitraum</translation>
+    </message>
+    <message>
+        <source>Space</source>
+        <translation>Leerzeichen</translation>
+    </message>
+    <message>
+        <source>Calendar Days</source>
+        <translation>Kalendertage</translation>
+    </message>
+    <message>
+        <source>less than an hour</source>
+        <translation>weniger als eine Stunde</translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation>%1 Mbps</translation>
+    </message>
+    <message>
+        <source>%1 Tb</source>
+        <translation>%1 TB</translation>
+    </message>
+    <message>
+        <source>%1 Gb</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>Total %1</source>
+        <translation>Insgesamt %1</translation>
+    </message>
+    <message>
+        <source>%1 with non-empty archive</source>
+        <translation>%1 mit nicht-leerem-Archiv</translation>
+    </message>
+    <message>
+        <source>Storage space occupied by %1</source>
+        <translation>Speicherplatz belegt bei %1</translation>
+    </message>
+</context>
+<context>
     <name>QnRecordingStatusHelper</name>
     <message>
         <source>Not recording</source>
@@ -5214,8 +5814,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Bilddateien</translation>
     </message>
     <message>
-        <source>Live Cameras</source>
-        <translation>Live-Kameras</translation>
+        <source>Live %1</source>
+        <translation>Live %1</translation>
     </message>
 </context>
 <context>
@@ -5244,16 +5844,16 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnResourceSelectionDialog</name>
     <message>
-        <source>Select users...</source>
+        <source>Select Users...</source>
         <translation>Benutzer wählen...</translation>
     </message>
     <message>
-        <source>Select cameras...</source>
-        <translation>Kameras wählen...</translation>
+        <source>Select Resources...</source>
+        <translation>Objekte wählen...</translation>
     </message>
     <message>
-        <source>Select resources...</source>
-        <translation>Objekte wählen...</translation>
+        <source>Select %1...</source>
+        <translation>Wähle %1...</translation>
     </message>
 </context>
 <context>
@@ -5387,52 +5987,35 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <source>Remove Storage</source>
-        <translation>Speicher entfernen</translation>
-    </message>
-    <message>
         <source>Open Web Page...</source>
         <translation>Webseite öffnen...</translation>
     </message>
     <message>
-        <source>Not available</source>
-        <translation>Nicht verfügbar</translation>
+        <source>General</source>
+        <translation>Allgemein</translation>
+    </message>
+    <message>
+        <source>Storage Analytics</source>
+        <translation>Speicher-Analyse</translation>
+    </message>
+</context>
+<context>
+    <name>QnServerSettingsWidget</name>
+    <message>
+        <source>Remove Storage</source>
+        <translation>Speicher entfernen</translation>
     </message>
     <message>
         <source>Loading...</source>
         <translation>Lade...</translation>
     </message>
     <message>
+        <source>Not available</source>
+        <translation>Nicht verfügbar</translation>
+    </message>
+    <message>
         <source>Warning</source>
         <translation>Warnung</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation>Abgeschlossen</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation>Archivindex wurde neu aufgebaut.</translation>
-    </message>
-    <message>
-        <source>At least two servers are required for this feature.</source>
-        <translation>Für diese Funktion werden mindestens zwei Server benötigt.</translation>
-    </message>
-    <message>
-        <source>This server already has more than max cameras</source>
-        <translation>Dieser Server hat die Anzahl maximaler Kameras bereits überschritten</translation>
-    </message>
-    <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>Passen Sie die maximale Anzahl von Kameras an, um Fehlfunktionen zu vermeiden</translation>
-    </message>
-    <message>
-        <source>Could not load storages from server.</source>
-        <translation>Konnte Speicher nicht vom Server laden.</translation>
-    </message>
-    <message>
-        <source>Add external Storage...</source>
-        <translation>Externen Speicher hinzufügen...</translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
@@ -5458,6 +6041,42 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
         <translation>Schneller Archiv Scan für Speicher &apos;%1&apos; ist in Bearbeitung</translation>
     </message>
+    <message>
+        <source>Finished</source>
+        <translation>Beendet</translation>
+    </message>
+    <message>
+        <source>Rebuilding archive index is completed.</source>
+        <translation>Archivindex wurde neu aufgebaut.</translation>
+    </message>
+    <message>
+        <source>At least two servers are required for this feature.</source>
+        <translation>Für diese Funktion werden mindestens zwei Server benötigt.</translation>
+    </message>
+    <message>
+        <source>Could not load storages from server.</source>
+        <translation>Konnte Speicher nicht vom Server laden.</translation>
+    </message>
+    <message>
+        <source>Add external Storage...</source>
+        <translation>Externen Speicher hinzufügen...</translation>
+    </message>
+    <message>
+        <source>Enable failover (server will take %1 automatically from offline servers)</source>
+        <translation>Aktiviere Failover (Server nimmt automatisch %1 von offline Servern)</translation>
+    </message>
+    <message>
+        <source>Max. %1 on this server:</source>
+        <translation>Max. %1 auf diesem Server:</translation>
+    </message>
+    <message>
+        <source>This server already has more than max %1</source>
+        <translation>Dieser Server hat bereits mehr als maximal %1</translation>
+    </message>
+    <message>
+        <source>To avoid malfunction adjust max number of %1</source>
+        <translation>Um Störungen zu vermeiden die maximal Anzahl von %1 anpassen</translation>
+    </message>
 </context>
 <context>
     <name>QnServerUpdatesModel</name>
@@ -5472,14 +6091,6 @@ Short for &quot;seconds&quot;</extracomment>
 </context>
 <context>
     <name>QnServerUpdatesWidget</name>
-    <message>
-        <source>Cannot check updates via the internet.</source>
-        <translation>Prüfung auf neue Updates über das Internet nicht möglich.</translation>
-    </message>
-    <message>
-        <source>Available version:</source>
-        <translation>Verfügbare Version:</translation>
-    </message>
     <message>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
@@ -5501,10 +6112,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>In Zwischenablage kopieren</translation>
     </message>
     <message>
-        <source>To update manually, download an archive with the following link:</source>
-        <translation>Um manuell upzudaten, laden Sie ein Archiv mit folgendem Link:</translation>
-    </message>
-    <message>
         <source>...</source>
         <translation>...</translation>
     </message>
@@ -5523,10 +6130,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Update Files (*.zip)</source>
         <translation>Update Dateien (*.zip)</translation>
-    </message>
-    <message>
-        <source>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</source>
-        <translation>Als Faustregel zur Erhöhung der Support Qualität empfehlen wir Systemupdates nicht am Ende der Woche durchzuführen.</translation>
     </message>
     <message>
         <source>Update from Internet...</source>
@@ -5553,14 +6156,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>URL in Zwischenablage kopiert.</translation>
     </message>
     <message>
-        <source>Latest version:</source>
-        <translation>Neueste Version:</translation>
-    </message>
-    <message>
-        <source>Target version:</source>
-        <translation>Zielversion:</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -5573,48 +6168,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Fehler</translation>
     </message>
     <message>
-        <source>Update finished... 100%</source>
-        <translation>Update beendet... 100%</translation>
-    </message>
-    <message>
         <source>Update has been successfully finished.</source>
         <translation>Update wurde erfolgreich abgeschlossen.</translation>
-    </message>
-    <message>
-        <source>Now you have to update the client manually.</source>
-        <translation>Sie müssen den Client jetzt manuell aktualisieren.</translation>
-    </message>
-    <message>
-        <source>Now you have to update the client manually using an installer.</source>
-        <translation>Sie müssen den Client jetzt, mittels eines Installers, manuell aktualisieren.</translation>
     </message>
     <message>
         <source>The client will be restarted to the updated version.</source>
         <translation>Der Client wird mit der aktualisierten Version neu gestartet.</translation>
     </message>
     <message>
-        <source>Update is successful</source>
-        <translation>Update erfolgreich</translation>
-    </message>
-    <message>
-        <source>Launcher process is not found</source>
-        <translation>Ladeprozess nicht gefunden</translation>
-    </message>
-    <message>
-        <source>Update cancelled</source>
-        <translation>Update abgebrochen</translation>
-    </message>
-    <message>
         <source>Update has been cancelled.</source>
         <translation>Das Update wurde abgebrochen.</translation>
-    </message>
-    <message>
-        <source>Update failed</source>
-        <translation>Update gescheitert</translation>
-    </message>
-    <message>
-        <source>Someone has already started an update.</source>
-        <translation>Es wurde bereits ein Update gestartet.</translation>
     </message>
     <message>
         <source>Could not download updates.</source>
@@ -5641,22 +6204,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Prüfe auf Updates...</translation>
     </message>
     <message>
-        <source>Internet connection problem</source>
-        <translation>Internetverbindungsproblem</translation>
-    </message>
-    <message>
-        <source>There is no such build on the update server</source>
-        <translation>Version auf dem Update Server nicht vorhanden</translation>
-    </message>
-    <message>
-        <source>Cannot start update. An update for one or more servers was not found.</source>
-        <translation>Update kann nicht gestartet werden. Für einen oder mehrere Server konnte kein Update gefunden werden.</translation>
-    </message>
-    <message>
-        <source>Cannot start update. An update for the client was not found.</source>
-        <translation>Update kann nicht gestartet werden. Für den Client konnte kein Update gefunden werden.</translation>
-    </message>
-    <message>
         <source>Newer version found.</source>
         <translation>Neuere Version gefunden.</translation>
     </message>
@@ -5675,10 +6222,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Cannot update from this file.</source>
         <translation>Update mit dieser Datei nicht möglich.</translation>
-    </message>
-    <message>
-        <source>Cannot extract the update file.</source>
-        <translation>Kann die Updatedatei nicht extrahieren.</translation>
     </message>
     <message>
         <source>Checking for updates... %1%</source>
@@ -5764,6 +6307,82 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Check for updates automatically</source>
         <translation>Automatisch nach verfügbaren Updates suchen</translation>
     </message>
+    <message>
+        <source>Caution: Applying system updates at the end of the week is not recommended.</source>
+        <translation>Achtung: Systemupdates am Ende der Woche werden nicht empfohlen.</translation>
+    </message>
+    <message>
+        <source>Latest Version:</source>
+        <translation>Neueste Version:</translation>
+    </message>
+    <message>
+        <source>Target Version:</source>
+        <translation>Zielversion:</translation>
+    </message>
+    <message>
+        <source>Update Finished...100%</source>
+        <translation>Update beendet... 100%</translation>
+    </message>
+    <message>
+        <source>Please update the client manually.</source>
+        <translation>Bitte updaten Sie den Client manuell.</translation>
+    </message>
+    <message>
+        <source>Please update the client manually using an installation package.</source>
+        <translation>Bitte updaten Sie den Client manuell mit einem Installationspaket.</translation>
+    </message>
+    <message>
+        <source>Update Succeeded.</source>
+        <translation>Update erfolgreich.</translation>
+    </message>
+    <message>
+        <source>Launcher process not found.</source>
+        <translation>Ladeprozess nicht gefunden.</translation>
+    </message>
+    <message>
+        <source>Update Cancelled</source>
+        <translation>Update abgebrochen</translation>
+    </message>
+    <message>
+        <source>Update unsuccessful.</source>
+        <translation>Update nicht erfolgreich.</translation>
+    </message>
+    <message>
+        <source>Another user has already started an update.</source>
+        <translation>Ein anderer Benutzer hat bereits ein Update gestartet.</translation>
+    </message>
+    <message>
+        <source>Internet Connectivity Problem</source>
+        <translation>Internetverbindungsproblem</translation>
+    </message>
+    <message>
+        <source>No such build available on update server.</source>
+        <translation>Diese Version ist auf dem Updateserver nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>Unable to begin update. An update for one or more servers not found.</source>
+        <translation>Update kann nicht gestartet werden. Für einen oder mehrere Server konnte kein Update gefunden werden.</translation>
+    </message>
+    <message>
+        <source>Unable to begin update. An update for the client was not found.</source>
+        <translation>Update kann nicht gestartet werden. Für den Client konnte kein Update gefunden werden.</translation>
+    </message>
+    <message>
+        <source>Unable to extract update file.</source>
+        <translation>Kann Update Datei nicht extrahieren.</translation>
+    </message>
+    <message>
+        <source>Unable to check updates via internet.</source>
+        <translation>Prüfung auf neue Updates über das Internet nicht möglich.</translation>
+    </message>
+    <message>
+        <source>Available Update:</source>
+        <translation>Verüfgbares Update:</translation>
+    </message>
+    <message>
+        <source>To update manually, download and use the archive file on the following link:</source>
+        <translation>Um manuell upzudaten, laden Sie ein Archiv mit folgendem Link:</translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5772,55 +6391,31 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Analysiere: %1%</translation>
     </message>
     <message>
-        <source>Watermark not found</source>
+        <source>Invalid watermark</source>
+        <translation>Ungültiges Wasserzeichen</translation>
+    </message>
+    <message>
+        <source>Watermark Not Found</source>
         <translation>Wasserzeichen nicht gefunden</translation>
     </message>
     <message>
-        <source>Watermark matched</source>
+        <source>Watermark Matched</source>
         <translation>Wasserzeichen abgestimmt</translation>
-    </message>
-    <message>
-        <source>Invalid watermark</source>
-        <translation>Ungültiges Wasserzeichen</translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <source>4:3</source>
-        <translation>4:3</translation>
+        <source>FPS value is too high</source>
+        <translation>FPS Werte ist zu hoch</translation>
     </message>
     <message>
-        <source>16:9</source>
-        <translation>16:9</translation>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation>Der akutelle FPS Wert im Zeitraster ist %1. Der FPS Wert wurde auf den maximalen FPS Wert der Kamera %2 runtergesetzt.</translation>
     </message>
     <message>
-        <source>1:1</source>
-        <translation>1:1</translation>
-    </message>
-    <message>
-        <source>0 degrees</source>
-        <translation>0 Grad</translation>
-    </message>
-    <message>
-        <source>90 degrees</source>
-        <translation>90 Grad</translation>
-    </message>
-    <message>
-        <source>180 degrees</source>
-        <translation>180 Grad</translation>
-    </message>
-    <message>
-        <source>270 degrees</source>
-        <translation>270 Grad</translation>
-    </message>
-    <message>
-        <source>Hardware (Camera built-in)</source>
-        <translation>Hardware (Eingebaute Kamera)</translation>
-    </message>
-    <message>
-        <source>Do not record motion</source>
-        <translation>Keine Bewegung aufnehmen</translation>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation>2 FPS für den zweiten Stream reserviert. Aktueller FPS Wert im Zeitraster ist %1. FPS Werte wurde auf %2 heruntergesetzt.</translation>
     </message>
     <message>
         <source>Invalid schedule</source>
@@ -5828,32 +6423,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Der sekundäre Stream ist bei dieser Kamera deaktiviert. Die Motion und LQ-Option bleiben ohne Effekt. Drücken Sie &quot;Ja&quot; um den Aufnahmetyp auf &quot;Immer&quot; zu setzen oder &quot;Nein&quot;, um den Sekundär Stream zu reaktivieren.</translation>
+        <translation>Der sekundäre Stream ist bei dieser Kamera deaktiviert. Die Motion und LQ-Option bleiben ohne Effekt. Drücken Sie &quot;Ja&quot; um den Aufnahmetyp auf &quot;Immer&quot; zu setzen oder &quot;Nein&quot; um den Sekundär Stream zu reaktivieren.</translation>
     </message>
     <message>
         <source>Confirm motion regions reset</source>
-        <translation>Reset für Motion-Erkennbereiche bestätigen</translation>
+        <translation>Bestätige Reset der Bewegungserkennungszonen</translation>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translatorcomment>!!!Translation Quality???</translatorcomment>
-        <translation>Möchten Sie die Motion Regionen auf den Standard zurücksetzen?</translation>
+        <translation>Sind Sie sich sicher die Bewegungserkennungszonen auf Standard zurückzusetzen?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
         <translation>Diese Aktion kann NICHT widerrufen werden!</translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>FPS Wert ist zu hoch</translation>
+        <source>Hardware (camera built-in)</source>
+        <translation>Hardware (Eingebaute Kamera)</translation>
     </message>
     <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>Die momentane FPS in der Aufnahmeplan-Übersicht beträgt %1. FPS wurden auf den maximalen FPS-Wert der Kamera heruntergesetzt: %2.</translation>
+        <source>Do Not Record Motion</source>
+        <translation>Keine Bewegung aufnehmen</translation>
     </message>
     <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Für die Software Motion wurden 2 FPS für den sekundären Stream reserviert. Die momentane FPS in der Aufnahmeplan-Übersicht beträgt %1. Die FPS wurden heruntergesetzt auf %2.</translation>
+        <source>%1 Settings</source>
+        <translation>%1 Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -5865,10 +6459,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Invalid data</source>
         <translation>Ungültige Daten</translation>
-    </message>
-    <message>
-        <source>Provided parameters are not valid. Could not perform a test.</source>
-        <translation>Eingegebene Daten sind ungültig. Test konnte nicht durchgeführt werden.</translation>
     </message>
     <message>
         <source>Network Error</source>
@@ -5907,20 +6497,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Abgebrochen</translation>
     </message>
     <message>
-        <source>Timed out</source>
+        <source>Provided parameters not valid. Could not perform test.</source>
+        <translation>Eingegebene Daten sind ungültig. Test konnte nicht durchgeführt werden.</translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
         <translation>Zeitüberschreitung</translation>
     </message>
     <message>
-        <source>Email is not valid</source>
+        <source>E-Mail is not valid</source>
         <translation>Email ist nicht gültig</translation>
     </message>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option</source>
-        <translation>Keine Voreinstellung gefunden. Bitte verwenden Sie die &quot;Erweiterten&quot; Optionen</translation>
+        <source>No preset found. Use &apos;Advanced&apos; option.</source>
+        <translation>Keine Voreinstellung gefunden. Bitte verwenden Sie die &quot;Erweiterten&quot; Optionen.</translation>
     </message>
     <message>
-        <source>Support email is not valid</source>
-        <translation>Support Email ist nicht gültig</translation>
+        <source>Support email is not valid.</source>
+        <translation>Support Email ist nicht gültig.</translation>
     </message>
 </context>
 <context>
@@ -5945,10 +6539,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>NO SIGNAL</translation>
     </message>
     <message>
-        <source>Server offline</source>
-        <translation>Server ist offline</translation>
-    </message>
-    <message>
         <source>Unauthorized</source>
         <translation>Nicht authorisiert</translation>
     </message>
@@ -5965,12 +6555,32 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Lade...</translation>
     </message>
     <message>
-        <source>Diagnose...</source>
+        <source>No video stream</source>
+        <translation>Kein Videostream</translation>
+    </message>
+    <message>
+        <source>Diagnostics...</source>
         <translation>Diagnose...</translation>
     </message>
     <message>
-        <source>Please check authentication information in camera settings</source>
-        <translation>Bitte überprüfen Sie die Authentifizierung in den Kameraeinstellungen</translation>
+        <source>Enable</source>
+        <translation>Aktivieren</translation>
+    </message>
+    <message>
+        <source>Activate license...</source>
+        <translation>Aktiviere Lizenz...</translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
+        <translation>Modul ist deaktiviert</translation>
+    </message>
+    <message>
+        <source>Server Offline</source>
+        <translation>Server ist offline</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in %1 settings</source>
+        <translation>Bitte überprüfen Sie die Authentifizierungsinformationen in %1 Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -5987,26 +6597,28 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ungültiger Speicher</translation>
     </message>
     <message>
-        <source>Provided storage path does not define a valid external storage.</source>
-        <translation>Ungültge Pfadangabe zu externem Speicher.</translation>
-    </message>
-    <message>
-        <source>Windows Network Shared Resource</source>
-        <translatorcomment>???? it there a German term for that ???</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
         <translation>\\&lt;Computername&gt;\&lt;Ordner&gt;</translation>
     </message>
     <message>
-        <source>Coldstore Network Storage</source>
-        <translatorcomment>???? it there a German term for that ???</translatorcomment>
-        <translation></translation>
+        <source>Network Shared Resource</source>
+        <translation>Freigegebene Netzwerkressourcen</translation>
     </message>
     <message>
-        <source>coldstore://&lt;Address&gt;</source>
-        <translation>coldstore://&lt;Adresse&gt;</translation>
+        <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
+        <translation>Das System hat andere Server, welche denselben Netzwerkspeicherpfad verwenden. Aufnahmen von mehreren Servern auf denselben Pfad werden nicht empfohlen.</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Warnung</translation>
+    </message>
+    <message>
+        <source>Add storage</source>
+        <translation>Speicher hinzufügen</translation>
+    </message>
+    <message>
+        <source>Provided storage path does not point to a valid external storage location.</source>
+        <translation>Ungültge Pfadangabe zu externem Speicher.</translation>
     </message>
 </context>
 <context>
@@ -6054,6 +6666,21 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Update is in process now.</source>
         <translation>Update wird gerade ausgeführt.</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation>Benutzer</translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemSettingsWidget</name>
+    <message>
+        <source>Enable %1 and servers auto discovery</source>
+        <translation>Erlaube %1 und automatische Servererkennung</translation>
+    </message>
+    <message>
+        <source>Allow system to optimize %1 settings</source>
+        <translation>Erlaube dem System die %1 Einstellungen zu optimieren</translation>
     </message>
 </context>
 <context>
@@ -6114,7 +6741,7 @@ Short for &quot;seconds&quot;</extracomment>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>M</translation>
     </message>
     <message>
         <source>h</source>
@@ -6298,6 +6925,111 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnUserListModel</name>
+    <message>
+        <source>LDAP user</source>
+        <translation>LDAP Benutzer</translation>
+    </message>
+    <message>
+        <source>Normal user</source>
+        <translation>Normaler Benutzer</translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation>Aktiviert</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Deaktiviert</translation>
+    </message>
+    <message>
+        <source>Edit user</source>
+        <translation>Benutzer bearbeiten</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation>Berechtigungen</translation>
+    </message>
+    <message>
+        <source>LDAP</source>
+        <translation>LDAP</translation>
+    </message>
+</context>
+<context>
+    <name>QnUserListModelPrivate</name>
+    <message>
+        <source>Owner</source>
+        <translation>System-Betreiber</translation>
+    </message>
+    <message>
+        <source>Administrator</source>
+        <translation>Administrator</translation>
+    </message>
+    <message>
+        <source>View live video</source>
+        <translation>Live Video ansehen</translation>
+    </message>
+    <message>
+        <source>Use PTZ controls</source>
+        <translation>PTZ Steuerelemente verwenden</translation>
+    </message>
+    <message>
+        <source>View video archives</source>
+        <translation>Videoarchive ansehen</translation>
+    </message>
+    <message>
+        <source>Export video</source>
+        <translation>Video exportieren</translation>
+    </message>
+    <message>
+        <source>Edit Video Walls</source>
+        <translation>Videowände bearbeiten</translation>
+    </message>
+    <message>
+        <source>Adjust %1 settings</source>
+        <translation>Anpassen der %1 Einstellungen</translation>
+    </message>
+</context>
+<context>
+    <name>QnUserManagementWidget</name>
+    <message>
+        <source>LDAP Settings...</source>
+        <translation>LDAP-Einstellungen...</translation>
+    </message>
+    <message>
+        <source>Filter...</source>
+        <translation>Filter...</translation>
+    </message>
+    <message>
+        <source>New User...</source>
+        <translation>Neuer Benutzer...</translation>
+    </message>
+    <message>
+        <source>Fetch Users from LDAP...</source>
+        <translation>Benutzer von LDAP abrufen...</translation>
+    </message>
+    <message>
+        <source>Enable Selected</source>
+        <translation>Ausgewählte aktivieren</translation>
+    </message>
+    <message>
+        <source>Disable Selected</source>
+        <translation>Ausgewählte deaktivieren</translation>
+    </message>
+    <message>
+        <source>Delete Selected</source>
+        <translation>Ausgewählte löschen</translation>
+    </message>
+    <message>
+        <source>Clear Selection</source>
+        <translation>Auswahl aufheben</translation>
+    </message>
+</context>
+<context>
     <name>QnUserSettingsDialog</name>
     <message>
         <source>New Password</source>
@@ -6314,10 +7046,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>User with specified login already exists.</source>
         <translation>Benutzer mit diesem Namen existiert bereits.</translation>
-    </message>
-    <message>
-        <source>To change your password, please enter your current password.</source>
-        <translation>Bestätigen Sie die Passwortänderung bitte mit Ihrem aktuellen Passwort.</translation>
     </message>
     <message>
         <source>Invalid current password.</source>
@@ -6365,10 +7093,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Anpassen...</translation>
     </message>
     <message>
-        <source>Can adjust camera settings</source>
-        <translation>Kann Kamera-Einstellungen anpassen</translation>
-    </message>
-    <message>
         <source>Can use PTZ controls</source>
         <translation>Kann PTZ kontrollieren</translation>
     </message>
@@ -6385,8 +7109,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Kann die Video-Wand bearbeiten</translation>
     </message>
     <message>
-        <source>User was renamed. Password must be updated.</source>
+        <source>To modify your password, please enter existing one.</source>
+        <translation>Um das Passwort zu ändern, geben Sie bitte Ihr aktuelles Passwort ein.</translation>
+    </message>
+    <message>
+        <source>User has been renamed. Password must be updated.</source>
         <translation>Der Benutzer wurde unbenannt. Passwort muss aktualisiert werden.</translation>
+    </message>
+    <message>
+        <source>Can adjust %1 settings</source>
+        <translation>Kann %1 Einstellungen anpassen</translation>
     </message>
 </context>
 <context>
@@ -6444,12 +7176,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Video-Wand Einstellungen</translation>
     </message>
     <message>
-        <source>Start Video Wall when the Windows starts</source>
-        <translation>Video-Wand beim Start von Windows automatisch öffnen</translation>
+        <source>Launch video wall when Windows starts.</source>
+        <translation>Video-Wand beim Start von Windows automatisch öffnen.</translation>
     </message>
     <message>
-        <source>Shortcut on the desktop</source>
-        <translation>Verknüpfung auf dem Desktop</translation>
+        <source>Place shortcut on desktop.</source>
+        <translation>Erstelle Verknüpfung auf dem Desktop.</translation>
     </message>
 </context>
 <context>
@@ -6466,24 +7198,8 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnWorkbenchActionHandler</name>
     <message>
-        <source>New layout</source>
-        <translation>Neues Layout</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>Neues Layout %1</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Fehler</translation>
-    </message>
-    <message>
-        <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation>Kann Kamera(s) nicht auf anderen Server verschieben. Server %1 antwortet nicht auf Anfrage.</translation>
-    </message>
-    <message>
-        <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation>Der Server %1 kann die Kameras bis jetzt nicht wahrnehmen. Sind Sie sicher, dass Sie sie verschieben wollen?</translation>
     </message>
     <message>
         <source>Layout is locked and cannot be changed.</source>
@@ -6514,10 +7230,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Alle Dateien (*.*)</translation>
     </message>
     <message>
-        <source>Open file</source>
-        <translation>Datei öffnen</translation>
-    </message>
-    <message>
         <source>All Supported (*.layout)</source>
         <translation>Alle unterstützten Layouts (*.layout)</translation>
     </message>
@@ -6530,24 +7242,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ordner wählen...</translation>
     </message>
     <message>
-        <source>Could not perform preview search</source>
-        <translation>Konnte Vorschau-Suche nicht ausführen</translation>
-    </message>
-    <message>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
         <translation>Ausgewählter Zeitraum ist zu kurz, um eine Vorschau-Suche durchzuführen. Bitte wählen Sie einen längeren Zeitraum.</translation>
     </message>
     <message>
         <source>Preview Search for %1</source>
         <translation>Vorschau-Suche für %1</translation>
-    </message>
-    <message>
-        <source>Process is in progress</source>
-        <translation>Prozess ist am laufen</translation>
-    </message>
-    <message>
-        <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Kamera wird augenblicklich hinzugefügt. Sind Sie sicher, dass Sie diesen Prozess abbrechen wollen?</translation>
     </message>
     <message>
         <source>Delete Files</source>
@@ -6584,10 +7284,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Benutzer mit diesem Namen existiert bereits</translation>
     </message>
     <message>
-        <source>Video Wall with the same name already exists</source>
-        <translation>Video-Wand mit diesem Namen existiert bereits</translation>
-    </message>
-    <message>
         <source>Rename</source>
         <translation>Umbenennen</translation>
     </message>
@@ -6609,14 +7305,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>User Settings</source>
         <translation>Benutzereinstellungen</translation>
-    </message>
-    <message>
-        <source>Updating background</source>
-        <translation>Hintergrund aktualisieren</translation>
-    </message>
-    <message>
-        <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation>Bildverarbeitung kann recht lange dauern. Bitte haben Sie etwas Geduld.</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items.</source>
@@ -6649,34 +7337,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Beta Version %1</translation>
     </message>
     <message>
-        <source>You are running beta version of %1.</source>
-        <translation>Sie verwenden die Beta Version von %1.</translation>
-    </message>
-    <message>
-        <source>Launcher process is not found</source>
-        <translation>Ladeprozess nicht gefunden</translation>
-    </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered.</source>
-        <translation>
-            <numerusform>Diese %n Kamera wurde automatisch erkannt.</numerusform>
-            <numerusform>Diese %n Kameras wurden automatisch erkannt.</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>They may be auto-discovered again after removing.</source>
         <translation>Die automatische Erkennung könnte sie nach dem Entfernen erneut aktivieren.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete them?</source>
         <translation>Wollen Sie sie wirklich löschen?</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.</source>
-        <translation>
-            <numerusform>%n von %1 Kamera wurde automaitsch erkannt.</numerusform>
-            <numerusform>%n von %1 Kameras wurden automaitsch erkannt.</numerusform>
-        </translation>
     </message>
     <message>
         <source>An error has occurred while trying to delete a resource from Server. </source>
@@ -6732,6 +7398,73 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Das System sendet anonyme Nutzungs- und Absturzstatistiken an das Software Entwicklungsteam, um die Software zu verbessern.
 Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinstellungen deaktivieren.</translation>
     </message>
+    <message>
+        <source>New Layout</source>
+        <translation>Neues Layout</translation>
+    </message>
+    <message>
+        <source>New Layout %1</source>
+        <translation>Neues Layout %1</translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation>Datei öffnen</translation>
+    </message>
+    <message>
+        <source>Unable to perform preview search.</source>
+        <translation>Konnte Vorschau-Suche nicht ausführen.</translation>
+    </message>
+    <message>
+        <source>Process in progress...</source>
+        <translation>Prozess läuft...</translation>
+    </message>
+    <message>
+        <source>Video Wall with the same name already exists.</source>
+        <translation>Video-Wand mit diesem Namen existiert bereits.</translation>
+    </message>
+    <message>
+        <source>Updating Background...</source>
+        <translation>Aktualisiere Hintergrund...</translation>
+    </message>
+    <message>
+        <source>Image processing may take a few moments. Please be patient.</source>
+        <translation>Bildverarbeitung kann recht lange dauern. Bitte haben Sie etwas Geduld.</translation>
+    </message>
+    <message>
+        <source>This is a beta version of %1.</source>
+        <translation>Dies ist eine Beta-Version von %1.</translation>
+    </message>
+    <message>
+        <source>Launcher process not found.</source>
+        <translation>Ladeprozess nicht gefunden.</translation>
+    </message>
+    <message>
+        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
+        <translation>Kann %1 nicht auf den Server verschieben. Server %2 reagiert nicht.</translation>
+    </message>
+    <message>
+        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
+        <translation>Server %1 ist nicht imstande %2 zu finden und darauf zuzugreifen. Sind Sie sicher, dass Sie diese verschieben möchten?</translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
+        <translation>Das Hinzufügen von Geräten ist in Bearbeitung. Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?</translation>
+    </message>
+    <message>
+        <source>These %1 are auto-discovered.</source>
+        <translation>Diese %1 werden automatisch ermittelt.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 are auto-discovered.</source>
+        <translation>
+            <numerusform>%n von dieser %1 wird automatisch ermittelt.</numerusform>
+            <numerusform>%n von diesen %1 werden automatisch ermittelt.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Do you really want to delete the following %1?</source>
+        <translation>Wollen Sie das wirklich löschen %1?</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6740,28 +7473,28 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Fehler</translation>
     </message>
     <message>
-        <source>Bookmark can only be added to an online server.</source>
-        <translation>Lesezeichen kann nur hinzugefügt werden, wenn der Server online ist.</translation>
-    </message>
-    <message>
         <source>Bookmark</source>
         <translation>Lesezeichen</translation>
     </message>
     <message>
-        <source>Bookmark can only be edited on an online server.</source>
+        <source>Are you sure you want to delete this bookmark %1?</source>
+        <translation>Wollen Sie dieses Lesezeichen %1 wirklich löschen?</translation>
+    </message>
+    <message>
+        <source>Bookmarks can only be added to an online server.</source>
+        <translation>Lesezeichen kann nur hinzugefügt werden, wenn der Server online ist.</translation>
+    </message>
+    <message>
+        <source>Bookmarks can only be edited on an online server.</source>
         <translation>Lesezeichen kann nur bearbeitet werden, wenn der Server online ist.</translation>
     </message>
     <message>
-        <source>Bookmark can only be deleted from an online server.</source>
+        <source>Bookmarks can only be deleted from an online server.</source>
         <translation>Lesezeichen kann nur gelöscht werden, wenn der Server online ist.</translation>
     </message>
     <message>
-        <source>Confirm delete</source>
+        <source>Confirm Deletion</source>
         <translation>Löschen bestätigen</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation>Wollen Sie dieses Lesezeichen %1 wirklich löschen?</translation>
     </message>
 </context>
 <context>
@@ -6798,10 +7531,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Warnung</translation>
     </message>
     <message>
-        <source>Can&apos;t start recording due to the following error: %1</source>
-        <translation>Aufnahme kann wegen des folgenden Fehlers nicht gestartet werden: %1</translation>
-    </message>
-    <message>
         <source>Recorded Video</source>
         <translation>Aufgezeichnetes Video</translation>
     </message>
@@ -6814,12 +7543,16 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
-        <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
+        <source>Unable to start recording due to the following error: %1</source>
+        <translation>Aufnahme kann wegen des folgenden Fehlers nicht gestartet werden: %1</translation>
+    </message>
+    <message>
+        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
         <translation>Konnte die Datei %1 nicht überschreiben. Bitte verwenden Sie einen anderen Namen.</translation>
     </message>
     <message>
-        <source>Press any key to stop the tour</source>
-        <translation>Anhalten der Tour durch Drücken einer beliebigen Taste</translation>
+        <source>Press any key to stop the tour.</source>
+        <translation>Anhalten der Tour durch Drücken einer beliebigen Taste.</translation>
     </message>
 </context>
 <context>
@@ -6831,10 +7564,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>Executable %1 Media File (x86) (*.exe)</source>
         <translation>Ausführbare %1 Media Datei (x86) (*.exe)</translation>
-    </message>
-    <message>
-        <source>File is in use</source>
-        <translation>Datei wird gerade verwendet</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
@@ -6852,20 +7581,12 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>Exporting Layout</source>
         <translation>Exportiere Layout</translation>
     </message>
-    <message>
-        <source>Could not export file</source>
-        <translation>Konnte Datei nicht exportieren</translation>
-    </message>
     <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
         <translation>
             <numerusform>Genau ein Objekt muss für den Export markiert sein, derzeit sind aber %n Objekte markiert.</numerusform>
             <numerusform>Genau ein Objekt muss für den Export markiert sein, derzeit sind aber %n Objekte markiert.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>Warnung</translation>
     </message>
     <message>
         <source>AVI (*.avi)</source>
@@ -6878,26 +7599,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>Export Video As...</source>
         <translation>Exportiere Video als...</translation>
-    </message>
-    <message>
-        <source>No timestamp</source>
-        <translation>Keine Zeitmarke</translation>
-    </message>
-    <message>
-        <source>Top left corner (requires transcoding)</source>
-        <translation>Obere linke Ecke (Umcodierung erforderlich)</translation>
-    </message>
-    <message>
-        <source>Top right corner (requires transcoding)</source>
-        <translation>Obere rechte Ecke (Umcodierung erforderlich)</translation>
-    </message>
-    <message>
-        <source>Bottom left corner (requires transcoding)</source>
-        <translation>Untere linke Ecke (Umcodierung erforderlich)</translation>
-    </message>
-    <message>
-        <source>Bottom right corner (requires transcoding)</source>
-        <translation>Untere rechte Ecke (Umcodierung erforderlich)</translation>
     </message>
     <message>
         <source>Timestamps:</source>
@@ -6916,10 +7617,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Speichern unter</translation>
     </message>
     <message>
-        <source>You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?</source>
-        <translation>Sie sind dabei ein Video zu exportieren, das umcodiert werden muss. Das kann eine lange Zeit dauern. Möchten Sie fortfahren?</translation>
-    </message>
-    <message>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
         <translation>Datei &apos;%1&apos; existiert bereits. Möchten Sie diese überschreiben?</translation>
     </message>
@@ -6932,22 +7629,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Exportiere nach &quot;%1&quot;...</translation>
     </message>
     <message>
-        <source>Export finished</source>
-        <translation>Export abgeschlossen</translation>
-    </message>
-    <message>
-        <source>Export successfully finished</source>
-        <translation>Export wurde erfolgreich abgeschlossen</translation>
-    </message>
-    <message>
-        <source>Could not export layout</source>
-        <translation>Konnte Layout nicht exportieren</translation>
-    </message>
-    <message>
-        <source>Could not save a layout</source>
-        <translation>Konnte ein Layout nicht speichern</translation>
-    </message>
-    <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
         <translation>Das aktuelle Layout enthält Bilddateien. Bilder sind beim Multi-Video Export nicht zulässig.</translation>
     </message>
@@ -6956,28 +7637,12 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Das aktuelle Layout enthält lokale Dateien. Lokale Dateien sind beim Multi-Video Export nicht zulässig.</translation>
     </message>
     <message>
-        <source>Save local layout As...</source>
-        <translation>Lokales Layout speichern als...</translation>
-    </message>
-    <message>
         <source>Export Layout As...</source>
         <translation>Exportiere Layout als...</translation>
     </message>
     <message>
         <source>%1 Media File (*.nov)</source>
         <translation>%1 Media Datei (*.nov)</translation>
-    </message>
-    <message>
-        <source>Make file read-only</source>
-        <translation>Schreibschutz der Datei aktivieren</translation>
-    </message>
-    <message>
-        <source>Export successfully finished.</source>
-        <translation>Export wurde erfolgreich abgeschlossen.</translation>
-    </message>
-    <message>
-        <source>Could not export video</source>
-        <translation>Konnte Video nicht exportieren</translation>
     </message>
     <message>
         <source>You are about to export a video sequence that is longer than 30 minutes.</source>
@@ -7003,16 +7668,80 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>exported</source>
         <translation>exportiert</translation>
     </message>
+    <message>
+        <source>File is in use.</source>
+        <translation>Datei wird gerade verwendet.</translation>
+    </message>
+    <message>
+        <source>Unable to export file.</source>
+        <translation>Nicht möglich die Datei zu exportieren.</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation>Warnung!</translation>
+    </message>
+    <message>
+        <source>No Timestamp</source>
+        <translation>Keine Zeitmarke</translation>
+    </message>
+    <message>
+        <source>Top Left Corner (requires transcoding)</source>
+        <translation>Obere linke Ecke (Umcodierung erforderlich)</translation>
+    </message>
+    <message>
+        <source>Top Right Corner (requires transcoding)</source>
+        <translation>Obere rechte Ecke (Umcodierung erforderlich)</translation>
+    </message>
+    <message>
+        <source>Bottom Left Corner (requires transcoding)</source>
+        <translation>Untere linke Ecke (Umcodierung erforderlich)</translation>
+    </message>
+    <message>
+        <source>Bottom Right Corner (requires transcoding)</source>
+        <translation>Untere rechte Ecke (Umcodierung erforderlich)</translation>
+    </message>
+    <message>
+        <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
+        <translation>Sie sind dabei ein Video zu exportieren, das umcodiert werden muss. Das kann eine lange Zeit dauern. Möchten Sie fortfahren?</translation>
+    </message>
+    <message>
+        <source>Export Complete</source>
+        <translation>Export vollständig</translation>
+    </message>
+    <message>
+        <source>Export Successful</source>
+        <translation>Export erfolgreich</translation>
+    </message>
+    <message>
+        <source>Unable to export layout.</source>
+        <translation>Exportieren des Layouts nicht möglich.</translation>
+    </message>
+    <message>
+        <source>Unable to save layout.</source>
+        <translation>Speichern des Layouts nicht möglich.</translation>
+    </message>
+    <message>
+        <source>Save local layout as...</source>
+        <translation>Lokales Layout speichern als...</translation>
+    </message>
+    <message>
+        <source>Make file read-only.</source>
+        <translation>Schreibschutz der Datei aktivieren.</translation>
+    </message>
+    <message>
+        <source>Export Successful.</source>
+        <translation>Export erfolgreich.</translation>
+    </message>
+    <message>
+        <source>Unable to export video.</source>
+        <translation>Exportieren des Videos nicht möglich.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
         <source>Error</source>
         <translation>Fehler</translation>
-    </message>
-    <message>
-        <source>Please, wait before the previously requested servers will be added to your system.</source>
-        <translation>Bitte warten Sie bis die zuvor angeforderten Server Ihrem System hinzugefügt worden sind.</translation>
     </message>
     <message>
         <source>Enter Password...</source>
@@ -7035,10 +7764,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Information</translation>
     </message>
     <message>
-        <source>The selected servers has been successfully connected to your system!</source>
-        <translation>Der ausgewählte Server wurde erfolgreich mit Ihrem System verbunden!</translation>
-    </message>
-    <message>
         <source>Could not configure the selected servers.</source>
         <translation>Der ausgewählte Server konnte nicht konfiguriert werden.</translation>
     </message>
@@ -7059,28 +7784,37 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translatorcomment>???What is this supposed to meanm???  please improve translation.</translatorcomment>
         <translation>Sie können das Update erneut in der Systemadministation starten.</translation>
     </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.
+As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
+If you understand this and would like to proceed please click Merge to continue.
+</source>
+        <translation>Warnung: Sie sind dabei Systeme mit START Lizenzen zusammenzufügen.
+Da nur eine START Lizenz pro System erlaubt ist, wird Ihnen nach dem Zusammenfügen nur eine START Lizenz verbleiben.
+Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zusammenfügen.</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Warnung</translation>
+    </message>
+    <message>
+        <source>Merge</source>
+        <translation>Zusammenfügen</translation>
+    </message>
+    <message>
+        <source>Please wait. Requested servers will be added to your system.</source>
+        <translation>Bitte warten Sie bis die zuvor angeforderten Server Ihrem System hinzugefügt worden sind.</translation>
+    </message>
+    <message>
+        <source>Rejoice! Selected servers have been successfully connected to your system!</source>
+        <translation>Der ausgewählte Server wurde erfolgreich mit Ihrem System verbunden!</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
     <message>
-        <source>Layout already exists</source>
-        <translation>Layout existiert bereits</translation>
-    </message>
-    <message>
-        <source>Layout with the same name already exists and you do not have the rights to overwrite it.</source>
-        <translation>Layout mit diesem Namen existiert bereits und Sie verfügen nicht über die Rechte dieses zu überschreiben.</translation>
-    </message>
-    <message>
         <source>Save Layout As</source>
         <translation>Layout speichern als</translation>
-    </message>
-    <message>
-        <source>Enter layout name:</source>
-        <translation>Layoutnamen eingeben:</translation>
-    </message>
-    <message>
-        <source>Layout with the same name already exists. Do you want to overwrite it?</source>
-        <translation>Layout mit diesem Namen existiert bereits. Möchten Sie dieses überschreiben?</translation>
     </message>
     <message>
         <source>Close Layouts</source>
@@ -7117,14 +7851,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Geben Sie einen Namen für das neue Layout ein:</translation>
     </message>
     <message>
-        <source>New layout</source>
-        <translation>Neues Layout</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>Neues Layout %1</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -7142,13 +7868,29 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
             <numerusform>Möchten Sie diese %n Layouts wiederherstellen?</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Layout already exists.</source>
+        <translation>Layout existiert bereits.</translation>
+    </message>
+    <message>
+        <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
+        <translation>Layout mit diesem Namen existiert bereits und Sie verfügen nicht über die Rechte dieses zu überschreiben.</translation>
+    </message>
+    <message>
+        <source>Enter Layout Name:</source>
+        <translation>Layoutnamen eingeben:</translation>
+    </message>
+    <message>
+        <source>A layout with the same name already exists. Would you like to overwrite it?</source>
+        <translation>Layout mit diesem Namen existiert bereits. Möchten Sie dieses überschreiben?</translation>
+    </message>
+    <message>
+        <source>New Layout %1</source>
+        <translation>Neues Layout %1</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchNavigator</name>
-    <message>
-        <source>All Cameras</source>
-        <translation>Alle Kameras</translation>
-    </message>
     <message>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
@@ -7169,21 +7911,13 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
         <translation></translation>
     </message>
+    <message>
+        <source>All %1</source>
+        <translation>Alle %1</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
-    <message>
-        <source>Could not get position from camera</source>
-        <translation>Positionsabfrage bei Kamera gescheitert</translation>
-    </message>
-    <message>
-        <source>Could not set position for camera</source>
-        <translation>Konnte Position der Kamera nicht setzen</translation>
-    </message>
-    <message>
-        <source>Could not set position to camera</source>
-        <translation>Konnte Position der Kamera nicht setzen</translation>
-    </message>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
@@ -7199,6 +7933,18 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation>Beim Versuch die Position von Kamera %1 zu setzen, ereignete sich ein Fehler.</translation>
+    </message>
+    <message>
+        <source>Unable to get position from camera.</source>
+        <translation>Positionsabfrage bei Kamera gescheitert.</translation>
+    </message>
+    <message>
+        <source>Unable to set position for camera.</source>
+        <translation>Konnte Position der Kamera nicht setzen.</translation>
+    </message>
+    <message>
+        <source>Unable to set position of camera.</source>
+        <translation>Konnte Position von Kamera nicht setzen.</translation>
     </message>
 </context>
 <context>
@@ -7216,26 +7962,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Screenshot speichern als...</translation>
     </message>
     <message>
-        <source>No timestamp</source>
-        <translation>Keine Zeitmarke</translation>
-    </message>
-    <message>
-        <source>Top left corner</source>
-        <translation>Obere linke Ecke</translation>
-    </message>
-    <message>
-        <source>Top right corner</source>
-        <translation>Obere rechte Ecke</translation>
-    </message>
-    <message>
-        <source>Bottom left corner</source>
-        <translation>Untere linke Ecke</translation>
-    </message>
-    <message>
-        <source>Bottom right corner</source>
-        <translation>Untere rechte Ecke</translation>
-    </message>
-    <message>
         <source>Timestamp:</source>
         <translation>Zeitmarke:</translation>
     </message>
@@ -7248,10 +7974,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Datei &apos;%1&apos; existiert bereits. Möchten Sie diese überschreiben?</translation>
     </message>
     <message>
-        <source>Could not overwrite file</source>
-        <translation>Konnte die Datei nicht überschreiben</translation>
-    </message>
-    <message>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
         <translation>Datei &apos;%1&apos; wird von einem anderen Prozess verwendet. Bitte verwenden Sie einen anderen Namen.</translation>
     </message>
@@ -7260,31 +7982,47 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Speichere %1</translation>
     </message>
     <message>
-        <source>Could not save screenshot</source>
-        <translation>Konnte Screenshot nicht speichern</translation>
-    </message>
-    <message>
-        <source>An error has occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation>Ein Fehler ist beim Speichern von Screenshot &apos;%1&apos; aufgetreten.</translation>
-    </message>
-    <message>
         <source>Saving Screenshot...</source>
         <translation>Speichere Screenshot...</translation>
+    </message>
+    <message>
+        <source>No Timestamp</source>
+        <translation>Keine Zeitmarke</translation>
+    </message>
+    <message>
+        <source>Top Left Corner</source>
+        <translation>Obere linke Ecke</translation>
+    </message>
+    <message>
+        <source>Top Right Corner</source>
+        <translation>Obere rechte Ecke</translation>
+    </message>
+    <message>
+        <source>Bottom Left Corner</source>
+        <translation>Untere linke Ecke</translation>
+    </message>
+    <message>
+        <source>Bottom Right Corner</source>
+        <translation>Untere rechte Ecke</translation>
+    </message>
+    <message>
+        <source>Could not overwrite file.</source>
+        <translation>Konnte die Datei nicht überschreiben.</translation>
+    </message>
+    <message>
+        <source>Could not save screenshot.</source>
+        <translation>Konnte Screenshot nicht speichern.</translation>
+    </message>
+    <message>
+        <source>An error occured while saving screenshot &apos;%1&apos;.</source>
+        <translation>Ein Fehler ist beim Speichern von Screenshot &apos;%1&apos; aufgetreten.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
-        <source>Newer version is available</source>
-        <translation>Eine neuere Version ist verfügbar</translation>
-    </message>
-    <message>
         <source>Would you like to update?</source>
         <translation>Möchten Sie ein Update durchführen?</translation>
-    </message>
-    <message>
-        <source>Update is recommended</source>
-        <translation>Das Update wird empfohlen</translation>
     </message>
     <message>
         <source>Major issues have been fixed.</source>
@@ -7293,10 +8031,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>Update is strongly recommended.</source>
         <translation>Das Update wird dringend empfohlen.</translation>
-    </message>
-    <message>
-        <source>Don&apos;t notify again about this update.</source>
-        <translation>Keine weitere Benachrichtigung zu diesem Update.</translation>
     </message>
     <message>
         <source>Release Notes</source>
@@ -7310,48 +8044,32 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>New version %1 is available.</source>
         <translation>Eine neue Version %1 ist verfügbar.</translation>
     </message>
+    <message>
+        <source>A newer version is available.</source>
+        <translation>Eine neuere Version ist verfügbar.</translation>
+    </message>
+    <message>
+        <source>Update is recommended.</source>
+        <translation>Das Update wird empfohlen.</translation>
+    </message>
+    <message>
+        <source>Do not notify me again about this update.</source>
+        <translation>Keine weitere Benachrichtigung zu diesem Update.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
-        <source>Control session is already running</source>
-        <translation>Kontrollsitzung bereits aktiv</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Fehler</translation>
-    </message>
-    <message>
-        <source>Unexpected error has occurred. Changes cannot be saved.</source>
-        <translation>Ein unerwarteter Fehler ist aufgetreten. Die Änderungen können nicht gespeichert werden.</translation>
-    </message>
-    <message>
-        <source>There are no offline videowall items attached to this pc.</source>
-        <translation>Mit diesem PC sind keine offline Video-Wand-Objekte verküpft.</translation>
     </message>
     <message>
         <source>Switch to Video Wall Mode...</source>
         <translation>In Video-Wand-Modus wechseln...</translation>
     </message>
     <message>
-        <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation>Video-Wand wird jetzt gestartet. Möchten Sie diesen %1 Client schließen?</translation>
-    </message>
-    <message>
-        <source>More licenses required</source>
-        <translation>Weitere Lizenzen werden benötigt</translation>
-    </message>
-    <message>
-        <source>To enable the feature please activate at least one Video Wall license.</source>
-        <translation>Aktivieren Sie mindestens eine Video-Wand Lizenz um diese Funktion zu aktivieren.</translation>
-    </message>
-    <message>
         <source>Could not start Video Wall control session.</source>
         <translation>Konnte die Kontrollsitzung für die Video-Wand nicht starten.</translation>
-    </message>
-    <message>
-        <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation>Aktivieren Sie mindestens eine Video-Wand Lizenz um diese Funktion zu aktivieren</translation>
     </message>
     <message>
         <source>Video Wall</source>
@@ -7368,14 +8086,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>Enter the name of the Video Wall to create:</source>
         <translation>Geben Sie einen Namen für die neue Video-Wand ein:</translation>
-    </message>
-    <message>
-        <source>Video Wall already exists</source>
-        <translation>Video-Wand existiert bereits</translation>
-    </message>
-    <message>
-        <source>Video Wall with the same name already exists</source>
-        <translation>Video-Wand mit diesem Namen existiert bereits</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7448,8 +8158,44 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Bildschirm von %1</translation>
     </message>
     <message>
-        <source>%n cameras</source>
-        <translation>%n Kameras</translation>
+        <source>A control session is already running.</source>
+        <translation>Kontrollsitzung bereits aktiv.</translation>
+    </message>
+    <message>
+        <source>An unexpected error has occured. Changes cannot be applied.</source>
+        <translation>Ein unerwarteter Fehler ist aufgetreten. Die Änderungen können nicht gespeichert werden.</translation>
+    </message>
+    <message>
+        <source>There are no offline video wall items attached to this computer.</source>
+        <translation>Mit diesem PC sind keine offline Video-Wand-Objekte verküpft.</translation>
+    </message>
+    <message>
+        <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
+        <translation>Video-Wand wird jetzt gestartet. Möchten Sie diesen %1 Client schließen?</translation>
+    </message>
+    <message>
+        <source>Additional licenses required.</source>
+        <translation>Zusätzliche Lizenzen werden benötigt.</translation>
+    </message>
+    <message>
+        <source>To enable this feature please activate at least one Video Wall license.</source>
+        <translation>Aktivieren Sie mindestens eine Video-Wand Lizenz um diese Funktion zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>To enable Video Wall, please activate at least one Video Wall license.</source>
+        <translation>Aktivieren Sie mindestens eine Video-Wand Lizenz um diese Funktion zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Video Wall already exists.</source>
+        <translation>Video-Wand existiert bereits.</translation>
+    </message>
+    <message>
+        <source>A Video Wall with the same name already exists.</source>
+        <translation>Video-Wand mit diesem Namen existiert bereits.</translation>
+    </message>
+    <message>
+        <source>%n items</source>
+        <translation>%n Elemente</translation>
     </message>
 </context>
 <context>
@@ -7459,7 +8205,7 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Verbindung wird wiederhergestellt...</translation>
     </message>
     <message>
-        <source>Please wait while connection is being restored...</source>
+        <source>Please wait while the connection is restored...</source>
         <translation>Bitte warten Sie während die Verbindung wiederhergestellt wird...</translation>
     </message>
 </context>
@@ -7474,20 +8220,20 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>FPS</translation>
     </message>
     <message>
-        <source>Pre-recording:</source>
-        <translation>Vorlauf:</translation>
-    </message>
-    <message>
         <source>s</source>
         <translation>s</translation>
     </message>
     <message>
-        <source>Post-recording:</source>
-        <translation>Nachlauf:</translation>
-    </message>
-    <message>
         <source>max</source>
         <translation>max</translation>
+    </message>
+    <message>
+        <source>Pre-Recording:</source>
+        <translation>Vorlauf:</translation>
+    </message>
+    <message>
+        <source>Post-Recording:</source>
+        <translation>Nachlauf:</translation>
     </message>
 </context>
 <context>
@@ -7593,8 +8339,59 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Externes Tongerät:</translation>
     </message>
     <message>
-        <source>Very powerful machine is required for Best quality and high resolution.</source>
-        <translation>Aufnahmen in hochwertiger und hoher Auflösung benötigen sehr leistungsfähige Computer.</translation>
+        <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+        <translation>Ein leistungsfähiger Computer wird für die &quot;Beste&quot; Qualität und Auflösung empfohlen.</translation>
+    </message>
+</context>
+<context>
+    <name>RecordingStatisticsWidget</name>
+    <message>
+        <source>Refresh</source>
+        <translation>Aktualisieren</translation>
+    </message>
+    <message>
+        <source>10 Tb</source>
+        <translation>10 TB</translation>
+    </message>
+    <message>
+        <source>Forecast for full storage(s) usage</source>
+        <translation>Prognose für vollständige Speicherbenutzung</translation>
+    </message>
+    <message>
+        <source>0 Tb</source>
+        <translation>0 TB</translation>
+    </message>
+    <message>
+        <source>Additional storage:</source>
+        <translation>Zusätzlicher Speicher:</translation>
+    </message>
+    <message>
+        <source>1000 Tb</source>
+        <translation>1000 TB</translation>
+    </message>
+    <message>
+        <source>100 Tb</source>
+        <translation>100 TB</translation>
+    </message>
+    <message>
+        <source>Tb</source>
+        <translation>TB</translation>
+    </message>
+    <message>
+        <source>1 Tb</source>
+        <translation>1 TB</translation>
+    </message>
+    <message>
+        <source>Current usage</source>
+        <translation>Aktuelle Nutzung</translation>
+    </message>
+    <message>
+        <source>Forecast</source>
+        <translation>Prognose</translation>
+    </message>
+    <message>
+        <source>Servers is offline. Statistics is not available.</source>
+        <translation>Server sind offline. Statistiken sind nicht verfügbar.</translation>
     </message>
 </context>
 <context>
@@ -7656,9 +8453,12 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
 <context>
     <name>ServerSettingsDialog</name>
     <message>
-        <source>Server settings</source>
+        <source>Server Settings</source>
         <translation>Server Einstellungen</translation>
     </message>
+</context>
+<context>
+    <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
         <translation>Name:</translation>
@@ -7684,20 +8484,16 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Ausfallsicherung</translation>
     </message>
     <message>
-        <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation>Ausfallsicherung aktivieren (automatische Kameraübernahme ausgefallener Server)</translation>
-    </message>
-    <message>
-        <source>Max. cameras on this server:</source>
-        <translation>Max. Kameraanzahl auf diesem Server:</translation>
-    </message>
-    <message>
         <source>Storages</source>
         <translation>Speichermedien</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation>Verwendet</translation>
+        <translation>Derzeit verwendet</translation>
+    </message>
+    <message>
+        <source>Protocol</source>
+        <translation>Protokoll</translation>
     </message>
     <message>
         <source>Path</source>
@@ -7717,8 +8513,12 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message>
         <source>Space</source>
-        <translatorcomment>Space free on device - I assume  heider@allnet.kg</translatorcomment>
-        <translation>Frei</translation>
+        <translation>Leerzeichen</translation>
+    </message>
+    <message>
+        <source>Unchecking the storage will cause nothing but writing stop.
+It won&apos;t deny oldest footage removing from the drive.</source>
+        <translation>Deaktivieren des Speichers stoppt das Schreiben.</translation>
     </message>
     <message>
         <source>Rebuild archive index</source>
@@ -7736,24 +8536,20 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
 <context>
     <name>SignDialog</name>
     <message>
-        <source>Watermark check</source>
+        <source>Watermark Check</source>
         <translation>Wasserzeichen prüfen</translation>
     </message>
     <message>
-        <source>Checked file:</source>
+        <source>Checked File:</source>
         <translation>Geprüfte Datei:</translation>
     </message>
     <message>
-        <source>Check result:</source>
+        <source>Check Result:</source>
         <translation>Prüfungsergebnis:</translation>
     </message>
 </context>
 <context>
     <name>SingleCameraSettingsWidget</name>
-    <message>
-        <source>Camera settings</source>
-        <translation>Kamera Einstellungen</translation>
-    </message>
     <message>
         <source>General</source>
         <translation>Allgemein</translation>
@@ -7807,38 +8603,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Passwort:</translation>
     </message>
     <message>
-        <source>Image Control</source>
-        <translation>Bildeinstellungen</translation>
-    </message>
-    <message>
-        <source>Force aspect ratio to:</source>
-        <translation>Seitenverhältnis erzwingen im Format:</translation>
-    </message>
-    <message>
-        <source>Default rotation:</source>
-        <translation>Standardeinstellung Rotation:</translation>
-    </message>
-    <message>
-        <source>Licensing</source>
-        <translation>Lizenzierung</translation>
-    </message>
-    <message>
-        <source>Use an analog license to view this camera</source>
-        <translation>Analog-Lizenz für diese Kamera verwenden</translation>
-    </message>
-    <message>
-        <source>Get More Licenses...</source>
-        <translation>Lizenzen hinzufügen...</translation>
-    </message>
-    <message>
-        <source>Enable audio</source>
-        <translation>Audio aktivieren</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Dies ist eine Kamera mit Fischaugenobjektiv</translation>
-    </message>
-    <message>
         <source>Recording</source>
         <translation>Aufnahme</translation>
     </message>
@@ -7847,52 +8611,16 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Motion</translation>
     </message>
     <message>
-        <source>Motion is not available for this camera</source>
-        <translation>Motion is für diese Kamera nicht verfügbar</translation>
-    </message>
-    <message>
-        <source>Motion settings</source>
-        <translation>Motion Einstellungen</translation>
-    </message>
-    <message>
-        <source>Motion detection:</source>
-        <translation>Bewegungserkennung:</translation>
-    </message>
-    <message>
-        <source>Hardware (Camera built-in)</source>
-        <translation>Hardware (Eingebaute Kamera)</translation>
-    </message>
-    <message>
-        <source>Software (Max FPS may be slightly decreased on Server)</source>
-        <translation>Software (Max. FPS auf dem Server könnte sich leicht reduzieren)</translation>
-    </message>
-    <message>
         <source>Sensitivity:</source>
         <translation>Empfindlichkeit:</translation>
-    </message>
-    <message>
-        <source>Motion mask (0)</source>
-        <translation>Motion-Erkennbereich</translation>
     </message>
     <message>
         <source>Maximum sensitivity (9)</source>
         <translation>Maximale Empfindlichkeit</translation>
     </message>
     <message>
-        <source>Camera motion web page:</source>
-        <translation>Motion Webseite der Kamera:</translation>
-    </message>
-    <message>
         <source>URL</source>
         <translation>URL</translation>
-    </message>
-    <message>
-        <source>Reset motion regions</source>
-        <translation>Motion-Regionen zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Dewarping</source>
-        <translation>Dewarping</translation>
     </message>
     <message>
         <source>Advanced</source>
@@ -7901,6 +8629,50 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>Expert</source>
         <translation>Experten</translation>
+    </message>
+    <message>
+        <source>IO ports</source>
+        <translation>IO Ports</translation>
+    </message>
+    <message>
+        <source>Enable Audio</source>
+        <translation>Audio aktivieren</translation>
+    </message>
+    <message>
+        <source>Motion is not available for this camera.</source>
+        <translation>Motion is für diese Kamera nicht verfügbar.</translation>
+    </message>
+    <message>
+        <source>Motion Settings</source>
+        <translation>Motion Einstellungen</translation>
+    </message>
+    <message>
+        <source>Motion Detection</source>
+        <translation>Bewegungserkennung</translation>
+    </message>
+    <message>
+        <source>Software - maximum FPS could decrease slightly on server</source>
+        <translation>Software - Maximale FPS könnten Server verlangsamen</translation>
+    </message>
+    <message>
+        <source>Motion Mask (0)</source>
+        <translation>Motion-Erkennbereich</translation>
+    </message>
+    <message>
+        <source>Camera web page:</source>
+        <translation>Motion Webseite der Kamera:</translation>
+    </message>
+    <message>
+        <source>Reset Motion Regions</source>
+        <translation>Motion-Regionen zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Hardware (camera built-in)</source>
+        <translation>Hardware (Eingebaute Kamera)</translation>
+    </message>
+    <message>
+        <source>Fisheye</source>
+        <translation>Fischauge</translation>
     </message>
 </context>
 <context>
@@ -7930,10 +8702,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>&amp;System Signatur:</translation>
     </message>
     <message>
-        <source>Enter short system description here...</source>
-        <translation>Geben Sie eine kurze Systembeschreibung ein...</translation>
-    </message>
-    <message>
         <source>Support Signature:</source>
         <translation>Support Signatur:</translation>
     </message>
@@ -7952,18 +8720,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>P&amp;ort:</source>
         <translation>P&amp;ort:</translation>
-    </message>
-    <message>
-        <source>Unsecure connection</source>
-        <translation>Ungesicherte Verbindung</translation>
-    </message>
-    <message>
-        <source>Secure connection using TLS</source>
-        <translation>Sichere Verbindung mittels TLS</translation>
-    </message>
-    <message>
-        <source>Secure connection using SSL</source>
-        <translation>Sichere Verbindung mittels SSL</translation>
     </message>
     <message>
         <source>Server:</source>
@@ -8001,6 +8757,22 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>(recommended)</source>
         <translation>(empfohlen)</translation>
     </message>
+    <message>
+        <source>Enter a short system description here.</source>
+        <translation>Geben Sie eine kurze Systembeschreibung ein.</translation>
+    </message>
+    <message>
+        <source>Unsecure Connection</source>
+        <translation>Ungesicherte Verbindung</translation>
+    </message>
+    <message>
+        <source>Secure connection using TLS.</source>
+        <translation>Sichere Verbindung mittels TLS.</translation>
+    </message>
+    <message>
+        <source>Secure connection using SSL.</source>
+        <translation>Sichere Verbindung mittels SSL.</translation>
+    </message>
 </context>
 <context>
     <name>StatisticsOverlayWidget</name>
@@ -8037,18 +8809,37 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
 </context>
 <context>
-    <name>TimeServerSelectionWidget</name>
+    <name>SystemSettingsWidget</name>
     <message>
-        <source>Current system time:</source>
-        <translation>Aktuelle Systemzeit:</translation>
+        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
+        <translation>Achtung: Die Einstellungen FPS und Aufnahmequalität funktionieren nicht im Aufnahmeplan!</translation>
     </message>
+    <message>
+        <source>(recommended)</source>
+        <translation>(empfohlen)</translation>
+    </message>
+    <message>
+        <source>Enable audit trail</source>
+        <translation>Aktiviere Überwachungspfad</translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers</source>
+        <translation>Senden von anonymen Benutzer- und Absturzstatistiken an die Software-Entwickler</translation>
+    </message>
+</context>
+<context>
+    <name>TimeServerSelectionWidget</name>
     <message>
         <source>Synchronizing...</source>
         <translation>Synchronisiere...</translation>
     </message>
     <message>
-        <source>Choose the server which is going to be used as a time server if the system has no internet access:</source>
-        <translation>Wählen Sie den Server, der als Zeitserver fungiert, wenn das System keinen Internetzugang hat:</translation>
+        <source>Current System Time:</source>
+        <translation>Aktuelle Systemzeit:</translation>
+    </message>
+    <message>
+        <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
+        <translation>Wählen Sie einen verfügbaren lokalen Server aus, welcher als Zeitserver fungiert, wenn keine Internetverbindung besteht:</translation>
     </message>
 </context>
 <context>
@@ -8056,10 +8847,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>Create New User</source>
         <translation>Neuen Benutzer erstellen</translation>
-    </message>
-    <message>
-        <source>User Properties</source>
-        <translation>Benutzerdefinition</translation>
     </message>
     <message>
         <source>Advanced...</source>
@@ -8090,20 +8877,16 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>&amp;Login:</translation>
     </message>
     <message>
-        <source>&amp;Email:</source>
+        <source>E&amp;mail:</source>
         <translation>&amp;Email:</translation>
+    </message>
+    <message>
+        <source>Enabled:</source>
+        <translation>Aktiviert:</translation>
     </message>
 </context>
 <context>
     <name>WeekTimeScheduleDialog</name>
-    <message>
-        <source>Schedule Grid</source>
-        <translation>Aufnahmeplan-Übersicht</translation>
-    </message>
-    <message>
-        <source>Note: Schedule is based on Server Time</source>
-        <translation>Hinweis: Der Aufnahmeplan basiert auf der Serverzeiteinstellung</translation>
-    </message>
     <message>
         <source>Schedule Settings</source>
         <translation>Aufnahmeplanung</translation>
@@ -8115,6 +8898,14 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     <message>
         <source>Off</source>
         <translation>Aus</translation>
+    </message>
+    <message>
+        <source>Schedule</source>
+        <translation>Zeitplan</translation>
+    </message>
+    <message>
+        <source>Note: Schedule is based on server time.</source>
+        <translation>Hinweis: Der Aufnahmeplan basiert auf der Serverzeiteinstellung.</translation>
     </message>
 </context>
 </TS>

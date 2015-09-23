@@ -71,5 +71,5 @@ void QnButtonBoxDialog::at_buttonBox_clicked(QAbstractButton *button) {
 
 void QnButtonBoxDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
     //do nothing
-    static_cast<void>(button);
+    Q_UNUSED(button);
 }

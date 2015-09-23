@@ -83,11 +83,11 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
     QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No;
 
     if (majorVersionChange) {
-        title = tr("Newer version is available");
+        title = tr("A newer version is available.");
         message = tr("New version %1 is available.").arg(htmlBold(updateVersion.toString()));
         message += lit("<br/>");
     } else {
-        title = tr("Update is recommended");
+        title = tr("Update is recommended.");
         message = tr("New version %1 is available.").arg(htmlBold(updateVersion.toString()));
         message += lit("<br/>");
         message += tr("Major issues have been fixed.");
@@ -120,7 +120,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
 
     messageBox.setWindowTitle(title);
     messageBox.setRichText(message);
-    messageBox.setCheckBoxText(tr("Don't notify again about this update."));
+    messageBox.setCheckBoxText(tr("Do not notify me again about this update."));
     setHelpTopic(&messageBox, Qn::Upgrade_Help);
 
     if (releaseNotesUrl.isValid()) {

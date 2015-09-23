@@ -162,13 +162,14 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     QList<QUrl> ignoredUrls = server->getIgnoredUrls();
 
     if (addInformation) {
-        if (!data.ignore) {
-            if (!additionalUrls.contains(url) && !addresses.contains(QHostAddress(url.host())))
-                additionalUrls.append(url);
-            ignoredUrls.removeOne(url);
-        } else {
+        if (!additionalUrls.contains(url) && !addresses.contains(QHostAddress(url.host())))
+            additionalUrls.append(url);
+
+        if (data.ignore) {
             if (!ignoredUrls.contains(url))
                 ignoredUrls.append(url);
+        } else {
+            ignoredUrls.removeOne(url);
         }
     } else {
         additionalUrls.removeOne(url);
@@ -202,7 +203,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
 {
     QnResourcePtr resource = qnResPool->getResourceById(param.resourceId);
     if (resource)
-        resource->setProperty(param.name, param.value, false);
+        resource->setProperty(param.name, param.value, QnResource::NO_MARK_DIRTY);
     else
         propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
 }

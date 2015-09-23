@@ -99,7 +99,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
     nx_http::header::WWWAuthenticate authHeader;
     authHeader.authScheme = nx_http::header::AuthScheme::digest;
     authHeader.params["nonce"] = QString::number(time, 16).toLatin1();
-    authHeader.params["realm"] = QnAuthHelper::REALM.toLatin1();;
+    authHeader.params["realm"] = QnAppInfo::realm().toLatin1();
 
     nx_http::header::DigestAuthorization digestHeader;
     if (!nx_http::AsyncHttpClient::calcDigestResponse(
@@ -109,13 +109,14 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
 
     return QString(QLatin1String(
        "%1 %2 HTTP/1.1\r\n" \
-       "Host: %3\r\n" \
-       "Authorization: %4\r\n" \
-       "NX-User-Name: %5\r\n" \
-       "X-Server-Uuid: %6\r\n" \
+       "Host: %3:%4\r\n" \
+       "Authorization: %5\r\n" \
+       "NX-User-Name: %6\r\n" \
+       "X-Server-Uuid: %7\r\n" \
        "\r\n"))
             .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
-            .arg(url.toString()).arg(QString::fromUtf8(digestHeader.toString()))
+            .arg(url.host()).arg(url.port(nx_http::DEFAULT_HTTP_PORT))
+            .arg(QString::fromUtf8(digestHeader.toString()))
             .arg(admin->getName()).arg(serverUuid.toString())
             .toUtf8();
 }

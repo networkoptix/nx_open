@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QVariant>
 
+#include <base/types.h>
 #include <base/constants.h>
 
 namespace rtu
@@ -13,10 +14,9 @@ namespace rtu
     {
         Q_OBJECT
         
-        Q_PROPERTY(int currentPage READ currentPage
-            WRITE setCurrentPage NOTIFY currentPageChanged)
+        Q_PROPERTY(int currentPage READ currentPage NOTIFY currentPageChanged)
         Q_PROPERTY(QObject* selection READ selection NOTIFY selectionChanged)
-
+        Q_PROPERTY(QObject* progressTask READ progressTask NOTIFY progressTaskChanged)
         Q_PROPERTY(QString toolDisplayName READ toolDisplayName NOTIFY toolInfoChanged)
 
         Q_PROPERTY(bool isBeta READ isBeta NOTIFY toolInfoChanged)
@@ -25,19 +25,40 @@ namespace rtu
         Q_PROPERTY(QString toolSupportMail READ toolSupportMail NOTIFY toolInfoChanged)
         Q_PROPERTY(QString toolCompanyUrl READ toolCompanyUrl NOTIFY toolInfoChanged)
 
+        Q_PROPERTY(bool showWarnings READ showWarnings WRITE setShowWarnings NOTIFY showWarningsChanged)
+
     public:
         RtuContext(QObject *parent = nullptr);
         
         virtual ~RtuContext();
         
     public:
-        void setCurrentPage(int pageId);
-        
         int currentPage() const;
         
+        bool showWarnings() const;
+
+        void setShowWarnings(bool show);
+
         ///
 
         QObject *selection() const;
+
+    public slots:
+        /// Changes management
+
+        QObject *changesManager();
+
+        QObject *progressTask();
+
+        void showProgressTask(const ApplyChangesTaskPtr &task);
+
+        void showProgressTaskFromList(int index);
+
+        void hideProgressTask();
+
+        void removeProgressTask(int index);
+
+        void applyTaskCompleted(const ApplyChangesTaskPtr &task);
 
     public slots:
         QObject *selectionModel();
@@ -46,8 +67,16 @@ namespace rtu
         
         QObject *timeZonesModel(QObject *parent);
         
-        QObject *changesManager();
-        
+        bool isValidSubnetMask(const QString &mask) const;
+
+        bool isDiscoverableFromCurrentNetwork(const QString &ip
+            , const QString &mask) const;
+
+        bool isDiscoverableFromNetwork(const QString &ip
+            , const QString &mask
+            , const QString &subnet
+            , const QString &subnetMask) const;
+
         QDateTime applyTimeZone(const QDate &date
             , const QTime &time
             , const QByteArray &prevTimeZoneId
@@ -55,7 +84,7 @@ namespace rtu
         
         void tryLoginWith(const QString &primarySystem
             , const QString &password);
-        
+
     public:
         QString toolDisplayName() const;
 
@@ -76,7 +105,11 @@ namespace rtu
 
         void selectionChanged();
 
+        void showWarningsChanged();
+
         void loginOperationFailed(const QString &primarySystem);
+
+        void progressTaskChanged();
         
     private:
         class Impl;

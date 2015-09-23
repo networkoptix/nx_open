@@ -16,7 +16,8 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     cameraControlDisabled(false),
     secondaryQuality(Qn::SSQualityMedium),
     minDays(0),
-    maxDays(0)
+    maxDays(0),
+    failoverPriority(Qn::FP_Medium)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         motionRegions << QnMotionRegion();
@@ -36,6 +37,10 @@ void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<Q
         *modifiedFields << "scheduleTasksChanged";
     if( motionRegions != right.motionRegions )
         *modifiedFields << "motionRegionChanged";
+    if (licenseUsed != right.licenseUsed)
+        *modifiedFields << "licenseUsedChanged";
+    if (failoverPriority != right.failoverPriority)
+        *modifiedFields << "failoverPriorityChanged";
 
     *this = right;
 }

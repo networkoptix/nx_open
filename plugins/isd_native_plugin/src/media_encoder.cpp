@@ -39,6 +39,7 @@ static QStringList getValues(const QString& line)
 }
 
 
+
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
     unsigned int encoderNum
@@ -200,10 +201,24 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
     }
 #endif
 
-    const float vbrMinCoeff = IsdNativePlugin::instance()->getSetting<int>(
-        isd_edge_settings::vbrMinPercent, isd_edge_settings::vbrMinPercentDefault ) / 100.0;
-    const float vbrMaxCoeff = IsdNativePlugin::instance()->getSetting<int>(
-        isd_edge_settings::vbrMaxPercent, isd_edge_settings::vbrMaxPercentDefault ) / 100.0;
+    float vbrMinCoeff = 0.0;
+    float vbrMaxCoeff = 0.0;
+    if( m_encoderNum == 0 )
+    {
+        //hi quality
+        vbrMinCoeff = IsdNativePlugin::instance()->getSetting<int>(
+            isd_edge_settings::hiVbrMinPercent, isd_edge_settings::hiVbrMinPercentDefault ) / 100.0;
+        vbrMaxCoeff = IsdNativePlugin::instance()->getSetting<int>(
+            isd_edge_settings::hiVbrMaxPercent, isd_edge_settings::hiVbrMaxPercentDefault ) / 100.0;
+    }
+    else
+    {
+        //lo quality
+        vbrMinCoeff = IsdNativePlugin::instance()->getSetting<int>(
+            isd_edge_settings::loVbrMinPercent, isd_edge_settings::loVbrMinPercentDefault ) / 100.0;
+        vbrMaxCoeff = IsdNativePlugin::instance()->getSetting<int>(
+            isd_edge_settings::loVbrMaxPercent, isd_edge_settings::loVbrMaxPercentDefault ) / 100.0;
+    }
 
     //std::cout<<"MediaEncoder::setBitrate "<<bitrateKbps<<" Kbps"<<std::endl;
     QString result;

@@ -134,6 +134,7 @@ namespace ec2
         QnMiscNotificationManager* m_miscManager;
         QnDiscoveryNotificationManager* m_discoveryManager;
     };
+
 }
 
 #endif  //EC_CONNECTION_NOTIFICATION_MANAGER_H

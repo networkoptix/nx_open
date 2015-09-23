@@ -47,10 +47,13 @@ QnResourceData QnResourceDataPool::data(const QString &key) const {
 QnResourceData QnResourceDataPool::data(const QnConstSecurityCamResourcePtr &camera) const {
     if (!camera)
         return QnResourceData();
+    return data(camera->getVendor(), camera->getModel(), camera->getFirmware());
+}
 
-    QString vendor = camera->getVendor().toLower();
-    vendor = m_shortVendorByName.value(vendor, vendor);
-    QString model = camera->getModel().toLower();
+QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _model, const QString& firmware) const {
+
+    QString vendor = m_shortVendorByName.value(_vendor.toLower(), _vendor.toLower());
+    QString model = _model.toLower();
     QString key1 = vendor + lit("|") + model;
    
     QnResourceData result;
@@ -63,7 +66,7 @@ QnResourceData QnResourceDataPool::data(const QnConstSecurityCamResourcePtr &cam
     } else {
         result = m_cachedResultByKey[key1];
     }
-    auto additionData = m_dataByKey.find(key1 + lit("|") + camera->getFirmware().toLower());
+    auto additionData = m_dataByKey.find(key1 + lit("|") + firmware.toLower());
     if (additionData != m_dataByKey.end())
         result.add(additionData.value());
     return result;

@@ -13,7 +13,14 @@ Base.Column
 
     property alias selectAllCheckedState: selectAllCheckBox.selectAllCheckedState;
 
-    width: parent.width;
+    anchors
+    {
+        left: parent.left;
+        right: parent.right;
+
+        leftMargin: Common.SizeManager.spacing.medium;
+        rightMargin: Common.SizeManager.spacing.medium;
+    }
 
     Base.EmptyCell {}
 

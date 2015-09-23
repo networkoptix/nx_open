@@ -36,7 +36,7 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* 
 
     setChannelCount(1);
 
-    connect(this, SIGNAL(canBeDestroyed()), this, SLOT(deleteLater()), Qt::QueuedConnection);
+    connect(this, &QnAbstractRenderer::canBeDestroyed, this, &QObject::deleteLater);
 
 #ifdef TEST_FISHEYE_CALIBRATOR
     m_isCircleDetected = false;
@@ -90,13 +90,12 @@ void QnResourceWidgetRenderer::destroyAsync()
 }
 
 QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
-    foreach(RenderingTools ctx, m_channelRenderers)
-    {
+    while (!m_channelRenderers.empty()) {
+        RenderingTools ctx  = m_channelRenderers.back();
+        m_channelRenderers.pop_back();
         delete ctx.renderer;
         delete ctx.uploader;
     }
-
-    m_channelRenderers.clear();
 }
 
 void QnResourceWidgetRenderer::pleaseStop()
@@ -334,7 +333,8 @@ void QnResourceWidgetRenderer::setImageCorrection(const ImageCorrectionParams& p
         if( !ctx.uploader )
             continue;
         ctx.uploader->setImageCorrection(params);
-        ctx.renderer->setImageCorrectionParams(params);
+        if (ctx.renderer)
+            ctx.renderer->setImageCorrectionParams(params);
     }
 }
 
@@ -344,7 +344,8 @@ void QnResourceWidgetRenderer::setFisheyeController(QnFisheyePtzController* cont
         RenderingTools& ctx = m_channelRenderers[i];
         if( !ctx.uploader )
             continue;
-        ctx.renderer->setFisheyeController(controller);
+        if (ctx.renderer)
+            ctx.renderer->setFisheyeController(controller);
     }
 }
 

@@ -188,16 +188,16 @@ void GraphicsScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     QPointer<QMenu> guard = new QMenu(event->widget());
     QMenu *menu = guard.data();
 
-    QAction *actScrollHere = menu->addAction(tr("Scroll here"));
+    QAction *actScrollHere = menu->addAction(tr("Scroll Here"));
     menu->addSeparator();
-    QAction *actScrollTop =  menu->addAction(horiz ? tr("Left edge") : tr("Top"));
-    QAction *actScrollBottom = menu->addAction(horiz ? tr("Right edge") : tr("Bottom"));
+    QAction *actScrollTop =  menu->addAction(horiz ? tr("Left Edge") : tr("Top"));
+    QAction *actScrollBottom = menu->addAction(horiz ? tr("Right Edge") : tr("Bottom"));
     menu->addSeparator();
-    QAction *actPageUp = menu->addAction(horiz ? tr("Page left") : tr("Page up"));
-    QAction *actPageDn = menu->addAction(horiz ? tr("Page right") : tr("Page down"));
+    QAction *actPageUp = menu->addAction(horiz ? tr("Page Left") : tr("Page Up"));
+    QAction *actPageDn = menu->addAction(horiz ? tr("Page Right") : tr("Page Down"));
     menu->addSeparator();
-    QAction *actScrollUp = menu->addAction(horiz ? tr("Scroll left") : tr("Scroll up"));
-    QAction *actScrollDn = menu->addAction(horiz ? tr("Scroll right") : tr("Scroll down"));
+    QAction *actScrollUp = menu->addAction(horiz ? tr("Scroll Left") : tr("Scroll Up"));
+    QAction *actScrollDn = menu->addAction(horiz ? tr("Scroll Right") : tr("Scroll Down"));
     QAction *actionSelected = menu->exec(event->screenPos());
     if(guard)
         delete menu;

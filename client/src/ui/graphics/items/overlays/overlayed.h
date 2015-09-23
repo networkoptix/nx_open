@@ -23,20 +23,31 @@ namespace detail {
             UserVisible,
         };
 
+        enum OverlayLayer {
+            BaseLayer = 0,
+            StatusLayer,
+            InfoLayer,
+            HudLayer,
+            TopControlsLayer
+        };
+
         bool isOverlayVisible() const;
         void setOverlayVisible(bool visible = true, bool animate = true);
 
-        void addOverlayWidget(QGraphicsWidget *widget, 
+        void addOverlayWidget(
+            QGraphicsWidget *widget,
             OverlayVisibility visibility = UserVisible,
-            bool autoRotate = false, 
-            bool bindToViewport = false, 
-            bool placeOverControls = false,
-            bool isControlsWidget = false);
+            bool autoRotate = false,
+            bool bindToViewport = false,
+            qreal z = BaseLayer
+        );
         void removeOverlayWidget(QGraphicsWidget *widget);
 
         OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
         void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
         void updateOverlayWidgetsVisibility(bool animate = true);
+
+        static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible = true, bool animate = true);
     private:
         template<class Base>
         friend class ::Overlayed; 
@@ -66,8 +77,6 @@ namespace detail {
 
         /** Fixed rotation angle in degrees. Used to rotate static text and images. */
         Qn::FixedRotation m_overlayRotation;
-
-        QGraphicsWidget* m_controlsWidget;
     };
 
 } // namespace detail

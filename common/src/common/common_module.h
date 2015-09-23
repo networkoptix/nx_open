@@ -41,7 +41,8 @@ public:
     void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
     QnUuid moduleGUID() const{ return m_uuid; }
 
-    QnUuid runningInstanceGUID() const{ return m_runUuid; }
+    QnUuid runningInstanceGUID() const;
+    void updateRunningInstanceGuid();
 
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
@@ -65,6 +66,9 @@ public:
 
     void setLocalSystemName(const QString& value);
     QString localSystemName() const;
+
+    void setReadOnly(bool value);
+    bool isReadOnly() const;
 
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
@@ -96,10 +100,14 @@ public:
     inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 
+    void setLocalPeerType(Qn::PeerType peerType);
+    Qn::PeerType localPeerType() const;
+
     void updateModuleInformation();
 
 signals:
     void systemNameChanged(const QString &systemName);
+    void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
@@ -126,6 +134,7 @@ private:
     QByteArray m_adminPaswdHash;
     QByteArray m_adminPaswdDigest;
     bool m_lowPriorityAdminPassword;
+    Qn::PeerType m_localPeerType;
 };
 
 #define qnCommon (QnCommonModule::instance())

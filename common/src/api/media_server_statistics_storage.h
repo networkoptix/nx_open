@@ -7,7 +7,6 @@
 #include <api/media_server_connection.h>
 #include <core/resource/resource_fwd.h>
 #include <api/model/statistics_reply.h>
-#include <api/media_server_statistics_storage.h>
 
 /**
   * Class that receives, parses and stores statistics data from one server.

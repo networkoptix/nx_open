@@ -9,6 +9,7 @@
 
 #include <plugins/resource/archive/rtsp_client_archive_delegate.h>
 #include <plugins/resource/archive/archive_stream_reader.h>
+#include "http/custom_headers.h"
 
 #include <recording/time_period.h>
 
@@ -133,12 +134,11 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
 }
 
 void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
-                                                  const QString& fileName, 
-                                                  const QString& format, 
-                                                  const QnStorageResourcePtr &storage, 
-                                                  QnStreamRecorder::Role role, 
-                                                  const QnImageFilterHelper &imageParameters,
-                                                  qint64 serverTimeZoneMs)
+												  const  QString& fileName, const QString& format, 
+                                            QnStorageResourcePtr storage, 
+                                            QnStreamRecorder::Role role,
+                                            qint64 serverTimeZoneMs,
+                                            QnImageFilterHelper transcodeParams)
 {
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
     Q_ASSERT_X(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
@@ -166,6 +166,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false); 
+            rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
         }
         if (role == QnStreamRecorder::Role_FileExport)
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
@@ -175,7 +176,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         if (storage)
             m_exportRecorder->setStorage(storage);
 
-        m_exportRecorder->setExtraTranscodeParams(imageParameters);
+        m_exportRecorder->setExtraTranscodeParams(transcodeParams);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);

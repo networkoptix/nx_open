@@ -7,6 +7,7 @@
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
+#include <http/custom_headers.h>
 
 #include "motion/motion_helper.h"
 
@@ -20,6 +21,8 @@
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
+    static const qint64 USEC_PER_MS = 1000;
+
     Q_UNUSED(path)
     
     QByteArray errStr;

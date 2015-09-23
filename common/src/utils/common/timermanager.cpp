@@ -9,7 +9,7 @@
 #include <string>
 
 #include <QtCore/QAtomicInt>
-#include <QtCore/QDateTime>
+#include <QtCore/QElapsedTimer>
 #include <utils/thread/mutex.h>
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
@@ -31,12 +31,35 @@ public:
     bool terminated;
     //!ID of task, being executed. 0, if no running task
     quint64 runningTaskID;
+    QElapsedTimer monotonicClock;
 
     TimerManagerImpl()
     :
         terminated( false ),
         runningTaskID( 0 )
     {
+        monotonicClock.restart();
+    }
+
+    void addTaskNonSafe(
+        const quint64 timerID,
+        std::function<void( quint64 )> taskHandler,
+        const unsigned int delayMillis )
+    {
+        const qint64 taskTime = monotonicClock.elapsed() + delayMillis;
+
+        if( !timeToTask.insert( make_pair(
+                make_pair( taskTime, timerID ),
+                taskHandler ) ).second )
+        {
+            //ASSERT( false );
+        }
+        if( !taskToTime.insert( make_pair( timerID, taskTime ) ).second )
+        {
+            //ASSERT( false );
+        }
+
+        cond.wakeOne();
     }
 
     void deleteTaskNonSafe( const quint64 timerID )
@@ -45,12 +68,8 @@ public:
         if( it == taskToTime.end() )
             return;
 
-        /*size_t ret =*/ timeToTask.erase( make_pair( it->second, it->first ) );
-        //ASSERT2( ret == 1, "deleteTimer", "ret = "<<ret<<", task time (UTC) "<<it->second<<", current UTC time "<<QDateTime::currentMSecsSinceEpoch() );
-
-        /*map<quint64, qint64>::size_type s1 =*/ taskToTime.size();
+        timeToTask.erase( make_pair( it->second, it->first ) );
         taskToTime.erase( it );
-        //ASSERT2( taskToTime.size() == s1-1, "s1 = "<<s1<<", taskToTime.size() = "<<taskToTime.size() );
     }
 };
 
@@ -97,25 +116,35 @@ quint64 TimerManager::addTimer(
 
     QnMutexLocker lk( &m_impl->mtx );
 
-    const qint64 taskTime = QDateTime::currentMSecsSinceEpoch() + delay;
     quint64 timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
     if( timerID == 0 )
-        lastTaskID.fetchAndAddOrdered(1);     //0 is a reserved value
-
-    if( !m_impl->timeToTask.insert( make_pair(
-            make_pair( taskTime, timerID ),
-            taskHandler ) ).second )
-    {
-        //ASSERT( false );
-    }
-    if( !m_impl->taskToTime.insert( make_pair( timerID, taskTime ) ).second )
-    {
-        //ASSERT( false );
-    }
-
-    m_impl->cond.wakeOne();
+        timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
+    m_impl->addTaskNonSafe( timerID, taskHandler, delay );
 
     return timerID;
+}
+
+bool TimerManager::modifyTimerDelay(
+    quint64 timerID,
+    const unsigned int newDelayMillis )
+{
+    QnMutexLocker lk( &m_impl->mtx );
+    if( m_impl->runningTaskID == timerID )
+        return false; //timer being executed at the moment
+
+    //fetching handler
+    auto taskIter = m_impl->taskToTime.find( timerID );
+    if( taskIter == m_impl->taskToTime.end() )
+        return false;   //no timer with requested id
+    auto handlerIter = m_impl->timeToTask.find( std::make_pair( taskIter->second, timerID ) );
+    Q_ASSERT( handlerIter != m_impl->timeToTask.end() );
+    auto taskHandler = std::move(handlerIter->second);
+
+    m_impl->taskToTime.erase( taskIter );
+    m_impl->timeToTask.erase( handlerIter );
+
+    m_impl->addTaskNonSafe( timerID, taskHandler, newDelayMillis );
+    return true;
 }
 
 void TimerManager::deleteTimer( const quint64& timerID )
@@ -156,7 +185,7 @@ void TimerManager::run()
     {
         try
         {
-            qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+            qint64 currentTime = m_impl->monotonicClock.elapsed();
             for( ;; )
             {
                 if( m_impl->timeToTask.empty() )
@@ -187,7 +216,7 @@ void TimerManager::run()
                     break;
             }
 
-            currentTime = QDateTime::currentMSecsSinceEpoch();
+            currentTime = m_impl->monotonicClock.elapsed();
             if( m_impl->timeToTask.empty() )
                 m_impl->cond.wait( lk.mutex() );
             else if( m_impl->timeToTask.begin()->first.first > currentTime )
@@ -204,4 +233,79 @@ void TimerManager::run()
     }
 
     NX_LOG( lit("TimerManager stopped"), cl_logDEBUG1 );
+}
+
+
+
+
+TimerManager::TimerGuard::TimerGuard()
+:
+    m_timerID( 0 )
+{
+}
+
+TimerManager::TimerGuard::TimerGuard( quint64 timerID )
+:
+    m_timerID( timerID )
+{
+}
+
+TimerManager::TimerGuard::TimerGuard( TimerGuard&& right )
+:
+    m_timerID( right.m_timerID )
+{
+    right.m_timerID = 0;
+}
+
+TimerManager::TimerGuard::~TimerGuard()
+{
+    reset();
+}
+
+TimerManager::TimerGuard& TimerManager::TimerGuard::operator=( TimerManager::TimerGuard&& right )
+{
+    if( &right == this )
+        return *this;
+
+    reset();
+
+    m_timerID = right.m_timerID;
+    right.m_timerID = 0;
+    return *this;
+}
+
+//!Cancels timer and blocks until running handler returns
+void TimerManager::TimerGuard::reset()
+{
+    if( !m_timerID )
+        return;
+    TimerManager::instance()->joinAndDeleteTimer( m_timerID );
+    m_timerID = 0;
+}
+
+quint64 TimerManager::TimerGuard::get() const
+{
+    return m_timerID;
+}
+
+quint64 TimerManager::TimerGuard::release()
+{
+    const auto result = m_timerID;
+    m_timerID = 0;
+    return result;
+}
+
+TimerManager::TimerGuard::operator bool_type() const
+{
+    return m_timerID ? &TimerGuard::this_type_does_not_support_comparisons : 0;
+}
+
+bool TimerManager::TimerGuard::operator==( const TimerManager::TimerGuard& right ) const
+{
+    return m_timerID == right.m_timerID;
+}
+
+bool TimerManager::TimerGuard::operator!=( const TimerManager::TimerGuard& right ) const
+{
+    return m_timerID != right.m_timerID;
 }

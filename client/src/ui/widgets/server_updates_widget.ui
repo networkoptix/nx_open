@@ -57,7 +57,7 @@
      <item>
       <widget class="QLabel" name="connectionProblemLabel">
        <property name="text">
-        <string>Cannot check updates via the internet.</string>
+        <string>Unable to check updates via internet.</string>
        </property>
       </widget>
      </item>
@@ -206,7 +206,7 @@
             <item>
              <widget class="QLabel" name="versionTitleLabel">
               <property name="text">
-               <string>Available version:</string>
+               <string>Available Update:</string>
               </property>
              </widget>
             </item>
@@ -317,7 +317,7 @@
          <item row="0" column="0" colspan="3">
           <widget class="QLabel" name="linkTitleLabel">
            <property name="text">
-            <string>To update manually, download an archive with the following link:</string>
+            <string>To update manually, download and use the archive file on the following link:</string>
            </property>
           </widget>
          </item>

@@ -29,14 +29,16 @@
             "keys": [
                 "DW|*"
             ],
-            "bitratePerGOP": true
+            "bitratePerGOP": true,
+            "defaultCredentials" : "admin:admin"
         },
 
         {
             "keys": [
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04",
-                "Avigilon|ENC-*"
+                "Avigilon|ENC-*",
+                "ACTI|V32"
             ],
             "analogEncoder": true
         },
@@ -105,6 +107,13 @@
         },
         {
             "keys": [
+                "ACTI|V32",
+                "ACTi Corporation|V32"
+            ],
+            "forceONVIF": true
+        },
+        {
+            "keys": [
                 "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
                 "Sony|SNC-XM636",
             "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20"
@@ -156,6 +165,13 @@
         },
         {
             "keys": [
+                "ACTi|V32"
+            ],
+            "defaultAR": "16x9",
+            "ptzTraits": "EightWayPtz"
+        },
+        {
+            "keys": [
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER"
@@ -186,6 +202,21 @@
                 "AXIS|AXISM7016Group1", "AXIS|AXISM7016Group2", "AXIS|AXISM7016Group3", "AXIS|AXISM7016Group4"
             ],
             "axisMaxZoomSpeed": 70
+        },
+        {
+            "keys": [
+                "Honeywell|HVE4"
+            ],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationA01,VideoEncoderConfigurationA05",
+                    "VideoEncoderConfigurationA02,VideoEncoderConfigurationA06",
+                    "VideoEncoderConfigurationA03,VideoEncoderConfigurationA07",
+                    "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
+                ]
+            }
         },
         {
             "keys": [
@@ -563,13 +594,13 @@
                 "fromCamera": {
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [   1,  -1],
+                        "device":  [  -1,   1],
                         "logical": [-180, 180]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "_TODO": "Actual tilt range is [0, -180].",
-                        "device":  [-1,   1],
+                        "device":  [1,   -1],
                         "logical": [0,   90]
                     },
                     "z": {
@@ -580,7 +611,8 @@
                         "space": "35MmEquiv"
                     }
                 }
-            }
+            },
+			"onvifPtzDigitsAfterDecimalPoint": 0
         },        
         {
             "keys": [

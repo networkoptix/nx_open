@@ -72,7 +72,7 @@ namespace
         if (servers.empty())
             return QString();
         
-        static const QString kDifferentServerNames = "<different>";
+        static const QString kDifferentServerNames = QString();
 
         const auto &getter = [](const rtu::ServerInfo &info)
         {
@@ -88,7 +88,7 @@ namespace
         if (servers.empty())
             return QString();
 
-        static const QString kDifferentPasswords = QT_TR_NOOP("<Different passwords>");
+        static const QString kDifferentPasswords = QString();
         const auto &getter = [](const rtu::ServerInfo &info) -> QString
         {
             return (info.hasExtraInfo() ? info.extraInfo().password : QString()); 
@@ -166,10 +166,76 @@ namespace
         const int ipsCount = getSelectionValue<int>(servers, kEmptyIps, kDifferentIpsCount
             , std::equal_to<int>(), [](const rtu::ServerInfo &info) -> int
         {
-            return info.extraInfo().interfaces.size(); 
+            return (info.hasExtraInfo() ? info.extraInfo().interfaces.size() : kEmptyIps);  
         });
         
         return (ipsCount == kSingleIp ? true : false);
+    }
+
+    /// Make sense only if all servers has one interfaces. 
+    /// Calculated value will not be used in other cases
+    bool calcHasEmptyAddresses(const rtu::ServerInfoPtrContainer &servers)
+    {
+        if (servers.empty())
+            return false;
+
+        const bool aggregatedHasEmptyIps = getSelectionValue<bool>(servers, false, true
+            , std::equal_to<bool>(), [](const rtu::ServerInfo &info) -> bool
+        {
+            if (!info.hasExtraInfo())
+                return false;
+
+            const auto &interfaces = info.extraInfo().interfaces;
+            if (interfaces.empty())
+                return false;
+            
+            return interfaces.first().ip.isEmpty();
+        });
+
+        return aggregatedHasEmptyIps;
+    }
+
+    rtu::InterfaceInfoList calcAggregatedInterfaces(const rtu::ServerInfoPtrContainer &servers)
+    {
+        /// Editability checked at calcEditableInterfaces.
+
+        if (servers.empty())
+            return rtu::InterfaceInfoList();
+
+        const auto &firstServer = servers.front();
+        if (servers.size() == kSingleServerSelectionCount)
+            return (firstServer->hasExtraInfo() ? firstServer->extraInfo().interfaces : rtu::InterfaceInfoList());
+
+        /// All servers have only one interfaces due to calcEditableInterfaces() result check before call
+        const auto dhcpCheckedState = getSelectionValue<Qt::CheckState>(servers, Qt::Unchecked, Qt::PartiallyChecked
+            , std::equal_to<Qt::CheckState>(), [](const rtu::ServerInfo &info) -> Qt::CheckState
+        {
+            return (!info.hasExtraInfo() ? Qt::PartiallyChecked : info.extraInfo().interfaces.first().useDHCP);
+        });
+
+        static const QString kEmptyAddress; 
+
+        const auto maskGetter = [](const rtu::ServerInfo &info) -> QString
+            { return (info.hasExtraInfo() ? info.extraInfo().interfaces.first().mask : kEmptyAddress); };
+        const auto dnsGetter = [](const rtu::ServerInfo &info) -> QString
+            { return (info.hasExtraInfo() ? info.extraInfo().interfaces.first().dns : kEmptyAddress); };
+        const auto gatewayGetter = [](const rtu::ServerInfo &info) -> QString
+            { return (info.hasExtraInfo() ? info.extraInfo().interfaces.first().gateway: kEmptyAddress); };
+
+        const auto mask = getSelectionValue<QString>(servers, kEmptyAddress, kEmptyAddress
+            , std::equal_to<QString>(), maskGetter);
+        const auto gateway = getSelectionValue<QString>(servers, kEmptyAddress, kEmptyAddress
+            , std::equal_to<QString>(), gatewayGetter);
+        const auto dns = getSelectionValue<QString>(servers, kEmptyAddress, kEmptyAddress
+            , std::equal_to<QString>(), dnsGetter);
+
+        static const QString kFakeItfName = QLatin1String("no_matter");
+        rtu::InterfaceInfoList addresses;
+
+        addresses.push_back(rtu::InterfaceInfo(kFakeItfName
+            , kEmptyAddress, kEmptyAddress              /// Ip and Mac case: addresses are always different for servers
+            , mask, gateway, dns, dhcpCheckedState ));
+        return addresses;
     }
 }
 
@@ -185,7 +251,9 @@ struct rtu::Selection::Snapshot
     QString password;
     QDateTime dateTime;
     bool editableInterfaces;
-    
+    bool hasEmptyIps;
+    InterfaceInfoList aggregatedInterfaces;
+
     Snapshot(rtu::ServersSelectionModel *model);
 };
 
@@ -199,6 +267,8 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     , password(calcPassword(model->selectedServers()))
     , dateTime(calcDateTime(model->selectedServers(), flags))
     , editableInterfaces(calcEditableInterfaces(model->selectedServers()))
+    , hasEmptyIps(calcHasEmptyAddresses(model->selectedServers()))
+    , aggregatedInterfaces(editableInterfaces ? calcAggregatedInterfaces(model->selectedServers()) : InterfaceInfoList())
 {}
 
 ///
@@ -251,4 +321,14 @@ const QDateTime &rtu::Selection::dateTime() const
 bool rtu::Selection::editableInterfaces() const
 {
     return m_snapshot->editableInterfaces;
+}
+
+bool rtu::Selection::hasEmptyIps() const
+{
+    return m_snapshot->hasEmptyIps;
+}
+
+rtu::InterfaceInfoList rtu::Selection::aggregatedInterfaces()
+{
+    return m_snapshot->aggregatedInterfaces;
 }

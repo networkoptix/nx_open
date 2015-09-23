@@ -32,19 +32,16 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_widgetCount(0),
     m_counter(NULL),
-    m_syncPlay(NULL),
+    m_syncPlay(new QnArchiveSyncPlayWrapper(this)),
     m_watcher(context()->instance<QnWorkbenchRenderWatcher>())
 {
-    /* Prepare syncplay. */
-    m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: #Elric QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
-
     /* Connect to display. */
     connect(display(),                  &QnWorkbenchDisplay::widgetAdded,               this,       &QnWorkbenchStreamSynchronizer::at_display_widgetAdded);
     connect(display(),                  &QnWorkbenchDisplay::widgetAboutToBeRemoved,    this,       &QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved);
     connect(workbench(),                &QnWorkbench::currentLayoutChanged,             this,       &QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged);
     
     /* Prepare counter. */
-    m_counter = new QnCounter(1); // TODO: #Elric this one also doesn't get destroyed.
+    m_counter = new QnCounter(1, this);
     connect(this,                       &QObject::destroyed,                            m_counter,  &QnCounter::decrement);
     connect(m_counter,                  &QnCounter::reachedZero,                        m_syncPlay, &QnArchiveSyncPlayWrapper::deleteLater);
     connect(m_counter,                  &QnCounter::reachedZero,                        m_counter,  &QnCounter::deleteLater);

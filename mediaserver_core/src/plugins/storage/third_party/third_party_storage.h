@@ -10,13 +10,13 @@
     #define STORAGE_METHOD_CALL
 #endif
  
+//!Storage plugin namespace
 namespace nx_spl
 {
     const uint64_t unknown_size = 0xffffffffffffffff;
  
-    /**
-    *   File IO flags.
-    */
+    
+    //!File IO flags.
     namespace io
     {
         enum mode_t
@@ -28,9 +28,7 @@ namespace nx_spl
         };
     }
  
-    /**
-    *   Storage capabilities flags.
-    */
+    //!Storage capabilities flags.
     namespace cap
     {
         enum cap_t
@@ -43,6 +41,7 @@ namespace nx_spl
         };
     }
 
+    //!Storage operations errors
     namespace error
     {
         enum code_t
@@ -56,9 +55,9 @@ namespace nx_spl
             WriteNotSupported,
             UrlNotExists,
             UnknownError,
-            // some other codes
         };
     }
+
     enum FileType
     {
         isFile,
@@ -68,9 +67,8 @@ namespace nx_spl
     // {F922BB26-D59E-4046-9B80-8466B101986B}
     static const nxpl::NX_GUID IID_IODevice =
     { { 0xf9, 0x22, 0xbb, 0x26, 0xd5, 0x9e, 0x40, 0x46, 0x9b, 0x80, 0x84, 0x66, 0xb1, 0x1, 0x98, 0x6b } };
-    /**
-    *   IO device abstraction
-    */
+    
+    //!IO device abstraction
     class IODevice
         :public nxpl::PluginInterface
     {
@@ -123,6 +121,7 @@ namespace nx_spl
         ) = 0;
     };
  
+    //! Common file information 
     struct FileInfo
     {
         const char* url;
@@ -133,9 +132,8 @@ namespace nx_spl
     // {D5DA5C59-44D5-4C14-AB17-EA7395555189}
     static const nxpl::NX_GUID IID_FileInfoIterator =
     { { 0xd5, 0xda, 0x5c, 0x59, 0x44, 0xd5, 0x4c, 0x14, 0xab, 0x17, 0xea, 0x73, 0x95, 0x55, 0x51, 0x89 } };
-    /**
-    *   File information iterator abstraction
-    */
+
+    //!File information iterator abstraction
     class FileInfoIterator
         : public nxpl::PluginInterface
     {
@@ -152,9 +150,7 @@ namespace nx_spl
     static const nxpl::NX_GUID IID_Storage =
     { { 0xd5, 0xda, 0x5c, 0x59, 0x44, 0xd5, 0x4c, 0x14, 0xab, 0x17, 0xea, 0x73, 0x95, 0x55, 0x51, 0x89 } };
     
-    /**
-    *   Storage abstraction
-    */
+    //!Storage abstraction
     class Storage
         : public nxpl::PluginInterface
     {
@@ -267,6 +263,12 @@ namespace nx_spl
     static const nxpl::NX_GUID IID_StorageFactory =
     { { 0x2e, 0x2c, 0x7a, 0x3d, 0x25, 0x6d, 0x40, 0x18, 0xb4, 0xe, 0x51, 0x2d, 0x72, 0x51, 0xb, 0xec } };
 
+    //!Storage factory abstraction
+    /*!
+        This is the entry-point library class. 
+            - Creates storage entities. 
+            - "Knows" storage library type
+    */
     class StorageFactory
         : public nxpl::PluginInterface
     {

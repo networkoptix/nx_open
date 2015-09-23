@@ -1,6 +1,6 @@
 #include "word_wrapped_label.h"
 
-QnWordWrappedLabel::QnWordWrappedLabel(QWidget *parent /*= 0*/):
+QnWordWrappedLabel::QnWordWrappedLabel(QWidget *parent /* = 0*/):
     QWidget(parent),
     m_label(new QLabel(this))
 {

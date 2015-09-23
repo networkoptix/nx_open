@@ -17,6 +17,7 @@ Item
     property string systemName;
     property int loggedState;
     property int selectedState;
+    property bool selectionEnabled: true;
     
     signal selectionStateShouldBeChanged(int currentItemIndex);
 
@@ -36,7 +37,7 @@ Item
         }
         
         spacing: 2;
-        enabled: (loggedState != NxRtu.Constants.NotLogged);
+        enabled: thisComponent.selectionEnabled;
         opacity: (enabled ? 1.0 : 0.6);
         Item
         {
@@ -66,7 +67,10 @@ Item
                     left: parent.left;
                     verticalCenter: parent.verticalCenter;
                 }
-                
+
+                activeFocusOnPress: false;
+                activeFocusOnTab: false;
+
                 Binding
                 {
                     target: selectionCheckbox;
@@ -150,8 +154,7 @@ Item
             id: loginButton;
             
             visible: (thisComponent.loggedState !== NxRtu.Constants.LoggedToAllServers);
-            height: (visible ? Common.SizeManager.clickableSizes.base : 0);
-            
+
             anchors
             {
                 verticalCenter: parent.verticalCenter;
@@ -159,7 +162,10 @@ Item
                 right: (visible ? parent.right : undefined);
             }
         
-            text: qsTr("enter password");
+            activeFocusOnTab: false;
+            activeFocusOnPress: false;
+
+            text: qsTr("Enter the Password");
             fontSize: Common.SizeManager.fontSizes.base;
             onClicked: { loginDialog.show(); }
             

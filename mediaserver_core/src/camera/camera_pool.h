@@ -22,11 +22,11 @@ public:
     /*!
         \return Object belongs to this pool
     */
-    QnVideoCamera* getVideoCamera(const QnResourcePtr& res);
+    QnVideoCameraPtr getVideoCamera(const QnResourcePtr& res);
     void removeVideoCamera(const QnResourcePtr& res);
-
+    void updateActivity();
 private:
-    typedef QMap<QnResourcePtr, QnVideoCamera*> CameraMap;
+    typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
     CameraMap m_cameras;
     static QnMutex m_staticMtx;
 };

@@ -10,7 +10,7 @@ Row
 
     property alias address: addressText.text;
 
-    spacing: Common.SizeManager.spacing.base;
+    spacing: Common.SizeManager.spacing.medium;
 
     anchors
     {

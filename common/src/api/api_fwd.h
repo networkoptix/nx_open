@@ -4,6 +4,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QVariant>
 
 class QnUuid;
 
@@ -18,5 +19,10 @@ struct QnBookmarkRequestData;
 
 struct MultiServerPeriodData;
 typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
+
+struct QnChunksRequestData;
+struct MultiServerPeriodData;
+typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
+
 
 #endif // QN_API_FWD_H

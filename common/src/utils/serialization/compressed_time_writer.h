@@ -9,7 +9,6 @@
 
 #include "binary_stream.h"
 #include "compressed_time_fwd.h"
-#include "compressed_time_writer.h"
 #include "recording/time_period.h"
 
 template<class Output>

@@ -19,7 +19,7 @@
      <item>
       <widget class="QRadioButton" name="viewDownButton">
        <property name="text">
-        <string>Vertical mount (camera on the ceiling)</string>
+        <string>Ceiling Mount</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -29,7 +29,7 @@
      <item>
       <widget class="QRadioButton" name="horizontalRadioButton">
        <property name="text">
-        <string>Horizontal mount (camera on the wall)</string>
+        <string>Wall Mount</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -39,7 +39,7 @@
      <item>
       <widget class="QRadioButton" name="viewUpButton">
        <property name="text">
-        <string>Vertical mount (camera on the floor)</string>
+        <string>Floor/Table Mount</string>
        </property>
       </widget>
      </item>
@@ -50,7 +50,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Camera view angle correction:</string>
+        <string>Camera View Angle Correction</string>
        </property>
       </widget>
      </item>

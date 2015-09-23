@@ -366,7 +366,7 @@
    <item>
     <widget class="QLabel" name="recordingWarningLabel">
      <property name="text">
-      <string>Very powerful machine is required for Best quality and high resolution.</string>
+      <string>A powerful computer is recommended for "Best" quality and resolution.</string>
      </property>
     </widget>
    </item>

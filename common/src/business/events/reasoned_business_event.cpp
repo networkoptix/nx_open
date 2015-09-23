@@ -16,6 +16,6 @@ QnBusinessEventParameters QnReasonedBusinessEvent::getRuntimeParams() const
 
     QnBusinessEventParameters params = base_type::getRuntimeParams();
     params.reasonCode = m_reasonCode;
-    params.reasonParamsEncoded = m_reasonParamsEncoded;
+    params.description = m_reasonParamsEncoded;
     return params;
 }

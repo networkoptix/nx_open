@@ -73,7 +73,7 @@ unsigned int IsdNativePlugin::releaseRef()
 
 const char* IsdNativePlugin::name() const
 {
-    return "isd_edge";
+    return isd_edge_settings::paramGroup;
 }
 
 void IsdNativePlugin::setSettings( const nxpl::Setting* settings, int count )

@@ -37,7 +37,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     QnSecurityCamResourcePtr secCamRes = resource.dynamicCast<QnSecurityCamResource>();
     if( !secCamRes )
         return nx_http::StatusCode::badRequest;
-    QnVideoCamera* videoCamera = QnVideoCameraPool::instance()->getVideoCamera( secCamRes );
+    QnVideoCameraPtr videoCamera = QnVideoCameraPool::instance()->getVideoCamera( secCamRes );
     if( !videoCamera )
         return nx_http::StatusCode::notFound;
 
@@ -83,7 +83,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailabilit
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaStream(
     const QnSecurityCamResourcePtr& cameraRes,
-    QnVideoCamera* videoCamera )
+    const QnVideoCameraPtr& videoCamera )
 {
     Q_UNUSED(cameraRes)
     QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader(QnServer::HiQualityCatalog);

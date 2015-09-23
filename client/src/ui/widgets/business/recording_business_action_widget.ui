@@ -69,7 +69,7 @@
    <item>
     <widget class="QLabel" name="beforeLabel">
      <property name="text">
-      <string>Pre-recording:</string>
+      <string>Pre-Recording:</string>
      </property>
     </widget>
    </item>
@@ -86,7 +86,7 @@
    <item>
     <widget class="QLabel" name="afterLabel">
      <property name="text">
-      <string>Post-recording:</string>
+      <string>Post-Recording:</string>
      </property>
     </widget>
    </item>

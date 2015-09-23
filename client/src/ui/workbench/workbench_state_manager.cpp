@@ -10,7 +10,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 
-QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /*= NULL*/):
+QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = NULL*/):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
@@ -57,7 +57,7 @@ void QnWorkbenchStateManager::forcedUpdate() {
 }
 
 
-QnWorkbenchStateDelegate::QnWorkbenchStateDelegate(QObject *parent /*= NULL*/):
+QnWorkbenchStateDelegate::QnWorkbenchStateDelegate(QObject *parent /* = NULL*/):
     QnWorkbenchContextAware(parent)
 {
     context()->instance<QnWorkbenchStateManager>()->registerDelegate(this);

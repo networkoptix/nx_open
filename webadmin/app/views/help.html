@@ -1,5 +1,4 @@
-
-
+<div class="container">
     <p>Tools and links to help you better understand/interact with your VMS system</p>
     <div class="col-xs-12" ng-repeat="(key, link) in config.helpLinks">
         <h2>{{link.title}}</h2>
@@ -13,5 +12,5 @@
            ng-href="{{url.url}}"
            ng-class="url.class"
            target="{{link.target=='new'?'_blank':'_top'}}">{{url.button}}</a>
-
     </div>
+</div>

@@ -8,6 +8,7 @@
 #include "http/httptypes.h"
 #include "../common/util.h"
 #include "network/authenticate_helper.h"
+#include "network/authutil.h"
 
 
 //static const int MAX_LINE_LENGTH = 1024*16;
@@ -467,8 +468,8 @@ int CLSimpleHTTPClient::read(char* data, int max_len)
         return readed;
 }
 
-//===================================================================================
-//===================================================================================
+// ===================================================================================
+// ===================================================================================
 void CLSimpleHTTPClient::getAuthInfo()
 {
     QByteArray wwwAuth = m_header.value("WWW-Authenticate");
@@ -479,7 +480,7 @@ void CLSimpleHTTPClient::getAuthInfo()
     QList<QByteArray> authParams = wwwAuth.split(',');
     for (int i = 0; i < authParams.size(); ++i)
     {
-        QList<QByteArray> param = QnAuthHelper::smartSplit(authParams[i], '=');
+        QList<QByteArray> param = smartSplit(authParams[i], '=');
         if (param.size() > 1) 
         {
             param[0] = param[0].trimmed();

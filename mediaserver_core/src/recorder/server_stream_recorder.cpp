@@ -19,9 +19,6 @@
 #include <media_server/settings.h>
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-
-
 static const int MOTION_PREBUFFER_SIZE = 8;
 
 QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider)

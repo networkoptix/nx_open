@@ -228,7 +228,7 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
         toSharedPointer(),
         inputNumber,
         isActivated,
-        QDateTime::currentMSecsSinceEpoch() );
+        qnSyncTime->currentUSecsSinceEpoch() );
 }
 
 QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
@@ -364,6 +364,26 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     return CameraDiagnostics::NoErrorResult();
 }
+
+bool QnActiResource::SetupAudioInput()
+{
+    if (!isAudioSupported())
+        return true;
+    bool value = isAudioEnabled();
+    QMutexLocker lock(&m_audioCfgMutex);
+    if (value == m_audioInputOn)
+        return true;
+    CLHttpStatus status;
+    makeActiRequest(QLatin1String("system"), lit("V2_AUDIO_ENABLED=%1").arg(value ? lit("1") : lit("0")), status);
+    if (status == CL_HTTP_SUCCESS) {
+        m_audioInputOn = value;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 
 bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {

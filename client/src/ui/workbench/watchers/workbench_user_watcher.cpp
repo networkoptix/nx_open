@@ -47,7 +47,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
 
     m_user = user;
     m_userPassword = QString();
-    m_userPasswordHash = user ? user->getHash() : QByteArray();
+    m_userDigest = user ? user->getDigest() : QByteArray();
     m_userPermissions = accessController()->globalPermissions(user);
     m_permissionsNotifier = user ? accessController()->notifier(user) : NULL;
 
@@ -72,7 +72,7 @@ void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
         return;
 
     m_userPassword = password;
-    m_userPasswordHash = QByteArray(); //hash will be recalculated
+    m_userDigest = QByteArray(); //hash will be recalculated
 }
 
 void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool reconnect) {
@@ -102,13 +102,13 @@ bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) 
         return false;
 
     if (m_userPassword.isEmpty())
-        return m_userPasswordHash != user->getHash();
+        return m_userDigest != user->getDigest();
 
     // password was just changed by the user
     if (!user->checkPassword(m_userPassword))
         return true;
 
-    m_userPasswordHash = user->getHash();
+    m_userDigest = user->getDigest();
     m_userPassword = QString();
     return false;
 }

@@ -22,17 +22,20 @@ Item
         
         Base.Text
         {
+            id: welcomeText;
             anchors.horizontalCenter: parent.horizontalCenter;
             
+            width: image.width * 1.6;   /// It is a magic! Don't change it!
             color: "#666666";
-            text: qsTr("Welcome to the Nx1 Setup Tool.");
+            text: qsTr("Welcome to the\n%1").arg(rtuContext.toolDisplayName);
             font.pixelSize: Common.SizeManager.fontSizes.medium;
             wrapMode: Text.Wrap;
-    
+            horizontalAlignment: Text.AlignHCenter;
         }
         
         Image 
         {
+            id: image;
             width: Common.SizeManager.clickableSizes.large * 3;
             height: width * sourceSize.height / sourceSize.width;
             
@@ -43,11 +46,14 @@ Item
         
         Base.Text
         {
+            width: welcomeText.width;
             anchors.horizontalCenter: parent.horizontalCenter;
     
             color: "#666666";
-            text: qsTr("Select Nx1 device(s) from the\nmenu on the left to get started");
+            text: qsTr("Select server(s) from the menu on the left to get started");
             font.pixelSize: Common.SizeManager.fontSizes.medium;
+            horizontalAlignment: Text.AlignHCenter;
+            wrapMode: Text.Wrap;
         }
     }
 

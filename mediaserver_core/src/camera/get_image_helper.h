@@ -20,6 +20,9 @@ public:
 private:
     static QSharedPointer<CLVideoDecoderOutput> readFrame(qint64 time, bool useHQ, RoundMethod roundMethod, const QSharedPointer<QnVirtualCameraResource>& res, QnServerArchiveDelegate& serverDelegate, int prefferedChannel);
     static QSize updateDstSize(const QSharedPointer<QnVirtualCameraResource>& res, const QSize& dstSize, QSharedPointer<CLVideoDecoderOutput> outFrame);
+    static QSharedPointer<CLVideoDecoderOutput> getImageWithCertainQuality(
+        bool useHQ, const QnVirtualCameraResourcePtr& res, qint64 time,
+        const QSize& size, RoundMethod roundMethod = IFrameBeforeTime, int rotation = -1 );
 };
 
 #endif // __GET_IMAGE_HELPER_H__

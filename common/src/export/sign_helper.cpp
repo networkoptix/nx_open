@@ -66,12 +66,12 @@ QnSignHelper::QnSignHelper():
     m_signBackground = Qt::white;
 
     m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(QCoreApplication::applicationVersion());
-    m_hwIdStr = QLatin1String(qnLicensePool->currentHardwareId());
+    m_hwIdStr = qnLicensePool->currentHardwareId();
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    m_licensedToStr = tr("Trial license");
+    m_licensedToStr = tr("Trial License");
     for (const QnLicensePtr& license: list)
     {
         if (license->type() != Qn::LC_Trial && license->isValid()) {
@@ -266,7 +266,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), m_versionStr);
 
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware ID: ").append(m_hwIdStr));
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed to: ").append(m_licensedToStr));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed To: ").append(m_licensedToStr));
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), tr("Watermark: ").append(QLatin1String(m_sign.toHex())));
     }
 
@@ -712,13 +712,13 @@ QByteArray QnSignHelper::getSignPattern()
 
     result.append(qApp->applicationName().toUtf8()).append(" v").append(QCoreApplication::applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QString hid = QLatin1String(qnLicensePool->currentHardwareId());
+    QString hid = qnLicensePool->currentHardwareId();
     if (hid.isEmpty())
         hid = tr("Unknown");
     result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    QString licenseName(tr("FREE license"));
+    QString licenseName(tr("FREE License"));
     for (const QnLicensePtr& license: list)
     {
         if (license->name() != QLatin1String("FREE"))

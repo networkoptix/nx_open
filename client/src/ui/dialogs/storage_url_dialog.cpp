@@ -1,16 +1,18 @@
-
 #include "storage_url_dialog.h"
+#include "ui_storage_url_dialog.h"
 
 #include <QtWidgets/QMessageBox>
 
-#include "ui_storage_url_dialog.h"
+#include <api/media_server_connection.h>
+#include <api/runtime_info_manager.h>
+
+#include "common/common_module.h"
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/abstract_storage_resource.h>
+#include <core/resource_management/resource_pool.h>
 
-#include <api/media_server_connection.h>
-#include "common/common_module.h"
-#include "api/runtime_info_manager.h"
+#include <ui/dialogs/message_box.h>
 
 QnStorageUrlDialog::QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -52,13 +54,20 @@ QnStorageSpaceData QnStorageUrlDialog::storage() const {
 
 QString QnStorageUrlDialog::normalizePath(QString path) {
     QString separator = lit("/");
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->item(m_server->getId()).data;
-    if (data.platform.toLower() == lit("windows"))
-        separator = lit("\\");
+    //ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->item(m_server->getId()).data;
+    //if (data.platform.toLower() == lit("windows"))
+    //    separator = lit("\\");
     QString result = path.replace(L'/', separator);
     result = path.replace(L'\\', separator);
     if (result.endsWith(separator))
         result.chop(1);
+    if (separator == lit("/"))
+    {
+        int i = 0;
+        while (result[i] == separator[0])
+            ++i;
+        return result.mid(i);
+    }
     return result;
 }
 
@@ -70,7 +79,7 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
 
     if(protocol == lit("smb")) {
         result.protocol = protocol;
-        result.name = tr("Windows Network Shared Resource");
+        result.name = tr("Network Shared Resource");
         result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
         result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
     } 
@@ -94,26 +103,16 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
 
 QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, const QString& password)
 {
-    if (path.indexOf(lit("://")) != -1) {
-        if (!login.isEmpty()) {
-            QUrl url(path);
-            url.setUserName(login);
-            url.setPassword(password);
-            return url.toString();
-        } else {
-            return path;
-        }
-    }
-    
-    if (login.isEmpty()) {
-        return normalizePath(path);
-    }
-    else {
-        QUrl url = QString(lit("file:///%1")).arg(normalizePath(path));
+    QString urlString = normalizePath(path);
+
+    if (urlString.indexOf(lit("://")) == -1)
+        urlString = lit("smb://%1").arg(urlString);
+    QUrl url(urlString);
+    if (!login.isEmpty())
         url.setUserName(login);
+    if (!password.isEmpty())
         url.setPassword(password);
-        return url.toString();
-    }
+    return url.toString();
 }
 
 void QnStorageUrlDialog::accept() 
@@ -144,9 +143,22 @@ void QnStorageUrlDialog::accept()
 
     m_storage = result.reply().value<QnStorageStatusReply>().storage;
     if(result.status() != 0 || !m_storage.isWritable || !m_storage.isExternal) {
-        QMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not define a valid external storage."));
+        QMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
         return;
     }
+
+    if (storageAlreadyUsed(m_storage.url)) {
+        QString message = tr("System has other server(s) using the same network storage path. "\
+                             "Recording data by multiple servers to exactly same place is not recommended.");
+
+        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning"), message, QnMessageBox::Cancel);
+        messageBox.addButton(tr("Add storage"), QnMessageBox::AcceptRole);
+
+        if (messageBox.exec() == QnMessageBox::Cancel)
+            return;
+
+    }
+
 
     base_type::accept();
 }
@@ -188,4 +200,14 @@ void QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged() {
 #else
     ui->browseButton->setVisible(false);
 #endif
+}
+
+bool QnStorageUrlDialog::storageAlreadyUsed(const QString &path) const {
+    QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+
+    return boost::algorithm::any_of(servers, [path](const QnMediaServerResourcePtr &server) {
+        //TODO: #GDM very weak comparison, also storage already added to dialog but not saved is not counted
+        return !server->getStorageByUrl(path).isNull();
+    });
+
 }

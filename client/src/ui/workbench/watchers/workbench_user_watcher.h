@@ -60,7 +60,7 @@ private:
 private:
     QString m_userName;
     QString m_userPassword;
-    QByteArray m_userPasswordHash;
+    QByteArray m_userDigest;
     Qn::Permissions m_userPermissions;
     QPointer<QnWorkbenchPermissionsNotifier> m_permissionsNotifier;
     QnUserResourcePtr m_user;

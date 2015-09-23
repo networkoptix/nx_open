@@ -9,15 +9,14 @@
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
 
+#include <core/resource/resource_fwd.h>
 #include <utils/network/http/httpstreamreader.h>
 #include <utils/network/tcp_connection_processor.h>
 
+#include "camera/video_camera.h"
 #include "hls_playlist_manager.h"
 #include "../streaming_chunk.h"
 
-#include <core/resource/resource_fwd.h>
-
-class QnVideoCamera;
 
 namespace nx_hls
 {
@@ -53,9 +52,7 @@ namespace nx_hls
             sDone
         };
 
-        nx_http::HttpStreamReader m_httpStreamReader;
         State m_state;
-        nx::Buffer m_readBuffer;
         nx::Buffer m_writeBuffer;
         StreamingChunkPtr m_currentChunk;
         //!For reading data from \a m_currentChunk
@@ -67,10 +64,6 @@ namespace nx_hls
         QString m_currentFileName;
         size_t m_bytesSent;
 
-        /*!
-            \return false in case if error
-        */
-        bool receiveRequest();
         //!Processes \a request, generates and sends (asynchronously) response
         void processRequest( const nx_http::Request& request );
         //!
@@ -86,7 +79,7 @@ namespace nx_hls
         nx_http::StatusCode::Value getPlaylist(
             const nx_http::Request& request,
             const QnSecurityCamResourcePtr& camResource,
-            QnVideoCamera* const videoCamera,
+            const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         //!Generates variant playlist (containing references to other playlists providing different qualities)
@@ -94,7 +87,7 @@ namespace nx_hls
             HLSSession* session,
             const nx_http::Request& request,
             const QnSecurityCamResourcePtr& camResource,
-            QnVideoCamera* const videoCamera,
+            const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         //!Generates playlist with chunks inside
@@ -112,16 +105,17 @@ namespace nx_hls
             nx_http::Response* const response );
 
         nx_http::StatusCode::Value createSession(
+            const QString& requestedPlaylistPath,
             const QString& sessionID,
             const std::multimap<QString, QString>& requestParams,
             const QnSecurityCamResourcePtr& camResource,
-            QnVideoCamera* const videoCamera,
+            const QnVideoCameraPtr& videoCamera,
             MediaQuality streamQuality,
             HLSSession** session );
         int estimateStreamBitrate(
             HLSSession* const session,
             QnSecurityCamResourcePtr camResource,
-            QnVideoCamera* const videoCamera,
+            const QnVideoCameraPtr& videoCamera,
             MediaQuality streamQuality );
         void ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality );
 

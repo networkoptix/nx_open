@@ -16,7 +16,7 @@ StreamingChunk::SequentialReadingContext::SequentialReadingContext()
 StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
 :
     m_params( params ),
-    m_isOpenedForModification( false )
+    m_modificationState( State::init )
 {
 }
 
@@ -56,7 +56,8 @@ bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, nx::Buffer* c
 {
     QnMutexLocker lk( &m_mutex );
     if( ctx->m_currentOffset >= m_data.size() ) //all data has been read
-        return !m_isOpenedForModification;      //if opened, expecting more data to arrive to chunk
+        return m_modificationState != State::opened;    //if chunk not opened, signalling end-of-data.
+                                                        //Else, expecting more data to arrive to chunk
     dataBuffer->append( m_data.mid( ctx->m_currentOffset ) );
     ctx->m_currentOffset = m_data.size();
     return true;
@@ -71,9 +72,9 @@ static QString filePathBase( lit("c:\\tmp\\chunks\\%1_%2.ts").arg(rand()) );
 bool StreamingChunk::openForModification()
 {
     QnMutexLocker lk( &m_mutex );
-    if( m_isOpenedForModification )
+    if( m_modificationState == State::opened )
         return false;
-    m_isOpenedForModification = true;
+    m_modificationState = State::opened;
 
 #ifdef DUMP_CHUNK_TO_FILE
     m_dumpFile.open(
@@ -90,7 +91,7 @@ void StreamingChunk::appendData( const nx::Buffer& data )
 
     {
         QnMutexLocker lk( &m_mutex );
-        Q_ASSERT( m_isOpenedForModification );
+        Q_ASSERT( m_modificationState == State::opened );
         if( m_data.capacity() < m_data.size() + data.size() )
             m_data.reserve( m_data.size() + data.size() + BUF_INCREASE_STEP );
         m_data.append( data );
@@ -108,8 +109,8 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
 {
     {
         QnMutexLocker lk( &m_mutex );
-        Q_ASSERT( m_isOpenedForModification );
-        m_isOpenedForModification = false;
+        Q_ASSERT( m_modificationState == State::opened );
+        m_modificationState = State::closed;
         m_cond.wakeAll();
     }
 
@@ -124,7 +125,7 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
 bool StreamingChunk::isClosed() const
 {
     QnMutexLocker lk( &m_mutex );
-    return !m_isOpenedForModification;
+    return m_modificationState != State::opened;
 }
 
 size_t StreamingChunk::sizeInBytes() const
@@ -136,7 +137,8 @@ size_t StreamingChunk::sizeInBytes() const
 void StreamingChunk::waitForChunkReady()
 {
     QnMutexLocker lk( &m_mutex );
-    while( (m_data.size() == 0) || m_isOpenedForModification )
+    //waiting while chunk is modified
+    while( m_modificationState < State::closed )
         m_cond.wait( lk.mutex() );
 }
 

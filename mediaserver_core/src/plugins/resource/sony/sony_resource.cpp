@@ -7,6 +7,7 @@
 #include <utils/common/log.h>
 
 #include "onvif/soapMediaBindingProxy.h"
+#include "utils/common/synctime.h"
 
 
 int QnPlSonyResource::MAX_RESOLUTION_DECREASES_NUM = 3;
@@ -264,7 +265,7 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpCli
             toSharedPointer(),
             QString::number(inputPortIndex),
             currentPortState,
-            QDateTime::currentMSecsSinceEpoch() );
+            qnSyncTime->currentUSecsSinceEpoch() );
     }
 }
 

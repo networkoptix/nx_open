@@ -55,11 +55,13 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camRes)
         connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
-    connect(res.data(),     &QnResource::propertyChanged,         this,          &QnMulticodecRtpReader::at_propertyChanged,        Qt::DirectConnection);
+    Qn::directConnect(res.data(), &QnResource::propertyChanged, this, &QnMulticodecRtpReader::at_propertyChanged);
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
 {
+    directDisconnectAll();
+
     for (unsigned int i = 0; i < m_demuxedData.size(); ++i)
         delete m_demuxedData[i];
 }
@@ -377,7 +379,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     }
     
     if (result)
-        connect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost, Qt::DirectConnection);
+        Qn::directConnect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
     return result;
 }
 
@@ -468,7 +470,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
 
-    m_numberOfVideoChannels = m_RtpSession.getTrackCount(RTPSession::TT_VIDEO);
+    m_numberOfVideoChannels = camera && camera->allowRtspVideoLayout() ?  m_RtpSession.getTrackCount(RTPSession::TT_VIDEO) : 1;
     {
         QnMutexLocker lock( &m_layoutMutex );
         m_customVideoLayout.clear();
@@ -477,15 +479,12 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             m_customVideoLayout = QnCustomResourceVideoLayoutPtr(new QnCustomResourceVideoLayout(QSize(m_numberOfVideoChannels, 1)));
             for (int i = 0; i < m_numberOfVideoChannels; ++i)
                 m_customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
+
             newVideoLayout = m_customVideoLayout->toString();
             QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
-            if (camRes && m_role == Qn::CR_LiveVideo) {
-                QString oldVideoLayout = camRes->getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
-                if (newVideoLayout != oldVideoLayout) {
-                    camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+            if (camRes && m_role == Qn::CR_LiveVideo)
+                if (camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout))
                     camRes->saveParams();
-                }
-            }
         }
     }
     

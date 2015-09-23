@@ -20,6 +20,7 @@
 #include "third_party_archive_delegate.h"
 #include "third_party_ptz_controller.h"
 #include "third_party_stream_reader.h"
+#include "utils/common/synctime.h"
 
 #include <utils/common/log.h>
 #include <utils/xml/camera_advanced_param_reader.h>
@@ -398,7 +399,7 @@ void QnThirdPartyResource::inputPortStateChanged(
         toSharedPointer(),
         QString::fromUtf8(inputPortID),
         newState != 0,
-        QDateTime::currentMSecsSinceEpoch() );
+        qnSyncTime->currentUSecsSinceEpoch() );
 }
 
 const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( int encoderNumber ) const

@@ -72,7 +72,7 @@ public:
         \return true, if started, false if failed to start
     */
     bool ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec );
-
+    QnResourcePtr resource() const { return m_resource; }
 private:
     void createReader(QnServer::ChunksCatalog catalog);
     void stop();
@@ -92,14 +92,18 @@ private:
     //!index - is a \a MediaQuality element
     std::vector<nx_hls::HLSLivePlaylistManagerPtr> m_hlsLivePlaylistManager;
     
-    const size_t m_hlsInactivityPeriodMS;
+    const qint64 m_loStreamHlsInactivityPeriodMS;
+    const qint64 m_hiStreamHlsInactivityPeriodMS;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
+    void startLiveCacheIfNeeded();
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
         const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
     QElapsedTimer m_lastActivityTimer;
 };
+
+typedef std::shared_ptr<QnVideoCamera> QnVideoCameraPtr;
 
 #endif // __VIDEO_CAMERA_H__

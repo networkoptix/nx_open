@@ -69,7 +69,7 @@ bool ResTypeXmlParser::processResource(const QString& localName, const QXmlAttri
 
 bool ResTypeXmlParser::processParam(const QString& localName, const QXmlAttributes& attrs)
 {
-    QN_UNUSED(localName);
+    Q_UNUSED(localName);
 
     ApiPropertyTypeData p;
     if (!m_resTypeFound) {

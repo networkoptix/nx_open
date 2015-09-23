@@ -44,10 +44,6 @@ private slots:
     void at_rulesButton_clicked();
     void at_openButton_clicked();
 
-    void at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList &cameras);
-    void at_cameras_properties_saved(int requestId, ec2::ErrorCode errorCode);
-    void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
-
     void updateCamerasFromSelection();
 private:
     void updateReadOnly();
@@ -61,6 +57,8 @@ private:
     void submitToResources(bool checkControls = false);
     
     void saveCameras(const QnVirtualCameraResourceList &cameras);
+
+    void retranslateUi();
 private:
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;

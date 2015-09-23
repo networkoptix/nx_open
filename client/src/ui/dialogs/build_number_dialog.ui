@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Install specific build</string>
+   <string>Install a specific build.</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -19,7 +19,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="buildNumberLabel">
        <property name="text">
-        <string>Build number:</string>
+        <string>Build Number:</string>
        </property>
       </widget>
      </item>

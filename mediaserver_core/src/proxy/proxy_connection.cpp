@@ -50,7 +50,7 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
 
 QnProxyConnectionProcessor::~QnProxyConnectionProcessor()
 {
-	pleaseStop();
+    pleaseStop();
     stop();
 }
 
@@ -122,6 +122,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             tran.params.socketCount = socketCount;
             qnTransactionBus->sendTransaction(tran, target);
         });
+    } else {
+        d->dstSocket.clear();
     }
 
     if (!d->dstSocket) {
@@ -228,18 +230,21 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             dstRoute.id = camera->getParentId().toString();
     }
 
-    for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
-    {
-        if (itr->first.toLower() == "host" && !host.isEmpty())
-            itr->second = host.toUtf8();
-        else if (itr->first == Qn::SERVER_GUID_HEADER_NAME)
-            dstRoute.id = itr->second;
-    }
+    nx_http::HttpHeaders::const_iterator itr = d->request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    if (itr != d->request.headers.end())
+        dstRoute.id = itr->second;
 
-
-    if (dstRoute.id == qnCommon->moduleGUID() && !cameraGuid.isNull()) {
-        if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
-            dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
+    if (dstRoute.id == qnCommon->moduleGUID()) {
+        if (!cameraGuid.isNull())
+        {
+            if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
+                dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
+        }
+        else
+        {
+            //proxying to ourself
+            dstRoute.addr = SocketAddress(HostAddress::localhost, d->socket->getLocalAddress().port);
+        }
     }
     else if (!dstRoute.id.isNull())
         dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
@@ -261,6 +266,9 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
                 return false;
 
             nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::PROXY_TTL_HEADER_NAME, QByteArray::number(ttl)));
+            nx_http::StringType existAuthSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
+            if (existAuthSession.isEmpty())
+                nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));
 
             QString path = urlPath;
             if (!path.startsWith(QLatin1Char('/')))
@@ -276,15 +284,28 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         //adding entry corresponding to current server to Via header
         nx_http::header::Via via;
+        auto viaHeaderIter = d->request.headers.find( "Via" );
+        if( viaHeaderIter != d->request.headers.end() )
+            via.parse( viaHeaderIter->second );
+
         nx_http::header::Via::ProxyEntry proxyEntry;
         proxyEntry.protoVersion = d->request.requestLine.version.version;
         proxyEntry.receivedBy = qnCommon->moduleGUID().toByteArray();
         via.entries.push_back( proxyEntry );
-        nx_http::StringType viaHeaderStr = nx_http::getHeaderValue( d->request.headers, "Via" );
         nx_http::insertOrReplaceHeader(
             &d->request.headers,
-            nx_http::HttpHeader( "Via", (viaHeaderStr.isEmpty() ? nx_http::StringType() : ", ") + via.toString() ) );
+            nx_http::HttpHeader( "Via", via.toString() ) );
     }
+
+    auto hostIter = d->request.headers.find("Host");
+    if (hostIter != d->request.headers.end())
+        hostIter->second = SocketAddress(
+            dstUrl.host(),
+            dstUrl.port(nx_http::DEFAULT_HTTP_PORT)).toString().toLatin1();
+
+
+    //NOTE next hop should accept Authorization header already present
+    //  in request since we use current time as nonce value
 
     d->clientRequest.clear();
     d->request.serialize(&d->clientRequest);
@@ -318,13 +339,13 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
 
 void QnProxyConnectionProcessor::pleaseStop()
 {
-	Q_D(QnProxyConnectionProcessor);
+    Q_D(QnProxyConnectionProcessor);
 
-	QnTCPConnectionProcessor::pleaseStop();
-	if (d->socket)
-		d->socket->close();
-	if (d->dstSocket)
-		d->dstSocket->close();
+    QnTCPConnectionProcessor::pleaseStop();
+    if (d->socket)
+        d->socket->close();
+    if (d->dstSocket)
+        d->dstSocket->close();
 }
 
 void QnProxyConnectionProcessor::run()
@@ -388,20 +409,27 @@ void QnProxyConnectionProcessor::doRawProxy()
         if (rez < 1)
             return; // error or timeout
 
-        if( (fds[0].revents & (POLLERR | POLLHUP | POLLNVAL)) ||
-            (fds[1].revents & (POLLERR | POLLHUP | POLLNVAL)) )
+        if( fds[0].revents & POLLIN) {
+            if( !doProxyData( d->socket.data(), d->dstSocket.data(), buffer.get(), READ_BUFFER_SIZE ) )
+                return;
+        }
+        else if(fds[0].revents & (POLLERR | POLLHUP | POLLNVAL))
         {
             //connection closed
             NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
             return;
         }
 
-        if( fds[0].revents )
-            if( !doProxyData( d->socket.data(), d->dstSocket.data(), buffer.get(), READ_BUFFER_SIZE ) )
-                return;
-        if( fds[1].revents )
+        if( fds[1].revents & POLLIN) {
             if( !doProxyData( d->dstSocket.data(), d->socket.data(), buffer.get(), READ_BUFFER_SIZE ) )
                 return;
+        }
+        else if(fds[1].revents & (POLLERR | POLLHUP | POLLNVAL))
+        {
+            //connection closed
+            NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
+            return;
+        }
 
         //for( aio::PollSet::const_iterator
         //    it = d->pollSet.begin();
@@ -449,14 +477,6 @@ void QnProxyConnectionProcessor::doSmartProxy()
         //{
         //    if( it.eventType() != aio::etRead )
         //        return;
-            //if( it.socket() == d->socket )
-            if( fds[0].revents & (POLLERR | POLLHUP | POLLNVAL) )
-            {
-                //error while polling
-                NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
-                return;
-            }
-
 
             if( fds[0].revents & POLLIN )    //if polled returned connection closed or error state, recv will fail and we will process error
             {
@@ -506,9 +526,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     d->clientRequest.clear();
                 }
             }
-
-            //else if( it.socket() == d->dstSocket )
-            if( fds[1].revents & (POLLERR | POLLHUP | POLLNVAL) )
+            else if( fds[0].revents & (POLLERR | POLLHUP | POLLNVAL) )
             {
                 //error while polling
                 NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
@@ -520,6 +538,13 @@ void QnProxyConnectionProcessor::doSmartProxy()
                 if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.get(), READ_BUFFER_SIZE))
                     return;
             }
+            else if( fds[1].revents & (POLLERR | POLLHUP | POLLNVAL) )
+            {
+                //error while polling
+                NX_LOG( lit("Error polling socket"), cl_logDEBUG1 );
+                return;
+            }
+
         //}
     }
 }

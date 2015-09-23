@@ -4,8 +4,10 @@
 
 #include <utils/common/log.h>
 #include <utils/common/util.h>
+#include <utils/network/flash_socket/types.h>
 #include <utils/network/http/httptypes.h>
 
+#include "http/http_mod_manager.h"
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
 #include "err.h"
@@ -16,6 +18,8 @@
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>
 #endif
+#include "core/resource_management/resource_pool.h"
+#include "http/custom_headers.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -53,6 +57,9 @@ int QnTCPConnectionProcessor::isFullMessage(
     const QByteArray& message,
     boost::optional<qint64>* const fullMessageSize )
 {
+    if( message.startsWith(nx_flash_sock::POLICY_FILE_REQUEST_NAME) )
+        return message.size();
+
     if( fullMessageSize && fullMessageSize->is_initialized() )
         return fullMessageSize->get() > message.size()
             ? 0
@@ -115,6 +122,8 @@ void QnTCPConnectionProcessor::parseRequest()
     }
     d->protocol = d->request.requestLine.version.protocol;
     d->requestBody = d->request.messageBody;
+
+    nx_http::HttpModManager::instance()->apply( &d->request );
 }
 
 /*
@@ -415,6 +424,8 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             d->protocol = d->request.requestLine.version.protocol;
             d->requestBody = d->httpStreamReader.fetchMessageBody();
 
+            nx_http::HttpModManager::instance()->apply( &d->request );
+
             //TODO #ak logging
             //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
             //    arg(d->socket->getForeignAddress().toString()).
@@ -478,4 +489,52 @@ bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
         return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
     else    //e.g., RTSP
         return false;
+}
+
+QnAuthSession QnTCPConnectionProcessor::authSession() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    QnAuthSession result;
+
+    QByteArray existSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
+    if (!existSession.isEmpty()) {
+        result.fromByteArray(existSession);
+        return result;
+    }
+
+    if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
+        result.userName = userRes->getName();
+    else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
+        result.userName = lit("Video wall");
+
+    result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull()) {
+        QByteArray nonce = d->request.getCookieValue("auth");
+        if (!nonce.isEmpty()) {
+            QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+            md5Hash.addData( nonce );
+            result.id = QnUuid::fromRfc4122(md5Hash.result());
+        }
+    }
+    if (result.id.isNull())
+        result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull()) {
+        QUrlQuery query(d->request.requestLine.url.query());
+        result.id = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
+    }
+    if (result.id.isNull())
+        result.id = QnUuid::createUuid();
+
+    result.userHost = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::USER_HOST_HEADER_NAME));
+    if (result.userHost.isEmpty())
+        result.userHost = d->socket->getForeignAddress().address.toString();
+    result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, "User-Agent"));
+
+    int trimmedPos = result.userAgent.indexOf(lit("/"));
+    if (trimmedPos != -1) {
+        trimmedPos = result.userAgent.indexOf(lit(" "), trimmedPos);
+        result.userAgent = result.userAgent.left(trimmedPos);
+    }
+
+    return result;
 }

@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 #include <QtCore/QProcess>
 
 #include <QtWidgets/QApplication>
@@ -32,6 +30,7 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/layout_resource.h>
@@ -40,6 +39,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_resource.h>
@@ -72,6 +72,7 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/failover_priority_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
@@ -129,10 +130,10 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 #include <utils/common/time.h>
-#include <utils/common/email.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/url.h>
+#include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
@@ -152,7 +153,6 @@
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
 #include "network/authenticate_helper.h"
-#include "ui/widgets/iomodule/iostate_display_widget.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -162,49 +162,13 @@ namespace {
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
 // -------------------------------------------------------------------------- //
-// QnResourceStatusReplyProcessor
-// -------------------------------------------------------------------------- //
-detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources):
-    awaitedResponseCount(0),
-    m_handler(handler),
-    m_resources(resources)
-{}
-
-void detail::QnResourceStatusReplyProcessor::at_replyReceived( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
-    Q_UNUSED(handle);
-
-    if(m_handler)
-        m_handler.data()->at_resources_statusSaved(errorCode, resources);
-
-    deleteLater();
-}
-
-
-// -------------------------------------------------------------------------- //
-// QnResourceReplyProcessor
-// -------------------------------------------------------------------------- //
-detail::QnResourceReplyProcessor::QnResourceReplyProcessor(QObject *parent):
-    QObject(parent),
-    m_handle(0),
-    m_status(0)
-{}
-
-void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QnResourceList &resources, int handle) {
-    m_status = status;
-    m_resources = resources;
-    m_handle = handle;
-
-    emit finished(status, resources, handle);
-}
-
-// -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
 // -------------------------------------------------------------------------- //
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_delayedDropGuard(false),
-    m_tourTimer(new QTimer())
+    m_tourTimer(new QTimer(this))
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
@@ -230,14 +194,16 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
+    connect(action(Qn::OpenFailoverPriorityAction),             &QAction::triggered,    this,   &QnWorkbenchActionHandler::openFailoverPriorityDialog);
     connect(action(Qn::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
-    connect(action(Qn::RecordingStatisticsAction),              SIGNAL(triggered()),    this,   SLOT(at_openRecordingStatsAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
+    connect(action(Qn::OpenAuditLogAction),                     SIGNAL(triggered()),    this,   SLOT(at_openAuditLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
     connect(action(Qn::SystemUpdateAction),                     SIGNAL(triggered()),    this,   SLOT(at_systemUpdateAction_triggered()));
+    connect(action(Qn::UserManagementAction),                   SIGNAL(triggered()),    this,   SLOT(at_userManagementAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -314,8 +280,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
-
-    connect(action(Qn::OpenIOMonitorAction),              SIGNAL(triggered()),    this,   SLOT(at_openIOMonitorAction_triggered()));
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -497,10 +461,6 @@ QnEventLogDialog *QnWorkbenchActionHandler::businessEventsLogDialog() const {
     return m_businessEventsLogDialog.data();
 }
 
-QnRecordingStatsDialog *QnWorkbenchActionHandler::recordingStatsDialog() const {
-    return m_recordingStatsDialog.data();
-}
-
 QnCameraListDialog *QnWorkbenchActionHandler::cameraListDialog() const {
     return m_cameraListDialog.data();
 }
@@ -598,7 +558,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
                 resourcePool()->removeResource(layout);
     }
 
-    /* Sometimes we get here when 'New layout' has already been added. But all user's layouts must be created AFTER this method.
+    /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
     * Otherwise the user will see uncreated layouts in layout selection menu.
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
@@ -807,18 +767,6 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_openIOMonitorAction_triggered() 
-{
-    foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        QnServerCameraPtr cameraResource = resource.dynamicCast<QnServerCamera>();
-        if(cameraResource) {
-            QnIOStateDisplayWidget* ioStateDisplay = new QnIOStateDisplayWidget(mainWindow());
-            ioStateDisplay->setCamera(cameraResource);
-            ioStateDisplay->show();
-        }
-    }
-}
-
 void QnWorkbenchActionHandler::at_openLayoutsInNewWindowAction_triggered() {
     // TODO: #GDM #Common this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
     QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
@@ -834,7 +782,7 @@ void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
 
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
+    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
@@ -849,7 +797,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     if (!m_awaitingMoveCameras.contains(handle))
         return;
     QnVirtualCameraResourceList modifiedResources = m_awaitingMoveCameras.value(handle).cameras;
-    QnResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
+    QnMediaServerResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
     m_awaitingMoveCameras.remove(handle);
 
     if (status != 0) {
@@ -858,7 +806,10 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Can't move camera(s) to other server. Server %1 doesn't answer to request.", NULL, modifiedResources.size()).arg(server->getName()),
+            //: "Cannot move these 5 cameras to server <server_name>. Server is unresponsive."
+            tr("Cannot move these %n %1 to server %2. Server is unresponsive.", "", modifiedResources.size())
+                .arg(getDefaultDevicesName(modifiedResources, false))
+                .arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -881,7 +832,10 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 errorResources,
                 Qn::MainWindow_Tree_DragCameras_Help,
                 tr("Error"),
-                tr("Server %1 cannot discover these cameras so far. Are you sure you want to move them?", NULL, errorResources.size()).arg(server->getName()),
+                //: "Server <server_name> is unable to find and access these 5 cameras. Are you sure you would like to move them?"
+                tr("Server %1 is unable to find and access these %n %2. Are you sure you would like to move them?", "", errorResources.size())
+                    .arg(server->getName())
+                    .arg(getDefaultDevicesName(errorResources, false)),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
                 );
         /* If user is sure, return invalid cameras back to list. */
@@ -890,32 +844,13 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     }
 
     const QnUuid serverId = server->getId();
-    for (auto camera: modifiedResources) {
-        camera->setParentId(serverId);
+    qnResourcesChangesManager->saveCameras(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
         camera->setPreferedServerId(serverId);
-    }
+    });
 
-    if(!modifiedResources.empty()) {
-        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources);
-
-        processor->awaitedResponseCount.store( 2 );
-        auto completionHandler = [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
-            if( --processor->awaitedResponseCount == 0 )
-                processor->at_replyReceived(reqID, errorCode, modifiedResources);
-        };
-
-        connection2()->getCameraManager()->save(
-            modifiedResources,
-            processor,
-            completionHandler );
-
-        const QList<QnUuid>& idList = idListFromResList(modifiedResources);
-        connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idList),
-            processor,
-            completionHandler );
-        propertyDictionary->saveParamsAsync(idList);    //saving modified properties
-    }
+    qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
+        camera->setParentId(serverId);
+    });
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
@@ -1041,7 +976,7 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     filters << tr("All files (*.*)");
 
     QStringList files = QnFileDialog::getOpenFileNames(mainWindow(),
-                                                       tr("Open file"),
+                                                       tr("Open File"),
                                                        QString(),
                                                        filters.join(lit(";;")),
                                                        0,
@@ -1058,7 +993,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     filters << tr("All files (*.*)");
 
     QString fileName = QnFileDialog::getOpenFileName(mainWindow(),
-                                                     tr("Open file"),
+                                                     tr("Open File"),
                                                      QString(),
                                                      filters.join(lit(";;")),
                                                      0,
@@ -1099,6 +1034,12 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
         if (wlayout)
             wlayout->centralizeItems();
     }
+}
+
+void QnWorkbenchActionHandler::openFailoverPriorityDialog() {
+    QScopedPointer<QnFailoverPriorityDialog> dialog(new QnFailoverPriorityDialog(mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
@@ -1183,6 +1124,11 @@ void QnWorkbenchActionHandler::at_systemUpdateAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UpdatesPage);
 }
 
+void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UserManagement);
+}
+
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 {
     QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
@@ -1208,14 +1154,9 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_openRecordingStatsAction_triggered() 
-{
-    QnNonModalDialogConstructor<QnRecordingStatsDialog> dialogConstructor(m_recordingStatsDialog, mainWindow());
+void QnWorkbenchActionHandler::at_openAuditLogAction_triggered() {
+    QnNonModalDialogConstructor<QnAuditLogDialog> dialogConstructor(m_auditLogDialog, mainWindow());
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaServerResourcePtr server;
-    if (!parameters.resources().isEmpty())
-        server = parameters.resource().dynamicCast<QnMediaServerResource>();
-    recordingStatsDialog()->setServer(server);
 }
 
 void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
@@ -1304,7 +1245,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(mainWindow(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -1499,8 +1440,8 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
             int result = QMessageBox::warning(
                         mainWindow(),
-                        tr("Process is in progress"),
-                        tr("Camera addition is already in progress."\
+                        tr("Process in progress..."),
+                        tr("Device addition is already in progress."\
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
@@ -1525,22 +1466,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QnMediaServerResourcePtr server = servers.first();
-
-    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->instance<QnCameraDataManager>(), &QnCameraDataManager::clearCache);
-
-    dialog->setWindowModality(Qt::ApplicationModal);
-    if(!dialog->exec())
-        return;
-
-    // TODO: #Elric move submitToResources here.
-    connection2()->getMediaServerManager()->saveUserAttributes(
-        QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()),
-        this,
-        [this, server]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << server );
-        } );
-    server->saveUpdatedStorages();
+    QnServerSettingsDialog::showNonModal(server, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
@@ -1558,7 +1484,10 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
     QUrlQuery urlQuery(url);
-    urlQuery.addQueryItem(lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(login, password)));
+    urlQuery.addQueryItem(
+        lit("auth"),
+        QLatin1String(QnAuthHelper::createHttpQueryAuthParam(
+            login, password, server->realm(), nx_http::Method::GET)));
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
     url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
@@ -1685,7 +1614,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
 
         QString message = checkedFlags == Qn::user 
             ? tr("User with the same name already exists")
-            : tr("Video Wall with the same name already exists");
+            : tr("Video Wall with the same name already exists.");
 
         QMessageBox::warning(
             mainWindow(),
@@ -1754,65 +1683,25 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     } else if (nodeType == Qn::RecorderNode) {
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
-        QnVirtualCameraResourceList modified;
-        foreach(const QnVirtualCameraResourcePtr &cam, qnResPool->getResources<QnVirtualCameraResource>()) {
-            if (!cam || cam->getGroupId() != groupId)
-                continue;
-            cam->setUserDefinedGroupName(name);
-            modified << cam;
-        }
-        if (modified.isEmpty())
-            return; // very strange outcome - at least camera should be in the list
-        connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modified)),
-            this, 
-            [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-                at_resources_saved( reqID, errorCode, modified );
-                if (errorCode != ec2::ErrorCode::ok)
-                    foreach (const QnVirtualCameraResourcePtr &camera, modified)
-                        camera->setUserDefinedGroupName(oldName);
-            } );
+
+        QnVirtualCameraResourceList modified = qnResPool->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera){
+            return camera->getGroupId() == groupId;
+        });
+        qnResourcesChangesManager->saveCameras(modified, [name](const QnVirtualCameraResourcePtr &camera) {
+            camera->setUserDefinedGroupName(name);
+        });
     } else {
-        if (!validateResourceName(resource, name))
-            return;
-
-        resource->setName(name);
-
-        // I've removed command "saveResource" because it cause sync issue in p2p mode. The problem because of we have transactions with different hash:
-        // for instance saveServer and saveResource. But result data will depend of transactions order.
-
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
+            qnResourcesChangesManager->saveServer(server, [name](const QnMediaServerResourcePtr &server) {
+                server->setName(name);
+            });
+        }
         
-        if (camera && nodeType == Qn::EdgeNode) {
-            if (mServer = camera->getParentServer())
-                mServer->setName(name);
+        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
+            qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) {
+                camera->setName(name);
+            });
         }
-
-        auto callback = [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << resource );
-            if (errorCode != ec2::ErrorCode::ok)
-                resource->setName(oldName);
-        };
-
-        if (mServer) {
-            connection2()->getMediaServerManager()->saveUserAttributes(
-                QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(mServer->getId()),
-                this,
-                callback );
-        }
-        if (camera)
-            connection2()->getCameraManager()->saveUserAttributes(
-                QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << camera)),
-                this,
-                callback);
-        if (user) 
-            connection2()->getUserManager()->save( user, this, callback );
-        if (layout)
-            connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this, callback);
-        propertyDictionary->saveParamsAsync(resource->getId()); //saving modified properties of resouce
     }
 }
 
@@ -1821,6 +1710,10 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     /* User cannot delete himself. */
     resources.removeOne(context()->user());
+
+    /* No one can delete Administrator. */
+    resources.removeOne(qnResPool->getAdministrator());
+
     if(resources.isEmpty())
         return;
 
@@ -1835,30 +1728,23 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
     };
 
-    auto deleteResources = [this](const QnResourceList& resources)
-    {
-        QVector<QnUuid> idToDelete;
-        foreach(const QnResourcePtr& resource, resources) 
-        {
-            if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) 
-            {
-                if(snapshotManager()->isLocal(layout)) {
-                    resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
-                    return;
-                }
-            }
-            QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
-                QnMediaServerResource::isHiddenServer(resource->getParentResource())
-                ? resource->getParentId()
-                : QnUuid();
-            if (!parentToDelete.isNull())
-                idToDelete << parentToDelete;
-            idToDelete << resource->getId();
+    auto deleteResources = [this](const QnResourceList &resources) {
+
+        QnLayoutResourceList localLayouts = resources.filtered<QnLayoutResource>([this](const QnLayoutResourcePtr &layout){
+            return snapshotManager()->isLocal(layout);
+        });
+
+        QnResourceList remoteResources = resources;
+
+        /* These can be simply deleted from resource pool. */
+        for (const QnLayoutResourcePtr &layout: localLayouts) {
+            remoteResources.removeOne(layout);
+            qnResPool->removeResource(layout); 
         }
 
-        // if we are deleting an edge camera, also delete its server
-        connection2()->getResourceManager()->remove( idToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
+        qnResourcesChangesManager->deleteResources(remoteResources);
     };
+
 
     /* Check if it's OK to delete something without asking. */
     QnResourceList autoDeleting;
@@ -1878,22 +1764,21 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if(resources.isEmpty())
         return; /* Nothing to delete. */
 
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    Q_ASSERT_X(cameras.size() == resources.size(), Q_FUNC_INFO, "Only cameras must stay here.");
+
     /* Check that we are deleting online auto-found cameras */ 
-    QnResourceList onlineAutoDiscoveredCameras;
-    foreach(const QnResourcePtr &resource, resources) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera ||
-            camera->getStatus() == Qn::Offline || 
-            camera->isManuallyAdded()) 
-                continue;
-        onlineAutoDiscoveredCameras << camera;
-    } 
+    QnVirtualCameraResourceList onlineAutoDiscoveredCameras = cameras.filtered([](const QnVirtualCameraResourcePtr &camera){
+        return camera->getStatus() != Qn::Offline 
+            && !camera->isManuallyAdded();
+    });
 
     QString question;
-    /* First version of the dialog if all cameras are auto-discovered. */
+    /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
     if (resources.size() == onlineAutoDiscoveredCameras.size()) {
         question =
-            tr("These %n cameras are auto-discovered.", "", resources.size()) + L'\n' 
+            //: "These 5 cameras are auto-discovered."
+            tr("These %n %1 are auto-discovered.").arg(getDefaultDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
@@ -1901,12 +1786,17 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* Second version - some cameras are auto-discovered, some not. */
     if (!onlineAutoDiscoveredCameras.isEmpty()) {
         question = 
-            tr("%n of these %1 cameras are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(resources.size()) + L'\n' 
+            tr("%n of these %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getDefaultDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
+    else if (cameras.size() == resources.size()) {
+        /* Third version - no auto-discovered cameras in the list. */
+        question =
+            tr("Do you really want to delete the following %1?").arg(getNumericDevicesName(cameras, false));
+    }
     else {
-    /* Third version - no auto-discovered cameras in the list. */
+        /* Forth version - cameras and other items. */
         question =
             tr("Do you really want to delete the following %n item(s)?", "", resources.size());
     }
@@ -1959,11 +1849,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setId(QnUuid::createUuid());
     user->setTypeByName(lit("User"));
 
-    connection2()->getUserManager()->save(
-        user, this,
-        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << user );
-        } );
+    qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
     user->setPassword(QString()); // forget the password now
 }
 
@@ -2038,10 +1924,15 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
     emailFlags &= flags;
 
+    QnUserSettingsDialog::ElementFlags enabledFlags =  
+        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable | QnUserSettingsDialog::Visible : zero);
+    enabledFlags &= flags;
+
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Email, emailFlags);
+    dialog->setElementFlags(QnUserSettingsDialog::Enabled, enabledFlags);
 
 
     // TODO #Elric: This is a totally evil hack. Store password hash/salt in user.
@@ -2060,13 +1951,11 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if (!(permissions & Qn::SavePermission))
         return;
     
-    
-    dialog->submitToResource();
-    connection2()->getUserManager()->save(
-        user, this, 
-        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << user );
-    } );
+    qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &) {
+        dialog->submitToResource();
+    });
+
+    //TODO: #GDM SafeMode what to rollback if current password changes cannot be saved?
 
     QString newPassword = user->getPassword();
     user->setPassword(QString());
@@ -2172,8 +2061,8 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
         return;
 
     QnProgressDialog *progressDialog = new QnProgressDialog(mainWindow());
-    progressDialog->setWindowTitle(tr("Updating background"));
-    progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
+    progressDialog->setWindowTitle(tr("Updating Background..."));
+    progressDialog->setLabelText(tr("Image processing may take a few moments. Please be patient."));
     progressDialog->setRange(0, 0);
     progressDialog->setCancelButton(NULL);
     connect(progressDialog, &QnProgressDialog::canceled, progressDialog,     &QObject::deleteLater);
@@ -2249,53 +2138,6 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
         }
     }
     layout->setBackgroundSize(QSize(w, h));
-}
-
-void QnWorkbenchActionHandler::at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
-    Q_UNUSED(handle);
-    Q_ASSERT(!resources.isEmpty());
-
-    if( errorCode == ec2::ErrorCode::ok )
-        return;
-
-    QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
-        tr("Error"),
-        tr("Could not save the following %n items.", "", resources.size()),
-        QDialogButtonBox::Ok
-        );
- 
-}
-
-void QnWorkbenchActionHandler::at_resources_properties_saved( int /*handle*/, ec2::ErrorCode /*errorCode */)
-{
-    //TODO/IMPL
-}
-
-void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode errorCode ) {
-    Q_UNUSED(handle);
-
-    if( errorCode == ec2::ErrorCode::ok )
-        return;
-
-    QMessageBox::critical(mainWindow(), 
-        tr("Could not delete resource"),
-        tr("An error has occurred while trying to delete a resource from Server. ") + L'\n'
-      + tr("Error description: '%1'").arg(ec2::toString(errorCode)));
-}
-
-void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources) {
-    if(errorCode == ec2::ErrorCode::ok || resources.isEmpty())
-        return;
-
-    QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
-        tr("Error"),
-        tr("Could not save changes made to the following %n resource(s).", "", resources.size()),
-        QDialogButtonBox::Ok
-    );
 }
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
@@ -2488,7 +2330,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-                         tr("You are running beta version of %1.")
+                         tr("This is a beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
 }
 
@@ -2544,7 +2386,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     if (!success) {
         QMessageBox::critical(
                     mainWindow(),
-                    tr("Launcher process is not found"),
+                    tr("Launcher process not found."),
                     tr("Cannot restart the client.") + L'\n' 
                   + tr("Please close the application and start it again using the shortcut in the start menu.")
                     );

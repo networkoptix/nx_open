@@ -10,12 +10,15 @@ GenericSettingsPanel
 {
     id: thisComponent;
 
+    property bool editBtnPrevTabIsSelf: false;
+
     property Component propertiesDelegate;
     property var maskedArea: area.item;
     
     //TODO: #ynikitenkov  (rtuContext.selection !== null) should not be required  here
+    property bool extraWarned: false;
     property bool warned: (rtuContext.selection && (rtuContext.selection !== null)
-        && (rtuContext.selection.count === 1) ? true : false);
+        && (rtuContext.selection.count === 1) ? true : false) || extraWarned;
 
     Component
     {
@@ -59,7 +62,7 @@ GenericSettingsPanel
 
                     wrapMode: Text.Wrap;
                     font.pixelSize: Common.SizeManager.fontSizes.medium;
-                    text: qsTr("Settings in this partition can be different for selected servers.");
+                    text: qsTr("Settings in this section can be different for selected servers.");
                 }
 
                 Row
@@ -72,12 +75,20 @@ GenericSettingsPanel
                     {
                         id: editAllButton;
 
+                        KeyNavigation.tab: null;
+                        KeyNavigation.backtab: (thisComponent.editBtnPrevTabIsSelf ? editAllButton : null);
+
                         height: Common.SizeManager.clickableSizes.medium;
                         width: height * 4;
                         text: qsTr("Edit all");
 
                         onClicked: { thisComponent.warned = true; }
 
+                        Component.onCompleted:
+                        {
+                            if (thisComponent.editBtnPrevTabIsSelf)
+                                forceActiveFocus();
+                        }
                     }
 
                     Base.Text

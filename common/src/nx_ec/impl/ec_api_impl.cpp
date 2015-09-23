@@ -26,6 +26,8 @@ namespace ec2
                 return lit( "unsupported" );
             case ErrorCode::unauthorized:
                 return lit( "unauthorized" );
+            case ErrorCode::temporary_unauthorized:
+                return lit( "temporary unauthorized" );
             case ErrorCode::badResponse:
                 return lit( "badResponse" );
             case ErrorCode::dbError:

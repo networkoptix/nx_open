@@ -3,7 +3,6 @@
 #include "utils/common/synctime.h"
 #include "core/resource/resource.h"
 
-
 namespace QnBusiness
 {
 
@@ -59,7 +58,8 @@ namespace QnBusiness
             break;
         case AnyBusinessEvent:
             result << CameraMotionEvent << CameraInputEvent <<
-                      AnyCameraEvent << AnyServerEvent;
+                      AnyCameraEvent << AnyServerEvent <<
+                      UserDefinedEvent;
             break;
         default:
             break;
@@ -80,7 +80,8 @@ namespace QnBusiness
             << ServerFailureEvent 
             << ServerConflictEvent 
             << ServerStartEvent 
-            << LicenseIssueEvent;
+            << LicenseIssueEvent
+            << UserDefinedEvent;
         return result;
     }
 
@@ -94,10 +95,21 @@ namespace QnBusiness
         case AnyBusinessEvent:
         case CameraMotionEvent:
         case CameraInputEvent:
+        case UserDefinedEvent:
             return true;
         default:
             return false;
         }
+    }
+
+    QList<EventState> allowedEventStates(EventType eventType)
+    {
+        QList<EventState> result;
+        if (hasToggleState(eventType))
+            result << QnBusiness::ActiveState << QnBusiness::InactiveState;
+        if (!hasToggleState(eventType) || eventType == UserDefinedEvent)
+            result << QnBusiness::UndefinedState;
+        return result;
     }
 
     bool requiresCameraResource(EventType eventType) {

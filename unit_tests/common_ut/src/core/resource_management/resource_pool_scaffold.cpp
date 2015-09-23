@@ -31,11 +31,11 @@ QnResourcePoolScaffold::~QnResourcePoolScaffold() {
     delete m_propertyDictionary;
 }
 
-QnVirtualCameraResourcePtr QnResourcePoolScaffold::addCamera(Qn::LicenseType cameraType, bool recordingEnabled) {
-    return addCameras(cameraType, 1, recordingEnabled).first();
+QnVirtualCameraResourcePtr QnResourcePoolScaffold::addCamera(Qn::LicenseType cameraType, bool licenseRequired) {
+    return addCameras(cameraType, 1, licenseRequired).first();
 }
 
-QnVirtualCameraResourceList QnResourcePoolScaffold::addCameras(Qn::LicenseType cameraType /*= Qn::LC_Professional*/, int count /*= 1*/, bool recordingEnabled /*= true*/) {
+QnVirtualCameraResourceList QnResourcePoolScaffold::addCameras(Qn::LicenseType cameraType /*= Qn::LC_Professional*/, int count /*= 1*/, bool licenseRequired /*= true*/) {
     if (m_resPool->getAllServers().isEmpty()) {
         QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
         server->setId(QnUuid::createUuid());
@@ -47,7 +47,7 @@ QnVirtualCameraResourceList QnResourcePoolScaffold::addCameras(Qn::LicenseType c
     for (int i = 0; i < count; ++i) {
         QnVirtualCameraResourcePtr camera(new QnCameraResourceStub(cameraType));
         camera->setParentId(m_resPool->getAllServers().first()->getId());
-        camera->setScheduleDisabled(!recordingEnabled);
+        camera->setLicenseUsed(licenseRequired);
         m_resPool->addResource(camera);
         result << camera;
     }

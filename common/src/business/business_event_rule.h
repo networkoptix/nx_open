@@ -66,6 +66,7 @@ public:
 
     static QnBusinessEventRuleList getDefaultRules();
     static QnBusinessEventRuleList getSystemRules();
+    static QnBusinessEventRuleList getRulesUpd43();
 
     QnBusinessEventRule* clone();
     void removeResource(const QnUuid& resId);

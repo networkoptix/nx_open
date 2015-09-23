@@ -1,3 +1,85 @@
+-----------------------------------------------2.4.1.xxxx-----------------------------------------
+NEW FEATURES:
+New Web Client
+VMS-440 Implemented external events API
+VMS-392 Implemented read-only mode to Server
+VMS-955 Introduced failover priority for cameras
+Added "Restart device" and "Reset to factory defaults" functions to Nx1 Server's Web interface
+
+NEW DEVICE SUPPORT:
+ACTi I-96
+BOSCH X1600 IP encoder
+
+IMPROVEMENTS:
+VMS-956 Improved algorithm of Storage Analytics
+VMS-682 Maximum number of cameras is limited to 8 for Nx1 in failover settings 
+VMS-630 Improved behaviour of Server Settings dialog
+VMS-307 Changed "Info" state for items on the Scene
+VMS-471 Added "duration" to HTTP Streaming API
+VMS-944 Added Server's hardware ID logging
+VMS-901 Improved PTZ support of Eneo cameras
+VISTA-54 Added PTZ presets support on Axis M7016 Encoder
+VMS-719 Improved PTZ support for Redvision dome camera RVX-IP30-IRWL-W
+VISTA-53 Added autofocus support for VK2-3MPBIR28V12re and VK2-3MPVRDIR28V12re cameras
+
+BUG FIXES:
+VMS-548 Different RTSP-links to the same camera generated Camera IP conflicts. Fixed.
+VMS-737 Notification "Rebuilding archive index is completed" appeared in case of cancelling rebuild process. Fixed.
+VMS-930 If time had been changed on the machine with installed Server, Server didn't resynchronize its System Time. Fixed.
+VMS-978 Nx1 Server always had higher password priority while merge systems. Fixed.
+VMS-995 Wrong warning appeared while deleting user. Fixed.
+VMS-689 Client was opened with delay after minimization to taskbar on Windows 10. Fixed.
+VMS-742 Advanced camera settings were not being requested for DW-MB421TIR camera. Fixed.
+VMS-941 MJPEG for ACTi-E921 doesn't work. Fixed.
+VMS-585 ONVIF-driven encoder channels are being initialised incorrectly. Fixed.
+
+SERVER CONFIGURATION TOOL IMPROVEMENTS AND BUG FIXES
+NXTOOL-81, NXTOOL-14 Added assigning IP addresses, DNS Server and default gateway for several units simultaneously
+NXTOOL-83 Introduced a way to configure devices from other network/subnet
+NXTOOL-96 Implemented "Restart device" and "Reset to factory defaults" functions
+NXTOOL-6 Added HDD presence and boot mode indicators
+NXTOOL-26 Added detailed Server information
+NXTOOL-10 Implemented Date/Time validation
+Improved user interface and system messages
+
+
+-----------------------------------------------2.4.0.xxxx-----------------------------------------
+NEW FEATURES:
+I/O Module Support 
+LDAP Integration
+Storage SDK
+Audit Trail
+Storage Analytics
+
+NEW DEVICE SUPPORT:
+Axis P8221 I/O Module
+ACTi V32 16 channel IP encoder
+Digital Watchdog DWC-BVI2IR
+Latest standard Arecont and Axis cameras are supported
+
+
+
+IMPROVEMENTS:
+Decrease CPU usage on camera-based Edge Server (ISD Jaguar).
+Improved usage statistics and crash reports.
+New warning when more than one server is recording to the same storage.
+When multiple servers are recording to a shared storage location (e.g. NAS) usage is shared more effectively.
+Mobile app performance improved when pulling video from Edge Server (ARM) devices.
+Adding NAS devices on Linux simplified to match Windows method.
+Check for updates automatically enabled by default.
+Video viewing synchronization in multi-server systems improved.
+
+
+BUG FIXES:
+Motion mask couldn't be changed for panoramic AV cameras in smart search mode. Fixed.
+Small issues in server API. Fixed.
+Intermittent "Loading" error in client in multi-server systems. Fixed.
+When client is started the keyboard cursor was not automatically moved to login dialog box. Fixed.
+Viewing video streams and information from a remote server with 2 public IPs failed. Fixed.
+Cameras that were not being recorded were shown as offline when autodiscovery was disabled. Fixed.
+In some cases Edge Media Server could not be stopped (specifically ISD Jaguar camera). Fixed.
+Archived video was inaccessible during fast archive scan. Fixed.
+
 ----------------------------------------------2.3.2.xxxx------------------------------------------
 
 Features:
@@ -27,6 +109,7 @@ Bug #5731 - Motion Detection didn't work for mjpeg stream. Fixed.
 Bug #5747 - Fixed authentication issue if server time has been changed.
 Bug #5749 - Server should not send multicast packets for cameras discovery if enable camera auto discovery is disabled and server has no failover enabled or only one server in the system.
 Bug #5766 - Login dialog displays servers with different protocol version as compatible. Fixed
+Bug #6075 - Server time is different on different Servers in the same System. Fixed.
 
 
 ----------------------------------------------2.3.1.xxxx-------------------------------------------

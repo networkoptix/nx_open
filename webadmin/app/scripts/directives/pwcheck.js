@@ -10,14 +10,13 @@ angular.module('webadminApp')
                     return;
                 }
                 function updateValidity(){
-                    console.log("updateValidity",model.$viewValue,scope.$eval(attrs.nxEqualEx));
                     // Only compare values if the second ctrl has a value.
                     if (model.$viewValue !== undefined && model.$viewValue !== '') {
                         model.$setValidity('nxEqualEx', scope.$eval(attrs.nxEqualEx) === model.$viewValue);
                     }
                 }
                 scope.$watch(attrs.nxEqualEx, updateValidity);
-                scope.$watch("$viewValue", updateValidity);
+                scope.$watch('$viewValue', updateValidity);
 
                 model.$parsers.push(function (value) {
                     // Mute the nxEqual error if the second ctrl is empty.

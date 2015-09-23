@@ -32,6 +32,7 @@ extern "C"
 #include <utils/network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
 #include "http/custom_headers.h"
+#include "common/common_module.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -353,7 +354,7 @@ void QnRtspClientArchiveDelegate::unlockTime()
     m_lockedTime = qint64(AV_NOPTS_VALUE);
 }
 
-qint64 QnRtspClientArchiveDelegate::startTime()
+qint64 QnRtspClientArchiveDelegate::startTime() const
 {
     QnMutexLocker lock( &m_timeMutex );
     if(m_lockedTime != qint64(AV_NOPTS_VALUE))
@@ -366,7 +367,7 @@ qint64 QnRtspClientArchiveDelegate::startTime()
         return DATETIME_NOW; // archive in a future
 }
 
-qint64 QnRtspClientArchiveDelegate::endTime()
+qint64 QnRtspClientArchiveDelegate::endTime() const
 {
     /*
     if (m_rtspSession.endTime() > qnSyncTime->currentUSecsSinceEpoch())
@@ -684,7 +685,7 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
    // RtpHeader* rtpHeader = (RtpHeader*) data;
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     QByteArray ba((const char*)payload, data + dataSize - payload);
-    if (ba.startsWith("npt="))
+    if (ba.startsWith("clock="))
         m_rtspSession.parseRangeHeader(QLatin1String(ba));
     else if (ba.startsWith("drop-report"))
         emit dataDropped(m_reader);
@@ -851,6 +852,9 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
+    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
+
 
     if (server) {
         QNetworkProxy proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);

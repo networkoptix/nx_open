@@ -6,6 +6,14 @@
 
 #include <recording/time_period_list.h>
 
+namespace {
+#ifdef _DEBUG
+    const qint64 bigDataTestsLimitMs = 5000;
+#else
+    const qint64 bigDataTestsLimitMs = 1000;
+#endif
+}
+
 //#define QN_NO_BIG_DATA_TEST
 
 void PrintTo(const QnTimePeriod& period, ::std::ostream* os) {
@@ -66,8 +74,8 @@ TEST( QnTimePeriodsListTest, mergeBigData )
     QnTimePeriodList merged = QnTimePeriodList::mergeTimePeriods(lists);
     qint64 timestamp2 = QDateTime::currentMSecsSinceEpoch();
 
-    qDebug() << resultPeriods.size() << "periods *" << mergingListsCount << "lists were merged in" << (timestamp2 - timestamp1) << "ms";
     ASSERT_EQ(resultPeriods, merged);
+    ASSERT_LE(timestamp2 - timestamp1, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBigData )
@@ -108,8 +116,8 @@ TEST( QnTimePeriodsListTest, unionBigData )
 
     qint64 timestamp2 = QDateTime::currentMSecsSinceEpoch();
 
-    qDebug() << resultPeriods.size() << "periods *" << mergingListsCount << "lists were unioned in" << (timestamp2 - timestamp1) << "ms";
     ASSERT_EQ(resultPeriods, lists[0]);
+    ASSERT_LE(timestamp2 - timestamp1, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBySameChunk )

@@ -1,14 +1,16 @@
 #ifndef MEDIA_SERVER_PROCESS_H
 #define MEDIA_SERVER_PROCESS_H
 
+#include <memory>
+
 #include <QtCore/QTimer>
 #include <QtCore/QStringList>
 
 #include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <crash_reporter.h>
 
+#include "http/auto_request_forwarder.h"
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
 #include "platform/monitoring/global_monitor.h"
@@ -16,6 +18,8 @@
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
+#include <utils/network/http/http_mod_manager.h>
+
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -23,6 +27,10 @@ class QnServerMessageProcessor;
 struct QnModuleInformation;
 class QnModuleFinder;
 struct QnPeerRuntimeInfo;
+class QnLdapManager;
+namespace ec2 {
+    class CrashReporter;
+}
 
 class MediaServerProcess : public QnLongRunnable
 {
@@ -34,10 +42,12 @@ public:
 
     void stopObjects();
     void run();
+    int getTcpPort() const;
 
     /** Entry point */
     static int main(int argc, char* argv[]);
-
+signals:
+    void started();
 public slots:
     void stopAsync();
     void stopSync();
@@ -79,6 +89,8 @@ private:
     qint64 m_firstRunningTime;
 
     QnModuleFinder* m_moduleFinder;
+    std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
+    std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
@@ -89,7 +101,7 @@ private:
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
     mutable QnMutex m_stopMutex;
-    ec2::CrashReporter m_crashReporter;
+    std::unique_ptr<ec2::CrashReporter> m_crashReporter;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

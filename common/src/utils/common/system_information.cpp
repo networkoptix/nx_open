@@ -34,11 +34,17 @@ bool QnSystemInformation::isValid() const {
     return !platform.isEmpty() && !arch.isEmpty();
 }
 
+QnSystemInformation QnSystemInformation::currentSystemInformation() {
+    return QnSystemInformation(QnAppInfo::applicationPlatform(),
+                               QnAppInfo::applicationArch(),
+                               QnAppInfo::applicationPlatformModification());
+}
+
 #if defined(Q_OS_WIN)
 
     #include <windows.h>
 
-    static QString platformModificationResolve(DWORD min, DWORD maj, bool ws)
+    static QString resolveGetVersionEx(DWORD min, DWORD maj, bool ws)
     {
         if (min == 5 && maj == 0) return lit("2000");
         if (min == 5 && maj == 1) return lit("XP");
@@ -56,25 +62,25 @@ bool QnSystemInformation::isValid() const {
         return lit("Unknown %1.%2").arg(min).arg(maj);
     }
 
-    static QString platformModification() {
+    QString QnSystemInformation::currentSystemRuntime() {
         OSVERSIONINFOEX osvi;
         ZeroMemory(&osvi, sizeof(osvi));
         osvi.dwOSVersionInfoSize = sizeof(osvi);
 
         if (GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&osvi)))
             return lit("Windows %1").arg(
-                platformModificationResolve(
+                resolveGetVersionEx(
                     osvi.dwMajorVersion, osvi.dwMinorVersion,
                     osvi.wProductType == VER_NT_WORKSTATION));
 
-        return QnAppInfo::applicationPlatformModification();
+        return QLatin1String("Windows without GetVersionEx");
     }
 
 #elif defined(Q_OS_LINUX)
 
     #include <fstream>
 
-    static QString platformModification() {
+    QString QnSystemInformation::currentSystemRuntime() {
         std::ifstream osrelease("/etc/os-release");
         if (osrelease.is_open())
         {
@@ -93,7 +99,7 @@ bool QnSystemInformation::isValid() const {
             }
         }
 
-        return QnAppInfo::applicationPlatformModification();
+        return QLatin1String("GNU-Linux without /etc/os-release");
     }
 
 #elif defined(Q_OS_OSX)
@@ -101,26 +107,20 @@ bool QnSystemInformation::isValid() const {
     #include <sys/types.h>
     #include <sys/sysctl.h>
 
-    static QString platformModification() {
+    QString QnSystemInformation::currentSystemRuntime() {
         char osrelease[256];
         int mibMem[2] = { CTL_KERN, KERN_OSRELEASE };
         size_t size = sizeof(osrelease);
         if (sysctl(mibMem, 2, osrelease, &size, NULL, 0) != -1)
             return QString::fromStdString(osrelease);
 
-        return QnAppInfo::applicationPlatformModification();
+        return QLatin1String("OSX without KERN_OSRELEASE");
     }
 
 #else
 
-    static QString platformModification() {
-        return QnAppInfo::applicationPlatformModification();
+    QString QnSystemInformation::currentSystemRuntime() {
+        return QLatin1String("Unknown");
     }
 
 #endif
-
-QnSystemInformation QnSystemInformation::currentSystemInformation() {
-    return QnSystemInformation(QnAppInfo::applicationPlatform(),
-                               QnAppInfo::applicationArch(),
-                               platformModification());
-}

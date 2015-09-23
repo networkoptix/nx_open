@@ -20,7 +20,7 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& 
 {
     QSize maxResolution = getMaxSensorSize(res);
 
-    //========this is due to bug in AV firmware;
+    // ========this is due to bug in AV firmware;
     // you cannot set up maxSensorWidth with HTTP. ( you can do it in tftp if you are really want to ).
     // for now(13 December 2009) if we use HTTP => right should be divisible by 64; bottom - by 32
     // may be while you are looking at this comments bug already fixed.

@@ -20,6 +20,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "nx_ec/ec_proto_version.h"
+#include <network/authenticate_helper.h>
 
 
 class QnMediaServerResourceGuard: public QObject {
@@ -81,6 +82,12 @@ void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
         m_firstCamera.clear();
 }
 
+void QnMediaServerResource::beforeDestroy()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_firstCamera.clear();
+}
+
 void QnMediaServerResource::atResourceChanged()
 {
     m_panicModeCache.update();
@@ -100,7 +107,7 @@ QString QnMediaServerResource::getName() const
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
-    else
+    
     {
         QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
         if( !(*lk)->name.isEmpty() )
@@ -111,19 +118,21 @@ QString QnMediaServerResource::getName() const
 
 void QnMediaServerResource::setName( const QString& name )
 {
-    QString oldName = getName();
-    if (oldName == name)
+    if (getId().isNull())
         return;
 
-    setServerName(name);
+    if (getServerFlags() & Qn::SF_Edge)
+        return;
+
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->name == name)
+            return;
+        (*lk)->name = name;
+    }
     emit nameChanged(toSharedPointer(this));
 }
 
-void QnMediaServerResource::setServerName( const QString& name )
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
-    (*lk)->name = name;
-}
 
 void QnMediaServerResource::setApiUrl(const QString &apiUrl)
 {
@@ -220,26 +229,6 @@ QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourc
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
     return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
-}
-
-void QnMediaServerResource::setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storagesToRemove)
-{
-    m_storagesToUpdate = storagesToUpdate;
-    m_storagesToRemove = storagesToRemove;
-}
-
-QPair<int, int> QnMediaServerResource::saveUpdatedStorages()
-{
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    int updateHandle = conn->getMediaServerManager()->saveStorages(m_storagesToUpdate, this, &QnMediaServerResource::onRequestDone);
-    int removeHandle = conn->getMediaServerManager()->removeStorages(m_storagesToRemove, this, &QnMediaServerResource::onRequestDone);
-
-    return QPair<int, int>(updateHandle, removeHandle);
-}
-
-void QnMediaServerResource::onRequestDone( int reqID, ec2::ErrorCode errorCode )
-{
-    emit storageSavingDone(reqID, errorCode);
 }
 
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
@@ -504,4 +493,9 @@ QString QnMediaServerResource::getAuthKey() const
 void QnMediaServerResource::setAuthKey(const QString& authKey)
 {
     m_authKey = authKey;
+}
+
+QString QnMediaServerResource::realm() const
+{
+    return QnAppInfo::realm();
 }

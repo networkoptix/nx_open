@@ -177,6 +177,7 @@ private:
     void processSkippingFramesTime();
     void clearMetaDataInfo();
     void mapMetadataFrame(const QnCompressedVideoDataPtr& video);
+    qint64 doSmartSleep(const qint64 needToSleep, float speed);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -207,7 +208,7 @@ protected:
     bool m_ignoringVideo;
     bool m_isRealTimeSource;
     QnAudioFormat m_expectedAudioFormat;
-    QnMutex m_audioChangeMutex;
+    mutable QnMutex m_audioChangeMutex;
     bool m_videoBufferOverflow;
     bool m_singleShotMode;
     bool m_singleShotQuantProcessed;

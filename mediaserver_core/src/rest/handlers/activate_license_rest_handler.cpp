@@ -1,6 +1,7 @@
 #include <QUrlQuery>
 #include <QUrl>
 #include <QLocale>
+#include <QtCore/QFile>
 
 #include "activate_license_rest_handler.h"
 #include <utils/network/tcp_connection_priv.h>
@@ -19,6 +20,10 @@
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
+#ifdef Q_OS_LINUX
+#include "nx1/info.h"
+#endif
+
 CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey, bool infoMode, QByteArray& response)
 {
     // make check license request
@@ -32,13 +37,26 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
     params.addQueryItem(QLatin1String("version"), QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
 
+#ifdef Q_OS_LINUX
+    if( QnAppInfo::armBox() == "nx1" || QnAppInfo::armBox() == "bpi") {
+        QString mac = Nx1::getMac(); 
+        QString serial = Nx1::getSerial();
+
+        if (!mac.isEmpty())
+            params.addQueryItem(QLatin1String("mac"), mac);
+
+        if (!serial.isEmpty())
+            params.addQueryItem(QLatin1String("serial"), serial);
+    }
+#endif
+
     QLocale locale;
     params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
 
-    const QVector<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QVector<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
+    const QVector<QString> mainHardwareIds = qnLicensePool->mainHardwareIds();
+    const QVector<QString> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
     int hw = 0;
-    for (const QByteArray& hwid: mainHardwareIds) {
+    for (const QString& hwid: mainHardwareIds) {
         QString name;
         if (hw == 0)
             name = QLatin1String("oldhwid");
@@ -47,15 +65,15 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
         else
             name = QString(QLatin1String("hwid%1")).arg(hw);
 
-        params.addQueryItem(name, QLatin1String(hwid));
+        params.addQueryItem(name, hwid);
 
         hw++;
     }
 
     hw = 1;
-    for(const QByteArray& hwid: compatibleHardwareIds) {
+    for(const QString& hwid: compatibleHardwareIds) {
         QString name = QString(QLatin1String("chwid%1")).arg(hw);
-        params.addQueryItem(name, QLatin1String(hwid));
+        params.addQueryItem(name, hwid);
         hw++;
     }
 
@@ -75,11 +93,11 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
 
     QString licenseKey = requestParams.value("key");
     if (licenseKey.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter, tr("Parameter 'key' is missed"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'key' is missed"));
         return CODE_OK;
     }
     if (licenseKey.length() != 19 || licenseKey.count("-") != 3) {
-        result.setError(QnJsonRestResult::MissingParameter, tr("Invalid license serial number provided. Serial number MUST be in format AAAA-BBBB-CCCC-DDDD"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("Invalid license serial number provided. Serial number MUST be in format AAAA-BBBB-CCCC-DDDD"));
         return CODE_OK;
     }
 
@@ -91,7 +109,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         CLHttpStatus errCode = makeRequest(licenseKey, isCheckMode, response);
         if (errCode != CL_HTTP_SUCCESS || response.isEmpty())
         {
-            result.setError(QnJsonRestResult::CantProcessRequest, tr("Network error has occurred during license activation. Error code: %1").arg(errCode));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Network error has occurred during license activation. Error code: %1").arg(errCode));
             return CODE_OK;
         }
     
@@ -99,7 +117,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         if (QJson::deserialize(response, &errorMessage)) 
         {
             QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
-            result.setError(QnJsonRestResult::CantProcessRequest, tr("Can't activate license:  %1").arg(message));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(message));
             return CODE_OK;
         }
 
@@ -110,7 +128,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         QnLicense::ErrorCode licenseErrCode;
         if (!license->isValid(&licenseErrCode, QnLicense::VM_CheckInfo)) 
         {
-            result.setError(QnJsonRestResult::CantProcessRequest, tr("Can't activate license:  %1").arg(QnLicense::errorMessage(licenseErrCode)));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(QnLicense::errorMessage(licenseErrCode)));
             return CODE_OK;
         }
     }    
@@ -120,7 +138,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     licenses << license;
     const ec2::ErrorCode errorCode = connect->getLicenseManager()->addLicensesSync(licenses);
     if( errorCode != ec2::ErrorCode::ok) {
-        result.setError(QnJsonRestResult::CantProcessRequest, tr("Internal server error: %1").arg(ec2::toString(errorCode)));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error: %1").arg(ec2::toString(errorCode)));
         return CODE_OK;
     }
     fromResourceToApi(license, reply);

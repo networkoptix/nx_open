@@ -30,9 +30,12 @@ public:
 
     /** Forcibly update dialog contents. Default behavior is - simply close dialog. */
     virtual void forcedUpdate() override {
+        retranslateUi();
         tryClose(true);
     }
 
+protected:
+    virtual void retranslateUi() {}
 };
 
 #undef ID
@@ -53,6 +56,9 @@ public:
 
     /** Forcibly update dialog contents. Default behavior is - simply close dialog. */
     virtual void forcedUpdate() override;
+
+protected:
+    virtual void retranslateUi() {}
 };
 
 

@@ -33,8 +33,8 @@ private:
     QnIOModuleMonitor* m_owner;
 };
 
-QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr camera):
-        m_camera(camera)
+QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera):
+    m_camera(camera)
 {
 }
 
@@ -71,7 +71,7 @@ bool QnIOModuleMonitor::open()
         requestUrl.setHost(route.addr.address.toString());
         requestUrl.setPort(route.addr.port);
     }
-
+    
     httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
     httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
 

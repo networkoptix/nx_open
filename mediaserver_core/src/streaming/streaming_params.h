@@ -15,6 +15,9 @@ namespace StreamingParams
     //!Internal timestamp (in micros). Not a calendar time
     static const QLatin1String START_TIMESTAMP_PARAM_NAME( "startTimestamp" );
     //!Start calendar time
+    static const QLatin1String START_POS_PARAM_NAME( "pos" );
+    static const QLatin1String END_POS_PARAM_NAME( "endPos" );
+    //!Deprecated. Same as \a START_POS_PARAM_NAME
     static const QLatin1String START_DATETIME_PARAM_NAME( "startDatetime" );
     //static const QLatin1String STOP_TIMESTAMP_PARAM_NAME( "endTimestamp" );
     static const QLatin1String PICTURE_SIZE_PIXELS_PARAM_NAME( "pictureSizePixels" );
@@ -30,6 +33,7 @@ namespace StreamingParams
     static const QLatin1String SESSION_ID_PARAM_NAME( "sessionID" );
     static const QLatin1String HI_QUALITY_PARAM_NAME( "hi" );
     static const QLatin1String LO_QUALITY_PARAM_NAME( "lo" );
+    static const QLatin1String FFMPEG_REALTIME_OPTIMIZATION("ffmpegRealTimeOptimization");
 }
 
 #endif  //STREAMING_PARAMS_H

@@ -20,7 +20,12 @@ public:
 
     virtual QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString());
 
-    virtual QNetworkProxy proxyToResource(const QnResourcePtr &resource);
+    /*!
+        \param via In not NULL filled with server, request is to be sent to
+    */
+    virtual QNetworkProxy proxyToResource(
+        const QnResourcePtr &resource,
+        QnMediaServerResourcePtr* const via = nullptr );
 
 protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query) override;

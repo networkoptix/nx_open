@@ -1,12 +1,16 @@
 #include "server_camera.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
-#include "plugins/resource/archive/rtsp_client_archive_delegate.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
-#include "api/app_server_connection.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource_management/status_dictionary.h"
 
+#include <api/app_server_connection.h>
+
+#include <plugins/resource/archive/archive_stream_reader.h>
+#include <plugins/resource/archive/rtsp_client_archive_delegate.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/status_dictionary.h>
+
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
 
 QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraResource()
 {
@@ -19,11 +23,38 @@ QString QnServerCamera::getDriverName() const
     return QLatin1String("Server camera"); //all other manufacture are also untranslated and should not be translated
 }
 
+
+QString QnServerCamera::getName() const {
+    if( !getId().isNull() )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if( !(*userAttributesLock)->name.isEmpty() )
+            return (*userAttributesLock)->name;
+    }
+
+    return base_type::getName();
+}
+
+
+void QnServerCamera::setName(const QString& name) {
+    if (getId().isNull() )
+        return;
+
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if ((*userAttributesLock)->name == name)
+            return;
+        (*userAttributesLock)->name = name;
+    }
+    emit nameChanged(toSharedPointer(this));
+}
+
+
 Qn::ResourceFlags QnServerCamera::flags() const {
     Qn::ResourceFlags result = base_type::flags();
     if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
         result |= Qn::motion;
-    if (hasCameraCapabilities(Qn::IOModuleCapability))
+    if (isIOModule())
         result |= Qn::io_module;
     return result;
 }
@@ -82,7 +113,3 @@ void QnServerCamera::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
     QnVirtualCameraResource::updateInner(other, modifiedFields);
 }
 
-QnIOModuleMonitorPtr QnServerCamera::createIOModuleMonitor()
-{
-    return QnIOModuleMonitorPtr(new QnIOModuleMonitor(toSharedPointer().dynamicCast<QnSecurityCamResource>()));
-}

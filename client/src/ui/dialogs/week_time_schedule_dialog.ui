@@ -17,7 +17,7 @@
    <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
      <property name="title">
-      <string>Schedule Grid</string>
+      <string>Schedule</string>
      </property>
      <property name="flat">
       <bool>true</bool>
@@ -51,7 +51,7 @@
       <item>
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Note: Schedule is based on Server Time</string>
+         <string>Note: Schedule is based on server time.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

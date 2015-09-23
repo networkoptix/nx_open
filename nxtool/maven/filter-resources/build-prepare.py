@@ -76,8 +76,12 @@ if __name__ == '__main__':
             print(join(target_dir, 'qml'))
             if os.path.exists(join(target_dir, config, 'qml')):
                 shutil.rmtree(join(target_dir, config, 'qml'))
-            shutil.copytree(join(qtbasedir, 'qml'),join(target_dir, config, 'qml'))
-            #copyDirectory(join(qtbasedir, 'qml'),join(target_dir))
+            shutil.copytree(join(qtbasedir, 'qml'), join(target_dir, config, 'qml'))
+        for root, dirs, files in os.walk(join(join(target_dir, 'release', 'qml'))):
+            for file in files:
+                if fnmatch.fnmatch(file, '*.pdb') or fnmatch.fnmatch(file, '*d.dll'):
+                    print("Deleting %s" % join(root, file))
+                    os.unlink(join(root, file))
     else:     
         lib_source_dir = '${qt.dir}/lib'
         lib_target_dir = join('${project.build.directory}', 'lib')

@@ -9,11 +9,31 @@ TextField
     id: thisComponent;
 
     property bool revertOnEmpty: false;
-    property bool changed: changedBase;
-    property bool changedBase: (text !== initialText);
-    
-    property string initialText: "";
 
+    property bool clearOnInitValue: false;
+
+    placeholderText: initialText;
+
+    property bool changed: changedBase;
+    property bool changedBase: ((text !== initialText)
+        && (!clearOnInitValue || (text.length || wasOnceChanged)));
+
+    property string initialText: "";
+    property bool wasOnceChanged: false;
+
+    onTextChanged:
+    {
+        if (clearOnInitValue && (text != "") && (text != initialText))
+            wasOnceChanged = true;
+    }
+
+    onChangedChanged:
+    {
+        if (changed)
+            placeholderText = "";
+    }
+
+    activeFocusOnTab: true;
     implicitHeight: Common.SizeManager.clickableSizes.medium;
     implicitWidth: implicitHeight * 4;
 
@@ -37,9 +57,12 @@ TextField
     {
         if (activeFocus)
         {
-            selectAll();
+            if (clearOnInitValue && !changedBase)
+                text = "";
+            else
+                selectAll();
         }
-        else if (revertOnEmpty && text.length === 0)
+        else if ((revertOnEmpty || (clearOnInitValue && !wasOnceChanged)) && (text.length === 0))
         {
             text = initialText;
         }

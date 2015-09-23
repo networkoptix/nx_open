@@ -33,11 +33,6 @@ private:
     CLSimpleHTTPClient* connection;
     QnDesktopCameraConnectionProcessor* processor;
     QnMutex m_mutex;
-    struct {
-        QString username;
-        QString password;
-        QnUuid clientGuid;
-    } m_auth;
 };
 
 typedef QSharedPointer<QnDesktopCameraConnection> QnDesktopCameraConnectionPtr;

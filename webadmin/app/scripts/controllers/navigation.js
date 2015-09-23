@@ -1,14 +1,15 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('NavigationCtrl', function ($scope, $location, mediaserver, ipCookie) {
+    .controller('NavigationCtrl', function ($scope, $location, mediaserver, ipCookie, $sessionStorage) {
         $scope.user = {
             isAdmin: true
         };
 
-        mediaserver.checkAdmin().then(function(isAdmin){
+        mediaserver.getUser().then(function(user){
             $scope.user = {
-                isAdmin: isAdmin
+                isAdmin: user.isAdmin,
+                name: user.name
             };
         });
 
@@ -23,15 +24,23 @@ angular.module('webadminApp')
         };
 
         $scope.logout = function(){
-
-            ipCookie.remove('response',{ path: '/' });
+            ipCookie.remove('auth', { path: '/' });
             ipCookie.remove('nonce',{ path: '/' });
             ipCookie.remove('realm',{ path: '/' });
-            ipCookie.remove('username',{ path: '/' });
+
+            // TODO: REMOVE OBSOLETE COOKIES
+            // ipCookie.remove('username',{ path: '/' });
+            // ipCookie.remove('response',{ path: '/' });
+
             window.location.reload();
         };
+
+        $scope.webclientEnabled = Config.webclientEnabled;
         $scope.alertVisible = true;
+
+        $scope.session = $sessionStorage;
+
         $scope.closeAlert = function(){
-            $scope.alertVisible = false;
+            $scope.session.serverInfoAlertHidden = true;
         }
     });

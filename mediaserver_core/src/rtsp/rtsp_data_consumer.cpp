@@ -63,7 +63,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_framesSinceRangeCheck(0),
     m_prevStartTime(AV_NOPTS_VALUE),
     m_prevEndTime(AV_NOPTS_VALUE)
-
 {
     m_timer.start();
     QnMutexLocker lock( &m_allConsumersMutex );
@@ -571,6 +570,8 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, (int)codecEncoder->getFrequency() };
 
+    m_owner->notifyMediaRangeUsed(media->timestamp);
+
     m_sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))
     {
@@ -651,7 +652,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
-    QnVideoCamera* camera = 0;
+    QnVideoCameraPtr camera;
     QnResourcePtr res;
     if (m_owner->getResource()) {
         res = m_owner->getResource()->toResourcePtr();

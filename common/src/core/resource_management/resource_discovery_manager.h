@@ -31,6 +31,7 @@ struct QnManualCameraInfo
     QnResourceTypePtr resType;
     QAuthenticator auth;
     QnAbstractResourceSearcher* searcher;
+    QString uniqueId;
 };
 typedef QMap<QString, QnManualCameraInfo> QnManualCameraInfoMap;
 

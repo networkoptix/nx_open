@@ -65,6 +65,8 @@
 #define QN_AX_TYPELIB_ID                "${ax.typeLibId}"
 #define QN_AX_APP_ID                    "${ax.appId}"
 
+#define QN_REALM                        "${deb.customization.company.name}"
+
 /* 
  * These constants are here for windows resource file.
  *

@@ -33,9 +33,10 @@ struct QnConnectionInfo {
     bool allowSslConnections;
     //!Transaction message bus protocol version (defined by \a nx_ec::EC2_PROTO_VERSION)
     int nxClusterProtoVersion;
+    bool ecDbReadOnly;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)(nxClusterProtoVersion)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

@@ -53,6 +53,12 @@ DROP TABLE vms_userprofile_tmp;
 
 update vms_cameraserveritem set timestamp = timestamp * 1000;
 
+DELETE FROM vms_property 
+    WHERE id NOT IN (
+        SELECT MAX(id) 
+            FROM vms_property p 
+            GROUP BY resource_id, property_type_id);
+
 INSERT INTO vms_kvpair (resource_id, name, value)
      SELECT p.resource_id, pt.name, p.value
        FROM vms_property p

@@ -136,7 +136,7 @@
           <item row="2" column="1">
            <widget class="QLineEdit" name="simpleSignatureLineEdit">
             <property name="placeholderText">
-             <string>Enter short system description here...</string>
+             <string>Enter a short system description here.</string>
             </property>
            </widget>
           </item>
@@ -277,7 +277,7 @@
             <item row="2" column="0">
              <widget class="QRadioButton" name="unsecuredRadioButton">
               <property name="text">
-               <string>Unsecure connection</string>
+               <string>Unsecure Connection</string>
               </property>
              </widget>
             </item>
@@ -303,7 +303,7 @@
                <enum>Qt::LeftToRight</enum>
               </property>
               <property name="text">
-               <string>Secure connection using TLS</string>
+               <string>Secure connection using TLS.</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -313,7 +313,7 @@
             <item row="1" column="0">
              <widget class="QRadioButton" name="sslRadioButton">
               <property name="text">
-               <string>Secure connection using SSL</string>
+               <string>Secure connection using SSL.</string>
               </property>
              </widget>
             </item>
@@ -350,7 +350,7 @@
             <item row="0" column="1">
              <widget class="QLineEdit" name="signatureLineEdit">
               <property name="placeholderText">
-               <string>Enter short system description here...</string>
+               <string>Enter a short system description here.</string>
               </property>
              </widget>
             </item>

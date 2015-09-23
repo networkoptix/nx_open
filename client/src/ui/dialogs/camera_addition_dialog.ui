@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Add cameras...</string>
+   <string>Add device(s)...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0">
    <item>
@@ -31,7 +31,7 @@
      <item>
       <widget class="QLabel" name="serverCaptionLabel">
        <property name="text">
-        <string>Selected server:</string>
+        <string>Selected Server:</string>
        </property>
       </widget>
      </item>
@@ -133,7 +133,7 @@
                   <item row="0" column="0">
                    <widget class="QLabel" name="singleCameraLabel">
                     <property name="text">
-                     <string>Ca&amp;mera Address:</string>
+                     <string>Device Address:</string>
                     </property>
                     <property name="buddy">
                      <cstring>singleCameraLineEdit</cstring>
@@ -213,7 +213,7 @@
             <item>
              <widget class="QCheckBox" name="subnetCheckbox">
               <property name="text">
-               <string>S&amp;ubnet scan</string>
+               <string>S&amp;ubnet Scan</string>
               </property>
              </widget>
             </item>
@@ -368,7 +368,7 @@
                      <enum>QFrame::NoFrame</enum>
                     </property>
                     <property name="text">
-                     <string>auto</string>
+                     <string>Auto</string>
                     </property>
                    </widget>
                   </item>
@@ -454,7 +454,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Discovered Cameras:</string>
+          <string>Discovered Devices:</string>
          </property>
         </widget>
        </item>
@@ -509,12 +509,12 @@
          </column>
          <column>
           <property name="text">
-           <string>Manuf.</string>
+           <string>Brand</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>Name</string>
+           <string>Model</string>
           </property>
          </column>
          <column>
@@ -654,7 +654,7 @@
          <item>
           <widget class="QPushButton" name="backToScanButton">
            <property name="text">
-            <string>New scan...</string>
+            <string>New Scan...</string>
            </property>
           </widget>
          </item>

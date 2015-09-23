@@ -13,11 +13,17 @@ namespace isd_edge_settings
 {
     static const char paramGroup[] = "isd_edge";
 
-    static const char vbrMinPercent[] = "isd_edge/vbrMinPercent";
-    static const int vbrMinPercentDefault = 20;
+    static const char hiVbrMinPercent[] = "isd_edge/hiVbrMinPercent";
+    static const int hiVbrMinPercentDefault = 20;
 
-    static const char vbrMaxPercent[] = "isd_edge/vbrMaxPercent";
-    static const int vbrMaxPercentDefault = 80;
+    static const char hiVbrMaxPercent[] = "isd_edge/hiVbrMaxPercent";
+    static const int hiVbrMaxPercentDefault = 80;
+
+    static const char loVbrMinPercent[] = "isd_edge/loVbrMinPercent";
+    static const int loVbrMinPercentDefault = 20;
+
+    static const char loVbrMaxPercent[] = "isd_edge/loVbrMaxPercent";
+    static const int loVbrMaxPercentDefault = 120;
 }
 
 #endif  //NX_ISD_EDGE_SETTINGS_H

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.3
 
 import "../base" as Base;
 import "../../common" as Common;
@@ -18,14 +18,23 @@ Item
     Row
     {
         id: row;
-        spacing: Common.SizeManager.spacing.base;
+        spacing: Common.SizeManager.spacing.medium;
 
-        anchors.centerIn: parent;
+        anchors
+        {
+            left: parent.left;
+            verticalCenter: parent.verticalCenter;
+        }
+
 
         Base.CheckBox
         {
             id: selectAllCheckbox;
 
+            activeFocusOnPress: false;
+            activeFocusOnTab: false;
+
+            anchors.verticalCenter: parent.verticalCenter;
             Binding
             {
                 target: selectAllCheckbox;
@@ -39,9 +48,13 @@ Item
             }
         }
 
+
         Base.Text
         {
+            anchors.verticalCenter: parent.verticalCenter;
             text: qsTr("select / unselect all");
+            font.pixelSize: Common.SizeManager.fontSizes.medium;
+            color: "#666666";
         }
     }
 

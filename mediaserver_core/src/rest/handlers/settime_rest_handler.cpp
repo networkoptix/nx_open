@@ -1,10 +1,14 @@
+
 #include <QFile>
+#include <QtCore/QProcess>
 
 #include "settime_rest_handler.h"
+#include <api/app_server_connection.h>
 #include <utils/network/tcp_connection_priv.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
+
 
 #ifdef Q_OS_LINUX
 #include <sys/time.h>
@@ -30,7 +34,23 @@ bool setDateTime(qint64 value)
     struct timeval tv;
     tv.tv_sec = value / 1000;
     tv.tv_usec = (value % 1000) * 1000;
-    return settimeofday(&tv, 0) == 0;
+    if (settimeofday(&tv, 0) != 0)
+        return false;
+
+    if (QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1")
+    {
+        //on nx1 have to execute hwclock -w to save time. But this command sometimes failes
+        for (int i = 0; i < 3; ++i)
+        {
+            const int resultCode = QProcess::execute("hwclock -w");
+            if (resultCode == 0)
+                return true;
+        }
+        return false;
+    }
+
+    return true;
+
 }
 #endif
 
@@ -47,37 +67,37 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
 
 
     if (dateTime < 1) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Invalid datetime format specified"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid datetime format specified"));
         return CODE_OK;
     }
 
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!mServer) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Internal server error"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;
     }
     if (!(mServer->getServerFlags() & Qn::SF_timeCtrl)) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("This server doesn't support time control"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("This server doesn't support time control"));
         return CODE_OK;
     }
     
 #ifdef Q_OS_LINUX
     if (!timezone.isEmpty()) {
         if (!setTimeZone(timezone)) {
-            result.setError(QnJsonRestResult::CantProcessRequest);
-            result.setErrorString(lit("Invalid timezone specified"));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Invalid timezone specified"));
             return CODE_OK;
         }
     }
 
     if (!setDateTime(dateTime)) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't set new datetime value"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't set new datetime value"));
         return CODE_OK;
     }
+
 #endif
+
+    //ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    //ec2Connection->getTimeManager()->forceTimeResync();
+
     return CODE_OK;
 }

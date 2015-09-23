@@ -17,13 +17,11 @@ int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams 
     QnUserResourceList users;
     if (ec2Connection->getUserManager()->getUsersSync(userId, &users) !=  ec2::ErrorCode::ok)
     {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(tr("Internal server error. Can't execute query 'getUsers'"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't execute query 'getUsers'"));
         return CODE_INTERNAL_ERROR;
     }
     if (users.isEmpty()) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(tr("Can't determine current user"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't determine current user"));
         return CODE_INTERNAL_ERROR;
     }
     fromResourceToApi(users.first(), user);

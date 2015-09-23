@@ -45,6 +45,7 @@ public:
         quint64 duration,
         MediaQuality streamQuality,
         const std::multimap<QString, QString>& auxiliaryParams );
+    StreamingChunkCacheKey( const QString& uniqueResourceID );
 
     //!data source (camera id, stream id)
     const QString& srcResourceUniqueID() const;

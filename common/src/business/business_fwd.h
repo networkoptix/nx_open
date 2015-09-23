@@ -26,6 +26,7 @@ typedef QList<QnPanicBusinessAction> QnPanicBusinessActionList;
 
 class QnBusinessActionData;
 typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
+typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
 typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;
 
 typedef QMap<QString, QVariant> QnBusinessParams;
@@ -109,6 +110,7 @@ public:
 
         /** System health message. */
         SystemHealthEvent = 500,
+        MaxSystemHealthEvent = 599,
 
         /** Event group. */
         AnyCameraEvent = 600,
@@ -116,7 +118,7 @@ public:
         AnyBusinessEvent = 602,
 
         /** Base index for the user defined events. */
-        UserEvent = 1000
+        UserDefinedEvent = 1000
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 
@@ -183,11 +185,10 @@ public:
 
 #define QN_BUSINESS_ENUM_TYPES \
     (QnBusiness::EventReason)\
-    (QnBusiness::EventState)\
     (QnBusiness::EventType)\
     (QnBusiness::ActionType)\
     (QnBusiness::UserGroup)\
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES, (metatype)(numeric)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES(QnBusiness::EventState), (metatype)(lexical))
 
 #endif // QN_BUSINESS_FWD_H

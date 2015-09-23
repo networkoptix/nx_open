@@ -56,6 +56,10 @@ private slots:
     void at_actionResourcesHolder_clicked();
 
     void updateModelAggregationPeriod();
+
+private:
+    void retranslateUi();
+
 private:
     QScopedPointer<Ui::BusinessRuleWidget> ui;
 

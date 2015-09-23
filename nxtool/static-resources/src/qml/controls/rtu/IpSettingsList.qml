@@ -11,6 +11,16 @@ Base.Column
 {
     id: thisComponent;
 
+    property Item firstIpLine: repeater.itemAt(0);
+    property Item lastIpLine: repeater.itemAt(repeater.count - 1);
+
+    Component.onCompleted:
+    {
+        firstIpLine = repeater.itemAt(0);
+        if (firstIpLine && enabled)
+            firstIpLine.ipAddressControl.forceActiveFocus();
+    }
+
     property bool changed:
     {      
         var result = false;
@@ -25,10 +35,12 @@ Base.Column
         }
         return result;
     }
-    
-    function tryApplyChanges () { return impl.tryApplyChanges(); }
+
+    function tryApplyChanges (warnings) { return impl.tryApplyChanges(warnings); }
     
     anchors.left: (parent ? parent.left : undefined);
+
+    activeFocusOnTab: false;
 
     Repeater
     {
@@ -38,6 +50,7 @@ Base.Column
         
         delegate: Rtu.IpChangeLine
         {
+            selectionSize: rtuContext.selection.count;
             useDHCPControl.initialCheckedState: useDHCP;
 
             ipAddressControl.initialText: model.address;
@@ -47,6 +60,23 @@ Base.Column
             
             adapterNameValue: model.adapterName;
             interfaceCaption: model.readableName;
+        }
+
+        onItemAdded:
+        {
+            if (index !== 0)
+            {
+                var prevChild = itemAt(index - 1);
+                item.KeyNavigation.backtab = (prevChild ? prevChild.dnsControl : null);
+                prevChild.KeyNavigation.tab = item.ipAddressControl;
+            }
+            else
+            {
+                item.KeyNavigation.backtab = item.ipAddressControl;
+                item.ipAddressControl.forceActiveFocus();
+            }
+
+            item.KeyNavigation.tab = thisComponent.KeyNavigation.tab;
         }
     }
     
@@ -59,10 +89,12 @@ Base.Column
 
     property QtObject impl : QtObject
     {
-        readonly property string errorTemplate: 
-            qsTr("Invalid %1 for interface %2 specified. Can't apply changes.");
-        
-        function tryApplyChanges()
+        readonly property string errorTemplate:
+            qsTr("Invalid %1 for \"%2\" specified. Can't apply changes.");
+        readonly property string errorTemplateServeral:
+            qsTr("Invalid %1 specified. Can't apply changes.");
+
+        function tryApplyChanges(warnings)
         {
             if (!thisComponent.changed)
                 return true;
@@ -78,67 +110,166 @@ Base.Column
                     continue;
                 }
 
+                var useRange = item.useIpRangeEnter;
+
                 var name = item.adapterNameValue;
-                
-                var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
+                var interfaceCaption = item.interfaceCaption;
 
-                /// Always send dhcp state due to serialization issue on the server side
-                rtuContext.changesManager().addDHCPChange(name, useDHCP);
+                var useDHCPState = item.useDHCPControl.checkedState;
+                var wrongGateway = (!item.gatewayControl.isEmptyAddress && !item.gatewayControl.acceptableInput);
 
-                if (!useDHCP)   /// do not send address and mask if dhcp is on
+                if ((useDHCPState === Qt.Unchecked) &&   /// do not send address/mask/gateway if dhcp is on
+                        (item.ipAddressControl.changed || item.subnetMaskControl.changed
+                         || item.gatewayControl.changed || item.useDHCPControl.changed))
                 {
-                    if (item.ipAddressControl.acceptableInput)
+                    var selectedCount = rtuContext.selection.count;
+                    var isSingleSelection = (selectedCount == 1);
+                    var ipAddressChangeAdded = false;
+
+                    if (item.ipAddressControl.acceptableInput
+                        && (!item.lastIpContol.visible || item.lastIpContol.valid))   /// for ranges
                     {
-                        rtuContext.changesManager().addAddressChange(name, item.ipAddressControl.text);
+                        rtuContext.changesManager().changeset().addAddressChange(name, item.ipAddressControl.text);
+                        ipAddressChangeAdded = true;
                     }
-                    else
+                    else if (isSingleSelection   /// for single selection empty or wrong ip is not correct anyway
+
+                        /// If there are no non-assigned addresses and current ip control value is empty
+                        /// - we use old addresses (does not change ips)
+                        || (!item.ipAddressControl.isEmptyAddress && (rtuContext.selection.hasEmptyIps || !item.lastIpContol.valid)))
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(name);
+                        if (isSingleSelection)
+                            errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(interfaceCaption);
+                        else
+                            errorDialog.message = errorTemplateServeral.arg(qsTr("range of addresses"));
+
                         errorDialog.show();
             
-                        item.ipAddressControl.focus = true;
+                        item.ipAddressControl.forceActiveFocus();
                         return false;
                     }
 
-                    if (item.subnetMaskControl.acceptableInput)
+                    var maskText = item.subnetMaskControl.text;
+                    var validMask = rtuContext.isValidSubnetMask(maskText);
+
+                    /// we have to check if start and finish addresses from the range are in the the same subnet
+                    var maskValidWidth = isSingleSelection || item.ipAddressControl.isEmptyAddress
+                        || (validMask && item.ipAddressControl.changed&& rtuContext.isDiscoverableFromNetwork(
+                             item.ipAddressControl.text, item.subnetMaskControl.text, item.lastIpContol.text, item.subnetMaskControl.text));
+
+                    if (item.subnetMaskControl.acceptableInput && validMask && maskValidWidth)
                     {
-                        rtuContext.changesManager().addMaskChange(name, item.subnetMaskControl.text);
+                        rtuContext.changesManager().changeset().addMaskChange(name, item.subnetMaskControl.text);
                     }
                     else
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(name);
+                        if (!validMask)
+                        {
+                            if (isSingleSelection)
+                                errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(interfaceCaption);
+                            else
+                                errorDialog.message = errorTemplateServeral.arg(qsTr("mask"));
+                        }
+                        else if (!maskValidWidth)
+                        {
+                            errorDialog.message = qsTr("Subnet mask is too narrow. Servers are going to be in different subnets. Can't apply changes");
+                        }
                         errorDialog.show();
                         
-                        item.subnetMaskControl.focus = true;
+                        item.subnetMaskControl.forceActiveFocus();
                         return false;
                     }
+
+                    var startIpDiscoverable = rtuContext.isDiscoverableFromCurrentNetwork(
+                        item.ipAddressControl.text, item.subnetMaskControl.text);
+                    var lastIpDiscoverable = (isSingleSelection || item.lastIpContol.valid && rtuContext.isDiscoverableFromCurrentNetwork(
+                        item.lastIpContol.text, item.subnetMaskControl.text));
+
+                    var showDiffSubnetWarning = (!startIpDiscoverable || !lastIpDiscoverable);
+
+                    if (ipAddressChangeAdded && showDiffSubnetWarning)
+                    {
+                        if (isSingleSelection)
+                            warnings.push(("The IP address of \"%1\" is about to be assigned is in a different subnet. The unit will be unreachable after the changes are made. Proceed?").arg(interfaceCaption));
+                        else
+                            warnings.push("Some of IP address are about to be assigned is in a different subnet. The units will be unreachable after the changes are made. Proceed?");
+                    }
+
+                    var gatewayDiscoverableFromStartIp = rtuContext.isDiscoverableFromNetwork(
+                        item.ipAddressControl.text, item.subnetMaskControl.text
+                        , item.gatewayControl.text, item.subnetMaskControl.text);
+                    var gatewayDiscoverableFromLastIp = (isSingleSelection || rtuContext.isDiscoverableFromNetwork(
+                        item.lastIpContol.text, item.subnetMaskControl.text
+                        , item.gatewayControl.text, item.subnetMaskControl.text));
+
+                    var gatewayDiscoverable = (gatewayDiscoverableFromStartIp && gatewayDiscoverableFromLastIp);
+                    if (!wrongGateway && !item.gatewayControl.isEmptyAddress && !gatewayDiscoverable
+                        && (isSingleSelection || !item.ipAddressControl.isEmptyAddress))
+                    {
+                        if (isSingleSelection)
+                        {
+                            errorDialog.message = ("Default gateway for \"%1\" is not in the same network as IP. Can't apply changes.")
+                                .arg(interfaceCaption);
+                        }
+                        else
+                            errorDialog.message = ("Default gateway is not in the same network as IPs. Can't apply changes.")
+
+                        errorDialog.show();
+
+                        if (item.ipAddressControl.changed)
+                            item.ipAddressControl.forceActiveFocus();
+                        else
+                            item.gatewayControl.forceActiveFocus();
+
+                        return false;
+                    }
+
+                    if (item.gatewayControl.changed)
+                    {
+                        if (wrongGateway)
+                        {
+                            if (isSingleSelection)
+                                errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(interfaceCaption);
+                            else
+                                errorDialog.message = errorTemplateServeral.arg(qsTr("gateway"));
+
+                            errorDialog.show();
+
+                            item.gatewayControl.forceActiveFocus();
+                            return false;
+                        }
+                        rtuContext.changesManager().changeset().addGatewayChange(name
+                            , (item.gatewayControl.isEmptyAddress ? "" : item.gatewayControl.text));
+                    }
+
+                    /// TODO: add multiplse address processing
                 }
                 
                 if (item.dnsControl.changed)
                 {
-                    if (item.dnsControl.text.trim().length && !item.dnsControl.acceptableInput)
+                    if (!item.dnsControl.isEmptyAddress && !item.dnsControl.acceptableInput)
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(name);
+                        if (isSingleSelection)
+                            errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(interfaceCaption);
+                        else
+                            errorDialog.message = errorTemplateServeral.arg(qsTr("dns"));
+
                         errorDialog.show();
                         
-                        item.dnsControl.focus = true;
+                        item.dnsControl.forceActiveFocus();
                         return false;
                     }
-                    rtuContext.changesManager().addDNSChange(name, item.dnsControl.text);
+
+                    rtuContext.changesManager().changeset().addDNSChange(name
+                        , (item.dnsControl.isEmptyAddress ? "" : item.dnsControl.text));
                 }
 
-                if (item.gatewayControl.changed)
+                if (item.useDHCPControl.changed)
                 {
-                    if (item.gatewayControl.text.trim().length && !item.gatewayControl.acceptableInput)
-                    {
-                        errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(name);
-                        errorDialog.show();
-                        
-                        item.gatewayControl.focus = true;
-                        return false;
-                    }
-                    rtuContext.changesManager().addGatewayChange(name, item.gatewayControl.text);
+                    var useDHCP = (useDHCPState === Qt.Checked);
+                    rtuContext.changesManager().changeset().addDHCPChange(name, useDHCP);
                 }
+
             }
             return true;
         }

@@ -12,7 +12,7 @@ class QnIOModuleMonitor: public QObject
 {
     Q_OBJECT
 public:
-    QnIOModuleMonitor(const QnSecurityCamResourcePtr camera);
+    QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera);
     bool open();
 signals:
     void connectionClosed();

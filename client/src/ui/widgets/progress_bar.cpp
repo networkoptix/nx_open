@@ -2,7 +2,7 @@
 
 #include <ui/style/noptix_style.h>
 
-QnProgressBar::QnProgressBar(QWidget *parent /*= 0*/):
+QnProgressBar::QnProgressBar(QWidget *parent /* = 0*/):
     base_type(parent)
 {
 
@@ -14,7 +14,7 @@ void QnProgressBar::initStyleOption(QnStyleOptionProgressBar *option) const {
 }
 
 void QnProgressBar::paintEvent(QPaintEvent *event) {
-    static_cast<void>(event);
+    Q_UNUSED(event);
 
     QStylePainter paint(this);
     QnStyleOptionProgressBar opt;

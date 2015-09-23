@@ -65,6 +65,14 @@ namespace nx_http
         return md5HashCalc.result().toHex();
     }
 
+    BufferType calcHa1(
+        const QString& userName,
+        const QString& realm,
+        const QString& userPassword )
+    {
+        return calcHa1( userName.toUtf8(), realm.toUtf8(), userPassword.toUtf8() );
+    }
+
     /*!
         \note HA2 in case of qop=auth-int is not supported
     */

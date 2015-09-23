@@ -2,8 +2,9 @@
 #include "ui_license_details_dialog.h"
 
 #include <licensing/license.h>
+#include <ui/style/warning_style.h>
 
-QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /*= NULL*/):
+QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /* = NULL*/):
     base_type(parent),
     ui(new Ui::LicenseDetailsDialog())
 {
@@ -14,7 +15,7 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWid
 
     ui->licenseTypeLabel->setText(license->displayName());
     ui->licenseKeyLabel->setText(QLatin1String(license->key()));
-    ui->licenseHwidLabel->setText(QLatin1String(license->hardwareId()));
+    ui->licenseHwidLabel->setText(license->hardwareId());
 
     auto addFeature = [this](const QString &text, int count) {
         QLabel* valueLabel = new QLabel(this);
@@ -28,6 +29,9 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWid
     } else {
         addFeature(tr("Archive Streams Allowed:"), license->cameraCount());
     }
+
+    setWarningStyle(ui->errorLabel);
+    ui->errorLabel->setVisible(license->type() == Qn::LC_Invalid);
 
     QString licenseText = licenseDescription(license);
 
@@ -53,7 +57,7 @@ QString QnLicenseDetailsDialog::licenseDescription(const QnLicensePtr &license) 
     result << tr("Generic:");
     addStringValue(tr("License Type"), license->displayName());
     addStringValue(tr("License Key"), QString::fromUtf8(license->key()));
-    addStringValue(tr("Locked to Hardware ID"), QString::fromUtf8(license->hardwareId()));
+    addStringValue(tr("Locked to Hardware ID"), license->hardwareId());
     result << QString(); //spacer
     result << tr("Features:");
     if (license->type() == Qn::LC_VideoWall) {

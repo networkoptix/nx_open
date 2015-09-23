@@ -376,7 +376,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
-            tr("Could not get position from camera"),
+            tr("Could not get position from camera."),
             tr("An error has occurred while trying to get current position from camera %1.").arg(m_resource->getName()) + L'\n' 
           + tr("Please wait for the camera to go online.")
             );
@@ -398,7 +398,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
-            tr("Could not set position for camera"),
+            tr("Could not set position for camera."),
             tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
           + tr("Please wait for the camera to go online.")
             );
@@ -439,7 +439,7 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             this,
-            tr("Could not set position for camera"),
+            tr("Could not set position for camera."),
             tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
           + tr("Please wait for the camera to go online.")
             );
@@ -494,7 +494,7 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
             if (!ignorePresetIsInUse) {
                 QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
                     this,
-                    tr("Remove preset"),
+                    tr("Remove Preset"),
                     tr("This preset is used in some tours.") + L'\n' 
                   + tr("These tours will become invalid if you remove it."),
                     tr("Do not show again."),
@@ -634,7 +634,7 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     m_resource = resource;
     m_adaptor->setResource(resource);
 
-    setWindowTitle(tr("Manage PTZ for %1").arg(getResourceName(m_resource)));
+    setWindowTitle(tr("Manage PTZ for %1.").arg(getResourceName(m_resource)));
 }
 
 bool QnPtzManageDialog::isModified() const {
@@ -677,7 +677,7 @@ bool QnPtzManageDialog::tryClose(bool force) {
     return askToSaveChanges();
 }
 
-bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /*= true*/) {
+bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /* = true*/) {
 
     QMessageBox::StandardButtons allowedButtons = QnMessageBox::Yes | QnMessageBox::No;
     if (cancelIsAllowed)
@@ -686,8 +686,8 @@ bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /*= true*/) {
     QnMessageBox::StandardButton button = QnMessageBox::question(
         this, 
         0,
-        tr("PTZ configuration is not saved"),
-        tr("Changes are not saved. Do you want to save them?"),
+        tr("PTZ configuration has not been saved."),
+        tr("Changes have not been saved. Would you like to save them?"),
         allowedButtons, 
         QnMessageBox::Yes);
 

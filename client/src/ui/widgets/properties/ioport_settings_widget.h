@@ -9,7 +9,7 @@
 
 #include <utils/common/connective.h>
 
-class QnIOPortsActualModel;
+class QnIOPortsViewModel;
 
 namespace Ui {
     class QnIOPortSettingsWidget;
@@ -23,7 +23,6 @@ public:
     QnIOPortSettingsWidget(QWidget* parent = 0);
     virtual ~QnIOPortSettingsWidget();
 
-    const QnVirtualCameraResourcePtr &camera() const;
     void updateFromResource(const QnVirtualCameraResourcePtr &camera);
     void submitToResource(const QnVirtualCameraResourcePtr &camera);
 signals:
@@ -32,7 +31,7 @@ private:
     void updateHeaderWidth();
 private:
     QScopedPointer<Ui::QnIOPortSettingsWidget> ui;
-    QnIOPortsActualModel* m_model;
+    QnIOPortsViewModel* m_model;
 };
 
 #endif // QN_IOPORT_SETTINGS_WIDGET_H

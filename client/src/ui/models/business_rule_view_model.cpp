@@ -1,6 +1,7 @@
 #include "business_rule_view_model.h"
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -25,7 +26,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 #include "core/resource_management/resource_pool.h"
 
@@ -98,17 +99,6 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventTypesModel->appendRow(row);
     }
 
-    QList<QnBusiness::EventState> values;
-    values << QnBusiness::ActiveState << QnBusiness::InactiveState;
-    foreach (QnBusiness::EventState val, values) {
-        QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventStatesModel->appendRow(row);
-    }
-
     for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
         item->setData(actionType);
@@ -119,6 +109,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_actionTypesModel->appendRow(row);
     }
     updateActionTypesModel();
+    updateEventStateModel();
 }
 
 QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
@@ -292,7 +283,10 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) {
     m_id = businessRule->id();
     m_modified = false;
-    m_eventType = businessRule->eventType();
+    if (m_eventType != businessRule->eventType()) {
+        m_eventType = businessRule->eventType();
+        updateEventStateModel();
+    }
 
     m_eventResources = businessRule->eventResources();
 
@@ -397,6 +391,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
     }
 
     updateActionTypesModel();
+    updateEventStateModel();
 
     emit dataChanged(this, fields);
     //TODO: #GDM #Business check others, params and resources should be merged
@@ -616,9 +611,7 @@ QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) 
     case QnBusiness::ModifiedColumn:
         return (m_modified ? QLatin1String("*") : QString());
     case QnBusiness::EventColumn:
-        return eventTypeString(m_eventType,
-                               m_eventState,
-                               m_actionType);
+        return QnBusinessStringsHelper::eventTypeString(m_eventType, m_eventState, m_actionType);
     case QnBusiness::SourceColumn:
         return getSourceText(detailed);
     case QnBusiness::SpacerColumn:
@@ -795,6 +788,19 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
     return true;
 }
 
+void QnBusinessRuleViewModel::updateEventStateModel()
+{
+    m_eventStatesModel->clear();
+    foreach (QnBusiness::EventState val, QnBusiness::allowedEventStates(m_eventType)) {
+        QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
+        item->setData(val);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_eventStatesModel->appendRow(row);
+    }
+};
+
 void QnBusinessRuleViewModel::updateActionTypesModel() {
     QModelIndexList prolongedActions = m_actionTypesModel->match(m_actionTypesModel->index(0,0),
                                                                  ProlongedActionRole, true, -1, Qt::MatchExactly);
@@ -819,15 +825,16 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
     } else if (resources.size() == 1) {
         return getResourceName(resources.first());
     } else if (QnBusiness::requiresServerResource(m_eventType)){
-        if (resources.size() == 0)
+        if (resources.isEmpty())
             return tr("<Any Server>");
         else
             return tr("%n Server(s)", "", resources.size());
     } else /*if (QnBusiness::requiresCameraResource(eventType))*/ {
-        if (resources.size() == 0)
-            return tr("<Any Camera>");
+        QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+        if (cameras.isEmpty())
+            return tr("<Any %1>").arg(getDefaultDeviceNameUpper());
         else
-            return tr("%n Camera(s)", "", resources.size());
+            return getNumericDevicesName(cameras);
     }
 }
 
@@ -850,9 +857,9 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::ShowPopupAction:
     {
         if (m_actionParams.userGroup == QnBusiness::AdminOnly)
-            return tr("Administrators only");
+            return tr("Administrators Only");
         else
-            return tr("All users");
+            return tr("All Users");
     }
     case QnBusiness::CameraRecordingAction:
     {
@@ -868,7 +875,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         QString filename = m_actionParams.soundUrl;
         if (filename.isEmpty())
-            return tr("Select a sound");
+            return tr("Select Sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
     }
@@ -876,7 +883,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         QString text = m_actionParams.sayText;
         if (text.isEmpty())
-            return tr("Enter text");
+            return tr("Enter Text");
         return text;
     }
     default:
@@ -884,17 +891,17 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
 
     //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-    if (!QnBusiness::requiresCameraResource(m_actionType)) {
+    if (!QnBusiness::requiresCameraResource(m_actionType)) 
         return tr("<System>");
-    } else if (resources.size() == 1) {
-        QnResourcePtr resource = resources.first();
-        return getResourceName(resource);
-    } else if (resources.isEmpty()) {
-        return tr("Select at least one camera");
-    } else {
-        return tr("%n Camera(s)", "", resources.size());
-    }
 
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.size() == 1) 
+        return getResourceName(cameras.first());
+    
+    if (cameras.isEmpty())
+        return tr("Select at least one %1").arg(getDefaultDeviceNameLower());
+    
+    return getNumericDevicesName(cameras);  
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const {
@@ -928,27 +935,7 @@ QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState
     case QnBusiness::ActiveState:
         return tr("Starts");
     case QnBusiness::UndefinedState:
-        return tr("Starts/Stops");
+        return tr("Occures");
     }
     return QString();
-}
-
-QString QnBusinessRuleViewModel::toggleStateToString(QnBusiness::EventState state) {
-    switch (state) {
-    case QnBusiness::ActiveState:
-        return tr("start");
-    case QnBusiness::InactiveState:
-        return tr("stop");
-    default:
-        break;
-    }
-    return QString();
-}
-
-QString QnBusinessRuleViewModel::eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType) {
-    QString typeStr = QnBusinessStringsHelper::eventName(eventType);
-    if (QnBusiness::hasToggleState(actionType))
-        return tr("While %1").arg(typeStr);
-    else
-        return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
 }

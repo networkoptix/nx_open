@@ -302,7 +302,7 @@ public:
     virtual ~DeviceSoapWrapper();
 
     //Input: normalized manufacturer
-    bool fetchLoginPassword(const QString& manufacturer);
+    bool fetchLoginPassword(const QString& manufacturer, const QString& model);
 
     int getServiceCapabilities( _onvifDevice__GetServiceCapabilities& request, _onvifDevice__GetServiceCapabilitiesResponse& response );
     int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
@@ -323,6 +323,7 @@ public:
 private:
     DeviceSoapWrapper();
     DeviceSoapWrapper(const DeviceSoapWrapper&);
+    QAuthenticator getDefaultPassword(const QString& manufacturer, const QString& model) const;
     void calcTimeDrift();
 
     PasswordHelper &m_passwordsData;

@@ -18,4 +18,4 @@ bool QnBusinessActionParameters::isDefault() const
     return (*this) == empty;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq), QnBusinessActionParameters_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record), QnBusinessActionParameters_Fields, (optional, true) )

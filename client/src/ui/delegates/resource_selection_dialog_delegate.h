@@ -8,6 +8,8 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/style/warning_style.h>
 
+class QnResourcePoolModelCustomColumnDelegate;
+
 class QnResourceSelectionDialogDelegate: public QObject {
     Q_OBJECT
 public:
@@ -29,7 +31,14 @@ public:
      */
     virtual bool validate(const QnResourceList &selectedResources);
 
-    virtual bool isValid(const QnResourcePtr &resource);
+    virtual bool isValid(const QnResourcePtr &resource) const;
+
+    /**
+     * @brief isFlat                Check if the delegate frame should ne attached to resources list seamlessly;
+     */
+    virtual bool isFlat() const;
+
+    virtual QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
 };
 
 template<typename CheckingPolicy>
@@ -64,7 +73,7 @@ public:
         return true;
     }
 
-    bool isValid(const QnResourcePtr &resource) override {
+    bool isValid(const QnResourcePtr &resource) const override {
         QnSharedResourcePointer<ResourceType> derived = resource.dynamicCast<ResourceType>();
 
         // return true for resources of other type - so root elements will not be highlighted

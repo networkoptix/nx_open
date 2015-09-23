@@ -52,6 +52,8 @@ public:
 
     // sets certain track
     virtual bool setAudioChannel(unsigned int num);
+
+    /** Is not used and not implemented. */
     virtual bool isNegativeSpeedSupported() const = 0;
 
     void setCycleMode(bool value);

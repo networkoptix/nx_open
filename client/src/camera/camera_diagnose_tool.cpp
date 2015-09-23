@@ -24,15 +24,14 @@ namespace CameraDiagnostics
         m_step( Step::mediaServerAvailability ),
         m_result( false )
     {
-        QnVirtualCameraResourcePtr camera = qnResPool->getResourceById( cameraID ).dynamicCast<QnVirtualCameraResource>();
-        if( !camera )
+        m_camera = qnResPool->getResourceById<QnVirtualCameraResource>( cameraID );
+        if( !m_camera )
             return;
 
-        QnMediaServerResourcePtr serverResource = camera->getParentServer();
-        if( !serverResource )
+        m_server = m_camera->getParentServer();
+        if( !m_server )
             return;
-        m_serverConnection = serverResource->apiConnection();
-        m_serverHostAddress = QUrl(serverResource->getApiUrl()).host();
+        m_serverHostAddress = QUrl(m_server->getApiUrl()).host();
     }
 
     DiagnoseTool::~DiagnoseTool()
@@ -89,11 +88,12 @@ namespace CameraDiagnostics
         }
 
         m_result = true;
-        m_errorMessage = ErrorCode::toString(ErrorCode::noError, QList<QString>());
+        m_errorMessage = ErrorCode::toString(ErrorCode::noError, m_camera, QList<QString>());
+
         emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
 
         emit diagnosticsStepStarted( static_cast<Step::Value>(m_step+1) );
-        if( m_serverConnection->doCameraDiagnosticsStepAsync(
+        if( m_server->apiConnection()->doCameraDiagnosticsStepAsync(
                 m_cameraID,
                 static_cast<Step::Value>(m_step+1),
                 this,
@@ -140,7 +140,7 @@ namespace CameraDiagnostics
         }
 
         m_result = reply.errorCode == ErrorCode::noError;
-        m_errorMessage = ErrorCode::toString(reply.errorCode, reply.errorParams);
+        m_errorMessage = ErrorCode::toString(reply.errorCode, m_camera, reply.errorParams);
         emit diagnosticsStepResult( static_cast<Step::Value>(reply.performedStep), m_result, m_errorMessage );
 
         const Step::Value nextStep = static_cast<Step::Value>(reply.performedStep+1);
@@ -155,7 +155,7 @@ namespace CameraDiagnostics
         m_step = nextStep;
         emit diagnosticsStepStarted( m_step );
 
-        if( m_serverConnection->doCameraDiagnosticsStepAsync(
+        if( m_server->apiConnection()->doCameraDiagnosticsStepAsync(
                 m_cameraID,
                 m_step,
                 this,
@@ -174,8 +174,8 @@ namespace CameraDiagnostics
     {
         emit diagnosticsStepStarted( m_step );
 
-        if( !m_serverConnection ||
-            m_serverConnection->getSystemNameAsync(
+        if( !m_server || !m_server->apiConnection() ||
+            m_server->apiConnection()->getSystemNameAsync(
                 this,
                 SLOT(onGetServerSystemNameResponse(int, QString, int)) ) == -1 )
         {

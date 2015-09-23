@@ -31,6 +31,8 @@ namespace {
             return QnMergeSystemsTool::AuthentificationError;
         else if (str == lit("BACKUP_ERROR"))
             return QnMergeSystemsTool::BackupError;
+        else if (str == lit("STARTER_LICENSE_ERROR"))
+            return QnMergeSystemsTool::StarterLicenseError;
         else
             return QnMergeSystemsTool::InternalError;
     }
@@ -85,9 +87,9 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 
     ErrorCode errorCode = (status == 0) ? errorStringToErrorCode(errorString) : InternalError;
 
-    if (errorCode == NoError) {
+    if (errorCode == NoError || errorCode == StarterLicenseError) {
         m_serverByRequestHandle.clear();
-        emit systemFound(moduleInformation, server, NoError);
+        emit systemFound(moduleInformation, server, errorCode);
         return;
     }
 
@@ -112,8 +114,11 @@ void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInfor
     m_password.clear();
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
-    if (status != 0)
-        emit mergeFinished(InternalError, moduleInformation, handle);
-    else
-        emit mergeFinished(errorStringToErrorCode(errorString), moduleInformation, handle);
+    QnMergeSystemsTool::ErrorCode errCode = InternalError;
+    if (status == QNetworkReply::ContentOperationNotPermittedError)
+        errCode = ForbiddenError;
+    else if (status == 0)
+        errCode = errorStringToErrorCode(errorString);
+
+    emit mergeFinished(errCode, moduleInformation, handle);
 }

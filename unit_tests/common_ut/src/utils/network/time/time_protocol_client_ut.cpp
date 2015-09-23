@@ -14,18 +14,17 @@
 #include <utils/network/time/time_protocol_client.h>
 
 
-static const char* NIST_RFC868_SERVER = "time.nist.gov";
-static const char* UCLA_RFC868_SERVER = "time1.ucla.edu";
+static const char* RFC868_SERVERS[] = { "time.nist.gov", "time.ien.it"/*, "time1.ucla.edu"*/ };
 
+#if 0
 TEST( InternetTimeFetcher, genericTest )
 {
     std::unique_ptr<MultipleInternetTimeFetcher> timeFetcher;
     timeFetcher.reset( new MultipleInternetTimeFetcher() );
 
-    timeFetcher->addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher>(
-        new TimeProtocolClient(QLatin1String(NIST_RFC868_SERVER))) );
-    timeFetcher->addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher>(
-        new TimeProtocolClient(QLatin1String(UCLA_RFC868_SERVER))) );
+    for (const char* timeServer : RFC868_SERVERS)
+        timeFetcher->addTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher>(
+            new TimeProtocolClient(QLatin1String(timeServer))));
 
     std::condition_variable condVar;
     std::mutex mutex;
@@ -62,3 +61,4 @@ TEST( InternetTimeFetcher, genericTest )
         ASSERT_TRUE( abs(ts - minTimestamp) < (et.elapsed() * 2) );
     }
 }
+#endif

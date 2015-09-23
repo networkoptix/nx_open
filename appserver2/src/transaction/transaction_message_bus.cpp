@@ -215,6 +215,7 @@ static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
         if( tranFormat == Qn::UbjsonFormat )
         {
             QnAbstractTransaction transaction;
+            transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
             QnUbjsonReader<QByteArray> stream(&serializedTransaction);
             if (!QnUbjson::deserialize(&stream, &transaction)) {
                 qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
@@ -231,6 +232,7 @@ static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
         else if( tranFormat == Qn::JsonFormat )
         {
             QnAbstractTransaction transaction;
+            transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
             QJsonObject tranObject;
             //TODO #ak take tranObject from cache
             if( !QJson::deserialize(serializedTransaction, &tranObject) )
@@ -1172,7 +1174,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         const SocketAddress& addr1 = getUrlAddr(url);
         for (int i = 0; i < m_connectingConnections.size(); ++i)
         {
-            const SocketAddress& addr2 = getUrlAddr(m_connectingConnections[i]->remoteAddr());
+            const SocketAddress& addr2 = m_connectingConnections[i]->remoteSocketAddr();
             if (addr2 == addr1)
                 return true;
         }
@@ -1418,7 +1420,8 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         const ApiPeerData& remotePeer,
         qint64 remoteSystemIdentityTime,
         const nx_http::Request& request,
-        const QByteArray& contentEncoding )
+        const QByteArray& contentEncoding,
+        std::function<void ()> ttFinishCallback )
     {
         if (!dbManager)
         {
@@ -1438,6 +1441,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             request,
             contentEncoding );
         transport->setRemoteIdentityTime(remoteSystemIdentityTime);
+        transport->setBeforeDestroyCallback(ttFinishCallback);
         connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
         connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
         connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
@@ -1445,15 +1449,30 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         QnMutexLocker lock(&m_mutex);
         transport->moveToThread(thread());
         m_connectingConnections << transport;
-        transport->setState(QnTransactionTransport::Connected);
         Q_ASSERT(!m_connections.contains(remotePeer.id));
+    }
+
+    bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& connectionGuid)
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        for(auto connection: m_connectingConnections)
+        {
+            if(connection->connectionGuid() == connectionGuid)
+            {
+                connection->setState(QnTransactionTransport::Connected);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
-        const QSharedPointer<AbstractStreamSocket>& socket,
-    const ApiPeerData &/*remotePeer*/,
-    qint64 /*remoteSystemIdentityTime*/,
+    QSharedPointer<AbstractStreamSocket> socket,
+        const ApiPeerData &/*remotePeer*/,
+        qint64 /*remoteSystemIdentityTime*/,
         const nx_http::Request& request,
         const QByteArray& requestBuf )
     {
@@ -1472,7 +1491,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             if( transport->connectionGuid() == connectionGuid )
             {
                 transport->setIncomingTransactionChannelSocket(
-                    socket,
+                std::move(socket),
                     request,
                     requestBuf );
                 return;
@@ -1541,7 +1560,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         const SocketAddress& urlStr = getUrlAddr(url);
         for(QnTransactionTransport* transport: m_connections.values())
         {
-            if (getUrlAddr(transport->remoteAddr()) == urlStr) {
+            if (transport->remoteSocketAddr() == urlStr) {
                 qWarning() << "Disconnected from peer" << url;
                 transport->setState(QnTransactionTransport::Error);
             }
@@ -1559,6 +1578,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             info.remotePeerId = transport->remotePeer().id;
             connections.append(info);
         };
+
 
         QnMutexLocker lock(&m_mutex);
 

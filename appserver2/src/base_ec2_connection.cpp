@@ -55,6 +55,8 @@ namespace ec2
                 m_updatesManager.get(),
                 m_miscManager.get(),
                 m_discoveryManager.get() ) );
+
+        m_auditManager.reset(new ECConnectionAuditManager(this));
     }
 
     template<class T>

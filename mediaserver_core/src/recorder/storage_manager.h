@@ -84,6 +84,7 @@ public:
     QnStorageResourceList getStoragesInLexicalOrder() const;
 
     void clearSpace();
+    void removeEmptyDirs(const QnStorageResourcePtr &storage);
     
     void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
     void clearMaxDaysData();
@@ -95,6 +96,7 @@ public:
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
     bool isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs);
+    bool isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period);
     void stopAsyncTasks();
 
     QnStorageScanData rebuildCatalogAsync();
@@ -174,6 +176,7 @@ private:
     mutable QnMutex m_mutexCatalog;
     mutable QnMutex m_mutexRebuild;
     mutable QnMutex m_rebuildStateMtx;
+    mutable QnMutex m_localPatches;
 
     QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storagesStatisticsReady;
@@ -203,6 +206,7 @@ private:
     mutable QnMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
+    QElapsedTimer m_removeEmtyDirTimer;
 };
 
 #define qnStorageMan QnStorageManager::instance()

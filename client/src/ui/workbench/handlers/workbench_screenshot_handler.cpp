@@ -396,11 +396,11 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     dialog->setAcceptMode(QFileDialog::AcceptSave);
 
     QComboBox* comboBox = new QComboBox(dialog.data());
-    comboBox->addItem(tr("No timestamp"), static_cast<int>(Qn::NoCorner));
-    comboBox->addItem(tr("Top left corner"), static_cast<int>(Qn::TopLeftCorner));
-    comboBox->addItem(tr("Top right corner"), static_cast<int>(Qn::TopRightCorner));
-    comboBox->addItem(tr("Bottom left corner"), static_cast<int>(Qn::BottomLeftCorner));
-    comboBox->addItem(tr("Bottom right corner"), static_cast<int>(Qn::BottomRightCorner));
+    comboBox->addItem(tr("No Timestamp"), static_cast<int>(Qn::NoCorner));
+    comboBox->addItem(tr("Top Left Corner"), static_cast<int>(Qn::TopLeftCorner));
+    comboBox->addItem(tr("Top Right Corner"), static_cast<int>(Qn::TopRightCorner));
+    comboBox->addItem(tr("Bottom Left Corner"), static_cast<int>(Qn::BottomLeftCorner));
+    comboBox->addItem(tr("Bottom Right Corner"), static_cast<int>(Qn::BottomRightCorner));
     comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
     dialog->addWidget(tr("Timestamp:"), comboBox);
@@ -447,7 +447,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
                 mainWindow(),
-                tr("Could not overwrite file"),
+                tr("Could not overwrite file."),
                 tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
                 QMessageBox::Ok
                 );
@@ -515,8 +515,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
         QMessageBox::critical(
             mainWindow(),
-            tr("Could not save screenshot"),
-            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
+            tr("Could not save screenshot."),
+            tr("An error occured while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
         );
         return;
     }

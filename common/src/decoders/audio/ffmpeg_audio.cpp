@@ -31,7 +31,7 @@ AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& 
         return AV_SAMPLE_FMT_NONE;
 }
 
-//================================================
+// ================================================
 
 CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
     c(0),

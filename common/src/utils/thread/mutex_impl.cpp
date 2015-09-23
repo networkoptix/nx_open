@@ -48,6 +48,10 @@ void QnMutexImpl::afterMutexLocked(
     //recursive mutex can be locked multiple times, that's why we need stack
     MutexLockAnalyzer::instance()->afterMutexLocked( lockKey );
     currentLockStack.push( std::move(lockKey) );
+#else
+    Q_UNUSED( sourceFile );
+    Q_UNUSED( sourceLine );
+    Q_UNUSED( lockID );
 #endif
 }
 

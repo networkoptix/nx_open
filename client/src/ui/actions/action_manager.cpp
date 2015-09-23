@@ -8,6 +8,7 @@
 
 #include "action.h"
 #include "action_factories.h"
+#include "action_text_factories.h"
 #include "action_conditions.h"
 #include "action_target_provider.h"
 #include "action_parameter_types.h"
@@ -17,6 +18,7 @@
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
@@ -147,6 +149,11 @@ public:
         m_action->setText(text);
         m_action->setNormalText(text);
 
+        return *this;
+    }
+
+    QnActionBuilder dynamicText(QnActionTextFactory* factory) {
+        m_action->setTextFactory(factory);
         return *this;
     }
 
@@ -409,7 +416,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::DropResourcesIntoNewLayoutAction).
         flags(Qn::ResourceTarget | Qn::WidgetTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::SingleTarget | Qn::MultiTarget).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Drop Resources into a New Layout"));
+        text(tr("Drop Resources into New Layout"));
 
     factory(Qn::DelayedOpenVideoWallItemAction).
         flags(Qn::NoTarget).
@@ -428,7 +435,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MoveCameraAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
         requiredPermissions(Qn::RemovePermission).
-        text(tr("Move Cameras")).
+        //: "Move Cameras" or "Move Devices"
+        text(tr("Move %1").arg(getDefaultDevicesName())).
         condition(hasFlags(Qn::network));
 
     factory(Qn::NextLayoutAction).
@@ -491,7 +499,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraDiagnosticsAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::ResourceTarget | Qn::SingleTarget).
-        text(tr("Check Camera Issues...")).
+        //: "Cameras Diagnostics" or "Devices Diagnostics..."
+        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 Diagnostics..."), this)).
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
     factory(Qn::OpenBusinessLogAction).
@@ -504,9 +513,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
+        mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules..."));
+
+    factory(Qn::OpenFailoverPriorityAction).
+        mode(QnActionTypes::DesktopMode).
+        flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Failover Priority..."));
 
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
@@ -527,7 +543,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SelectTimeServerAction).
         flags(Qn::NoTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Select time server"));
+        text(tr("Select Time Server"));
 
     factory(Qn::PtzActivatePresetAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
@@ -543,7 +559,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::PtzActivateObjectAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
-        text(tr("Activate PTZ object")).
+        text(tr("Activate PTZ Object")).
         requiredPermissions(Qn::WritePtzPermission);
 
     /* Context menu actions. */
@@ -805,7 +821,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::WebClientAction).
-        flags(Qn::Tree | Qn::NoTarget).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
         text(tr("Open Web Client...")).
         autoRepeat(false).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
@@ -816,12 +832,23 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Update...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
 
+    factory(Qn::UserManagementAction).
+        flags(Qn::Main | Qn::Tree).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
+        text(tr("User Management...")).
+        condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
+
     factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
         text(tr("Local Settings...")).
         //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false);
+
+    factory(Qn::OpenAuditLogAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Audit Trail..."));
 
     factory().
         flags(Qn::Main).
@@ -846,7 +873,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Camera List...")).
+        //: "Cameras List" or "Devices List"
+        text(tr("%1 List...").arg(getDefaultDevicesName())).
         shortcut(tr("Ctrl+M")).
         autoRepeat(false);
 
@@ -916,12 +944,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open")).
         conditionalText(tr("Monitor"), hasFlags(Qn::server), Qn::All).
         condition(new QnOpenInCurrentLayoutActionCondition(this));
-
-    factory(Qn::OpenIOMonitorAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
-        text(tr("IO monitor")).
-        condition(new QnOpenIOMonitorActionCondition(this));
 
     factory(Qn::OpenInNewLayoutAction).
         mode(QnActionTypes::DesktopMode).
@@ -1329,7 +1351,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraIssuesAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Check Camera Issues...")).
+        dynamicText(new QnDevicesNameActionTextFactory(tr("Check %1 Issues..."), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
@@ -1339,7 +1361,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraBusinessRulesAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Camera Rules...")).
+        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 Rules..."), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::ExactlyOne, this),
@@ -1349,9 +1371,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraSettingsAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Camera Settings...")).
-        conditionalText(tr("IO Module Settings..."), hasFlags(Qn::io_module), Qn::All).
-        requiredPermissions(Qn::WritePermission).
+        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 Settings..."), this)).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
              new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
              new QnPreviewSearchModeCondition(true, this),
@@ -1380,11 +1401,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Open in Camera Settings Dialog"));
+        //: "Open in Cameras Settings Dialog..." or "Open in Devices Settings Dialog..."
+        dynamicText(new QnDevicesNameActionTextFactory(tr("Open in %1 Settings Dialog..."), this));
 
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Add Camera(s)...")).
+        text(tr("Add Device(s)...")).   //intentionally hardcode devices here
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
@@ -1393,21 +1415,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CameraListByServerAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Camera(s) List by Server...")).
+        //: "Cameras List by Server..." or "Devices List by Server..."
+        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 List by Server..."), this)).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
-
-    factory(Qn::RecordingStatisticsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Recording statistics...")).
-        condition(new QnConjunctionActionCondition(
-        new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
-        new QnEdgeServerCondition(false, this),
-        new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
-        this));
 
     factory(Qn::PingAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
@@ -1432,7 +1446,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
-        requiredPermissions(Qn::WritePermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditServersPermissions).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
@@ -1633,18 +1647,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Space")).
         text(tr("Play")).
         toggledText(tr("Pause")).
-        condition(new QnArchiveActionCondition(this));
-
-    factory(Qn::SpeedDownAction).
-        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl+-")).
-        text(tr("Speed Down")).
-        condition(new QnArchiveActionCondition(this));
-
-    factory(Qn::SpeedUpAction).
-        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl++")).
-        text(tr("Speed Up")).
         condition(new QnArchiveActionCondition(this));
 
     factory(Qn::PreviousFrameAction).
@@ -1982,6 +1984,9 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 
             if(menu)
                 connect(result, &QObject::destroyed, menu, &QObject::deleteLater);
+
+            if (action->textFactory())
+                replacedText = action->textFactory()->text(parameters);
 
             if (action->hasConditionalTexts())
                 replacedText = action->checkConditionalText(parameters);

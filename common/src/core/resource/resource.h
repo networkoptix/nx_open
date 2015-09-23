@@ -192,9 +192,21 @@ public:
 
     bool hasProperty(const QString &key) const;
     QString getProperty(const QString &key) const;
-    void setProperty(const QString &key, const QString &value, bool markDirty = true, bool replaceIfExists = true);
-    void setProperty(const QString &key, const QVariant& value, bool markDirty = true, bool replaceIfExists = true );
     ec2::ApiResourceParamDataList getProperties() const;
+
+    enum PropertyOptions
+    {
+        DEFAULT_OPTIONS     = 0,
+        NO_MARK_DIRTY       = 1 << 0,
+        NO_REPLACE_IF_EXIST = 1 << 1,
+        NO_ALLOW_EMPTY      = 1 << 2,
+    };
+
+    bool setProperty(const QString &key, const QString &value,
+                     PropertyOptions options = DEFAULT_OPTIONS);
+
+    bool setProperty(const QString &key, const QVariant& value,
+                     PropertyOptions options = DEFAULT_OPTIONS);
 
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
     void emitModificationSignals( const QSet<QByteArray>& modifiedFields );

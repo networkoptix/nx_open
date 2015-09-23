@@ -16,6 +16,7 @@ namespace ec2 {
 class CrashReporter
 {
 public:
+    CrashReporter();
     ~CrashReporter();
 
     /** Scans for local reports and sends them to the statistics server asynchronously
@@ -27,6 +28,10 @@ public:
     bool scanAndReport(QSettings* settings);
     void scanAndReportAsync(QSettings* settings);
 
+    /** Executes /fn scanAndReportAsync by timer. Useful to collect reports coming late.
+     */
+    void scanAndReportByTimer(QSettings* settings);
+
     /** Sends \param crash to \param serverApi asynchronously
      *  \note Might be used for debug purposes
      */
@@ -37,7 +42,9 @@ private:
 
     QnMutex m_mutex;
     QnConcurrent::QnFuture<bool> m_activeCollection;
-    std::set<nx_http::AsyncHttpClientPtr> m_activeHttpClients;
+    nx_http::AsyncHttpClientPtr m_activeHttpClient;
+    bool m_terminated;
+    boost::optional<qint64> m_timerId;
 };
 
 class ReportData : public QObject

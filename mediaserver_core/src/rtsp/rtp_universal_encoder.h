@@ -32,6 +32,7 @@ public:
 
     virtual bool isRtpHeaderExists() const override { return true; }
     bool isOpened() const;
+    void setUseRealTimeOptimization(bool value);
 private:
     QnByteArray m_outputBuffer;
     int m_outputPos;

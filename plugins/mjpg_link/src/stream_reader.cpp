@@ -54,7 +54,8 @@ StreamReader::StreamReader(
     m_streamType( none ),
     m_prevFrameClock( -1 ),
     m_frameDurationMSec( 0 ),
-    m_terminated( false )
+    m_terminated( false ),
+    m_isInGetNextData( 0 )
 {
     setFps( fps );
 
@@ -66,6 +67,7 @@ StreamReader::StreamReader(
 
 StreamReader::~StreamReader()
 {
+    assert( m_isInGetNextData == 0 );
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -100,6 +102,11 @@ static const unsigned int MAX_FRAME_DURATION_MS = 5000;
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
+    ++m_isInGetNextData;
+    auto SCOPED_GUARD_FUNC = [this]( StreamReader* ) { --m_isInGetNextData; };
+    const std::unique_ptr<StreamReader, decltype(SCOPED_GUARD_FUNC)>
+        SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
     bool httpClientHasBeenJustCreated = false;
     std::shared_ptr<nx_http::HttpClient> localHttpClientPtr;
     {

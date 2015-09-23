@@ -41,12 +41,12 @@ void QnThumbnailsArchiveDelegate::close()
     m_currentPos = AV_NOPTS_VALUE;
 }
 
-qint64 QnThumbnailsArchiveDelegate::startTime()
+qint64 QnThumbnailsArchiveDelegate::startTime() const
 {
     return m_rangeStart;
 }
 
-qint64 QnThumbnailsArchiveDelegate::endTime()
+qint64 QnThumbnailsArchiveDelegate::endTime() const
 {
     return m_rangeEnd;
 }

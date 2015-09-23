@@ -33,7 +33,7 @@ public:
      *                                  a child of some context-aware object,
      *                                  or of a context. Must not be NULL.
      */
-    QnWorkbenchContextAware(QObject *parent);
+    QnWorkbenchContextAware(QObject *parent, bool lazyInitialization = false);
 
     QnWorkbenchContextAware(QnWorkbenchContext *context);
 
@@ -54,7 +54,15 @@ public:
         return m_context;
     }
 
+    /** Delayed initialization call. */
+    void initializeContext(QObject *parent);
+
+    /** Delayed initialization call. */
+    void initializeContext(QnWorkbenchContext *context);
+
 protected:
+    virtual void afterContextInitialized();
+
     QAction *action(const Qn::ActionId id) const;
 
     QnActionManager *menu() const;
@@ -76,11 +84,12 @@ protected:
     QWidget *mainWindow() const;
 
 private:
-    void init(QObject *parent);
+    void init(QObject *parent, bool lazyInitialization = false);
     void init(QnWorkbenchContext *context);
 
 private:
     QnWorkbenchContext *m_context;
+    bool m_initialized;
 };
 
 

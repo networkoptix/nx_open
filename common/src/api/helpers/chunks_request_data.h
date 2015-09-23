@@ -23,4 +23,5 @@ struct QnChunksRequestData
     bool isLocal;
     Qn::SerializationFormat format;
     int limit;
+    bool flat;
 };

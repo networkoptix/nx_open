@@ -23,8 +23,8 @@ public:
     virtual bool open(const QnResourcePtr &resource);
     bool isOpened() const;
     virtual void close();
-    virtual qint64 startTime();
-    virtual qint64 endTime();
+    virtual qint64 startTime() const;
+    virtual qint64 endTime() const;
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;

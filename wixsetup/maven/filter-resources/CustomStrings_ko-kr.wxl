@@ -48,7 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">비밀번호 확인</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">세부항목 추가</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">카메라 최적화 설정 허용 (권장)</String>   
-    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send anonymous usage and crash statistics to software developers</String>   
+    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">개발자에 문제점 리포트</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Play with ${product.name}</String>
@@ -56,6 +56,10 @@
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">바로가기</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">바탕화면에 바로가기 생성</String>
+    
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">바로가기</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">바탕화면에 바로가기 생성</String>
     
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">최종 버젼의 [ProductName] 이 이미 설치 되어있습니다.</String> 
@@ -126,6 +130,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">설정을 종료하시면 ${product.name} 이 시작됩니다.</String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">설정을 종료하시면 ${nxtool.name} 이 시작됩니다.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">이 프로그램은 32비트 운영체재용입니다. 설치가 종료 됩니다.</String>
 
     <!-- SelectionWarningDlg -->

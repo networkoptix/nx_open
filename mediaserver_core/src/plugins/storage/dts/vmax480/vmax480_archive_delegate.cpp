@@ -111,12 +111,12 @@ void QnVMax480ArchiveDelegate::close()
     m_maxStream = 0;
 }
 
-qint64 QnVMax480ArchiveDelegate::startTime()
+qint64 QnVMax480ArchiveDelegate::startTime() const
 {
     return m_res->startTime();
 }
 
-qint64 QnVMax480ArchiveDelegate::endTime()
+qint64 QnVMax480ArchiveDelegate::endTime() const
 {
     return m_res->endTime();
 }

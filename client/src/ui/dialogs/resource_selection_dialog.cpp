@@ -9,6 +9,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -79,30 +80,45 @@ void QnResourceSelectionDialog::init() {
 
     setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
 
+    switch (m_target) {
+    case UserResourceTarget:
+        setWindowTitle(tr("Select Users..."));
+        ui->detailsWidget->hide();
+        resize(minimumSize());
+        break;
+    case CameraResourceTarget:
+        setWindowTitle(tr("Select %1...").arg(getDefaultDevicesName()));
+        break;
+    default:
+        setWindowTitle(tr("Select Resources..."));
+        ui->detailsWidget->hide();
+        resize(minimumSize());
+        break;
+    }
+
+    initModel();
+}
+
+
+void QnResourceSelectionDialog::initModel() {
+
     QnResourcePoolModel::Scope scope;
 
     switch (m_target) {
     case UserResourceTarget:
         scope = QnResourcePoolModel::UsersScope;
-        setWindowTitle(tr("Select users..."));
-        ui->detailsWidget->hide();
-        resize(minimumSize());
         break;
     case CameraResourceTarget:
         scope = QnResourcePoolModel::CamerasScope;
-        setWindowTitle(tr("Select cameras..."));
         break;
     default:
         scope = QnResourcePoolModel::FullScope;
-        setWindowTitle(tr("Select resources..."));
-        ui->detailsWidget->hide();
-        resize(minimumSize());
         break;
     }
+
     m_resourceModel = new QnResourcePoolModel(scope, this);
 
     connect(m_resourceModel, &QnResourcePoolModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
-
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
@@ -130,6 +146,7 @@ void QnResourceSelectionDialog::init() {
 }
 
 QnResourceSelectionDialog::~QnResourceSelectionDialog() {}
+
 
 QnResourceList QnResourceSelectionDialog::selectedResources() const {
     return selectedResourcesInner();
@@ -207,8 +224,12 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *d
         QnColoringProxyModel* proxy = new QnColoringProxyModel(m_delegate, this);
         proxy->setSourceModel(m_resourceModel);
         ui->resourcesWidget->setModel(proxy);
+        ui->resourcesWidget->setCustomColumnDelegate(m_delegate->customColumnDelegate());
     }
     ui->delegateFrame->setVisible(m_delegate && ui->delegateLayout->count() > 0);
+    if (m_delegate && m_delegate->isFlat())
+        ui->resourcesLayout->setSpacing(0);
+
     at_resourceModel_dataChanged();
 }
 
@@ -225,9 +246,12 @@ QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const {
 }
 
 void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
-    QVariant toolTip = index.data(Qt::ToolTipRole);
-    QString toolTipText = toolTip.convert(QVariant::String) ? toolTip.toString() : QString();
-    ui->detailsLabel->setText(toolTipText);
+    QModelIndex baseIndex = index.column() == Qn::NameColumn
+        ? index
+        : index.sibling(index.row(), Qn::NameColumn);
+        
+    QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
+    ui->detailsLabel->setText(toolTip);
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource && (resource->flags() & Qn::live_cam) && resource.dynamicCast<QnNetworkResource>()) {

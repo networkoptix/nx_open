@@ -29,7 +29,8 @@ void QnBusinessRulesActualModel::saveRule(int row) {
         return;
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
-    //using namespace std::placeholders;
+    
+    //TODO: #GDM SafeMode
     int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->save(
         rule, this, [this, rule]( int handle, ec2::ErrorCode errorCode ){ at_resources_saved( handle, errorCode, rule ); } );
     m_savingRules[handle] = ruleModel;

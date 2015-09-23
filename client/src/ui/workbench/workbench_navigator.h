@@ -82,6 +82,8 @@ public:
     Q_SLOT bool setPlaying(bool playing);
     bool isPlayingSupported() const;
 
+    bool hasVideo() const;
+
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
     qreal minimalSpeed() const;
@@ -137,8 +139,8 @@ protected:
 
     QnThumbnailsLoader *thumbnailLoader(const QnMediaResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoaderByWidget(QnMediaResourceWidget *widget);
-    void clearLoaderCache();
-protected slots:
+
+    protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader(bool keepInWindow = true);

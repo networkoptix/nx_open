@@ -25,13 +25,16 @@
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <!-- build:css styles/vendor.css -->
                 <!-- bower:css -->
-                <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css"/>
+                <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css" >
                 <!-- endbower -->
                 <!-- endbuild -->
+                </link> <!-- This is strange hack, I know -->
 
                 <!-- build:css({.tmp,app}) styles/main.css -->
-                <link rel="stylesheet" href="styles/main.css" />
+                <link rel="stylesheet" href="styles/main.css" >
                 <!-- endbuild -->
+
+                </link><!-- This is strange hack, I know -->
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
@@ -73,7 +76,7 @@
                                             <xsl:for-each select="functions/function">
                                                 <xsl:if test="not(@proprietary)">
                                                     <xsl:variable name="quotedName"
-                                                      select="translate(name, '/&lt;&gt;', '___')"/>
+                                                      select="translate(name, ' /&lt;&gt;', '____')"/>
                                                     <li>
                                                         <a href="#execAction">
                                                             <xsl:attribute name="href">#group_<xsl:value-of
@@ -109,7 +112,7 @@
                                     </div> <xsl:for-each select="functions/function">
                                         <xsl:if test="not(@proprietary)">
                                             <xsl:variable name="quotedName"
-                                                select="translate(name, '/&lt;&gt;', '___')"/>
+                                                select="translate(name, ' /&lt;&gt;', '____')"/>
                                             <div class="subgroup"
                                                 style="padding-top: 70px; margin-top: -70px;">
                                                 <xsl:attribute name="id">group_<xsl:value-of
@@ -137,7 +140,7 @@
 
 
                                                 </h4> <div class="well">
-                                                    <xsl:value-of select="description"/>
+                                                    <xsl:copy-of select="description"/>
                                                 </div> <dl>
                                                     <dt>Parameters</dt>
                                                     <dd>
@@ -159,7 +162,7 @@
                                                                                 <xsl:value-of select="name"/>
                                                                             </td>
                                                                             <td>
-                                                                                <xsl:value-of select="description"/>
+                                                                                <xsl:copy-of select="description"/>
                                                                             </td>
                                                                             <td>
                                                                                 <xsl:value-of select="optional"/>
@@ -174,7 +177,7 @@
                                                                   data-placement="right"
                                                                   data-trigger="hover focus click">
                                                                                                     <xsl:attribute name="title">
-                                                                                                        <xsl:value-of select="description"/>
+                                                                                                        <xsl:copy-of select="description"/>
                                                                                                     </xsl:attribute> (?) </a>
                                                                                             </li>
                                                                                         </xsl:for-each>
@@ -245,7 +248,7 @@
                                 <xsl:value-of select="name"/>
                             </td>
                             <td>
-                                <xsl:value-of select="description"/>
+                                <xsl:copy-of select="description"/>
                             </td>
                         </tr>
                     </xsl:for-each>

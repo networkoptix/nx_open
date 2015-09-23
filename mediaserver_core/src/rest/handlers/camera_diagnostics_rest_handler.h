@@ -11,8 +11,8 @@
 
 #include <rest/server/json_rest_handler.h>
 
+#include "camera/video_camera.h"
 
-class QnVideoCamera;
 
 class QnCameraDiagnosticsRestHandler: public QnJsonRestHandler {
     Q_OBJECT
@@ -20,7 +20,9 @@ public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
     CameraDiagnostics::Result checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes );
-    CameraDiagnostics::Result tryAcquireCameraMediaStream( const QnSecurityCamResourcePtr& cameraRes, QnVideoCamera* videoCamera );
+    CameraDiagnostics::Result tryAcquireCameraMediaStream(
+        const QnSecurityCamResourcePtr& cameraRes,
+        const QnVideoCameraPtr& videoCamera );
     CameraDiagnostics::Result checkCameraMediaStreamForErrors( const QnResourcePtr& res );
 };
 

@@ -19,12 +19,12 @@
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient privileges to manage services</source>
-        <translation>Insufficient rights to manage services.</translation>
+        <source>Insufficient rights to manage services.</source>
+        <translation></translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>UAC must be enabled to request privileges for non-admin users.</translation>
+        <source>UAC must be enabled to request privileges for non-admin users.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -86,8 +86,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>Media server will be stopped. Continue?</translation>
+        <source>Media server will be stopped. Continue?</source>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Quit</source>

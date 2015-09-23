@@ -84,7 +84,7 @@ StreamReader::StreamReader(
     m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC),
     m_epollFD(-1),
     m_motionData(nullptr),
-    m_ptsMapper(90000, &TimeSynchronizationData::instance()->timeSyncData, encoderNum),
+    m_ptsMapper(90000, PTS_BITS, &TimeSynchronizationData::instance()->timeSyncData, encoderNum),
     m_currentGopSizeBytes( 0 )
 #ifdef DEBUG_OUTPUT
     ,m_totalFramesRead(0)
@@ -170,9 +170,9 @@ void StreamReader::setMotionMask(const uint8_t* data)
 void StreamReader::setAudioEnabled( bool audioEnabled )
 {
 #ifndef NO_ISD_AUDIO
-    m_audioEnabled.store( audioEnabled, std::memory_order_relaxed );
-
     QMutexLocker lk( &m_mutex );
+
+    m_audioEnabled = audioEnabled;
 
     if( audioEnabled )
     {
@@ -198,7 +198,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;
 
 #ifndef NO_ISD_AUDIO
-    const bool audioEnabledLocal = m_audioEnabled.load( std::memory_order_relaxed );
+    const bool audioEnabledLocal = m_audioEnabled;
 #endif
 
     const size_t cameraStreamsToRead = 
