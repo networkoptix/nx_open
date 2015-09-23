@@ -54,7 +54,7 @@ namespace {
     const qint64 bytesInMiB = 1024 * 1024;
 
     static const int PC_SERVER_MAX_CAMERAS = 128;
-    static const int ARM_SERVER_MAX_CAMERAS = 8;
+    static const int ARM_SERVER_MAX_CAMERAS = 12;
     static const int EDGE_SERVER_MAX_CAMERAS = 1;
 
     const int ReservedSpaceRole = Qt::UserRole;
