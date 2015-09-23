@@ -59,7 +59,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="eventTypeComboBox"/>
+           <widget class="QComboBox" name="eventTypeComboBox">
+            <property name="maxVisibleItems">
+             <number>11</number>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QComboBox" name="eventStatesComboBox">
