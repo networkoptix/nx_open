@@ -43,4 +43,7 @@ ios {
         ${basedir}/src/ui/window_utils_ios.mm
     QMAKE_LFLAGS += \
         ${ios.oslibs}
+
+    ios_icon.files = $$files(${basedir}/${arch}/ios/images/icon*.png)
+    QMAKE_BUNDLE_DATA += ios_icon
 }
