@@ -582,11 +582,6 @@ namespace Qn {
         LayoutSettingsAction,
 
         /**
-         * Opens provided resources in an existing camera settings dialog.
-         */
-        OpenInCameraSettingsDialogAction,
-
-        /**
          * Opens server settings dialog.
          */
         ServerSettingsAction,

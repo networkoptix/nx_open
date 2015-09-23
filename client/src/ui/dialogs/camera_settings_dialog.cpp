@@ -301,7 +301,9 @@ void QnCameraSettingsDialog::updateCamerasFromSelection() {
         m_selectionScope = scope;
     }
 
-    setCameras(provider->currentParameters(scope).resources().filtered<QnVirtualCameraResource>());
+    auto cameras = provider->currentParameters(scope).resources().filtered<QnVirtualCameraResource>();
+    if (!cameras.isEmpty())
+        setCameras(cameras);
 }
 
 void QnCameraSettingsDialog::at_selectionChangeAction_triggered() {
