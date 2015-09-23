@@ -52,8 +52,8 @@ public slots:
         \param value true, if input activated. false, if deactivated
     */
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStampUsec);
-
-    void at_customEvent(const QString &resourceName, const QString& caption, const QString& description, QnBusiness::EventState eventState, qint64 timeStamp);
+    
+    void at_customEvent(const QString &resourceName, const QString& caption, const QString& description, const QnEventMetaData& metadata, QnBusiness::EventState eventState, qint64 timeStamp);
 
     /*!
         \param timeStamp microseconds from 1970-01-01 (UTC)

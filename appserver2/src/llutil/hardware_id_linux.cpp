@@ -175,6 +175,7 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
 
 #elif defined(__arm__)
 
+// TODO: Use getMacFromPrimaryIF instead
 void mac_eth0(char  MAC_str[13], char** host)
 {
     #define HWADDR_len 6

@@ -43,7 +43,7 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    bool hasMotionUrl(const QModelIndex &index) const;
+    QnResourceList resourcesForPlayback(const QModelIndex &index) const;
 
     QnBusiness::EventType eventType(int row) const;
     QnResourcePtr eventResource(int row) const;
@@ -71,7 +71,7 @@ private:
     static QString getUserGroupString(QnBusiness::UserGroup value);
 
     void at_resource_removed(const QnResourcePtr &resource);
-
+    static bool hasVideoLink(const QnBusinessActionData &action);
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
