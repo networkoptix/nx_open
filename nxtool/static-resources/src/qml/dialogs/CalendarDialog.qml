@@ -31,6 +31,7 @@ Dialogs.Dialog
 
     buttons: NxRtu.Buttons.Ok | NxRtu.Buttons.Cancel;
     styledButtons: NxRtu.Buttons.Ok;
+    cancelButton: NxRtu.Buttons.Cancel;
 
     areaDelegate: Item
     {

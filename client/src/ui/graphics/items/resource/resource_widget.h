@@ -61,6 +61,7 @@ public:
 
         WindowRotationForbidden     = 0x1000,
         SyncPlayForbidden           = 0x2000,   /**< Whether SyncPlay is forbidden for this widget. */
+        InfoOverlaysForbidden       = 0x4000
     };
     Q_DECLARE_FLAGS(Options, Option)
 

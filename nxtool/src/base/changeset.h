@@ -31,14 +31,11 @@ namespace rtu
 
     public slots:
         /// Special setters available from Qml
-
         void addSystemChange(const QString &systemName);
 
         void addPasswordChange(const QString &password);
 
         void addPortChange(int port);
-
-        void turnOnDhcp();
 
         void addDHCPChange(const QString &name
             , bool useDHCP);

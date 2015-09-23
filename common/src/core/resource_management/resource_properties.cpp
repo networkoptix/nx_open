@@ -21,6 +21,7 @@ void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 
     ec2::ApiResourceParamWithRefDataList outData;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    //TODO: #GDM SafeMode
     ec2::ErrorCode rez = conn->getResourceManager()->saveSync(params, &outData);
 
     if (rez != ec2::ErrorCode::ok) 
@@ -48,8 +49,10 @@ int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDat
         return -1; // nothing to save
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     QMutexLocker lock(&m_requestMutex);
+
     //TODO #ak m_requestInProgress is redundant here, data can be saved to 
         //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone
+    //TODO: #GDM SafeMode
     int requestId = conn->getResourceManager()->save(data, this, &QnResourcePropertyDictionary::onRequestDone);
     m_requestInProgress.insert(requestId, std::move(data));
     return requestId;

@@ -13,8 +13,9 @@ namespace QnSystemHealth {
         UsersEmailIsEmpty,
         ConnectionLost,
         NoPrimaryTimeServer,
+        SystemIsReadOnly,
 
-        // These messages are sent from mediaserver
+        // These messages are sent from server
         EmailSendError,
         StoragesNotConfigured,
         StoragesAreFull,

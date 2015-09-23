@@ -457,18 +457,29 @@ bool QnEventsDB::migrateBusinessParams() {
             remapData[id] = remappedData;
         }
     }
+    
 
+    {  
+        QnDbTransactionLocker tran(getTransaction());
 
-    for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
         QSqlQuery query(m_sdb);
         query.prepare("UPDATE runtime_actions SET action_params = :action, runtime_params = :runtime WHERE rowid = :rowid");
-        query.bindValue(":rowid", iter.key());
-        query.bindValue(":action", iter->actionParams);
-        query.bindValue(":runtime", iter->runtimeParams);
-        if (!query.exec()) {
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
+        for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
+            query.bindValue(":rowid", iter.key());
+            query.bindValue(":action", iter->actionParams);
+            query.bindValue(":runtime", iter->runtimeParams);
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return false;
+            }
+        }
+
+        if( !tran.commit() )
+        {
+            qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
             return false;
         }
+
     }
 
     return true;

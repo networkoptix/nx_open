@@ -107,7 +107,7 @@ QString QnMediaServerResource::getName() const
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
-    else
+    
     {
         QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
         if( !(*lk)->name.isEmpty() )
@@ -118,19 +118,21 @@ QString QnMediaServerResource::getName() const
 
 void QnMediaServerResource::setName( const QString& name )
 {
-    QString oldName = getName();
-    if (oldName == name)
+    if (getId().isNull())
         return;
 
-    setServerName(name);
+    if (getServerFlags() & Qn::SF_Edge)
+        return;
+
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->name == name)
+            return;
+        (*lk)->name = name;
+    }
     emit nameChanged(toSharedPointer(this));
 }
 
-void QnMediaServerResource::setServerName( const QString& name )
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
-    (*lk)->name = name;
-}
 
 void QnMediaServerResource::setApiUrl(const QString &apiUrl)
 {
@@ -227,31 +229,6 @@ QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourc
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
     return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
-}
-
-void QnMediaServerResource::setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storagesToRemove)
-{
-    m_storagesToUpdate = storagesToUpdate;
-    m_storagesToRemove = storagesToRemove;
-}
-
-bool QnMediaServerResource::hasUpdatedStorages() const
-{
-    return m_storagesToUpdate.size() + m_storagesToRemove.size() > 0;
-}
-
-QPair<int, int> QnMediaServerResource::saveUpdatedStorages()
-{
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    int updateHandle = conn->getMediaServerManager()->saveStorages(m_storagesToUpdate, this, &QnMediaServerResource::onRequestDone);
-    int removeHandle = conn->getMediaServerManager()->removeStorages(m_storagesToRemove, this, &QnMediaServerResource::onRequestDone);
-
-    return QPair<int, int>(updateHandle, removeHandle);
-}
-
-void QnMediaServerResource::onRequestDone( int reqID, ec2::ErrorCode errorCode )
-{
-    emit storageSavingDone(reqID, errorCode);
 }
 
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)

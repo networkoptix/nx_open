@@ -17,7 +17,8 @@ namespace rtu
     {
         Q_OBJECT
     public:
-        enum { kStandardTimeout = -1 };
+        enum { kUseStandardTimeout = -1 };
+        enum { kDefaultTimeoutMs = 10 * 1000 };
 
         struct Request;
         typedef std::function<void (RequestError errorCode)> ErrorCallback;
@@ -29,7 +30,7 @@ namespace rtu
         static void sendPost(const Request &request
             , const QByteArray &data);
         
-        static const QString &adminUserName();
+        static const QString &defaultAdminUserName();
 
         static const QStringList &defaultAdminPasswords();
 
@@ -37,8 +38,8 @@ namespace rtu
 
     signals:
         /// Emits when command has failed by http, but successfully executed by multicast
-        void accessMethodChanged(const QUuid &id
-            , bool byHttp);
+        void accessMethodChanged(const QUuid &id    
+            , bool byHttp); /// TODO: change "byHttp" to enum later
 
     private:
         RestClient();

@@ -5,7 +5,7 @@
         if(!this.flashObject) {
             this.flashObject = getFlashMovieObject(instanceId);
         }
-        this.xhrGET(url,this.xhrReadBytes, this.xhrTransferFailed, resourceLoadedFlashCallback, resourceFailureFlashCallback, "arraybuffer");
+        this.xhrGET(url,this.xhrReadBytes, this.xhrTransferFailed, resourceLoadedFlashCallback, resourceFailureFlashCallback, 'arraybuffer');
     },
     abortFragment : function(instanceId) {
         if(this.xhr &&this.xhr.readyState !== 4) {
@@ -18,7 +18,7 @@
         xhr.binding = this;
         xhr.resourceLoadedFlashCallback = resourceLoadedFlashCallback;
         xhr.resourceFailureFlashCallback = resourceFailureFlashCallback;
-        xhr.open("GET", url, loadcallback? true: false);
+        xhr.open('GET', url, loadcallback? true: false);
         if (responseType) {
             xhr.responseType = responseType;
         }
@@ -28,7 +28,7 @@
             xhr.send();
         } else {
             xhr.send();
-            return xhr.status == 200? xhr.response: "";
+            return xhr.status == 200? xhr.response: '';
         }
     },
     xhrReadBytes : function(event) {
@@ -42,7 +42,7 @@
         ////console.log('encoding speed/toFlash:' + Math.round(len/(t1-t0)) + 'kB/s/' + Math.round(res.length/(t2-t1)) + 'kB/s');
     },
     xhrTransferFailed : function(oEvent) {
-        ////console.log("An error occurred while transferring the file :" + oEvent.target.status);
+        ////console.log('An error occurred while transferring the file :' + oEvent.target.status);
         this.binding.flashObject[this.resourceFailureFlashCallback](res);
     }
 };
@@ -50,7 +50,7 @@
 var JSLoaderPlaylist = {
 
     requestPlaylist : function(instanceId,url, resourceLoadedFlashCallback, resourceFailureFlashCallback) {
-        ////console.log("JSURLLoader.onRequestResource");
+        ////console.log('JSURLLoader.onRequestResource');
         if(!this.flashObject) {
             this.flashObject = getFlashMovieObject(instanceId);
         }
@@ -67,22 +67,22 @@ var JSLoaderPlaylist = {
         this.xhr = xhr;
         xhr.resourceLoadedFlashCallback = resourceLoadedFlashCallback;
         xhr.resourceFailureFlashCallback = resourceFailureFlashCallback;
-        xhr.open("GET", url, loadcallback? true: false);
+        xhr.open('GET', url, loadcallback? true: false);
         if (loadcallback) {
             xhr.onload = loadcallback;
             xhr.onerror= errorcallback;
             xhr.send();
         } else {
             xhr.send();
-            return xhr.status == 200? xhr.response: "";
+            return xhr.status == 200? xhr.response: '';
         }
     },
     xhrReadBytes : function(event) {
-        ////console.log("playlist loaded");
+        ////console.log('playlist loaded');
         this.binding.flashObject[this.resourceLoadedFlashCallback](event.currentTarget.responseText);
     },
     xhrTransferFailed : function(oEvent) {
-        ////console.log("An error occurred while transferring the file :" + oEvent.target.status);
+        ////console.log('An error occurred while transferring the file :' + oEvent.target.status);
         this.binding.flashObject[this.resourceFailureFlashCallback](res);
     }
 };*/
@@ -93,34 +93,34 @@ var flashlsAPI = new (function(){
 
     //We use swfobject to embed player. see https://code.google.com/p/swfobject/wiki/documentation
     var flashParameters = {
-        player:"components/flashlsChromeless.swf",
-        id:"flashvideo",
-        name:"flashvideoembed",
-        width:"100%",
-        height:"100%",
-        version: "9.0.0",
-        installer:"components/expressInstall.swf",
+        player:'components/flashlsChromeless.swf',
+        id:'flashvideo',
+        name:'flashvideoembed',
+        width:'100%',
+        height:'100%',
+        version: '9.0.0',
+        installer:'components/expressInstall.swf',
         flashvars:{
 
         },
         params:{
-            //movie:"components/flashlsChromeless.swf",
-            quality:"high",
+            //movie:'components/flashlsChromeless.swf',
+            quality:'high',
             swliveconnect:true,
-            allowScriptAccess:"always",
-            bgcolor:"#1C2327",
+            allowScriptAccess:'always',
+            bgcolor: '#1C2327',
             allowFullScreen:false,
-            wmode:"window",
-            FlashVars:"callback=flashlsCallback"
+            wmode:'window',
+            FlashVars:'callback=flashlsCallback'
         },
-        attributes:{ // https://code.google.com/p/swfobject/wiki/documentation - see section "How can you configure your Flash content?
-            id:"flashvideowindow",
-            name: "flashvideoembed"
+        attributes:{ // https://code.google.com/p/swfobject/wiki/documentation - see section 'How can you configure your Flash content?
+            id:'flashvideowindow',
+            name: 'flashvideoembed'
             /*,
-            align:"",
-            name:"",
-            styleclass:"",
-            class:""*/
+            align:'',
+            name:'',
+            styleclass:'',
+            class:''*/
         }
     };
     this.kill = function(){
@@ -131,6 +131,10 @@ var flashlsAPI = new (function(){
     };
 
     this.flashParams = function(){
+
+        if(Config && Config.allowDebugMode && Config.debug.video) {
+            flashParameters.params.bgcolor = '#FF8888';
+        }
         return flashParameters.params;
     };
 
@@ -141,12 +145,12 @@ var flashlsAPI = new (function(){
         {
             return window.document[movieName];
         }
-        if (navigator.appName.indexOf("Microsoft Internet")==-1)
+        if (navigator.appName.indexOf('Microsoft Internet')==-1)
         {
             if (document.embeds && document.embeds[movieName])
                 return document.embeds[movieName];
         }
-        else // if (navigator.appName.indexOf("Microsoft Internet")!=-1)
+        else // if (navigator.appName.indexOf('Microsoft Internet')!=-1)
         {
             return document.getElementById(movieName);
         }
@@ -156,15 +160,11 @@ var flashlsAPI = new (function(){
             this.flashObject = this.getFlashMovieObject(); //e.ref is a pointer to the <object>
 
             if(Config.allowDebugMode && Config.debug.video){
-                console.log("embed handler");
+                console.log('embed handler');
                 console.log(this.flashObject);
             }
 
-            if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.browserMajorVersion<=10) { // Force disabling hardware acceleration for IE9, IE10
-                this.playerSetUseHardwareVideoDecoder(false);
-            }else {
-                this.playerSetUseHardwareVideoDecoder(true);
-            }
+            this.playerSetUseHardwareVideoDecoder(true);
             this.readyHandler(this);
         }
     };
@@ -188,7 +188,7 @@ var flashlsAPI = new (function(){
             flashParameters.params,
             flashParameters.attributes,
             function(){
-                //console.log("swf ready");
+                //console.log('swf ready');
             });*/
 
     };
@@ -198,7 +198,7 @@ var flashlsAPI = new (function(){
         if(!url){
             return;
         }
-        //console.log("load video",url);
+        //console.log('load video',url);
         try {
             this.flashObject.playerLoad(url);
         }catch(a){
@@ -212,7 +212,7 @@ var flashlsAPI = new (function(){
             return;
         }
         try {
-            this.flashObject.playerPlay(offset);
+            this.flashObject.playerPlay(offset || -1);
         }catch(a){
             this.flashObject = null;
             this.errorHandler(a);
@@ -376,23 +376,23 @@ var flashlsAPI = new (function(){
 var timer = 0;
 flashlsAPI.flashlsEvents = {
     ready: function(flashTime) {
-        //console.log("ready",flashTime);
+        //console.log('ready',flashTime);
     },
     videoSize: function(width, height) {
-        //console.log("videoSize",width, height);
+        //console.log('videoSize',width, height);
     },
     complete: function() {
         flashlsAPI.positionHandler(null);
     },
     error: function(code, url, message) {
-        console.error("flashls error, code:"+ code + " url:" + url + " message:" + message);
+        console.error('flashls error, code:'+ code + ' url:' + url + ' message:' + message);
     },
     manifest: function(duration, levels, loadmetrics) {
-        //console.log("manifest loaded, playlist duration:"+ duration.toFixed(2));
+        //console.log('manifest loaded, playlist duration:'+ duration.toFixed(2));
     },
     audioLevelLoaded: function(loadmetrics) {
         var event = {
-            type : "level audio",
+            type : 'level audio',
             id : loadmetrics.level,
             start : loadmetrics.id,
             end : loadmetrics.id2,
@@ -402,11 +402,11 @@ flashlsAPI.flashlsEvents = {
             bw : Math.round(loadmetrics.bandwidth/1000)
         };
         event.time = loadmetrics.loading_request_time - flashLoadDate;
-        //console.log("audioLevelLoaded",event.time);
+        //console.log('audioLevelLoaded',event.time);
     },
     levelLoaded: function(loadmetrics) {
         var event = {
-            type : "level",
+            type : 'level',
             id : loadmetrics.level,
             start : loadmetrics.id,
             end : loadmetrics.id2,
@@ -417,7 +417,7 @@ flashlsAPI.flashlsEvents = {
         };
         event.time = loadmetrics.loading_request_time - flashLoadDate;
 
-        //console.log("levelLoaded",event);
+        //console.log('levelLoaded',event);
     },
     fragmentLoaded: function(loadmetrics) {
         var event = {
@@ -435,12 +435,12 @@ flashlsAPI.flashlsEvents = {
         } else {
             event.type =  'fragment main'
         }
-        //console.log("fragmentLoaded",event);
+        //console.log('fragmentLoaded',event);
     },
     fragmentPlaying: function(playmetrics) {
-        var event = {time : new Date() - jsLoadDate, type : "playing frag", name : playmetrics.seqnum + '@' + playmetrics.level, duration : playmetrics.duration*1000};
+        var event = {time : new Date() - jsLoadDate, type : 'playing frag', name : playmetrics.seqnum + '@' + playmetrics.level, duration : playmetrics.duration*1000};
 
-        //console.log("fragmentPlaying",event);
+        //console.log('fragmentPlaying',event);
     },
     position: function(timemetrics) {
 
@@ -457,11 +457,11 @@ flashlsAPI.flashlsEvents = {
         var sliding = timemetrics.live_sliding_main;
         var buffer = timemetrics.buffer;
 
-        console.log("position changed",
+        console.log('position changed',
             (((new Date()).getTime() - timer) / 1000 ).toFixed(2),
             backbuffer.toFixed(2),
             position.toFixed(2),
-            "bb:",backbuffer.toFixed(2),
+            'bb:',backbuffer.toFixed(2),
             (backbuffer - position).toFixed(2),
             (backbuffer + position).toFixed(2),
             (buffer + backbuffer).toFixed(2)
@@ -470,31 +470,31 @@ flashlsAPI.flashlsEvents = {
     state: function(newState) {
         var event = {time : new Date() - jsLoadDate, type : newState.toLowerCase(), name : ''};
 
-        //console.log("state",event);
+        //console.log('state',event);
     },
     seekState: function(newState) {
         var event = {time : new Date() - jsLoadDate, type : newState.toLowerCase(), name : ''};
 
-        //console.log("seekState",event);
+        //console.log('seekState',event);
     },
     switch: function(newLevel) {
-        var event = {time : new Date() - jsLoadDate, type : "levelSwitch", name : newLevel.toFixed()};
+        var event = {time : new Date() - jsLoadDate, type : 'levelSwitch', name : newLevel.toFixed()};
 
-        //console.log("switch",event);
+        //console.log('switch',event);
     },
     audioTracksListChange: function(trackList) {
 
-        //console.log("audioTracksListChange",trackList);
+        //console.log('audioTracksListChange',trackList);
     },
     audioTrackChange: function(trackId) {
-        var event = {time : new Date() - jsLoadDate, type : "audioTrackChange", name : trackId.toFixed()};
+        var event = {time : new Date() - jsLoadDate, type : 'audioTrackChange', name : trackId.toFixed()};
 
-        //console.log("audioTrackChange",event);
+        //console.log('audioTrackChange',event);
     },
     id3Updated: function(ID3Data) {
-        var event = {time : new Date() - jsLoadDate, type : "ID3Data", id3data: atob(ID3Data)};
+        var event = {time : new Date() - jsLoadDate, type : 'ID3Data', id3data: atob(ID3Data)};
 
-        //console.log("id3Updated",event);
+        //console.log('id3Updated',event);
     }
     /*,
     requestPlaylist: JSLoaderPlaylist.requestPlaylist.bind(JSLoaderPlaylist),

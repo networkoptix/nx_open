@@ -13,6 +13,8 @@
   background: rgb(53,70,79);
 }
 
+::-ms-clear { display: none; }
+
 
 .dark-theme{
   color:white;
@@ -121,32 +123,32 @@ table.webclient-window>tbody>tr>td.alert{
   overflow: hidden;
 }
 
-
-.videowindow{
-  background-color: #1C2327;
-}
 .videowindow,
 .videowindow .videoplayer
 {
   width:100%;
   height: 100%;
   overflow: hidden;
+  background-color: #1C2327;
+  text-align:center;
 }
 
 .videowindow video{
-  width:100%;
+  max-width:100%;
   max-height:100%;
+
+  margin: 0 auto;
 
   position: relative;
   top: 50%;
   transform: translateY(-50%);
   -ms-transform: translateY(-50%);
-
-  margin-left: auto;
-  margin-right: auto;
 }
 
 
+.videowindow video.fullsize{
+  height:100%;
+}
 
 .webclient-panel{
   white-space: nowrap;
@@ -155,6 +157,54 @@ table.webclient-window>tbody>tr>td.alert{
   margin: 0px 20px;
   padding: 10px 0px;
 }
+.cameras-search{
+  padding:10px;
+
+  margin:3px 0;
+}
+
+.cameras-search>.input-group{
+  margin:0;
+}
+
+.cameras-search>.input-group>*{
+  background: transparent;
+  border:none;
+  box-shadow:none;
+  color: #698796;
+  font-size: 16px;
+}
+
+
+.cameras-search>.input-group>input::-webkit-input-placeholder {
+  color: #698796;
+  font-size: 13px;
+}
+.cameras-search>.input-group>input:-moz-placeholder{
+  color: #698796;
+  font-size: 13px;
+}
+.cameras-search>.input-group>input::-moz-placeholder{
+  color: #698796;
+  font-size: 13px;
+}
+.cameras-search>.input-group>input:-ms-input-placeholder {
+  color: #698796;
+  font-size: 13px;
+}
+
+
+.cameras-search>.input-group>input{
+  border:none;
+  box-shadow:none;
+  color: #FFFFFF;
+  font-size: 16px;
+}
+
+.cameras-search .clear-button{
+  color: #FFFFFF;
+}
+
 
 .webclient-panel>div.text-left,
 .webclient-panel>div.text-right{
@@ -422,9 +472,20 @@ table.webclient-window>tbody>tr>td.alert{
   font-size: 75%
 }
 
+.not-supported .camera-view-message{
+  line-height:40px;
+}
+
+.visible-mobile{
+  display: none;
+}
+
 @media only screen and (max-device-width:640px) {
   .invisible-xs,.hidden-mobile{
     display:none;
+  }
+  .visible-mobile{
+    display: block;
   }
 }
 

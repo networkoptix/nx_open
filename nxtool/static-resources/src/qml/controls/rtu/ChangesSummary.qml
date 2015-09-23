@@ -15,6 +15,8 @@ Expandable.ExpandableItem
     property string caption;
     property var model;
     
+    activeFocusOnTab: false;
+
     expanded: !successfulSummary;
 
     headerDelegate: Item
@@ -54,6 +56,9 @@ Expandable.ExpandableItem
             height: Common.SizeManager.clickableSizes.medium;
             width: height * 4;   
             
+            activeFocusOnTab: false;
+            activeFocusOnPress: false;
+
             anchors
             {
                 top: delimiter.bottom;
@@ -80,6 +85,8 @@ Expandable.ExpandableItem
             left: parent.left;
             right: parent.right;
         }
+
+        activeFocusOnTab: false;
         
         backgroundVisible: false;
         headerVisible: false;

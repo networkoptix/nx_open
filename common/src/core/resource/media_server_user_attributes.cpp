@@ -34,4 +34,12 @@ QnMediaServerUserAttributesPool::QnMediaServerUserAttributesPool()
     } );
 }
 
+QnMediaServerUserAttributesList QnMediaServerUserAttributesPool::getAttributesList(const QList<QnUuid>& idList) {
+    QnMediaServerUserAttributesList valList;
+    valList.reserve( idList.size() );
+    for( const QnUuid id: idList )
+        valList.push_back( get(id) );
+    return valList;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnMediaServerUserAttributes), (eq), _Fields)
