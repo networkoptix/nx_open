@@ -201,7 +201,7 @@ private:
 
     void updateBookmarks();
 
-    void updateCurrentTime(qreal timeMs);
+    void updateCurrentTime(qint64 timeMs);
 
 private:
     struct ResourceStates
@@ -258,7 +258,7 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    qreal m_currentTime;
+    qint64 m_currentTime;
     QnCameraBookmarkList m_bookmarks;
     QnCameraBookmarkList::const_iterator m_bookmarksBeginPosition;
     QnCachingCameraDataLoader *m_dataLoader;

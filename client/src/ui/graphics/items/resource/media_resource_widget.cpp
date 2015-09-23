@@ -729,8 +729,11 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             if (channel >= channelCount())
                 channel = 0;
             
-            enum { kFactor = 1000 };
-            updateCurrentTime(m_renderer->getTimestampOfNextFrameToRender(channel) / kFactor);
+            auto timestamp = m_renderer->getTimestampOfNextFrameToRender(channel);
+            if (timestamp != AV_NOPTS_VALUE) {
+                enum { kFactor = 1000 };
+                updateCurrentTime(timestamp / kFactor);
+            }
         }
         else
         {
@@ -1563,8 +1566,11 @@ void QnMediaResourceWidget::updateBookmarks()
 //         updateCurrentTime(m_currentTime);
 }
 
-void QnMediaResourceWidget::updateCurrentTime(qreal timeMs)
+void QnMediaResourceWidget::updateCurrentTime(qint64 timeMs)
 {
+    if (timeMs < 0)
+        return;
+
     if (timeMs < m_currentTime)
         m_bookmarksBeginPosition = m_bookmarks.cbegin();
 
