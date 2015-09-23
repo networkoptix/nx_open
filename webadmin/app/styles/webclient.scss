@@ -159,6 +159,50 @@ table.webclient-window>tbody>tr>td.alert{
 }
 .cameras-search{
   padding:10px;
+
+  margin:3px 0;
+}
+
+.cameras-search>.input-group{
+  margin:0;
+}
+
+.cameras-search>.input-group>*{
+  background: transparent;
+  border:none;
+  box-shadow:none;
+  color: #698796;
+  font-size: 16px;
+}
+
+
+.cameras-search>.input-group>input::-webkit-input-placeholder {
+  color: #698796;
+  font-size: 13px;
+}
+.cameras-search>.input-group>input:-moz-placeholder{
+  color: #698796;
+  font-size: 13px;
+}
+.cameras-search>.input-group>input::-moz-placeholder{
+  color: #698796;
+  font-size: 13px;
+}
+.cameras-search>.input-group>input:-ms-input-placeholder {
+  color: #698796;
+  font-size: 13px;
+}
+
+
+.cameras-search>.input-group>input{
+  border:none;
+  box-shadow:none;
+  color: #FFFFFF;
+  font-size: 16px;
+}
+
+.cameras-search .clear-button{
+  color: #FFFFFF;
 }
 
 
