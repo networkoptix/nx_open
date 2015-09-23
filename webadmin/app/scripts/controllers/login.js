@@ -11,8 +11,8 @@ angular.module('webadminApp')
         $scope.authorizing = false;
         if(!$scope.user){
             $scope.user = {
-                username:"",
-                password:""
+                username:'',
+                password:''
             }
         }
         $scope.session = $sessionStorage;
@@ -35,25 +35,25 @@ angular.module('webadminApp')
                 var nonce = ipCookie('nonce');
 
                 var digest = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
-                var method = md5("GET:");
+                var method = md5('GET:');
                 var auth_digest = md5(digest + ':' + nonce + ':' + method);
                 var auth = Base64.encode(lowercaseLogin + ':' + nonce + ':' + auth_digest);
 
                 /*
-                console.log("debug auth - realm:",realm);
-                console.log("debug auth - nonce:",nonce);
-                console.log("debug auth - login:",lowercaseLogin);
-                console.log("debug auth - password:",$scope.user.password);
-                console.log("debug auth - digest = md5(login:realm:password):",digest);
-                console.log("debug auth - method:","GET:");
-                console.log("debug auth - md5(method):",method);
-                console.log("debug auth -  auth_digest = md5(digest:nonce:md5(method)):",auth_digest);
-                console.log("debug auth -  auth = base64(login:nonce:auth_digest):",auth);
+                console.log('debug auth - realm:',realm);
+                console.log('debug auth - nonce:',nonce);
+                console.log('debug auth - login:',lowercaseLogin);
+                console.log('debug auth - password:',$scope.user.password);
+                console.log('debug auth - digest = md5(login:realm:password):',digest);
+                console.log('debug auth - method:','GET:');
+                console.log('debug auth - md5(method):',method);
+                console.log('debug auth -  auth_digest = md5(digest:nonce:md5(method)):',auth_digest);
+                console.log('debug auth -  auth = base64(login:nonce:auth_digest):',auth);
                 */
 
                 ipCookie('auth',auth, { path: '/' });
 
-                var rtspmethod = md5("PLAY:");
+                var rtspmethod = md5('PLAY:');
                 var rtsp_digest = md5(digest + ':' + nonce + ':' + rtspmethod);
                 var auth_rtsp = Base64.encode(lowercaseLogin + ':' + nonce + ':' + rtsp_digest);
                 ipCookie('auth_rtsp',auth_rtsp, { path: '/' });
@@ -66,7 +66,7 @@ angular.module('webadminApp')
                 $scope.authorizing = true;
                 mediaserver.getCurrentUser(true).then(reload).catch(function(error){
                     $scope.authorizing = false;
-                    alert("Login or password is incorrect");
+                    alert('Login or password is incorrect');
                 });
             }
         };
