@@ -100,7 +100,7 @@ GenericSettingsPanel
                         color: "#666666";
                         wrapMode: Text.Wrap;
                         font.pixelSize: Common.SizeManager.fontSizes.base;
-                        text: qsTr("If you doesn't click this button,\nnothing will be changed");
+                        text: qsTr("Changes will be applied only if this button is clicked");
                     }
                 }
             }
