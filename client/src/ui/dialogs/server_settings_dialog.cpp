@@ -10,6 +10,7 @@
 #include <ui/widgets/properties/recording_statistics_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/watchers/workbench_selection_watcher.h>
 
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     : base_type(parent)
@@ -34,6 +35,19 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
 
     ui->buttonBox->addButton(m_webPageButton, QDialogButtonBox::HelpRole);
     setHelpTopic(m_webPageButton, Qn::ServerSettings_WebClient_Help);
+
+    auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources) {
+        if (isHidden())
+            return;
+
+        auto servers = resources.filtered<QnMediaServerResource>([](const QnMediaServerResourcePtr &server){
+            return server->getStatus() != Qn::Incompatible;
+        });
+
+        if (!servers.isEmpty())
+            setServer(servers.first());
+    });  
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 
