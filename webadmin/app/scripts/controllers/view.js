@@ -80,6 +80,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return true;
             });
             $scope.hasMobileApp = !!found;
+
         }
 
 
