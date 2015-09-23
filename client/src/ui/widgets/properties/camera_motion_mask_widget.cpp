@@ -162,7 +162,8 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
             QnResourceWidget::DisplayMotionSensitivity | 
             QnResourceWidget::DisplayMotion | 
             QnResourceWidget::WindowRotationForbidden |
-            QnResourceWidget::SyncPlayForbidden;
+            QnResourceWidget::SyncPlayForbidden |
+            QnResourceWidget::InfoOverlaysForbidden;
         item->setData(Qn::ItemWidgetOptions, forcedOptions);
 
         m_context->workbench()->currentLayout()->addItem(item);

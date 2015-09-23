@@ -756,8 +756,12 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
 
 ShortCache.prototype.setPlayingPosition = function(position){
     // This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
+
+    var oldPosition =  this.playedPosition;
+
     this.played = position;
     this.playedPosition = 0;
+
 
     if(position < this.lastRequestPosition) { // Somewhere back on timeline
         var lastPosition;
@@ -808,6 +812,10 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(position > this.lastPlayedPosition){
         this.lastPlayedPosition = position; // Save the boundaries of uploaded cache
         this.lastPlayedDate =  this.playedPosition; // Save the boundaries of uploaded cache
+    }
+
+    if(oldPosition > this.playedPosition && Config.allowDebugMode){
+        console.error("Position jumped back! ms:" , oldPosition - this.playedPosition);
     }
 
     return this.playedPosition;
@@ -952,13 +960,15 @@ ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
     }
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
+ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode,end){
     if(this.anchorDate == date){
         return;
     }
 
-    if(date > this.end){
+    if(date > this.end && liveMode){
         this.setEnd(date);
+    }else if(end>this.end){
+        this.setEnd(end);
     }
 
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
@@ -1087,6 +1097,15 @@ ScaleManager.prototype.getRelativeWidth = function(){
 };
 
 
+
+ScaleManager.prototype.canScroll = function(left){
+    if(left){
+        return this.visibleStart != this.start;
+    }
+
+    return this.visibleEnd != this.end;
+};
+
 ScaleManager.prototype.scroll = function(value){
     if(typeof (value) == "undefined"){
         return this.getRelativeCenter();
@@ -1097,6 +1116,10 @@ ScaleManager.prototype.scroll = function(value){
     var achcorDate = this.anchorDate; //Save anchorDate
     this.setAnchorDateAndPoint(this.start + value * (this.end-this.start),0.5); //Move viewport
     this.tryToRestoreAnchorDate(achcorDate); //Try to restore anchorDate
+};
+
+ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
+    return this.bound(0,this.scroll() +pixels / this.viewportWidth * this.getRelativeWidth(),1);
 };
 
 ScaleManager.prototype.scrollByPixels = function(pixels){

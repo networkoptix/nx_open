@@ -30,6 +30,9 @@ public:
         connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
         connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
         connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+
+        for (const QnUserResourcePtr &user: userList)
+            at_resourcePool_resourceAdded(user);
     }
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -51,13 +54,13 @@ void QnUserListModelPrivate::at_resourcePool_resourceAdded(const QnResourcePtr &
     if (!user)
         return;
 
-    if (userIndex(user->getId()) != -1)
-        return;
-
     connect(user,   &QnUserResource::nameChanged,           this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user,   &QnUserResource::permissionsChanged,    this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user,   &QnUserResource::enabledChanged,        this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user,   &QnUserResource::ldapChanged,           this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+
+    if (userIndex(user->getId()) != -1)
+        return;
 
     int row = userList.size();
     model->beginInsertRows(QModelIndex(), row, row);
@@ -70,11 +73,11 @@ void QnUserListModelPrivate::at_resourcePool_resourceRemoved(const QnResourcePtr
     if (!user)
         return;
 
+    disconnect(user, nullptr, this, nullptr);
+
     int row = userIndex(user->getId());
     if (row == -1)
         return;
-
-    disconnect(user, nullptr, this, nullptr);
 
     model->beginRemoveRows(QModelIndex(), row, row);
     userList.removeAt(row);

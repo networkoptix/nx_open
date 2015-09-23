@@ -302,6 +302,9 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!camera)
         return false;
 
+    if (camera->failoverPriority() == Qn::FP_Never)
+        return false;
+    
     QnUuid ownGuid = qnCommon->moduleGUID();
     QnMediaServerResourcePtr mServer = camera->getParentServer();
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(ownGuid);

@@ -24,19 +24,10 @@ Expandable.MaskedSettingsPanel
             return;
 
         var flagged = maskedArea.flaggedArea;
-        var currentItem = flagged.currentItem.item;
+        var currentItem = flagged.currentItem;
         if (flagged && currentItem)
         {
-            if (flagged.dhcpForceOnly)
-            {
-                if (currentItem.forceUseDHCPControl.enabled)
-                {
-                    maskedArea.portNumberControl.KeyNavigation.backtab = currentItem.forceUseDHCPControl;
-                    currentItem.forceUseDHCPControl.forceActiveFocus();
-                    return;
-                }
-            }
-            else if (currentItem.enabled && currentItem.firstIpLine)
+            if (currentItem.enabled && currentItem.firstIpLine)
             {
                 maskedArea.portNumberControl.KeyNavigation.backtab = currentItem.lastIpLine.useDHCPControl;
                 if (currentItem.firstIpLine.useDHCPControl.checked)
@@ -73,13 +64,7 @@ Expandable.MaskedSettingsPanel
                 if (!flagged.showFirst) // No changes
                     return true;
 
-                if (flagged.dhcpForceOnly && flagged.currentItem.forceUseDHCP)
-                {
-                    rtuContext.changesManager().changeset().turnOnDhcp();
-                    return true;
-                }
-
-                return (flagged.currentItem.item.tryApplyChanges(warnings));
+                return (flagged.currentItem.tryApplyChanges(warnings));
             }
 
             property bool changed: portNumber.changed || flagged.changed;
@@ -102,9 +87,7 @@ Expandable.MaskedSettingsPanel
             {
                 id: flagged;
 
-                property bool changed: (showFirst && currentItem.item
-                    && currentItem.item.changed ? true : false);
-                property bool dhcpForceOnly: (rtuContext.selection.count !== 1);
+                property bool changed: (showFirst && currentItem.changed ? true : false);
 
                 anchors
                 {
@@ -113,36 +96,13 @@ Expandable.MaskedSettingsPanel
                 }
 
                 message: qsTr("Can not change interfaces settings for some selected servers");
-                showItem: ((Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags)
-                    || (rtuContext.selection.count === 1));
+                showItem: rtuContext.selection.editableInterfaces;
 
-                Component
+                item: Rtu.IpSettingsList
                 {
-                    id: singleSelectionInterfaceList;
-
-                    Rtu.IpSettingsList
-                    {
-                        enabled: (Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags);
-                        KeyNavigation.tab: portNumber;
-                    }
-                }
-
-                Component
-                {
-                    id: multipleSelectionInterfaceList;
-
-                    Rtu.MultipleSelectionInterfaceList
-                    {
-                        dhcpState: rtuContext.selection.dhcpState;
-                    }
-                }
-
-                item: Loader
-                {
-                    id: loader;
-
-                    sourceComponent: (flagged.dhcpForceOnly ?
-                        multipleSelectionInterfaceList : singleSelectionInterfaceList);
+                    visible: (rtuContext.selection.count !== 0);
+                    enabled: (Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags);
+                    KeyNavigation.tab: portNumber;
                 }
             }
 

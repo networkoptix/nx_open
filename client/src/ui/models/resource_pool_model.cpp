@@ -94,13 +94,14 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
     connect(resourcePool(),     &QnResourcePool::resourceRemoved,                   this,   &QnResourcePoolModel::at_resPool_resourceRemoved, Qt::QueuedConnection);
     connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnResourcePoolModel::at_snapshotManager_flagsChanged);
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourcePoolModel::at_accessController_permissionsChanged);
-    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::at_context_userChanged, Qt::QueuedConnection);
+    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourcePoolModel::at_commonModule_systemNameChanged);
+    connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
     connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged);
 
     QnResourceList resources = resourcePool()->getResources(); 
 
-    at_context_userChanged();
+    rebuildTree();
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
     foreach(const QnResourcePtr &resource, resources)
@@ -702,7 +703,7 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 }
 
 
-void QnResourcePoolModel::at_context_userChanged() {
+void QnResourcePoolModel::rebuildTree() {
     m_rootNodes[Qn::LocalNode]->update();
     m_rootNodes[Qn::ServersNode]->update();
     m_rootNodes[Qn::UsersNode]->update();
@@ -724,6 +725,8 @@ void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResource
 
 void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
     node(resource)->update();
+    if (resource == context()->user())
+        rebuildTree();
 }
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {

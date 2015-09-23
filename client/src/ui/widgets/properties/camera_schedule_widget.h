@@ -86,7 +86,6 @@ signals:
     void recordingSettingsChanged();
     void scheduleEnabledChanged(int);
     void gridParamsChanged();
-    void scheduleExported(const QnVirtualCameraResourceList &);
     void controlsChangesApplied();
 
 protected:

@@ -14,6 +14,8 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         return tr("Connection to server lost");
     case QnSystemHealth::NoPrimaryTimeServer:
         return tr("Select server for others to synchronize time with");
+    case QnSystemHealth::SystemIsReadOnly:
+        return tr("System is in safe mode");
     case QnSystemHealth::EmailSendError:
         return tr("Error while sending email");
     case QnSystemHealth::StoragesAreFull:
@@ -54,6 +56,9 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         break;
     case QnSystemHealth::NoPrimaryTimeServer:
         messageParts << tr("Server times are not synchronized and a common time could not be detected automatically." );
+        break;
+    case QnSystemHealth::SystemIsReadOnly:         
+        messageParts << tr("The system is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
         break;
     case QnSystemHealth::StoragesAreFull:
         messageParts << tr("Storages are full on the following Server:") << resourceName;

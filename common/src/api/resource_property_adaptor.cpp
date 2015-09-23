@@ -205,6 +205,7 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResour
         return;
     ec2::ApiResourceParamWithRefDataList params;
     params.push_back(ec2::ApiResourceParamWithRefData(resource->getId(), m_key, serializedValue));
+    //TODO: #GDM SafeMode
     connection->getResourceManager()->save(params, this, &QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved);
 }
 

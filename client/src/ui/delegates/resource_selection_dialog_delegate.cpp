@@ -39,3 +39,7 @@ QnResourcePoolModelCustomColumnDelegate* QnResourceSelectionDialogDelegate::cust
     return nullptr;
 }
 
+bool QnResourceSelectionDialogDelegate::isFlat() const {
+    return false;
+}
+

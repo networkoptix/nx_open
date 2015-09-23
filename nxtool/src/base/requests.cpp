@@ -23,6 +23,7 @@ namespace
     const QString kGetTimeCommand = kApiNamespaceTag + "gettime";
     const QString kIfListCommand = kApiNamespaceTag + "iflist";
     const QString kGetServerExtraInfoCommand = kApiNamespaceTag + "aggregator";
+    const QString kRestartCommand = kApiNamespaceTag + "restart";
 
     const QString kIDTag = "id";
     const QString kSeedTag = "seed";
@@ -42,7 +43,7 @@ namespace
         url.setScheme("http");
         url.setHost(host);
         url.setPort(port);
-        url.setUserName(rtu::RestClient::adminUserName());
+        url.setUserName(rtu::RestClient::defaultAdminUserName());
         url.setPassword(password);
         url.setPath(command);
         return url;
@@ -265,7 +266,7 @@ namespace /// Parsers stuff
     void checkAuth(const rtu::BaseServerInfoPtr &baseInfo
         , const QString &password
         , const rtu::OperationCallback &callback
-        , int timeout = rtu::HttpClient::kUseDefaultTimeout)
+        , int timeout = rtu::RestClient::kUseStandardTimeout)
     {
         static const rtu::Constants::AffectedEntities affected = rtu::Constants::kNoEntitiesAffected;
 
@@ -465,6 +466,20 @@ void rtu::sendIfListRequest(const BaseServerInfoPtr &info
 
 ///
 
+void rtu::sendRestartRequest(const BaseServerInfoPtr &info
+    , const QString &password
+    , const OperationCallback &callback)
+{ 
+    const RestClient::Request request(info, password, kRestartCommand
+        , QUrlQuery(), RestClient::kUseStandardTimeout
+        , makeSuccessCallback(callback, Constants::kNoEntitiesAffected)
+        , makeErrorCallback(callback, Constants::kNoEntitiesAffected));
+
+    RestClient::sendGet(request);
+}
+
+///
+
 void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , qint64 utcDateTimeMs
@@ -486,14 +501,14 @@ void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
     query.addQueryItem(kTimeZoneTag, timeZoneId);
     
+    enum { kSpecialTimeout = 30 * 1000 }; /// Due to server could apply time changes too long in some cases (Nx1 for example)
     const RestClient::Request request(baseInfo
-        , password, kSetTimeCommand, query, RestClient::kStandardTimeout
+        , password, kSetTimeCommand, query, kSpecialTimeout
         , makeSuccessCallback(callback, affected), makeErrorCallback(callback, affected)); 
     RestClient::sendGet(request);
 }
 
 ///
-
 void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const QString &systemName
@@ -514,7 +529,7 @@ void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, password);
 
     const RestClient::Request request(baseInfo
-        , password, kConfigureCommand, query, RestClient::kStandardTimeout
+        , password, kConfigureCommand, query, RestClient::kUseStandardTimeout
         , makeSuccessCallback(callback, Constants::kSystemNameAffected)
         , makeErrorCallback(callback, Constants::kSystemNameAffected)); 
     RestClient::sendGet(request);
@@ -545,7 +560,7 @@ void rtu::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, authPass);
     
     const RestClient::Request request(baseInfo
-        , authPass, kConfigureCommand, query, RestClient::kStandardTimeout
+        , authPass, kConfigureCommand, query, RestClient::kUseStandardTimeout
         , makeSuccessCallback(callback, Constants::kPasswordAffected)
         , makeErrorCallback(callback, Constants::kPasswordAffected)); 
     RestClient::sendGet(request);
@@ -572,7 +587,7 @@ void rtu::sendSetPortRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, password);
 
     const RestClient::Request request(baseInfo
-        , password, kConfigureCommand, query, RestClient::kStandardTimeout
+        , password, kConfigureCommand, query, RestClient::kUseStandardTimeout
         , makeSuccessCallback(callback, Constants::kPortAffected)
         , makeErrorCallback(callback, Constants::kPortAffected)); 
     RestClient::sendGet(request);
@@ -632,7 +647,7 @@ void rtu::sendChangeItfRequest(const BaseServerInfoPtr &baseInfo
     }
 
     const RestClient::Request request(baseInfo, password, kIfConfigCommand, QUrlQuery()
-        , RestClient::kStandardTimeout, makeSuccessCallback(callback, affected)
+        , RestClient::kUseStandardTimeout, makeSuccessCallback(callback, affected)
         , makeErrorCallback(callback, affected));
     RestClient::sendPost(request, QJsonDocument(jsonInfoChanges).toJson());
 }

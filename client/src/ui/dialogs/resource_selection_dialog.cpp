@@ -227,6 +227,8 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *d
         ui->resourcesWidget->setCustomColumnDelegate(m_delegate->customColumnDelegate());
     }
     ui->delegateFrame->setVisible(m_delegate && ui->delegateLayout->count() > 0);
+    if (m_delegate && m_delegate->isFlat())
+        ui->resourcesLayout->setSpacing(0);
 
     at_resourceModel_dataChanged();
 }

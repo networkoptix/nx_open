@@ -46,6 +46,7 @@ private:
     void updateRebuildUi(const QnStorageScanData& reply);
     void updateFailoverLabel();
     
+    bool serverIsReadOnly() const;
 private slots:
     void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
