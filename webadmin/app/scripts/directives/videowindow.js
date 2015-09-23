@@ -129,9 +129,9 @@ angular.module('webadminApp')
                             // Check version here
 
 
-                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
+                            /*if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
                                 return "flashls"; //TODO: support flashls for IE!
-                            }
+                            }*/
 
 
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
