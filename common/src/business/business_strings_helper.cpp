@@ -65,7 +65,7 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     using namespace QnBusiness;
 
     if (value >= UserDefinedEvent) {
-        QString result = tr("User Defined");
+        QString result = tr("Generic Event");
         if (value > UserDefinedEvent)
             result += tr(" (%1)").arg((int)value - (int)UserDefinedEvent); // reserved for future use
         return result;
@@ -161,17 +161,18 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     QString result;
     result += tr("Event: %1").arg(eventName(eventType));
 
-    result += delimiter;
-    result += tr("Source: %1").arg(getFullResourceName(eventSource(params), useIp));
+    QString sourceText = getFullResourceName(eventSource(params), useIp);
+    if (sourceText.isNull())
+        sourceText = params.resourceName;
+    if (!sourceText.isEmpty()) {
+        result += delimiter;
+        result += tr("Source: %1").arg(sourceText);
+    }
 
     if (eventType == QnBusiness::UserDefinedEvent) {
         if (!params.caption.isEmpty()) {
             result += delimiter;
             result += tr("Caption: %1").arg(params.caption);
-        }
-        if (!params.description.isEmpty()) {
-            result += delimiter;
-            result += tr("Description: %1").arg(params.description);
         }
     }
 
@@ -262,7 +263,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case ServerStartEvent: 
         break;
     case UserDefinedEvent:
-        result += params.description.isEmpty() ? params.caption : params.description;
+        result += !params.description.isEmpty() ? params.description : params.caption;
         break;
     default:
         break;
@@ -552,7 +553,7 @@ QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState stat
     case QnBusiness::InactiveState:
         return tr("stop");
     case QnBusiness::UndefinedState:
-        return tr("undefined");
+        return QString();
     default:
         break;
     }
