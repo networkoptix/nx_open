@@ -47,14 +47,22 @@ typedef struct
 #   include <intrin.h> /* For __cpuid. */
 #elif defined(Q_CC_GNU)
 #   ifdef __amd64__
-#       define __cpuid(res, op)                                                 \
-            __asm__ volatile(                                                   \
-            "mov %%rbx, %%rsi    \n\t"                                          \
-            "cpuid               \n\t"                                          \
-            "mov %%rbx, %1       \n\t"                                          \
-            "mov %%rsi, %%rbx    \n\t"                                          \
-            :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])             \
-            :"0"(op) : "%rsi")
+#       ifdef __clang__
+#           define __cpuid(res, op)                                             \
+                __asm__ volatile(                                               \
+                "cpuid               \n\t"                                      \
+                :"=a"(res[0]), "=b"(res[1]), "=c"(res[2]), "=d"(res[3])         \
+                :"0"(op) : "%rsi")
+#       else
+#           define __cpuid(res, op)                                             \
+                __asm__ volatile(                                               \
+                "mov %%rbx, %%rsi    \n\t"                                      \
+                "cpuid               \n\t"                                      \
+                "mov %%rbx, %1       \n\t"                                      \
+                "mov %%rsi, %%rbx    \n\t"                                      \
+                :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])         \
+                :"0"(op) : "%rsi")
+#       endif
 #   elif defined(__i386) || defined(__amd64)
 #       define __cpuid(res, op)                                                 \
             __asm__ volatile(                                                   \
