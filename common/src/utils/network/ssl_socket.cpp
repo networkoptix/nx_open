@@ -1137,7 +1137,7 @@ QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide)
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     init();
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
     d->async_ssl_ptr.reset( new AsyncSSL(d->ssl.get(),d->wrappedSocket,isServerSide) );
 }
 
@@ -1149,7 +1149,7 @@ QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrapped
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     init();
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
 }
 
 void QnSSLSocket::init()
@@ -1722,7 +1722,7 @@ TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect)
     TCPServerSocket(),
     m_allowNonSecureConnect(allowNonSecureConnect)
 {
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
 }
 
 AbstractStreamSocket* TCPSslServerSocket::accept()
