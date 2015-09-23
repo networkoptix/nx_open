@@ -66,14 +66,14 @@ struct QnCameraBookmarkSearchFilter {
     qint64 startTimeMs;
 
     /** Maximum end time for the bookmark. */
-    qint64 endTimeMs;
+    qint64 endTimeMs; //TODO: #GDM #Bookmarks now works as maximum start time
 
     /** Text-search filter string. */
     QString text;
 
-    int limit;
+    int limit; //TODO: #GDM #Bookmarks does not work
 
-    Qn::BookmarkSearchStrategy strategy;
+    Qn::BookmarkSearchStrategy strategy; //TODO: #GDM #Bookmarks does not work
 
     QnCameraBookmarkSearchFilter();
 };
