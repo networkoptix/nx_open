@@ -3,7 +3,7 @@
         <tbody>
             <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified || ieNoWebm && !session.ieNoWebmNotified ">
                 <td colspan="2" class="alert">
-                    <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !session.mobileAppNotified">
+                    <div class="webclient-panel mobile-alert hidden-mobile" ng-if="hasMobileApp && !session.mobileAppNotified">
                         <div class="pull-right" >
                             <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
                                 Install
@@ -41,7 +41,7 @@
                                 <label class="input-group input-group">
                                     <span class="input-group-addon" ><span class="glyphicon glyphicon-search"></span></span>
                                     <input type="search" class="form-control" placeholder="search" ng-model="searchCams">
-                                    <span class="input-group-addon" ng-click="searchCams=''" ><span class="glyphicon glyphicon-remove"></span></span>
+                                    <span ng-if="searchCams && searchCams!=''" class="input-group-addon clear-button" ng-click="searchCams=''" ><span class="glyphicon glyphicon-remove"></span></span>
                                 </label>
                             </div>
                             <ul class="tree nav" >
@@ -82,6 +82,22 @@
                     </div>
                 </td>
                 <td width="100%" >
+                    <div class="view-wrapper not-supported visible-mobile">
+                        <div class="view-panel">
+                            <div class="camera-view-informer ">
+                                <div class="camera-view-message">
+                                Webclient doesn't support mobile phones.
+                                <div ng-if="hasMobileApp">
+                                    Please, use mobile application to view video:
+                                    <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
+                                        Install
+                                    </a>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
                         <div class="view-panel" ng-class="{'live-only':liveOnly}">
                             <div class="stick-to-top">
