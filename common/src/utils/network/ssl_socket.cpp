@@ -1,17 +1,20 @@
+
 #include "ssl_socket.h"
-#include <openssl/opensslconf.h>
+
 #ifdef ENABLE_SSL
 #include <mutex>
 #include <errno.h>
-
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-
-#include <utils/common/log.h>
 #include <list>
 #include <memory>
 #include <atomic>
 #include <thread>
+
+#include <openssl/err.h>
+#include <openssl/opensslconf.h>
+#include <openssl/ssl.h>
+
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 
 #ifdef max
 #undef max
@@ -20,6 +23,7 @@
 #ifdef min
 #undef min
 #endif
+
 
 //static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
@@ -206,11 +210,10 @@ public:
         Q_ASSERT(openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get() != nullptr);
         if (mode & CRYPTO_LOCK)
             openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].lock();
-        }
         else
-        {
             openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].unlock();
-        }
+    }
+
 private:
     OpenSSLLockingCallbackType m_initialLockingCallback;
 };
@@ -1133,7 +1136,7 @@ QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide)
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     init();
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
     d->async_ssl_ptr.reset( new AsyncSSL(d->ssl.get(),d->wrappedSocket,isServerSide) );
 }
 
@@ -1147,7 +1150,7 @@ QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrapped
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     init();
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
 }
 
 void QnSSLSocket::init()
@@ -1588,7 +1591,7 @@ SSLServerSocket::SSLServerSocket(AbstractStreamServerSocket* delegateSocket, boo
     m_allowNonSecureConnect( allowNonSecureConnect ),
     m_delegateSocket( delegateSocket )
 {
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
 }
 
 void SSLServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )

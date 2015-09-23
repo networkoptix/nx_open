@@ -353,10 +353,17 @@ QString QnLog::logFileName( int logID )
 const std::unique_ptr< QnLog >& QnLog::Logs::get( int logID )
 {
     QnMutexLocker lk( &m_mutex );
+    //TODO #ak aren't we supposed to explcitly create log with init call?
     auto& log = m_logs[logID];
     if( !log )
         log.reset( new QnLog );
     return log;
+}
+
+bool QnLog::Logs::exists(int logID) const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_logs.find(logID) != m_logs.end();
 }
 
 bool QnLog::Logs::init( int logID, std::unique_ptr< QnLog > log )

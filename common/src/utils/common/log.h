@@ -73,11 +73,12 @@ public:
     {
     public:
         const std::unique_ptr< QnLog >& get( int logID = MAIN_LOG_ID );
+        bool exists(int logID) const;
         bool init( int logID, std::unique_ptr< QnLog > log );
         bool init( int logID, const QString& logLevelStr );
 
     private:
-        QnMutex m_mutex;
+        mutable QnMutex m_mutex;
         std::map< int, std::unique_ptr< QnLog > > m_logs;
     };
 
