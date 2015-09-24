@@ -5,7 +5,7 @@
 
 #include <base/types.h>
 #include <base/selection.h>
-#include <base/server_info.h>
+#include <helpers/model_change_helper.h>
 
 namespace
 {
@@ -43,16 +43,18 @@ namespace
 
 ///
 
-class rtu::IpSettingsModel::Impl : public QObject
+class rtu::IpSettingsModel::Impl
 {
 public:
-    Impl(Selection *selection
-        , QObject *parent);
+    Impl(bool singleSelection
+        , const InterfaceInfoList &interfaces);
     
     virtual ~Impl();
     
     bool isSingleSelection() const;
     
+    const InterfaceInfoList &interfaces() const;
+
     int rowCount() const;
     
     QVariant data(const QModelIndex &index
@@ -64,12 +66,10 @@ private:
 };
 
 
-rtu::IpSettingsModel::Impl::Impl(Selection *selection
-    , QObject *parent)
-
-    : QObject(parent)
-    , m_isSingleSelection(selection ? selection->count() <= kSingleSelection : 0)
-    , m_addresses(selection ? selection->aggregatedInterfaces() : InterfaceInfoList())
+rtu::IpSettingsModel::Impl::Impl(bool singleSelection
+    , const InterfaceInfoList &interfaces)
+    : m_isSingleSelection(singleSelection)
+    , m_addresses(interfaces)
 {
 }
 
@@ -78,6 +78,11 @@ rtu::IpSettingsModel::Impl::~Impl() {}
 bool rtu::IpSettingsModel::Impl::isSingleSelection() const
 {
     return m_isSingleSelection;
+}
+
+const rtu::InterfaceInfoList &rtu::IpSettingsModel::Impl::interfaces() const
+{
+    return m_addresses;
 }
 
 int rtu::IpSettingsModel::Impl::rowCount() const
@@ -119,10 +124,12 @@ QVariant rtu::IpSettingsModel::Impl::data(const QModelIndex &index
 
 ///
 
-rtu::IpSettingsModel::IpSettingsModel(Selection *selection
+rtu::IpSettingsModel::IpSettingsModel(int count
+    , const InterfaceInfoList &interfaces
     , QObject *parent)
     : QAbstractListModel(parent)
-    , m_impl(new Impl(selection, this))
+    , m_helper(CREATE_MODEL_CHANGE_HELPER(this))
+    , m_impl(new Impl(count <= kSingleSelection, interfaces))
 {
 }
 
@@ -133,6 +140,22 @@ rtu::IpSettingsModel::~IpSettingsModel()
 bool rtu::IpSettingsModel::isSingleSelection() const
 {
     return m_impl->isSingleSelection();
+}
+
+const rtu::InterfaceInfoList &rtu::IpSettingsModel::interfaces() const
+{
+    return m_impl->interfaces();
+}
+
+void rtu::IpSettingsModel::resetTo(IpSettingsModel *source)
+{
+    if (!source)
+        return;
+
+    const auto resetGuard = m_helper->resetModelGuard();
+    Q_UNUSED(resetGuard);
+
+    m_impl.reset(new Impl(source->isSingleSelection(), source->interfaces()));
 }
 
 int rtu::IpSettingsModel::rowCount(const QModelIndex &parent) const

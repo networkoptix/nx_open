@@ -32,19 +32,13 @@ public:
 protected:
     virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 
-signals:
-    void cameraOpenRequested();
-
 private slots:
     void at_settingsWidget_hasChangesChanged();
     void at_settingsWidget_modeChanged();
-    void at_selectionChangeAction_triggered();
 
     void at_diagnoseButton_clicked();
     void at_rulesButton_clicked();
     void at_openButton_clicked();
-
-    void updateCamerasFromSelection();
 private:
     void updateReadOnly();
 
@@ -63,13 +57,6 @@ private:
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;
-
-    /** Whether the set of selected resources was changed and settings
-     * dialog is waiting to be updated. */
-    bool m_selectionUpdatePending;
-
-    /** Scope of the last selection change. */
-    Qn::ActionScope m_selectionScope;
 
     bool m_ignoreAccept;
 };

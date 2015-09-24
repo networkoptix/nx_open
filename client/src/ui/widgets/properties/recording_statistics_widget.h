@@ -26,10 +26,13 @@ class QnRecordingStatisticsWidget: public Connective<QnAbstractPreferencesWidget
 
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    QnRecordingStatisticsWidget(const QnMediaServerResourcePtr &server, QWidget* parent = 0);
+    QnRecordingStatisticsWidget(QWidget* parent = 0);
     virtual ~QnRecordingStatisticsWidget();
 
     virtual void updateFromSettings() override;
+
+    QnMediaServerResourcePtr server() const;
+    void setServer(const QnMediaServerResourcePtr &server);
 private:
     void updateData();
 

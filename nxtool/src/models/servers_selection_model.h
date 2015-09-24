@@ -15,7 +15,6 @@ namespace rtu
 
         Q_PROPERTY(int selectedCount READ selectedCount NOTIFY selectionChanged)
         Q_PROPERTY(int serversCount READ serversCount NOTIFY serversCountChanged)
-        Q_PROPERTY(bool selectionOutdated READ selectionOutdated NOTIFY selectionOutdatedChanged)
 
     public:
         ServersSelectionModel(QObject *parent = nullptr);
@@ -39,8 +38,6 @@ namespace rtu
 
         ///
 
-        bool selectionOutdated() const;
-
         int selectedCount() const;
         
         ServerInfoPtrContainer selectedServers();
@@ -61,6 +58,10 @@ namespace rtu
 
         void unknownRemoved(const QString &address);
 
+        void updateExtraInfo(const QUuid &id
+            , const ExtraServerInfo &extraInfo
+            , const QString &hostName);
+
         void updateTimeDateInfo(const QUuid &id
             , qint64 utcDateTimeMs
             , const QByteArray &timeZoneId
@@ -79,8 +80,9 @@ namespace rtu
         void updatePasswordInfo(const QUuid &id
             , const QString &password);
 
-        void setBusyState(const IDsVector &ids
-            , bool isBusy);
+        void setLockedState(const IDsVector &ids
+            , const QUuid &locker
+            , bool locked);
 
         void changeAccessMethod(const QUuid &id
             , bool byHttp);
@@ -88,10 +90,11 @@ namespace rtu
     signals:
         void layoutChanged();
 
-        void selectionOutdatedChanged();
+        void selectionChanged();    /// Signals that new items are selected or 
+                                    /// selection has got empty
 
-        void selectionChanged();
-        
+        void updateSelectionData();
+
         void serversCountChanged();
         
         void serverLogged(const ServerInfo &info);

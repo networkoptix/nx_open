@@ -209,6 +209,7 @@
 #include "utils/common/waiting_for_qthread_to_empty_event_queue.h"
 #include "core/multicast/multicast_http_server.h"
 #include "crash_reporter.h"
+#include "rest/handlers/exec_script_rest_handler.h"
 
 
 #ifdef __arm__
@@ -1347,19 +1348,20 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/aggregator", new QnJsonAggregatorRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler(), RestPermissions::adminOnly );
+    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), RestPermissions::adminOnly );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), RestPermissions::adminOnly);
 
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 

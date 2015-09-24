@@ -37,9 +37,9 @@ bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const Q
         return false;
     };
 
-    return mathKeywords(resourceNameKeywords, params.resourceName) &&
-           mathKeywords(captionKeywords, params.caption) &&
-           mathKeywords(descriptionKeywords, params.description);
+    return mathKeywords(resourceNameKeywords, m_resourceName) &&
+           mathKeywords(captionKeywords, m_caption) &&
+           mathKeywords(descriptionKeywords, m_description);
 }
 
 QnBusinessEventParameters QnCustomBusinessEvent::getRuntimeParams() const 

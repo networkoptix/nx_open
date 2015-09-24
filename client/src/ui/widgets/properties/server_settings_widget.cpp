@@ -119,16 +119,22 @@ namespace {
 } // anonymous namespace
 
 
-QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /* = 0*/):
+QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::ServerSettingsWidget),
-    m_server(server),
-    m_removeAction(nullptr),
-    m_hasStorageChanges(false),
-    m_maxCamerasAdjusted(false),
-    m_rebuildWasCanceled(false),
-    m_initServerName()
+      ui(new Ui::ServerSettingsWidget)
+    , m_server()
+    , m_storages()
+    , m_storageProtocols()
+    , m_tableBottomLabel()
+    , m_initialStorageCheckStates()
+    , m_removeAction(new QAction(tr("Remove Storage"), this))
+    , m_hasStorageChanges(false)
+    , m_maxCamerasAdjusted(false)
+    , m_rebuildState()
+    , m_storagesToRemove()
+    , m_rebuildWasCanceled(false)
+    , m_initServerName()
 {
     ui->setupUi(this);
 
@@ -151,24 +157,11 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
 
-    bool readOnly = serverIsReadOnly();
-
-    /* Edge servers cannot be renamed. */
-    ui->nameLineEdit->setReadOnly(readOnly || QnMediaServerResource::isEdgeServer(server));
-
-    if (!readOnly)
-        m_removeAction = new QAction(tr("Remove Storage"), this);
-
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
     signalizer->setEventType(QEvent::ContextMenu);
     ui->storagesTable->installEventFilter(signalizer);
-    setReadOnly(ui->storagesTable, readOnly);
-
     connect(signalizer, &QnAbstractEventSignalizer::activated,  this,   &QnServerSettingsWidget::at_storagesTable_contextMenuEvent);
-    connect(m_server,   &QnMediaServerResource::statusChanged,  this,   &QnServerSettingsWidget::at_updateRebuildInfo);
-    connect(m_server,   &QnMediaServerResource::apiUrlChanged,  this,   &QnServerSettingsWidget::at_updateRebuildInfo);
-    for (const auto& storage: m_server->getStorages())
-        connect(storage.data(), &QnResource::statusChanged,     this,   &QnServerSettingsWidget::at_updateRebuildInfo);
+
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -179,25 +172,17 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->rebuildGroupBox,                                         Qn::ServerSettings_ArchiveRestoring_Help);
     setHelpTopic(ui->failoverGroupBox,                                        Qn::ServerSettings_Failover_Help);
 
-    if (!readOnly)
-        connect(ui->storagesTable,          &QTableWidget::cellChanged, this,   &QnServerSettingsWidget::at_storagesTable_cellChanged);
-
+    connect(ui->storagesTable,          &QTableWidget::cellChanged, this,   &QnServerSettingsWidget::at_storagesTable_cellChanged);
     connect(ui->pingButton,             &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_pingButton_clicked);
-
-    if (!readOnly) {
-        connect(ui->rebuildStartButton,     &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_rebuildButton_clicked);
-        connect(ui->rebuildStopButton,      &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_rebuildButton_clicked);
-    } else {
-        ui->rebuildGroupBox->setVisible(false);
-    }
-
-    setReadOnly(ui->failoverCheckBox, readOnly);
+    connect(ui->rebuildStartButton,     &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_rebuildButton_clicked);
+    connect(ui->rebuildStopButton,      &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_rebuildButton_clicked);
+    
     connect(ui->failoverCheckBox,       &QCheckBox::stateChanged,       this,   [this] {
         ui->maxCamerasWidget->setEnabled(ui->failoverCheckBox->isChecked());
         updateFailoverLabel();
     });
 
-    setReadOnly(ui->maxCamerasSpinBox, readOnly);
+    
     connect(ui->maxCamerasSpinBox,      QnSpinboxIntValueChanged,       this,   [this] {
         m_maxCamerasAdjusted = true;
         updateFailoverLabel();
@@ -205,24 +190,62 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
 
     connect(ui->failoverPriorityButton, &QPushButton::clicked,  action(Qn::OpenFailoverPriorityAction), &QAction::trigger);
 
-    connect(m_server, &QnResource::nameChanged, this, [this](const QnResourcePtr &resource)
-    {
-        if (ui->nameLineEdit->text() != m_initServerName)   /// Field was changed
-            return;
-
-        m_initServerName = resource->getName();
-        ui->nameLineEdit->setText(m_initServerName);
-    });
-
     retranslateUi();
 }
 
 QnServerSettingsWidget::~QnServerSettingsWidget()
 {}
 
+QnMediaServerResourcePtr QnServerSettingsWidget::server() const {
+    return m_server;
+}
+
+void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server) {
+    if (m_server == server)
+        return;
+
+    if (m_server) {
+        disconnect(m_server, nullptr, this, nullptr);
+    }
+    for (const auto &storage: m_storages)
+        disconnect(storage, nullptr, this, nullptr);
+
+    m_server = server;
+
+    if (m_server) {
+        connect(m_server, &QnResource::nameChanged, this, [this](const QnResourcePtr &resource)
+        {
+            if (ui->nameLineEdit->text() != m_initServerName)   /// Field was changed
+                return;
+
+            m_initServerName = resource->getName();
+            ui->nameLineEdit->setText(m_initServerName);
+        });
+
+        connect(m_server,   &QnMediaServerResource::statusChanged,  this,   &QnServerSettingsWidget::updateRebuildInfo);
+        connect(m_server,   &QnMediaServerResource::apiUrlChanged,  this,   &QnServerSettingsWidget::updateRebuildInfo);
+        m_storages = m_server->getStorages();
+        for (const auto& storage: m_storages)
+            connect(storage, &QnResource::statusChanged,            this,   &QnServerSettingsWidget::updateRebuildInfo);
+    }
+
+    updateReadOnly();
+}
+
+void QnServerSettingsWidget::updateReadOnly() {
+    bool readOnly = isReadOnly();
+    setReadOnly(ui->failoverCheckBox, readOnly);
+    setReadOnly(ui->maxCamerasSpinBox, readOnly);
+    setReadOnly(ui->storagesTable, readOnly);
+
+    /* Edge servers cannot be renamed. */
+    ui->nameLineEdit->setReadOnly(readOnly || QnMediaServerResource::isEdgeServer(m_server));
+
+    ui->rebuildGroupBox->setVisible(!readOnly);
+}
 
 bool QnServerSettingsWidget::hasChanges() const {
-    if (serverIsReadOnly())
+    if (isReadOnly())
         return false;
 
     if (m_hasStorageChanges)
@@ -248,14 +271,19 @@ void QnServerSettingsWidget::retranslateUi() {
 }
 
 void QnServerSettingsWidget::updateFromSettings() {
-    sendStorageSpaceRequest();
     updateRebuildUi(QnStorageScanData());
-
-    if (m_server->getStatus() == Qn::Online)
-        sendNextArchiveRequest();
-
     setTableItems(QList<QnStorageSpaceData>());
-    setBottomLabelText(tr("Loading..."));
+
+    if (!m_server)
+        return;
+
+    sendStorageSpaceRequest();
+    if (m_server->getStatus() == Qn::Online) {
+        sendNextArchiveRequest();
+        setBottomLabelText(tr("Loading..."));
+    } else {
+        setBottomLabelText(tr("Server is unavailable"));
+    }
 
     m_initServerName = m_server->getName();
     ui->nameLineEdit->setText(m_initServerName);
@@ -266,15 +294,15 @@ void QnServerSettingsWidget::updateFromSettings() {
         maxCameras = ARM_SERVER_MAX_CAMERAS;   //generic ARM based servre
     else
         maxCameras = PC_SERVER_MAX_CAMERAS;    //PC server
+    ui->maxCamerasSpinBox->setMaximum(maxCameras);
+
     int currentMaxCamerasValue = m_server->getMaxCameras();
     if( currentMaxCamerasValue == 0 )
         currentMaxCamerasValue = maxCameras;
 
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
-    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
-
-    ui->maxCamerasSpinBox->setMaximum(maxCameras);
+    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());   
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -287,7 +315,7 @@ void QnServerSettingsWidget::updateFromSettings() {
 }
 
 void QnServerSettingsWidget::submitToSettings() {
-    if (serverIsReadOnly())
+    if (isReadOnly())
         return;
 
     if(m_hasStorageChanges) {
@@ -298,7 +326,7 @@ void QnServerSettingsWidget::submitToSettings() {
             if (storage) {
                 if (item.isUsedForWriting != storage->isUsedForWriting()) {
                     storage->setUsedForWriting(item.isUsedForWriting);
-                    newStorages.push_back(storage); // todo: #rvasilenko: temporarty code line. Need remote it after moving 'usedForWriting' to separate property
+                    newStorages.push_back(storage); // todo: #rvasilenko: temporary code line. Need remote it after moving 'usedForWriting' to separate property
                 }
             }
             else {
@@ -343,7 +371,7 @@ void QnServerSettingsWidget::addTableItem(const QnStorageSpaceData &item) {
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
     Qt::ItemFlags flags = Qt::ItemIsSelectable;
-    if (!serverIsReadOnly())
+    if (!isReadOnly())
         flags |= Qt::ItemIsUserCheckable;
 
     if (item.isWritable)
@@ -507,7 +535,9 @@ int QnServerSettingsWidget::dataRowCount() const {
     return rowCount;
 }
 
-bool QnServerSettingsWidget::serverIsReadOnly() const {
+bool QnServerSettingsWidget::isReadOnly() const {
+    if (!m_server)
+        return true;
     return !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
 }
 
@@ -533,6 +563,9 @@ void QnServerSettingsWidget::at_tableBottomLabel_linkActivated() {
 }
 
 void QnServerSettingsWidget::at_storagesTable_cellChanged(int row, int column) {
+    if (isReadOnly())
+        return;
+
     if (column == CheckBoxColumn) {
         if (QTableWidgetItem *item = ui->storagesTable->item(row, column)) {
             bool checked = item->checkState() == Qt::Checked;
@@ -545,25 +578,29 @@ void QnServerSettingsWidget::at_storagesTable_cellChanged(int row, int column) {
 }
 
 void QnServerSettingsWidget::at_storagesTable_contextMenuEvent(QObject *, QEvent *) {
+    if (isReadOnly())
+        return;
+
     int row = ui->storagesTable->currentRow();
     QnStorageSpaceData item = tableItem(row);
     if(item.url.isEmpty() || !item.isExternal)
         return;
 
     QScopedPointer<QMenu> menu(new QMenu(this));
-    if (m_removeAction)
-        menu->addAction(m_removeAction);
+    menu->addAction(m_removeAction);
 
     QAction *action = menu->exec(QCursor::pos());
-    if(action && action == m_removeAction) {
+    if(action == m_removeAction) {
         m_storagesToRemove.push_back(item.storageId);
         ui->storagesTable->removeRow(row);
         m_hasStorageChanges = true;
     }
 }
 
-void QnServerSettingsWidget::at_rebuildButton_clicked()
-{
+void QnServerSettingsWidget::at_rebuildButton_clicked() {
+    if (!m_server)
+        return;
+
     RebuildAction action;
     if (m_rebuildState.state > Qn::RebuildState_None) {
         action = RebuildAction_Cancel;
@@ -592,8 +629,10 @@ void QnServerSettingsWidget::at_rebuildButton_clicked()
     updateRebuildUi(m_rebuildState);
 }
 
-void QnServerSettingsWidget::at_updateRebuildInfo()
-{
+void QnServerSettingsWidget::updateRebuildInfo() {
+    if (isReadOnly())
+        return;
+
     if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
     else
@@ -601,12 +640,13 @@ void QnServerSettingsWidget::at_updateRebuildInfo()
 }
 
 void QnServerSettingsWidget::sendStorageSpaceRequest() {
-    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    if (m_server)
+        m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
 }
 
-void QnServerSettingsWidget::sendNextArchiveRequest()
-{
-    m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
+void QnServerSettingsWidget::sendNextArchiveRequest() {
+    if (m_server)
+        m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
 }
 
 void QnServerSettingsWidget::updateRebuildUi(const QnStorageScanData& reply) {
@@ -708,7 +748,7 @@ void QnServerSettingsWidget::at_replyReceived(int status, const QnStorageSpaceRe
     setTableItems(items);
 
     m_storageProtocols = reply.storageProtocols;
-    if (m_storageProtocols.isEmpty() || serverIsReadOnly()) 
+    if (m_storageProtocols.isEmpty() || isReadOnly()) 
     {
         setBottomLabelText(QString());
     } else {

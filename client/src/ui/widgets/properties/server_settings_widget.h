@@ -25,7 +25,7 @@ class QnServerSettingsWidget: public Connective<QnAbstractPreferencesWidget>, pu
 
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    QnServerSettingsWidget(const QnMediaServerResourcePtr &server, QWidget* parent = 0);
+    QnServerSettingsWidget(QWidget* parent = nullptr);
     virtual ~QnServerSettingsWidget();
 
     virtual bool hasChanges() const override;
@@ -33,6 +33,8 @@ public:
     virtual void submitToSettings() override;
     virtual void retranslateUi() override;
 
+    QnMediaServerResourcePtr server() const;
+    void setServer(const QnMediaServerResourcePtr &server);
 private:
     void addTableItem(const QnStorageSpaceData &item);
     void setTableItems(const QList<QnStorageSpaceData> &items);
@@ -43,10 +45,13 @@ private:
     QString bottomLabelText() const;
     int dataRowCount() const;
 
+    void updateRebuildInfo();
     void updateRebuildUi(const QnStorageScanData& reply);
     void updateFailoverLabel();
     
-    bool serverIsReadOnly() const;
+    bool isReadOnly() const;
+    void updateReadOnly();
+
 private slots:
     void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
@@ -56,7 +61,7 @@ private slots:
 
     void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int);
     void sendNextArchiveRequest();
-    void at_updateRebuildInfo();
+    
 
     void sendStorageSpaceRequest();
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
@@ -65,6 +70,7 @@ private:
     QScopedPointer<Ui::ServerSettingsWidget> ui;
 
     QnMediaServerResourcePtr m_server;
+    QnStorageResourceList m_storages;
 
     QList<QString> m_storageProtocols;
     QPointer<QLabel> m_tableBottomLabel;

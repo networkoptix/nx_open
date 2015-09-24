@@ -414,6 +414,67 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     return 0;
 }
 
+int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
+{
+    if (!m_vTranscoder && !m_aTranscoder)
+        return 0;
+
+    for (int streamIndex = 0; streamIndex < 2; ++streamIndex)
+    {
+        AVRational srcRate = { 1, 1000000 };
+
+        //finalizing codec transcoder
+        QnCodecTranscoderPtr transcoder;
+        if (streamIndex == 0)
+            transcoder = m_vTranscoder;
+        else if (streamIndex == 1)
+            transcoder = m_aTranscoder;
+        if (!transcoder)
+            continue;
+
+        AVStream* stream = m_formatCtx->streams[streamIndex];
+
+        QnAbstractMediaDataPtr transcodedData;
+        do
+        {
+            transcodedData.reset();
+
+            AVPacket packet;
+            av_init_packet(&packet);
+            packet.data = 0;
+            packet.size = 0;
+
+            // transcode media
+            int errCode = transcoder->transcodePacket(QnConstAbstractMediaDataPtr(), &transcodedData);
+            if (errCode != 0)
+                return errCode;
+            if (transcodedData)
+            {
+                packet.data = const_cast<quint8*>((const quint8*)transcodedData->data());  //const_cast is here because av_write_frame accepts 
+                                                                                            //non-const pointer, but does not modifiy packet buffer
+                packet.size = static_cast<int>(transcodedData->dataSize());
+                packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
+                if (transcodedData->flags & AV_PKT_FLAG_KEY)
+                    packet.flags |= AV_PKT_FLAG_KEY;
+            }
+
+            packet.stream_index = streamIndex;
+            packet.dts = packet.pts;
+
+            if (packet.size > 0)
+            {
+                if (av_write_frame(m_formatCtx, &packet) < 0)
+                    qWarning() << QLatin1String("QnFfmpegTranscoder::finalizeIntenal. Transcoder error: can't write AV packet");
+            }
+        } while (transcodedData);
+    }
+
+    //finalizing container stream
+    av_write_trailer(m_formatCtx);
+
+    return 0;
+}
+
 AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const 
 { 
     /*
