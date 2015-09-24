@@ -708,6 +708,28 @@
             </dependencies>
         </profile>
         <profile>
+            <id>mobile-android-desktop</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>mobile</name>
+                    <value>android-desktop</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.digia</groupId>
+                    <version>5.4.1-SNAPSHOT</version>
+                    <artifactId>qt</artifactId>
+                    <type>tar.gz</type>
+                    <classifier>${qt.classifier}${compile.options}</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
