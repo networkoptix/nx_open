@@ -170,14 +170,22 @@ void StreamingChunkTranscoderThread::run()
 
         if( !srcPacket )
         {
-            NX_LOG( QString::fromLatin1("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
-                arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
+            NX_LOG( lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
+                arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
+                arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
             removeTranscodingNonSafe( transcodeIter, false, &lk );
             continue;
         }
 
         QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
         Q_ASSERT( srcMediaData );
+
+        if( srcMediaData->dataType == QnAbstractMediaData::VIDEO &&
+            srcMediaData->channelNumber != transcodeIter->second->transcodeParams.channel() )
+        {
+            //skipping packet of different channel
+            continue;
+        }
 
         QnByteArray resultStream( 1, RESERVED_TRANSCODED_PACKET_SIZE );
 #ifdef SAVE_INPUT_STREAM_TO_FILE
@@ -186,8 +194,9 @@ void StreamingChunkTranscoderThread::run()
         int res = transcodeIter->second->dataSourceCtx->transcoder->transcodePacket( srcMediaData, &resultStream );
         if( res )
         {
-            NX_LOG( QString::fromLatin1("Error transcoding resource %1 data, error code %2. Transcoded %3 ms of source data").
-                arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).arg(res).arg(transcodeIter->second->msTranscoded), cl_logWARNING );
+            NX_LOG( lit("Error transcoding resource %1 data, error code %2. Transcoded %3 ms of source data").
+                arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
+                arg(res).arg(transcodeIter->second->msTranscoded), cl_logWARNING );
             removeTranscodingNonSafe( transcodeIter, false, &lk );
             continue;
         }

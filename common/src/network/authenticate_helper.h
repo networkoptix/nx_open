@@ -211,8 +211,7 @@ private:
         const QnUserResourcePtr& userRes,
         bool isProxy );
     QByteArray getNonce();
-    bool isNonceValid(const QByteArray& nonce) const;
-    bool isCookieNonceValid(const QByteArray& nonce);
+    bool isNonceValid(const QByteArray& nonce);
     Qn::AuthResult doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
                       std::function<bool(const QByteArray&)> checkNonceFunc, QnUserResourcePtr* const outUserResource = nullptr);
     Qn::AuthResult doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
@@ -225,6 +224,7 @@ private:
     QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
 
+    //map<nonce, nonce creation timestamp usec>
     QMap<qint64, qint64> m_cookieNonceCache;
     mutable QMutex m_cookieNonceCacheMutex;
 
