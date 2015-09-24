@@ -49,7 +49,8 @@ namespace nx_http
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
         m_msgBodyReadTimeoutMs( 0 ),
         m_authType(authBasicAndDigest),
-        m_awaitedMessageNumber( 0 )
+        m_awaitedMessageNumber( 0 ),
+        m_requestSequence( 0 )
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -432,7 +433,7 @@ namespace nx_http
                     lk.unlock();
                     emit done( sharedThis );
                     lk.relock();
-                    break;
+                    return;
                 }
 
                 //response read
@@ -465,11 +466,15 @@ namespace nx_http
                     (m_httpStreamReader.messageBodyBufferSize() > 0);
 
                 m_state = sResponseReceived;
+                const auto requestSequenceBak = m_requestSequence;
                 lk.unlock();
                 emit responseReceived( sharedThis );
                 lk.relock();
-                if( m_terminated )
-                    break;
+                if( m_terminated ||
+                    (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
+                {
+                    return;
+                }
 
                 //does message body follow?
                 if( !messageHasMessageBody )
@@ -479,7 +484,7 @@ namespace nx_http
                     lk.unlock();
                     emit done( sharedThis );
                     lk.relock();
-                    break;
+                    return;
                 }
 
                 //starting reading message body
@@ -492,7 +497,7 @@ namespace nx_http
                     emit someMessageBodyAvailable( sharedThis );
                     lk.relock();
                     if( m_terminated )
-                        break;
+                        return;
                 }
 
                 if( ((m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
@@ -566,20 +571,7 @@ namespace nx_http
 
     void AsyncHttpClient::resetDataBeforeNewRequest()
     {
-        //stopping client, if it is running
-        {
-            QMutexLocker lk( &m_mutex );
-            m_terminated = true;
-        }
-        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
-        if( m_socket )
-            m_socket->cancelAsyncIO();
-
-        {
-            QMutexLocker lk( &m_mutex );
-            m_terminated = false;
-        }
-
+        ++m_requestSequence;
         m_authorizationTried = false;
         m_ha1RecalcTried = false;
         m_request = nx_http::Request();
@@ -602,9 +594,6 @@ namespace nx_http
 
         if( m_socket )
         {
-            //TODO #ak think again about next cancellation
-            m_socket->cancelAsyncIO();
-
             if( !m_connectionClosed &&
                 canUseExistingConnection &&
                 (m_remoteEndpoint == remoteEndpoint) )  //m_socket->getForeignAddress() returns ip address only, not host name
