@@ -586,7 +586,6 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
 {
     Q_ASSERT( action );
 
-#ifdef ENABLE_SENDMAIL
     QStringList log;
     QStringList recipients;
     for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
@@ -659,10 +658,6 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
      */
     action->getParams().emailAddress = formatEmailList(recipients);
     return true;
-
-#else
-    return false;
-#endif // ENABLE_SENDMAIL
 }
 
 void QnBusinessRuleProcessor::sendEmailAsync(const ec2::ApiEmailData& data)
