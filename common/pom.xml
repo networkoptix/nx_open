@@ -120,7 +120,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>mobile</name>
+                    <name>newmobile</name>
                     <value>android</value>
                 </property>
             </activation>
@@ -133,7 +133,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>mobile</name>
+                    <name>newmobile</name>
                     <value>ios</value>
                 </property>
             </activation>
