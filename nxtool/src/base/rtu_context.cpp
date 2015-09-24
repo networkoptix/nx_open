@@ -24,10 +24,6 @@ public:
     
     rtu::ServersSelectionModel *selectionModel();
     
-    QAbstractListModel *ipSettingsModel();
-    
-    rtu::TimeZonesModel *timeZonesModel(QObject *parent);
-    
     rtu::ChangesManager *changesManager();
     
     ApplyChangesTask *progressTask();
@@ -87,6 +83,18 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
         emit m_owner->selectionChanged();
     });
 
+    QObject::connect(m_selectionModel, &ServersSelectionModel::updateSelectionData
+        , [this]()
+    {
+        if (!m_selection)
+        {
+            m_selection.reset(new Selection(m_selectionModel));
+            emit m_owner->selectionChanged();
+        }
+        else
+            m_selection->updateSelection(m_selectionModel);
+    });
+
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverAdded
         , m_selectionModel, &ServersSelectionModel::addServer);
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverChanged
@@ -99,7 +107,7 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
         , m_selectionModel, &ServersSelectionModel::unknownRemoved);
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_selectionModel, &ServersSelectionModel::serverDiscovered);
-
+ 
     QObject::connect(RestClient::instance(), &RestClient::accessMethodChanged
         , [this](const QUuid &id, bool byHttp) { m_selectionModel->changeAccessMethod(id, byHttp); });
 }
@@ -111,16 +119,6 @@ rtu::RtuContext::Impl::~Impl()
 rtu::ServersSelectionModel *rtu::RtuContext::Impl::selectionModel()
 {
     return m_selectionModel;
-}
-
-QAbstractListModel *rtu::RtuContext::Impl::ipSettingsModel()
-{
-    return new IpSettingsModel(m_selection.data());
-}
-
-rtu::TimeZonesModel *rtu::RtuContext::Impl::timeZonesModel(QObject *parent)
-{
-    return new TimeZonesModel(m_selectionModel->selectedServers(), parent);
 }
 
 rtu::ChangesManager *rtu::RtuContext::Impl::changesManager()
@@ -246,16 +244,6 @@ rtu::RtuContext::~RtuContext()
 QObject *rtu::RtuContext::selectionModel()
 {
     return m_impl->selectionModel();
-}
-
-QObject *rtu::RtuContext::ipSettingsModel()
-{
-    return m_impl->ipSettingsModel();
-}
-
-QObject *rtu::RtuContext::timeZonesModel(QObject *parent)
-{
-    return m_impl->timeZonesModel(parent);
 }
 
 QObject *rtu::RtuContext::changesManager()

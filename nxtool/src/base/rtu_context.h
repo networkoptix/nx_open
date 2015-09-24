@@ -63,10 +63,6 @@ namespace rtu
     public slots:
         QObject *selectionModel();
         
-        QObject *ipSettingsModel();
-        
-        QObject *timeZonesModel(QObject *parent);
-        
         bool isValidSubnetMask(const QString &mask) const;
 
         bool isDiscoverableFromCurrentNetwork(const QString &ip

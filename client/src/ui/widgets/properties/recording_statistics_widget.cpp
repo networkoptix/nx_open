@@ -192,11 +192,11 @@ namespace {
 
 }
 
-QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /* = 0*/):
+QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingStatisticsWidget),
-    m_server(server),
+    m_server(),
     m_model(new QnRecordingStatsModel(this)),
     m_requests(),
     m_updateDisabled(false),
@@ -273,6 +273,14 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(const QnMediaServerReso
 
 QnRecordingStatisticsWidget::~QnRecordingStatisticsWidget()
 {}
+
+QnMediaServerResourcePtr QnRecordingStatisticsWidget::server() const {
+    return m_server;
+}
+
+void QnRecordingStatisticsWidget::setServer(const QnMediaServerResourcePtr &server) {
+    m_server = server;
+}
 
 void QnRecordingStatisticsWidget::updateFromSettings() {
     updateData();

@@ -126,8 +126,9 @@ void rtu::HttpClient::Impl::sendPost(const QUrl &url
         , ReplyInfo(successfullCallback, errorCallback));
 }
 
-void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs) {
-    if (timeoutMs < 0)
+void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs) 
+{
+    if ((timeoutMs < 0) && (timeoutMs != RestClient::kUseStandardTimeout))
         return;
 
     if (timeoutMs == RestClient::kUseStandardTimeout)

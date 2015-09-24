@@ -61,9 +61,7 @@
 #include <ui/actions/action_target_provider.h>
 
 #include <ui/dialogs/about_dialog.h>
-#include <ui/dialogs/server_settings_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/dialogs/camera_settings_dialog.h>
 #include <ui/dialogs/user_settings_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/preferences_dialog.h>
@@ -217,18 +215,14 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
-    connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
-    connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));   
     connect(action(Qn::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
     connect(action(Qn::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
-    connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
-    connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    
-    connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
-    connect(action(Qn::ServerSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
+    connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));    
+    connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));    
     connect(action(Qn::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
@@ -447,10 +441,6 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
     if (qnRedAssController)
         qnRedAssController->setMode(resolutionMode);
-}
-
-QnCameraSettingsDialog *QnWorkbenchActionHandler::cameraSettingsDialog() const {
-    return m_cameraSettingsDialog.data();
 }
 
 QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const {
@@ -1365,15 +1355,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 }
 
-void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnVirtualCameraResourceList cameras = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
-
-    QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
-    dialogConstructor.setDontFocus(true);
-
-    cameraSettingsDialog()->setCameras(cameras);
-}
-
 void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if (!resource)
@@ -1450,22 +1431,6 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
         }
         dialog->setServer(server);
     }
-}
-
-void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnMediaServerResourceList servers;
-    for (const auto &resource: menu()->currentParameters(sender()).resources()) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (server && server->getStatus() != Qn::Incompatible)
-            servers << server;
-    }
-
-    Q_ASSERT_X(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");
-    if(servers.isEmpty())
-        return;
-
-    QnMediaServerResourcePtr server = servers.first();
-    QnServerSettingsDialog::showNonModal(server, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
@@ -2399,9 +2364,6 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::deleteDialogs() {
-    if(cameraSettingsDialog())
-        delete cameraSettingsDialog();
-
     if (businessRulesDialog())
         delete businessRulesDialog();
 
