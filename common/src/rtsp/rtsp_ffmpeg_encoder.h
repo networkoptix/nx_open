@@ -34,11 +34,11 @@ public:
 
     void setCodecContext(QnMediaContextPtr context);
 private:
-    QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);
+    QnMediaContextPtr getGeneratedContext(CodecID compressionType);
 private:
     bool m_gotLivePacket;
     QnMediaContextPtr m_ctxSended;
-    QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
+    QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     QnConstAbstractMediaDataPtr m_media;
     const char* m_curDataBuffer;
     QByteArray m_codecCtxData;

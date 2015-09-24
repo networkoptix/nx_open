@@ -76,7 +76,7 @@ bool FileTranscoder::addTag( const QString& name, const QString& value )
 }
 
 bool FileTranscoder::setVideoCodec(
-    AVCodecID codec,
+    CodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod,
     Qn::StreamQuality quality,
     const QSize& resolution,
@@ -87,7 +87,7 @@ bool FileTranscoder::setVideoCodec(
 }
 
 bool FileTranscoder::setAudioCodec(
-    AVCodecID codec,
+    CodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod )
 {
     return m_transcoder.setAudioCodec( codec, transcodeMethod ) == QnTranscoder::OperationResult::Success;

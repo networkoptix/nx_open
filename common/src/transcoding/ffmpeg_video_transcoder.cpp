@@ -25,7 +25,7 @@ static qint64& movigAverage(qint64& accumulator, qint64 value)
     return accumulator = accumulator * movingAvg + value * (1.0 - movingAvg);
 }
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),

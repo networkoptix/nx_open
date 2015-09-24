@@ -23,7 +23,7 @@ protected:
     virtual void pleaseStop() override;
 
 private:
-    QnAbstractMediaDataPtr getNextDataMPEG(AVCodecID ci);
+    QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);
     QnAbstractMediaDataPtr getNextDataMJPEG();
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 

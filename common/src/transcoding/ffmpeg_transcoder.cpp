@@ -205,7 +205,6 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             NX_LOG(m_lastErrMessage, cl_logERROR);
             return -1;
         }
-        videoStream->id = 0;
 
         videoStream->id = 0;
         //videoStream->codec = m_videoEncoderCodecCtx = avcodec_alloc_context3(0);
@@ -286,7 +285,6 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             NX_LOG(m_lastErrMessage, cl_logERROR);
             return -1;
         }
-        audioStream->id = 0;
 
         audioStream->id = 0;
         AVCodec* avCodec = avcodec_find_decoder(m_audioCodec);

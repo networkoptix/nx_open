@@ -367,7 +367,7 @@ QString PlDlinkStreamReader::getRTPurl(int profileId) const
     return QString();
 }
 
-QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(AVCodecID ci)
+QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 {
     char headerBuffer[sizeof(ACS_VideoHeader)];
     uint gotInBuffer = 0;

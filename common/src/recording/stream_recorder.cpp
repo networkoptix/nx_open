@@ -563,7 +563,6 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 NX_LOG(lit("Can't allocate output stream for recording."), cl_logERROR);
                 return false;
             }
-            videoStream->id = DEFAULT_VIDEO_STREAM_ID+i;
 
             videoStream->id = DEFAULT_VIDEO_STREAM_ID + i;
             AVCodecContext* videoCodecCtx = videoStream->codec;
@@ -639,7 +638,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             }
 
             audioStream->id = DEFAULT_AUDIO_STREAM_ID + i;
-            AVCodecID srcAudioCodec = CODEC_ID_NONE;
+            CodecID srcAudioCodec = CODEC_ID_NONE;
             QnMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(i).codecContext.dynamicCast<QnMediaContext>();
             if (!mediaContext) {
                 m_lastError = InvalidAudioCodecError;
@@ -853,7 +852,7 @@ bool QnStreamRecorder::isAudioPresent() const
     return m_isAudioPresent;
 }
 
-void QnStreamRecorder::setAudioCodec(AVCodecID codec)
+void QnStreamRecorder::setAudioCodec(CodecID codec)
 {
     m_dstAudioCodec = codec;
 }

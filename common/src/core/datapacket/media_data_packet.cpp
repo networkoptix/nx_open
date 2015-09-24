@@ -29,9 +29,9 @@ QnMediaContext::QnMediaContext(AVCodecContext* ctx)
     avcodec_copy_context(m_ctx, ctx);
 }
 
-QnMediaContext::QnMediaContext(AVCodecID codecId)
+QnMediaContext::QnMediaContext(CodecID codecId)
 {
-    if (codecId != AV_CODEC_ID_NONE)
+    if (codecId != CODEC_ID_NONE)
     {
         AVCodec* codec = avcodec_find_decoder(codecId);
         if( codec && codec->id == codecId )

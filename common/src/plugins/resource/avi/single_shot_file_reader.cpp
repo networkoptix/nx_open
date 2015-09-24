@@ -16,7 +16,7 @@ QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(const QnResourcePtr& 
 
 QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 {
-    AVCodecID compressionType;
+    CodecID compressionType;
     QString lowerFileName = getResource()->getUrl().toLower();
 
 

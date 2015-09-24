@@ -16,7 +16,7 @@ public:
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
-    void setCodecId(AVCodecID codecId);
+    void setCodecId(CodecID codecId);
     void setBitsPerSample(int value);
     void setSampleFormat(AVSampleFormat sampleFormat);
 private:
@@ -25,7 +25,7 @@ private:
     int m_frequency;
     int m_channels;
     int m_bits_per_coded_sample;
-    AVCodecID m_codecId;
+    CodecID m_codecId;
     AVSampleFormat m_sampleFormat;
 };
 

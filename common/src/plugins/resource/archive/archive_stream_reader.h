@@ -124,8 +124,8 @@ protected:
     int m_primaryVideoIdx;
     int m_audioStreamIndex;
 
-    AVCodecID m_videoCodecId;
-    AVCodecID m_audioCodecId;
+    CodecID m_videoCodecId;
+    CodecID m_audioCodecId;
 
     int m_freq;
     int m_channels;

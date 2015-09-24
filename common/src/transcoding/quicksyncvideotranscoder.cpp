@@ -8,7 +8,7 @@
 
 #if 0
 
-QnQuickSyncVideoTranscoder::QnQuickSyncVideoTranscoder( AVCodecID codecId )
+QnQuickSyncVideoTranscoder::QnQuickSyncVideoTranscoder( CodecID codecId )
 :
     QnVideoTranscoder( codecId ),
     m_transcoderInitialized( false ),

@@ -29,7 +29,7 @@ namespace
 {
     bool isIFrame( QnAbstractMediaDataPtr packet )
     {
-        AVCodecID codecId = packet->compressionType;
+        CodecID codecId = packet->compressionType;
 
         Q_ASSERT_X( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
 
@@ -459,7 +459,7 @@ QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
         : (m_builtinStreamReader.get() ? m_builtinStreamReader->getAudioLayout() : QnConstResourceAudioLayoutPtr());
 }
 
-AVCodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )
+CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )
 {
     switch( compressionType )
     {
@@ -608,7 +608,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
 
 void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )
 {
-    const AVCodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
+    const CodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
     m_audioContext = QnMediaContextPtr( new QnMediaContext(ffmpegCodecId) );
 
     //filling mediaPacket->context

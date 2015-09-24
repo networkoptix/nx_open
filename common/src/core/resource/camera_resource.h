@@ -13,7 +13,7 @@
 #include "security_cam_resource.h"
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-#define AVCodecID int
+#define CodecID int
 #define CODEC_ID_NONE 0
 #endif
 
@@ -132,7 +132,7 @@ public:
     CameraMediaStreamInfo(
         int _encoderIndex = -1,
         const QSize& _resolution = QSize(),
-        AVCodecID _codec = CODEC_ID_NONE)
+        CodecID _codec = CODEC_ID_NONE)
     :
         encoderIndex( _encoderIndex ),
         resolution( resolutionToString( _resolution ) ),
@@ -146,7 +146,7 @@ public:
         CameraMediaStreamInfo(
             int _encoderIndex,
             const QSize& _resolution,
-            AVCodecID _codec,
+            CodecID _codec,
             CustomParamDictType&& _customStreamParams )
     :
         encoderIndex( _encoderIndex ),

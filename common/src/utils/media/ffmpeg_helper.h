@@ -13,7 +13,7 @@ extern "C"
 #include <QtCore/QIODevice>
 
 
-QString codecIDToString(AVCodecID codecID);
+QString codecIDToString(CodecID codecID);
 QString getAudioCodecDescription(AVCodecContext* codecContext);
 
 
@@ -23,14 +23,14 @@ class FrameTypeExtractor
 {
 public:
     FrameTypeExtractor(AVCodecContext* context);
-    FrameTypeExtractor(AVCodecID id, bool nalPrefixes = true);
+    FrameTypeExtractor(CodecID id, bool nalPrefixes = true);
     ~FrameTypeExtractor();
 
     enum FrameType {UnknownFrameType, I_Frame, P_Frame, B_Frame};
     FrameType getFrameType(const quint8* data, int dataLen);
 
     AVCodecContext* getContext() const { return m_context; }
-    AVCodecID getCodec() const { return m_codecId; }
+    CodecID getCodec() const { return m_codecId; }
 
 private:
 
@@ -43,7 +43,7 @@ private:
     void decodeWMVSequence(const quint8* data, int size);
 private:
     AVCodecContext* m_context;
-    AVCodecID m_codecId;
+    CodecID m_codecId;
     VC1SequenceHeader* m_vcSequence;
     bool m_dataWithNalPrefixes;
 };

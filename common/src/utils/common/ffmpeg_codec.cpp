@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-CLCodecType ffmpegCodecIdToInternal(AVCodecID ffmpeg_video_codec_id)
+CLCodecType ffmpegCodecIdToInternal(CodecID ffmpeg_video_codec_id)
 {
     CLCodecType m_videoCodecId = CL_UNKNOWN;
     CLCodecType &m_audioCodecId = m_videoCodecId;
@@ -108,9 +108,9 @@ CLCodecType ffmpegCodecIdToInternal(AVCodecID ffmpeg_video_codec_id)
     return m_videoCodecId;
 }
 
-AVCodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId)
+CodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId)
 {
-    AVCodecID codec = CODEC_ID_NONE;
+    CodecID codec = CODEC_ID_NONE;
 
     switch(internalCodecId)
     {
