@@ -103,9 +103,10 @@ namespace /// Parsers stuff
     bool isErrorReply(const QJsonObject &object)
     {
         static const QString &kErrorTag = "error";
-        const int code = (!object.contains(kErrorTag) ? 0
-            : object.value(kErrorTag).toString().toInt());
-        return code;
+        if (!object.contains(kErrorTag))
+            return false;
+
+        return (object.value(kErrorTag).toInt() != 0);
     }
    
     /*
@@ -244,10 +245,16 @@ namespace /// Parsers stuff
     rtu::RestClient::SuccessCallback makeSuccessCallback(const rtu::OperationCallback &callback
         , rtu::Constants::AffectedEntities affected)
     {
-        return [callback, affected](const QByteArray & /* data */)
+        return [callback, affected](const QByteArray &data)
         {
-            if (callback)
-                callback(rtu::RequestError::kSuccess, affected);
+            if (!callback)
+                return;
+
+            const QJsonObject object = QJsonDocument::fromJson(data.data()).object();
+            const auto code = (isErrorReply(object) 
+                ? rtu::RequestError::kInternalAppError : rtu::RequestError::kSuccess);
+
+            callback(code, affected);
         };
     }
 

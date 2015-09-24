@@ -10,7 +10,11 @@ Rectangle
 {
     id: thisComponent;
 
-    signal updateClicked();
+    function addOnUpdateAction(action)
+    {
+        impl.handlers.push(action);
+        show = true;
+    }
 
     property bool show: false;
     property real shownY: 0;
@@ -70,6 +74,16 @@ Rectangle
         buttons: NxRtu.Buttons.Update;
         spacing: Common.SizeManager.spacing.medium;
 
-        onButtonClicked: { updateClicked(); }
+        onButtonClicked:
+        {
+            impl.handlers.forEach(function(handler) { handler(); })
+            impl.handlers = [];
+            thisComponent.show = false;
+        }
+    }
+
+    property QtObject impl: QtObject
+    {
+        property var handlers:[];
     }
 }

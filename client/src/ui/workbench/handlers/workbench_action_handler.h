@@ -41,7 +41,6 @@ class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
-class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
 class QnCameraAdditionDialog;
 class QnPopupCollectionWidget;
@@ -100,8 +99,6 @@ protected:
     void rotateItems(int degrees);
 
     void setResolutionMode(Qn::ResolutionMode resolutionMode);
-
-    QnCameraSettingsDialog *cameraSettingsDialog() const;
 
     QnBusinessRulesDialog *businessRulesDialog() const;
 
@@ -169,7 +166,7 @@ protected slots:
     void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
     void at_userSettingsAction_triggered();
-    void at_cameraSettingsAction_triggered();
+    
     void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
@@ -177,7 +174,6 @@ protected slots:
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
-    void at_serverSettingsAction_triggered();
     void at_serverLogsAction_triggered();
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
@@ -250,7 +246,6 @@ private:
     QPointer<QMenu> m_mainMenu;
     QPointer<QMenu> m_currentUserLayoutsMenu;
 
-    QPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
     QPointer<QnAuditLogDialog> m_auditLogDialog;
