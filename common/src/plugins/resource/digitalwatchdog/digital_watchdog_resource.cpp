@@ -128,18 +128,16 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     QnPlOnvifResource::fetchAndSetCameraSettings();
 
     QString cameraModel = fetchCameraModel();
-    QString baseIdStr = getProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME);
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId()); 
+    QString baseIdStr = resType ? resType->defaultValue(Qn::CAMERA_SETTINGS_ID_PARAM_NAME) : QString();
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
         if(suffix.endsWith(QLatin1String("-FOCUS")))
             m_hasZoom = true;
 
-        QString prefix = baseIdStr.split(QLatin1String("-"))[0];
-        QString fullCameraType = prefix + suffix;
-        if (fullCameraType != baseIdStr)
-            setProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME, fullCameraType);
-        baseIdStr = prefix;
+        QString fullCameraType = baseIdStr + suffix;
+        setProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME, fullCameraType);
     }
 
     QMutexLocker lock(&m_physicalParamsMutex);
