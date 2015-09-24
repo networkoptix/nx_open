@@ -190,9 +190,9 @@ Base.Column
                     if (ipAddressChangeAdded && showDiffSubnetWarning)
                     {
                         if (isSingleSelection)
-                            warnings.push(("The IP address of \"%1\" is about to be assigned is in a different subnet. The unit will be unreachable after the changes are made. Proceed?").arg(interfaceCaption));
+                            warnings.push(("IP address from a different subnet is about to be assigned to \"%1\". The device will be unreachable. Proceed?").arg(interfaceCaption));
                         else
-                            warnings.push("Some of IP address are about to be assigned is in a different subnet. The units will be unreachable after the changes are made. Proceed?");
+                            warnings.push("IP addresses from a different subnet are about to be assigned to some devices. Such devices will be unreachable. Proceed?");
                     }
 
                     var gatewayDiscoverableFromStartIp = rtuContext.isDiscoverableFromNetwork(
