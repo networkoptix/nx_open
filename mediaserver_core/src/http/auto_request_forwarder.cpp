@@ -35,6 +35,13 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
         return;
     }
 
+    if( urlQuery.hasQueryItem( Qn::CAMERA_GUID_HEADER_NAME ) ||
+        request->headers.find( Qn::CAMERA_GUID_HEADER_NAME ) != request->headers.end() )
+    {
+        //CAMERA_GUID_HEADER_NAME already present
+        return;
+    }
+
     const bool liveStreamRequested = urlQuery.hasQueryItem( StreamingParams::LIVE_PARAM_NAME );
 
     QnResourcePtr cameraRes;
