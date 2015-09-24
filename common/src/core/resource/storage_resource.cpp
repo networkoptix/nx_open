@@ -180,9 +180,9 @@ void QnStorageResource::setRedundantSchedule(
     int rPeriod
 )
 { 
-    m_redundantSchedule.redundantStartTime = rStart; 
-    m_redundantSchedule.redundantDuration = rDuration;
-    m_redundantSchedule.redundantPeriod = rPeriod;
+    m_redundantSchedule.startTime = rStart; 
+    m_redundantSchedule.duration = rDuration;
+    m_redundantSchedule.period = rPeriod;
 }
 
 const QnStorageResource::RedundantSchedule &

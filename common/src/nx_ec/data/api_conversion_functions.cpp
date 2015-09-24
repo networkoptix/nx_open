@@ -537,9 +537,9 @@ void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     dst.redundant = src->isRedundant();
 
     const QnStorageResource::RedundantSchedule& rs = src->getRedundantSchedule();
-    dst.redundantStartTime = rs.redundantStartTime;
-    dst.redundantDuration = rs.redundantDuration;
-    dst.redundantPeriod = rs.redundantPeriod;
+    dst.redundantStartTime = rs.startTime;
+    dst.redundantDuration = rs.duration;
+    dst.redundantPeriod = rs.period;
 }
 
 void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)

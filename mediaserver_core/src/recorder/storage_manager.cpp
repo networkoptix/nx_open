@@ -34,6 +34,11 @@
 #include "utils/serialization/lexical_enum.h"
 
 #include <memory>
+#include <thread>
+#include <chrono>
+#include <algorithm>
+#include <vector>
+
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
@@ -1437,11 +1442,33 @@ std::vector<QnStorageResourcePtr> QnStorageManager::getRedundantLiveStorages() c
     std::vector<QnStorageResourcePtr> result;
     const QSet<QnStorageResourcePtr> storages = getWritableStorages();
 
-    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); 
+        itr != storages.constEnd(); 
+        ++itr)
     {
         QnStorageResourcePtr storage = *itr;
-        if (storage->isRedundant() && storage->getRedundantSchedule().redundantStartTime == -1)
+        if (storage->isRedundant() && 
+            storage->getRedundantSchedule().startTime == -1)
             result.push_back(storage);
+    }
+    return result;
+}
+
+std::vector<QnStorageResourcePtr> QnStorageManager::getRedundantSyncStorages() const
+{
+    std::vector<QnStorageResourcePtr> result;
+    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
+
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); 
+        itr != storages.constEnd(); 
+        ++itr)
+    {
+        QnStorageResourcePtr storage = *itr;
+        if (storage->isRedundant() && 
+            storage->getRedundantSchedule().startTime != -1)
+        {
+            result.push_back(storage);
+        }
     }
     return result;
 }
@@ -1954,4 +1981,298 @@ void QnStorageManager::getCamerasWithArchiveInternal(std::set<QString>& result, 
         if (!catalog->isEmpty())
             result.insert(catalog->cameraUniqueId());
     }
+}
+
+namespace aux
+{
+    template<typename Cont>
+    typename Cont::const_iterator 
+    constIteratorFromReverse(typename Cont::reverse_iterator it)
+    {
+        return (it+1).base();
+    }
+
+#define DEFINE_EQUAL_RANGE_BY_MEMBER(memberName) \
+    template< \
+        typename ForwardIt, \
+        typename T, \
+        typename CheckMember = decltype( \
+                     std::declval<typename std::iterator_traits<ForwardIt>::value_type>().memberName, void() \
+                 ), \
+        typename CheckMemberType = typename std::enable_if< \
+                                        std::is_same< \
+                                            T, \
+                                            decltype(std::declval<typename std::iterator_traits<ForwardIt>::value_type>().memberName) \
+                                        >::value>::type \
+    > \
+    struct equalRangeByHelper \
+    { \
+        std::pair<ForwardIt, ForwardIt> operator ()(ForwardIt begin , ForwardIt end, T&& value) \
+        { \
+            std::pair<ForwardIt, ForwardIt> result = std::make_pair(end, end); \
+            while (begin != end) \
+            { \
+                if (result.first == end && begin->memberName == value) \
+                    result.first = begin; \
+                if (result.first != end && begin->memberName != value) \
+                { \
+                    result.second = begin; \
+                    break; \
+                } \
+                ++begin; \
+            } \
+            return result; \
+        } \
+    }; \
+     \
+    template<typename ForwardIt, typename T> \
+    std::pair<ForwardIt, ForwardIt> equalRangeBy(ForwardIt begin , ForwardIt end, T&& value) \
+    { \
+        return equalRangeByHelper<ForwardIt, T>()(begin, end, std::forward<T>(value)); \
+    }
+
+    DEFINE_EQUAL_RANGE_BY_MEMBER(startTimeMs)
+}
+
+template<typename NeedStopCB>
+void QnStorageManager::synchronizeStorages(
+    std::vector<QnStorageResourcePtr>   storages,
+    NeedStopCB                          needStop
+)
+{
+    typedef std::deque<DeviceFileCatalog::Chunk>    ChunkContainerType;
+    typedef ChunkContainerType::const_iterator      ChunkConstIteratorType;
+    typedef ChunkContainerType::reverse_iterator    ChunkReverseIteratorType;
+    typedef std::vector<ChunkReverseIteratorType>   CRIteratorVectorType;
+
+    const int CATALOG_QUALITY_COUNT = 2;
+
+    for (int qualityIndex = 0; 
+         qualityIndex < CATALOG_QUALITY_COUNT; 
+         ++qualityIndex)
+    {
+        std::vector<QString>    visitedCameras;
+        ChunkContainerType      currentChunks;
+        QString                 currentCamera;
+
+        auto getUnvisited = 
+            [this, &visitedCameras, qualityIndex]
+            (QString &currentCamera, ChunkContainerType &currentCatalog)
+            {
+                QnMutexLocker _(&m_mutexCatalog);
+                const FileCatalogMap &currentMap = m_devFileCatalog[qualityIndex];
+                
+                for (auto it = currentMap.cbegin();
+                     it != currentMap.cend();
+                     ++it)
+                {
+                    const QString &cameraID = it.key();
+                    auto visitedIt = std::find(
+                        visitedCameras.cbegin(),
+                        visitedCameras.cend(),
+                        cameraID
+                    );
+                    if (visitedIt == visitedCameras.cend())
+                    {
+                        currentCatalog = it.value()->m_chunks;
+                        currentCamera = cameraID;
+                        visitedCameras.push_back(cameraID);
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+        auto mergeNewChunks = 
+            [this](const QString &cameraID, const ChunkContainerType &newChunks)
+            {
+                QnMutexLocker _(&m_mutexCatalog);
+                FileCatalogMap currentMap = m_devFileCatalog[qualityIndex];
+
+                auto cameraCatalogIt = currentMap.find(cameraID);
+                if (cameraCatalogIt == currentMap.end())
+                    return;
+
+                ChunkContainerType &catalogChunks = cameraCatalogIt.value()->m_chunks;
+                auto startCatalogIt = catalogChunks.begin();
+
+                for (auto it = newChunks.cbegin();
+                     it != newChunks.cend();
+                     ++it)
+                {
+                    auto chunkIt = std::find_if(
+                        startCatalogIt,
+                        catalogChunks.end(),
+                        [&it](const DeviceFileCatalog::Chunk &chunk)
+                        {
+                            return chunk.startTimeMs == it->startTimeMs;
+                        }
+                    );
+
+                    if (chunkIt == catalogChunks.end())
+                        break;
+
+                    auto startTimeMs = chunkIt->startTimeMs;
+                    auto newChunksRange = equalRangeBy(
+                        it, 
+                        newChunks.end(), 
+                        startTimeMs
+                    );
+                    auto catalogChunksRange = equalRangeBy(
+                        chunkIt, 
+                        catalogChunks.end(), 
+                        startTimeMs
+                    );
+                }
+            };
+
+        auto copyChunk =
+            [&storages, needStop](CRIteratorVectorType &currentChunkRange)
+            {
+                for (auto storageIt = storages.begin();
+                        storageIt != storages.end();
+                        ++storageIt)
+                {
+                    int currentStorageIndex = getStorageIndex(*storageIt);
+                    auto chunkOnStorageIt = std::find_if(
+                        currentChunkRange.cbegin(),
+                        currentChunkRange.cend(),
+                        [currentStorageIndex](ChunkReverseIteratorType c)
+                        {
+                            return c->storageIndex == currentStorageIndex;
+                        }
+                    );
+                    if (chunkOnStorageIt == currentChunkRange.cend())
+                    {
+                        // copy from storage to storage
+                        //
+                        auto newChunk = *(*currentChunkRange.cbegin());
+                        newChunk.storageIndex = currentStorageIndex;
+                        currentChunks.insert(
+                            constIteratorFromReverse<ChunkContainerType>(
+                                *currentChunkRange.cbegin()
+                            ),
+                            newChunk
+                        );
+ 
+                        if (needStop())
+                        {
+                            mergeNewChunks(currentCamera, currentChunks);
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            };
+
+        while (getUnvisited(currentCamera, currentChunks))
+        {
+            CRIteratorVectorType currentChunkRange;
+
+            for (auto reverseChunkIt = currentChunks.rbegin();
+                 ;
+                 ++reverseChunkIt)
+            {
+                if (reverseChunkIt == currentChunks.rend())
+                {
+                     if (!currentChunkRange.empty() && !copyChunk(currentChunkRange))
+                        return;
+                     break;
+                }
+
+                auto currentChunk = *reverseChunkIt;
+
+                if (currentChunkRange.empty() || 
+                    (*currentChunkRange.cbegin())->startTimeMs == currentChunk.startTimeMs)
+                {
+                    currentChunkRange.push_back(reverseChunkIt);
+                }
+                else
+                {
+                    if (!copyChunk(currentChunkRange))
+                        return;
+                    currentChunkRange.clear();
+                }
+            } // for reverse chunks iterator
+            mergeNewChunks(currentCamera, currentChunks);
+        } // while getUnvisited() == true
+    } // for quality index
+}
+
+void QnStorageManager::startRedundantSyncWatchdog()
+{
+    static const auto 
+    REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(10);
+    m_redundantSyncOn = true;
+
+    std::thread(
+        [this]
+        {
+            while (m_redundantSyncOn)
+            {
+                std::this_thread::sleep_for(
+                    REDUNDANT_SYNC_TIMEOUT
+                );
+                auto redundantSyncStorages = getRedundantSyncStorages();
+
+                std::for_each(
+                    redundantSyncStorages.begin(),
+                    redundantSyncStorages.end(),
+                    [this](QnStorageResourcePtr &storage)
+                    {
+                        if (!m_redundantSyncOn)
+                            return;
+
+                        int nowSeconds = 
+                            std::chrono::duration_cast<std::chrono::seconds>(
+                                std::chrono::system_clock::now().time_since_epoch()
+                            ).count();
+
+                        const auto &schedule = storage->getRedundantSchedule();
+                        if (schedule.startTime == -1 ||
+                            schedule.duration == -1 ||
+                            schedule.period == -1)
+                        {
+                            NX_LOG(
+                                lit("Redundant storage %1 wrong schedule").arg(storage->getUrl()), 
+                                cl_logDEBUG1
+                            );
+                            return;
+                        }
+
+                        // let's find out if now is a time for synchronization
+                        int closestStart = schedule.startTime;
+                        if (nowSeconds < closestStart) // it's too early
+                            return;
+
+                        while (true)
+                        {
+                            if (closestStart + schedule.period < nowSeconds)
+                                break;
+                            closestStart += schedule.period;
+                        }
+
+                        if (closestStart + schedule.duration < nowSeconds) // we are there
+                        {
+                            while (true)
+                            {
+
+                                // get current time point again. Copying file might take some time
+                                nowSeconds = 
+                                    std::chrono::duration_cast<std::chrono::seconds>(
+                                        std::chrono::system_clock::now().time_since_epoch()
+                                    ).count();
+
+                                if (!m_redundantSyncOn || // stop forced
+                                    closestStart + schedule.duration < nowSeconds) // synchronization period is over
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                );
+            }
+        }
+    ).detach();
 }

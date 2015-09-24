@@ -24,6 +24,8 @@
 #include "api/model/rebuild_archive_reply.h"
 #include "api/model/recording_stats_reply.h"
 
+#include <atomic>
+
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
@@ -80,6 +82,7 @@ public:
 
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
     std::vector<QnStorageResourcePtr> getRedundantLiveStorages() const;
+    std::vector<QnStorageResourcePtr> getRedundantSyncStorages() const;
 
     QnStorageResourceList getStorages() const;
     QnStorageResourceList getStoragesInLexicalOrder() const;
@@ -169,6 +172,15 @@ private:
 
     // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalizePeriodMs
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
+
+    void startRedundantSyncWatchdog();
+    void stopRedundantSyncWatchdog() { m_redundantSyncOn = false; }
+
+    template<typename NeedStopCB>
+    void synchronizeStorages(
+        std::vector<QnStorageResourcePtr>   storages,
+        NeedStopCB                          needStop
+    );
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -208,6 +220,8 @@ private:
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
     QElapsedTimer m_removeEmtyDirTimer;
+
+    std::atomic<bool> m_redundantSyncOn;
 };
 
 #define qnStorageMan QnStorageManager::instance()
