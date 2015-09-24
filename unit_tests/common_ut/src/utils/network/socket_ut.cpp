@@ -223,10 +223,12 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
 
 TEST( Socket, HostNameResolve3 )
 {
+    nx::DnsResolver dnsResolver;
+
     {
         HostAddress resolvedAddress;
         ASSERT_TRUE(
-            HostAddressResolver::instance()->resolveAddressSync(
+            dnsResolver.resolveAddressSync(
                 QLatin1String("ya.ru"),
                 &resolvedAddress) );
         ASSERT_TRUE(resolvedAddress.ipv4() != 0);
@@ -235,7 +237,7 @@ TEST( Socket, HostNameResolve3 )
     {
         HostAddress resolvedAddress;
         ASSERT_FALSE(
-            HostAddressResolver::instance()->resolveAddressSync(
+            dnsResolver.resolveAddressSync(
                 QLatin1String("hren2349jf234.ru"),
                 &resolvedAddress));
     }
