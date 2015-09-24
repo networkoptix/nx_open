@@ -1,7 +1,5 @@
 #include "time_helper.h"
 
-#include <QDebug>
-
 enum { kMSecFactor = 1000 };
 
 QDateTime rtu::convertDateTime(const QDate &date
