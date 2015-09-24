@@ -57,6 +57,7 @@
         <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
+        <newmobile></newmobile>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
         <!-- compile.option2. See profile angle  -->
