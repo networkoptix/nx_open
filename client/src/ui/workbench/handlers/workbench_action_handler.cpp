@@ -1736,12 +1736,13 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             && !camera->isManuallyAdded();
     });
 
+    //TODO: #GDM #tr strings are really untranslatable. Also second and third sentences are always plural.
     QString question;
     /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
     if (resources.size() == onlineAutoDiscoveredCameras.size()) {
         question =
             //: "These 5 cameras are auto-discovered."
-            tr("These %n %1 are auto-discovered.").arg(getDefaultDevicesName(cameras, false)) + L'\n' 
+            tr("These %n %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getDefaultDevicesName(cameras, false)) + L'\n' 
           + tr("They may be auto-discovered again after removing.") + L'\n' 
           + tr("Are you sure you want to delete them?");
     }
