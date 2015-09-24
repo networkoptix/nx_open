@@ -180,7 +180,8 @@ void StreamingChunkTranscoderThread::run()
         QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
         Q_ASSERT( srcMediaData );
 
-        if( srcMediaData->channelNumber != transcodeIter->second->transcodeParams.channel() )
+        if( srcMediaData->dataType == QnAbstractMediaData::VIDEO &&
+            srcMediaData->channelNumber != transcodeIter->second->transcodeParams.channel() )
         {
             //skipping packet of different channel
             continue;
