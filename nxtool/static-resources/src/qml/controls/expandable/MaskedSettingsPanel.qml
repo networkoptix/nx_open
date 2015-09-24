@@ -20,6 +20,12 @@ GenericSettingsPanel
     property bool warned: (rtuContext.selection && (rtuContext.selection !== null)
         && (rtuContext.selection.count === 1) ? true : false) || extraWarned;
 
+    function recreate()
+    {
+        area.sourceComponent = undefined;
+        area.sourceComponent = areaBinding.value;
+    }
+
     Component
     {
         id: maskingPanel;
@@ -110,8 +116,16 @@ GenericSettingsPanel
     areaDelegate: Loader
     {
         id: areaDelegateLoader;
-        
-        sourceComponent: (thisComponent.warned ? propertiesDelegate : maskingPanel);
     }
+
+    Binding
+    {
+        id: areaBinding;
+
+        target: area;
+        property: "sourceComponent";
+        value: (thisComponent.warned ? propertiesDelegate : maskingPanel);
+    }
+
 }
 

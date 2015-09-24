@@ -382,7 +382,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
         m_eventState = QnBusiness::UndefinedState;
         fields |= QnBusiness::EventStateField;
     } else if (QnBusiness::hasToggleState(m_eventType) && !QnBusiness::hasToggleState(m_actionType)) {
-        m_eventState = QnBusiness::ActiveState;
+        m_eventState = allowedEventStates(m_eventType).first();
         fields |= QnBusiness::EventStateField;
     }
     if (!QnBusiness::hasToggleState(m_eventType) && QnBusiness::hasToggleState(m_actionType)) {

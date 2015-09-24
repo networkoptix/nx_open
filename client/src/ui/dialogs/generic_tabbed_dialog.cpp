@@ -43,17 +43,12 @@ void QnGenericTabbedDialog::reject() {
     base_type::reject();
 }
 
-bool QnGenericTabbedDialog::tryAccept() {
+void QnGenericTabbedDialog::accept() {
     if (!confirm())
-        return false;
+        return;
 
     submitData();
     base_type::accept();
-    return true;
-}
-
-void QnGenericTabbedDialog::accept() {
-    tryAccept();
 }
 
 void QnGenericTabbedDialog::loadData() {
@@ -166,6 +161,17 @@ QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::modifiedPages() const 
     return result;
 }
 
+QString QnGenericTabbedDialog::confirmMessageTitle() const {
+    return tr("Confirm exit");
+}
+
+QString QnGenericTabbedDialog::confirmMessageText() const {
+    QStringList details;
+    foreach(const Page &page, modifiedPages())
+        details << tr("* %1").arg(page.title);
+    return tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n');
+}
+
 bool QnGenericTabbedDialog::tryClose(bool force) {
     if (!discard())
         return false;   //TODO: #dklychkov and what then? see QnWorkbenchConnectHandler
@@ -179,13 +185,9 @@ bool QnGenericTabbedDialog::tryClose(bool force) {
     if (isHidden() || !hasChanges())
         return true;
 
-    QStringList details;
-    foreach(const Page &page, modifiedPages())
-        details << tr("* %1").arg(page.title);
-
     QMessageBox::StandardButton btn =  QMessageBox::question(this,
-        tr("Confirm exit"),
-        tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n'),
+        confirmMessageTitle(),
+        confirmMessageText(),
         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
         QMessageBox::Cancel);
 
@@ -215,3 +217,4 @@ void QnGenericTabbedDialog::retranslateUi() {
     for(const Page &page: m_pages)
         page.widget->retranslateUi();
 }
+

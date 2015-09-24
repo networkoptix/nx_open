@@ -381,11 +381,14 @@ void QnEventLogDialog::requestFinished()
 
 void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
 {
-    if (m_lastMouseButton == Qt::LeftButton && m_model->hasMotionUrl(idx))
+    if (m_lastMouseButton != Qt::LeftButton)
+        return;
+
+    QnResourceList resources = m_model->resourcesForPlayback(idx);
+    if (!resources.isEmpty())
     {
-        QnResourcePtr resource = m_model->eventResource(idx.row());
         qint64 pos = m_model->eventTimestamp(idx.row())/1000;
-        QnActionParameters params(resource);
+        QnActionParameters params(resources);
         params.setArgument(Qn::ItemTimeRole, pos);
 
         context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);

@@ -46,10 +46,11 @@ namespace rtu
 
     enum class RequestError
     {
-        kSuccess = 0 
-        , kRequestTimeout = 408
-        , kUnauthorized = 401
-        , kUnspecified = -1
+        kSuccess
+        , kRequestTimeout
+        , kUnauthorized
+        , kInternalAppError
+        , kUnspecified
     };
 
 }

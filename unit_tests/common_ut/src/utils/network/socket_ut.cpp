@@ -104,8 +104,7 @@ protected:
 TEST( Socket, AsyncOperationCancellation )
 {
     static const std::chrono::milliseconds TEST_DURATION( 200 );
-    //static const int TEST_RUNS = 37;
-    static const int TEST_RUNS = 37;
+    static const int TEST_RUNS = 17;
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
@@ -288,10 +287,9 @@ TEST( Socket, BadHostNameResolve )
     }
 }
 
-#if 0
 TEST( Socket, postCancellation )
 {
-    static const int TEST_RUNS = 200;
+    static const int TEST_RUNS = 10;
 
     std::atomic<size_t> postCalls( 0 );
 
@@ -331,4 +329,3 @@ TEST( Socket, postCancellation )
     for( auto& f: futures )
         f.wait();
 }
-#endif

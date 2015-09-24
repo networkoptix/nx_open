@@ -10,6 +10,7 @@
 // TODO: #Elric #enum
 enum QnLogLevel {
     cl_logUNKNOWN,
+    cl_logNONE,
     cl_logALWAYS,
     cl_logERROR,
     cl_logWARNING,

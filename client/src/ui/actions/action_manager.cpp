@@ -1399,11 +1399,6 @@ QnActionManager::QnActionManager(QObject *parent):
             new QnAutoStartAllowedActionCodition(this),
             this));
 
-    factory(Qn::OpenInCameraSettingsDialogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        //: "Open in Cameras Settings Dialog..." or "Open in Devices Settings Dialog..."
-        dynamicText(new QnDevicesNameActionTextFactory(tr("Open in %1 Settings Dialog..."), this));
-
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Add Device(s)...")).   //intentionally hardcode devices here

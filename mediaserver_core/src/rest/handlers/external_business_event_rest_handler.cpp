@@ -27,8 +27,8 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
 
     if (params.contains("event_type"))
         businessParams.eventType = QnLexical::deserialized<QnBusiness::EventType>(params["event_type"]);
-    if (params.contains("eventTimestamp"))
-        businessParams.eventTimestampUsec = parseDateTime(params["eventTimestamp"]);
+    if (params.contains("timestamp"))
+        businessParams.eventTimestampUsec = parseDateTime(params["timestamp"]);
     if (params.contains("eventResourceId"))
         businessParams.eventResourceId = params["eventResourceId"];
     if (params.contains("state"))
@@ -37,12 +37,14 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
         businessParams.reasonCode = QnLexical::deserialized<QnBusiness::EventReason>(params["reasonCode"]);
     if (params.contains("inputPortId"))
         businessParams.inputPortId = params["inputPortId"];
-    if (params.contains("deviceName"))
-        businessParams.resourceName = params["deviceName"];
+    if (params.contains("source"))
+        businessParams.resourceName = params["source"];
     if (params.contains("caption"))
         businessParams.caption = params["caption"];
     if (params.contains("description"))
         businessParams.description = params["description"];
+    if (params.contains("metadata"))
+        businessParams.metadata = QJson::deserialized<QnEventMetaData>(params["metadata"].toUtf8());
     
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
