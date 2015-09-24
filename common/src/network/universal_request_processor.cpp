@@ -12,6 +12,7 @@
 #include "utils/network/flash_socket/types.h"
 #include "audit/audit_manager.h"
 #include <utils/common/model_functions.h>
+#include "core/resource_management/resource_pool.h"
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
@@ -70,8 +71,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        //not asking Proxy authentication because we proxy requests in a custom way
-        const bool isProxy = false;
+        const bool isProxy = isProxyForCamera(d->request);
         QElapsedTimer t;
         t.restart();
         AuthMethod::Value usedMethod = AuthMethod::noAuth;
@@ -219,4 +219,36 @@ void QnUniversalRequestProcessor::pleaseStop()
     QnTCPConnectionProcessor::pleaseStop();
     if (d->processor)
         d->processor->pleaseStop();
+}
+
+bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)
+{
+    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    if( xServerGuidIter != request.headers.end() )
+    {
+        // is proxy to other media server
+        QnUuid desiredServerGuid(xServerGuidIter->second);
+        return desiredServerGuid != qnCommon->moduleGUID();
+    }
+
+    return isProxyForCamera(request);
+}
+
+bool QnUniversalRequestProcessor::isProxyForCamera(const nx_http::Request& request)
+{
+    nx_http::BufferType desiredCameraGuid;
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
+    if( xCameraGuidIter != request.headers.end() )
+    {
+        desiredCameraGuid = xCameraGuidIter->second;
+    }
+    else {
+        desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
+    }
+    if (!desiredCameraGuid.isEmpty()) {
+        QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);
+        return camera != 0;
+    }
+
+    return false;
 }
