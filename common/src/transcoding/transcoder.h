@@ -193,6 +193,11 @@ public:
     * @return Returns OperationResult::Success if no error or error code otherwise
     */
     int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result);
+    //!Flushes codec buffer and finalizes stream. No \a QnTranscoder::transcodePacket is allowed after this call
+    /*
+    * @return Returns OperationResult::Success if no error or error code otherwise
+    */
+    int finalize(QnByteArray* const result);
     //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
     /*!
         This implementation always returns \a false
@@ -235,6 +240,7 @@ protected:
     virtual int open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio) = 0;
 
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) = 0;
+    virtual int finalizeInternal(QnByteArray* const result) = 0;
 
     QSharedPointer<QnFfmpegVideoTranscoder> m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;

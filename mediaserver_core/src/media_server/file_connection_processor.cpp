@@ -39,7 +39,8 @@ static HttpContentTypes contentTypes[] =
     { "jpg",  "image/jpeg"},
     { "xml",  "application/xml" },
     { "xsl",  "applicaton/xslt+xml" },
-    { "zip",  "application/zip" }
+    { "zip",  "application/zip" },
+    { "swf",  "application/x-shockwave-flash" }
 };
 
 

@@ -19,7 +19,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Device  name contains:</string>
+        <string>Source contains:</string>
        </property>
       </widget>
      </item>

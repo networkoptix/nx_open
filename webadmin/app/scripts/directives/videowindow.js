@@ -136,15 +136,15 @@ angular.module('webadminApp')
                                 return "jshls";
                             }*/
 
-                            /*if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
+                            if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
                                 scope.flashOrWebmRequired = true;
-                                return false; //TODO: support flashls for IE!
+                                return false;
                             }
 
                             if(weHaveHls) {
                                 scope.flashRequired = true;
-                                return false;//TODO: support flashls for IE!
-                            }*/
+                                return false;
+                            }
 
                             if(weHaveWebm && (window.jscd.osVersion < 10))
                             {
