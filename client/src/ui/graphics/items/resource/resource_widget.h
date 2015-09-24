@@ -326,9 +326,6 @@ protected:
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
 
-    /** Create custom widget overlays. */
-    virtual void createCustomOverlays();
-
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
     }
@@ -422,8 +419,6 @@ private:
     QnImageButtonWidget *m_iconButton;
 
 
-    QnProxyLabel *m_footerBookmarkDescriptionLabel;
-
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
     struct OverlayWidgets {
@@ -438,6 +433,8 @@ private:
 
         GraphicsLabel *infoNameLabel;
         GraphicsLabel *infoTimeLabel;
+
+        QnProxyLabel * bookmarksLabel;
 
         OverlayWidgets();
     };

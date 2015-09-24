@@ -7,12 +7,11 @@
 
 #include <api/app_server_connection.h>
 
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
-
-#include <utils/common/warnings.h>
-#include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/synctime.h>
-#include <utils/common/collection.h>
+#include <camera/resource_display.h>
+#include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
+#include <camera/loaders/caching_camera_data_loader.h>  //TODO: #GDM remove this dependency
+#include <camera/camera_bookmarks_manager.h>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -21,6 +20,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
 
@@ -34,23 +34,23 @@
 #include <core/ptz/fisheye_home_ptz_controller.h>
 #include <core/resource/camera_bookmark.h>
 
-#include <camera/resource_display.h>
-#include <camera/cam_display.h>
-#include <camera/camera_data_manager.h>
+#include <plugins/resource/archive/abstract_archive_stream_reader.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
+#include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/help/help_topics.h>
-#include <utils/math/color_transformations.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+#include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
@@ -59,28 +59,20 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workaround/gl_native_painting.h>
-#include <ui/fisheye/fisheye_ptz_controller.h>
-#include <ui/graphics/items/overlays/io_module_overlay_widget.h>
-#include <utils/aspect_ratio.h>
-
-#include "resource_widget_renderer.h"
-#include "resource_widget.h"
-
-#include <core/resource/camera_history.h>
-
-//TODO: #Elric remove
-#include <camera/loaders/caching_camera_data_loader.h>
 #include "ui/workbench/workbench_item.h"
 
+#include <utils/aspect_ratio.h>
+#include <utils/common/warnings.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/synctime.h>
+#include <utils/common/collection.h>
 #include <utils/license_usage_helper.h>
+#include <utils/math/color_transformations.h>
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
 namespace 
 {
-    enum { kInvalidTime = 0 };
-
     bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &object, QString *name) {
         switch(object.type) {
         case Qn::PresetPtzObject: {
@@ -152,29 +144,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_ptzController(nullptr)
     , m_homePtzController(nullptr)
     , m_dewarpingParams()
-    , m_currentTime(kInvalidTime)
     , m_bookmarks()
-    , m_bookmarksBeginPosition(m_bookmarks.cbegin())
-    , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource))
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
 {
-    updateBookmarks();
-/*
-    connect(m_dataLoader, &QnCachingCameraDataLoader::bookmarksChanged, this, &QnMediaResourceWidget::updateBookmarks);
-    connect(m_dataLoader, &QnCachingCameraDataLoader::loadingFailed, this, [this]()
-    {
-        m_bookmarks = QnCameraBookmarkList();
-        m_bookmarksBeginPosition = m_bookmarks.cbegin();
-    });
-    connect(m_dataLoader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type)
-    {
-        if (type == Qn::BookmarksContent)
-        {
-            updateBookmarks();
-        }
-    });
-*/
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
 
@@ -237,18 +210,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
-    updateInfoText();
 
-    {
-        QnImageButtonWidget *ioModuleButton = new QnImageButtonWidget();
-        ioModuleButton->setIcon(qnSkin->icon("item/io.png"));
-        ioModuleButton->setCheckable(true);
-        ioModuleButton->setChecked(false);
-        ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
-        ioModuleButton->setToolTip(tr("IO Module"));
-        connect(ioModuleButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ioModuleButton_toggled);
-        buttonBar()->addButton(IoModuleButton, ioModuleButton);
-    }
+
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module)) 
@@ -297,6 +260,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateIconButton();
 
     updateTitleText();
+    updateInfoText();
+    updateBookmarks();
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
@@ -384,6 +349,17 @@ void QnMediaResourceWidget::createButtons() {
         buttonBar()->addButton(EnhancementButton, enhancementButton);
     }
 
+    {
+        QnImageButtonWidget *ioModuleButton = new QnImageButtonWidget();
+        ioModuleButton->setIcon(qnSkin->icon("item/io.png"));
+        ioModuleButton->setCheckable(true);
+        ioModuleButton->setChecked(false);
+        ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
+        ioModuleButton->setToolTip(tr("IO Module"));
+        connect(ioModuleButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ioModuleButton_toggled);
+        buttonBar()->addButton(IoModuleButton, ioModuleButton);
+    }
+
     if (qnRuntime->isDevMode()) {
         QnImageButtonWidget *debugScreenshotButton = new QnImageButtonWidget();
         debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
@@ -396,14 +372,6 @@ void QnMediaResourceWidget::createButtons() {
         buttonBar()->addButton(DbgScreenshotButton, debugScreenshotButton);
     }
 
-  
-
-
-
-}
-
-void QnMediaResourceWidget::createCustomOverlays() {
-    /* Bookmarks text overlay. */ 
 }
 
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const {
@@ -719,35 +687,10 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     for(int channel = 0; channel < channelCount(); channel++)
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
-    if(isOverlayVisible() && isInfoVisible())
-    {
-        if (m_resource->toResource()->flags() & Qn::utc)
-        { 
-            // get timestamp from the first channel that was painted
-            int channel = std::distance(m_paintedChannels.cbegin(),
-                std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
-            if (channel >= channelCount())
-                channel = 0;
-            
-            auto timestamp = m_renderer->getTimestampOfNextFrameToRender(channel);
-            if (timestamp != AV_NOPTS_VALUE) {
-                enum { kFactor = 1000 };
-                updateCurrentTime(timestamp / kFactor);
-            }
-        }
-        else
-        {
-            updateCurrentTime(kInvalidTime);
-        }
-
-
-    }
 	updateInfoTextLater();
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
-//	return Qn::NewFrameRendered;
-
     QnGlNativePainting::begin(m_renderer->glContext(),painter);
 
     qreal opacity = effectiveOpacity();
@@ -1087,7 +1030,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         /* Do not show time for regular media files. */
         timeString = m_display->camDisplay()->isRealTimeSource() 
             ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(m_currentTime).toString(lit("yyyy-MM-dd hh:mm:ss"));
+            : QDateTime::fromMSecsSinceEpoch(getCurrentTime()).toString(lit("yyyy-MM-dd hh:mm:ss"));
         
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
@@ -1252,7 +1195,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(m_resource);
+        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
         else
@@ -1557,40 +1500,37 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
 }
 
-void QnMediaResourceWidget::updateBookmarks()
-{
-//     m_bookmarks = m_dataLoader->bookmarks();
-//     m_bookmarksBeginPosition = m_bookmarks.cbegin();
-// 
-//     if (m_currentTime != kInvalidTime)
-//         updateCurrentTime(m_currentTime);
-}
+void QnMediaResourceWidget::updateBookmarks() {
 
-void QnMediaResourceWidget::updateCurrentTime(qint64 timeMs)
-{
-    if (timeMs < 0)
-        return;
-
-    if (timeMs < m_currentTime)
-        m_bookmarksBeginPosition = m_bookmarks.cbegin();
-
-    m_bookmarksBeginPosition = std::find_if(m_bookmarksBeginPosition, m_bookmarks.cend()
-        , [timeMs](const QnCameraBookmark &bookmark) -> bool
+    auto bookmarksManager = context()->instance<QnCameraBookmarksManager>();
+    bookmarksManager->getBookmarksAsync(QnVirtualCameraResourceList() << m_camera, 
+        QnCameraBookmarkSearchFilter(), 
+        item()->uuid().getQUuid(),
+        [this](bool success, const QnCameraBookmarkList &bookmarks)
     {
-        return (bookmark.endTimeMs() >= timeMs);
+        static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
+
+        QString text;
+        for (const QnCameraBookmark &bookmark: bookmarks) {
+            text += outputTemplate.arg(bookmark.name, bookmark.description);
+        }
+        setBookmarksLabelText(text);
     });
 
-    m_currentTime = timeMs;
+}
 
-    static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
+qint64 QnMediaResourceWidget::getCurrentTime() const {
+    // get timestamp from the first channel that was painted
+    int channel = std::distance(m_paintedChannels.cbegin(),
+        std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
+    if (channel >= channelCount())
+        channel = 0;
 
-    QString text;
-    auto itBookmark = m_bookmarksBeginPosition;
-    while((itBookmark != m_bookmarks.cend()) && (itBookmark->startTimeMs <= timeMs))
-    {
-        text += outputTemplate.arg(itBookmark->name, itBookmark->description);
-        ++itBookmark;
-    }
+    qint64 timestampMs = (m_resource->hasVideo(m_display->mediaProvider()))
+        ? m_renderer->getTimestampOfNextFrameToRender(channel) / 1000
+        : display()->camDisplay()->getCurrentTime() / 1000;
 
-    setBookmarksLabelText(text);
+    if(qnSettings->timeMode() == Qn::ServerTimeMode)
+        timestampMs += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
+    return timestampMs;
 }

@@ -163,8 +163,6 @@ protected:
 
     void suspendHomePtzController();
     void resumeHomePtzController();
-
-    virtual void createCustomOverlays() override;
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -201,7 +199,7 @@ private:
 
     void updateBookmarks();
 
-    void updateCurrentTime(qint64 timeMs);
+    qint64 getCurrentTime() const;
 
 private:
     struct ResourceStates
@@ -258,10 +256,7 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    qint64 m_currentTime;
     QnCameraBookmarkList m_bookmarks;
-    QnCameraBookmarkList::const_iterator m_bookmarksBeginPosition;
-    QnCachingCameraDataLoader *m_dataLoader;
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
 };
