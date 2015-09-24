@@ -1820,7 +1820,7 @@ void MediaServerProcess::run()
     }
 
     using namespace std::placeholders;
-    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
+    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(&QnUniversalRequestProcessor::isProxy);
     messageProcessor->registerProxySender(m_universalTcpListener);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
