@@ -1,6 +1,8 @@
 #ifndef EC2_STATICTICS_REPORTER_H
 #define EC2_STATICTICS_REPORTER_H
 
+#include <QtCore/QDateTime>
+
 #include <core/resource/resource_fwd.h>
 #include <utils/common/timermanager.h>
 #include <utils/network/http/asynchttpclient.h>

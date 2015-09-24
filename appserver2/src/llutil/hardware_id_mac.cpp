@@ -1,5 +1,9 @@
 #include <string>
+
+#ifndef Q_OS_IOS
 #include <IOKit/IOKitLib.h>
+#endif
+
 #include <cassert>
 
 #include <QtCore/QStringList>
@@ -46,6 +50,8 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
 {
     Q_UNUSED(settings)
     #define MAX_HWID_SIZE 1024
+
+#ifndef Q_OS_IOS
 
     char buf[MAX_HWID_SIZE];
 

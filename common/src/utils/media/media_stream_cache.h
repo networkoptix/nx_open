@@ -5,6 +5,8 @@
 #ifndef MEDIASTREAMCACHE_H
 #define MEDIASTREAMCACHE_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 #include <functional> /* For std::function. */
 
@@ -120,5 +122,7 @@ public:
 private:
     std::shared_ptr<detail::MediaStreamCache> m_sharedImpl;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //MEDIASTREAMCACHE_H

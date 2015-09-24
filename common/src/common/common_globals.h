@@ -554,7 +554,9 @@ public:
         AlternateColorRole,                         /**< Use alternate color in painting */
         AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
 
-        LastItemDataRole
+        LastItemDataRole,
+
+        RoleCount
     };
 
     // TODO: #Elric #EC2 rename

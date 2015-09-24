@@ -101,6 +101,11 @@ public:
         const QString& realm,
         const QByteArray& method,
         QByteArray nonce = QByteArray() );
+    static QByteArray createHttpQueryAuthParam(
+        const QString& userName,
+        const QByteArray& digest,
+        const QByteArray& method,
+        QByteArray nonce = QByteArray());
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 

@@ -1,5 +1,7 @@
 #include "license_usage_helper.h"
 
+#ifdef ENABLE_SENDMAIL
+
 #include <numeric>
 #include <functional>
 
@@ -547,3 +549,5 @@ QnVideoWallLicenseUsageProposer::~QnVideoWallLicenseUsageProposer() {
         return;
     m_helper->propose(-m_count);
 }
+
+#endif //ENABLE_SENDMAIL

@@ -1,5 +1,7 @@
 #include "update_utils.h"
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+
 #include <QtCore/QJsonDocument>
 #include <QtCore/QDir>
 #include <QtCore/QCryptographicHash>
@@ -128,3 +130,5 @@ void clearUpdatesCache(const QnSoftwareVersion &versionToKeep) {
         dir.remove(fileName);
     }
 }
+
+#endif

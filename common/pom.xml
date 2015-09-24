@@ -23,19 +23,23 @@
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
+        <template>lib</template>
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>
-        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lquazip</global.libs>
+        <global.libs></global.libs>
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32 -lWldap32</windows.oslibs>
         <linux.oslibs>-lssl -lsigar -lldap</linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx -lldap</mac.oslibs>
+        <android.oslibs>-lssl -lcrypto -lz</android.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+        <android.defines/>
     </properties>   
 
     <dependencies>
@@ -111,6 +115,32 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
     </profiles>	
 
 </project>
