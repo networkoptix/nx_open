@@ -28,30 +28,17 @@ private:
     /// @brief Callback for bookmarks. If data is nullptr it means error occurred
     void bookmarksDataEvent(const QnCameraBookmarkList &bookmarks);
 
-    QnBookmarksLoader *loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists = true);
+private slots:
+    void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle);
 
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
 
-    typedef int HandleType;
-    typedef std::map<const QnBookmarksLoader *, HandleType> AnswersContainer;
-
-    /// @brief Structure holds data for the request of the bookmarks
-    struct BookmarkRequestHolder
-    {
-        QnTimePeriod targetPeriod;
+    struct RequestInfo {
+        int handle;
         BookmarksCallbackType callback;
-        QnCameraBookmarkList bookmarks;
-        AnswersContainer answers;
-        bool success;
     };
-
-    typedef QList<BookmarkRequestHolder> RequestsContainer;
-    typedef QHash<QnVirtualCameraResourcePtr, QnBookmarksLoader *> LoadersContainer;
-
-    LoadersContainer m_loaderByResource;
-    RequestsContainer m_requests;
-
+    QHash<QUuid, RequestInfo> m_requests;
     
 };

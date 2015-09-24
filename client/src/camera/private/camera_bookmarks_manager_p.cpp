@@ -7,6 +7,10 @@
 #include <core/resource/media_server_resource.h>
 #include <camera/loaders/bookmark_camera_data_loader.h>
 
+/* Temporary includes */
+#include <common/common_module.h>
+#include <api/helpers/bookmark_request_data.h>
+
 namespace
 {
 
@@ -16,7 +20,6 @@ namespace
 QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent)
     : QObject(parent)
     , q_ptr(parent)
-    , m_loaderByResource()
     , m_requests()
 {
     //TODO: #GDM #Bookmarks clear cache on time changed and on history change. Should we refresh the cache on timer?
@@ -32,6 +35,25 @@ void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraRes
                                                         , const QUuid &requestId
                                                         , BookmarksCallbackType callback)
 {
+
+    auto server = qnCommon->currentServer();
+    if (!server)
+        return;
+
+    auto connection = server->apiConnection();
+    if (!connection)
+        return;
+
+    QnBookmarkRequestData requestData;
+    requestData.cameras = cameras;
+    requestData.format = Qn::JsonFormat;
+    requestData.filter = filter;
+
+    //TODO: #GDM #Bookmarks #IMPLEMENT ME
+    RequestInfo request;
+    request.callback = callback;
+    request.handle = connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
+    m_requests[requestId] = request;
 
     /*
     Here we should do the following:
@@ -68,6 +90,18 @@ void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraRes
 //     if (!request.answers.empty())
 //         m_requests.push_back(request);
 }
+
+void QnCameraBookmarksManagerPrivate::handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle) {
+    for (const RequestInfo &info: m_requests) {
+        if (info.handle != handle)
+            continue;
+        if (info.callback)
+            info.callback(status == 0, bookmarks);
+        break;
+    }
+
+}
+
 
 void QnCameraBookmarksManagerPrivate::bookmarksDataEvent(const QnCameraBookmarkList &bookmarks)
 {
@@ -116,45 +150,28 @@ void QnCameraBookmarksManagerPrivate::bookmarksDataEvent(const QnCameraBookmarkL
     }*/
 }
 
-QnBookmarksLoader * QnCameraBookmarksManagerPrivate::loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists) {
-    LoadersContainer::const_iterator pos = m_loaderByResource.find(camera);
-    if(pos != m_loaderByResource.cend())
-        return *pos;
-
-    if (!createIfNotExists)
-        return nullptr;
-    
-    QnBookmarksLoader *loader = new QnBookmarksLoader(camera, this);
-    connect(loader, &QnBookmarksLoader::bookmarksChanged, [this, camera] {
-        Q_Q(QnCameraBookmarksManager);
-        emit q->bookmarksChanged(camera);
-    });
-
-    m_loaderByResource[camera] = loader;
-    return loader;
-}
-
 QnCameraBookmarkList QnCameraBookmarksManagerPrivate::bookmarks(const QnVirtualCameraResourcePtr &camera) const {
-    LoadersContainer::const_iterator pos = m_loaderByResource.find(camera);
+  /*  LoadersContainer::const_iterator pos = m_loaderByResource.find(camera);
     if(pos == m_loaderByResource.cend())
         return QnCameraBookmarkList();
 
     auto loader = *pos;
-    return loader->bookmarks();
+    return loader->bookmarks();*/
+    return QnCameraBookmarkList();
 }
 
 void QnCameraBookmarksManagerPrivate::clearCache() {
-    for (QnBookmarksLoader* loader: m_loaderByResource)
+  /*  for (QnBookmarksLoader* loader: m_loaderByResource)
         if (loader)
-            loader->discardCachedData();
+            loader->discardCachedData();*/
 }
 
 void QnCameraBookmarksManagerPrivate::loadBookmarks(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period) {
-    if (!camera || !period.isValid())
+ /*   if (!camera || !period.isValid())
         return;
 
     auto loaderForCamera = loader(camera);
     Q_ASSERT_X(loaderForCamera, Q_FUNC_INFO, "Loader must be created here");
     if (loaderForCamera)
-        loaderForCamera->load(period);
+        loaderForCamera->load(period);*/
 }
