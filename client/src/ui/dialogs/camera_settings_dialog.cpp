@@ -4,18 +4,13 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 
-#include <api/app_server_connection.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_provider.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/actions/action_manager.h>
 
 #include <ui/dialogs/resource_list_dialog.h>
 
@@ -23,22 +18,12 @@
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_selection_watcher.h>
 
-#include <utils/common/delayed.h>
 #include <utils/license_usage_helper.h>
-
-namespace {
-
-    /* Update selection no more often than once in 50 ms */
-    const int selectionUpdateTimeoutMs = 50;
-
-}
-
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
-    m_selectionUpdatePending(false),
-    m_selectionScope(Qn::SceneScope),
     m_ignoreAccept(false)
 {
     m_settingsWidget = new QnCameraSettingsWidget(this);
@@ -74,7 +59,15 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     
     connect(context(),          &QnWorkbenchContext::userChanged,          this,   &QnCameraSettingsDialog::updateReadOnly);
 
-    connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
+    auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources) {
+        if (isHidden())
+            return;
+
+        auto cameras = resources.filtered<QnVirtualCameraResource>();
+        if (!cameras.isEmpty())
+            setCameras(cameras);
+    });  
 
     at_settingsWidget_hasChangesChanged();
     retranslateUi();
@@ -278,36 +271,4 @@ void QnCameraSettingsDialog::at_openButton_clicked() {
     menu()->trigger(Qn::OpenInNewLayoutAction, cameras);
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
-    m_selectionUpdatePending = false;
-}
-
-void QnCameraSettingsDialog::updateCamerasFromSelection() {
-    if(!m_selectionUpdatePending)
-        return;
-
-    m_selectionUpdatePending = false;
-
-    if (isHidden())
-        return;
-
-    QnActionTargetProvider *provider = menu()->targetProvider();
-    if(!provider)
-        return;
-
-    Qn::ActionScope scope = provider->currentScope();
-    if(scope != Qn::SceneScope && scope != Qn::TreeScope) {
-        scope = m_selectionScope;
-    } else {
-        m_selectionScope = scope;
-    }
-
-    setCameras(provider->currentParameters(scope).resources().filtered<QnVirtualCameraResource>());
-}
-
-void QnCameraSettingsDialog::at_selectionChangeAction_triggered() {
-    if(isHidden() || m_selectionUpdatePending)
-        return;
-
-    m_selectionUpdatePending = true;
-    executeDelayed([this]{updateCamerasFromSelection();}, selectionUpdateTimeoutMs);
 }

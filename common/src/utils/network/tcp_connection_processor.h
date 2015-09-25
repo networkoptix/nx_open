@@ -86,7 +86,7 @@ protected:
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
-
+    void sendUnauthorizedResponse(bool isProxy, const QByteArray& messageBody);
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 

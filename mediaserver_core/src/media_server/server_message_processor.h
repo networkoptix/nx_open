@@ -19,7 +19,6 @@ public:
     QnServerMessageProcessor();
 
     virtual void updateResource(const QnResourcePtr &resource) override;
-    bool isProxy(const nx_http::Request& request) const;
     void registerProxySender(QnUniversalTcpListener* tcpListener);
 
 protected:

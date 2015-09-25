@@ -125,14 +125,30 @@ FocusScope
         }
     }
     
+    Connections
+    {
+        target: rtuContext.selection;
+
+        function processChanges(item)
+        {
+            var updateFunc = function() { item.recreate(); }
+
+            if (item.warned && !item.changed)
+                updateFunc();
+            else
+                outdatedWarning.addOnUpdateAction(updateFunc);
+        }
+
+        onInterfaceSettingsChanged: { processChanges(ipPortSettings); }
+        onDateTimeSettingsChanged: { processChanges(dateTimeSettings); }
+        onSystemSettingsChanged: { processChanges(systemAndPasswordSettings); }
+    }
+
     Rtu.OutdatedWarningPanel
     {
         id: outdatedWarning;
 
-        show: rtuContext.selectionModel().selectionOutdated;
         width: parent.width;
-
-        onUpdateClicked: { rtuContext.selectionModel().selectionChanged(); }
     }
 
     ScrollView

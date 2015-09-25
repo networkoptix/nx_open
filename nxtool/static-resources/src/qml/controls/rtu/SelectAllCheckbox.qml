@@ -52,7 +52,7 @@ Item
         Base.Text
         {
             anchors.verticalCenter: parent.verticalCenter;
-            text: qsTr("select / unselect all");
+            text: qsTr("Select / Deselect All");
             font.pixelSize: Common.SizeManager.fontSizes.medium;
             color: "#666666";
         }

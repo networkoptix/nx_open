@@ -25,8 +25,6 @@ namespace rtu
         QString dns;
         Qt::CheckState useDHCP;
         
-        bool operator == (const InterfaceInfo &other);
-
         InterfaceInfo();
 
         InterfaceInfo(const QString &initName

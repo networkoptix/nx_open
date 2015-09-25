@@ -19,6 +19,11 @@ class QnRestConnectionProcessor;
 // are named XyzRestHandler I suggest to rename this one to either
 // QnAbstractRestHandler or simply to QnRestHandler. And rename the header.
 
+enum class RestPermissions {
+    anyUser,
+    adminOnly
+};
+
 
 /**
  * QnRestRequestHandler must be thread-safe.
@@ -28,6 +33,7 @@ class QnRestConnectionProcessor;
 class QnRestRequestHandler: public QObject {
     Q_OBJECT
 public:
+    QnRestRequestHandler();
 
     // TODO: #Elric #EC2 replace QnRequestParamList -> QnRequestParams
 
@@ -48,13 +54,16 @@ public:
 
     friend class QnRestProcessorPool;
 
+    RestPermissions permissions() const { return m_permissions; }
+
 protected:
     void setPath(const QString &path) { m_path = path; }
-    
+    void setPermissions(RestPermissions permissions ) {m_permissions = permissions; }
     QString extractAction(const QString &path) const;
 
 protected:
     QString m_path;
+    RestPermissions m_permissions;
 };
 
 typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;

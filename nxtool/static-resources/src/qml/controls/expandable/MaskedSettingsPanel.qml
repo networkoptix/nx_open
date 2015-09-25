@@ -20,6 +20,12 @@ GenericSettingsPanel
     property bool warned: (rtuContext.selection && (rtuContext.selection !== null)
         && (rtuContext.selection.count === 1) ? true : false) || extraWarned;
 
+    function recreate()
+    {
+        area.sourceComponent = undefined;
+        area.sourceComponent = areaBinding.value;
+    }
+
     Component
     {
         id: maskingPanel;
@@ -80,7 +86,7 @@ GenericSettingsPanel
 
                         height: Common.SizeManager.clickableSizes.medium;
                         width: height * 4;
-                        text: qsTr("Edit all");
+                        text: qsTr("Edit All");
 
                         onClicked: { thisComponent.warned = true; }
 
@@ -100,7 +106,7 @@ GenericSettingsPanel
                         color: "#666666";
                         wrapMode: Text.Wrap;
                         font.pixelSize: Common.SizeManager.fontSizes.base;
-                        text: qsTr("If you doesn't click this button,\nnothing will be changed");
+                        text: qsTr("Changes will be applied only if this button is clicked");
                     }
                 }
             }
@@ -110,8 +116,16 @@ GenericSettingsPanel
     areaDelegate: Loader
     {
         id: areaDelegateLoader;
-        
-        sourceComponent: (thisComponent.warned ? propertiesDelegate : maskingPanel);
     }
+
+    Binding
+    {
+        id: areaBinding;
+
+        target: area;
+        property: "sourceComponent";
+        value: (thisComponent.warned ? propertiesDelegate : maskingPanel);
+    }
+
 }
 

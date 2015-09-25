@@ -19,18 +19,21 @@ namespace
         const rtu::ApplyChangesTaskPtr task = 
             rtu::ApplyChangesTask::create(changeset, selectionModel->selectedServers());
 
-        selectionModel->setBusyState(task->targetServerIds(), true);
+        const auto ids = task->targetServerIds();
+        const auto locker = task->id();
+        selectionModel->setLockedState(ids, locker, true);
 
         typedef std::weak_ptr<rtu::ApplyChangesTask> TaskWeak;
         const TaskWeak weak = task;
         QObject::connect(task.get(), &rtu::ApplyChangesTask::changesApplied
-            , context, [context, weak, selectionModel]() 
+            , context, [ids, locker, context, weak, selectionModel]() 
         {
+            selectionModel->setLockedState(ids, locker, false);
+
             if (weak.expired())
                 return;
 
             const rtu::ApplyChangesTaskPtr task = weak.lock();
-            selectionModel->setBusyState(task->targetServerIds(), false);
             context->applyTaskCompleted(task); 
         });
 
@@ -42,8 +45,8 @@ namespace
             , selectionModel, &rtu::ServersSelectionModel::updatePasswordInfo);
         QObject::connect(task.get(), &rtu::ApplyChangesTask::dateTimeUpdated
             , selectionModel, &rtu::ServersSelectionModel::updateTimeDateInfo);
-        QObject::connect(task.get(), &rtu::ApplyChangesTask::itfUpdated
-            , selectionModel, &rtu::ServersSelectionModel::updateInterfacesInfo);
+        QObject::connect(task.get(), &rtu::ApplyChangesTask::extraInfoUpdated
+            , selectionModel, &rtu::ServersSelectionModel::updateExtraInfo);
 
         QObject::connect(serversFinder, &rtu::ServersFinder::serverDiscovered
             , task.get(), &rtu::ApplyChangesTask::serverDiscovered);

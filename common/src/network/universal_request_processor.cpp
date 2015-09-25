@@ -12,6 +12,7 @@
 #include "utils/network/flash_socket/types.h"
 #include "audit/audit_manager.h"
 #include <utils/common/model_functions.h>
+#include "core/resource_management/resource_pool.h"
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
@@ -70,8 +71,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        //not asking Proxy authentication because we proxy requests in a custom way
-        const bool isProxy = false;
+        const bool isProxy = isProxyForCamera(d->request);
         QElapsedTimer t;
         t.restart();
         AuthMethod::Value usedMethod = AuthMethod::noAuth;
@@ -98,43 +98,15 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if( !d->socket->isConnected() )
                 return false;   //connection has been closed
 
-            if( d->request.requestLine.method == nx_http::Method::GET ||
-                d->request.requestLine.method == nx_http::Method::HEAD )
-            {
-                if (isProxy)
-                    d->response.messageBody = STATIC_PROXY_UNAUTHORIZED_HTML;
-                else if (usedMethod & m_unauthorizedPageForMethods)
-                    d->response.messageBody = unauthorizedPageBody();
-                else
-                    d->response.messageBody = STATIC_UNAUTHORIZED_HTML;
-            }
-            if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
-                d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
+            QByteArray msgBody;
+            if (isProxy)
+                msgBody = STATIC_PROXY_UNAUTHORIZED_HTML;
+            else if (usedMethod & m_unauthorizedPageForMethods)
+                msgBody = unauthorizedPageBody();
+            else
+                msgBody = STATIC_UNAUTHORIZED_HTML;
+            sendUnauthorizedResponse(isProxy, msgBody);
 
-            auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
-            QByteArray contentEncoding;
-            if( acceptEncodingHeaderIter != d->request.headers.end() )
-            {
-                nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
-                if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
-                {
-                    contentEncoding = "identity";
-                }
-                else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
-                {
-                    contentEncoding = "gzip";
-                    if( !d->response.messageBody.isEmpty() )
-                        d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
-                }
-                else
-                {
-                    //TODO #ak not supported encoding requested
-                }
-            }
-            sendResponse(
-                isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
-                d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
-                contentEncoding );
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT) {
                 return false;
@@ -247,4 +219,36 @@ void QnUniversalRequestProcessor::pleaseStop()
     QnTCPConnectionProcessor::pleaseStop();
     if (d->processor)
         d->processor->pleaseStop();
+}
+
+bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)
+{
+    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    if( xServerGuidIter != request.headers.end() )
+    {
+        // is proxy to other media server
+        QnUuid desiredServerGuid(xServerGuidIter->second);
+        return desiredServerGuid != qnCommon->moduleGUID();
+    }
+
+    return isProxyForCamera(request);
+}
+
+bool QnUniversalRequestProcessor::isProxyForCamera(const nx_http::Request& request)
+{
+    nx_http::BufferType desiredCameraGuid;
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
+    if( xCameraGuidIter != request.headers.end() )
+    {
+        desiredCameraGuid = xCameraGuidIter->second;
+    }
+    else {
+        desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
+    }
+    if (!desiredCameraGuid.isEmpty()) {
+        QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);
+        return camera != 0;
+    }
+
+    return false;
 }
