@@ -9,10 +9,12 @@ export BOOTPART=/dev/mmcblk0p2
 export MNTBOOTPART=/mnt/boot
 mkdir -p $MNTBOOTPART
 mount -t ext4 $BOOTPART $MNTBOOTPART
+cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite /root/tools/nx/ecs_static.sqlite
 rm -Rf $MNTBOOTPART/opt/$CUSTOMIZATION
 tar xfv /tmp/$DISTRIB.tar.gz -C $MNTBOOTPART
 mkdir -p $MNTBOOTPART/opt/$CUSTOMIZATION/mediaserver/var
-cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite $MNTBOOTPART/opt/$CUSTOMIZATION/mediaserver/var
+cp -f /root/tools/nx/ecs_static.sqlite $MNTBOOTPART/opt/$CUSTOMIZATION/mediaserver/var
+echo "statisticsReportAllowed=true" >> $MNTBOOTPART/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf
 umount $BOOTPART
 
 exit 0
