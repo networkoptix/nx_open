@@ -322,11 +322,11 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
                 screenfull.request($('.videowindow').get(0));
-                $('.videowindow').addClass("fullscreen");
             }
         };
-        document.addEventListener("fullscreenchange",function(){
-            $('.videowindow').removeClass("fullscreen");
+
+        document.addEventListener('MSFullscreenChange',function(){ // IE only
+            $('.videowindow').toggleClass('fullscreen');
         });
 
 
@@ -722,14 +722,15 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             $camerasPanel.css('height',viewportHeight );
             $viewPanel.css('height',viewportHeight );
+
+            //One more IE hack.
+            var videoWidth = $('header').width() - $('.cameras-panel').width();
+            $('videowindow').parent().css('width',videoWidth + 'px');
         };
 
         updateHeights();
         setTimeout(updateHeights,50);
         $window.resize(updateHeights);
-
-
-
 
         $scope.mobileAppAlertClose = function(){
             $scope.session.mobileAppNotified  = true;
