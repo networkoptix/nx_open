@@ -31,6 +31,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         // TODO: detect better resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
         var nativeResolutions = ['Auto', 'hi', 'lo'];
+        var onlyHiResolution =  ['Auto', 'hi'];
         var reloadInterval = 5*1000;//30 seconds
         var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
         var mimeTypes = {
@@ -124,7 +125,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(formatSupported('webm')){
                 $scope.availableResolutions = transcodingResolutions;
             }else{
-                $scope.availableResolutions = nativeResolutions;
+                if(!$scope.activeCamera || $scope.activeCamera.addParams.hasDualStreaming && $scope.activeCamera.addParams.hasDualStreaming!='0') {
+                    $scope.availableResolutions = nativeResolutions;
+                }else{
+                    $scope.availableResolutions = onlyHiResolution;
+                }
+
             }
 
             if($scope.availableResolutions.indexOf($scope.activeResolution)<0){
@@ -199,6 +205,9 @@ angular.module('webadminApp').controller('ViewCtrl',
             var resolution = $scope.activeResolution;
             var resolutionHls = resolution=='Auto'?'lo':resolution;
 
+            if(resolutionHls == 'lo' && (!$scope.activeCamera.addParams.hasDualStreaming || $scope.activeCamera.addParams.hasDualStreaming == '0')){
+                resolutionHls = 'hi';
+            }
             // TODO: check resolution ?
             $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes['hls'], transport:'hls'},
