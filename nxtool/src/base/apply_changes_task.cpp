@@ -164,7 +164,6 @@ namespace
         }
     };
 
-
     typedef std::function<void (rtu::RequestError error
         , rtu::Constants::AffectedEntities affected)> BeforeDeleteAction;
     typedef QPair<rtu::AwaitingOp::Holder, BeforeDeleteAction> AwaitingOpData;
@@ -185,6 +184,10 @@ public:
     rtu::IDsVector targetServerIds() const;
 
     const QUuid &id() const;
+
+    QString progressPageHeaderText() const;
+
+    QString minimizedText() const;
 
     ChangesSummaryModel *successfulModel();
 
@@ -334,6 +337,16 @@ rtu::IDsVector rtu::ApplyChangesTask::Impl::targetServerIds() const
 const QUuid &rtu::ApplyChangesTask::Impl::id() const
 {
     return m_id;
+}
+
+QString rtu::ApplyChangesTask::Impl::progressPageHeaderText() const
+{
+    return m_changeset->getProgressText();
+}
+
+QString rtu::ApplyChangesTask::Impl::minimizedText() const
+{
+    return m_changeset->getMinimizedProgressText();
 }
 
 rtu::ChangesSummaryModel *rtu::ApplyChangesTask::Impl::successfulModel()
@@ -660,7 +673,7 @@ void rtu::ApplyChangesTask::Impl::addRestartRequests()
                 if (weak.expired())
                     return;
 
-                static const auto kRestartOpDescription = QStringLiteral("Restarted");
+                static const auto kRestartOpDescription = QStringLiteral("Restart operation");
                 static const auto kRestartOpValue = QString();
 
                 const auto shared = weak.lock();
@@ -1156,6 +1169,16 @@ QObject *rtu::ApplyChangesTask::successfulModel()
 QObject *rtu::ApplyChangesTask::failedModel()
 {
     return m_impl->failedModel();
+}
+
+QString rtu::ApplyChangesTask::progressPageHeaderText() const
+{
+    return m_impl->progressPageHeaderText();
+}
+
+QString rtu::ApplyChangesTask::minimizedText() const
+{
+    return m_impl->minimizedText();
 }
 
 bool rtu::ApplyChangesTask::inProgress() const

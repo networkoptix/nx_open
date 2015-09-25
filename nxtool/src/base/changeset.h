@@ -39,6 +39,10 @@ namespace rtu
 
         bool factoryDefaultsButNetwork() const;
 
+        QString getProgressText() const;
+
+        QString getMinimizedProgressText() const;
+
     public slots:
         /// Special setters available from Qml
         void addSystemChange(const QString &systemName);
@@ -77,9 +81,9 @@ namespace rtu
     private:
         Changeset();
 
-        void clear();
+        void preapareActionData();
 
-        void clearActions();
+        void preparePropChangesData();
 
         ItfUpdateInfo &getItfUpdateInfo(const QString &name);
 

@@ -6,6 +6,17 @@
 #include <helpers/qml_helpers.h>
 #include <helpers/time_helper.h>
 
+namespace
+{
+    const auto kChangesProgressTextDesc = QStringLiteral("Applying changes (%1/%2)...");
+    const auto kRestartProgressTextDesc = QStringLiteral("Restarting servers (%1/%2)...");
+    const auto kRestoreFactoryProgressTextDesc = QStringLiteral("Restoring servers to factory defaults (%1/%2)...");
+
+    const auto kMinimizedChangesProgressTextDesc = QStringLiteral("Applying...");
+    const auto kMinimizedRestartProgressTextDesc = QStringLiteral("Restarting...");
+    const auto kMinimizedRestoreProgressTextDesc = QStringLiteral("Restoring...");
+}
+
 rtu::ChangesetPointer rtu::Changeset::create()
 {
     return ChangesetPointer(new Changeset());
@@ -76,56 +87,76 @@ bool rtu::Changeset::factoryDefaultsButNetwork() const
     return m_factoryDefaultsButNetwork;
 }
 
+QString rtu::Changeset::getProgressText() const
+{
+    if (m_factoryDefaults || m_factoryDefaultsButNetwork)
+        return kRestoreFactoryProgressTextDesc;
+    else if (m_osRestart || m_softRestart)
+        return kRestartProgressTextDesc;
+    
+    return kChangesProgressTextDesc;
+}
+
+QString rtu::Changeset::getMinimizedProgressText() const
+{
+    if (m_factoryDefaults || m_factoryDefaultsButNetwork)
+        return kMinimizedRestoreProgressTextDesc;
+    else if (m_osRestart || m_softRestart)
+        return kMinimizedRestartProgressTextDesc;
+    
+    return kMinimizedChangesProgressTextDesc;
+}
+
 void rtu::Changeset::addSystemChange(const QString &systemName)
 {
-    clearActions();
+    preparePropChangesData();
     m_systemName.reset(new QString(systemName));
 }
         
 void rtu::Changeset::addPasswordChange(const QString &password)
 {
-    clearActions();
+    preparePropChangesData();
     m_password.reset(new QString(password));
 }
         
 void rtu::Changeset::addPortChange(int port)
 {
-    clearActions();
+    preparePropChangesData();
     m_port.reset(new int(port));
 }
 
 void rtu::Changeset::addDHCPChange(const QString &name
     , bool useDHCP)
 {
-    clearActions();
+    preparePropChangesData();
     getItfUpdateInfo(name).useDHCP.reset(new bool(useDHCP));
 }
         
 void rtu::Changeset::addAddressChange(const QString &name
     , const QString &address)
 {
-    clearActions();
+    preparePropChangesData();
     getItfUpdateInfo(name).ip.reset(new QString(address));
 }
         
 void rtu::Changeset::addMaskChange(const QString &name
     , const QString &mask)
 {
-    clearActions();
+    preparePropChangesData();
     getItfUpdateInfo(name).mask.reset(new QString(mask));
 }
         
 void rtu::Changeset::addDNSChange(const QString &name
     , const QString &dns)
 {
-    clearActions();
+    preparePropChangesData();
     getItfUpdateInfo(name).dns.reset(new QString(dns));
 }
         
 void rtu::Changeset::addGatewayChange(const QString &name
     , const QString &gateway)
 {
-    clearActions();
+    preparePropChangesData();
     getItfUpdateInfo(name).gateway.reset(new QString(gateway));
 }
         
@@ -133,36 +164,36 @@ void rtu::Changeset::addDateTimeChange(const QDate &date
     , const QTime &time
     , const QByteArray &timeZoneId)
 {
-    clearActions();
+    preparePropChangesData();
     qint64 utcTimeMs = msecondsFromEpoch(date, time, QTimeZone(timeZoneId));
     m_dateTime.reset(new DateTime(utcTimeMs, timeZoneId));
 }
 
 void rtu::Changeset::addSoftRestartAction()
 {
-    clear();
+    preapareActionData();
     m_softRestart = true;
 }
 
 void rtu::Changeset::addOsRestartAction()
 {
-    clear();
+    preapareActionData();
     m_osRestart = true;
 }
 
 void rtu::Changeset::addFactoryDefaultsAction()
 {
-    clear();
+    preapareActionData();
     m_factoryDefaults = true;
 }
 
 void rtu::Changeset::addFactoryDefaultsButNetworkAction()
 {
-    clear();
+    preapareActionData();
     m_factoryDefaultsButNetwork = true;
 }
 
-void rtu::Changeset::clear()
+void rtu::Changeset::preapareActionData()
 {
     m_port.reset();
     m_password.reset();
@@ -170,10 +201,10 @@ void rtu::Changeset::clear()
     m_dateTime.reset();
     m_itfUpdateInfo.reset();
 
-    clearActions();
+    preparePropChangesData();
 }
 
-void rtu::Changeset::clearActions()
+void rtu::Changeset::preparePropChangesData()
 {
     m_softRestart = false;
     m_osRestart = false;
