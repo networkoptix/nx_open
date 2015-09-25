@@ -1,28 +1,34 @@
 #include "camera_bookmarks_manager_p.h"
 
+#include <api/helpers/bookmark_request_data.h>
+
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
+
+#include <common/common_module.h>
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <camera/loaders/bookmark_camera_data_loader.h>
 
-/* Temporary includes */
-#include <common/common_module.h>
-#include <api/helpers/bookmark_request_data.h>
-
-namespace
-{
-    const static int defaultSearchLimit = 100;
-}
-
 QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent)
     : QObject(parent)
     , q_ptr(parent)
     , m_requests()
 {
-    //TODO: #GDM #Bookmarks clear cache on time changed and on history change. Should we refresh the cache on timer?
+    /*
+     Bookmarks updating strategy:
+     * clear cache or removing camera from pool
+     * once a time update all auto-updating queries independently
+        - return results at once, without local filtering (?)
+        - make sure queries are listening only in bookmarks mode
+     * implement full-text search on the client side
+     * make sure bookmark periods exists before requesting to avoid a lot of empty requests
+     * filter request period by chunks and by already loaded data
+     * update chunks on history change and bookmarks adding/deleting, then forcefully re-request required periods
+     */
+
 
 }
 
@@ -51,15 +57,15 @@ void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraRes
 }
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-
+    //TODO: #GDM #Bookmarks #IMPLEMENT_ME
 }
 
 void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-
+    //TODO: #GDM #Bookmarks #IMPLEMENT_ME
 }
 
 void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-
+    //TODO: #GDM #Bookmarks #IMPLEMENT_ME
 }
 
 
