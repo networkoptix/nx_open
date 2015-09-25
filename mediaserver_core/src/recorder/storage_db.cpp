@@ -396,10 +396,13 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
 
     if (!cameraUniqueId.isEmpty())
         addFilter("book.unique_id = :cameraUniqueId");
-    if (filter.startTimeMs > 0)
-        addFilter("startTimeMs >= :minStartTimeMs");
-    if (filter.endTimeMs < INT64_MAX)
-        addFilter("startTimeMs <= :maxStartTimeMs");
+
+    if (filter.isValid()) {
+        if (filter.startTimeMs > 0)
+            addFilter("startTimeMs >= :minStartTimeMs");
+        if (filter.endTimeMs < INT64_MAX)
+            addFilter("endTimeMs <= :maxEndTimeMs");
+    }
 //     if (filter.minDurationMs > 0)
 //         addFilter("durationMs >= :minDurationMs");
     //TODO: #GDM #Bookmarks add strategy filter
@@ -412,6 +415,7 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
                      book.guid as guid, \
                      book.start_time as startTimeMs, \
                      book.duration as durationMs, \
+                     book.start_time + book.duration as endTimeMs, \
                      book.name as name, \
                      book.description as description, \
                      book.timeout as timeout, \
@@ -434,7 +438,7 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
 
     checkedBind(":cameraUniqueId", cameraUniqueId);
     checkedBind(":minStartTimeMs", filter.startTimeMs);
-    checkedBind(":maxStartTimeMs", filter.endTimeMs);
+    checkedBind(":maxEndTimeMs", filter.endTimeMs);
     //checkedBind(":minDurationMs", filter.minDurationMs);
     checkedBind(":text", filter.text);
 

@@ -12,8 +12,9 @@ public:
     virtual ~QnCameraBookmarksManagerPrivate();
 
     void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
-
-    void clearCache();
+    void addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback);
+    void updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback);
+    void deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback);
 
     /// @brief Register bookmarks search query to auto-update it.
     /// @param query            Target query.
@@ -30,9 +31,18 @@ private slots:
     void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle);
 
 private:
+    void clearCache();
+    void updateQueryCache(const QnCameraBookmarksQueryPtr &query);
+    QnCameraBookmarkList executeQueryInternal(const QnCameraBookmarksQueryPtr &query) const;
+
+private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
 
     QMap<int, BookmarksCallbackType> m_requests;
-    QList<QnCameraBookmarksQueryPtr> m_queries;
+
+    /** Cached bookmarks by query. */
+    QHash<QnCameraBookmarksQueryPtr, QnCameraBookmarkList> m_autoUpdatingQueries;
+
+    QHash<QnVirtualCameraResourcePtr, QnCameraBookmarkList> m_bookmarksByCamera;
 };

@@ -14,6 +14,8 @@ public:
     QnCameraBookmarksQuery(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QObject *parent = nullptr);
     virtual ~QnCameraBookmarksQuery();
 
+    bool isValid() const;
+
     bool autoUpdate() const;
     void setAutoUpdate(bool value);
 

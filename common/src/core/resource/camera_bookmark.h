@@ -73,15 +73,19 @@ struct QnCameraBookmarkSearchFilter {
     /** Text-search filter string. */
     QString text;
 
-    int limit; //TODO: #GDM #Bookmarks does not work
+    int limit; //TODO: #GDM #Bookmarks works in merge function only
 
-    Qn::BookmarkSearchStrategy strategy; //TODO: #GDM #Bookmarks does not work
+    Qn::BookmarkSearchStrategy strategy; //TODO: #GDM #Bookmarks works in merge function only
 
     QnCameraBookmarkSearchFilter();
+
+    bool isValid() const;
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
+bool operator<(qint64 first, const QnCameraBookmark &other);
+bool operator<(const QnCameraBookmark &first, qint64 other);
 
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
 

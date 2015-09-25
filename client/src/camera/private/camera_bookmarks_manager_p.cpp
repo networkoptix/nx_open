@@ -14,7 +14,6 @@
 
 namespace
 {
-
     const static int defaultSearchLimit = 100;
 }
 
@@ -28,14 +27,11 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmar
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
-{
-}
+{}
 
 void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraResourceList &cameras
                                                         , const QnCameraBookmarkSearchFilter &filter
-                                                        , BookmarksCallbackType callback)
-{
-
+                                                        , BookmarksCallbackType callback) {
     auto server = qnCommon->currentServer();
     if (!server)
         return;
@@ -49,46 +45,23 @@ void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraRes
     requestData.format = Qn::JsonFormat;
     requestData.filter = filter;
 
-    //TODO: #GDM #Bookmarks #IMPLEMENT ME
     int handle = connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
     if (callback)
         m_requests[handle] = callback;
-
-    /*
-    Here we should do the following:
-    1) get list of already loaded bookmarks by this request.
-    2) Select correct loader:
-       * that may be the 'Search loader' that will support cameras list, text filter and start time only, also will not cache data and drop requests
-       * or 'Timeline loader' - single camera, set period, cache data?, wait requests
-    
-    */
-
-// 
-// 
-//     BookmarkRequestHolder request = { QnTimePeriod(filter.startTimeMs, filter.endTimeMs - filter.startTimeMs)
-//         , callback, QnCameraBookmarkList(), AnswersContainer(), true };
-// 
-//     /// Make Load request for any camera
-//     for(const auto &camera: cameras)
-//     {
-//         LoadersContainer::iterator it = m_loaderByResource.find(camera);
-//         if (it == m_loaderByResource.end())
-//         {
-//             QnBookmarksLoader *loader = new QnBookmarksLoader(camera, this);
-//                 connect(loader, &QnBookmarksLoader::bookmarksChanged, this, &QnCameraBookmarksManagerPrivate::bookmarksDataEvent);
-//                 it = m_loaderByResource.insert(camera, loader);
-//         }
-// 
-//         QnBookmarksLoader * const loader = it.value();
-//         
-//             //TODO: #GDM #Bookmarks IMPLEMENT ME
-//         loader->load(request.targetPeriod);
-//       //  request.answers.insert(std::make_pair(loader, handle));
-//     }
-// 
-//     if (!request.answers.empty())
-//         m_requests.push_back(request);
 }
+
+void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+
+}
+
+void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+
+}
+
+void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+
+}
+
 
 void QnCameraBookmarksManagerPrivate::handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle) {
     if (!m_requests.contains(handle))
@@ -98,27 +71,64 @@ void QnCameraBookmarksManagerPrivate::handleDataLoaded(int status, const QnCamer
     callback(status == 0, bookmarks);
 }
 
-
-
 void QnCameraBookmarksManagerPrivate::clearCache() {
     m_requests.clear();
 
-    for (auto query: m_queries)
-        emit query->bookmarksChanged(QnCameraBookmarkList());
-
-  /*  for (QnBookmarksLoader* loader: m_loaderByResource)
-        if (loader)
-            loader->discardCachedData();*/
+    for (auto query: m_autoUpdatingQueries.keys())
+        updateQueryCache(query);
 }
 
 void QnCameraBookmarksManagerPrivate::registerAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query) {
-    m_queries << query;
+    m_autoUpdatingQueries[query] = QnCameraBookmarkList();
 }
 
 void QnCameraBookmarksManagerPrivate::unregisterAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query) {
-    m_queries.removeOne(query);
+    m_autoUpdatingQueries.remove(query);
 }
 
 QnCameraBookmarkList QnCameraBookmarksManagerPrivate::executeQuery(const QnCameraBookmarksQueryPtr &query) const {
-    return QnCameraBookmarkList();
+    /* Check if we have already cached query result. */
+    if (m_autoUpdatingQueries.contains(query))
+        return m_autoUpdatingQueries[query];
+
+    /* Calculate result from local data. */
+    return executeQueryInternal(query);
 }
+
+QnCameraBookmarkList QnCameraBookmarksManagerPrivate::executeQueryInternal(const QnCameraBookmarksQueryPtr &query) const {
+
+    if (!query->isValid())
+        return QnCameraBookmarkList();
+
+    MultiServerCameraBookmarkList result;
+
+    for (const QnVirtualCameraResourcePtr &camera: query->cameras()) {
+        if (!m_bookmarksByCamera.contains(camera))
+            continue;
+            
+        QnCameraBookmarkList cameraBookmarks = m_bookmarksByCamera[camera];
+
+        auto startIter = std::lower_bound(cameraBookmarks.cbegin(), cameraBookmarks.cend(), query->filter().startTimeMs);
+        auto endIter = std::upper_bound(cameraBookmarks.cbegin(), cameraBookmarks.cend(), query->filter().endTimeMs, [](qint64 value, const QnCameraBookmark &other) {
+            return value < other.endTimeMs();
+        });
+
+        QnCameraBookmarkList filtered;
+        Q_ASSERT_X(startIter <= endIter, Q_FUNC_INFO, "Check if bookmarks are sorted and query is valid");
+        for (auto iter = startIter; iter != endIter; ++iter)
+            filtered << *iter;
+        result.push_back(std::move(filtered));        
+
+    }
+
+    return QnCameraBookmark::mergeCameraBookmarks(result, query->filter().limit, query->filter().strategy);
+}
+
+void QnCameraBookmarksManagerPrivate::updateQueryCache(const QnCameraBookmarksQueryPtr &query) {
+    auto cachedValue = m_autoUpdatingQueries[query];
+    auto updatedValue = executeQueryInternal(query);
+    m_autoUpdatingQueries[query] = updatedValue;
+    if (cachedValue != updatedValue)
+        emit query->bookmarksChanged(updatedValue);
+}
+

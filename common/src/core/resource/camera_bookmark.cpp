@@ -125,6 +125,14 @@ bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {
     return first.startTimeMs < other.startTimeMs;
 }
 
+bool operator<(qint64 first, const QnCameraBookmark &other) {
+    return first < other.startTimeMs;
+}
+
+bool operator<(const QnCameraBookmark &first, qint64 other) {
+    return first.startTimeMs < other;
+}
+
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
     if (bookmark.durationMs > 0)
         dbg.nospace() << "QnCameraBookmark(" << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs).toString(lit("dd hh:mm"))
@@ -144,6 +152,9 @@ QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
     strategy(Qn::EarliestFirst)
 {}
 
+bool QnCameraBookmarkSearchFilter::isValid() const {
+    return startTimeMs <= endTimeMs && limit > 0;
+}
 
 void serialize_field(const QStringList& /*value*/, QVariant* /*target*/) {return ;}
 void deserialize_field(const QVariant& /*value*/, QStringList* /*target*/) {return ;}

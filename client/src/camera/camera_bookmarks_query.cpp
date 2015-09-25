@@ -22,6 +22,10 @@ QnCameraBookmarksQuery::~QnCameraBookmarksQuery() {
     setAutoUpdate(false);    
 }
 
+bool QnCameraBookmarksQuery::isValid() const {
+    return !m_cameras.isEmpty() && m_filter.isValid();
+}
+
 bool QnCameraBookmarksQuery::autoUpdate() const {
     return m_autoUpdate;
 }
