@@ -141,7 +141,7 @@ angular.module('webadminApp')
                 return $http.get('/api/scriptList');
             },
             execute:function(script,mode){
-                return $http.post('/api/execute/' + script + '?' + mode);
+                return $http.post('/api/execute/' + script + '?' + (mode||''));
             },
             getSettings: function(url) {
                 url = url || proxy;
