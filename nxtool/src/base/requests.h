@@ -72,8 +72,8 @@ namespace rtu
         , const OperationCallback &failed
         , int timeout = RestClient::kUseStandardTimeout);
 
-    /// Sends getTime and getIfList consequentially. 
-    /// If getTime is successful, calls successfull callback anyway
+    /// Checks authorization and sends getTime and getIfList consequentially. 
+    /// If authorized and getTime is successful, calls successfull callback anyway
     void getServerExtraInfo(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
@@ -89,6 +89,13 @@ namespace rtu
     void sendRestartRequest(const BaseServerInfoPtr &info
         , const QString &password
         , const OperationCallback &callback);
+
+    void sendCustomCommand(const BaseServerInfoPtr &info
+        , const QString &password
+        , const QString &path
+        , const QUrlQuery &params
+        , const OperationCallback &callback);
+
     ///
 
     void sendSetTimeRequest(const BaseServerInfoPtr &baseInfo

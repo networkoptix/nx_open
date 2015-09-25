@@ -45,9 +45,10 @@ namespace
         });
     }
     
-    rtu::Constants::ServerFlags calcFlags(const rtu::ServerInfoPtrContainer &servers)
+    template<typename ReturnValue, typename InitValue>
+    ReturnValue calcFlags(const rtu::ServerInfoPtrContainer &servers, InitValue allSelectedValue)
     {
-        rtu::Constants::ServerFlags flags = rtu::Constants::AllFlags;
+        ReturnValue flags = allSelectedValue;
         for (const rtu::ServerInfo * const info: servers)
         {
             flags &= info->baseInfo().flags;
@@ -299,9 +300,7 @@ struct rtu::Selection::Snapshot
     QDateTime dateTime;
     TimeZonesModelPtr timeZonesModel;
     
-    bool changesInSystemSettings;
-    bool changesInDateTimeSettings;
-    bool changesInIntefaceSettings;
+    rtu::Constants::ExtraServerFlags extraFlags;
 
     Snapshot(rtu::ServersSelectionModel *model);
 };
@@ -310,7 +309,8 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
 
     : count(model->selectedCount())
 
-    , flags(calcFlags(model->selectedServers()))
+    , flags(calcFlags<rtu::Constants::ServerFlags>(
+        model->selectedServers(), rtu::Constants::ServerFlag::AllFlags))
 
     , port(calcPort(model->selectedServers()))
     , dhcpState(calcDHCPState(model->selectedServers()))
@@ -324,6 +324,9 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     , timestamp(timestampTimer.elapsed())
     , dateTime(calcDateTime(model->selectedServers()))
     , timeZonesModel(new TimeZonesModel(model->selectedServers(), rtu::helpers::qml_objects_parent()))
+
+    , extraFlags(calcFlags<rtu::Constants::ExtraServerFlags>(
+        model->selectedServers(), rtu::Constants::ExtraServerFlag::AllExtraFlags))
 {
 }
 
@@ -347,6 +350,7 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
     bool emitDateTimeChanged = (m_snapshot->count != otherSnapshot.count);
     bool emitSystemSettingsChanged = (m_snapshot->count != otherSnapshot.count);
     bool emitInterfacesChanged = (m_snapshot->count != otherSnapshot.count);
+    bool emitActionsChanged = (m_snapshot->count != otherSnapshot.count);
 
     /// Check differences in password/system name settings
     if (!emitSystemSettingsChanged
@@ -364,12 +368,19 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
         emitDateTimeChanged = true;
     }
 
+    /// Check differences in port/interfaces settings
     if (!emitInterfacesChanged && 
         ((m_snapshot->port != otherSnapshot.port)
             || (m_snapshot->editableInterfaces != otherSnapshot.editableInterfaces)
             || itfsAreDifferent(m_snapshot->itfModel, otherSnapshot.itfModel)))
     {
         emitInterfacesChanged = true;
+    }
+
+    /// Check differences in extra flags (used for actions availability)
+    if (!emitActionsChanged && (m_snapshot->extraFlags != otherSnapshot.extraFlags))
+    {
+        emitActionsChanged = true;
     }
 
     m_snapshot->count = otherSnapshot.count;
@@ -389,6 +400,8 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
     m_snapshot->dateTime = otherSnapshot.dateTime;
     m_snapshot->timeZonesModel->resetTo(otherSnapshot.timeZonesModel.get());
 
+    m_snapshot->extraFlags = otherSnapshot.extraFlags;
+
     if (emitDateTimeChanged)
         emit dateTimeSettingsChanged();
 
@@ -397,6 +410,9 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
 
     if (emitSystemSettingsChanged)
         emit systemSettingsChanged();
+
+    if (emitActionsChanged)
+        emit actionsSettingsChanged();
 }
 
 int rtu::Selection::count() const
@@ -412,6 +428,11 @@ int rtu::Selection::port() const
 int rtu::Selection::flags() const
 {
     return static_cast<int>(m_snapshot->flags);
+}
+
+int rtu::Selection::extraFlags() const
+{
+    return static_cast<int>(m_snapshot->extraFlags);
 }
 
 int rtu::Selection::dhcpState() const

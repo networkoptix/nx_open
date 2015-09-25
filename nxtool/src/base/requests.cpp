@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -22,11 +23,13 @@ namespace
     const QString kSetTimeCommand = kApiNamespaceTag + "settime";
     const QString kGetTimeCommand = kApiNamespaceTag + "gettime";
     const QString kIfListCommand = kApiNamespaceTag + "iflist";
-    const QString kGetServerExtraInfoCommand = kApiNamespaceTag + "aggregator";
     const QString kRestartCommand = kApiNamespaceTag + "restart";
+    const QString kScriptsList = kApiNamespaceTag + "";
 
     const QString kIDTag = "id";
     const QString kSeedTag = "seed";
+    const QString kRuntimeIdTag = "runtimeId";
+    const QString kVersionTag = "version";
     const QString kNameTag = "name";
     const QString kSystemNameTag = "systemName";
     const QString kPortTag = "port";
@@ -68,13 +71,16 @@ namespace
             { info.id = QUuid(object.value(kIDTag).toString()); });
         result.insert(kSeedTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.id = QUuid(object.value(kSeedTag).toString()); });
+        result.insert(kRuntimeIdTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.runtimeId = QUuid(object.value(kRuntimeIdTag).toString()); });
         result.insert(kNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.name = object.value(kNameTag).toString(); });
         result.insert(kSystemNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.systemName = object.value(kSystemNameTag).toString(); });
         result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.port = object.value(kPortTag).toInt(); });
-
+        result.insert(kVersionTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.version = object.value(kVersionTag).toString(); });
 
         result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             {
@@ -83,7 +89,8 @@ namespace
                 {
                     TextFlagsInfo("SF_timeCtrl", rtu::Constants::ServerFlag::AllowChangeDateTimeFlag)
                     , TextFlagsInfo("SF_IfListCtrl", rtu::Constants::ServerFlag::AllowIfConfigFlag)
-                    , TextFlagsInfo("SF_AutoSystemName" , rtu::Constants::ServerFlag::IsFactoryFlag)
+                    , TextFlagsInfo("SF_AutoSystemName", rtu::Constants::ServerFlag::IsFactoryFlag)
+                    , TextFlagsInfo("SF_Has_HDD", rtu::Constants::ServerFlag::HasHdd)
                 };
 
                 info.flags = rtu::Constants::ServerFlag::NoFlags;
@@ -108,18 +115,7 @@ namespace /// Parsers stuff
 
         return (object.value(kErrorTag).toInt() != 0);
     }
-   
-    /*
-    ///
-
-    QString getErrorDescription(const QJsonObject &object)
-    {
-        static const QString &kReasonTag = "errorString";
-        return (object.contains(kReasonTag) ? 
-            object.value(kReasonTag).toString() : QString());
-    }
-    */
-    ///
+  
     typedef std::function<bool (const QJsonObject &object
         , rtu::ExtraServerInfo &extraInfo)> ParseFunction;
 
@@ -242,6 +238,7 @@ namespace /// Parsers stuff
     }
 
     ///
+
     rtu::RestClient::SuccessCallback makeSuccessCallback(const rtu::OperationCallback &callback
         , rtu::Constants::AffectedEntities affected)
     {
@@ -283,6 +280,81 @@ namespace /// Parsers stuff
         rtu::RestClient::sendGet(request);
     }
 
+    ///
+
+    rtu::ExtraServerInfo extractExtraFlagsFromAnswer(const QJsonObject &object)
+    {
+        typedef QMap<QString, rtu::Constants::ExtraServerFlag> ScriptFlagMap;
+        static const ScriptFlagMap kMapping = []() -> ScriptFlagMap
+        {
+            /// TODO: add real script names
+            ScriptFlagMap result;
+            result.insert("test", rtu::Constants::ExtraServerFlag::OsRestartAbility);
+            return result;
+        }();
+
+        rtu::ExtraServerInfo result;
+
+        const QJsonArray &scripts = extractReplyBody(object).toArray();
+        for(const QJsonValue &script: scripts)
+        {
+            const auto scriptFullName = script.toString();
+
+            /// Scripts could have different extensions in the different OS. 
+            const auto scriptId = QFileInfo(scriptFullName).completeBaseName();
+
+            const auto it = kMapping.find(scriptId);
+            if (it != kMapping.end())
+            {
+                const auto flag = it.value();
+                result.extraFlags |= flag;
+                result.scriptNames[flag] = scriptFullName;
+            }
+        }
+        return result;
+    }
+
+    void getExtraFlags(const rtu::BaseServerInfoPtr &baseInfo
+        , const QString &password
+        , const rtu::ExtraServerInfoSuccessCallback &successCallback
+        , const rtu::OperationCallback &failedCallback
+        , const qint64 timeout)
+    {
+        static const auto minScriptAvailableVersion = QStringLiteral("2.4.1");
+
+        const auto failed = [failedCallback](rtu::RequestError error)
+        {
+            if (failedCallback)
+            {
+                failedCallback(rtu::RequestError::kInternalAppError
+                    , rtu::Constants::kNoEntitiesAffected);
+            }
+        };
+
+        if (baseInfo->version < minScriptAvailableVersion)
+        {
+            failed(rtu::RequestError::kRequestTimeout);
+            return;
+        }
+
+        const auto id = baseInfo->id;
+        const auto success = [id, successCallback, failed](const QByteArray &data)
+        {
+            const QJsonObject &object = QJsonDocument::fromJson(data).object();
+            if (isErrorReply(object))
+            {
+                failed(rtu::RequestError::kInternalAppError);
+                return;
+            }
+
+            if (successCallback)
+                successCallback(id, extractExtraFlagsFromAnswer(object));
+        };
+
+        const rtu::RestClient::Request request(baseInfo, password
+            , kScriptsList, QUrlQuery(), timeout, success, failed);
+        rtu::RestClient::sendGet(request);
+    }
 }
 
 ///
@@ -402,36 +474,62 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
     static const Constants::AffectedEntities affected = (Constants::kAllAddressFlagsAffected 
         | Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
 
+    typedef std::shared_ptr<ExtraServerInfo> ExtraServerInfoPtr;
+    const ExtraServerInfoPtr extraInfoStorage(new ExtraServerInfo());
+
     const auto &getTimeFailed = [failed](const RequestError errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
         if (failed)
             failed(errorCode, affected);
     };
 
-    const auto &getTimeSuccessfull = [baseInfo, password, successful, timeout]
+    const auto &getTimeSuccessfull = [extraInfoStorage, baseInfo, password, successful, timeout]
         (const QUuid &id, const rtu::ExtraServerInfo &extraInfo) 
     {
         /// getTime command is successfully executed up to now
-        const auto &ifListFailed = [successful, id, extraInfo](const RequestError /* errorCode */
-            , Constants::AffectedEntities  /* affectedEntities */)
+
+        extraInfoStorage->timeZoneId = extraInfo.timeZoneId;
+        extraInfoStorage->timestampMs = extraInfo.timestampMs;
+        extraInfoStorage->utcDateTimeMs = extraInfo.utcDateTimeMs;
+
+        enum { kParallelCommandsCount = 2 };
+        const IntPointer commandsLeft(new int(kParallelCommandsCount));
+
+        const auto condCallSuccessfull = [commandsLeft, successful]
+            (const QUuid &id, const ExtraServerInfo &info)
         {
-            if (successful)
-                successful(id, extraInfo);
+            if ((--(*commandsLeft) == 0) && successful)
+                successful(id, info);
         };
 
-        const auto &ifListSuccessful = [successful, extraInfo](const QUuid &id, const rtu::ExtraServerInfo &ifListExtraInfo)
+        const auto &extraCommandsFailed = [extraInfoStorage, condCallSuccessfull, id]
+            (const RequestError /* errorCode */, Constants::AffectedEntities /* affectedEntities */)
         {
-            if (successful)
-            {
-                successful(id, ExtraServerInfo(extraInfo.password, extraInfo.timestampMs
-                    , extraInfo.utcDateTimeMs, extraInfo.timeZoneId, ifListExtraInfo.interfaces));
-            }
+            /// Calls successfull, anyway, for old servers not supporting ifList
+            condCallSuccessfull(id, *extraInfoStorage);
         };
 
-        getIfList(baseInfo, password, ifListSuccessful, ifListFailed, timeout);
+        const auto &ifListSuccessful = [extraInfoStorage, condCallSuccessfull]
+            (const QUuid &id, const rtu::ExtraServerInfo &extraInfo)
+        {
+            extraInfoStorage->interfaces = extraInfo.interfaces;
+            condCallSuccessfull(id, *extraInfoStorage);
+        };
+
+        const auto &extraFlagsSuccessful = [extraInfoStorage, condCallSuccessfull]
+            (const QUuid &id, const ExtraServerInfo &extraInfo)
+        {
+            extraInfoStorage->extraFlags = extraInfo.extraFlags;
+            extraInfoStorage->scriptNames = extraInfo.scriptNames;
+            condCallSuccessfull(id, *extraInfoStorage);
+        };
+
+        getIfList(baseInfo, password, ifListSuccessful, extraCommandsFailed, timeout);
+        getExtraFlags(baseInfo, password, extraFlagsSuccessful, extraCommandsFailed, timeout);
     };
 
-    const auto &callback = [failed, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout]
+    const auto &callback = [extraInfoStorage, failed, baseInfo, password
+        , getTimeSuccessfull, getTimeFailed, timeout]
         (const RequestError errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
         if (errorCode != RequestError::kSuccess)
@@ -441,6 +539,7 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
             return;
         }
 
+        extraInfoStorage->password = password;
         getTime(baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
     };
 
@@ -483,6 +582,16 @@ void rtu::sendRestartRequest(const BaseServerInfoPtr &info
         , makeErrorCallback(callback, Constants::kNoEntitiesAffected));
 
     RestClient::sendGet(request);
+}
+
+void rtu::sendCustomCommand(const BaseServerInfoPtr &info
+    , const QString &password
+    , const QString &path
+    , const QUrlQuery &params
+    , const OperationCallback &callback)
+{
+    
+//    /const RestClient::Request
 }
 
 ///

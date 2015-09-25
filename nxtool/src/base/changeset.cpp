@@ -19,6 +19,11 @@ rtu::Changeset::Changeset()
     , m_systemName()
     , m_dateTime()
     , m_itfUpdateInfo()
+
+    , m_softRestart()
+    , m_osRestart()
+    , m_factoryDefaults()
+    , m_factoryDefaultsButNetwork()
 {
 }
 
@@ -51,48 +56,76 @@ const rtu::ItfUpdateInfoContainerPointer &rtu::Changeset::itfUpdateInfo() const
     return m_itfUpdateInfo;
 }
 
+bool rtu::Changeset::softRestart() const
+{
+    return m_softRestart;
+}
+
+bool rtu::Changeset::osRestart() const
+{
+    return m_osRestart;
+}
+
+bool rtu::Changeset::factoryDefaults() const
+{
+    return m_factoryDefaults;
+}
+
+bool rtu::Changeset::factoryDefaultsButNetwork() const
+{
+    return m_factoryDefaultsButNetwork;
+}
+
 void rtu::Changeset::addSystemChange(const QString &systemName)
 {
+    clearActions();
     m_systemName.reset(new QString(systemName));
 }
         
 void rtu::Changeset::addPasswordChange(const QString &password)
 {
+    clearActions();
     m_password.reset(new QString(password));
 }
         
 void rtu::Changeset::addPortChange(int port)
 {
+    clearActions();
     m_port.reset(new int(port));
 }
 
 void rtu::Changeset::addDHCPChange(const QString &name
     , bool useDHCP)
 {
+    clearActions();
     getItfUpdateInfo(name).useDHCP.reset(new bool(useDHCP));
 }
         
 void rtu::Changeset::addAddressChange(const QString &name
     , const QString &address)
 {
+    clearActions();
     getItfUpdateInfo(name).ip.reset(new QString(address));
 }
         
 void rtu::Changeset::addMaskChange(const QString &name
     , const QString &mask)
 {
+    clearActions();
     getItfUpdateInfo(name).mask.reset(new QString(mask));
 }
         
 void rtu::Changeset::addDNSChange(const QString &name
     , const QString &dns)
 {
+    clearActions();
     getItfUpdateInfo(name).dns.reset(new QString(dns));
 }
         
 void rtu::Changeset::addGatewayChange(const QString &name
     , const QString &gateway)
 {
+    clearActions();
     getItfUpdateInfo(name).gateway.reset(new QString(gateway));
 }
         
@@ -100,8 +133,52 @@ void rtu::Changeset::addDateTimeChange(const QDate &date
     , const QTime &time
     , const QByteArray &timeZoneId)
 {
+    clearActions();
     qint64 utcTimeMs = msecondsFromEpoch(date, time, QTimeZone(timeZoneId));
     m_dateTime.reset(new DateTime(utcTimeMs, timeZoneId));
+}
+
+void rtu::Changeset::addSoftRestartAction()
+{
+    clear();
+    m_softRestart = true;
+}
+
+void rtu::Changeset::addOsRestartAction()
+{
+    clear();
+    m_osRestart = true;
+}
+
+void rtu::Changeset::addFactoryDefaultsAction()
+{
+    clear();
+    m_factoryDefaults = true;
+}
+
+void rtu::Changeset::addFactoryDefaultsButNetworkAction()
+{
+    clear();
+    m_factoryDefaultsButNetwork = true;
+}
+
+void rtu::Changeset::clear()
+{
+    m_port.reset();
+    m_password.reset();
+    m_systemName.reset();
+    m_dateTime.reset();
+    m_itfUpdateInfo.reset();
+
+    clearActions();
+}
+
+void rtu::Changeset::clearActions()
+{
+    m_softRestart = false;
+    m_osRestart = false;
+    m_factoryDefaults = false;
+    m_factoryDefaultsButNetwork = false;
 }
 
 rtu::ItfUpdateInfo &rtu::Changeset::getItfUpdateInfo(const QString &name)

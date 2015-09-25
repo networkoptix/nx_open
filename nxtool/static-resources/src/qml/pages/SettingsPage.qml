@@ -200,6 +200,13 @@ FocusScope
                     id: systemAndPasswordSettings;
                 }
 
+                Settings.ActionSettings
+                {
+                    id: actionSettings;
+
+                    flags: rtuContext.selection.extraFlags;
+                }
+
                 Base.EmptyCell {}
             }
         }

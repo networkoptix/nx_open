@@ -46,11 +46,12 @@ rtu::InterfaceInfo::InterfaceInfo(const QString &initName
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
-    /// Do not compare flags, hostAddress and visibleAddress - it is Ok
+    /// Do not compare flags, hostAddress, runtimeId and visibleAddress - it is Ok
     return ((first.id == second.id)
         && (first.name == second.name)
         && (first.port == second.port)
-        && (first.systemName == second.systemName));
+        && (first.systemName == second.systemName)
+        && (first.version == second.version));
 }
 
 bool rtu::operator != (const BaseServerInfo &first
@@ -67,6 +68,8 @@ rtu::ExtraServerInfo::ExtraServerInfo()
     , utcDateTimeMs(0)
     , timeZoneId()
     , interfaces()
+    , extraFlags(Constants::ExtraServerFlag::NoExtraFlags)
+    , scriptNames()
 {
 }
 
@@ -74,12 +77,16 @@ rtu::ExtraServerInfo::ExtraServerInfo(const QString &initPassword
     , const qint64 &initTimestampMs
     , const qint64 &initUtcDateTimeMs
     , const QByteArray &initTimeZoneId
-    , const InterfaceInfoList initInterfaces)
+    , const InterfaceInfoList initInterfaces
+    , const Constants::ExtraServerFlags initExtraFlags
+    , const ScriptNames &initScriptNames)
     : password(initPassword)
     , timestampMs(initTimestampMs)
     , utcDateTimeMs(initUtcDateTimeMs)
     , timeZoneId(initTimeZoneId)
     , interfaces(initInterfaces)
+    , extraFlags(initExtraFlags)
+    , scriptNames(initScriptNames)
 {
 }
 

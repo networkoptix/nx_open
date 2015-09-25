@@ -48,6 +48,8 @@ namespace rtu
     struct BaseServerInfo
     {
         QUuid id;
+        QUuid runtimeId;
+        QString version;
         QString displayAddress;
         Constants::ServerFlags flags;
         
@@ -64,7 +66,8 @@ namespace rtu
     
     bool operator != (const BaseServerInfo &first
         , const BaseServerInfo &second);
-    
+
+
     struct ExtraServerInfo
     {
         QString password;
@@ -72,14 +75,21 @@ namespace rtu
         qint64 utcDateTimeMs;
         QByteArray timeZoneId;
         InterfaceInfoList interfaces;
-        
+
+        Constants::ExtraServerFlags extraFlags;
+
+        typedef QHash<Constants::ExtraServerFlags, QString> ScriptNames;
+        ScriptNames scriptNames;
+
         ExtraServerInfo();
         
         ExtraServerInfo(const QString &initPassword
             , const qint64 &initTimestampMs
             , const qint64 &initUtcDateTimeMs
             , const QByteArray &initTimeZoneId
-            , const InterfaceInfoList initInterfaces);
+            , const InterfaceInfoList initInterfaces
+            , const Constants::ExtraServerFlags initExtraFlags
+            , const ScriptNames &initScriptNames);
     };
     
     class ServerInfo

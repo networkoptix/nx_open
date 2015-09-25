@@ -29,6 +29,16 @@ namespace rtu
 
         const ItfUpdateInfoContainerPointer &itfUpdateInfo() const;
 
+        ///
+
+        bool softRestart() const;
+
+        bool osRestart() const;
+
+        bool factoryDefaults() const;
+
+        bool factoryDefaultsButNetwork() const;
+
     public slots:
         /// Special setters available from Qml
         void addSystemChange(const QString &systemName);
@@ -56,16 +66,33 @@ namespace rtu
             , const QTime &time
             , const QByteArray &timeZoneId);
 
+        void addSoftRestartAction();
+
+        void addOsRestartAction();
+
+        void addFactoryDefaultsAction();
+
+        void addFactoryDefaultsButNetworkAction();
+
     private:
         Changeset();
 
-        rtu::ItfUpdateInfo &getItfUpdateInfo(const QString &name);
+        void clear();
+
+        void clearActions();
+
+        ItfUpdateInfo &getItfUpdateInfo(const QString &name);
 
     private:
-        rtu::IntPointer m_port;
-        rtu::StringPointer m_password;
-        rtu::StringPointer m_systemName;
-        rtu::DateTimePointer m_dateTime;
-        rtu::ItfUpdateInfoContainerPointer m_itfUpdateInfo;
+        IntPointer m_port;
+        StringPointer m_password;
+        StringPointer m_systemName;
+        DateTimePointer m_dateTime;
+        ItfUpdateInfoContainerPointer m_itfUpdateInfo;
+
+        bool m_softRestart;
+        bool m_osRestart;
+        bool m_factoryDefaults;
+        bool m_factoryDefaultsButNetwork;
     };
 };

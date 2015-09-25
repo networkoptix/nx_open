@@ -9,6 +9,7 @@
 #include <base/changeset.h>
 #include <base/selection.h>
 
+#include <helpers/awaiting_op.h>
 #include <helpers/time_helper.h>
 #include <helpers/qml_helpers.h>
 
@@ -24,7 +25,7 @@ namespace
         , kWaitTriesCount = 150
 
         /// Accepted wait time is 300 seconds due to restart on network interface parameters change
-        , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
+        , kRestartTimeout = kIfListRequestsPeriod * kWaitTriesCount   
     };
 
     int changesFromUpdateInfos(const rtu::ItfUpdateInfoContainer &itfUpdateInfos)
@@ -163,6 +164,11 @@ namespace
         }
     };
 
+
+    typedef std::function<void (rtu::RequestError error
+        , rtu::Constants::AffectedEntities affected)> BeforeDeleteAction;
+    typedef QPair<rtu::AwaitingOp::Holder, BeforeDeleteAction> AwaitingOpData;
+    typedef QHash<QUuid, AwaitingOpData> AwaitingOps;
 }
 
 class rtu::ApplyChangesTask::Impl : public std::enable_shared_from_this<rtu::ApplyChangesTask::Impl>
@@ -195,9 +201,30 @@ public:
     bool unknownAdded(const QString &ip);
 
 private:
+    void checkActionDiscoveredServer(const BaseServerInfo &baseInfo);
+
+private:
     void onChangesetApplied(int changesCount);
 
     void sendRequests();
+
+    rtu::OperationCallback makeAwaitingRequestCallback(const QUuid &id);
+
+    void removeAwatingOp(const QUuid &id
+        , RequestError error
+        , Constants::AffectedEntities affected);
+
+    rtu::AwaitingOp::Holder addAwaitingOp(const QUuid &id
+        , int changesCount
+        , qint64 timeout
+        , const AwaitingOp::ServerDiscoveredAction &discovered
+        , const AwaitingOp::ServersDisappearedAction &disappeared
+        , const BeforeDeleteAction &beforeDeleteAction
+        , const Constants::AffectedEntities affected);
+
+    void addActions();
+
+    void addRestartRequests();
 
     void addDateTimeChangeRequests();
 
@@ -243,6 +270,7 @@ private:
     
     RequestContainer m_requests;
     ItfChangesContainer m_itfChanges;
+    AwaitingOps m_awaiting;
 
     int m_appliedChangesIndex;
     int m_lastChangesetIndex;
@@ -269,6 +297,7 @@ rtu::ApplyChangesTask::Impl::Impl(const ChangesetPointer &changeset
     
     , m_requests()
     , m_itfChanges()
+    , m_awaiting()
     
     , m_appliedChangesIndex(0)
     , m_lastChangesetIndex(0)
@@ -287,12 +316,13 @@ void rtu::ApplyChangesTask::Impl::apply(const ApplyChangesTaskPtr &owner)
 {
     m_owner = owner;
 
+    addActions();
     addDateTimeChangeRequests();
     addSystemNameChangeRequests();
     addPasswordChangeRequests();
     addPortChangeRequests();
     addIpChangeRequests();
-    
+
     sendRequests();
 }
 
@@ -328,6 +358,16 @@ int rtu::ApplyChangesTask::Impl::appliedChangesCount() const
 
 void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &info)
 {
+    {
+        /// Awating operations processor
+        const auto it = m_awaiting.find(info.id);
+        if (it != m_awaiting.end())
+        {
+            const auto awatingOp = it.value().first;
+            awatingOp->serverDiscovered(info);
+        }
+    }
+
     if (unknownAdded(info.hostAddress))
         return;
 
@@ -355,7 +395,6 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &in
         const auto &it = shared->m_itfChanges.find(id);
         if (it == shared->m_itfChanges.end())
         {
-
             return;
         }
         
@@ -418,6 +457,8 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &in
 
 void rtu::ApplyChangesTask::Impl::serversDisappeared(const rtu::IDsVector &ids)
 {
+    //// TODO: add awaiting operation handling
+
     for (const QUuid &id: ids)
     {
         const auto &it = m_itfChanges.find(id);
@@ -522,6 +563,137 @@ void rtu::ApplyChangesTask::Impl::sendRequests()
 
         request.second();
         ++m_lastChangesetIndex;
+    }
+}
+
+rtu::OperationCallback rtu::ApplyChangesTask::Impl::makeAwaitingRequestCallback(const QUuid &id)
+{
+    const ThisWeakPtr weak = shared_from_this();
+    const auto callback = [id, weak]
+        (RequestError error, Constants::AffectedEntities affected)
+    {
+        if (weak.expired())
+            return;
+
+        if (error != RequestError::kSuccess)
+        {
+            const auto shared = weak.lock();
+            shared->removeAwatingOp(id, error, affected);
+        }
+    };
+
+    return callback;
+}
+
+void rtu::ApplyChangesTask::Impl::removeAwatingOp(const QUuid &id
+    , RequestError error
+    , Constants::AffectedEntities affected)
+{
+    const auto itOp = m_awaiting.find(id);
+    if (itOp == m_awaiting.end())
+        return;
+
+    const auto &data = (*itOp);
+    if (data.second)
+        data.second(error, affected);
+
+    onChangesetApplied(data.first->changesCount());
+    m_awaiting.erase(itOp);
+}
+
+rtu::AwaitingOp::Holder rtu::ApplyChangesTask::Impl::addAwaitingOp(const QUuid &id
+    , int changesCount
+    , qint64 timeout
+    , const AwaitingOp::ServerDiscoveredAction &discovered
+    , const AwaitingOp::ServersDisappearedAction &disappeared
+    , const BeforeDeleteAction &beforeDeleteAction
+    , Constants::AffectedEntities affected)
+{
+    const ThisWeakPtr weak = shared_from_this(); 
+    const auto removeByTimeout = [weak, affected](const QUuid &id)
+    {
+        if (weak.expired())
+            return;
+
+        const auto shared = weak.lock();
+        shared->removeAwatingOp(id, RequestError::kRequestTimeout, affected);
+    };
+
+    const auto op = AwaitingOp::create(id, changesCount, timeout
+        , discovered, disappeared, removeByTimeout);
+    m_awaiting.insert(id, AwaitingOpData(op, beforeDeleteAction));
+    return op;
+}
+
+void rtu::ApplyChangesTask::Impl::addRestartRequests()
+{
+    const ThisWeakPtr weak = shared_from_this();
+    for (ServerInfoCacheItem &item: m_serversCache)
+    {
+        enum { kRestartChangesCount = 1};
+
+        const auto restartRequest = [&item, weak]()
+        {
+            if (weak.expired())
+                return;
+
+            static const auto kRestartOpAffected = Constants::kAllEntitiesAffected;
+
+            const auto id = item.first->id;
+            const auto initialRuntimeId = item.first->runtimeId;
+
+            const auto discoveredHandler = [weak, id, initialRuntimeId]
+                (const BaseServerInfo &info)
+            {
+                if (weak.expired())
+                    return;
+
+                const auto shared = weak.lock();
+                if (info.runtimeId != initialRuntimeId) /// Server has restarted
+                    shared->removeAwatingOp(id, RequestError::kSuccess, kRestartOpAffected);
+            };
+
+
+            const auto beforeRemoveHandler = [weak, initialRuntimeId, &item]
+                (RequestError error, Constants::AffectedEntities /* affected */)
+            {
+                if (weak.expired())
+                    return;
+
+                static const auto kRestartOpDescription = QStringLiteral("Restarted");
+                static const auto kRestartOpValue = QString();
+
+                const auto shared = weak.lock();
+                shared->addSummaryItem(item, kRestartOpDescription, kRestartOpValue, error
+                    , kRestartOpAffected, kRestartOpAffected);
+            };
+    
+            const auto shared = weak.lock();
+            const auto op = shared->addAwaitingOp(id, kRestartChangesCount
+                , kRestartTimeout, discoveredHandler, AwaitingOp::ServersDisappearedAction()
+                , beforeRemoveHandler, kRestartOpAffected);
+
+            sendRestartRequest(item.first, item.second.password
+                , shared->makeAwaitingRequestCallback(id));
+        };
+
+        m_totalChangesCount += kRestartChangesCount;
+        m_requests.push_back(RequestData(kNonBlockingRequest, restartRequest));
+    }
+}
+
+void rtu::ApplyChangesTask::Impl::addActions()
+{
+    if (!m_changeset->softRestart() && !m_changeset->osRestart()
+        && !m_changeset->factoryDefaults() && !m_changeset->factoryDefaultsButNetwork())
+    {
+        return;
+    }
+
+    if (m_changeset->softRestart())
+    {
+        addRestartRequests();
+        return;
     }
 }
 
@@ -730,7 +902,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
                 else
                 {
                     /* In case of success we need to wait more until server is rediscovered. */
-                    QTimer::singleShot(kTotalIfConfigTimeout, [failedCallback, affected]() 
+                    QTimer::singleShot(kRestartTimeout, [failedCallback, affected]() 
                     {
                         failedCallback(RequestError::kRequestTimeout, affected);
                     });
