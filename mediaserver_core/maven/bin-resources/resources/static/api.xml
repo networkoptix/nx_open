@@ -1664,17 +1664,11 @@
                         </param>
                         <param>
                             <name>metadata</name>
-                            <description>Addition information for various purpose. This field contain Json object:
-                             <tt><pre>
-struct QnEventMetaData
-{
-   // Camera list (ID list) associated 
-   // with event. Archive for that 
-   // cameras is shown when user 
-   // views Generic Event.
-   std::vector&lt;QnUuid&gt; cameraRefs;
-};
-                             <br/></pre>
+                            <description>Addition information for various purpose. This field should contain valid Json object.
+                                         Current version uses field 'cameraRefs', any other fields could be added for future purpose.
+                                         'cameraRefs' field sould contains list if camera's 'id' field. This value could be obtained
+                                         via '/ec2/getCamerasEx' call.
+                             <tt>
                              <br/>Json string example:
                              <pre>
 {
