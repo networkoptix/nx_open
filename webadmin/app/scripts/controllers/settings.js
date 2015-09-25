@@ -49,6 +49,8 @@ angular.module('webadminApp')
             });
         }
 
+
+
         function errorHandler(){
             alert ('Connection error');
             return false;
@@ -102,10 +104,35 @@ angular.module('webadminApp')
                 mediaserver.changePassword($scope.password, $scope.oldPassword).then(resultHandler, errorHandler);
             }
         };
-
+// execute/scryptname&mode
         $scope.restart = function () {
             if(confirm('Do you want to restart server now?')){
                 restartServer(false);
+            }
+        };
+
+        $scope.nx1script = false;
+        mediaserver.getScripts().then(function(data){
+            if(data.data && data.data.reply) {
+                $scope.nx1script = data.data.result.indexOf('nx1boot') >= 0;
+            }
+        });
+
+        $scope.hardwareRestart = function(){
+            if(confirm('Do you want to restart server\'s operation system?')){
+                mediaserver.execute('nx1boot','reboot').then(resultHandler, errorHandler);
+            }
+        };
+
+        $scope.restoreSettings = function(){
+            if(confirm('Do you want to restart all server\'s settings? Archive will be saved, but network settings will be reset.')){
+                mediaserver.execute('nx1boot','restore').then(resultHandler, errorHandler);
+            }
+        };
+
+        $scope.restoreSettingsNotNetwork = function(){
+            if(confirm('Do you want to restart all server\'s settings? Archive and network settings will be saved.')){
+                mediaserver.execute('nx1boot','restore_keep_ip').then(resultHandler, errorHandler);
             }
         };
 

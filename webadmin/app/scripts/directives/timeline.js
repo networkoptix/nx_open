@@ -256,6 +256,7 @@ angular.module('webadminApp')
                 };
                 scope.selectPreset(scope.presets[3]);
 
+                scope.playbackNotSupported = window.jscd.mobile;
                 /**
                  * This is main timeline module.
                  *
