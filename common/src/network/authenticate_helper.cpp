@@ -636,7 +636,7 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Re
 
 QByteArray QnAuthHelper::getNonce()
 {
-    QMutexLocker lock(&m_cookieNonceCacheMutex);
+    QnMutexLocker lock(&m_cookieNonceCacheMutex);
     const qint64 nonce = qnSyncTime->currentUSecsSinceEpoch();
     m_cookieNonceCache.insert(nonce, nonce);
     return QByteArray::number(nonce, 16);
