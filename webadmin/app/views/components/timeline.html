@@ -49,7 +49,7 @@
         <canvas ></canvas>
     </div>
 
-    <div ng-if="playbackNotSupported">
+    <div ng-if="!liveOnly && playbackNotSupported" class="webclient-panel">
         <span class="caption-row no-archive-message">
              Playback is not supported in mobile browsers
         </span>
