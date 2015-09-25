@@ -21,6 +21,12 @@
             <span ng-if="emptyArchive" class="caption-row no-archive-message">
                 There is no archive for this camera
             </span>
+
+            <div ng-if="!liveOnly && playbackNotSupported && !positionProvider.liveMode" class="webclient-panel">
+                <span class="small">
+                    {{playingTime}}
+                </span>
+            </div>
         </div><div class="text-center" >
         <div class="webclient-panel-border"></div>
             <span class="webclient-button caption-row"

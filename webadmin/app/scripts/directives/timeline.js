@@ -133,6 +133,10 @@ angular.module('webadminApp')
                     end: 0
                 };
 
+
+
+
+
                 scope.timelineConfig = timelineConfig;
 
                 var rulerPreset = {
@@ -922,6 +926,7 @@ angular.module('webadminApp')
                     if(scope.positionProvider.playedPosition > lastMinute && scope.positionProvider.playing){
                         scope.goToLive();
                     }
+
                     drawMarker(context, scope.positionProvider.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
                 }
 
@@ -1485,6 +1490,16 @@ angular.module('webadminApp')
                         scope.goToLive(true);
                     }
                 });
+
+                if(scope.positionProvider) {
+                    scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
+                }
+                if(scope.playbackNotSupported) {
+                    scope.$watch('positionProvider.playedPosition', function (mode) {
+                        scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
+                    });
+                }
+
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
