@@ -68,6 +68,7 @@ private:
     QnMediaServerResourcePtr m_server;
 
     QnRecordingStatsModel *m_model;
+    QnRecordingStatsModel *m_forecastModel;
     QMap<int, QnUuid> m_requests;
 
     bool m_updateDisabled;
