@@ -105,7 +105,7 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     , m_beginResetModel(beginResetModel)
     , m_endResetModel(endResetModel)
     , m_owner(owner)
-    , m_bookmarksManager(new QnCameraBookmarksManager(this))
+    , m_bookmarksManager(qnCameraBookmarksManager)
 
     , m_bookmarks()
     , m_filter()
@@ -145,7 +145,7 @@ void QnSearchBookmarksModel::Impl::applyFilter(bool clearBookmarksCache)
     if (m_cameras.empty())
         m_cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-    m_bookmarksManager->getBookmarksAsync(m_cameras, m_filter, m_searchRequestId
+    m_bookmarksManager->getBookmarksAsync(m_cameras, m_filter
         , [this](bool success, const QnCameraBookmarkList &bookmarks)
     {
         m_beginResetModel();

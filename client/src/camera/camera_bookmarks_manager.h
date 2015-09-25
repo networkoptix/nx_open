@@ -2,16 +2,11 @@
 
 #include <functional>
 
-#include <core/resource/resource_fwd.h>
-#include <core/resource/camera_bookmark_fwd.h>
+#include <camera/camera_bookmarks_manager_fwd.h>
 
-#include <recording/time_period.h>
+#include <utils/common/singleton.h>
 
-class QnBookmarksLoader;
-
-class QnCameraBookmarksManagerPrivate;
-
-class QnCameraBookmarksManager : public QObject
+class QnCameraBookmarksManager : public QObject, public Singleton<QnCameraBookmarksManager>
 {
     Q_OBJECT
 public:
@@ -19,19 +14,54 @@ public:
 
     virtual ~QnCameraBookmarksManager();
 
+     /* Direct API section */
+
     /// @brief Asynchronously gathers bookmarks using specified filter
-    /// @param filter Filter parameters
-    /// @param callback Callback for receiving bookmarks data
-    void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, const QUuid &requestId, BookmarksCallbackType callback);
+    /// @param cameras          List of target cameras.
+    /// @param filter           Filter parameters.
+    /// @param callback         Callback for receiving bookmarks data.
+    void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
-    void loadBookmarks(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period);   
+    /// @brief Add the bookmark to the camera.
+    /// @param camera           Target camera.
+    /// @param bookmark         Target bookmark.
+    /// @param callback         Callback with operation result.
+    void addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
-    QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera) const;    
+    /// @brief Update the existing bookmark on the camera.
+    /// @param camera           Target camera.
+    /// @param bookmark         Target bookmark.
+    /// @param callback         Callback with operation result.
+    void updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+
+    /// @brief Delete the existing bookmark from the camera.
+    /// @param camera           Target camera.
+    /// @param bookmark         Target bookmark.
+    /// @param callback         Callback with operation result.
+    void deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+
+    /* Queries API section */
+
+    /// @brief Register bookmarks search query to auto-update it.
+    /// @param query            Target query.
+    void registerAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query);
+
+    /// @brief Unregister bookmarks search query.
+    /// @param query            Target query.
+    void unregisterAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query);
+
+    /// @brief Execute search query on local (cached) data.
+    /// @param query            Target query.
+    QnCameraBookmarkList executeQueryLocal(const QnCameraBookmarksQueryPtr &query) const;
+
+    /// @brief Asynchronously execute search query on remote (actual) data.
+    /// @param query            Target query.
+    void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
 protected:
     Q_DECLARE_PRIVATE(QnCameraBookmarksManager);
 
-signals:
-    void bookmarksChanged(const QnVirtualCameraResourcePtr &camera);
 private:
     QScopedPointer<QnCameraBookmarksManagerPrivate> d_ptr;
 };
+
+#define qnCameraBookmarksManager QnCameraBookmarksManager::instance()

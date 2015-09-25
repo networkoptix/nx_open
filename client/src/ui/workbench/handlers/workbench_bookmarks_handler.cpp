@@ -117,6 +117,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
+    //TODO: #GDM #Bookmarks move this to manager to notify queries?
     int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
     m_processingBookmarks[handle] = camera;
 }

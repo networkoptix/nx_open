@@ -11,6 +11,8 @@
 
 #include "camera_bookmark_fwd.h"
 
+#include <utils/common/model_functions_fwd.h>
+
 /**
  * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
  */
@@ -83,10 +85,12 @@ bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
 
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
 
-Q_DECLARE_METATYPE(QnCameraBookmark)
 Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
 Q_DECLARE_METATYPE(QnCameraBookmarkList)
 Q_DECLARE_METATYPE(QnCameraBookmarkTags)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
 
 #endif //QN_CAMERA_BOOKMARK_H

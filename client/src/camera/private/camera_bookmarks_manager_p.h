@@ -2,13 +2,7 @@
 
 #include <functional>
 
-#include <core/resource/resource_fwd.h>
-#include <core/resource/camera_bookmark_fwd.h>
-
-#include <recording/time_period.h>
-
-class QnBookmarksLoader;
-class QnCameraBookmarksManager;
+#include <camera/camera_bookmarks_manager_fwd.h>
 
 class QnCameraBookmarksManagerPrivate : public QObject {
     Q_OBJECT
@@ -17,17 +11,21 @@ public:
     
     virtual ~QnCameraBookmarksManagerPrivate();
 
-    void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, const QUuid &requestId, BookmarksCallbackType callback);
-
-    void loadBookmarks(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period);
-
-    QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera) const;
+    void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
     void clearCache();
-private:
-    /// @brief Callback for bookmarks. If data is nullptr it means error occurred
-    void bookmarksDataEvent(const QnCameraBookmarkList &bookmarks);
 
+    /// @brief Register bookmarks search query to auto-update it.
+    /// @param query            Target query.
+    void registerAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query);
+
+    /// @brief Unregister bookmarks search query.
+    /// @param query            Target query.
+    void unregisterAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query);
+
+    /// @brief Execute search query on local data.
+    /// @param query            Target query.
+    QnCameraBookmarkList executeQuery(const QnCameraBookmarksQueryPtr &query) const;
 private slots:
     void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle);
 
@@ -35,10 +33,6 @@ private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
 
-    struct RequestInfo {
-        int handle;
-        BookmarksCallbackType callback;
-    };
-    QHash<QUuid, RequestInfo> m_requests;
-    
+    QMap<int, BookmarksCallbackType> m_requests;
+    QList<QnCameraBookmarksQueryPtr> m_queries;
 };

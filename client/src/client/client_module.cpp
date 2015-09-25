@@ -15,15 +15,15 @@
     #include "common/systemexcept_win32.h"
 #endif
 
+#include <camera/camera_bookmarks_manager.h>
+
 #include <client/client_startup_parameters.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
 #include <client/client_translation_manager.h>
-
-#include <redass/redass_controller.h>
-#include <client/desktop_client_message_processor.h>
 #include <client/client_instance_manager.h>
+#include <client/desktop_client_message_processor.h>
 
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -37,6 +37,8 @@
 #include <platform/platform_abstraction.h>
 
 #include <plugins/resource/server_camera/server_camera_factory.h>
+
+#include <redass/redass_controller.h>
 
 #include <ui/style/globals.h>
 
@@ -132,6 +134,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnServerCameraFactory>(new QnServerCameraFactory());
 
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
+    common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
 
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());

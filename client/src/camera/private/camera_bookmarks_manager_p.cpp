@@ -1,6 +1,7 @@
 #include "camera_bookmarks_manager_p.h"
 
 #include <camera/camera_bookmarks_manager.h>
+#include <camera/camera_bookmarks_query.h>
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
@@ -32,7 +33,6 @@ QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
 
 void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraResourceList &cameras
                                                         , const QnCameraBookmarkSearchFilter &filter
-                                                        , const QUuid &requestId
                                                         , BookmarksCallbackType callback)
 {
 
@@ -50,10 +50,9 @@ void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraRes
     requestData.filter = filter;
 
     //TODO: #GDM #Bookmarks #IMPLEMENT ME
-    RequestInfo request;
-    request.callback = callback;
-    request.handle = connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
-    m_requests[requestId] = request;
+    int handle = connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
+    if (callback)
+        m_requests[handle] = callback;
 
     /*
     Here we should do the following:
@@ -92,86 +91,34 @@ void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraRes
 }
 
 void QnCameraBookmarksManagerPrivate::handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle) {
-    for (const RequestInfo &info: m_requests) {
-        if (info.handle != handle)
-            continue;
-        if (info.callback)
-            info.callback(status == 0, bookmarks);
-        break;
-    }
+    if (!m_requests.contains(handle))
+        return;
 
+    auto callback = m_requests.take(handle);
+    callback(status == 0, bookmarks);
 }
 
 
-void QnCameraBookmarksManagerPrivate::bookmarksDataEvent(const QnCameraBookmarkList &bookmarks)
-{
-   /* const QnAbstractCameraDataLoader * const loader = static_cast<QnAbstractCameraDataLoader *>(sender());
-    AnswersContainer::iterator itAnswer;
-    const RequestsContainer::iterator itRequest = std::find_if(m_requests.begin(), m_requests.end()
-        , [loader, handle, &itAnswer](RequestsContainer::value_type &request)
-    {
-        AnswersContainer &answers = request.answers;
-        itAnswer = answers.find(loader);
-        return (itAnswer != answers.end() && (itAnswer->second == handle));     
-    });
-
-    if (itRequest == m_requests.end()) /// We don't wait for such answer
-        return; 
-
-    bool &success = itRequest->success;
-    success = success && (data ? true : false);
-
-    QnCameraBookmarkList &bookmarks = itRequest->bookmarks;
-
-    if (data)   /// if it is successful callback
-    {
-        typedef QSharedPointer<QnBookmarkCameraData> QnBookmarkCameraDataPtr;
-        const QnBookmarkCameraDataPtr bookmarkData = data.dynamicCast<QnBookmarkCameraData>();
-        QnCameraBookmarkList newBookmarks = bookmarkData->data(itRequest->targetPeriod);
-    
-        {
-            /// TODO: #ynikitenkov Remove this section when cameraId will be set on bookmark creation
-            const auto id = loader->resource()->getUniqueId();
-            for(QnCameraBookmark& bookmark: newBookmarks) 
-            {
-                bookmark.cameraId = id; 
-            }
-        }
-
-        bookmarks.append(newBookmarks);
-    }
-
-    AnswersContainer &answers = itRequest->answers;
-    answers.erase(itAnswer);    /// Answer processed, we should remove it
-    if (answers.empty())
-    {
-        itRequest->callback(success, bookmarks);
-        m_requests.erase(itRequest);
-    }*/
-}
-
-QnCameraBookmarkList QnCameraBookmarksManagerPrivate::bookmarks(const QnVirtualCameraResourcePtr &camera) const {
-  /*  LoadersContainer::const_iterator pos = m_loaderByResource.find(camera);
-    if(pos == m_loaderByResource.cend())
-        return QnCameraBookmarkList();
-
-    auto loader = *pos;
-    return loader->bookmarks();*/
-    return QnCameraBookmarkList();
-}
 
 void QnCameraBookmarksManagerPrivate::clearCache() {
+    m_requests.clear();
+
+    for (auto query: m_queries)
+        emit query->bookmarksChanged(QnCameraBookmarkList());
+
   /*  for (QnBookmarksLoader* loader: m_loaderByResource)
         if (loader)
             loader->discardCachedData();*/
 }
 
-void QnCameraBookmarksManagerPrivate::loadBookmarks(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period) {
- /*   if (!camera || !period.isValid())
-        return;
+void QnCameraBookmarksManagerPrivate::registerAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query) {
+    m_queries << query;
+}
 
-    auto loaderForCamera = loader(camera);
-    Q_ASSERT_X(loaderForCamera, Q_FUNC_INFO, "Loader must be created here");
-    if (loaderForCamera)
-        loaderForCamera->load(period);*/
+void QnCameraBookmarksManagerPrivate::unregisterAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query) {
+    m_queries.removeOne(query);
+}
+
+QnCameraBookmarkList QnCameraBookmarksManagerPrivate::executeQuery(const QnCameraBookmarksQueryPtr &query) const {
+    return QnCameraBookmarkList();
 }

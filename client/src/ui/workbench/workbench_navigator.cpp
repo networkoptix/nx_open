@@ -120,12 +120,13 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_cameraDataManager = context()->instance<QnCameraDataManager>();
     connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this, &QnWorkbenchNavigator::updateLoaderPeriods);
 
-    auto bookmarksManager = context()->instance<QnCameraBookmarksManager>();
+    /*
+    auto bookmarksManager = qnCameraBookmarksManager;
     connect(bookmarksManager, &QnCameraBookmarksManager::bookmarksChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
         if(!m_currentWidget || m_currentWidget->resource() != camera)
             return;
         updateTimelineBookmarks();
-    });
+    });*/
 
     //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.
@@ -1864,9 +1865,9 @@ void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
 void QnWorkbenchNavigator::updateTimelineBookmarks() {
     QnCameraBookmarkList bookmarks;
 
-    if (isBookmarksLoadingAvailable())
-        bookmarks = context()->instance<QnCameraBookmarksManager>()->bookmarks(m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>());
-
+  /*  if (isBookmarksLoadingAvailable())
+        bookmarks = qnCameraBookmarksManager->bookmarks(m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>());
+*/
     m_timeSlider->setBookmarks(bookmarks);
 }
 
@@ -1878,7 +1879,7 @@ void QnWorkbenchNavigator::loadBookmarks() {
     QnTimePeriod timeSliderPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
 
     /* m_currentWidget and its resource are checked inside the isBookmarksLoadingAvailable() method. */
-    context()->instance<QnCameraBookmarksManager>()->loadBookmarks(m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>(), timeSliderPeriod);
+//    qnCameraBookmarksManager->loadBookmarks(m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>(), timeSliderPeriod);
 }
 
 bool QnWorkbenchNavigator::isBookmarksLoadingAvailable() const {

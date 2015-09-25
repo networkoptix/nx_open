@@ -1505,7 +1505,6 @@ void QnMediaResourceWidget::updateBookmarks() {
     auto bookmarksManager = context()->instance<QnCameraBookmarksManager>();
     bookmarksManager->getBookmarksAsync(QnVirtualCameraResourceList() << m_camera, 
         QnCameraBookmarkSearchFilter(), 
-        item()->uuid().getQUuid(),
         [this](bool success, const QnCameraBookmarkList &bookmarks)
     {
         static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
