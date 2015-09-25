@@ -110,29 +110,33 @@ angular.module('webadminApp')
                 restartServer(false);
             }
         };
+        $scope.canHardwareRestart = false;
+        $scope.canRestoreSettings = false;
+        $scope.canRestoreSettingsNotNetwork = false;
 
-        $scope.nx1script = false;
         mediaserver.getScripts().then(function(data){
             if(data.data && data.data.reply) {
-                $scope.nx1script = data.data.result.indexOf('nx1boot') >= 0;
+                $scope.canHardwareRestart = data.data.result.indexOf('reboot') >= 0;
+                $scope.canRestoreSettings = data.data.result.indexOf('restore') >= 0;
+                $scope.canRestoreSettingsNotNetwork = data.data.result.indexOf('restore_keep_ip') >= 0;
             }
         });
 
         $scope.hardwareRestart = function(){
             if(confirm('Do you want to restart server\'s operation system?')){
-                mediaserver.execute('nx1boot','reboot').then(resultHandler, errorHandler);
+                mediaserver.execute('reboot').then(resultHandler, errorHandler);
             }
         };
 
         $scope.restoreSettings = function(){
             if(confirm('Do you want to restart all server\'s settings? Archive will be saved, but network settings will be reset.')){
-                mediaserver.execute('nx1boot','restore').then(resultHandler, errorHandler);
+                mediaserver.execute('restore').then(resultHandler, errorHandler);
             }
         };
 
         $scope.restoreSettingsNotNetwork = function(){
             if(confirm('Do you want to restart all server\'s settings? Archive and network settings will be saved.')){
-                mediaserver.execute('nx1boot','restore_keep_ip').then(resultHandler, errorHandler);
+                mediaserver.execute('restore_keep_ip').then(resultHandler, errorHandler);
             }
         };
 

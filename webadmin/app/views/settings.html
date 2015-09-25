@@ -86,13 +86,12 @@
         <h3>Restart server</h3>
 
         <button type="button" class="btn btn-default" ng-click="restart()">Restart server</button>
-        <button type="button" class="btn btn-default" ng-if="nx1script" ng-click="hardwareRestart()">Hardware restart</button>
+        <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Hardware restart</button>
     </div>
-    <div class="col-sm-6" ng-if="nx1script" >
+    <div class="col-sm-6" ng-if="canRestoreSettings || canRestoreSettingsNotNetwork" >
         <h3>Restore server factory defaults</h3>
-
-        <button type="button" class="btn btn-default" ng-click="restoreSettings()">Restore all</button>
-        <button type="button" class="btn btn-default" ng-click="restoreSettingsNotNetwork()">Restore all but network</button>
+        <button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Restore all</button>
+        <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restore all but network</button>
     </div>
 </div>
 
