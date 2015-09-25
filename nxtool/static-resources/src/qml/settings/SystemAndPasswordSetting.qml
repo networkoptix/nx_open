@@ -20,7 +20,7 @@ Expandable.MaskedSettingsPanel
 
     onMaskedAreaChanged:
     {
-        if (warned)
+        if (warned && maskedArea)
             maskedArea.systemNameControl.forceActiveFocus();
     }
 

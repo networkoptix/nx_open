@@ -1610,6 +1610,26 @@
                     <result/>
                 </function>
                 <function>
+                    <name>iflist</name>
+                    <description>Returns detail information about server's network interfaces</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON data.</caption>
+                    </result>
+                </function>
+                <function proprietary="true">
+                    <name>execute</name>
+                    <description>Execute any script from subfolder 'scripts' of media server. Script name provides directly in a URL path like '/api/execute/script1.sh'.
+                                 All URL parameters are passed directly to a script as an parameters.
+                    </description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON with error code</caption>
+                    </result>
+                </function>
+                <function>
                     <name>createEvent</name>
                     <description>Using this method it's possible to deliver a generic event to the system from 3rd party systems. 
                                  It will be processed and logged according to current event rules.

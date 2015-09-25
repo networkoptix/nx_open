@@ -241,6 +241,7 @@ namespace nx_http
         int m_awaitedMessageNumber;
         SocketAddress m_remoteEndpoint;
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
+        int m_requestSequence;
 
         AsyncHttpClient();
 

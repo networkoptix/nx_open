@@ -82,19 +82,13 @@
                     </div>
                 </td>
                 <td width="100%" >
-                    <div class="view-wrapper not-supported visible-mobile">
-                        <div class="view-panel">
-                            <div class="camera-view-informer ">
-                                <div class="camera-view-message">
-                                Webclient doesn't support mobile phones.
-                                <div ng-if="hasMobileApp">
-                                    Please, use mobile application to view video:
-                                    <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
-                                        Install
-                                    </a>
-                                </div>
-                            </div>
-                            </div>
+                    <div class="view-wrapper not-supported visible-mobile view-panel camera-view-message">
+                        Webclient doesn't support mobile phones.
+                        <div ng-if="hasMobileApp">
+                            Please, use mobile application to view video:<br>
+                            <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
+                                Install
+                            </a>
                         </div>
                     </div>
 

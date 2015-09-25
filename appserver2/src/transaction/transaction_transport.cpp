@@ -1161,7 +1161,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if (m_authByKey) {
             m_authByKey = false;
             fillAuthInfo( m_httpClient, m_authByKey );
-            QTimer::singleShot(0, this, SLOT(repeatDoGet()));
+            repeatDoGet();
         }
         else {
             QnUuid guid(nx_http::getHeaderValue( client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME ));
@@ -1288,7 +1288,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             query.addQueryItem("canceled", QString());
             m_remoteAddr.setQuery(query);
         }
-        QTimer::singleShot(0, this, SLOT(repeatDoGet()));
+        repeatDoGet();
     }
     else {
         if( nx_http::getHeaderValue(
