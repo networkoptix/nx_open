@@ -23,22 +23,28 @@ namespace
     struct ServerModelInfo
     {
         qint64 updateTimestamp;
-        rtu::IDsVector lockers;
+        int removeRequestsCounter;
+        bool locked;
+        QString lockReason;
         Qt::CheckState selectedState;
         ServerLoggedState loginState;
         rtu::ServerInfo serverInfo;
         
         ServerModelInfo();
+
         ServerModelInfo(qint64 initUpdateTimestamp 
             , Qt::CheckState initSelectedState
             , ServerLoggedState loginState
-            , const rtu::IDsVector &initLockers
+            , bool initLocked
+            , const QString &initLockReason
+            , int initRemoveRequestsCounter
             , const rtu::ServerInfo initServerInfo);
     };
 
     ServerModelInfo::ServerModelInfo()
         : updateTimestamp(0)
-        , lockers()
+        , removeRequestsCounter(0)
+        , locked(false)
         , selectedState(Qt::Unchecked)
         , loginState(kServerUnauthorized)
         , serverInfo()
@@ -47,10 +53,14 @@ namespace
     ServerModelInfo::ServerModelInfo(qint64 initUpdateTimestamp 
         , Qt::CheckState initSelectedState
         , ServerLoggedState initLoginState
-        , const rtu::IDsVector &initLockers
+        , bool initLocked
+        , const QString &initLockReason
+        , int initRemoveRequestsCounter
         , const rtu::ServerInfo initServerInfo)
         : updateTimestamp(initUpdateTimestamp)
-        , lockers(initLockers)
+        , removeRequestsCounter(initRemoveRequestsCounter)
+        , locked(initLocked)
+        , lockReason(initLockReason)
         , selectedState(initSelectedState)
         , loginState(initLoginState)
         , serverInfo(initServerInfo)
@@ -380,8 +390,10 @@ public:
     void serverDiscovered(const BaseServerInfo &baseInfo);
 
     void addServer(const rtu::ServerInfo &info
-        , Qt::CheckState selected
-        , const IDsVector &lockers);
+        , Qt::CheckState selected = Qt::Unchecked
+        , bool locked = false
+        , const QString &lockReason = QString()
+        , int removeRequestsCounter = 0);
 
     void changeServer(const rtu::BaseServerInfo &info
         , bool outdate = false);
@@ -403,8 +415,8 @@ public:
         , ItemSearchInfo &searchInfo);
 
     void setLockedState(const IDsVector &ids
-        , const QUuid &locker
-        , bool lock);
+        , bool locked
+        , const QString &reason);
 
     void changeAccessMethod(const QUuid &id
         , bool byHttp);
@@ -419,7 +431,7 @@ private:
     
 private:
     /// return true if no selected servers
-    bool removeServerImpl(const QUuid &id
+    void removeServerImpl(const QUuid &id
         , bool removeEmptySystem);
     
 private:
@@ -516,8 +528,8 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
             return info.baseInfo().id;
         case kMacAddressRoleId:
         {
-            if (!searchInfo.serverInfoIterator->lockers.empty())
-                return "Applying changes";
+            if (searchInfo.serverInfoIterator->locked)
+                return searchInfo.serverInfoIterator->lockReason;
 
             const bool hasMacAddress = info.hasExtraInfo() && !info.extraInfo().interfaces.empty();
             return (hasMacAddress ? info.extraInfo().interfaces.front().macAddress :
@@ -526,7 +538,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kLoggedIn:
             return info.hasExtraInfo();
         case kBusyStateRoleId:
-            return !searchInfo.serverInfoIterator->lockers.empty();
+            return searchInfo.serverInfoIterator->locked;
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
@@ -555,7 +567,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
             /// TODO: #ynikitenkov refactor this. Add calcaulation "on fly", not here
             for (const auto &serverModelInfo: systemInfo.servers)
             {
-                if (serverModelInfo.lockers.empty() && (serverModelInfo.loginState == kServerLoggedInState))
+                if (!serverModelInfo.locked && (serverModelInfo.loginState == kServerLoggedInState))
                     return true;
             }
             return false;
@@ -645,7 +657,7 @@ void rtu::ServersSelectionModel::Impl::setSystemSelectedStateImpl(SystemModelInf
     int selectedCount = 0;
     for(ServerModelInfo &server: systemInfo.servers)
     {
-        if (!server.serverInfo.hasExtraInfo() || !server.lockers.empty())
+        if (!server.serverInfo.hasExtraInfo() || server.locked)
             continue;
 
         server.selectedState = newState;
@@ -665,7 +677,7 @@ void rtu::ServersSelectionModel::Impl::setSelectedItems(const IDsVector &ids)
             const bool shouldBeSelected = ids.contains(serverModelInfo.serverInfo.baseInfo().id);
             const bool selected = (serverModelInfo.selectedState == Qt::Checked);
             const bool shouldBeUpdated = (shouldBeSelected ^ selected);
-            if (!shouldBeUpdated || !serverModelInfo.lockers.empty() 
+            if (!shouldBeUpdated || serverModelInfo.locked 
                 || (serverModelInfo.loginState != kServerLoggedInState))
             {
                 continue;
@@ -720,7 +732,7 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
     if (searchInfo.serverInfoIterator != searchInfo.systemInfoIterator->servers.end())
     {
         if (!searchInfo.serverInfoIterator->serverInfo.hasExtraInfo() 
-            || !searchInfo.serverInfoIterator->lockers.empty())  /// Not logged in or applying changes - do nothing
+            || searchInfo.serverInfoIterator->locked)  /// Not logged in or applying changes - do nothing
         {
             return; 
         }
@@ -1106,7 +1118,9 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
 
 void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     , Qt::CheckState selected
-    , const IDsVector &lockers)
+    , bool locked
+    , const QString &lockReason
+    , int removeRequestsCounter)
 {
     const QString systemName = (info.baseInfo().flags & Constants::IsFactoryFlag
         ? QString() : info.baseInfo().systemName);
@@ -1136,14 +1150,18 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     }
 
     const ServerLoggedState loginState = (info.hasExtraInfo() ? kServerLoggedInState : kDifferentNetwork);
+
     {
         const int serverRow = (row + systemModelInfo->servers.size() + 1);
         const auto &guard = m_changeHelper->insertRowsGuard(serverRow, serverRow);
         Q_UNUSED(guard);
     
+        /// If removeRequestsCounter is 0 than  it means it is first-time addition operation
+        const int finalRemoveRequestsCount = (removeRequestsCounter > 0 ? removeRequestsCounter - 1 : 0);
+    
         /// TODO: #ynikitenkov change for QElapsedTimer implementation
         systemModelInfo->servers.push_back(ServerModelInfo(QDateTime::currentMSecsSinceEpoch(), selected
-            , loginState, lockers, info));
+            , loginState, locked, lockReason, finalRemoveRequestsCount, info));
     }
 
     systemModelInfo->loggedServers += (loginState == kServerLoggedInState ? 1 : 0);
@@ -1155,6 +1173,7 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     if (!info.hasExtraInfo())
         m_serverInfoManager->loginToServer(info.baseInfo()
             , m_updateExtra, m_updateExtraFailed);
+
 
     emit m_owner->serversCountChanged();
 }
@@ -1189,7 +1208,9 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
 
         removeServerImpl(baseInfo.id, targetSystemExists);
         foundServer.setBaseInfo(baseInfo);
-        addServer(foundServer, selected, searchInfo.serverInfoIterator->lockers);
+        addServer(foundServer, selected, searchInfo.serverInfoIterator->locked
+            , searchInfo.serverInfoIterator->lockReason
+            , searchInfo.serverInfoIterator->removeRequestsCounter);
     }
     else
     {
@@ -1223,8 +1244,8 @@ bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id
 }
 
 void rtu::ServersSelectionModel::Impl::setLockedState(const IDsVector &ids
-    , const QUuid &locker
-    , bool lock)
+    , bool locked
+    , const QString &reason)
 {
     bool selectionChanged = false;
     for (const QUuid &id: ids)
@@ -1235,17 +1256,26 @@ void rtu::ServersSelectionModel::Impl::setLockedState(const IDsVector &ids
 
         enum { kItemNotFoundIndex = -1 };
         ServerModelInfo &modelInfo = *searchInfo.serverInfoIterator;
-        const int index = modelInfo.lockers.indexOf(locker);
-        const bool found = (index != kItemNotFoundIndex);
-        if (lock == found)
+        if (locked == modelInfo.locked)
+        {
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid lock state");
             continue;
+        }
 
-        if (lock)
-            modelInfo.lockers.push_back(locker);
-        else
-            modelInfo.lockers.removeAt(index);
+        modelInfo.locked = locked;
+        modelInfo.lockReason = reason;
 
-        if (lock && (modelInfo.selectedState == Qt::Checked))
+        if (!locked && modelInfo.removeRequestsCounter > 0)
+        {
+            Q_ASSERT_X(modelInfo.removeRequestsCounter == 1, Q_FUNC_INFO    /// removeRequestsCounter is int type. It is to find out if any 
+                , "wrong removeRequestsCounter is greater than 1");         /// logic error about addition and deletion servers presences.
+                                                                            /// Appropriate values are 0 or 1 only!
+
+            removeServerImpl(id, true);
+            continue;
+        }
+
+        if (locked && (modelInfo.selectedState == Qt::Checked))
         {
             --searchInfo.systemInfoIterator->selectedServers;
             modelInfo.selectedState = Qt::Unchecked;
@@ -1353,16 +1383,20 @@ void rtu::ServersSelectionModel::Impl::unknownRemoved(const QString &address)
     m_unknownEntities.removeAt(index);
 }
 
-bool rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
+void rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
     , bool removeEmptySystem)
 {
     ItemSearchInfo searchInfo;
     
     if (!findServer(id, searchInfo))
-        return false;
-
-    const int selCount = searchInfo.systemInfoIterator->selectedServers;    
+        return;
     
+    if (searchInfo.serverInfoIterator->locked)
+    {
+        ++searchInfo.serverInfoIterator->removeRequestsCounter; /// if locked - remove it later, on unlocking operation
+        return;
+    }
+
     {
         const auto &modelActionGuard = m_changeHelper->removeRowsGuard(
             searchInfo.serverRowIndex, searchInfo.serverRowIndex);
@@ -1382,7 +1416,6 @@ bool rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
         searchInfo.systemInfoIterator->servers.erase(searchInfo.serverInfoIterator);
     }
 
-    const int newSelCount = searchInfo.systemInfoIterator->selectedServers;
     if (!searchInfo.systemInfoIterator->servers.empty())
     {
         m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
@@ -1395,7 +1428,6 @@ bool rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
         
         m_systems.erase(searchInfo.systemInfoIterator);
     }
-    return (selCount && !newSelCount);
 }
 
 ///
@@ -1445,7 +1477,7 @@ void rtu::ServersSelectionModel::serverDiscovered(const BaseServerInfo &baseInfo
 
 void rtu::ServersSelectionModel::addServer(const BaseServerInfo &baseInfo)
 {
-    m_impl->addServer(ServerInfo(baseInfo), Qt::Unchecked, IDsVector());
+    m_impl->addServer(ServerInfo(baseInfo));
 }
 
 void rtu::ServersSelectionModel::changeServer(const BaseServerInfo &baseInfo)
@@ -1520,11 +1552,15 @@ void rtu::ServersSelectionModel::updatePasswordInfo(const QUuid &id
     m_impl->updatePasswordInfo(searchInfo, password);
 }
 
-void rtu::ServersSelectionModel::setLockedState(const IDsVector &ids
-    , const QUuid &locker
-    , bool locked)
+void rtu::ServersSelectionModel::lockItems(const IDsVector &ids
+    , const QString &reason)
 {
-    m_impl->setLockedState(ids, locker, locked);
+    m_impl->setLockedState(ids, true, reason);
+}
+
+void rtu::ServersSelectionModel::unlockItems(const IDsVector &ids)
+{
+    m_impl->setLockedState(ids, false, QString());
 }
 
 void rtu::ServersSelectionModel::changeAccessMethod(const QUuid &id

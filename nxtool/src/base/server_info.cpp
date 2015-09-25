@@ -46,12 +46,13 @@ rtu::InterfaceInfo::InterfaceInfo(const QString &initName
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
-    /// Do not compare flags, hostAddress, runtimeId and visibleAddress - it is Ok
+    /// Do not compare flags, hostAddress and visibleAddress - it is Ok
     return ((first.id == second.id)
         && (first.name == second.name)
         && (first.port == second.port)
         && (first.systemName == second.systemName)
-        && (first.version == second.version));
+        && (first.version == second.version)
+        && (first.runtimeId == second.runtimeId));
 }
 
 bool rtu::operator != (const BaseServerInfo &first

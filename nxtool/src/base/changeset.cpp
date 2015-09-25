@@ -12,7 +12,7 @@ namespace
     const auto kRestartProgressTextDesc = QStringLiteral("Restarting servers (%1/%2)...");
     const auto kRestoreFactoryProgressTextDesc = QStringLiteral("Restoring servers to factory defaults (%1/%2)...");
 
-    const auto kMinimizedChangesProgressTextDesc = QStringLiteral("Applying...");
+    const auto kMinimizedChangesProgressTextDesc = QStringLiteral("Applying changes...");
     const auto kMinimizedRestartProgressTextDesc = QStringLiteral("Restarting...");
     const auto kMinimizedRestoreProgressTextDesc = QStringLiteral("Restoring...");
 }

@@ -80,9 +80,10 @@ namespace rtu
         void updatePasswordInfo(const QUuid &id
             , const QString &password);
 
-        void setLockedState(const IDsVector &ids
-            , const QUuid &locker
-            , bool locked);
+        void lockItems(const IDsVector &ids
+            , const QString &reason);
+
+        void unlockItems(const IDsVector &ids);
 
         void changeAccessMethod(const QUuid &id
             , bool byHttp);
