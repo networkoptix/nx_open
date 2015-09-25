@@ -34,7 +34,6 @@ extern "C"
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
-#include <camera/loaders/bookmark_camera_data_loader.h>
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
