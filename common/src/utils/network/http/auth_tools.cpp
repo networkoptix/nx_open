@@ -5,6 +5,8 @@
 
 #include "auth_tools.h"
 
+#include <openssl/md5.h>
+
 #include <QtCore/QCryptographicHash>
 
 
@@ -247,5 +249,41 @@ namespace nx_http
         if( responseIter == digestAuthorizationHeader.digest->params.end() )
             return false;
         return calculatedResponseIter.value() == responseIter.value();
+    }
+
+    BufferType calcIntermediateResponse(
+        const BufferType& ha1,
+        const BufferType& nonce)
+    {
+        MD5_CTX md5Ctx;
+        MD5_Init(&md5Ctx);
+        MD5_Update(&md5Ctx, ha1.constData(), ha1.size());
+        MD5_Update(&md5Ctx, ":", 1);
+        MD5_Update(&md5Ctx, nonce.constData(), nonce.size());
+        BufferType intermediateResponse;
+        intermediateResponse.resize(MD5_DIGEST_LENGTH);
+        memcpy(intermediateResponse.data(), &md5Ctx, MD5_DIGEST_LENGTH);
+        return intermediateResponse.toHex();
+    }
+
+    BufferType calcResponseFromIntermediate(
+        const BufferType& intermediateResponse,
+        size_t intermediateResponseNonceLen,
+        const BufferType& ha2)
+    {
+        assert((MD5_DIGEST_LENGTH*2 + 1 + intermediateResponseNonceLen) % MD5_DIGEST_LENGTH == 0);
+
+        const auto intermediateResponseBin = QByteArray::fromHex(intermediateResponse);
+
+        MD5_CTX md5Ctx;
+        memset(&md5Ctx, 0, sizeof(md5Ctx));
+        memcpy(&md5Ctx, intermediateResponseBin.constData(), MD5_DIGEST_LENGTH);
+        md5Ctx.Nl = (MD5_DIGEST_LENGTH * 2 + 1 + intermediateResponseNonceLen) << 3;
+        MD5_Update(&md5Ctx, ":", 1);
+        MD5_Update(&md5Ctx, ha2.constData(), ha2.size());
+        BufferType response;
+        response.resize(MD5_DIGEST_LENGTH);
+        MD5_Final(reinterpret_cast<unsigned char*>(response.data()), &md5Ctx);
+        return response.toHex();
     }
 }

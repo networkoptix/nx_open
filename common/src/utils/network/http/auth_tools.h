@@ -75,6 +75,21 @@ namespace nx_http
         const boost::optional<StringType>& userPassword,
         const boost::optional<BufferType>& predefinedHA1,
         const header::DigestAuthorization& digestAuthorizationHeader );
+
+    /*!
+        \param ha1 That's what \a calcHa1 has returned
+    */
+    BufferType calcIntermediateResponse(
+        const BufferType& ha1,
+        const BufferType& nonce);
+    /*!
+        \param intermediateResponse Calculated with \a calcIntermediateResponse
+        \param intermediateResponseNonceLen Length of nonce (bytes) used to generate \a intermediateResponse
+    */
+    BufferType calcResponseFromIntermediate(
+        const BufferType& intermediateResponse,
+        size_t intermediateResponseNonceLen,
+        const BufferType& ha2);
 }
 
 #endif  //NX_AUTH_TOOLS_H

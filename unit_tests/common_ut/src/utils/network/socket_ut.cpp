@@ -305,7 +305,7 @@ TEST( Socket, postCancellation )
             std::for_each(
                 sockets.begin(),
                 sockets.end(),
-                []( std::unique_ptr<AbstractStreamSocket>& ptr ){ ptr.reset( SocketFactory::createStreamSocket() ); } );
+                []( std::unique_ptr<AbstractStreamSocket>& ptr ){ ptr = SocketFactory::createStreamSocket(); } );
             //std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
 
             for( const auto& sock: sockets )
