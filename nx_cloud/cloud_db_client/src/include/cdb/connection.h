@@ -12,6 +12,7 @@
 #include <string>
 
 #include "account_manager.h"
+#include "auth_provider.h"
 #include "module_info.h"
 #include "result_code.h"
 #include "system_manager.h"
@@ -39,6 +40,7 @@ public:
 
     virtual api::AccountManager* accountManager() = 0;
     virtual api::SystemManager* systemManager() = 0;
+    virtual api::AuthProvider* authProvider() = 0;
 
     //!Set credentials to use
     /*!

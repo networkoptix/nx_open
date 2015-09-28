@@ -63,6 +63,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::dbError, "dbError")
     (ResultCode::networkError, "networkError")
     (ResultCode::notImplemented, "notImplemented")
+    (ResultCode::unknownRealm, "unknownRealm")
+    (ResultCode::badUsername, "badUsername")
     (ResultCode::unknownError, "unknownError")
 );
 

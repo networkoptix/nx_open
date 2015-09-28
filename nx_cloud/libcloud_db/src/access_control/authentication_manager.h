@@ -56,6 +56,7 @@ private:
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;
 
+    bool validateNonce(const nx_http::StringType& nonce);
     bool findHa1(
         const stree::AbstractResourceReader& authSearchResult,
         const nx_http::StringType& username,

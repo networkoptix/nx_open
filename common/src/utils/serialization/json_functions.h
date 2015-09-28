@@ -1,6 +1,7 @@
 #ifndef QN_SERIALIZATION_JSON_FUNCTIONS_H
 #define QN_SERIALIZATION_JSON_FUNCTIONS_H
 
+#include <chrono>
 #include <vector>
 #include <set>
 #include <string>
@@ -265,6 +266,25 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, std::string *t
     return true;
 }
 
+
+#ifndef Q_MOC_RUN
+#define QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(TYPE)                                         \
+inline void serialize(QnJsonContext *, const std::chrono::TYPE &value, QJsonValue *target) {        \
+    *target = QJsonValue(QString::number(value.count()));                                           \
+}                                                                                                   \
+                                                                                                    \
+inline bool deserialize(QnJsonContext *, const QJsonValue &value, std::chrono::TYPE *target) {      \
+    if(value.type() != QJsonValue::String)                                                          \
+        return false;                                                                               \
+                                                                                                    \
+    *target = std::chrono::TYPE(value.toVariant().value<std::chrono::TYPE::rep>());                 \
+    return true;                                                                                    \
+}
+
+QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(seconds)
+QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(milliseconds)
+QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(microseconds)
+#endif
 
 #define QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(TYPE)                    \
 inline void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \

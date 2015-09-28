@@ -21,6 +21,7 @@ Connection::Connection(
 {
     m_accountManager = std::make_unique<AccountManager>(endPointFetcher);
     m_systemManager = std::make_unique<SystemManager>(endPointFetcher);
+    m_authProvider = std::make_unique<AuthProvider>(endPointFetcher);
 
     setCredentials(login, password);
 }
@@ -33,6 +34,11 @@ api::AccountManager* Connection::accountManager()
 api::SystemManager* Connection::systemManager()
 {
     return m_systemManager.get();
+}
+
+api::AuthProvider* Connection::authProvider()
+{
+    return m_authProvider.get();
 }
 
 void Connection::setCredentials(

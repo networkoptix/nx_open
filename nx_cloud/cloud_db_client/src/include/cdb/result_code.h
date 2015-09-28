@@ -25,6 +25,8 @@ enum class ResultCode
     //!Network operation failed
     networkError,
     notImplemented,
+    unknownRealm,
+    badUsername,
     unknownError
 };
 

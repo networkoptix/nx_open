@@ -32,6 +32,7 @@ namespace cdb {
 class AuthorizationManager;
 class AccountManager;
 class SystemManager;
+class AuthenticationProvider;
 
 class CloudDBProcess
 :
@@ -58,7 +59,8 @@ private:
         nx_http::MessageDispatcher* const msgDispatcher,
         const AuthorizationManager& authorizationManager,
         AccountManager* const accountManager,
-        SystemManager* const systemManager );
+        SystemManager* const systemManager,
+        AuthenticationProvider* const authProvider);
     bool initializeDB( nx::db::DBManager* const dbManager );
     bool configureDB( nx::db::DBManager* const dbManager );
     bool updateDB( nx::db::DBManager* const dbManager );

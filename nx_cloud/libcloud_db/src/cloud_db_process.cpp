@@ -28,12 +28,15 @@
 #include "db/structure_update_statements.h"
 #include "http_handlers/add_account_handler.h"
 #include "http_handlers/bind_system_handler.h"
-#include "http_handlers/unbind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
 #include "http_handlers/get_systems_handler.h"
-#include "http_handlers/verify_email_address_handler.h"
+#include "http_handlers/get_cdb_nonce_handler.h"
+#include "http_handlers/get_authentication_response_handler.h"
 #include "http_handlers/ping.h"
+#include "http_handlers/verify_email_address_handler.h"
+#include "http_handlers/unbind_system_handler.h"
 #include "managers/account_manager.h"
+#include "managers/auth_provider.h"
 #include "managers/email_manager.h"
 #include "managers/system_manager.h"
 #include "stree/stree_manager.h"
@@ -122,6 +125,8 @@ int CloudDBProcess::executeApplication()
             authRestrictionList,
             streeManager );
 
+        AuthenticationProvider authProvider;
+
         AuthorizationManager authorizationManager;
     
         nx_http::MessageDispatcher httpMessageDispatcher;
@@ -130,7 +135,8 @@ int CloudDBProcess::executeApplication()
             &httpMessageDispatcher,
             authorizationManager,
             &accountManager,
-            &systemManager );
+            &systemManager,
+            &authProvider);
     
         MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
@@ -202,7 +208,8 @@ void CloudDBProcess::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
-    SystemManager* const systemManager )
+    SystemManager* const systemManager,
+    AuthenticationProvider* const authProvider)
 {
     msgDispatcher->registerRequestProcessor<PingHandler>(
         PingHandler::HANDLER_PATH,
@@ -246,6 +253,19 @@ void CloudDBProcess::registerApiHandlers(
         UnbindSystemHandler::HANDLER_PATH,
         [systemManager, &authorizationManager]() -> std::unique_ptr<UnbindSystemHandler> {
             return std::make_unique<UnbindSystemHandler>( systemManager, authorizationManager );
+        } );
+
+    //authentication
+    msgDispatcher->registerRequestProcessor<GetCdbNonceHandler>(
+        GetCdbNonceHandler::HANDLER_PATH,
+        [authProvider, &authorizationManager]() -> std::unique_ptr<GetCdbNonceHandler> {
+            return std::make_unique<GetCdbNonceHandler>( authProvider, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<GetAuthenticationResponseHandler>(
+        GetAuthenticationResponseHandler::HANDLER_PATH,
+        [authProvider, &authorizationManager]() -> std::unique_ptr<GetAuthenticationResponseHandler> {
+            return std::make_unique<GetAuthenticationResponseHandler>( authProvider, authorizationManager );
         } );
 }
 

@@ -11,8 +11,11 @@
 #include "account_manager.h"
 #include "async_http_requests_executor.h"
 #include "system_manager.h"
+#include "auth_provider.h"
 
-namespace nx { namespace cc {
+
+namespace nx {
+namespace cc {
     class CloudModuleEndPointFetcher;
 } } // nx::cc
 
@@ -35,6 +38,8 @@ public:
     virtual api::AccountManager* accountManager() override;
     //!Implemetation of api::Connection::getAccountManager
     virtual api::SystemManager* systemManager() override;
+    //!Implemetation of api::Connection::authProvider
+    virtual api::AuthProvider* authProvider() override;
 
     //!Implemetation of api::Connection::setCredentials
     virtual void setCredentials(
@@ -47,6 +52,7 @@ public:
 private:
     std::unique_ptr<AccountManager> m_accountManager;
     std::unique_ptr<SystemManager> m_systemManager;
+    std::unique_ptr<AuthProvider> m_authProvider;
 };
 
 }   //cl
