@@ -12,6 +12,8 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 
+#include <utils/common/delayed.h>
+
 namespace {
     const int updateLiveBookmarksTimeoutMs = 10000;
 }
@@ -65,12 +67,16 @@ void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraRes
                                                         , const QnCameraBookmarkSearchFilter &filter
                                                         , BookmarksCallbackType callback) {
     auto server = qnCommon->currentServer();
-    if (!server)
+    if (!server) {
+        executeCallbackDelayed(callback);
         return;
+    }
 
     auto connection = server->apiConnection();
-    if (!connection)
+    if (!connection) {
+        executeCallbackDelayed(callback);
         return;
+    }
 
     QnBookmarkRequestData requestData;
     requestData.cameras = cameras.toList();
@@ -256,4 +262,13 @@ QnCameraBookmarksQueryPtr QnCameraBookmarksManagerPrivate::createQuery(const QnV
     });
 
     return query;
+}
+
+void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksCallbackType callback) {
+    if (!callback)
+        return;
+
+    executeDelayed([this, callback]{
+        callback(false, QnCameraBookmarkList());
+    });
 }

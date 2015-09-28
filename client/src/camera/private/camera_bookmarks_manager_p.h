@@ -90,6 +90,7 @@ private:
     /// @brief                  Force recalculate value based on local data.
     QnCameraBookmarkList executeQueryInternal(const QnCameraBookmarksQueryPtr &query) const;
 
+    void executeCallbackDelayed(BookmarksCallbackType callback);
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
