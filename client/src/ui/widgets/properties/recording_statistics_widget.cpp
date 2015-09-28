@@ -82,36 +82,27 @@ namespace {
                 painter->translate(shift);
                 opt.rect.translate(-shift);
 
-                qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
-                qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
+                //qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
+                //qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
+                qreal chartData = index.data(Qn::RecordingStatChartDataRole).toReal();
+                QColor chartColor;
+                QVariant colorData =  index.data(Qn::RecordingStatChartColorDataRole);
+                if (colorData.isValid() && colorData.canConvert<QColor>())
+                    chartColor = qvariant_cast<QColor>(colorData);
 
 
                 QColor baseColor = opt.backgroundBrush.color(); //opt.palette.color(QPalette::Normal, QPalette::Base);
-
-                QVariant value = index.data(Qn::RecordingStatColorsDataRole);
-                QnRecordingStatsColors colors;
-                if (value.isValid() && value.canConvert<QnRecordingStatsColors>())
-                    colors = qvariant_cast<QnRecordingStatsColors>(value);
 
                 if (opt.state & QStyle::State_Selected) {
                     // alternate row color
                     const int shift = 16;
                     baseColor = shiftColor(baseColor, shift, shift, shift);
-                    colors.chartMainColor = shiftColor(colors.chartMainColor, shift, shift, shift);
-                    colors.chartForecastColor = shiftColor(colors.chartForecastColor, shift, shift, shift);
                 }
                 painter->fillRect(opt.rect, baseColor);
 
                 opt.rect.adjust(2, 1, -2, -1);
 
-                if (forecastData > realData) {
-                    painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), colors.chartForecastColor);
-                    painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
-                }
-                else {
-                    painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
-                    painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), colors.chartForecastColor);
-                }
+                painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * chartData, opt.rect.height()), chartColor);
 
                 painter->setFont(opt.font);
                 painter->setPen(opt.palette.foreground().color());
@@ -197,7 +188,8 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingStatisticsWidget),
     m_server(),
-    m_model(new QnRecordingStatsModel(this)),
+    m_model(new QnRecordingStatsModel(false, this)),
+    m_forecastModel(new QnRecordingStatsModel(true, this)),
     m_requests(),
     m_updateDisabled(false),
     m_dirty(false),
@@ -484,6 +476,12 @@ int QnRecordingStatisticsWidget::bytesToSliderPosition (qint64 value) const
 
 void QnRecordingStatisticsWidget::at_forecastParamsChanged()
 {
+    QnSortedRecordingStatsModel* sortModel = static_cast<QnSortedRecordingStatsModel*> (ui->gridEvents->model());
+    if (ui->checkBoxForecast->isChecked())
+        sortModel->setSourceModel(m_forecastModel);
+    else
+        sortModel->setSourceModel(m_model);
+
     if (!ui->gridEvents->isEnabled())
         return;
     ui->gridEvents->setEnabled(false);
@@ -514,10 +512,10 @@ void QnRecordingStatisticsWidget::at_forecastParamsChanged()
             ui->extraSpaceSlider->setValue(bytesToSliderPosition(forecastedSize));
         }
 
-        m_model->setForecastData(getForecastData(forecastedSize));
+        m_forecastModel->setModelData(getForecastData(forecastedSize));
     }
     else
-        m_model->setForecastData(QnRecordingStatsReply());
+        m_forecastModel->setModelData(QnRecordingStatsReply());
     updateColumnWidth();
     ui->gridEvents->setEnabled(true);
 }
@@ -527,12 +525,13 @@ void QnRecordingStatisticsWidget::updateColumnWidth()
     int minWidth = 0;
     auto* headers = ui->gridEvents->horizontalHeader();
     headers->setMinimumSectionSize(0);
+    auto model = ui->gridEvents->model();
 
     for (int j = 1; j < QnRecordingStatsModel::BitrateColumn; ++j)
     {
-        for (int i = 0; i < m_model->rowCount(); ++i)
+        for (int i = 0; i < model->rowCount(); ++i)
         {
-            QModelIndex index = m_model->index(i, j);
+            QModelIndex index = model->index(i, j);
             QString txt = index.data(Qt::DisplayRole).toString();
 
             QVariant value = index.data(Qt::FontRole);
@@ -562,24 +561,30 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraS
     ForecastData forecastData;
 
     // 1. collect camera related forecast params
+    bool hasExpaned = false;
     for(const auto& cameraStats: modelData) 
     {
         ForecastDataPerCamera cameraForecast;
-        cameraForecast.stats = cameraStats;
 
         QnSecurityCamResourcePtr camRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
         if (camRes) {
             cameraForecast.expand = !camRes->isScheduleDisabled();
             cameraForecast.expand &= (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
-            cameraForecast.expand &= cameraForecast.stats.archiveDurationSecs > 0 && cameraForecast.stats.recordedBytes > 0;
+            cameraForecast.expand &= cameraStats.archiveDurationSecs > 0 && cameraStats.recordedBytes > 0;
             cameraForecast.minDays = qMax(0, camRes->minDays());
             cameraForecast.maxDays = qMax(0, camRes->maxDays());
-            cameraForecast.byterate = cameraForecast.stats.recordedBytes / cameraForecast.stats.archiveDurationSecs;
+            cameraForecast.byterate = cameraStats.recordedBytes / cameraStats.archiveDurationSecs;
+            if (cameraForecast.expand)
+                hasExpaned = true;
         }
-        cameraForecast.stats.archiveDurationSecs = 0;
+        cameraForecast.stats.uniqueId = cameraStats.uniqueId;
+        cameraForecast.stats.averageBitrate = cameraStats.averageBitrate;
         forecastData.cameras.push_back(std::move(cameraForecast));
         forecastData.totalSpace += cameraStats.recordedBytes; // 2.1 add current archive space
     }
+
+    if (!hasExpaned)
+        return modelData; // no recording cameras at all. Do not forecast anything
     
     // 2.1 add free storage space
     for (const auto& storageSpaceData: m_availStorages) 
@@ -625,8 +630,11 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::doForecast(ForecastData forec
     }
 
     QnRecordingStatsReply result;
-    for (const auto& value: forecastData.cameras)
+    for (auto& value: forecastData.cameras) 
+    {
+        value.stats.recordedBytes = value.byterate * value.stats.archiveDurationSecs;
         result << value.stats;
+    }
     return result;
 }
 

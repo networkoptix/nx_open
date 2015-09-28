@@ -2181,7 +2181,20 @@ void MediaServerProcess::run()
 #endif
     emit started();
     exec();
-    disconnect(0,0, this, 0);
+
+    disconnect(QnAuthHelper::instance(), 0, this, 0);
+    disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
+    disconnect(QnStorageManager::instance(), 0, this, 0);
+    disconnect(qnCommon, 0, this, 0);
+    disconnect(QnRuntimeInfoManager::instance(), 0, this, 0);
+    disconnect(ec2Connection->getTimeManager().get(), 0, this, 0);
+    disconnect(ec2Connection.get(), 0, this, 0);
+    disconnect(m_updatePiblicIpTimer.get(), 0, this, 0);
+    disconnect(m_ipDiscovery.get(), 0, this, 0);
+    disconnect(m_moduleFinder, 0, this, 0);
+    disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
+
+
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( QThread::currentThread(), 3 );
     waitingForObjectsToBeFreed.join();
 
