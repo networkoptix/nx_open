@@ -301,7 +301,7 @@ struct rtu::Selection::Snapshot
     QDateTime dateTime;
     TimeZonesModelPtr timeZonesModel;
     
-    rtu::Constants::AvailableSysCommands sysCommands;
+    rtu::Constants::SystemCommands sysCommands;
 
     Snapshot(rtu::ServersSelectionModel *model);
 };
@@ -327,12 +327,12 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     , dateTime(calcDateTime(model->selectedServers()))
     , timeZonesModel(new TimeZonesModel(model->selectedServers(), rtu::helpers::qml_objects_parent()))
 
-    , sysCommands(calcFlags<rtu::Constants::AvailableSysCommands>(
-        model->selectedServers(), rtu::Constants::AvailableSysCommand::AllCommands
+    , sysCommands(calcFlags<rtu::Constants::SystemCommands>(
+        model->selectedServers(), rtu::Constants::SystemCommand::AllCommands
         , [](const ServerInfo &info) 
         { 
             return (info.hasExtraInfo() ? info.extraInfo().sysCommands
-                : rtu::Constants::AvailableSysCommand::NoCommands);
+                : rtu::Constants::SystemCommand::NoCommands);
         }))
 {
 }
@@ -437,7 +437,7 @@ int rtu::Selection::flags() const
     return static_cast<int>(m_snapshot->flags);
 }
 
-int rtu::Selection::availableSysCommands() const
+int rtu::Selection::SystemCommands() const
 {
     return static_cast<int>(m_snapshot->sysCommands);
 }

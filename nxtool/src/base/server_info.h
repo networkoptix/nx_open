@@ -78,9 +78,9 @@ namespace rtu
         QByteArray timeZoneId;
         InterfaceInfoList interfaces;
 
-        Constants::AvailableSysCommands sysCommands;
+        Constants::SystemCommands sysCommands;
 
-        typedef QHash<Constants::AvailableSysCommands, QString> ScriptNames;
+        typedef QHash<Constants::SystemCommands, QString> ScriptNames;
         ScriptNames scriptNames;
 
         ExtraServerInfo();
@@ -90,7 +90,7 @@ namespace rtu
             , const qint64 &initUtcDateTimeMs
             , const QByteArray &initTimeZoneId
             , const InterfaceInfoList initInterfaces
-            , const Constants::AvailableSysCommands initSysCommands
+            , const Constants::SystemCommands initSysCommands
             , const ScriptNames &initScriptNames);
     };
     

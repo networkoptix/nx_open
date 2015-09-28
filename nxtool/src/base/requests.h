@@ -92,7 +92,7 @@ namespace rtu
 
     void sendSystemCommand(const BaseServerInfoPtr &info
         , const QString &password
-        , const Constants::AvailableSysCommand sysCommand
+        , const Constants::SystemCommand sysCommand
         , const OperationCallback &callback);
 
     ///

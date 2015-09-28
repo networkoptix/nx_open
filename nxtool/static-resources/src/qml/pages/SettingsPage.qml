@@ -204,7 +204,7 @@ FocusScope
                 {
                     id: actionSettings;
 
-                    flags: rtuContext.selection.availableSysCommands;
+                    flags: rtuContext.selection.SystemCommands;
                 }
 
                 Base.EmptyCell {}

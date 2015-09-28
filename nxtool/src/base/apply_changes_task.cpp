@@ -258,7 +258,7 @@ private:
         , const Constants::AffectedEntities affected);
 
     Request makeActionRequest(ServerInfoCacheItem &item
-        , Constants::AvailableSysCommand cmd
+        , Constants::SystemCommand cmd
         , int changesCount
         , const ExtraPred &pred
         , const QString &description
@@ -564,7 +564,7 @@ rtu::AwaitingOp::Holder rtu::ApplyChangesTask::Impl::addAwaitingOp(const QUuid &
 }
 
 Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
-    , Constants::AvailableSysCommand cmd
+    , Constants::SystemCommand cmd
     , int changesCount
     , const ExtraPred &pred
     , const QString &description

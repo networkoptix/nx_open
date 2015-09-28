@@ -38,6 +38,7 @@ namespace
     const QString kPortTag = "port";
     const QString kFlagsTag = "flags";
     const QString kLocalTimeFlagTag = "local";
+    const QString kSafeModeTag = "ecDbReadOnly";
 
     QUrl makeUrl(const QString &host
         , const int port
@@ -84,6 +85,8 @@ namespace
             { info.port = object.value(kPortTag).toInt(); });
         result.insert(kVersionTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.version = object.value(kVersionTag).toString(); });
+        result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.safeMode = object.value(kSafeModeTag).toBool(); });
 
         result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             {
@@ -287,13 +290,13 @@ namespace /// Parsers stuff
 
     rtu::ExtraServerInfo extractScriptInfoFromAnswer(const QJsonObject &object)
     {
-        typedef QMultiMap<QString, rtu::Constants::AvailableSysCommand> ScriptCmdMap;
+        typedef QMultiMap<QString, rtu::Constants::SystemCommand> ScriptCmdMap;
         static ScriptCmdMap kMapping = []() -> ScriptCmdMap
         {
             ScriptCmdMap result;
-            result.insertMulti("reboot", rtu::Constants::AvailableSysCommand::RebootCmd);
-            result.insertMulti("restore", rtu::Constants::AvailableSysCommand::FactoryDefaultsCmd);
-            result.insertMulti("restore_keep_ip", rtu::Constants::AvailableSysCommand::FactoryDefaultsButNetworkCmd);
+            result.insert("reboot", rtu::Constants::SystemCommand::RebootCmd);
+            result.insert("restore", rtu::Constants::SystemCommand::FactoryDefaultsCmd);
+            result.insert("restore_keep_ip", rtu::Constants::SystemCommand::FactoryDefaultsButNetworkCmd);
             return result;
         }();
 
@@ -594,23 +597,23 @@ void rtu::sendRestartRequest(const BaseServerInfoPtr &info
 
 void rtu::sendSystemCommand(const BaseServerInfoPtr &info
     , const QString &password
-    , const Constants::AvailableSysCommand sysCommand
+    , const Constants::SystemCommand sysCommand
     , const OperationCallback &callback)
 {
     QString cmd;
     switch(sysCommand)
     {
-    case Constants::AvailableSysCommand::RestartServerCmd:
+    case Constants::SystemCommand::RestartServerCmd:
         sendRestartRequest(info, password, callback);
         return;
 
-    case Constants::AvailableSysCommand::RebootCmd:
+    case Constants::SystemCommand::RebootCmd:
         cmd = QStringLiteral("reboot");
         break;
-    case Constants::AvailableSysCommand::FactoryDefaultsCmd:
+    case Constants::SystemCommand::FactoryDefaultsCmd:
         cmd = QStringLiteral("restore");
         break;
-    case Constants::AvailableSysCommand::FactoryDefaultsButNetworkCmd:
+    case Constants::SystemCommand::FactoryDefaultsButNetworkCmd:
         cmd = QStringLiteral("restore_keep_ip");
         break;
     default:

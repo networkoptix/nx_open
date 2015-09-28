@@ -50,7 +50,7 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: (rtuContext.selection.availableSysCommands
+                enabled: (rtuContext.selection.SystemCommands
                     && NxRtu.Constants.RebootCmd);
 
                 thin: true;
@@ -80,7 +80,7 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: (rtuContext.selection.availableSysCommands
+                enabled: (rtuContext.selection.SystemCommands
                     && NxRtu.Constants.FactoryDefaultsCmd);
 
                 thin: true;
@@ -90,7 +90,7 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: (rtuContext.selection.availableSysCommands
+                enabled: (rtuContext.selection.SystemCommands
                     && NxRtu.Constants.FactoryDefaultsButNetworkCmd);
 
                 thin: true;

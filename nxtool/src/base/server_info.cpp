@@ -70,7 +70,7 @@ rtu::ExtraServerInfo::ExtraServerInfo()
     , utcDateTimeMs(0)
     , timeZoneId()
     , interfaces()
-    , sysCommands(Constants::AvailableSysCommand::NoCommands)
+    , sysCommands(Constants::SystemCommand::NoCommands)
     , scriptNames()
 {
 }
@@ -80,7 +80,7 @@ rtu::ExtraServerInfo::ExtraServerInfo(const QString &initPassword
     , const qint64 &initUtcDateTimeMs
     , const QByteArray &initTimeZoneId
     , const InterfaceInfoList initInterfaces
-    , const Constants::AvailableSysCommands initSysCommands
+    , const Constants::SystemCommands initSysCommands
     , const ScriptNames &initScriptNames)
     : password(initPassword)
     , timestampMs(initTimestampMs)

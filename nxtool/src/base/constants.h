@@ -26,7 +26,7 @@ namespace rtu
         Q_ENUMS(ServerFlag)
         Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 
-        enum AvailableSysCommand
+        enum SystemCommand
         {
             NoCommands                          = 0x00
 
@@ -37,8 +37,8 @@ namespace rtu
 
             , AllCommands                       = 0xFF       
         };
-        Q_ENUMS(AvailableSysCommand)
-        Q_DECLARE_FLAGS(AvailableSysCommands, AvailableSysCommand)
+        Q_ENUMS(SystemCommand)
+        Q_DECLARE_FLAGS(SystemCommands, SystemCommand)
 
         enum Pages
         {

@@ -375,7 +375,7 @@ public:
         , qint64 timestampMs);
     
     void updateActionsInfo(ItemSearchInfo &searchInfo
-        , Constants::AvailableSysCommands sysCommands);
+        , Constants::SystemCommands sysCommands);
 
     void updateInterfacesInfo(ItemSearchInfo &searchInfo
         , const InterfaceInfoList &interfaces
@@ -998,7 +998,7 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(
 }
 
 void rtu::ServersSelectionModel::Impl::updateActionsInfo(ItemSearchInfo &searchInfo
-    , Constants::AvailableSysCommands sysCommands)
+    , Constants::SystemCommands sysCommands)
 {
     ExtraServerInfo &extra = getExtraInfo(searchInfo);
     if (extra.sysCommands == sysCommands)
