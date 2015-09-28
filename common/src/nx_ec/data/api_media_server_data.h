@@ -13,11 +13,11 @@ namespace ec2
             NoDay       = 0,
             Monday      = 2,
             Tuesday     = 4,
-            Wednsday    = 16,
-            Thursday    = 32,
-            Friday      = 64,
-            Saturday    = 128,
-            Sunday      = 256
+            Wednsday    = 8,
+            Thursday    = 16,
+            Friday      = 32,
+            Saturday    = 64,
+            Sunday      = 128
         };
     }
 
