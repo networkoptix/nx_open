@@ -83,7 +83,8 @@ void readH264NALUsFromAnnexBStream(
         //skipping leading_zero_8bits and trailing_zero_8bits
         while ((naluEnd > curNalu) && (*(naluEnd - 1) == 0))
             --naluEnd;
-        nalUnits->emplace_back((const quint8*)curNalu, naluEnd - curNalu);
+        if (naluEnd > curNalu)
+            nalUnits->emplace_back((const quint8*)curNalu, naluEnd - curNalu);
     }
 }
 }
