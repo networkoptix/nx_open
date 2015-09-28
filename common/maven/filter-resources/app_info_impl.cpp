@@ -15,7 +15,7 @@ QString QnAppInfo::linuxOrganizationName() {
 }
 
 QString QnAppInfo::realm() {
-    return QStringLiteral("${deb.customization.company.name}");
+    return QStringLiteral("VMS");
 }
 
 QString QnAppInfo::applicationVersion() {

@@ -65,7 +65,6 @@
 #define QN_AX_TYPELIB_ID                "${ax.typeLibId}"
 #define QN_AX_APP_ID                    "${ax.appId}"
 
-#define QN_REALM                        "${deb.customization.company.name}"
 #define QN_CLOUD_MODULES_XML            "${cloud.modulesXmlUrl}"
 
 /* 
