@@ -399,9 +399,9 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
 
     if (filter.isValid()) {
         if (filter.startTimeMs > 0)
-            addFilter("startTimeMs >= :minStartTimeMs");
+            addFilter("endTimeMs >= :minStartTimeMs");
         if (filter.endTimeMs < INT64_MAX)
-            addFilter("endTimeMs <= :maxEndTimeMs");
+            addFilter("startTimeMs <= :maxEndTimeMs");
     }
 //     if (filter.minDurationMs > 0)
 //         addFilter("durationMs >= :minDurationMs");
