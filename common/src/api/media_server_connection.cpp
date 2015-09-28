@@ -877,8 +877,8 @@ int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 bitrateAnalizePe
 
 int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("startTimeMs", startTimeMs);
-    params << QnRequestParam("endTimeMs", endTimeMs);
+    params << QnRequestParam("from", startTimeMs * 1000ll);
+    params << QnRequestParam("to", endTimeMs * 1000ll);
     params << QnRequestParam("format", "ubjson");
     return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }

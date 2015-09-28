@@ -54,7 +54,7 @@ case "$1" in
             exit 0
         fi
 
-        ulimit -n 3072
+        ulimit -n 8192
         ulimit -c unlimited
         process_core_dump
 
@@ -75,7 +75,7 @@ case "$1" in
             exit 0
         fi
 
-        ulimit -n 3072
+        ulimit -n 8192
         ulimit -c unlimited
         $BIN_PATH $RUN_ARGS
         ;;
