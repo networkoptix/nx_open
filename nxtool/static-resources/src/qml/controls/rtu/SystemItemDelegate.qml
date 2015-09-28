@@ -96,7 +96,7 @@ Item
                 thin: false;
                 wrapMode: Text.Wrap;
                 font.pixelSize: Common.SizeManager.fontSizes.medium;
-                text: (systemName.length === 0 ? qsTr("Unassigned system") : systemName);
+                text: (systemName.length === 0 ? qsTr("Unassigned System") : systemName);
             }
             
             Rtu.LoggedState

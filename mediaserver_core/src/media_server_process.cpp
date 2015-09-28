@@ -211,6 +211,7 @@
 #include "core/multicast/multicast_http_server.h"
 #include "crash_reporter.h"
 #include "rest/handlers/exec_script_rest_handler.h"
+#include "rest/handlers/script_list_rest_handler.h"
 
 
 #ifdef __arm__
@@ -1393,7 +1394,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/getHardwareInfo", new QnGetHardwareInfoHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
@@ -1418,6 +1419,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
 
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
@@ -1842,7 +1844,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(qnCommon->moduleGUID().toQUuid(), m_universalTcpListener));
 
     using namespace std::placeholders;
-    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
+    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(&QnUniversalRequestProcessor::isProxy);
     messageProcessor->registerProxySender(m_universalTcpListener);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
@@ -2272,7 +2274,20 @@ void MediaServerProcess::run()
 #endif
     emit started();
     exec();
-    disconnect(0,0, this, 0);
+
+    disconnect(QnAuthHelper::instance(), 0, this, 0);
+    disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
+    disconnect(QnStorageManager::instance(), 0, this, 0);
+    disconnect(qnCommon, 0, this, 0);
+    disconnect(QnRuntimeInfoManager::instance(), 0, this, 0);
+    disconnect(ec2Connection->getTimeManager().get(), 0, this, 0);
+    disconnect(ec2Connection.get(), 0, this, 0);
+    disconnect(m_updatePiblicIpTimer.get(), 0, this, 0);
+    disconnect(m_ipDiscovery.get(), 0, this, 0);
+    disconnect(m_moduleFinder, 0, this, 0);
+    disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
+
+
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( QThread::currentThread(), 3 );
     waitingForObjectsToBeFreed.join();
 

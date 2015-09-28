@@ -51,8 +51,9 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
     }
 }
 
-QnRecordingStatsModel::QnRecordingStatsModel(QObject *parent) :
-    base_type(parent)
+QnRecordingStatsModel::QnRecordingStatsModel(bool isForecastRole, QObject *parent):
+    base_type(parent),
+    m_isForecastRole(isForecastRole)
 { }
 
 QnRecordingStatsModel::~QnRecordingStatsModel()
@@ -60,7 +61,7 @@ QnRecordingStatsModel::~QnRecordingStatsModel()
 
 int QnRecordingStatsModel::rowCount(const QModelIndex &parent) const {
     if (!parent.isValid()) {
-        int dataSize = internalModelData().size();
+        int dataSize = m_data.size();
         if (dataSize > 0)
             return dataSize + footerRowsCount;
         return 0;
@@ -75,8 +76,7 @@ int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const {
 }
 
 QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
-    const QnRecordingStatsReply& data = internalModelData();
-    const QnCamRecordingStatsData& value = data.at(index.row());
+    const QnCamRecordingStatsData& value = m_data.at(index.row());
     switch(index.column()) {
     case CameraNameColumn:
         return getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
@@ -92,25 +92,23 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
 }
 
 QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const {
-    auto footer = internalFooterData();
-
     switch(index.column())
     {
     case CameraNameColumn:
         {
             QnVirtualCameraResourceList cameras;
-            for (const QnCamRecordingStatsData &data: internalModelData())
+            for (const QnCamRecordingStatsData &data: m_data)
                 if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId(data.uniqueId).dynamicCast<QnVirtualCameraResource>())
                     cameras << camera;
-            Q_ASSERT_X(cameras.size() == internalModelData().size(), Q_FUNC_INFO, "Make sure all cameras exist");
+            Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
             return tr("Total %1").arg(getNumericDevicesName(cameras, false));
         }
     case BytesColumn:
-        return formatBytesString(footer.recordedBytes);
+        return formatBytesString(m_footer.recordedBytes);
     case DurationColumn:
-        return formatDurationString(footer);
+        return formatDurationString(m_footer);
     case BitrateColumn:
-        return formatBitrateString(footer.bitrateSum);
+        return formatBitrateString(m_footer.bitrateSum);
     default:
         return QString();
     }
@@ -129,22 +127,24 @@ QnResourcePtr QnRecordingStatsModel::getResource(const QModelIndex &index) const
     }
 }
 
-qreal QnRecordingStatsModel::chartData(const QModelIndex &index, bool isForecast) const
+qreal QnRecordingStatsModel::chartData(const QModelIndex &index) const
 {
-    if (m_forecastData.size() != m_data.size() && isForecast)
-        return 0.0;
-    bool useForecast = !m_forecastData.isEmpty() && index.column() != BitrateColumn;
-    const QnRecordingStatsReply& data = isForecast && useForecast ? m_forecastData : m_data;
-    const QnCamRecordingStatsData& value = data.at(index.row());
+    const QnCamRecordingStatsData& value = m_data.at(index.row());
     qreal result = 0.0;
-    const auto& footer = useForecast ? m_forecastFooter : m_footer;
+    const auto& footer = m_footer;
     switch(index.column())
     {
     case BytesColumn:
-        result = value.recordedBytes / (qreal) footer.recordedBytes;
+        if (footer.recordedBytes > 0)
+            result = value.recordedBytes / (qreal) footer.recordedBytes;
+        else
+            return 0.0;
         break;
     case DurationColumn:
-        result = value.archiveDurationSecs / (qreal) footer.archiveDurationSecs;
+        if (footer.archiveDurationSecs > 0)
+            result = value.archiveDurationSecs / (qreal) footer.archiveDurationSecs;
+        else
+            result = 0.0;
         break;
     case BitrateColumn:
         if (footer.averageBitrate > 0)
@@ -174,7 +174,7 @@ QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) c
         return qApp->palette().color(QPalette::Normal, QPalette::Background);
 
     case Qn::RecordingStatsDataRole:
-        return QVariant::fromValue<QnCamRecordingStatsData>(internalFooterData());
+        return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
     default:
         break;
     }
@@ -206,7 +206,7 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    if (index.row() >= internalModelData().size())
+    if (index.row() >= m_data.size())
         return footerData(index, role);
 
     switch(role) {
@@ -222,11 +222,13 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
     case Qn::RecordingStatsDataRole:
         return QVariant::fromValue<QnCamRecordingStatsData>(m_data.at(index.row()));
     case Qn::RecordingStatChartDataRole:
-        return chartData(index, false);
-    case Qn::RecordingStatForecastDataRole:
-        return chartData(index, true);
-    case Qn::RecordingStatColorsDataRole:
-        return QVariant::fromValue<QnRecordingStatsColors>(m_colors);
+        return chartData(index);
+    //case Qn::RecordingStatForecastDataRole:
+    //    return chartData(index, true);
+    //case Qn::RecordingStatColorsDataRole:
+    //    return QVariant::fromValue<QnRecordingStatsColors>(m_colors);
+    case Qn::RecordingStatChartColorDataRole:
+        return m_isForecastRole ? m_colors.chartForecastColor : m_colors.chartMainColor;
     case Qt::ToolTipRole:
         return tooltipText(static_cast<Columns>(index.column()));
     default:
@@ -264,17 +266,8 @@ void QnRecordingStatsModel::clear() {
 
 void QnRecordingStatsModel::setModelData(const QnRecordingStatsReply& data) {
     beginResetModel();
-    m_forecastData.clear();
-    m_forecastFooter = QnFooterData();
     m_data = data;
     m_footer = calculateFooter(data);
-    endResetModel();
-}
-
-void QnRecordingStatsModel::setForecastData(const QnRecordingStatsReply& data) {
-    beginResetModel();
-    m_forecastData = data;
-    m_forecastFooter = calculateFooter(data);
     endResetModel();
 }
 
@@ -289,18 +282,6 @@ QnRecordingStatsColors QnRecordingStatsModel::colors() const {
 void QnRecordingStatsModel::setColors(const QnRecordingStatsColors &colors) {
     m_colors = colors;
     emit colorsChanged();
-}
-
-const QnRecordingStatsReply& QnRecordingStatsModel::internalModelData() const {
-    return m_forecastData.isEmpty()
-        ? m_data 
-        : m_forecastData;
-}
-
-const QnFooterData& QnRecordingStatsModel::internalFooterData() const {
-    return m_forecastData.isEmpty()
-        ? m_footer 
-        : m_forecastFooter;
 }
 
 QnFooterData QnRecordingStatsModel::calculateFooter(const QnRecordingStatsReply& data) const {
@@ -340,7 +321,11 @@ QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const {
 }
 
 
-QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData &data) const {
+QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData &data) const 
+{
+    if (data.archiveDurationSecs == 0)
+        return tr("empty");
+
     qint64 tmpVal = data.archiveDurationSecs;
     int years = tmpVal / SECS_PER_YEAR;
     tmpVal -= years * SECS_PER_YEAR;

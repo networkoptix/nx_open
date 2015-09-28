@@ -210,6 +210,7 @@ namespace nx_http
         SocketAddress m_remoteEndpoint;
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
         SystemError::ErrorCode m_lastSysErrorCode;
+        int m_requestSequence;
 
         AsyncHttpClient();
 
