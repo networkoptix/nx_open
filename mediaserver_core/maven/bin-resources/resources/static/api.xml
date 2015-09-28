@@ -993,6 +993,82 @@
                     </result>
                 </function>
                 <function>
+                    <name>businessEvents</name>
+                    <description>Returns event log information at requested format.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>from</name>
+                            <description>Start time of a time interval. Microseconds since 1970 UTC
+                                or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                detected.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>to</name>
+                            <description>End time of a time interval. Microseconds since 1970 UTC or
+                                string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                detected.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>physicalId</name>
+                            <description>Filter events log by a single camera. Camera's 'physicalId' could be obtain via request ec2/getCamerasEx </description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>event_type</name>
+                            <description>Filter events log by specified event type.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>action_type</name>
+                            <description>Filter events log by specified action type.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>brule_id</name>
+                            <description>Filter events log by specified business event rule (keep only records generated via that business rule). This id could be obtained via 'ec2/getBusinessRules' call.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Tail of the server log file in text format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>auditLog</name>
+                    <description>Returns audit log information at requested format.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>from</name>
+                            <description>Start time of a time interval. Microseconds since 1970 UTC
+                                or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                detected.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>to</name>
+                            <description>End time of a time interval. Microseconds since 1970 UTC or
+                                string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                detected.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Tail of the server log file in text format</caption>
+                    </result>
+                </function>
+                <function>
                     <name>manualCamera/search</name>
                     <description>Search cameras in manual mode</description>
                     <method>GET</method>
@@ -1627,6 +1703,15 @@
                     <params/>
                     <result>
                         <caption>JSON with error code</caption>
+                    </result>
+                </function>
+                <function proprietary="true">
+                    <name>scriptList</name>
+                    <description>Returns list of scripts to execute.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON object with string list.</caption>
                     </result>
                 </function>
                 <function>
