@@ -8,6 +8,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
+#include <camera/camera_bookmarks_manager_fwd.h>
 
 #include <client/client_globals.h>
 
@@ -201,6 +202,8 @@ protected slots:
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_thumbnailClicked();
 
+    void at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks);
+
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
     
@@ -214,17 +217,6 @@ private:
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
 
-    /* Bookmarks methods section */
-
-    /** Check if bookmarks can be loaded for the current widget. */
-    bool isBookmarksLoadingAvailable() const;
-
-    /** Update bookmarks on the timeline. */
-    void updateTimelineBookmarks();
-
-    /** Queue bookmarks loading for the currently selected camera. */
-    void loadBookmarks();
-    
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -275,6 +267,7 @@ private:
 
     QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
+    QnCameraBookmarksQueryPtr m_bookmarkQuery;
 
     QnCameraDataManager* m_cameraDataManager;
 
