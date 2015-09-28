@@ -49,15 +49,13 @@ public:
 
     /* Queries API section */
 
-    /// @brief                  Register bookmarks search query to auto-update it if needed.
-    /// @param query            Target query.
-    void registerQuery(const QnCameraBookmarksQueryPtr &query);
+    /// @brief                  Instantiate new search query.
+    /// @param cameras          Set of target cameras.
+    /// @param filter           Filter parameters.
+    /// @returns                Search query that is ready to be used.
+    QnCameraBookmarksQueryPtr createQuery(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter);
 
-    /// @brief                  Unregister bookmarks search query.
-    /// @param query            Target query.
-    void unregisterQuery(const QnCameraBookmarksQueryPtr &query);
-
-    /// @brief                  Execute search query on local (cached) data.
+    /// @brief                  Get search query cached value from local data.
     /// @param query            Target query.
     /// @returns                Locally cached bookmarks, filtered by the query.
     QnCameraBookmarkList executeQueryLocal(const QnCameraBookmarksQueryPtr &query) const;
@@ -70,12 +68,26 @@ private slots:
     void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle);
 
 private:
+    /// @brief                  Register bookmarks search query to auto-update it if needed.
+    /// @param query            Target query.
+    void registerQuery(const QnCameraBookmarksQueryPtr &query);
+
+    /// @brief                  Unregister bookmarks search query.
+    /// @param queryId          Target query id.
+    void unregisterQuery(const QUuid &queryId);
+
     void clearCache();
 
+    /// @brief                  Update query cached data based on local cache.
     void updateQueryLocal(const QUuid &queryId);
+
+    /// @brief                  Send request to update query with actual data.
     void updateQueryAsync(const QUuid &queryId);
 
+    /// @brief                  Update cache with provided value and emit signals if needed.
     void updateQueryCache(const QUuid &queryId, const QnCameraBookmarkList &bookmarks);
+
+    /// @brief                  Force recalculate value based on local data.
     QnCameraBookmarkList executeQueryInternal(const QnCameraBookmarksQueryPtr &query) const;
 
 private:

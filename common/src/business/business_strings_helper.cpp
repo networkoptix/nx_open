@@ -509,11 +509,11 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (id.isNull())
         return QString();
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById(id).dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
     if (!camera)
         return QString();
 
-    QnMediaServerResourcePtr mserverRes = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr mserverRes = camera->getParentServer();
     if (!mserverRes)
         return QString();
     

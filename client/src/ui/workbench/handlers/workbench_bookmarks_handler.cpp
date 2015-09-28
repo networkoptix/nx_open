@@ -69,20 +69,6 @@ QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tags() const {
     return m_tags;
 }
 
-
-QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const {
-    QnMediaServerResourcePtr currentServer = camera->getParentServer();
-
-    if (time == DATETIME_NOW)
-        return currentServer;
-
-    QnMediaServerResourcePtr mediaServer = qnCameraHistoryPool->getMediaServerOnTime(camera, time);
-    if (!mediaServer)
-        return currentServer;
-
-    return mediaServer;
-}
-
 ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
@@ -96,7 +82,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
-    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, period.startTimeMs);
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
@@ -131,7 +117,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
@@ -159,7 +145,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),

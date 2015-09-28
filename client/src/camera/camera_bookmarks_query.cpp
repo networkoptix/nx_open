@@ -9,21 +9,16 @@ QnCameraBookmarksQuery::QnCameraBookmarksQuery(QObject *parent /*= nullptr*/)
     , m_id(QUuid::createUuid())
     , m_cameras()
     , m_filter()
-{
-    qnCameraBookmarksManager->registerQuery(toSharedPointer());
-}
+{}
 
 QnCameraBookmarksQuery::QnCameraBookmarksQuery(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, QObject *parent /*= nullptr*/)
     : base_type(parent)
     , m_id(QUuid::createUuid())
     , m_cameras(cameras)
     , m_filter(filter)
-{
-    qnCameraBookmarksManager->registerQuery(toSharedPointer());
-}
+{}
 
 QnCameraBookmarksQuery::~QnCameraBookmarksQuery() {
-    qnCameraBookmarksManager->unregisterQuery(toSharedPointer());
 }
 
 QUuid QnCameraBookmarksQuery::id() const {

@@ -35,7 +35,6 @@ private slots:
     void updateTags();
 private:
     ec2::AbstractECConnectionPtr connection() const;
-    QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const;
 
     QnCameraBookmarkTags m_tags;
     QHash<int, QnMediaResourcePtr> m_processingBookmarks; 

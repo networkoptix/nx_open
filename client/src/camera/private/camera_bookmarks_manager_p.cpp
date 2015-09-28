@@ -9,6 +9,7 @@
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 
 namespace {
@@ -111,7 +112,15 @@ QnCameraBookmarkList QnCameraBookmarksManagerPrivate::getLocalBookmarks(const Qn
 
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    //TODO: #GDM #Bookmarks #IMPLEMENT_ME
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
+    if (!server)
+        server = camera->getParentServer();
+
+    //TODO: #GDM #Bookmarks notify queries?
+    //TODO: #GDM #Bookmarks check if 
+    //TODO: #GDM #Bookmarks implement distributed call
+//     int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
+//     m_processingBookmarks[handle] = camera;
 }
 
 void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
@@ -152,13 +161,13 @@ void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQuery
         updateQueryAsync(queryId);
     });
 
+    updateQueryLocal(queryId);
+    updateQueryAsync(queryId);
 }
 
-void QnCameraBookmarksManagerPrivate::unregisterQuery(const QnCameraBookmarksQueryPtr &query) {
-    Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
-    Q_ASSERT_X(m_queries.contains(query->id()), Q_FUNC_INFO, "Query should be registered and unregistered only once");
-
-    m_queries.remove(query->id());
+void QnCameraBookmarksManagerPrivate::unregisterQuery(const QUuid &queryId) {
+    Q_ASSERT_X(m_queries.contains(queryId), Q_FUNC_INFO, "Query should be registered and unregistered only once");
+    m_queries.remove(queryId);
 }
 
 QnCameraBookmarkList QnCameraBookmarksManagerPrivate::executeQueryLocal(const QnCameraBookmarksQueryPtr &query) const {
@@ -168,6 +177,7 @@ QnCameraBookmarkList QnCameraBookmarksManagerPrivate::executeQueryLocal(const Qn
     if (m_queries.contains(query->id()))
         return m_queries[query->id()].bookmarksCache;
 
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here. Cached value should always exist");
     /* Calculate result from local data. */
     return executeQueryInternal(query);
 }
@@ -236,3 +246,14 @@ void QnCameraBookmarksManagerPrivate::updateQueryCache(const QUuid &queryId, con
         emit query->bookmarksChanged(bookmarks);
 }
 
+QnCameraBookmarksQueryPtr QnCameraBookmarksManagerPrivate::createQuery(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter) {
+    QnCameraBookmarksQueryPtr query(new QnCameraBookmarksQuery(cameras, filter));
+    QUuid queryId = query->id();
+    registerQuery(query);
+
+    connect(query, &QObject::destroyed, this, [this, queryId]() {
+        unregisterQuery(queryId);
+    });
+
+    return query;
+}

@@ -12,6 +12,7 @@
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>  //TODO: #GDM remove this dependency
 #include <camera/camera_bookmarks_manager.h>
+#include <camera/camera_bookmarks_query.h>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -1502,11 +1503,12 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
 
 void QnMediaResourceWidget::updateBookmarks() {
 
-    auto bookmarksManager = context()->instance<QnCameraBookmarksManager>();
-    bookmarksManager->getBookmarksAsync(QnVirtualCameraResourceSet() << m_camera, 
-        QnCameraBookmarkSearchFilter(), 
-        [this](bool success, const QnCameraBookmarkList &bookmarks)
-    {
+    QnCameraBookmarksQueryPtr query(new QnCameraBookmarksQuery(
+        QnVirtualCameraResourceSet() << m_camera,
+        QnCameraBookmarkSearchFilter(),
+        this));
+
+    connect(query, &QnCameraBookmarksQuery::bookmarksChanged, this, [this](const QnCameraBookmarkList &bookmarks) {
         static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
 
         QString text;

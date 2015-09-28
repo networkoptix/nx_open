@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <core/resource/camera_bookmark.h>
+
 #include <camera/camera_bookmarks_manager_fwd.h>
 
 #include <utils/common/singleton.h>
@@ -49,13 +51,11 @@ public:
 
     /* Queries API section */
 
-    /// @brief                  Register bookmarks search query to auto-update it if needed.
-    /// @param query            Target query.
-    void registerQuery(const QnCameraBookmarksQueryPtr &query);
-
-    /// @brief                  Unregister bookmarks search query.
-    /// @param query            Target query.
-    void unregisterQuery(const QnCameraBookmarksQueryPtr &query);
+    /// @brief                  Instantiate new search query.
+    /// @param cameras          Set of target cameras.
+    /// @param filter           Filter parameters.
+    /// @returns                Search query that is ready to be used.
+    QnCameraBookmarksQueryPtr createQuery(const QnVirtualCameraResourceSet &cameras = QnVirtualCameraResourceSet(), const QnCameraBookmarkSearchFilter &filter = QnCameraBookmarkSearchFilter());
 
     /// @brief                  Execute search query on local (cached) data.
     /// @param query            Target query.
