@@ -28,16 +28,12 @@ private slots:
     void at_addCameraBookmarkAction_triggered();
     void at_editCameraBookmarkAction_triggered();
     void at_removeCameraBookmarkAction_triggered();
-    void at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle);
-    void at_bookmarkUpdated(int status, const QnCameraBookmark &bookmark, int handle);
-    void at_bookmarkDeleted(int status, const QnCameraBookmark &bookmark, int handle);
 
     void updateTags();
 private:
     ec2::AbstractECConnectionPtr connection() const;
 
     QnCameraBookmarkTags m_tags;
-    QHash<int, QnMediaResourcePtr> m_processingBookmarks; 
 };
 
 #endif // WORKBENCH_BOOKMARKS_HANDLER_H

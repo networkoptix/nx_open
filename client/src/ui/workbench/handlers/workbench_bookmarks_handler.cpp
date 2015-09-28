@@ -4,6 +4,7 @@
 #include <api/common_message_processor.h>
 
 #include <camera/camera_data_manager.h>
+#include <camera/camera_bookmarks_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -103,9 +104,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
-    //TODO: #GDM #Bookmarks move this to manager to notify queries?
-    int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
-    m_processingBookmarks[handle] = camera;
+    qnCameraBookmarksManager->addCameraBookmark(camera, bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
@@ -132,8 +131,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
-    int handle = server->apiConnection()->updateBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkUpdated(int, const QnCameraBookmark &, int)));
-    m_processingBookmarks[handle] = camera;
+    qnCameraBookmarksManager->updateCameraBookmark(camera, bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
@@ -160,10 +158,10 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
             QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
-    int handle = server->apiConnection()->deleteBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkDeleted(int, const QnCameraBookmark &, int)));
-    m_processingBookmarks[handle] = camera;
+    qnCameraBookmarksManager->deleteCameraBookmark(camera, bookmark);
 }
 
+/*
 void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle) {
     auto camera = m_processingBookmarks.take(handle);
     if (status != 0 || !camera)
@@ -172,9 +170,6 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     m_tags.append(bookmark.tags);
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
-
-//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
-//         loader->addBookmark(bookmark);
 }
 
 
@@ -199,4 +194,4 @@ void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraB
 //     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
 //         loader->removeBookmark(bookmark);
 }
-
+*/

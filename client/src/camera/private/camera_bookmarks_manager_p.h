@@ -65,8 +65,10 @@ public:
     /// @param callback         Callback for receiving bookmarks data.
     void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
 private slots:
+
     void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle);
 
+    void handleBookmarkOperation(int status, const QnCameraBookmark &bookmark, int handle);
 private:
     /// @brief                  Register bookmarks search query to auto-update it if needed.
     /// @param query            Target query.
@@ -96,6 +98,23 @@ private:
     QnCameraBookmarksManager *q_ptr;
 
     QMap<int, BookmarksCallbackType> m_requests;
+
+    struct OperationInfo {
+        enum class OperationType {
+            Add,
+            Update,
+            Delete
+        };
+
+        OperationType operation;
+        OperationCallbackType callback;
+        QnVirtualCameraResourcePtr camera;
+
+        OperationInfo();
+        OperationInfo(OperationType operation, OperationCallbackType callback, const QnVirtualCameraResourcePtr &camera);
+    };
+
+    QMap<int, OperationInfo> m_operations;
 
     struct QueryInfo {
         QnCameraBookmarksQueryWeakPtr queryRef;

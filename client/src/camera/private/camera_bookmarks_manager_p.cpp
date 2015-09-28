@@ -18,6 +18,26 @@ namespace {
     const int updateLiveBookmarksTimeoutMs = 10000;
 }
 
+
+/************************************************************************/
+/* OperationInfo                                                        */
+/************************************************************************/
+QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo()
+    : operation(OperationType::Add)
+    , callback()
+    , camera()    
+{}
+
+QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(OperationType operation, OperationCallbackType callback, const QnVirtualCameraResourcePtr &camera)
+    : operation(operation)
+    , callback(callback)
+    , camera(camera)
+{}
+
+
+/************************************************************************/
+/* QueryInfo                                                            */
+/************************************************************************/
 QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo() 
     : queryRef()
     , bookmarksCache()
@@ -30,6 +50,10 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQue
     , bookmarksCache()
 {}
 
+
+/************************************************************************/
+/* QnCameraBookmarksManagerPrivate                                      */
+/************************************************************************/
 QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent)
     : base_type(parent)
     , q_ptr(parent)
@@ -123,18 +147,40 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnVirtualCameraRes
         server = camera->getParentServer();
 
     //TODO: #GDM #Bookmarks notify queries?
-    //TODO: #GDM #Bookmarks check if 
     //TODO: #GDM #Bookmarks implement distributed call
-//     int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
-//     m_processingBookmarks[handle] = camera;
+    int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(handleBookmarkOperation(int, const QnCameraBookmark &, int)));
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, callback, camera);
 }
 
 void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    //TODO: #GDM #Bookmarks #IMPLEMENT_ME
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
+    if (!server)
+        server = camera->getParentServer();
+
+    //TODO: #GDM #Bookmarks notify queries?
+    //TODO: #GDM #Bookmarks implement distributed call
+    int handle = server->apiConnection()->updateBookmarkAsync(camera, bookmark, this, SLOT(handleBookmarkOperation(int, const QnCameraBookmark &, int)));
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, callback, camera);
 }
 
 void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    //TODO: #GDM #Bookmarks #IMPLEMENT_ME
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
+    if (!server)
+        server = camera->getParentServer();
+
+    //TODO: #GDM #Bookmarks notify queries?
+    //TODO: #GDM #Bookmarks implement distributed call
+    int handle = server->apiConnection()->deleteBookmarkAsync(camera, bookmark, this, SLOT(handleBookmarkOperation(int, const QnCameraBookmark &, int)));
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, callback, camera);
+}
+
+void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, const QnCameraBookmark &bookmark, int handle) {
+    if (!m_operations.contains(handle))
+        return;
+    
+    auto operationInfo = m_operations.take(handle);
+    if (operationInfo.callback)
+        operationInfo.callback(status == 0);
 }
 
 
