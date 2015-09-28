@@ -32,7 +32,7 @@ bool OnDemandMediaDataProvider::tryRead( QnAbstractDataPacketPtr* const data )
 
     *data = m_dataQueue.front();
     m_prevPacketTimestamp = m_dataQueue.front()->timestamp;
-    m_dataQueue.pop();
+    m_dataQueue.pop_front();
     return true;
 }
 
@@ -47,6 +47,12 @@ quint64 OnDemandMediaDataProvider::currentPos() const
     return -1;
 }
 
+void OnDemandMediaDataProvider::put(QnAbstractDataPacketPtr packet)
+{
+    QMutexLocker lk(&m_mutex);
+    m_dataQueue.push_front(std::move(packet));
+}
+
 bool OnDemandMediaDataProvider::canAcceptData() const
 {
     QMutexLocker lk( &m_mutex );
@@ -59,7 +65,7 @@ void OnDemandMediaDataProvider::putData( const QnAbstractDataPacketPtr& data )
     {
         QMutexLocker lk( &m_mutex );
         dataBecameAvailable = m_dataQueue.empty();
-        m_dataQueue.push( data );
+        m_dataQueue.push_back( data );
     }
 
     if( dataBecameAvailable )
