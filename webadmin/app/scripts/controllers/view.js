@@ -733,8 +733,10 @@ angular.module('webadminApp').controller('ViewCtrl',
             $viewPanel.css('height',viewportHeight );
 
             //One more IE hack.
-            var videoWidth = $('header').width() - $('.cameras-panel').width();
-            $('videowindow').parent().css('width',videoWidth + 'px');
+            if(window.jscd.browser == 'Microsoft Internet Explorer') {
+                var videoWidth = $('header').width() - $('.cameras-panel').outerWidth(true);
+                $('videowindow').parent().css('width', videoWidth + 'px');
+            }
         };
 
         updateHeights();
