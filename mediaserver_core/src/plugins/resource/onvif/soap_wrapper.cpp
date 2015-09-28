@@ -336,6 +336,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
         }
 
         if (passwdIter == passwords.end()) {
+#if 0
             //If we had no luck in picking a password, let's try to create a user
             qDebug() << "Trying to create a user admin/admin";
             setLogin(QString());
@@ -368,6 +369,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
 
                 qDebug() << "User is NOT created";
             }
+#endif
 
             setLogin(QString());
             setPassword(QString());

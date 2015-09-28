@@ -46,7 +46,7 @@ QnAuthHelper* QnAuthHelper::m_instance;
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
 static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
-static const qint64 COOKIE_EXPERATION_PERIOD = 3600;
+static const qint64 COOKIE_EXPIRATION_PERIOD = 3600;
 static const QString COOKIE_DIGEST_AUTH( lit( "Authorization=Digest" ) );
 static const QString TEMP_AUTH_KEY_NAME = lit( "authKey" );
 static const nx_http::StringType URL_QUERY_AUTH_KEY_NAME = "auth";
@@ -498,7 +498,6 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteA
     QByteArray ha2 = md5Hash.result().toHex();
 
     QnUserResourcePtr userResource;
-    //if (isNonceValid(nonce))
     Qn::AuthResult errCode = Qn::Auth_WrongDigest;
     if (checkNonceFunc(nonce))
     {
@@ -628,7 +627,15 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Re
     return errCode;
 }
 
-bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
+QByteArray QnAuthHelper::getNonce()
+{
+    QMutexLocker lock(&m_cookieNonceCacheMutex);
+    const qint64 nonce = qnSyncTime->currentUSecsSinceEpoch();
+    m_cookieNonceCache.insert(nonce, nonce);
+    return QByteArray::number(nonce, 16);
+}
+
+bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
 {
     if (nonce.isEmpty())
         return false;
@@ -636,23 +643,24 @@ bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
 
     QnMutexLocker lock( &m_cookieNonceCacheMutex );
 
-    qint64 n1 = nonce.toLongLong(0, 16);
-    qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();
+    const qint64 intNonce = nonce.toLongLong(0, 16);
+    const qint64 curTimeUSec = qnSyncTime->currentUSecsSinceEpoch();
 
     bool rez;
-    auto itr = m_cookieNonceCache.find(n1);
+    auto itr = m_cookieNonceCache.find(intNonce);
     if (itr == m_cookieNonceCache.end()) {
-        m_cookieNonceCache.insert(n1, n2);
-        rez = isNonceValid(nonce);
+        rez = qAbs(curTimeUSec - intNonce) < NONCE_TIMEOUT;
+        if (rez)
+            m_cookieNonceCache.insert(intNonce, curTimeUSec);
     }
     else {
-        rez = n2 - itr.value() < COOKIE_EXPERATION_PERIOD * USEC_IN_SEC;
-        itr.value() = n2;
+        rez = curTimeUSec - itr.value() < COOKIE_EXPIRATION_PERIOD * USEC_IN_SEC;
+        itr.value() = curTimeUSec;
     }
 
     // cleanup cookie cache
 
-    qint64 minAllowedTime = n2 - COOKIE_EXPERATION_PERIOD * USEC_IN_SEC;
+    const qint64 minAllowedTime = curTimeUSec - COOKIE_EXPIRATION_PERIOD * USEC_IN_SEC;
     for (auto itr = m_cookieNonceCache.begin(); itr != m_cookieNonceCache.end();)
     {
         if (itr.value() < minAllowedTime)
@@ -681,7 +689,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, con
             QUrl::fromPercentEncoding(params.value(URL_QUERY_AUTH_KEY_NAME)).toUtf8(),
             method,
             &userID,
-            std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1));
+            std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
         outUserResource = m_users.value( userID );
         if( authUserId )
             *authUserId = userID;
@@ -690,7 +698,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, con
     {
         authResult = doDigestAuth(
             method, authData, tmpHeaders, false, authUserId, ';',
-            std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1),
+            std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1),
             &outUserResource);
     }
     if( authResult != Qn::Auth_OK)
@@ -699,7 +707,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, con
             &responseHeaders.headers,
             nx_http::HttpHeader("Set-Cookie", lit("realm=%1; Path=/").arg(outUserResource ? outUserResource->getRealm() : QnAppInfo::realm()).toUtf8() ));
 
-        QDateTime dt = qnSyncTime->currentDateTime().addSecs(COOKIE_EXPERATION_PERIOD);
+        QDateTime dt = qnSyncTime->currentDateTime().addSecs(COOKIE_EXPIRATION_PERIOD);
         //QString nonce = lit("nonce=%1; Expires=%2; Path=/").arg(QLatin1String(getNonce())).arg(dateTimeToHTTPFormat(dt)); // Qt::RFC2822Date
         QString nonce = lit("nonce=%1; Path=/").arg(QLatin1String(getNonce()));
         nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", nonce.toUtf8()));
@@ -730,30 +738,6 @@ void QnAuthHelper::addAuthHeader(
     nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader(
         headerName,
         auth.arg(realm).arg(QLatin1String(getNonce())).toLatin1() ) );
-}
-
-bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const
-{
-    {
-        // nonce cache will help if time just changed
-        QnMutexLocker lock(&m_nonceMtx);
-        if (m_digestNonceCache.contains(nonce) && m_digestNonceCache[nonce]->elapsed() < NONCE_TIMEOUT)
-            return true;
-    }
-    // trust to unknown nonce to allow one step digest auth
-    qint64 n1 = nonce.toLongLong(0, 16);
-    qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();
-    return qAbs(n2 - n1) < NONCE_TIMEOUT;
-}
-
-QByteArray QnAuthHelper::getNonce()
-{
-    QByteArray result = QByteArray::number(qnSyncTime->currentUSecsSinceEpoch(), 16);
-    QElapsedTimer* timeout = new QElapsedTimer();
-    timeout->restart();
-    QnMutexLocker lock(&m_nonceMtx);
-    m_digestNonceCache.insert(result, timeout);
-    return result;
 }
 
 void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
