@@ -22,10 +22,9 @@ namespace
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
-        , kWaitTriesCount = 150
 
         /// Accepted wait time is 300 seconds due to restart on network interface parameters change
-        , kRestartTimeout = kIfListRequestsPeriod * kWaitTriesCount   
+        , kRestartTimeout = 300 * 1000
 
         /// Long 30-minutes timeout for reset to factory defautls operation
         , kFactoryDefaultsTimeout = 30 * 60 * 1000
@@ -112,6 +111,29 @@ namespace
         return result;
     };
 
+    rtu::Constants::AffectedEntities calcAffected(const rtu::ItfUpdateInfoContainer &changes)
+    {
+        rtu::Constants::AffectedEntities affected = rtu::Constants::kNoEntitiesAffected;
+
+        for (const auto &change: changes)
+        {   
+            if (change.useDHCP)
+                affected |= rtu::Constants::kDHCPUsageAffected;
+        
+            if (change.ip && !change.ip->isEmpty())
+                affected |= rtu::Constants::kIpAddressAffected;
+        
+            if (change.mask && !change.mask->isEmpty())
+                affected |= rtu::Constants::kMaskAffected;
+        
+            if (change.dns)
+                affected |= rtu::Constants::kDNSAffected;
+        
+            if (change.gateway)
+                affected |= rtu::Constants::kGatewayAffected;       
+        }
+        return affected;
+    }
 }
 
 namespace
@@ -127,28 +149,23 @@ namespace
     struct ItfChangeRequest
     {
         bool inProgress;
-        int tries;
         qint64 timestamp;
-        ServerInfoCacheItem *item;
-        rtu::ItfUpdateInfoContainer itfUpdateInfo;
-        int changesCount;
 
-        ItfChangeRequest(ServerInfoCacheItem *initItem
-            , const rtu::ItfUpdateInfoContainer &initItfUpdateInfo)
+        ItfChangeRequest(ServerInfoCacheItem *item
+            , rtu::ItfUpdateInfoContainer &itfUpdateInfo)
             : inProgress(false)
-            , tries(0)
             , timestamp(QDateTime::currentMSecsSinceEpoch())
-            , item(initItem)
-            , itfUpdateInfo(initItfUpdateInfo)
-            , changesCount(changesFromUpdateInfos(initItfUpdateInfo))
         {
             /// Forces send dhcp on every call
             /// Forces send old ip if new one hasn't been assigned
-            const auto &extraInfo = initItem->second;
+            const auto &extraInfo = item->second;
             const auto &interfaces = extraInfo.interfaces;
             for (auto &item: itfUpdateInfo)
             {
-                if (!item.useDHCP || (item.mask && !item.ip))
+                const bool hasMaskChange = (!!item.mask);
+                const bool hasIpChange = (!!item.ip);
+                const bool fixMaskIp = (hasMaskChange != hasIpChange);
+                if (!item.useDHCP || fixMaskIp)
                 {
                     ///searching the specified in current existing
                     const auto it = std::find_if(interfaces.begin(), interfaces.end()
@@ -161,8 +178,14 @@ namespace
                     {
                         if (!item.useDHCP)  /// Force dhcp old value
                             item.useDHCP.reset(new bool(it->useDHCP == Qt::Checked));
-                        else
-                            item.ip.reset(new QString(it->ip));
+
+                        if (fixMaskIp)
+                        {
+                            if (hasMaskChange)              /// Force old ip usage if mask was changed
+                               item.ip.reset(new QString(it->ip));
+                            else                            /// Force old mask usage if ip was changed
+                                item.mask.reset(new QString(it->mask));
+                        }
                     }
                     else
                         Q_ASSERT_X(false, Q_FUNC_INFO, "Interface name not found!");
@@ -171,6 +194,7 @@ namespace
         }
     };
 
+    typedef std::shared_ptr<ItfChangeRequest> ItfChangeRequestPtr;
     typedef std::function<void (rtu::RequestError error
         , rtu::Constants::AffectedEntities affected)> BeforeDeleteAction;
     typedef QPair<rtu::AwaitingOp::Holder, BeforeDeleteAction> AwaitingOpData;
@@ -228,7 +252,8 @@ private:
         , int changesCount
         , qint64 timeout
         , const AwaitingOp::ServerDiscoveredAction &discovered
-        , const AwaitingOp::ServersDisappearedAction &disappeared
+        , const Callback &disappeared
+        , const AwaitingOp::UnknownAddedHandler &unknownAdded
         , const BeforeDeleteAction &beforeDeleteAction
         , const Constants::AffectedEntities affected);
 
@@ -247,6 +272,22 @@ private:
     
     void addPortChangeRequests();
     
+    AwaitingOp::ServerDiscoveredAction makeItfChangeDiscoveredHandler(
+        ServerInfoCacheItem &item
+        , const ItfChangeRequestPtr &itfChangeRequest
+        , const ItfUpdateInfoContainer &initialChanges
+        , Constants::AffectedEntities affected);
+
+    Callback makeItfChangeDisappearedHandler(const ServerInfoCacheItem &item
+        , const rtu::ItfUpdateInfoContainer &initialChanges);
+    
+    AwaitingOp::UnknownAddedHandler makeItfChangeUnknownAddedHandler(
+        const ServerInfoCacheItem &item
+        , const ItfUpdateInfoContainer &initialChanges);
+
+    void addItfsChangeRequest(ServerInfoCacheItem &item
+        , const ItfUpdateInfoContainer &changes);
+
     void addIpChangeRequests();
 
     void addPasswordChangeRequests();    
@@ -264,7 +305,9 @@ private:
         , Constants::AffectedEntities affected);
 
     typedef QHash<QUuid, ItfChangeRequest> ItfChangesContainer;
-    void itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it);
+    
+    void itfRequestSuccessfullyApplied(const rtu::ItfUpdateInfoContainer &initialChanges
+        , const ServerInfoCacheItem &item);
 
 private:
     typedef QPair<bool, Request> RequestData;
@@ -283,7 +326,6 @@ private:
     ChangesSummaryModel m_failedChangesModel;
     
     RequestContainer m_requests;
-    ItfChangesContainer m_itfChanges;
     AwaitingOps m_awaiting;
 
     int m_appliedChangesIndex;
@@ -310,7 +352,6 @@ rtu::ApplyChangesTask::Impl::Impl(const ChangesetPointer &changeset
     , m_failedChangesModel(false, this)
     
     , m_requests()
-    , m_itfChanges()
     , m_awaiting()
     
     , m_appliedChangesIndex(0)
@@ -382,101 +423,13 @@ int rtu::ApplyChangesTask::Impl::appliedChangesCount() const
 
 void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &info)
 {
+    /// Awating operations processor
+    const auto it = m_awaiting.find(info.id);
+    if (it != m_awaiting.end())
     {
-        /// Awating operations processor
-        const auto it = m_awaiting.find(info.id);
-        if (it != m_awaiting.end())
-        {
-            const auto awatingOp = it.value().first;
-            awatingOp->serverDiscovered(info);
-        }
+        const auto awatingOp = it.value().first;
+        awatingOp->processServerDiscovered(info);
     }
-
-    if (unknownAdded(info.hostAddress))
-        return;
-
-    const auto &it = m_itfChanges.find(info.id);
-    if (it == m_itfChanges.end())
-        return;
-    
-    ItfChangeRequest &request = it.value();
-    if (request.inProgress)
-        return;
-
-    const qint64 current = QDateTime::currentMSecsSinceEpoch();
-    if ((current - request.timestamp) < kIfListRequestsPeriod)
-        return;
-    
-    const ThisWeakPtr &weak = shared_from_this();
-
-    const auto processCallback =
-        [weak](bool successful, const QUuid &id, const ExtraServerInfo &extraInfo)
-    {
-        if (weak.expired())
-            return;
-
-        const auto shared = weak.lock();
-        const auto &it = shared->m_itfChanges.find(id);
-        if (it == shared->m_itfChanges.end())
-        {
-            return;
-        }
-        
-        ItfChangeRequest &request = it.value();
-        request.inProgress = false;
-        request.timestamp = QDateTime::currentMSecsSinceEpoch();
-        
-        const bool totalApplied = changesWasApplied(extraInfo.interfaces, request.itfUpdateInfo);
-        
-        if (!(successful && totalApplied) && (++request.tries < kWaitTriesCount))
-            return;
-
-        InterfaceInfoList newInterfaces;
-        for (ItfUpdateInfo &change: request.itfUpdateInfo)
-        {
-            const auto &it = changeAppliedPos(extraInfo.interfaces, change);
-            const bool applied = (it != extraInfo.interfaces.end());
-            const Constants::AffectedEntities affected = 
-                (applied ? Constants::kAllEntitiesAffected : Constants::kNoEntitiesAffected);
-            shared->addUpdateInfoSummaryItem(*request.item
-                , (applied ? RequestError::kSuccess : RequestError::kUnspecified) , change, affected);
-            
-            if (applied)
-                newInterfaces.push_back(*it);
-        }
-
-        if (successful && totalApplied)
-        {
-            const BaseServerInfo &inf = *request.item->first;
-            emit shared->m_owner->extraInfoUpdated(inf.id
-                , extraInfo, inf.hostAddress);
-        }
-        
-        const int changesCount = request.changesCount;
-        shared->m_itfChanges.erase(it);
-        shared->onChangesetApplied(changesCount);
-    };
-    
-    const auto &successful =
-        [processCallback](const QUuid &id, const ExtraServerInfo &extraInfo)
-    {
-        processCallback(true, id, extraInfo);
-    };
-
-    const auto &failed = 
-        [processCallback, info](const RequestError /* errorCode */, int /* affected */)
-    {
-        processCallback(false, info.id, ExtraServerInfo());
-    };
-    
-    BaseServerInfo &currentBase = *request.item->first;
-    const bool currentDiscoverByHttp = currentBase.accessibleByHttp;
-    currentBase = info;
-    currentBase.accessibleByHttp = currentDiscoverByHttp;
-    request.inProgress = true;
-    
-    getServerExtraInfo(request.item->first, request.item->second.password
-        , successful, failed, kIfListRequestsPeriod);
 }
 
 void rtu::ApplyChangesTask::Impl::serversDisappeared(const rtu::IDsVector &ids)
@@ -485,76 +438,36 @@ void rtu::ApplyChangesTask::Impl::serversDisappeared(const rtu::IDsVector &ids)
 
     for (const QUuid &id: ids)
     {
-        const auto &it = m_itfChanges.find(id);
-        if (it == m_itfChanges.end())
+        const auto it = m_awaiting.find(id);
+        if (it == m_awaiting.end())
             continue;
 
-        ItfChangeRequest &request = it.value();
-    
-        /// TODO: extend logic for several interface changes
-        if (request.itfUpdateInfo.size() != kSingleInterfaceChangeCount)
-            continue;
-
-
-        bool isDHCPTurnOnChange = true;
-        for (const auto &change: request.itfUpdateInfo)
-        {
-            isDHCPTurnOnChange &= (change.useDHCP && *change.useDHCP);
-        }
-    
-        if (!isDHCPTurnOnChange)
-            continue;
-
-        //// If server is disappeared and all changes are dhcp "on"
-        itfRequestSuccessfullyApplied(it);
+        const auto awaitingOp = it.value().first;
+        awaitingOp->processServersDisappeared();
     }
 }
 
 bool rtu::ApplyChangesTask::Impl::unknownAdded(const QString &ip)
 {
-    /// Searches for the change request
-    const auto &it = std::find_if(m_itfChanges.begin(), m_itfChanges.end()
-        , [ip](const ItfChangeRequest &request)
+    for(const auto &awaiting: m_awaiting)
     {
-        /// Currently it is supposed to be only one-interface-change action
-        /// TODO: extend logic for several interface changes
-        if (request.itfUpdateInfo.size() != kSingleInterfaceChangeCount)
-            return false;
-
-        const auto &it = std::find_if(request.itfUpdateInfo.begin(), request.itfUpdateInfo.end()
-            , [ip](const ItfUpdateInfo &updateInfo) 
-        {
-            return ((!updateInfo.useDHCP || !*updateInfo.useDHCP) && updateInfo.ip && *updateInfo.ip == ip);
-        });
-
-        return (it != request.itfUpdateInfo.end());
-    });
-
-    if (it == m_itfChanges.end())
-    {
-        return false;
+        if (awaiting.first->processUnknownAdded(ip))
+            return true;
     }
-
-    /// We've found change request with dhcp "off" state and ip that is 
-    /// equals to ip of found unknown entity.
-    /// So, we suppose that request to change ip is successfully applied
-
-    itfRequestSuccessfullyApplied(it);
-    return true;
+    return false;
 }
 
-void rtu::ApplyChangesTask::Impl::itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it)
+void rtu::ApplyChangesTask::Impl::itfRequestSuccessfullyApplied(
+    const rtu::ItfUpdateInfoContainer &initialChanges
+    , const ServerInfoCacheItem &item)
 {
-    const ItfChangeRequest &request = *it;
-    for(const auto &change: request.itfUpdateInfo)
+    for(const auto &change: initialChanges)
     {
-        addUpdateInfoSummaryItem(*request.item, RequestError::kSuccess
+        addUpdateInfoSummaryItem(item, RequestError::kSuccess
             , change, Constants::kAllEntitiesAffected);
     }
 
-    const int changesCount = request.changesCount;
-    m_itfChanges.erase(it);
-    onChangesetApplied(changesCount);
+    removeAwatingOp(item.first->id, RequestError::kSuccess, Constants::kAllEntitiesAffected);
 }
 
 void rtu::ApplyChangesTask::Impl::onChangesetApplied(int changesCount)
@@ -629,7 +542,8 @@ rtu::AwaitingOp::Holder rtu::ApplyChangesTask::Impl::addAwaitingOp(const QUuid &
     , int changesCount
     , qint64 timeout
     , const AwaitingOp::ServerDiscoveredAction &discovered
-    , const AwaitingOp::ServersDisappearedAction &disappeared
+    , const Callback &disappeared
+    , const AwaitingOp::UnknownAddedHandler &unknownAdded
     , const BeforeDeleteAction &beforeDeleteAction
     , Constants::AffectedEntities affected)
 {
@@ -644,7 +558,7 @@ rtu::AwaitingOp::Holder rtu::ApplyChangesTask::Impl::addAwaitingOp(const QUuid &
     };
 
     const auto op = AwaitingOp::create(id, changesCount, timeout
-        , discovered, disappeared, removeByTimeout);
+        , discovered, disappeared, unknownAdded, removeByTimeout);
     m_awaiting.insert(id, AwaitingOpData(op, beforeDeleteAction));
     return op;
 }
@@ -698,9 +612,9 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
     
         
         const auto shared = weak.lock();
-        const auto op = shared->addAwaitingOp(id, changesCount
-            , timeout, discoveredHandler, AwaitingOp::ServersDisappearedAction()
-            , beforeRemoveHandler, kOpAffected);
+        
+        shared->addAwaitingOp(id, changesCount, timeout, discoveredHandler
+            , Callback(), AwaitingOp::UnknownAddedHandler(), beforeRemoveHandler, kOpAffected);
 
         const auto &baseServerInfo = item.first;
         const auto &password = item.second.password;
@@ -903,85 +817,240 @@ void rtu::ApplyChangesTask::Impl::addPortChangeRequests()
     }
 }
 
+rtu::AwaitingOp::ServerDiscoveredAction rtu::ApplyChangesTask::Impl::makeItfChangeDiscoveredHandler(
+    ServerInfoCacheItem &item
+    , const ItfChangeRequestPtr &itfChangeRequest
+    , const rtu::ItfUpdateInfoContainer &initialChanges
+    , Constants::AffectedEntities affected)
+{
+    const ThisWeakPtr weak = shared_from_this();
+
+    const auto handler = [weak, &item, itfChangeRequest, initialChanges, affected]
+        (const BaseServerInfo &info)
+    {
+        if (weak.expired())
+            return;
+
+        const auto shared = weak.lock();
+        if (shared->unknownAdded(info.hostAddress))
+            return;
+
+        if (itfChangeRequest->inProgress)
+            return;
+
+        const qint64 current = QDateTime::currentMSecsSinceEpoch();
+        if ((current - itfChangeRequest->timestamp) < kIfListRequestsPeriod)
+            return;
+
+        const auto processCallback = [weak, &item, itfChangeRequest, initialChanges, affected]
+            (bool successful, const QUuid &id, const ExtraServerInfo &extraInfo)
+        {
+            if (weak.expired())
+                return;
+
+            const auto shared = weak.lock();
+        
+            itfChangeRequest->inProgress = false;
+            itfChangeRequest->timestamp = QDateTime::currentMSecsSinceEpoch();
+        
+            const bool totalApplied = changesWasApplied(extraInfo.interfaces, initialChanges);
+        
+            if (!successful || !totalApplied)
+                return;
+
+            for (const ItfUpdateInfo &change: initialChanges)
+            {
+                const auto &it = changeAppliedPos(extraInfo.interfaces, change);
+                const bool applied = (it != extraInfo.interfaces.end());
+                const auto affected = (applied ? Constants::kAllEntitiesAffected : Constants::kNoEntitiesAffected);
+                const auto code = (applied ? RequestError::kSuccess : RequestError::kUnspecified);
+                shared->addUpdateInfoSummaryItem(item, code, change, affected);
+            }
+
+            RequestError finalError = RequestError::kUnspecified;
+            if (successful && totalApplied)
+            {
+                finalError = RequestError::kSuccess;
+                emit shared->m_owner->extraInfoUpdated(
+                    id, extraInfo, item.first->hostAddress);
+            }
+
+            shared->removeAwatingOp(id, finalError, affected);
+        };
+    
+        const auto &successful =
+            [processCallback](const QUuid &id, const ExtraServerInfo &extraInfo)
+        {
+            processCallback(true, id, extraInfo);
+        };
+
+        const auto &failed = 
+            [processCallback, info](const RequestError /* errorCode */, int /* affected */)
+        {
+            processCallback(false, info.id, ExtraServerInfo());
+        };
+    
+        BaseServerInfo &currentBase = *item.first;
+
+        const bool currentDiscoverByHttp = currentBase.accessibleByHttp;
+        currentBase = info;
+        currentBase.accessibleByHttp = currentDiscoverByHttp;
+        itfChangeRequest->inProgress = true;
+    
+        getServerExtraInfo(item.first, item.second.password
+            , successful, failed, kIfListRequestsPeriod);
+    };
+
+    return handler;
+}
+
+rtu::Callback rtu::ApplyChangesTask::Impl::makeItfChangeDisappearedHandler(
+    const ServerInfoCacheItem &item
+    , const rtu::ItfUpdateInfoContainer &initialChanges)
+{
+    const ThisWeakPtr weak = shared_from_this();
+
+    const auto handler = [weak, &item, initialChanges]()
+    {
+        /// TODO: extend logic for several interface changes
+        if (weak.expired() 
+            || (initialChanges.size() != kSingleInterfaceChangeCount))
+            return;
+
+        bool isDHCPTurnOnChange = true;
+        for (const auto &change: initialChanges)
+        {
+            isDHCPTurnOnChange &= (change.useDHCP && *change.useDHCP);
+        }
+    
+        if (!isDHCPTurnOnChange)
+            return;
+
+        //// If server is disappeared and all changes are dhcp "on"
+        const auto shared = weak.lock();
+        shared->itfRequestSuccessfullyApplied(initialChanges, item);
+    };
+
+    return handler;
+}
+
+rtu::AwaitingOp::UnknownAddedHandler rtu::ApplyChangesTask::Impl::makeItfChangeUnknownAddedHandler(
+    const ServerInfoCacheItem &item
+    , const ItfUpdateInfoContainer &initialChanges)
+{
+    const ThisWeakPtr weak = shared_from_this();
+
+    const auto handler = [weak, &item, initialChanges](const QString &ip) -> bool
+    {
+        if (weak.expired())
+            return false;
+
+        /// Searches for the change request
+        const auto &it = std::find_if(initialChanges.begin(), initialChanges.end()
+            , [ip](const ItfUpdateInfo &updateInfo) 
+        {
+            return ((!updateInfo.useDHCP || !*updateInfo.useDHCP) && updateInfo.ip && *updateInfo.ip == ip);
+        });
+
+        if (it == initialChanges.end())
+        {
+            return false;
+        }
+
+        /// We've found change request with dhcp "off" state and ip that is 
+        /// equals to ip of found unknown entity.
+        /// So, we suppose that request to change ip is successfully applied
+
+        const auto shared = weak.lock();
+        shared->itfRequestSuccessfullyApplied(initialChanges, item);
+        return true;
+    };
+
+    return handler;
+}
+
+void rtu::ApplyChangesTask::Impl::addItfsChangeRequest(ServerInfoCacheItem &item
+                                                       , const ItfUpdateInfoContainer &initialChanges)
+{
+    const ThisWeakPtr weak = shared_from_this();
+
+    const QUuid id = item.first->id;
+
+    const auto affected = calcAffected(initialChanges);
+    const auto changesCount = changesFromUpdateInfos(initialChanges);
+
+    const auto &request = 
+        [weak, id, &item, initialChanges, changesCount, affected]()
+    {
+        if (weak.expired())
+            return;
+
+        const auto failedCallback = [weak, id, &item, initialChanges]
+            (const RequestError errorCode, Constants::AffectedEntities affected)
+        {
+            if (weak.expired())
+                return;
+
+            const auto shared = weak.lock();
+            shared->removeAwatingOp(id, errorCode, affected);
+        };
+
+        const auto callback = [failedCallback, weak, initialChanges, item]
+            (const RequestError errorCode, Constants::AffectedEntities affected)
+        {
+            if (errorCode != RequestError::kSuccess)
+                failedCallback(errorCode , affected);
+        };
+
+        auto augmentedChanges = initialChanges;
+        const auto itfChangeRequest = ItfChangeRequestPtr(new ItfChangeRequest(&item, augmentedChanges));
+
+        const auto beforeDeleteCallback = [weak, itfChangeRequest, initialChanges, &item]
+            (RequestError errorCode, Constants::AffectedEntities affected)
+        {
+            if (weak.expired())
+                return;
+
+            const auto shared = weak.lock();
+            if (errorCode != RequestError::kSuccess)
+            {
+                for (const auto &change: initialChanges)
+                    shared->addUpdateInfoSummaryItem(item, errorCode, change, affected);
+            }
+        };
+
+        const auto shared = weak.lock();
+        const auto discoveredHandler = shared->makeItfChangeDiscoveredHandler(
+            item, itfChangeRequest, initialChanges, affected);
+
+        const auto disappearedHandler = shared->makeItfChangeDisappearedHandler(
+            item, initialChanges);
+        const auto unknownAdded = shared->makeItfChangeUnknownAddedHandler(
+            item, initialChanges);
+
+        shared->addAwaitingOp(id, changesCount, kRestartTimeout, discoveredHandler
+            , disappearedHandler, unknownAdded, beforeDeleteCallback, affected);
+
+        const auto baseInfo = item.first;
+        const auto password = item.second.password;
+        sendChangeItfRequest(baseInfo, password, augmentedChanges, callback);
+    };
+        
+    const auto shared = weak.lock();
+    shared->m_totalChangesCount += changesCount;
+
+    /// Request is non blocking due to restart on interface parameters change. 
+    // I.e. we send multiple unqued requests and not wait until they complete before next send.
+    shared->m_requests.push_back(RequestData(kNonBlockingRequest, request));
+}
+
 void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
 {
     if (!m_changeset->itfUpdateInfo() || m_changeset->itfUpdateInfo()->empty())
         return;
     
-    const ThisWeakPtr weak = shared_from_this();
-
-    const auto &addRequest = 
-        [weak](ServerInfoCacheItem &item, const ItfUpdateInfoContainer &changes)
-    {
-        if (weak.expired())
-            return;
-
-        const QUuid id = item.first->id;
-        const ItfChangeRequest changeRequest(&item, changes);
-        const auto &request = 
-            [weak, id, &item, changes, changeRequest]()
-        {
-            if (weak.expired())
-                return;
-
-            const auto &failedCallback =
-                [weak, id, &item, changes](const RequestError errorCode, Constants::AffectedEntities affected)
-            {
-                if (weak.expired())
-                    return;
-
-                const auto shared = weak.lock();
-                const auto &it = shared->m_itfChanges.find(id);
-                if (it == shared->m_itfChanges.end())
-                    return;
-
-                for (const auto &change: changes)
-                    shared->addUpdateInfoSummaryItem(item, errorCode, change, affected);
-
-                const int changesCount = it.value().changesCount;
-                shared->m_itfChanges.erase(it);
-                shared->onChangesetApplied(changesCount);
-            };
-
-            const auto &callback = 
-                [weak, id, changeRequest, failedCallback](const RequestError errorCode, Constants::AffectedEntities affected)
-            {
-                if (weak.expired())
-                    return;
-
-                const auto shared = weak.lock();
-                shared->m_itfChanges.insert(id, changeRequest);
-
-                if (errorCode != RequestError::kSuccess)
-                {
-                    failedCallback(errorCode , affected);
-                }
-                else
-                {
-                    /* In case of success we need to wait more until server is rediscovered. */
-                    QTimer::singleShot(kRestartTimeout, [failedCallback, affected]() 
-                    {
-                        failedCallback(RequestError::kRequestTimeout, affected);
-                    });
-                }
-                
-            };
-
-            sendChangeItfRequest(changeRequest.item->first, changeRequest.item->second.password
-                , changes, callback);
-        };
-        
-        const auto shared = weak.lock();
-        shared->m_totalChangesCount += changeRequest.changesCount;
-
-        /// Request is non blocking due to restart on interface parameters change. 
-        // I.e. we send multiple unqued requests and not wait until they complete before next send.
-        shared->m_requests.push_back(RequestData(kNonBlockingRequest, request));
-    };
-
     const auto &updateInfos = m_changeset->itfUpdateInfo();
-
-    const bool isForMultipleSelection =  std::any_of(updateInfos->begin(), updateInfos->end()
+    const bool isForMultipleSelection = std::any_of(updateInfos->begin(), updateInfos->end()
         , [](const ItfUpdateInfo &info)
     {
         return (info.name == Selection::kMultipleSelectionItfName);
@@ -992,7 +1061,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
     if (!isForMultipleSelection && (m_serversCache.size() == 1))
     {
         /// Allow multiple interface changes on single server
-        addRequest(m_serversCache.first(), *updateInfos);
+        addItfsChangeRequest(m_serversCache.first(), *updateInfos);
         return;
     }
 
@@ -1021,7 +1090,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
             change.ip.reset(new QString(newAddr));
         }
 
-        addRequest(cacheInfo, ItfUpdateInfoContainer(1, change));
+        addItfsChangeRequest(cacheInfo, ItfUpdateInfoContainer(1, change));
     }
 }
 

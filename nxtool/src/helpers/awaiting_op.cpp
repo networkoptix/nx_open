@@ -13,11 +13,12 @@ rtu::AwaitingOp::Holder rtu::AwaitingOp::create(const QUuid &id
     , int changesCount
     , qint64 timeout
     , const ServerDiscoveredAction &discovered
-    , const ServersDisappearedAction &disappeared
+    , const Callback &disappeared
+    , const UnknownAddedHandler &unknownAdded
     , const TimeoutHandler &timeoutHandler)
 {
     const auto result = Holder(new AwaitingOp(
-        id, changesCount, timeout, discovered, disappeared));
+        id, changesCount, timeout, discovered, unknownAdded, disappeared));
 
     if (timeoutHandler)
     {
@@ -32,11 +33,13 @@ rtu::AwaitingOp::AwaitingOp(const QUuid &id
     , int changesCount
     , qint64 timeout
     , const ServerDiscoveredAction &discovered
-    , const ServersDisappearedAction &disappeared)
+    , const UnknownAddedHandler &unknownAdded
+    , const Callback &disappeared)
     
     : m_id(id)
     , m_discovered(discovered)
     , m_disappeared(disappeared)
+    , m_unknownAdded(unknownAdded)
     , m_changesCount(changesCount)
     , m_timeout(timeout)
     , m_creationTimestamp(timeoutCounter.elapsed())
@@ -52,7 +55,7 @@ bool rtu::AwaitingOp::isTimedOut() const
     return ((timeoutCounter.elapsed()- m_creationTimestamp) > m_timeout);
 }
 
-void rtu::AwaitingOp::serverDiscovered(const BaseServerInfo &info)
+void rtu::AwaitingOp::processServerDiscovered(const BaseServerInfo &info)
 {
     if (!m_discovered || isTimedOut())
         return;
@@ -60,12 +63,20 @@ void rtu::AwaitingOp::serverDiscovered(const BaseServerInfo &info)
     m_discovered(info);
 }
 
-void rtu::AwaitingOp::serversDisappeared(const IDsVector &ids)
+void rtu::AwaitingOp::processServersDisappeared()
 {
     if (!m_disappeared || isTimedOut())
         return;
 
-    m_disappeared(ids);
+    m_disappeared();
+}
+
+bool rtu::AwaitingOp::processUnknownAdded(const QString &ip)
+{
+    if (!m_unknownAdded || isTimedOut())
+        return false;
+
+    return m_unknownAdded(ip);
 }
 
 const QUuid &rtu::AwaitingOp::id() const

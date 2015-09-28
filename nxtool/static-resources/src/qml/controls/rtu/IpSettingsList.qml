@@ -129,8 +129,11 @@ Base.Column
                     if (item.ipAddressControl.acceptableInput
                         && (!item.lastIpContol.visible || item.lastIpContol.valid))   /// for ranges
                     {
-                        rtuContext.changesManager().changeset().addAddressChange(name, item.ipAddressControl.text);
-                        ipAddressChangeAdded = true;
+                        if (item.ipAddressControl.changed)  /// add address only if it was changed
+                        {
+                            rtuContext.changesManager().changeset().addAddressChange(name, item.ipAddressControl.text);
+                            ipAddressChangeAdded = true;
+                        }
                     }
                     else if (isSingleSelection   /// for single selection empty or wrong ip is not correct anyway
 
@@ -159,7 +162,8 @@ Base.Column
 
                     if (item.subnetMaskControl.acceptableInput && validMask && maskValidWidth)
                     {
-                        rtuContext.changesManager().changeset().addMaskChange(name, item.subnetMaskControl.text);
+                        if (item.subnetMaskControl.changed) /// add subnet mask only if it was changed
+                            rtuContext.changesManager().changeset().addMaskChange(name, item.subnetMaskControl.text);
                     }
                     else
                     {
