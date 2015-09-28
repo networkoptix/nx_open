@@ -175,14 +175,14 @@ void QnStorageResource::setRedundantSchedule(
 }
 
 void QnStorageResource::setRedundantSchedule(
+    int rDOW, 
     int rStart, 
-    int rDuration, 
-    int rPeriod
+    int rDuration
 )
 { 
-    m_redundantSchedule.startTime = rStart; 
+    m_redundantSchedule.daysOfTheWeek = rDOW; 
+    m_redundantSchedule.start = rStart;
     m_redundantSchedule.duration = rDuration;
-    m_redundantSchedule.period = rPeriod;
 }
 
 const QnStorageResource::RedundantSchedule &

@@ -15,9 +15,9 @@ class QnStorageResource
 public:
     struct RedundantSchedule
     {
-        int startTime;     // seconds from 00:00, -1 if not set
-        int duration;      // seconds
-        int period;        // seconds, period between starts
+        int daysOfTheWeek; 
+        int start;
+        int duration;
     };
 
 public:
@@ -73,9 +73,9 @@ public:
     );
 
     void setRedundantSchedule(
+        int rDOW = -1, 
         int rStart = -1, 
-        int rDuration = -1, 
-        int rPeriod = -1
+        int rDuration = -1
     );
 
     const RedundantSchedule &getRedundantSchedule() const;

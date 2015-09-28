@@ -25,6 +25,7 @@
 
 #include "plugins/storage/file_storage/file_storage_resource.h"
 
+#include <nx_ec/data/api_media_server_data.h>
 #include <media_server/serverutil.h>
 #include "file_deletor.h"
 #include "utils/common/synctime.h"
@@ -278,6 +279,8 @@ QnStorageManager::QnStorageManager():
     m_rebuildArchiveThread->start();
     m_clearMotionTimer.restart();
     m_removeEmtyDirTimer.restart();
+
+    startRedundantSyncWatchdog();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -1448,8 +1451,10 @@ std::vector<QnStorageResourcePtr> QnStorageManager::getRedundantLiveStorages() c
     {
         QnStorageResourcePtr storage = *itr;
         if (storage->isRedundant() && 
-            storage->getRedundantSchedule().startTime == -1)
+            storage->getRedundantSchedule().daysOfTheWeek == -1)
+        {
             result.push_back(storage);
+        }
     }
     return result;
 }
@@ -1465,7 +1470,7 @@ std::vector<QnStorageResourcePtr> QnStorageManager::getRedundantSyncStorages() c
     {
         QnStorageResourcePtr storage = *itr;
         if (storage->isRedundant() && 
-            storage->getRedundantSchedule().startTime != -1)
+            storage->getRedundantSchedule().daysOfTheWeek != -1)
         {
             result.push_back(storage);
         }
@@ -2001,8 +2006,10 @@ namespace aux
                  ), \
         typename CheckMemberType = typename std::enable_if< \
                                         std::is_same< \
-                                            T, \
-                                            decltype(std::declval<typename std::iterator_traits<ForwardIt>::value_type>().memberName) \
+                                            typename std::remove_reference<T>::type, \
+                                            typename std::remove_reference< \
+                                                decltype(std::declval<typename std::iterator_traits<ForwardIt>::value_type>().memberName) \
+                                            >::type \
                                         >::value>::type \
     > \
     struct equalRangeByHelper \
@@ -2026,7 +2033,7 @@ namespace aux
     }; \
      \
     template<typename ForwardIt, typename T> \
-    std::pair<ForwardIt, ForwardIt> equalRangeBy(ForwardIt begin , ForwardIt end, T&& value) \
+    std::pair<ForwardIt, ForwardIt> equalRangeBy_##memberName(ForwardIt begin , ForwardIt end, T&& value) \
     { \
         return equalRangeByHelper<ForwardIt, T>()(begin, end, std::forward<T>(value)); \
     }
@@ -2036,14 +2043,16 @@ namespace aux
 
 template<typename NeedStopCB>
 void QnStorageManager::synchronizeStorages(
-    std::vector<QnStorageResourcePtr>   storages,
-    NeedStopCB                          needStop
+    QnStorageResourcePtr    storage,
+    NeedStopCB              needStop
 )
 {
     typedef std::deque<DeviceFileCatalog::Chunk>    ChunkContainerType;
-    typedef ChunkContainerType::const_iterator      ChunkConstIteratorType;
-    typedef ChunkContainerType::reverse_iterator    ChunkReverseIteratorType;
+    typedef std::list<DeviceFileCatalog::Chunk>     ChunkListType;
+    typedef ChunkListType::const_iterator           ChunkConstIteratorType;
+    typedef ChunkListType::reverse_iterator         ChunkReverseIteratorType;
     typedef std::vector<ChunkReverseIteratorType>   CRIteratorVectorType;
+    typedef std::vector<ChunkConstIteratorType>     CCIteratorVectorType;
 
     const int CATALOG_QUALITY_COUNT = 2;
 
@@ -2052,12 +2061,13 @@ void QnStorageManager::synchronizeStorages(
          ++qualityIndex)
     {
         std::vector<QString>    visitedCameras;
-        ChunkContainerType      currentChunks;
+        ChunkListType           currentChunks;
         QString                 currentCamera;
+
 
         auto getUnvisited = 
             [this, &visitedCameras, qualityIndex]
-            (QString &currentCamera, ChunkContainerType &currentCatalog)
+            (QString &currentCamera, ChunkListType &currentCatalog)
             {
                 QnMutexLocker _(&m_mutexCatalog);
                 const FileCatalogMap &currentMap = m_devFileCatalog[qualityIndex];
@@ -2074,7 +2084,12 @@ void QnStorageManager::synchronizeStorages(
                     );
                     if (visitedIt == visitedCameras.cend())
                     {
-                        currentCatalog = it.value()->m_chunks;
+                        if (it.value()->m_chunks.size() <= 1)
+                            continue;
+                        currentCatalog.assign(
+                            it.value()->m_chunks.cbegin(), 
+                            --it.value()->m_chunks.cend() // get all chunks but last (it may be being recorded just now)
+                        );
                         currentCamera = cameraID;
                         visitedCameras.push_back(cameraID);
                         return true;
@@ -2084,7 +2099,7 @@ void QnStorageManager::synchronizeStorages(
             };
 
         auto mergeNewChunks = 
-            [this](const QString &cameraID, const ChunkContainerType &newChunks)
+            [this, qualityIndex](const QString &cameraID, const ChunkListType &newChunks)
             {
                 QnMutexLocker _(&m_mutexCatalog);
                 FileCatalogMap currentMap = m_devFileCatalog[qualityIndex];
@@ -2096,9 +2111,10 @@ void QnStorageManager::synchronizeStorages(
                 ChunkContainerType &catalogChunks = cameraCatalogIt.value()->m_chunks;
                 auto startCatalogIt = catalogChunks.begin();
 
-                for (auto it = newChunks.cbegin();
-                     it != newChunks.cend();
-                     ++it)
+                ChunkContainerType mergedChunks;
+                auto it = newChunks.cbegin();
+
+                while (it != newChunks.cend())
                 {
                     auto chunkIt = std::find_if(
                         startCatalogIt,
@@ -2110,56 +2126,122 @@ void QnStorageManager::synchronizeStorages(
                     );
 
                     if (chunkIt == catalogChunks.end())
+                    {
+                        mergedChunks.insert(
+                            mergedChunks.end(),
+                            startCatalogIt, 
+                            chunkIt
+                        );
                         break;
+                    }
 
                     auto startTimeMs = chunkIt->startTimeMs;
-                    auto newChunksRange = equalRangeBy(
+                    auto newChunksRange = aux::equalRangeBy_startTimeMs(
                         it, 
                         newChunks.end(), 
                         startTimeMs
                     );
-                    auto catalogChunksRange = equalRangeBy(
+                    auto catalogChunksRange = aux::equalRangeBy_startTimeMs(
                         chunkIt, 
                         catalogChunks.end(), 
                         startTimeMs
                     );
+
+                    mergedChunks.insert(
+                        mergedChunks.end(),
+                        catalogChunksRange.first, 
+                        catalogChunksRange.second
+                    );
+
+                    while (newChunksRange.first != newChunksRange.second)
+                    {
+                        auto newChunkExistIt = std::find_if(
+                            catalogChunksRange.first, 
+                            catalogChunksRange.second,
+                            [&newChunksRange](const DeviceFileCatalog::Chunk &chunk)
+                            {
+                                return newChunksRange.first->storageIndex == chunk.storageIndex;
+                            }
+                        );
+
+                        if (newChunkExistIt == catalogChunksRange.second)
+                            mergedChunks.insert(mergedChunks.end(), *newChunksRange.first);
+                        ++newChunksRange.first;
+                    }
+                    
+                    it = newChunksRange.second;
+                    startCatalogIt = catalogChunksRange.second;
                 }
+                mergedChunks.push_back(catalogChunks.back());
+                catalogChunks = std::move(mergedChunks);
             };
 
         auto copyChunk =
-            [&storages, needStop](CRIteratorVectorType &currentChunkRange)
+            [&storage, needStop, &currentChunks, this, qualityIndex, &mergeNewChunks] (
+                const CCIteratorVectorType    &currentChunkRange,
+                const QString                 &currentCamera
+            )
             {
-                for (auto storageIt = storages.begin();
-                        storageIt != storages.end();
-                        ++storageIt)
-                {
-                    int currentStorageIndex = getStorageIndex(*storageIt);
-                    auto chunkOnStorageIt = std::find_if(
-                        currentChunkRange.cbegin(),
-                        currentChunkRange.cend(),
-                        [currentStorageIndex](ChunkReverseIteratorType c)
-                        {
-                            return c->storageIndex == currentStorageIndex;
-                        }
-                    );
-                    if (chunkOnStorageIt == currentChunkRange.cend())
+                int currentStorageIndex = getStorageIndex(storage);
+                auto chunkOnStorageIt = std::find_if(
+                    currentChunkRange.cbegin(),
+                    currentChunkRange.cend(),
+                    [currentStorageIndex](const ChunkConstIteratorType& c)
                     {
-                        // copy from storage to storage
-                        //
-                        auto newChunk = *(*currentChunkRange.cbegin());
-                        newChunk.storageIndex = currentStorageIndex;
-                        currentChunks.insert(
-                            constIteratorFromReverse<ChunkContainerType>(
-                                *currentChunkRange.cbegin()
-                            ),
-                            newChunk
-                        );
- 
-                        if (needStop())
+                        DeviceFileCatalog::Chunk chunk = *c;
+                        return chunk.storageIndex == currentStorageIndex;
+                    }
+                );
+                if (chunkOnStorageIt == currentChunkRange.cend())
+                {
+                    // copy from storage to storage
+                    auto newChunk = *(*currentChunkRange.begin());
+                    auto fromStorage = storageRoot(newChunk.storageIndex);
+
+                    {
+                        QString fromFileFullName;
                         {
-                            mergeNewChunks(currentCamera, currentChunks);
-                            return false;
+                            QnMutexLocker _(&m_mutexCatalog);
+                            fromFileFullName = m_devFileCatalog[qualityIndex][currentCamera]->fullFileName(newChunk);
                         }
+
+
+                        std::unique_ptr<QIODevice> fromFile = std::unique_ptr<QIODevice>(
+                            fromStorage->open(
+                                fromFileFullName,
+                                QIODevice::ReadOnly
+                            )
+                        );
+                        
+                        auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
+
+                        std::unique_ptr<QIODevice> toFile = std::unique_ptr<QIODevice>(
+                            storage->open(
+                                storage->getUrl() + relativeFileName,
+                                QIODevice::WriteOnly
+                            )
+                        );
+
+                        if (!fromFile || !toFile)
+                            return true;
+
+                        auto data = fromFile->readAll();
+                        toFile->write(data);
+                    }
+
+                    newChunk.storageIndex = currentStorageIndex;
+                    auto forwardIt = *currentChunkRange.cbegin();
+                    ++forwardIt;
+
+                    currentChunks.insert(
+                        forwardIt,
+                        newChunk
+                    );
+ 
+                    if (needStop())
+                    {
+                        mergeNewChunks(currentCamera, currentChunks);
+                        return false;
                     }
                 }
                 return true;
@@ -2167,29 +2249,32 @@ void QnStorageManager::synchronizeStorages(
 
         while (getUnvisited(currentCamera, currentChunks))
         {
-            CRIteratorVectorType currentChunkRange;
+            if (currentChunks.empty())
+                continue;
 
-            for (auto reverseChunkIt = currentChunks.rbegin();
-                 ;
-                 ++reverseChunkIt)
+            CCIteratorVectorType currentChunkRange;
+            auto reverseChunkIt = currentChunks.cend();
+            --reverseChunkIt;
+
+            while (true)
             {
-                if (reverseChunkIt == currentChunks.rend())
-                {
-                     if (!currentChunkRange.empty() && !copyChunk(currentChunkRange))
-                        return;
-                     break;
-                }
-
                 auto currentChunk = *reverseChunkIt;
 
                 if (currentChunkRange.empty() || 
                     (*currentChunkRange.cbegin())->startTimeMs == currentChunk.startTimeMs)
                 {
                     currentChunkRange.push_back(reverseChunkIt);
-                }
-                else
+                    if (reverseChunkIt != currentChunks.cbegin())
+                        --reverseChunkIt;
+                    else
+                    {
+                        copyChunk(currentChunkRange, currentCamera);
+                        break;
+                    }
+                }                
+                else if (!currentChunkRange.empty())
                 {
-                    if (!copyChunk(currentChunkRange))
+                    if (!copyChunk(currentChunkRange, currentCamera))
                         return;
                     currentChunkRange.clear();
                 }
@@ -2223,15 +2308,10 @@ void QnStorageManager::startRedundantSyncWatchdog()
                         if (!m_redundantSyncOn)
                             return;
 
-                        int nowSeconds = 
-                            std::chrono::duration_cast<std::chrono::seconds>(
-                                std::chrono::system_clock::now().time_since_epoch()
-                            ).count();
-
                         const auto &schedule = storage->getRedundantSchedule();
-                        if (schedule.startTime == -1 ||
-                            schedule.duration == -1 ||
-                            schedule.period == -1)
+                        if (schedule.daysOfTheWeek == -1 ||
+                            schedule.start == -1 ||
+                            schedule.duration == -1)
                         {
                             NX_LOG(
                                 lit("Redundant storage %1 wrong schedule").arg(storage->getUrl()), 
@@ -2239,36 +2319,62 @@ void QnStorageManager::startRedundantSyncWatchdog()
                             );
                             return;
                         }
-
-                        // let's find out if now is a time for synchronization
-                        int closestStart = schedule.startTime;
-                        if (nowSeconds < closestStart) // it's too early
-                            return;
-
-                        while (true)
+                        
+                        auto fromQtDOW = [](int qtDOW)
                         {
-                            if (closestStart + schedule.period < nowSeconds)
-                                break;
-                            closestStart += schedule.period;
-                        }
-
-                        if (closestStart + schedule.duration < nowSeconds) // we are there
-                        {
-                            while (true)
+                            switch (qtDOW)
                             {
+                            case 1:
+                                return ec2::redundant::Monday;
+                            case 2:
+                                return ec2::redundant::Tuesday;
+                            case 3:
+                                return ec2::redundant::Wednsday;
+                            case 4:
+                                return ec2::redundant::Thursday;
+                            case 5:
+                                return ec2::redundant::Friday;
+                            case 6:
+                                return ec2::redundant::Saturday;
+                            case 7:
+                                return ec2::redundant::Sunday;
+                            default:
+                                return ec2::redundant::NoDay;
+                            }
+                        };
 
-                                // get current time point again. Copying file might take some time
-                                nowSeconds = 
-                                    std::chrono::duration_cast<std::chrono::seconds>(
-                                        std::chrono::system_clock::now().time_since_epoch()
-                                    ).count();
+                        auto isItTimeForSync = [fromQtDOW] (const QnStorageResource::RedundantSchedule &schedule)
+                        {
+                            QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
+                            const auto curDate = now.date();
 
-                                if (!m_redundantSyncOn || // stop forced
-                                    closestStart + schedule.duration < nowSeconds) // synchronization period is over
+                            if (fromQtDOW(curDate.dayOfWeek()) & schedule.daysOfTheWeek)
+                            {
+                                const auto curTime = now.time();
+                                if (curTime.msecsSinceStartOfDay() > schedule.start * 1000 &&
+                                    curTime.msecsSinceStartOfDay() < schedule.start * 1000 + schedule.duration * 1000)
                                 {
-                                    break;
+                                    return true;
                                 }
                             }
+                            return false;
+                        };
+
+                        if (isItTimeForSync(schedule)) // we are there
+                        {
+                            // get current time point again. Copying file might take some time
+                            synchronizeStorages(
+                                storage,
+                                [this, isItTimeForSync, &schedule]
+                                {
+                                    if (!m_redundantSyncOn || // stop forced
+                                        !isItTimeForSync(schedule)) // synchronization period is over
+                                    {
+                                       return true;
+                                    }
+                                    return false;
+                                }
+                            );
                         }
                     }
                 );

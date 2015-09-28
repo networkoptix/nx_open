@@ -6,6 +6,20 @@
 
 namespace ec2
 {
+    namespace redundant 
+    {
+        enum DaysOfWeek
+        {
+            NoDay       = 0,
+            Monday      = 2,
+            Tuesday     = 4,
+            Wednsday    = 16,
+            Thursday    = 32,
+            Friday      = 64,
+            Saturday    = 128,
+            Sunday      = 256
+        };
+    }
 
     struct ApiStorageData: ApiResourceData
     {
@@ -15,9 +29,9 @@ namespace ec2
         bool            usedForWriting;
         QString         storageType;
         bool            redundant;              // is storage redundant
-        int             redundantStartTime;     // seconds from 00:00, -1 if not set
-        int             redundantDuration;      // seconds
-        int             redundantPeriod;        // seconds, period between starts
+        int             redundantDaysOfTheWeek; // Days of the week mask. 0 if not set
+        int             redundantStart;         // seconds from 00:00.
+        int             redundantDuration;      // duration of synchronization period
 
         std::vector<ApiResourceParamData> addParams;
     };
@@ -27,9 +41,9 @@ namespace ec2
     (usedForWriting)            \
     (storageType)               \
     (redundant)                 \
-    (redundantStartTime)        \
+    (redundantDaysOfTheWeek)    \
+    (redundantStart)            \
     (redundantDuration)         \
-    (redundantPeriod)           \
     (addParams)
 
 
