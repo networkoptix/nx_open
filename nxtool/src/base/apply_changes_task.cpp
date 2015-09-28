@@ -26,7 +26,14 @@ namespace
 
         /// Accepted wait time is 300 seconds due to restart on network interface parameters change
         , kRestartTimeout = kIfListRequestsPeriod * kWaitTriesCount   
+
+        /// Long 30-minutes timeout for reset to factory defautls operation
+        , kFactoryDefaultsTimeout = 30 * 60 * 1000
+
     };
+
+    typedef std::function<void ()> Request;
+    typedef std::function<bool (const rtu::BaseServerInfo &info)> ExtraPred;
 
     int changesFromUpdateInfos(const rtu::ItfUpdateInfoContainer &itfUpdateInfos)
     {
@@ -225,9 +232,14 @@ private:
         , const BeforeDeleteAction &beforeDeleteAction
         , const Constants::AffectedEntities affected);
 
-    void addActions();
+    Request makeActionRequest(ServerInfoCacheItem &item
+        , Constants::AvailableSysCommand cmd
+        , int changesCount
+        , const ExtraPred &pred
+        , const QString &description
+        , int timeout);
 
-    void addRestartRequests();
+    void addActions();
 
     void addDateTimeChangeRequests();
 
@@ -255,7 +267,6 @@ private:
     void itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it);
 
 private:
-    typedef std::function<void ()> Request;
     typedef QPair<bool, Request> RequestData;
     typedef QVector<RequestData>  RequestContainer;
     typedef std::weak_ptr<Impl> ThisWeakPtr;
@@ -638,75 +649,108 @@ rtu::AwaitingOp::Holder rtu::ApplyChangesTask::Impl::addAwaitingOp(const QUuid &
     return op;
 }
 
-void rtu::ApplyChangesTask::Impl::addRestartRequests()
+Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
+    , Constants::AvailableSysCommand cmd
+    , int changesCount
+    , const ExtraPred &pred
+    , const QString &description
+    , int timeout)
 {
-    const ThisWeakPtr weak = shared_from_this();
-    for (ServerInfoCacheItem &item: m_serversCache)
-    {
-        enum { kRestartChangesCount = 1};
+    static const auto kOpAffected = Constants::kAllEntitiesAffected;
+    static const auto kOpValue = QString();
 
-        const auto restartRequest = [&item, weak]()
+    const ThisWeakPtr weak = shared_from_this();
+
+    const auto request = [&item, weak, cmd, pred, description, changesCount, timeout]()
+    {
+
+        if (weak.expired())
+            return;
+
+        const auto id = item.first->id;
+        const auto initialRuntimeId = item.first->runtimeId;
+
+        const auto discoveredHandler = [weak, id, initialRuntimeId, pred] (const BaseServerInfo &info)
         {
             if (weak.expired())
                 return;
 
-            static const auto kRestartOpAffected = Constants::kAllEntitiesAffected;
-
-            const auto id = item.first->id;
-            const auto initialRuntimeId = item.first->runtimeId;
-
-            const auto discoveredHandler = [weak, id, initialRuntimeId]
-                (const BaseServerInfo &info)
+            /// Server has restarted, thus we are waiting until it gets in normal (not safe) mode
+            if ((info.runtimeId != initialRuntimeId) && (!pred || pred(info))) 
+                                                        
             {
-                if (weak.expired())
-                    return;
-
                 const auto shared = weak.lock();
-                if (info.runtimeId != initialRuntimeId) /// Server has restarted
-                    shared->removeAwatingOp(id, RequestError::kSuccess, kRestartOpAffected);
-            };
-
-
-            const auto beforeRemoveHandler = [weak, initialRuntimeId, &item]
-                (RequestError error, Constants::AffectedEntities /* affected */)
-            {
-                if (weak.expired())
-                    return;
-
-                static const auto kRestartOpDescription = QStringLiteral("Restart operation");
-                static const auto kRestartOpValue = QString();
-
-                const auto shared = weak.lock();
-                shared->addSummaryItem(item, kRestartOpDescription, kRestartOpValue, error
-                    , kRestartOpAffected, kRestartOpAffected);
-            };
-    
-            const auto shared = weak.lock();
-            const auto op = shared->addAwaitingOp(id, kRestartChangesCount
-                , kRestartTimeout, discoveredHandler, AwaitingOp::ServersDisappearedAction()
-                , beforeRemoveHandler, kRestartOpAffected);
-
-            sendRestartRequest(item.first, item.second.password
-                , shared->makeAwaitingRequestCallback(id));
+                shared->removeAwatingOp(id, RequestError::kSuccess, kOpAffected);
+            }
         };
 
-        m_totalChangesCount += kRestartChangesCount;
-        m_requests.push_back(RequestData(kNonBlockingRequest, restartRequest));
-    }
+
+        const auto beforeRemoveHandler = [weak, &item, cmd, description]
+            (RequestError error, Constants::AffectedEntities /* affected */)
+        {
+            if (weak.expired())
+                return;
+
+            const auto shared = weak.lock();
+            shared->addSummaryItem(item, description, kOpValue, error
+                , kOpAffected, kOpAffected);
+        };
+    
+        
+        const auto shared = weak.lock();
+        const auto op = shared->addAwaitingOp(id, changesCount
+            , timeout, discoveredHandler, AwaitingOp::ServersDisappearedAction()
+            , beforeRemoveHandler, kOpAffected);
+
+        const auto &baseServerInfo = item.first;
+        const auto &password = item.second.password;
+        const auto &callback = shared->makeAwaitingRequestCallback(id);
+
+        sendSystemCommand(baseServerInfo, password, cmd, callback);
+    };
+
+    return request;
 }
 
 void rtu::ApplyChangesTask::Impl::addActions()
 {
-    if (!m_changeset->softRestart() && !m_changeset->osRestart()
-        && !m_changeset->factoryDefaults() && !m_changeset->factoryDefaultsButNetwork())
-    {
-        return;
-    }
+    const auto cmd = (m_changeset->softRestart() ? Constants::RestartServerCmd : 
+        (m_changeset->osRestart() ? Constants::RebootCmd : 
+        (m_changeset->factoryDefaults() ? Constants::FactoryDefaultsCmd :
+        (m_changeset->factoryDefaultsButNetwork() ? Constants::FactoryDefaultsButNetworkCmd
+            : Constants::NoCommands))));
 
-    if (m_changeset->softRestart())
-    {
-        addRestartRequests();
+    if (cmd == Constants::NoCommands)
         return;
+
+    static const auto kRestartOpDescription = QStringLiteral("Restart operation");
+    static const auto kRebootOpDescription = QStringLiteral("Reboot OS operation");
+    static const auto kButNetworkRequest = QStringLiteral("Reset to factory defaults\n but network operation");
+    static const auto kFactoryDefautls = QStringLiteral("Reset to factory defaults");
+
+    const QString &description = (cmd == Constants::RestartServerCmd ? kRestartOpDescription : 
+        (cmd == Constants::RebootCmd ? kRebootOpDescription :
+        (cmd == Constants::FactoryDefaultsCmd ? kFactoryDefautls : kButNetworkRequest)));
+
+    static const ExtraPred restartExtraPred = ExtraPred(); /// We don't use extra predicate to check simple restart
+    static const ExtraPred factoryExtraPred = [](const BaseServerInfo &info) { return !info.safeMode; };
+
+    const ExtraPred extraPred = ((cmd == Constants::RestartServerCmd) || (cmd == Constants::RebootCmd) 
+        ? restartExtraPred : factoryExtraPred);
+
+    const int timeout = ((cmd == Constants::RestartServerCmd) || (cmd == Constants::RebootCmd) ? 
+        kRestartTimeout : kFactoryDefaultsTimeout);
+
+    const ThisWeakPtr weak = shared_from_this();
+    for (ServerInfoCacheItem &item: m_serversCache)
+    {
+        enum { kOpChangesCount = 1};
+
+        const auto request = makeActionRequest(item, cmd
+            , kOpChangesCount, extraPred, description, timeout);
+
+        m_totalChangesCount += kOpChangesCount;
+        m_requests.push_back(RequestData(kNonBlockingRequest, request));
     }
 }
 

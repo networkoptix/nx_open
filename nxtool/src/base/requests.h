@@ -90,10 +90,9 @@ namespace rtu
         , const QString &password
         , const OperationCallback &callback);
 
-    void sendCustomCommand(const BaseServerInfoPtr &info
+    void sendSystemCommand(const BaseServerInfoPtr &info
         , const QString &password
-        , const QString &path
-        , const QUrlQuery &params
+        , const Constants::AvailableSysCommand sysCommand
         , const OperationCallback &callback);
 
     ///

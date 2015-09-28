@@ -8,7 +8,7 @@ import networkoptix.rtu 1.0 as NxRtu;
 
 Expandable.GenericSettingsPanel
 {
-    property int flags: NxRtu.Constants.NoExtraFlags;
+    property int flags: NxRtu.Constants.NoCommands;
 
     propertiesGroupName: qsTr("Actions");
 
@@ -46,16 +46,22 @@ Expandable.GenericSettingsPanel
                     rtuContext.changesManager().changeset().addSoftRestartAction();
                     rtuContext.changesManager().applyChanges();
                 }
-
             }
 
             Base.Button
             {
-                enabled: NxRtu.Constants.OsRestartAbility;
+                enabled: (rtuContext.selection.availableSysCommands
+                    && NxRtu.Constants.RebootCmd);
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
                 text: "Hardware Restart";
+
+                onClicked:
+                {
+                    rtuContext.changesManager().changeset().addOsRestartAction();
+                    rtuContext.changesManager().applyChanges();
+                }
             }
         }
 
@@ -74,7 +80,8 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: NxRtu.Constants.ResetToFactoryDefaultsAbility;
+                enabled: (rtuContext.selection.availableSysCommands
+                    && NxRtu.Constants.FactoryDefaultsCmd);
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
@@ -83,7 +90,8 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: NxRtu.Constants.ResetToFactoryDefaultsAbility;
+                enabled: (rtuContext.selection.availableSysCommands
+                    && NxRtu.Constants.FactoryDefaultsButNetworkCmd);
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;

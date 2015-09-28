@@ -26,16 +26,19 @@ namespace rtu
         Q_ENUMS(ServerFlag)
         Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 
-        enum ExtraServerFlag
+        enum AvailableSysCommand
         {
-            NoExtraFlags                        = 0x00
-            , OsRestartAbility                  = 0x01
-            , ResetToFactoryDefaultsAbility     = 0x02
+            NoCommands                          = 0x00
 
-            , AllExtraFlags                     = 0xFF       
+            , RestartServerCmd                  = 0x01
+            , RebootCmd                         = 0x02
+            , FactoryDefaultsCmd                = 0x04
+            , FactoryDefaultsButNetworkCmd      = 0x08
+
+            , AllCommands                       = 0xFF       
         };
-        Q_ENUMS(ExtraServerFlag)
-        Q_DECLARE_FLAGS(ExtraServerFlags, ExtraServerFlag)
+        Q_ENUMS(AvailableSysCommand)
+        Q_DECLARE_FLAGS(AvailableSysCommands, AvailableSysCommand)
 
         enum Pages
         {

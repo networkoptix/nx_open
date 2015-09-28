@@ -45,13 +45,14 @@ namespace
         });
     }
     
-    template<typename ReturnValue, typename InitValue>
-    ReturnValue calcFlags(const rtu::ServerInfoPtrContainer &servers, InitValue allSelectedValue)
+    template<typename ReturnValue, typename InitValue, typename GetterType>
+    ReturnValue calcFlags(const rtu::ServerInfoPtrContainer &servers, InitValue allSelectedValue
+        , const GetterType &getter)
     {
         ReturnValue flags = allSelectedValue;
         for (const rtu::ServerInfo * const info: servers)
         {
-            flags &= info->baseInfo().flags;
+            flags &= getter(*info);
         }
         return flags;
     }
@@ -300,7 +301,7 @@ struct rtu::Selection::Snapshot
     QDateTime dateTime;
     TimeZonesModelPtr timeZonesModel;
     
-    rtu::Constants::ExtraServerFlags extraFlags;
+    rtu::Constants::AvailableSysCommands sysCommands;
 
     Snapshot(rtu::ServersSelectionModel *model);
 };
@@ -310,7 +311,8 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     : count(model->selectedCount())
 
     , flags(calcFlags<rtu::Constants::ServerFlags>(
-        model->selectedServers(), rtu::Constants::ServerFlag::AllFlags))
+        model->selectedServers(), rtu::Constants::ServerFlag::AllFlags
+        , [](const ServerInfo &info) { return info.baseInfo().flags; }))
 
     , port(calcPort(model->selectedServers()))
     , dhcpState(calcDHCPState(model->selectedServers()))
@@ -325,8 +327,13 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     , dateTime(calcDateTime(model->selectedServers()))
     , timeZonesModel(new TimeZonesModel(model->selectedServers(), rtu::helpers::qml_objects_parent()))
 
-    , extraFlags(calcFlags<rtu::Constants::ExtraServerFlags>(
-        model->selectedServers(), rtu::Constants::ExtraServerFlag::AllExtraFlags))
+    , sysCommands(calcFlags<rtu::Constants::AvailableSysCommands>(
+        model->selectedServers(), rtu::Constants::AvailableSysCommand::AllCommands
+        , [](const ServerInfo &info) 
+        { 
+            return (info.hasExtraInfo() ? info.extraInfo().sysCommands
+                : rtu::Constants::AvailableSysCommand::NoCommands);
+        }))
 {
 }
 
@@ -378,7 +385,7 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
     }
 
     /// Check differences in extra flags (used for actions availability)
-    if (!emitActionsChanged && (m_snapshot->extraFlags != otherSnapshot.extraFlags))
+    if (!emitActionsChanged && (m_snapshot->sysCommands != otherSnapshot.sysCommands))
     {
         emitActionsChanged = true;
     }
@@ -400,7 +407,7 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
     m_snapshot->dateTime = otherSnapshot.dateTime;
     m_snapshot->timeZonesModel->resetTo(otherSnapshot.timeZonesModel.get());
 
-    m_snapshot->extraFlags = otherSnapshot.extraFlags;
+    m_snapshot->sysCommands = otherSnapshot.sysCommands;
 
     if (emitDateTimeChanged)
         emit dateTimeSettingsChanged();
@@ -430,9 +437,9 @@ int rtu::Selection::flags() const
     return static_cast<int>(m_snapshot->flags);
 }
 
-int rtu::Selection::extraFlags() const
+int rtu::Selection::availableSysCommands() const
 {
-    return static_cast<int>(m_snapshot->extraFlags);
+    return static_cast<int>(m_snapshot->sysCommands);
 }
 
 int rtu::Selection::dhcpState() const

@@ -31,8 +31,8 @@ namespace rtu
         Q_PROPERTY(QDateTime dateTime READ dateTime NOTIFY changed)
         Q_PROPERTY(QObject *timeZonesModel READ timeZonesModel NOTIFY changed)
 
-        Q_PROPERTY(int extraFlags READ extraFlags NOTIFY actionsSettingsChanged)    /// We can't change something on actions page now.
-                                                                                    /// Thus, we could update extraFlags value immediately 
+        /// We can't change something on actions page now. Thus, we could update extraFlags value immediately 
+        Q_PROPERTY(int availableSysCommands READ availableSysCommands NOTIFY actionsSettingsChanged)    
 
     public:
         explicit Selection(ServersSelectionModel *selectionModel
@@ -51,7 +51,7 @@ namespace rtu
         
         int flags() const;
 
-        int extraFlags() const;
+        int availableSysCommands() const;
 
         ///
 

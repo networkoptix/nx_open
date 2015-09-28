@@ -49,6 +49,8 @@ namespace rtu
     {
         QUuid id;
         QUuid runtimeId;
+
+        bool safeMode;
         QString version;
         QString displayAddress;
         Constants::ServerFlags flags;
@@ -76,9 +78,9 @@ namespace rtu
         QByteArray timeZoneId;
         InterfaceInfoList interfaces;
 
-        Constants::ExtraServerFlags extraFlags;
+        Constants::AvailableSysCommands sysCommands;
 
-        typedef QHash<Constants::ExtraServerFlags, QString> ScriptNames;
+        typedef QHash<Constants::AvailableSysCommands, QString> ScriptNames;
         ScriptNames scriptNames;
 
         ExtraServerInfo();
@@ -88,7 +90,7 @@ namespace rtu
             , const qint64 &initUtcDateTimeMs
             , const QByteArray &initTimeZoneId
             , const InterfaceInfoList initInterfaces
-            , const Constants::ExtraServerFlags initExtraFlags
+            , const Constants::AvailableSysCommands initSysCommands
             , const ScriptNames &initScriptNames);
     };
     

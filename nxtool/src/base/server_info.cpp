@@ -52,7 +52,8 @@ bool rtu::operator == (const BaseServerInfo &first
         && (first.port == second.port)
         && (first.systemName == second.systemName)
         && (first.version == second.version)
-        && (first.runtimeId == second.runtimeId));
+        && (first.runtimeId == second.runtimeId)
+        && (first.safeMode == second.safeMode));
 }
 
 bool rtu::operator != (const BaseServerInfo &first
@@ -69,7 +70,7 @@ rtu::ExtraServerInfo::ExtraServerInfo()
     , utcDateTimeMs(0)
     , timeZoneId()
     , interfaces()
-    , extraFlags(Constants::ExtraServerFlag::NoExtraFlags)
+    , sysCommands(Constants::AvailableSysCommand::NoCommands)
     , scriptNames()
 {
 }
@@ -79,14 +80,14 @@ rtu::ExtraServerInfo::ExtraServerInfo(const QString &initPassword
     , const qint64 &initUtcDateTimeMs
     , const QByteArray &initTimeZoneId
     , const InterfaceInfoList initInterfaces
-    , const Constants::ExtraServerFlags initExtraFlags
+    , const Constants::AvailableSysCommands initSysCommands
     , const ScriptNames &initScriptNames)
     : password(initPassword)
     , timestampMs(initTimestampMs)
     , utcDateTimeMs(initUtcDateTimeMs)
     , timeZoneId(initTimeZoneId)
     , interfaces(initInterfaces)
-    , extraFlags(initExtraFlags)
+    , sysCommands(initSysCommands)
     , scriptNames(initScriptNames)
 {
 }

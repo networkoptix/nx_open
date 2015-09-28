@@ -374,6 +374,9 @@ public:
         , const QByteArray &timeZoneId
         , qint64 timestampMs);
     
+    void updateActionsInfo(ItemSearchInfo &searchInfo
+        , Constants::AvailableSysCommands sysCommands);
+
     void updateInterfacesInfo(ItemSearchInfo &searchInfo
         , const InterfaceInfoList &interfaces
         , const QString &host);
@@ -679,7 +682,7 @@ void rtu::ServersSelectionModel::Impl::setSelectedItems(const IDsVector &ids)
             const bool shouldBeUpdated = (shouldBeSelected ^ selected);
             if (!shouldBeUpdated || serverModelInfo.locked 
                 || (serverModelInfo.loginState != kServerLoggedInState))
-            {
+           { 
                 continue;
             }
 
@@ -909,6 +912,7 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfo(const QUuid &id
     updateTimeDateInfo(searchInfo, extraInfo.utcDateTimeMs
         , extraInfo.timeZoneId, extraInfo.timestampMs);
     updateInterfacesInfo(searchInfo, extraInfo.interfaces, hostName);
+    updateActionsInfo(searchInfo, extraInfo.sysCommands);
 
     m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
 }
@@ -989,6 +993,18 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(
     }
 
     if ((searchInfo.serverInfoIterator->selectedState == Qt::Checked) && (diffTime || diffTimeZone))
+        emit m_owner->updateSelectionData();
+}
+
+void rtu::ServersSelectionModel::Impl::updateActionsInfo(ItemSearchInfo &searchInfo
+    , Constants::AvailableSysCommands sysCommands)
+{
+    ExtraServerInfo &extra = getExtraInfo(searchInfo);
+    if (extra.sysCommands == sysCommands)
+        return;
+
+    extra.sysCommands = sysCommands;
+    if (searchInfo.serverInfoIterator->selectedState == Qt::Checked)
         emit m_owner->updateSelectionData();
 }
 
@@ -1156,7 +1172,7 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
         const auto &guard = m_changeHelper->insertRowsGuard(serverRow, serverRow);
         Q_UNUSED(guard);
     
-        /// If removeRequestsCounter is 0 than  it means it is first-time addition operation
+        /// If removeRequestsCounter is 0 then it means it is first-time addition operation
         const int finalRemoveRequestsCount = (removeRequestsCounter > 0 ? removeRequestsCounter - 1 : 0);
     
         /// TODO: #ynikitenkov change for QElapsedTimer implementation

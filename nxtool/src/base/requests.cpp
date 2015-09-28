@@ -13,6 +13,8 @@
 #include <helpers/rest_client.h>
 #include <helpers/time_helper.h>
 
+#include <QDebug>
+
 namespace 
 {
     const QString kApiNamespaceTag = "/api/";
@@ -24,7 +26,8 @@ namespace
     const QString kGetTimeCommand = kApiNamespaceTag + "gettime";
     const QString kIfListCommand = kApiNamespaceTag + "iflist";
     const QString kRestartCommand = kApiNamespaceTag + "restart";
-    const QString kScriptsList = kApiNamespaceTag + "";
+    const QString kScriptsList = kApiNamespaceTag + "scriptList";
+    const QString kExecuteCommand = kApiNamespaceTag + "execute";
 
     const QString kIDTag = "id";
     const QString kSeedTag = "seed";
@@ -282,14 +285,15 @@ namespace /// Parsers stuff
 
     ///
 
-    rtu::ExtraServerInfo extractExtraFlagsFromAnswer(const QJsonObject &object)
+    rtu::ExtraServerInfo extractScriptInfoFromAnswer(const QJsonObject &object)
     {
-        typedef QMap<QString, rtu::Constants::ExtraServerFlag> ScriptFlagMap;
-        static const ScriptFlagMap kMapping = []() -> ScriptFlagMap
+        typedef QMultiMap<QString, rtu::Constants::AvailableSysCommand> ScriptCmdMap;
+        static ScriptCmdMap kMapping = []() -> ScriptCmdMap
         {
-            /// TODO: add real script names
-            ScriptFlagMap result;
-            result.insert("test", rtu::Constants::ExtraServerFlag::OsRestartAbility);
+            ScriptCmdMap result;
+            result.insertMulti("reboot", rtu::Constants::AvailableSysCommand::RebootCmd);
+            result.insertMulti("restore", rtu::Constants::AvailableSysCommand::FactoryDefaultsCmd);
+            result.insertMulti("restore_keep_ip", rtu::Constants::AvailableSysCommand::FactoryDefaultsButNetworkCmd);
             return result;
         }();
 
@@ -302,19 +306,23 @@ namespace /// Parsers stuff
 
             /// Scripts could have different extensions in the different OS. 
             const auto scriptId = QFileInfo(scriptFullName).completeBaseName();
-
-            const auto it = kMapping.find(scriptId);
-            if (it != kMapping.end())
+            const auto range = kMapping.equal_range(scriptId);
+            if (range.first != kMapping.end())
             {
-                const auto flag = it.value();
-                result.extraFlags |= flag;
-                result.scriptNames[flag] = scriptFullName;
+                std::for_each(range.first, range.second
+                    , [&result, &scriptFullName](ScriptCmdMap::mapped_type sysCmd)
+                {
+                    result.sysCommands |= sysCmd;
+                    result.scriptNames[sysCmd] = scriptFullName;
+                });
             }
         }
+
+        result.sysCommands |= rtu::Constants::RestartServerCmd;
         return result;
     }
 
-    void getExtraFlags(const rtu::BaseServerInfoPtr &baseInfo
+    void getScriptInfos(const rtu::BaseServerInfoPtr &baseInfo
         , const QString &password
         , const rtu::ExtraServerInfoSuccessCallback &successCallback
         , const rtu::OperationCallback &failedCallback
@@ -322,7 +330,7 @@ namespace /// Parsers stuff
     {
         static const auto minScriptAvailableVersion = QStringLiteral("2.4.1");
 
-        const auto failed = [failedCallback](rtu::RequestError error)
+        const auto failed = [failedCallback](rtu::RequestError /* error */)
         {
             if (failedCallback)
             {
@@ -348,7 +356,7 @@ namespace /// Parsers stuff
             }
 
             if (successCallback)
-                successCallback(id, extractExtraFlagsFromAnswer(object));
+                successCallback(id, extractScriptInfoFromAnswer(object));
         };
 
         const rtu::RestClient::Request request(baseInfo, password
@@ -519,13 +527,13 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
         const auto &extraFlagsSuccessful = [extraInfoStorage, condCallSuccessfull]
             (const QUuid &id, const ExtraServerInfo &extraInfo)
         {
-            extraInfoStorage->extraFlags = extraInfo.extraFlags;
+            extraInfoStorage->sysCommands = extraInfo.sysCommands;
             extraInfoStorage->scriptNames = extraInfo.scriptNames;
             condCallSuccessfull(id, *extraInfoStorage);
         };
 
         getIfList(baseInfo, password, ifListSuccessful, extraCommandsFailed, timeout);
-        getExtraFlags(baseInfo, password, extraFlagsSuccessful, extraCommandsFailed, timeout);
+        getScriptInfos(baseInfo, password, extraFlagsSuccessful, extraCommandsFailed, timeout);
     };
 
     const auto &callback = [extraInfoStorage, failed, baseInfo, password
@@ -584,14 +592,44 @@ void rtu::sendRestartRequest(const BaseServerInfoPtr &info
     RestClient::sendGet(request);
 }
 
-void rtu::sendCustomCommand(const BaseServerInfoPtr &info
+void rtu::sendSystemCommand(const BaseServerInfoPtr &info
     , const QString &password
-    , const QString &path
-    , const QUrlQuery &params
+    , const Constants::AvailableSysCommand sysCommand
     , const OperationCallback &callback)
 {
+    QString cmd;
+    switch(sysCommand)
+    {
+    case Constants::AvailableSysCommand::RestartServerCmd:
+        sendRestartRequest(info, password, callback);
+        return;
+
+    case Constants::AvailableSysCommand::RebootCmd:
+        cmd = QStringLiteral("reboot");
+        break;
+    case Constants::AvailableSysCommand::FactoryDefaultsCmd:
+        cmd = QStringLiteral("restore");
+        break;
+    case Constants::AvailableSysCommand::FactoryDefaultsButNetworkCmd:
+        cmd = QStringLiteral("restore_keep_ip");
+        break;
+    default:
+    {
+        if (callback)
+            callback(RequestError::kInternalAppError, Constants::kNoEntitiesAffected);
+        return;
+    }
+
+    };
+
+    static const auto kExecutePathTemplate = QStringLiteral("%1/%2").arg(kExecuteCommand);
     
-//    /const RestClient::Request
+    const auto path = kExecutePathTemplate.arg(cmd);
+    const RestClient::Request request(info, password, path, QUrlQuery(), RestClient::kUseStandardTimeout
+        , makeSuccessCallback(callback, Constants::kNoEntitiesAffected)
+        , makeErrorCallback(callback, Constants::kNoEntitiesAffected));
+
+    RestClient::sendGet(request);
 }
 
 ///
