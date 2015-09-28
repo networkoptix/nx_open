@@ -6,50 +6,49 @@
 
 QnCameraBookmarksQuery::QnCameraBookmarksQuery(QObject *parent /*= nullptr*/)
     : base_type(parent)
-    , m_autoUpdate(false)
+    , m_id(QUuid::createUuid())
     , m_cameras()
     , m_filter()
-{}
+{
+    qnCameraBookmarksManager->registerQuery(toSharedPointer());
+}
 
-QnCameraBookmarksQuery::QnCameraBookmarksQuery(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QObject *parent /*= nullptr*/)
+QnCameraBookmarksQuery::QnCameraBookmarksQuery(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, QObject *parent /*= nullptr*/)
     : base_type(parent)
-    , m_autoUpdate(false)
+    , m_id(QUuid::createUuid())
     , m_cameras(cameras)
     , m_filter(filter)
-{}
+{
+    qnCameraBookmarksManager->registerQuery(toSharedPointer());
+}
 
 QnCameraBookmarksQuery::~QnCameraBookmarksQuery() {
-    setAutoUpdate(false);    
+    qnCameraBookmarksManager->unregisterQuery(toSharedPointer());
+}
+
+QUuid QnCameraBookmarksQuery::id() const {
+    return m_id;
 }
 
 bool QnCameraBookmarksQuery::isValid() const {
     return !m_cameras.isEmpty() && m_filter.isValid();
 }
 
-bool QnCameraBookmarksQuery::autoUpdate() const {
-    return m_autoUpdate;
-}
-
-void QnCameraBookmarksQuery::setAutoUpdate(bool value) {
-    if (m_autoUpdate == value)
-        return;
-    m_autoUpdate = value;
-    if (value)
-        qnCameraBookmarksManager->registerAutoUpdateQuery(toSharedPointer());
-    else
-        qnCameraBookmarksManager->unregisterAutoUpdateQuery(toSharedPointer());
-}
-
-QnVirtualCameraResourceList QnCameraBookmarksQuery::cameras() const {
+QnVirtualCameraResourceSet QnCameraBookmarksQuery::cameras() const {
     return m_cameras;
 }
 
-void QnCameraBookmarksQuery::setCameras(const QnVirtualCameraResourceList &value) {
+void QnCameraBookmarksQuery::setCameras(const QnVirtualCameraResourceSet &value) {
     if (m_cameras == value)
         return;
     m_cameras = value;
     emit queryChanged();
 }
+
+void QnCameraBookmarksQuery::setCamera(const QnVirtualCameraResourcePtr &value) {
+    setCameras(QnVirtualCameraResourceSet() << value);
+}
+
 
 QnCameraBookmarkSearchFilter QnCameraBookmarksQuery::filter() const {
     return m_filter;

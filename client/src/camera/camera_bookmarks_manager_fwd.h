@@ -11,3 +11,4 @@ typedef std::function<void (bool success)> OperationCallbackType;
 typedef std::function<void (bool success, const QnCameraBookmarkList &bookmarks)> BookmarksCallbackType;
 
 typedef QSharedPointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryPtr;
+typedef QWeakPointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryWeakPtr;

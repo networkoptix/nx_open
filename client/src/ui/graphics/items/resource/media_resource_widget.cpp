@@ -1503,7 +1503,7 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
 void QnMediaResourceWidget::updateBookmarks() {
 
     auto bookmarksManager = context()->instance<QnCameraBookmarksManager>();
-    bookmarksManager->getBookmarksAsync(QnVirtualCameraResourceList() << m_camera, 
+    bookmarksManager->getBookmarksAsync(QnVirtualCameraResourceSet() << m_camera, 
         QnCameraBookmarkSearchFilter(), 
         [this](bool success, const QnCameraBookmarkList &bookmarks)
     {

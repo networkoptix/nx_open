@@ -14,13 +14,20 @@ QnCameraBookmarksManager::~QnCameraBookmarksManager()
 {
 }
 
-void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceList &cameras
+void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
                                                  , const QnCameraBookmarkSearchFilter &filter
                                                  , BookmarksCallbackType callback)
 {
     Q_D(QnCameraBookmarksManager);
     d->getBookmarksAsync(cameras, filter, callback);
 }
+
+
+QnCameraBookmarkList QnCameraBookmarksManager::getLocalBookmarks(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter) const {
+    Q_D(const QnCameraBookmarksManager);
+    return d->getLocalBookmarks(cameras, filter);
+}
+
 
 void QnCameraBookmarksManager::addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
     Q_D(QnCameraBookmarksManager);
@@ -37,21 +44,22 @@ void QnCameraBookmarksManager::deleteCameraBookmark(const QnVirtualCameraResourc
     d->deleteCameraBookmark(camera, bookmark, callback);
 }
 
-void QnCameraBookmarksManager::registerAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query) {
+void QnCameraBookmarksManager::registerQuery(const QnCameraBookmarksQueryPtr &query) {
     Q_D(QnCameraBookmarksManager);
-    d->registerAutoUpdateQuery(query);
+    d->registerQuery(query);
 }
 
-void QnCameraBookmarksManager::unregisterAutoUpdateQuery(const QnCameraBookmarksQueryPtr &query) {
+void QnCameraBookmarksManager::unregisterQuery(const QnCameraBookmarksQueryPtr &query) {
     Q_D(QnCameraBookmarksManager);
-    d->unregisterAutoUpdateQuery(query);
+    d->unregisterQuery(query);
 }
 
 QnCameraBookmarkList QnCameraBookmarksManager::executeQueryLocal(const QnCameraBookmarksQueryPtr &query) const {
     Q_D(const QnCameraBookmarksManager);
-    return d->executeQuery(query);
+    return d->executeQueryLocal(query);
 }
 
 void QnCameraBookmarksManager::executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback) {
-    getBookmarksAsync(query->cameras(), query->filter(), callback);
+    Q_D(QnCameraBookmarksManager);
+    d->executeQueryRemoteAsync(query, callback);
 }
