@@ -109,7 +109,15 @@ void QnRestConnectionProcessor::run()
         if (handler->permissions() == RestPermissions::adminOnly)
         {
             QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
-            if (!user || (user->getPermissions() & Qn::GlobalAdminPermissions) != Qn::GlobalAdminPermissions)
+            if (!user)
+            {
+                sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
+                return;
+            }
+
+
+            bool isAdmin = (user->getPermissions() & (Qn::GlobalProtectedPermission | Qn::GlobalEditProtectedUserPermission)) > 0;
+            if (!isAdmin)
             {
                 sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
                 return;
