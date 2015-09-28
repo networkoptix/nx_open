@@ -435,7 +435,8 @@ private:
 private:
     /// return true if no selected servers
     void removeServerImpl(const QUuid &id
-        , bool removeEmptySystem);
+        , bool removeEmptySystem
+        , bool forceRemove = false);
     
 private:
     rtu::ServersSelectionModel * const m_owner;
@@ -1174,7 +1175,7 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     
         /// If removeRequestsCounter is 0 then it means it is first-time addition operation
         const int finalRemoveRequestsCount = (removeRequestsCounter > 0 ? removeRequestsCounter - 1 : 0);
-    
+
         /// TODO: #ynikitenkov change for QElapsedTimer implementation
         systemModelInfo->servers.push_back(ServerModelInfo(QDateTime::currentMSecsSinceEpoch(), selected
             , loginState, locked, lockReason, finalRemoveRequestsCount, info));
@@ -1222,11 +1223,13 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
             m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
         }
 
-        removeServerImpl(baseInfo.id, targetSystemExists);
+        const auto locked = searchInfo.serverInfoIterator->locked;
+        const auto lockReason = searchInfo.serverInfoIterator->lockReason;
+        const auto counter = searchInfo.serverInfoIterator->removeRequestsCounter;
+
+        removeServerImpl(baseInfo.id, targetSystemExists, true);
         foundServer.setBaseInfo(baseInfo);
-        addServer(foundServer, selected, searchInfo.serverInfoIterator->locked
-            , searchInfo.serverInfoIterator->lockReason
-            , searchInfo.serverInfoIterator->removeRequestsCounter);
+        addServer(foundServer, selected, locked, lockReason, counter);
     }
     else
     {
@@ -1400,14 +1403,15 @@ void rtu::ServersSelectionModel::Impl::unknownRemoved(const QString &address)
 }
 
 void rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
-    , bool removeEmptySystem)
+    , bool removeEmptySystem
+    , bool forceRemove)
 {
     ItemSearchInfo searchInfo;
     
     if (!findServer(id, searchInfo))
         return;
     
-    if (searchInfo.serverInfoIterator->locked)
+    if (searchInfo.serverInfoIterator->locked && !forceRemove)
     {
         ++searchInfo.serverInfoIterator->removeRequestsCounter; /// if locked - remove it later, on unlocking operation
         return;

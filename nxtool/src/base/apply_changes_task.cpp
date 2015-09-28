@@ -679,7 +679,7 @@ void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
 
     for (auto &info: m_serversCache)
     {
-        enum { kDateTimeChangesetSize = 2};
+        enum { kDateTimeChangesetSize = 1};
         const auto request = [weak, &info, change, timestampMs]()
         {
             if (weak.expired())
@@ -688,8 +688,8 @@ void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
             const auto &callback = [weak, &info, change, timestampMs]
                 (const RequestError errorCode, Constants::AffectedEntities affected)
             {
-                static const QString kDateTimeDescription = "date / time";
-                static const QString kTimeZoneDescription = "time zone";
+                static const QString kTimeDescription = "Server time";
+                static const QString kTimeTemplate("%1\n%2");
 
                 if (weak.expired())
                     return;
@@ -698,13 +698,13 @@ void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
                 QString timeZoneName = timeZoneNameWithOffset(QTimeZone(change.timeZoneId), QDateTime::currentDateTime());
 
                 QDateTime timeValue = convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId));
-                const QString &value = timeValue.toString(Qt::SystemLocaleLongDate);
-                const bool dateTimeOk = shared->addSummaryItem(info, kDateTimeDescription
-                    , value, errorCode, Constants::kDateTimeAffected, affected);
-                const bool timeZoneOk = shared->addSummaryItem(info, kTimeZoneDescription
-                    , timeZoneName, errorCode, Constants::kTimeZoneAffected, affected);
-                
-                if (dateTimeOk && timeZoneOk)
+                const QString &timeStr = timeValue.toString(Qt::SystemLocaleLongDate);
+
+                const auto flags = (Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
+                const bool successful = shared->addSummaryItem(info, kTimeDescription
+                    , kTimeTemplate.arg(timeStr, timeZoneName), errorCode, flags, affected);
+
+                if (successful)
                 {
                     emit shared->m_owner->dateTimeUpdated(info.first->id
                         , change.utcDateTimeMs, change.timeZoneId, timestampMs);
@@ -1135,7 +1135,7 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
                 if (weak.expired())
                     return;
 
-                if (errorCode != RequestError::kSuccess)
+                if ((errorCode != RequestError::kSuccess) && (errorCode != RequestError::kUnauthorized))
                 {
                     finalCallback(errorCode, affected);
                 }
