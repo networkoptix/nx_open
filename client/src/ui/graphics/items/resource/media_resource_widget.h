@@ -5,6 +5,8 @@
 
 #include <QtGui/QStaticText>
 
+#include <camera/camera_bookmarks_manager_fwd.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
@@ -257,6 +259,8 @@ private:
     QnMediaDewarpingParams m_dewarpingParams;
 
     QnCameraBookmarkList m_bookmarks;
+    QnCameraBookmarksQueryPtr m_bookmarksQuery;
+
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
 };

@@ -11,8 +11,6 @@ class QnCameraBookmarksQuery: public QObject, public QnFromThisToShared<QnCamera
 
     typedef QObject base_type;
 public:
-    QnCameraBookmarksQuery(QObject *parent = nullptr);
-    QnCameraBookmarksQuery(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, QObject *parent = nullptr);
     virtual ~QnCameraBookmarksQuery();
 
     /// @brief                  Unique query id.
@@ -59,6 +57,8 @@ signals:
     void bookmarksChanged(const QnCameraBookmarkList &bookmarks);
 
 private:
+    friend class QnCameraBookmarksManagerPrivate;
+    QnCameraBookmarksQuery(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, QObject *parent = nullptr);
     QnCameraBookmarksQueryPtr toSharedPointer() const;
 
 private:

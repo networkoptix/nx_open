@@ -55,7 +55,8 @@ public:
     /// @param cameras          Set of target cameras.
     /// @param filter           Filter parameters.
     /// @returns                Search query that is ready to be used.
-    QnCameraBookmarksQueryPtr createQuery(const QnVirtualCameraResourceSet &cameras = QnVirtualCameraResourceSet(), const QnCameraBookmarkSearchFilter &filter = QnCameraBookmarkSearchFilter());
+    QnCameraBookmarksQueryPtr createQuery(const QnVirtualCameraResourceSet &cameras = QnVirtualCameraResourceSet(),
+                                          const QnCameraBookmarkSearchFilter &filter = QnCameraBookmarkSearchFilter());
 
     /// @brief                  Execute search query on local (cached) data.
     /// @param query            Target query.

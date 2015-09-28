@@ -3,14 +3,6 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/camera_resource.h>
 
-
-QnCameraBookmarksQuery::QnCameraBookmarksQuery(QObject *parent /*= nullptr*/)
-    : base_type(parent)
-    , m_id(QUuid::createUuid())
-    , m_cameras()
-    , m_filter()
-{}
-
 QnCameraBookmarksQuery::QnCameraBookmarksQuery(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, QObject *parent /*= nullptr*/)
     : base_type(parent)
     , m_id(QUuid::createUuid())
@@ -41,9 +33,11 @@ void QnCameraBookmarksQuery::setCameras(const QnVirtualCameraResourceSet &value)
 }
 
 void QnCameraBookmarksQuery::setCamera(const QnVirtualCameraResourcePtr &value) {
-    setCameras(QnVirtualCameraResourceSet() << value);
+    QnVirtualCameraResourceSet cameras;
+    if (value)
+        cameras << value;
+    setCameras(cameras);
 }
-
 
 QnCameraBookmarkSearchFilter QnCameraBookmarksQuery::filter() const {
     return m_filter;

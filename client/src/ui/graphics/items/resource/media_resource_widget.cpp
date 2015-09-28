@@ -1502,13 +1502,12 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
 }
 
 void QnMediaResourceWidget::updateBookmarks() {
+    if (m_bookmarksQuery)
+        return;
 
-    QnCameraBookmarksQueryPtr query(new QnCameraBookmarksQuery(
-        QnVirtualCameraResourceSet() << m_camera,
-        QnCameraBookmarkSearchFilter(),
-        this));
+    m_bookmarksQuery = qnCameraBookmarksManager->createQuery(QnVirtualCameraResourceSet() << m_camera);
 
-    connect(query, &QnCameraBookmarksQuery::bookmarksChanged, this, [this](const QnCameraBookmarkList &bookmarks) {
+    connect(m_bookmarksQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, [this](const QnCameraBookmarkList &bookmarks) {
         static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
 
         QString text;
