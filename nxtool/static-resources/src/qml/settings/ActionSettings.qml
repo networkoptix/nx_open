@@ -8,6 +8,8 @@ import networkoptix.rtu 1.0 as NxRtu;
 
 Expandable.GenericSettingsPanel
 {
+    id: thisComponent;
+
     property int flags: NxRtu.Constants.NoCommands;
 
     propertiesGroupName: qsTr("Actions");
@@ -102,6 +104,8 @@ Expandable.GenericSettingsPanel
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
                 text: "Reset All But Network";
+
+                KeyNavigation.tab: thisComponent.nextTab;
 
                 onClicked:
                 {

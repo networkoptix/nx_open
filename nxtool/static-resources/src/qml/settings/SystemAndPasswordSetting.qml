@@ -120,7 +120,6 @@ Expandable.MaskedSettingsPanel
                 id: password;
 
                 KeyNavigation.backtab: systemName;
-               // KeyNavigation.tab: password;
 
                 readonly property string kDifferentPasswords: qsTr("<different passwords>");
 

@@ -204,6 +204,7 @@ FocusScope
                 {
                     id: actionSettings;
 
+                    nextTab: applyButton;
                     flags: rtuContext.selection.SystemCommands;
                 }
 
