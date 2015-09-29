@@ -67,7 +67,9 @@ public:
             std::unique_ptr<SocketServerType> socketServer = m_socketServerFactory();
             if( !socketServer->bind( addr ) )
             {
-                NX_LOG( QString::fromLatin1("Failed to bind to address %1. %2").arg(addr.toString()).arg(SystemError::getLastOSErrorText()), cl_logERROR );
+                const auto osErrorCode = SystemError::getLastOSErrorCode();
+                NX_LOG( lit("Failed to bind to address %1. %2").arg(addr.toString()).
+                    arg(SystemError::toString(osErrorCode)), cl_logERROR );
                 if( bindToEveryAddress )
                 {
                     m_listeners.clear();
