@@ -32,6 +32,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
         var nativeResolutions = ['Auto', 'hi', 'lo'];
         var onlyHiResolution =  ['Auto', 'hi'];
+        var onlyLoResolution =  ['Auto', 'lo'];
+
         var reloadInterval = 5*1000;//30 seconds
         var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
         var mimeTypes = {
@@ -59,20 +61,20 @@ angular.module('webadminApp').controller('ViewCtrl',
             };
         });
 
-        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
+        if(window.jscd.browser === 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
             if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
                 $scope.ieNoWebm = true;
             }
         }
 
         if(window.jscd.mobile) {
-            $scope.mobileStore = window.jscd.os == 'iOS'?'appstore':'googleplay';
+            $scope.mobileStore = window.jscd.os === 'iOS'?'appstore':'googleplay';
             var found = _.find(Config.helpLinks, function (links) {
                 if (!links.urls) {
                     return false;
                 }
                 var url = _.find(links.urls, function (url) {
-                    return url.class == $scope.mobileStore;
+                    return url.class === $scope.mobileStore;
                 });
                 if (!url) {
                     return false;
@@ -91,14 +93,14 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return true;//Native support
             }
             if(maybe){
-                if(type=='hls' && window.jscd.os != 'Android' ){
+                if(type === 'hls' && window.jscd.os !== 'Android' ){
                     return true; // Requires flash, but may be played
                 }
-                if(type=='webm' && window.jscd.browser == 'Microsoft Internet Explorer' ){
+                if(type === 'webm' && window.jscd.browser === 'Microsoft Internet Explorer' ){
                     return true; // Requires plugin, but may be played
                 }
             }
-            if(type=='hls'){
+            if(type === 'hls'){
                 return !!window.jscd.flashVersion ; // flash hls support
             }
             return false;
@@ -115,6 +117,18 @@ angular.module('webadminApp').controller('ViewCtrl',
         function formatSupported(type){
             return cameraSupports(type) && browserSupports(type,true);
         }
+
+        function largeResolution (resolution){
+            var dimensions = resolution.split('x');
+            return dimensions[0] > 1920 || dimensions[1] > 1080;
+        }
+        function checkiOSResolution(camera){
+            var streams = _.find(camera.mediaStreams,function(stream){
+                return stream.transports.indexOf('hls')>0 && largeResolution(stream.resolution);
+            });
+            // Here we have two hls streams
+            return !!streams;
+        }
         function updateAvailableResolutions() {
             if(!$scope.activeCamera){
                 $scope.activeResolution = 'Auto';
@@ -125,10 +139,20 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(formatSupported('webm')){
                 $scope.availableResolutions = transcodingResolutions;
             }else{
-                if(!$scope.activeCamera || $scope.activeCamera.addParams.hasDualStreaming && $scope.activeCamera.addParams.hasDualStreaming!='0') {
+                $scope.iOSVideoTooLarge = false;
+
+                if(!$scope.activeCamera || $scope.activeCamera.hasDualStreaming ) {
                     $scope.availableResolutions = nativeResolutions;
                 }else{
                     $scope.availableResolutions = onlyHiResolution;
+                }
+
+                if($scope.activeCamera && window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera)){
+                    if($scope.activeCamera.hasDualStreaming) {
+                        $scope.availableResolutions = onlyLoResolution;
+                    }else {
+                        $scope.iOSVideoTooLarge = true;
+                    }
                 }
 
             }
@@ -203,23 +227,23 @@ angular.module('webadminApp').controller('ViewCtrl',
             var positionMedia = !live ? '&pos=' + (playing) : '';
 
             var resolution = $scope.activeResolution;
-            var resolutionHls = resolution=='Auto'?'lo':resolution;
+            var resolutionHls = resolution === 'Auto'?'lo':resolution;
 
-            if(resolutionHls == 'lo' && (!$scope.activeCamera.addParams.hasDualStreaming || $scope.activeCamera.addParams.hasDualStreaming == '0')){
+            if(resolutionHls === 'lo' && !$scope.activeCamera.hasDualStreaming ){
                 resolutionHls = 'hi';
             }
             // TODO: check resolution ?
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes['hls'], transport:'hls'},
-                { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' },
 
                 // Not supported:
-                // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes['mjpeg'] , transport:'mjpeg'},
+                // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes.mjpeg , transport:'mjpeg'},
 
                 // Require plugin
-                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution=='lo'?1:0)), type: mimeTypes['rtsp'], transport:'rtsp'}
+                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution === 'lo'?1:0)), type: mimeTypes.rtsp, transport:'rtsp'}
             ],function(src){
-                return formatSupported(src.transport) && $scope.activeFormat == 'Auto'|| $scope.activeFormat == src.type;
+                return formatSupported(src.transport) && $scope.activeFormat === 'Auto'|| $scope.activeFormat === src.type;
             });
         }
 
@@ -241,7 +265,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectCameraById = function (cameraId, position, silent) {
-            if($scope.activeCamera && ($scope.activeCamera.id == cameraId || $scope.activeCamera.physicalId === cameraId)){
+            if($scope.activeCamera && ($scope.activeCamera.id === cameraId || $scope.activeCamera.physicalId === cameraId)){
                 return;
             }
             var oldTimePosition = null;
@@ -316,11 +340,11 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectResolution = function(resolution){
-            /*if(resolution == 'auto' || resolution == 'Auto' || resolution == 'AUTO'){
+            /*if(resolution === 'auto' || resolution === 'Auto' || resolution === 'AUTO'){
                 resolution = '320p'; //TODO: detect better resolution here
             }*/
 
-            if($scope.activeResolution == resolution){
+            if($scope.activeResolution === resolution){
                 return;
             }
             $scope.activeResolution = resolution;
@@ -348,13 +372,13 @@ angular.module('webadminApp').controller('ViewCtrl',
                 var cameras = $scope.cameras[server.id];
                 var camsVisible = false;
                 _.forEach(cameras,function(camera){
-                    camera.visible = $scope.searchCams == '' ||
+                    camera.visible = $scope.searchCams === '' ||
                             has(camera.name, $scope.searchCams) ||
                             has(camera.url, $scope.searchCams);
                     camsVisible = camsVisible || camera.visible;
                 });
 
-                server.visible = $scope.searchCams == '' ||
+                server.visible = $scope.searchCams === '' ||
                     camsVisible ||
                     has(server.name, $scope.searchCams) ||
                     has(server.url, $scope.searchCams);
@@ -400,12 +424,16 @@ angular.module('webadminApp').controller('ViewCtrl',
                 var cameras = data.data;
                 
                 var findMediaStream = function(param){
-                    return param.name == 'mediaStreams';
+                    return param.name === 'mediaStreams';
+                };
+
+                var findDualStreaming = function(param){
+                    return param.name === 'hasDualStreaming';
                 };
                 
                 function cameraFilter(camera){
                     // Filter desktop cameras here
-                    if(camera.typeId == desktopCameraTypeId){ // Hide desctop cameras
+                    if(camera.typeId === desktopCameraTypeId){ // Hide desctop cameras
                         return false;
                     }
 
@@ -423,14 +451,18 @@ angular.module('webadminApp').controller('ViewCtrl',
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = getServer(camera.parentId);
-                    if(camera.server && camera.server.status == 'Offline'){
+                    if(camera.server && camera.server.status === 'Offline'){
                         camera.status = 'Offline';
                     }
 
                     var mediaStreams = _.find(camera.addParams,findMediaStream);
                     camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
 
-                    if(typeof(camera.visible) == 'undefined'){
+
+                    var dualStreaming =  _.find(camera.addParams,findDualStreaming) ;
+                    camera.hasDualStreaming = dualStreaming?(dualStreaming.value === '1'):false;
+
+                    if(typeof(camera.visible) === 'undefined'){
                         camera.visible = true;
                     }
 
@@ -503,7 +535,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                         for(var i = 0; i < activeCameras.length; i++) { // Remove old cameras
                             if(!_.find(newCameras,function(camera){
-                                    return camera.id == activeCameras[i].id;
+                                    return camera.id === activeCameras[i].id;
                                 }))
                             {
                                 activeCameras.splice(i, 1);
@@ -544,7 +576,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 server.collapsed = $scope.storage.serverStates[server.id];
 
 
-                if(typeof(server.visible) == 'undefined'){
+                if(typeof(server.visible) === 'undefined'){
                     server.visible = true;
                 }
 
@@ -579,7 +611,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                     var servers = data.data;
                     for(var i = 0; i < $scope.mediaServers.length; i++) { // Remove old servers
                         if(!_.find(servers,function(server){
-                                return server.id == $scope.mediaServers[i].id;
+                                return server.id === $scope.mediaServers[i].id;
                             }))
                         {
                             $scope.mediaServers.splice(i, 1);
@@ -619,7 +651,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 firstTime = false;
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
-                if(typeof(error.status)=='undefined' || !error.status) {
+                if(typeof(error.status) === 'undefined' || !error.status) {
                     console.error(error);
                 }
                 timer = $timeout(reloader, reloadInterval); // Some error happened. Maybe, request was aborted. Wait and try again
@@ -629,7 +661,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         function requestResourses() {
             mediaserver.getResourceTypes().then(function (result) {
                 desktopCameraTypeId = _.find(result.data, function (type) {
-                    return type.name == 'SERVER_DESKTOP_CAMERA';
+                    return type.name === 'SERVER_DESKTOP_CAMERA';
                 });
                 desktopCameraTypeId = desktopCameraTypeId ? desktopCameraTypeId.id : null;
                 reloader();
@@ -645,7 +677,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.$watch('searchCams',searchCams);
 
         $scope.$watch('activeCamera.status',function(status){
-            if((!$scope.positionProvider || $scope.positionProvider.liveMode) && !(status == 'Offline' || status == 'Unauthorized')){
+            if((!$scope.positionProvider || $scope.positionProvider.liveMode) && !(status === 'Offline' || status === 'Unauthorized')){
                 updateVideoSource();
             }
         });
@@ -677,7 +709,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                 availableCameras = _.chain(data.data).
                     filter(function(layout){
-                        return layout.parentId == userId;
+                        return layout.parentId === userId;
                     }).
                     map(function(layout){
                         return layout.items;
@@ -733,7 +765,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             $viewPanel.css('height',viewportHeight );
 
             //One more IE hack.
-            if(window.jscd.browser == 'Microsoft Internet Explorer') {
+            if(window.jscd.browser === 'Microsoft Internet Explorer') {
                 var videoWidth = $('header').width() - $('.cameras-panel').outerWidth(true);
                 $('videowindow').parent().css('width', videoWidth + 'px');
             }
