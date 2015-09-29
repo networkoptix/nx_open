@@ -61,6 +61,9 @@ namespace rtu
         int port;
 
         bool accessibleByHttp;
+
+        BaseServerInfo();
+
     };
     
     bool operator == (const BaseServerInfo &first

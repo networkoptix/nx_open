@@ -33,7 +33,7 @@ namespace rtu
 
         void processServerDiscovered(const BaseServerInfo &info);
 
-        void processServersDisappeared();
+        void processServerDisappeared();
 
         bool processUnknownAdded(const QString &ip);
 

@@ -43,6 +43,26 @@ rtu::InterfaceInfo::InterfaceInfo(const QString &initName
     , useDHCP(initUseDHCP)
 {}
 
+
+rtu::BaseServerInfo::BaseServerInfo()
+    : id()
+    , runtimeId()
+
+    , safeMode(false)
+    , version()
+    , displayAddress()
+    , flags(Constants::NoFlags)
+        
+    , name()
+    , systemName()
+    , hostAddress()
+    , port(0)
+
+    , accessibleByHttp(true)
+{
+}
+
+
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {

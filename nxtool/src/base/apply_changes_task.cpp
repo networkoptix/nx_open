@@ -434,8 +434,6 @@ void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &in
 
 void rtu::ApplyChangesTask::Impl::serversDisappeared(const rtu::IDsVector &ids)
 {
-    //// TODO: add awaiting operation handling
-
     for (const QUuid &id: ids)
     {
         const auto it = m_awaiting.find(id);
@@ -443,7 +441,7 @@ void rtu::ApplyChangesTask::Impl::serversDisappeared(const rtu::IDsVector &ids)
             continue;
 
         const auto awaitingOp = it.value().first;
-        awaitingOp->processServersDisappeared();
+        awaitingOp->processServerDisappeared();
     }
 }
 
@@ -700,9 +698,10 @@ void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
                 QDateTime timeValue = convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId));
                 const QString &timeStr = timeValue.toString(Qt::SystemLocaleLongDate);
 
+                const auto val = kTimeTemplate.arg(timeStr, timeZoneName);
                 const auto flags = (Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
                 const bool successful = shared->addSummaryItem(info, kTimeDescription
-                    , kTimeTemplate.arg(timeStr, timeZoneName), errorCode, flags, affected);
+                    , val, errorCode, flags, affected);
 
                 if (successful)
                 {

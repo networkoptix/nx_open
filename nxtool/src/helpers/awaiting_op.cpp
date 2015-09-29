@@ -63,7 +63,7 @@ void rtu::AwaitingOp::processServerDiscovered(const BaseServerInfo &info)
     m_discovered(info);
 }
 
-void rtu::AwaitingOp::processServersDisappeared()
+void rtu::AwaitingOp::processServerDisappeared()
 {
     if (!m_disappeared || isTimedOut())
         return;

@@ -79,6 +79,10 @@ Expandable.ExpandableItem
     {
         id: table;
 
+        enabled: false;
+
+        verticalScrollBarPolicy: Qt.ScrollBarAlwaysOff;
+
         height: 0;
         anchors
         {
@@ -87,7 +91,7 @@ Expandable.ExpandableItem
         }
 
         activeFocusOnTab: false;
-        
+
         backgroundVisible: false;
         headerVisible: false;
         contentHeader: Item {}
@@ -99,29 +103,28 @@ Expandable.ExpandableItem
 
         selectionMode: SelectionMode.NoSelection;
         model: thisComponent.model;
-    
+
         rowDelegate: Item
         {
-            height: Common.SizeManager.spacing.medium;
+            height: Common.SizeManager.clickableSizes.medium;
             Component.onCompleted: table.height += height;
         }
-    
+
         section
         {
             property: "id";
             delegate: Rtu.SummaryTextDelegate
             {
                 property string base: section;
-            
+
                 parentColumn: nameColumn;
                 fontSize: Common.SizeManager.fontSizes.medium;
-                verticalSpace:Common.SizeManager.spacing.medium;
                 text: base.substr(base.indexOf('}') + 1);
-            
+
                 Component.onCompleted: table.height += height;
             }
         }
-    
+
         TableViewColumn
         {
             id: nameColumn;
@@ -134,20 +137,20 @@ Expandable.ExpandableItem
                 text: styleData.value;
             }
         }
-    
+
         TableViewColumn
         {
             id: valueColumn;
             role: "value";
             width: 0;
-        
+
             delegate: Rtu.SummaryTextDelegate
             {
                 color: (table.model.isSuccessChangesModel ? "black" : "red");
                 parentColumn: valueColumn;
                 text: styleData.value;
             }
-        }   
+        }
 
         TableViewColumn
         {
@@ -167,16 +170,16 @@ Expandable.ExpandableItem
                 }
             }
         }
-    
+
         TableViewColumn
         {
             id: reasonColumn;
             role: "reason";
             width: 0;
-        
+
             delegate: Rtu.SummaryTextDelegate
             {
-                parentColumn: reasonColumn; 
+                parentColumn: reasonColumn;
                 text: styleData.value;
             }
         }
