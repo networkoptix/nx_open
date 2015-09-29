@@ -282,7 +282,7 @@ void QnResourceWidget::addMainOverlay() {
 void QnResourceWidget::setBookmarksLabelText(const QString &text)
 {
     m_overlayWidgets.bookmarksLabel->setText(text);
-    m_overlayWidgets.bookmarksLabel->setVisible(!text.isEmpty());
+    setOverlayWidgetVisible(m_overlayWidgets.bookmarksLabel, !text.isEmpty(), true);
 }
 
 void QnResourceWidget::createButtons() {

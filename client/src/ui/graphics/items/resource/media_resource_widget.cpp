@@ -141,6 +141,15 @@ namespace
         return result;
     }
 
+    //TODO: #GDM #Bookmarks #duplicate code
+    QnCameraBookmarkList getBookmarksAtPosition(const QnCameraBookmarkList &bookmarks, qint64 position) {
+        QnCameraBookmarkList result;
+        std::copy_if(bookmarks.cbegin(), bookmarks.cend(), std::back_inserter(result), [position](const QnCameraBookmark &bookmark) {
+            return bookmark.startTimeMs <= position && position < bookmark.endTimeMs();
+        });
+        return result;
+    }
+
 } // anonymous namespace
 
 
@@ -186,14 +195,25 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
     if (m_camera)
         connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
-    connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateBookmarks);
+    connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateBookmarksMode);
     connect(navigator(),                &QnWorkbenchNavigator::positionChanged,         this, &QnMediaResourceWidget::updateBookmarksFilter);
 
-    /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */
-    QTimer* timer = new QTimer(this);
-    timer->setInterval(bookmarksFilterPrecisionMs / 2);
-    connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateBookmarksFilter);
-    timer->start();
+    {
+        /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */
+        QTimer* timer = new QTimer(this);
+        timer->setInterval(bookmarksFilterPrecisionMs / 2);
+        connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateBookmarksFilter);
+        timer->start();
+    }
+    {
+        /* Update bookmarks text by timer. */
+        QTimer* timer = new QTimer(this);
+        timer->setInterval(1000);
+        connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateBookmarks);
+        timer->start();
+    }
+
+
 
     updateDisplay();
     updateDewarpingParams();
@@ -287,7 +307,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     updateTitleText();
     updateInfoText();
-    updateBookmarks();
+    updateBookmarksMode();
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
@@ -1056,7 +1076,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         /* Do not show time for regular media files. */
         timeString = m_display->camDisplay()->isRealTimeSource() 
             ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(getCurrentTime()).toString(lit("yyyy-MM-dd hh:mm:ss"));
+            : QDateTime::fromMSecsSinceEpoch(getDisplayTimeMs()).toString(lit("yyyy-MM-dd hh:mm:ss"));
         
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
@@ -1358,6 +1378,7 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ioModuleButton_toggled(bool checked) {
+    Q_UNUSED(checked);
     if (m_ioModuleOverlayWidget)
         updateIoModuleVisibility(true);
 }
@@ -1529,36 +1550,53 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
 void QnMediaResourceWidget::updateBookmarksFilter() {
     if (!m_bookmarksQuery)
         return;
-    m_bookmarksQuery->setFilter(constructBookmarksFilter(navigator()->position() / 1000));
+
+    m_bookmarksQuery->setFilter(constructBookmarksFilter(getUtcCurrentTimeMs()));
 }
 
-
-void QnMediaResourceWidget::updateBookmarks() {
+void QnMediaResourceWidget::updateBookmarksMode() {
     bool enable = navigator()->bookmarksModeEnabled() && !m_camera.isNull();
 
     if (!m_bookmarksQuery.isNull() == enable)
         return;
 
     if (enable) {
-        m_bookmarksQuery = qnCameraBookmarksManager->createQuery(QnVirtualCameraResourceSet() << m_camera, constructBookmarksFilter(navigator()->position() / 1000));
+        m_bookmarksQuery = qnCameraBookmarksManager->createQuery();
 
-        connect(m_bookmarksQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, [this](const QnCameraBookmarkList &bookmarks) {
-            static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
-
-            QString text;
-            for (const QnCameraBookmark &bookmark: bookmarks) {
-                text += outputTemplate.arg(bookmark.name, bookmark.description);
-            }
-            setBookmarksLabelText(text);
-        });
-
+        connect(m_bookmarksQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, &QnMediaResourceWidget::updateBookmarks);
+        updateBookmarksFilter();
+        m_bookmarksQuery->setCamera(m_camera);
     } else {
+        if (m_bookmarksQuery)
+            disconnect(m_bookmarksQuery, nullptr, this, nullptr);
         m_bookmarksQuery.clear();
-        setBookmarksLabelText(QString());
     }
+    updateBookmarks();
 }
 
-qint64 QnMediaResourceWidget::getCurrentTime() const {
+void QnMediaResourceWidget::updateBookmarks() {
+    if (!m_bookmarksQuery) {
+        setBookmarksLabelText(QString());
+        return;
+    }
+
+    auto dt = [](const QnCameraBookmark &b) {
+        static const QString fmt(lit("mm:ss"));
+        return lit("%1 - %2")
+            .arg(QDateTime::fromMSecsSinceEpoch(b.startTimeMs).toString(fmt))
+            .arg(QDateTime::fromMSecsSinceEpoch(b.endTimeMs()).toString(fmt));
+    };
+
+    static const QString outputTemplate = lit("<b>%1</b><br>%2<br>%3<hr color = \"lightgrey\">");
+
+    QString text;
+    for (const QnCameraBookmark &bookmark: getBookmarksAtPosition(m_bookmarksQuery->executeLocal(), getUtcCurrentTimeMs())) {
+        text += outputTemplate.arg(bookmark.name, bookmark.description, dt(bookmark));
+    }
+    setBookmarksLabelText(text);
+}
+
+qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const {
     // get timestamp from the first channel that was painted
     int channel = std::distance(m_paintedChannels.cbegin(),
         std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
@@ -1569,6 +1607,11 @@ qint64 QnMediaResourceWidget::getCurrentTime() const {
         ? m_renderer->getTimestampOfNextFrameToRender(channel) / 1000
         : display()->camDisplay()->getCurrentTime() / 1000;
 
+    return timestampMs;
+}
+
+qint64 QnMediaResourceWidget::getDisplayTimeMs() const {
+    qint64 timestampMs = getUtcCurrentTimeMs();
     if(qnSettings->timeMode() == Qn::ServerTimeMode)
         timestampMs += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
     return timestampMs;

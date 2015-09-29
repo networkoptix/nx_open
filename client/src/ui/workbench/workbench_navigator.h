@@ -93,8 +93,8 @@ public:
     qreal minimalSpeed() const;
     qreal maximalSpeed() const;
 
-    qint64 position() const;
-    void setPosition(qint64 position);
+    qint64 positionUsec() const;
+    void setPosition(qint64 positionUsec);
 
     QnResourceWidget *currentWidget() const;
     WidgetFlags currentWidgetFlags() const;

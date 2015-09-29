@@ -333,12 +333,16 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool bookmarksModeEnabled) {
             filter.text = m_searchQueryStrategy->query();
 
         m_bookmarkQuery = qnCameraBookmarksManager->createQuery();
+        connect(m_bookmarkQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, &QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged);
+
         m_bookmarkQuery->setFilter(filter);
         if (m_currentMediaWidget)
             m_bookmarkQuery->setCamera(m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>());
 
-        connect(m_bookmarkQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, &QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged);
+        
     } else {
+        if (m_bookmarkQuery)
+            disconnect(m_bookmarkQuery, nullptr, this, nullptr);
         m_bookmarkQuery.clear();
         m_timeSlider->setBookmarks(QnCameraBookmarkList());
         m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
@@ -631,14 +635,14 @@ qreal QnWorkbenchNavigator::maximalSpeed() const {
         : 1.0;
 }
 
-qint64 QnWorkbenchNavigator::position() const {
+qint64 QnWorkbenchNavigator::positionUsec() const {
     if(!m_currentMediaWidget)
         return 0;
 
     return m_currentMediaWidget->display()->camera()->getCurrentTime();
 }
 
-void QnWorkbenchNavigator::setPosition(qint64 position) {
+void QnWorkbenchNavigator::setPosition(qint64 positionUsec) {
     if(!m_currentMediaWidget)
         return;
 
@@ -647,9 +651,9 @@ void QnWorkbenchNavigator::setPosition(qint64 position) {
         return;
 
     if(isPlaying())
-        reader->jumpTo(position, 0);
+        reader->jumpTo(positionUsec, 0);
     else
-        reader->jumpTo(position, position);
+        reader->jumpTo(positionUsec, positionUsec);
     emit positionChanged();
 }
 

@@ -199,10 +199,12 @@ private:
     Q_SLOT void updateIoModuleVisibility(bool animate);
     Q_SLOT void updateOverlayButton();
 
-    void updateBookmarks();
+    void updateBookmarksMode();
     void updateBookmarksFilter();
+    void updateBookmarks();
 
-    qint64 getCurrentTime() const;
+    qint64 getDisplayTimeMs() const;
+    qint64 getUtcCurrentTimeMs() const;
 
 private:
     struct ResourceStates
