@@ -14,13 +14,24 @@ namespace api {
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AuthRequest* const authRequest)
 {
-    //TODO #ak
-    return false;
+    if (!urlQuery.hasQueryItem("nonce") ||
+        !urlQuery.hasQueryItem("username") ||
+        !urlQuery.hasQueryItem("realm"))
+    {
+        return false;
+    }
+
+    authRequest->nonce = urlQuery.queryItemValue("nonce").toStdString();
+    authRequest->username = urlQuery.queryItemValue("username").toStdString();
+    authRequest->realm = urlQuery.queryItemValue("realm").toStdString();
+    return true;
 }
 
 void serializeToUrlQuery(const AuthRequest& authRequest, QUrlQuery* const urlQuery)
 {
-    //TODO #ak
+    urlQuery->addQueryItem("nonce", QString::fromStdString(authRequest.nonce));
+    urlQuery->addQueryItem("username", QString::fromStdString(authRequest.username));
+    urlQuery->addQueryItem("realm", QString::fromStdString(authRequest.realm));
 }
 
 

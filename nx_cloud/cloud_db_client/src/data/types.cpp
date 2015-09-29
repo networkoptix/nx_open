@@ -65,6 +65,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::notImplemented, "notImplemented")
     (ResultCode::unknownRealm, "unknownRealm")
     (ResultCode::badUsername, "badUsername")
+    (ResultCode::badRequest, "badRequest")
+    (ResultCode::invalidNonce, "invalidNonce")
     (ResultCode::unknownError, "unknownError")
 );
 

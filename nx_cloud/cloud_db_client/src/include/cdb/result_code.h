@@ -27,6 +27,8 @@ enum class ResultCode
     notImplemented,
     unknownRealm,
     badUsername,
+    badRequest,
+    invalidNonce,
     unknownError
 };
 

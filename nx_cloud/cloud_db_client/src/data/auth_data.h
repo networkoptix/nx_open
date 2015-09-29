@@ -23,7 +23,7 @@ void serializeToUrlQuery(const AuthRequest&, QUrlQuery* const urlQuery);
 
 #define NonceData_Fields (nonce)(validPeriod)
 #define AuthRequest_Fields (nonce)(username)(realm)
-#define AuthResponse_Fields (intermediateResponse)
+#define AuthResponse_Fields (nonce)(intermediateResponse)(accessRole)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

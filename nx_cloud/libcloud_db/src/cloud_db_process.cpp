@@ -35,6 +35,7 @@
 #include "http_handlers/ping.h"
 #include "http_handlers/verify_email_address_handler.h"
 #include "http_handlers/unbind_system_handler.h"
+#include "http_handlers/share_system_handler.h"
 #include "managers/account_manager.h"
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
@@ -125,7 +126,9 @@ int CloudDBProcess::executeApplication()
             authRestrictionList,
             streeManager );
 
-        AuthenticationProvider authProvider;
+        AuthenticationProvider authProvider(
+            accountManager,
+            systemManager);
 
         AuthorizationManager authorizationManager;
     
@@ -253,6 +256,12 @@ void CloudDBProcess::registerApiHandlers(
         UnbindSystemHandler::HANDLER_PATH,
         [systemManager, &authorizationManager]() -> std::unique_ptr<UnbindSystemHandler> {
             return std::make_unique<UnbindSystemHandler>( systemManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<ShareSystemHttpHandler>(
+        ShareSystemHttpHandler::HANDLER_PATH,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<ShareSystemHttpHandler> {
+            return std::make_unique<ShareSystemHttpHandler>(systemManager, authorizationManager);
         } );
 
     //authentication

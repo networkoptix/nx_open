@@ -12,6 +12,7 @@
 #include <string>
 
 #include "result_code.h"
+#include "system_data.h"
 
 
 namespace nx {
@@ -39,7 +40,18 @@ public:
 class AuthResponse
 {
 public:
+    //!nonce from \a AuthRequest
+    std::string nonce;
+    //!H(ha1:nonce). H is calculated like MD5 but without appending 1 bit, zero bits and message length
     std::string intermediateResponse;
+    //!Authorized access role
+    SystemAccessRole accessRole;
+
+    AuthResponse()
+    :
+        accessRole(SystemAccessRole::none)
+    {
+    }
 };
 
 //!Provides some temporary hashes which can be used by mediaserver to authenticate requests using cloud account credentials

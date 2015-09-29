@@ -8,6 +8,8 @@
 
 #include <functional>
 
+#include <QtCore/QByteArray>
+
 #include <cdb/auth_provider.h>
 
 #include "access_control/auth_types.h"
@@ -16,6 +18,9 @@
 namespace nx {
 namespace cdb {
 
+class AccountManager;
+class SystemManager;
+
 //!Provides some temporary hashes which can be used by mediaserver to authenticate requests using cloud account credentials
 /*!
     \note These requests are allowed for system only
@@ -23,6 +28,10 @@ namespace cdb {
 class AuthenticationProvider
 {
 public:
+    AuthenticationProvider(
+        const AccountManager& accountManager,
+        const SystemManager& systemManager);
+
     //!Returns nonce to be used by mediaserver
     void getCdbNonce(
         const AuthorizationInfo& authzInfo,
@@ -35,6 +44,17 @@ public:
         const AuthorizationInfo& authzInfo,
         const api::AuthRequest& authRequest,
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler);
+
+private:
+    const AccountManager& m_accountManager;
+    const SystemManager& m_systemManager;
+
+    bool parseNonce(
+        const std::string& nonce,
+        QByteArray* const random3Bytes,
+        uint32_t* const timestamp,
+        QByteArray* const nonceHash) const;
+    QByteArray calcNonceHash(const QnUuid& systemID, uint32_t timestamp) const;
 };
 
 }   //cdb

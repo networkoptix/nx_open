@@ -48,6 +48,18 @@ namespace QnLexicalDetail {
         return true;
     }
 
+    template<class T>
+    void serialize_enum_class(const T& value, QString* target) {
+        QnLexical::serialize(value, target);
+    }
+
+
+    template<class T>
+    bool deserialize_enum_class(const QString &value, T *target) {
+        bool ok = false;
+        *target = QnLexical::deserialized<T>(value, T(), &ok);
+        return ok;
+    }
 } // namespace QnLexicalDetail
 
 
@@ -133,6 +145,22 @@ void serialize(const T &value, QString *target, typename std::enable_if<QnLexica
 template<class T>
 bool deserialize(const QString &value, T *target, typename std::enable_if<QnLexical::is_numerically_serializable_enum_or_flags<T>::value>::type * = NULL) {
     return QnLexicalDetail::deserialize_numeric_enum(value, target);
+}
+
+
+//overloads for "enum class"
+template<class T>
+void serialize(const T &value, QString *target,
+    typename std::enable_if<std::is_enum<T>::value && !QnLexical::is_numerically_serializable_enum_or_flags<T>::value>::type * = NULL)
+{
+    QnLexicalDetail::serialize_enum_class(value, target);
+}
+
+template<class T>
+bool deserialize(const QString &value, T *target,
+    typename std::enable_if<std::is_enum<T>::value && !QnLexical::is_numerically_serializable_enum_or_flags<T>::value>::type * = NULL)
+{
+    return QnLexicalDetail::deserialize_enum_class(value, target);
 }
 
 
