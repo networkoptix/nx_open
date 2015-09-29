@@ -8,6 +8,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <utils/common/log.h>
+#include <utils/common/sync_call.h>
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
@@ -97,8 +98,19 @@ void SystemManager::getSystems(
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
     }
-    //    else if(auto accountID = wholeFilterMap.get<QnUuid>(cdb::attr::accountID)) 
-    //        ;//TODO #ak effectively selecting systems with specified account id
+    else if (auto accountID = wholeFilterMap.get<QnUuid>(cdb::attr::accountID))
+    {
+        //effectively selecting systems with specified account id
+        QnMutexLocker lk(&m_mutex);
+        for (auto it = m_accountAccessRoleForSystem.lower_bound(std::make_pair(accountID.get(), QnUuid()));
+             it != m_accountAccessRoleForSystem.end() && it->first.first == accountID.get();
+             ++it)
+        {
+            auto system = m_cache.find(it->first.second);
+            if (system)
+                resultData.systems.push_back(system.get());
+        }
+    }
     else
     {
         //filtering full system list
@@ -131,11 +143,14 @@ boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id
     return m_cache.find(id);
 }
 
-api::SystemAccessRole::Value SystemManager::getAccountRightsForSystem(
-    const QnUuid& /*accountID*/, const QnUuid& /*systemID*/) const
+api::SystemAccessRole SystemManager::getAccountRightsForSystem(
+    const QnUuid& accountID, const QnUuid& systemID) const
 {
-    //TODO #ak
-    return api::SystemAccessRole::none;
+    QnMutexLocker lk(&m_mutex);
+    auto it = m_accountAccessRoleForSystem.find(std::make_pair(accountID, systemID));
+    return it == m_accountAccessRoleForSystem.end()
+        ? api::SystemAccessRole::none
+        : it->second;
 }
 
 nx::db::DBResult SystemManager::insertSystemToDB(
@@ -160,20 +175,17 @@ nx::db::DBResult SystemManager::insertSystemToDB(
         return db::DBResult::ioError;
     }
 
-    //adding binding system -> account
-    QSqlQuery insertSystemToAccountBinding(*connection);
-    insertSystemToAccountBinding.prepare(
-        "INSERT INTO system_to_account( account_id, system_id, access_role_id ) "
-        " VALUES( :accountID, :systemID, :accessRole )");
-    insertSystemToAccountBinding.bindValue(":accountID", QnSql::serialized_field(newSystem.accountID));
-    insertSystemToAccountBinding.bindValue(":systemID", QnSql::serialized_field(systemData->id));
-    insertSystemToAccountBinding.bindValue(":accessRole", api::SystemAccessRole::owner);
-    if (!insertSystemToAccountBinding.exec())
+    data::SystemSharing systemSharing;
+    systemSharing.accountID = newSystem.accountID;
+    systemSharing.systemID = systemData->id;
+    systemSharing.accessRole = api::SystemAccessRole::owner;
+    auto result = insertSystemSharingToDB(connection, systemSharing);
+    if (result != nx::db::DBResult::ok)
     {
         NX_LOG(lit("Could not insert system %1 to account %2 binding into DB. %3").
             arg(QString::fromStdString(newSystem.name)).arg(newSystem.accountID.toString()).
             arg(connection->lastError().text()), cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return result;
     }
 
     return nx::db::DBResult::ok;
@@ -189,7 +201,11 @@ void SystemManager::systemAdded(
     {
         //updating cache
         m_cache.insert(systemData.id, systemData);
-        //TODO #ak updating "systems by account id" index
+        //updating "systems by account id" index
+        QnMutexLocker lk(&m_mutex);
+        m_accountAccessRoleForSystem.emplace(
+            std::make_pair(systemData.ownerAccountID, systemData.id),
+            api::SystemAccessRole::owner);
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
@@ -221,13 +237,18 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
 
 void SystemManager::systemSharingAdded(
     nx::db::DBResult dbResult,
-    data::SystemSharing /*sytemSharing*/,
+    data::SystemSharing systemSharing,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        //TODO #ak updating "systems by account id" index
+        //updating "systems by account id" index
+        QnMutexLocker lk(&m_mutex);
+        m_accountAccessRoleForSystem.emplace(
+            std::make_pair(systemSharing.accountID, systemSharing.systemID),
+            systemSharing.accessRole);
     }
+
     completionHandler(
         dbResult == nx::db::DBResult::ok
         ? api::ResultCode::ok
@@ -271,7 +292,16 @@ void SystemManager::systemDeleted(
     if (dbResult == nx::db::DBResult::ok)
     {
         m_cache.erase(systemID.id);
-        //TODO #ak updating "systems by account id" index
+        QnMutexLocker lk(&m_mutex);
+        for (auto it = m_accountAccessRoleForSystem.begin();
+             it != m_accountAccessRoleForSystem.end();
+             )
+        {
+            if (it->first.second == systemID.id)
+                it = m_accountAccessRoleForSystem.erase(it);
+            else
+                ++it;
+        }
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
@@ -281,22 +311,42 @@ void SystemManager::systemDeleted(
 
 nx::db::DBResult SystemManager::fillCache()
 {
-    std::promise<db::DBResult> cacheFilledPromise;
-    auto future = cacheFilledPromise.get_future();
+    {
+        std::promise<db::DBResult> cacheFilledPromise;
+        auto future = cacheFilledPromise.get_future();
 
-    //starting async operation
-    using namespace std::placeholders;
-    m_dbManager->executeSelect<int>(
-        std::bind(&SystemManager::fetchSystems, this, _1, _2),
-        [&cacheFilledPromise](db::DBResult dbResult, int /*dummy*/) {
-        cacheFilledPromise.set_value(dbResult);
-    });
+        //starting async operation
+        using namespace std::placeholders;
+        m_dbManager->executeSelect<int>(
+            std::bind(&SystemManager::fetchSystems, this, _1, _2),
+            [&cacheFilledPromise](db::DBResult dbResult, int /*dummy*/) {
+                cacheFilledPromise.set_value(dbResult);
+            });
+        //waiting for completion
+        future.wait();
+        if (future.get() != db::DBResult::ok)
+            return future.get();
+    }
 
-    //TODO #ak fetching system_to_account binding
+    //fetching system_to_account binding
+    {
+        std::promise<db::DBResult> cacheFilledPromise;
+        auto future = cacheFilledPromise.get_future();
 
-    //waiting for completion
-    future.wait();
-    return future.get();
+        //starting async operation
+        using namespace std::placeholders;
+        m_dbManager->executeSelect<int>(
+            std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2),
+            [&cacheFilledPromise](db::DBResult dbResult, int /*dummy*/) {
+                cacheFilledPromise.set_value(dbResult);
+            });
+        //waiting for completion
+        future.wait();
+        if (future.get() != db::DBResult::ok)
+            return future.get();
+    }
+
+    return db::DBResult::ok;
 }
 
 nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* const /*dummy*/)
@@ -312,7 +362,7 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
             arg(connection->lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
-
+    
     std::vector<data::SystemData> systems;
     QnSql::fetch_many(readSystemsQuery, &systems);
 
@@ -329,6 +379,32 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
 
     return db::DBResult::ok;
 }
+
+nx::db::DBResult SystemManager::fetchSystemToAccountBinder(QSqlDatabase* connection, int* const /*dummy*/)
+{
+    QSqlQuery readSystemToAccountQuery(*connection);
+    readSystemToAccountQuery.prepare(
+        "SELECT account_id as accountID, system_id as systemID, access_role_id as accessRole "
+        "FROM system_to_account");
+    if (!readSystemToAccountQuery.exec())
+    {
+        NX_LOG(lit("Failed to read system list from DB. %1").
+            arg(connection->lastError().text()), cl_logWARNING);
+        return db::DBResult::ioError;
+    }
+
+    std::vector<data::SystemSharing> systemToAccount;
+    QnSql::fetch_many(readSystemToAccountQuery, &systemToAccount);
+    for (auto& sharing : systemToAccount)
+    {
+        m_accountAccessRoleForSystem.emplace(
+            std::make_pair(sharing.accountID, sharing.systemID),
+            sharing.accessRole);
+    }
+
+    return db::DBResult::ok;
+}
+
 
 }   //cdb
 }   //nx

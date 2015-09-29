@@ -50,6 +50,8 @@ void AccountManager::addAccount(
     data::AccountData accountData,
     std::function<void(api::ResultCode)> completionHandler )
 {
+    accountData.id = QnUuid::createUuid();
+
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountData, data::EmailVerificationCode>(
         std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
@@ -156,13 +158,11 @@ db::DBResult AccountManager::insertAccount(
     //TODO #ak should return specific error if email address already used for account
 
     //inserting account
-    const QnUuid accountID = QnUuid::createUuid();
     QSqlQuery insertAccountQuery( *connection );
     insertAccountQuery.prepare( 
         "INSERT INTO account (id, email, password_ha1, full_name, status_code) "
                     "VALUES  (:id, :email, :passwordHa1, :fullName, :statusCode)");
     QnSql::bind( accountData, &insertAccountQuery );
-    insertAccountQuery.bindValue( ":id", QnSql::serialized_field(accountID) );
     insertAccountQuery.bindValue( ":statusCode", api::asAwaitingEmailConfirmation );
     if( !insertAccountQuery.exec() )
     {
@@ -177,7 +177,7 @@ db::DBResult AccountManager::insertAccount(
     insertEmailVerificationQuery.prepare( 
         "INSERT INTO email_verification( account_id, verification_code, expiration_date ) "
                                "VALUES ( ?, ?, ? )" );
-    insertEmailVerificationQuery.bindValue( 0, QnSql::serialized_field( accountID ) );
+    insertEmailVerificationQuery.bindValue( 0, QnSql::serialized_field(accountData.id) );
     insertEmailVerificationQuery.bindValue( 1, emailVerificationCode );
     insertEmailVerificationQuery.bindValue( 2, QDateTime::currentDateTimeUtc().addSecs(UNCONFIRMED_ACCOUNT_EXPIRATION_SEC) );
     if( !insertEmailVerificationQuery.exec() )

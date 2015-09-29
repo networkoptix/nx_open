@@ -22,11 +22,8 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-namespace SystemAccessRole
-{
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Value), (lexical))
-}
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemAccessRole)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemAccessRole), (lexical))
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemStatus)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))

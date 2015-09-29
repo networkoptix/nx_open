@@ -25,18 +25,15 @@ public:
     std::string systemID;
 };
 
-namespace SystemAccessRole
+enum class SystemAccessRole
 {
-    enum Value
-    {
-        none = 0,
-        owner = 1,
-        maintenance,
-        viewer,
-        editor,
-        editorWithSharing
-    };
-}
+    none = 0,
+    owner = 1,
+    maintenance,
+    viewer,
+    editor,
+    editorWithSharing
+};
 
 //!Information required to register system in cloud
 class SystemRegistrationData
@@ -75,6 +72,17 @@ public:
         cloudConnectionSubscriptionStatus(false)
     {
     }
+
+    bool operator==(const SystemData& right) const
+    {
+        return
+            id == right.id &&
+            name == right.name &&
+            authKey == right.authKey &&
+            ownerAccountID == right.ownerAccountID &&
+            status == right.status &&
+            cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus;
+    }
 };
 
 
@@ -90,7 +98,7 @@ class SystemSharing
 public:
     QnUuid accountID;
     QnUuid systemID;
-    SystemAccessRole::Value accessRole;
+    SystemAccessRole accessRole;
 
     SystemSharing()
     :

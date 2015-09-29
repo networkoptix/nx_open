@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <utils/db/db_manager.h>
+#include <utils/thread/mutex.h>
 
 #include "access_control/auth_types.h"
 #include "cache.h"
@@ -83,7 +84,7 @@ public:
         - \a accountID has no rights for \a systemID
         - \a accountID or \a systemID is unknown
     */
-    api::SystemAccessRole::Value getAccountRightsForSystem(
+    api::SystemAccessRole getAccountRightsForSystem(
         const QnUuid& accountID, const QnUuid& systemID) const;
 
     //!Create data view restricted by \a authzInfo and \a filter
@@ -94,6 +95,9 @@ public:
 private:
     nx::db::DBManager* const m_dbManager;
     Cache<QnUuid, data::SystemData> m_cache;
+    mutable QnMutex m_mutex;
+    //!map<pair<accountID, systemID>, accessRole>
+    std::map<std::pair<QnUuid, QnUuid>, api::SystemAccessRole> m_accountAccessRoleForSystem;
 
     nx::db::DBResult insertSystemToDB(
         QSqlDatabase* const connection,
@@ -123,6 +127,7 @@ private:
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchSystems(QSqlDatabase* connection, int* const /*dummy*/);
+    nx::db::DBResult fetchSystemToAccountBinder(QSqlDatabase* connection, int* const /*dummy*/);
 };
 
 }   //cdb

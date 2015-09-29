@@ -13,15 +13,13 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-namespace SystemAccessRole {
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Value,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
     (SystemAccessRole::none, "none")
     (SystemAccessRole::owner, "owner")
     (SystemAccessRole::maintenance, "maintenance")
     (SystemAccessRole::viewer, "viewer")
     (SystemAccessRole::editor, "editor")
     (SystemAccessRole::editorWithSharing, "editorWithSharing"));
-}
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemStatus,
     (ssInvalid, "invalid")
@@ -59,7 +57,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
     systemSharing->systemID = QnUuid::fromStringSafe(urlQuery.queryItemValue("systemID"));
     systemSharing->accountID = QnUuid::fromStringSafe(urlQuery.queryItemValue("accountID"));
     bool success = false;
-    systemSharing->accessRole = QnLexical::deserialized<api::SystemAccessRole::Value>(
+    systemSharing->accessRole = QnLexical::deserialized<api::SystemAccessRole>(
         urlQuery.queryItemValue("accessRole"), api::SystemAccessRole::none, &success);
     return success;
 }
