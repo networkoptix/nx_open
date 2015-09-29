@@ -86,6 +86,12 @@ Expandable.GenericSettingsPanel
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
                 text: "Reset All";
+
+                onClicked:
+                {
+                    rtuContext.changesManager().changeset().addFactoryDefaultsAction();
+                    rtuContext.changesManager().applyChanges();
+                }
             }
 
             Base.Button
@@ -96,6 +102,12 @@ Expandable.GenericSettingsPanel
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
                 text: "Reset All But Network";
+
+                onClicked:
+                {
+                    rtuContext.changesManager().changeset().addFactoryDefaultsButNetworkAction();
+                    rtuContext.changesManager().applyChanges();
+                }
             }
         }
 
