@@ -1,6 +1,7 @@
 #ifndef QN_SERIALIZATION_JSON_FUNCTIONS_H
 #define QN_SERIALIZATION_JSON_FUNCTIONS_H
 
+#include <chrono>
 #include <vector>
 #include <set>
 #include <string>
