@@ -53,7 +53,7 @@ struct QnCameraBookmark {
         durationMs(0)
     {}
 
-    QString tagsAsString() const;
+    QString tagsAsString(QChar delimiter = L' ') const;
 
     static QnCameraBookmarkList mergeCameraBookmarks(const MultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
 };

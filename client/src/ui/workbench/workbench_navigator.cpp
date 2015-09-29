@@ -1862,7 +1862,7 @@ void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
     if (!isValid())
         return;
 
-    QCompleter *completer = new QCompleter(m_bookmarkTags);
+    QCompleter *completer = new QCompleter(QStringList(m_bookmarkTags.toList()));
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setCompletionMode(QCompleter::InlineCompletion);
 

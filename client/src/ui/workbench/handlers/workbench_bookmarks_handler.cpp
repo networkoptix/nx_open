@@ -38,14 +38,12 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTags);
 
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.append(tags);
-        m_tags.removeDuplicates();
+        m_tags.unite(tags);
         context()->navigator()->setBookmarkTags(m_tags);
     });
 
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
-        for (const QString &tag: tags)
-            m_tags.removeAll(tag);
+        m_tags.subtract(tags);
         context()->navigator()->setBookmarkTags(m_tags);
     });
 }

@@ -353,7 +353,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
         query.bindValue(":docid", docId);
         query.bindValue(":name", bookmark.name);
         query.bindValue(":description", bookmark.description);
-        query.bindValue(":tags", bookmark.tags.join(L' '));
+        query.bindValue(":tags", bookmark.tagsAsString(L' '));
         if (!query.exec()) {
             qWarning() << Q_FUNC_INFO << query.lastError().text();
             return false;
@@ -488,7 +488,7 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
 
         QString tag = query.value(tagNameFieldIdx).toString();
         if (!tag.isEmpty())
-            result.back().tags.append(tag);
+            result.back().tags.insert(tag);
     }
     return true;
 }
