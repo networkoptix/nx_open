@@ -156,7 +156,12 @@
                                     <div class="camera-view-message">UNAUTHORIZED</div>
                                 </div>
 
-                                <videowindow ng-class="{invisible: !positionSelected && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
+                                <div class="camera-view-informer" ng-if="iOSVideoTooLarge">
+                                    Video cannot be played.<br>
+                                    iOS doesn't support video larger than fullHD (2MP: 1920x1080).<br>
+                                </div>
+
+                                <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
                                              vg-update-time="updateTime($currentTime, $duration)"
                                              vg-player-ready="playerReady($API)"
                                              vg-src="acitveVideoSource">
