@@ -151,6 +151,7 @@ cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$
 cp -R ./etc $BUILD_DIR
 cp -R ./opt $BUILD_DIR
 chmod -R 755 $BUILD_DIR/etc/init.d
+chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts
 mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
 
 #additional platform specific files
