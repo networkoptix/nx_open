@@ -15,6 +15,7 @@
 #include "axis_resource.h"
 
 static const int DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
+static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
 // TODO: #Elric #EC2 use QnIniSection
 
@@ -81,6 +82,12 @@ QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
         data.value<qreal>(lit("axisMaxTiltSpeed"), 100),
         data.value<qreal>(lit("axisMaxZoomSpeed"), 100)
     );
+
+    Qn::PtzCapabilities extraCaps;
+    if(data.value(lit("extraPtzCapabilities"), &extraCaps))
+        m_capabilities |= extraCaps;
+    
+    m_cacheUpdateTimer.invalidate();
 }
 
 QnAxisPtzController::~QnAxisPtzController() {
@@ -175,6 +182,12 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
     } else {
         m_capabilities &= ~Qn::AbsolutePtzCapabilities;
     }
+
+    QnResourceData data = qnCommon->dataPool()->data(m_resource);
+    Qn::PtzCapabilities extraCaps;
+    if(data.value(lit("extraPtzCapabilities"), &extraCaps))
+        m_capabilities |= extraCaps;
+
 }
 
 CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
@@ -345,5 +358,80 @@ bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
     *flip = m_flip;
     return true;
 }
+
+
+
+bool QnAxisPtzController::getPresets(QnPtzPresetList *presets)
+{
+    if (!(m_capabilities & Qn::PresetsPtzCapability))
+        return base_type::getPresets(presets);
+    
+    if (!m_cacheUpdateTimer.isValid() || m_cacheUpdateTimer.elapsed() > CACHE_UPDATE_TIMEOUT)
+    {
+        QByteArray body;
+        bool rez = query(lit("com/ptz.cgi?query=presetposcam"), &body);
+        if (!rez)
+            return rez;
+        QMutexLocker lock(&m_mutex);
+        for(QByteArray line: body.split(L'\n').mid(1))
+        {
+            line = line.trimmed();
+            QList<QByteArray> params = line.split(L'=');
+            if (params.size() == 2)
+                m_cachedData.insert(QString::fromUtf8(params[0]), QString::fromUtf8(params[1]));
+        }
+        m_cacheUpdateTimer.restart();
+    }
+
+    for (auto itr = m_cachedData.begin(); itr != m_cachedData.end(); ++itr)
+        presets->push_back(QnPtzPreset(itr.key(), itr.value()));
+    return true;
+}
+
+int extractPresetNum(const QString& presetId)
+{
+    QString result;
+    for (int i = 0; i < presetId.size(); ++i)
+    {
+        if (presetId.at(i) >= L'0' && presetId.at(i) <= L'9')
+            result += presetId.at(i);
+    }
+    return result.toInt();
+}
+
+bool QnAxisPtzController::activatePreset(const QString &presetId, qreal speed)
+{
+    if (!(m_capabilities & Qn::PresetsPtzCapability))
+        return base_type::activatePreset(presetId, speed);
+    
+    return query(lit("com/ptz.cgi?gotoserverpresetno=%1").arg(extractPresetNum(presetId)));
+}
+
+
+bool QnAxisPtzController::createPreset(const QnPtzPreset &preset)
+{
+    if (!(m_capabilities & Qn::PresetsPtzCapability))
+        return base_type::createPreset(preset);
+
+    m_cacheUpdateTimer.invalidate();
+    return query(lit("com/ptz.cgi?setserverpresetname=%1").arg(preset.name));
+}
+
+bool QnAxisPtzController::updatePreset(const QnPtzPreset &preset)
+{
+    if (!(m_capabilities & Qn::PresetsPtzCapability))
+        return base_type::updatePreset(preset);
+
+    return removePreset(preset.id) && createPreset(preset);
+}
+
+bool QnAxisPtzController::removePreset(const QString &presetId)
+{
+    if (!(m_capabilities & Qn::PresetsPtzCapability))
+        return base_type::removePreset(presetId);
+
+    return query(lit("com/ptz.cgi?removeserverpresetno=%1").arg(extractPresetNum(presetId)));
+}
+
 
 #endif // ENABLE_AXIS
