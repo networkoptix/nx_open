@@ -190,6 +190,10 @@ namespace {
 
     const int startDragDistance = 5;
 
+    const int minBookmarkWidth = 24;
+    const int allowedBookmarkOverlap = 4;
+    const int bookmarkTextPadding = 6;
+    const int minBookmarkTextCharsVisible = 6;
 
 
     bool checkLine(int line) {
@@ -755,6 +759,7 @@ QnCameraBookmarkList QnTimeSlider::bookmarks() const {
 
 void QnTimeSlider::setBookmarks(const QnCameraBookmarkList &bookmarks) {
     m_bookmarks = bookmarks;
+    updateVisibleBookmarks();
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -866,6 +871,8 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
                 }
             }
             
+            qint64 oldWindowSize = m_windowEnd - m_windowStart;
+
             m_windowStart = start;
             m_windowEnd = end;
 
@@ -875,6 +882,9 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
             updateToolTipVisibility();
             updateMSecsPerPixel();
             updateThumbnailsPeriod();
+
+            if (oldWindowSize != m_windowEnd - m_windowStart)
+                updateVisibleBookmarks();
         }
     }
 }
@@ -1231,6 +1241,94 @@ void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
 
 void QnTimeSlider::clearThumbnails() {
     m_thumbnailData.clear();
+}
+
+void QnTimeSlider::updateVisibleBookmarks() {
+    qint64 windowLength = m_windowEnd - m_windowStart;
+    qint64 minBookmarkDuration = windowLength * minBookmarkWidth / rect().width();
+    qint64 allowedOverlap = windowLength * allowedBookmarkOverlap / rect().width();
+
+    QBitArray possibleBookmark(m_bookmarks.size(), true);
+    QBitArray visibleBookmark(m_bookmarks.size(), false);
+
+    int possibleCount = m_bookmarks.size();
+
+    for (int i = 0; i < m_bookmarks.size(); ++i) {
+        const QnCameraBookmark &bookmark = m_bookmarks[i];
+        if (bookmark.durationMs < minBookmarkDuration) {
+            possibleBookmark[i] = false;
+            --possibleCount;
+        }
+    }
+
+    while (possibleCount > 0) {
+        int i = 0;
+        while (i < m_bookmarks.size()) {
+            QVector<int> pending;
+            qint64 start = -1;
+            qint64 end = -1;
+            qint64 duration = 0;
+            int bestBookmark = -1;
+
+            // Look for the longest bookmark in the current subset of overlapped bookmarks
+            for (/* no init */; i < m_bookmarks.size(); ++i) {
+                if (!possibleBookmark[i])
+                    continue;
+
+                const QnCameraBookmark &bookmark = m_bookmarks[i];
+
+                if (bookmark.startTimeMs >= end - allowedOverlap) {
+                    if (bestBookmark >= 0)
+                        break;
+
+                    pending.append(i);
+
+                    start = bookmark.startTimeMs;
+                    end = bookmark.endTimeMs();
+                    duration = bookmark.durationMs;
+                    bestBookmark = i;
+                } else {
+                    pending.append(i);
+
+                    if (bookmark.durationMs > duration) {
+                        start = bookmark.startTimeMs;
+                        end = bookmark.endTimeMs();
+                        duration = bookmark.durationMs;
+                        bestBookmark = i;
+                    }
+                }
+            }
+
+            // Mark the best bookmark as visible and remove all overlapped bookmarks from possible
+            if (bestBookmark >= 0) {
+                // add the best bookmark to visible mask
+                visibleBookmark[bestBookmark] = true;
+                --possibleCount;
+
+                if (pending.size() > 1) {
+                    // remove overlapped pendings from possible
+                    qint64 bestBookmarkStart = m_bookmarks[bestBookmark].startTimeMs;
+                    qint64 bestBookmarkEnd = m_bookmarks[bestBookmark].endTimeMs();
+                    for (int p = 0; p < pending.size(); ++p) {
+                        if (p == bestBookmark)
+                            continue;
+
+                        const QnCameraBookmark &bookmark = m_bookmarks[p];
+                        if (bookmark.startTimeMs < bestBookmarkEnd || bookmark.endTimeMs() > bestBookmarkStart) {
+                            possibleBookmark[p] = false;
+                            --possibleCount;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    m_visibleBookmarks.clear();
+    for (int i = 0; i < m_bookmarks.size(); ++i) {
+        if (visibleBookmark[i])
+            m_visibleBookmarks.append(m_bookmarks[i]);
+    }
 }
 
 void QnTimeSlider::freezeThumbnails() {
@@ -2216,41 +2314,34 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
 }
 
 //TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
-//TODO: #GDM #Bookmarks check text length to fit right edge
-//TODO: #GDM #Bookmarks check text overlapping - paint longest if overlaps
-//TODO: #GDM #Bookmarks move text from left edge a bit
 void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
     if (!m_bookmarksVisible)
         return;
 
-    qint64 windowLength = m_windowEnd - m_windowStart;
-    qint64 minBookmarkDuration = windowLength / 16;
-    QnCameraBookmarkList displaying;
-
-    QnTimePeriod window(m_windowStart, m_windowEnd - m_windowStart);
-    foreach(const QnCameraBookmark &bookmark, m_bookmarks) {
-        if (bookmark.name.isEmpty())
-            continue;
-        if (QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs).intersected(window).durationMs < minBookmarkDuration)
-            continue;
-        displaying << bookmark;
-    }
-
-    if (displaying.isEmpty())
+    if (m_visibleBookmarks.isEmpty())
         return;
     
-    /* Do some precalculations. */
     const qreal textHeight = rect.height() * 0.7;
     const qreal textTopMargin = rect.height() * 0.15;
 
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
-    
-    /* Draw highlight. */
 
-    foreach (const QnCameraBookmark &bookmark, displaying) {
-        qreal x = quickPositionFromValue(qMax(bookmark.startTimeMs, m_windowStart));
-        QPixmap pixmap = m_pixmapCache->textPixmap(bookmark.name, textHeight);
+    QFontMetricsF fontMetrics(m_pixmapCache->font());
+    
+    for (const QnCameraBookmark &bookmark: m_visibleBookmarks) {
+        if (bookmark.startTimeMs >= m_windowEnd || bookmark.endTimeMs() <= m_windowStart)
+            continue;
+
+        qreal x = quickPositionFromValue(qMax(bookmark.startTimeMs, m_windowStart)) + bookmarkTextPadding;
+        qreal xr = quickPositionFromValue(bookmark.endTimeMs()) - bookmarkTextPadding;
+
+        QString text = fontMetrics.elidedText(bookmark.name, Qt::ElideRight, xr - x);
+        static const int elideStringLength = 3; /* "..." */
+        if (text != bookmark.name && text.length() - elideStringLength < minBookmarkTextCharsVisible)
+            continue;
+
+        QPixmap pixmap = m_pixmapCache->textPixmap(text, textHeight);
 
         QRectF textRect(x, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
         drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
