@@ -125,6 +125,22 @@ namespace
                         : (licenseUsed ? LicenseUsed : LicenseNotUsed);
     }
 
+
+    const qint64 bookmarksFilterPrecisionMs = 5 * 60 * 1000;
+
+    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs) {
+        /* Round the current time to reload bookmarks only once a time. */
+        qint64 mid = positionMs - (positionMs % bookmarksFilterPrecisionMs);
+
+        QnCameraBookmarkSearchFilter result;
+        result.startTimeMs = mid - bookmarksFilterPrecisionMs;
+
+        /* Seek forward twice as long so when the mid point changes, next period will be preloaded. */
+        result.endTimeMs = mid + bookmarksFilterPrecisionMs * 2;
+
+        return result;
+    }
+
 } // anonymous namespace
 
 
@@ -171,6 +187,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if (m_camera)
         connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
     connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateBookmarks);
+    connect(navigator(),                &QnWorkbenchNavigator::positionChanged,         this, &QnMediaResourceWidget::updateBookmarksFilter);
+
+    /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */
+    QTimer* timer = new QTimer(this);
+    timer->setInterval(bookmarksFilterPrecisionMs / 2);
+    connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateBookmarksFilter);
+    timer->start();
 
     updateDisplay();
     updateDewarpingParams();
@@ -1503,14 +1526,21 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
 }
 
+void QnMediaResourceWidget::updateBookmarksFilter() {
+    if (!m_bookmarksQuery)
+        return;
+    m_bookmarksQuery->setFilter(constructBookmarksFilter(navigator()->position() / 1000));
+}
+
+
 void QnMediaResourceWidget::updateBookmarks() {
-    bool enable = navigator()->bookmarksModeEnabled();
+    bool enable = navigator()->bookmarksModeEnabled() && !m_camera.isNull();
 
     if (!m_bookmarksQuery.isNull() == enable)
         return;
 
     if (enable) {
-        m_bookmarksQuery = qnCameraBookmarksManager->createQuery(QnVirtualCameraResourceSet() << m_camera);
+        m_bookmarksQuery = qnCameraBookmarksManager->createQuery(QnVirtualCameraResourceSet() << m_camera, constructBookmarksFilter(navigator()->position() / 1000));
 
         connect(m_bookmarksQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, [this](const QnCameraBookmarkList &bookmarks) {
             static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");

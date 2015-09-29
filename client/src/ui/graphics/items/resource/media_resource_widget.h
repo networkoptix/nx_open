@@ -200,6 +200,7 @@ private:
     Q_SLOT void updateOverlayButton();
 
     void updateBookmarks();
+    void updateBookmarksFilter();
 
     qint64 getCurrentTime() const;
 
