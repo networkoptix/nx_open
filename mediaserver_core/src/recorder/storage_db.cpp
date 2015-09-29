@@ -262,6 +262,8 @@ void QnStorageDb::addCatalogFromMediaFolder(
 }
 
 bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
+    QnDbTransactionLocker tran(getTransaction());
+
     {
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid IN (SELECT guid from storage_bookmark WHERE unique_id = :id)");
@@ -287,11 +289,17 @@ bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
     if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM storage_bookmark)", m_sdb))
         return false;
 
-    flushRecords();
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        m_needReopenDB = true;
+        return false;
+    }
     return true;
 }
 
 bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, const QString& cameraUniqueId) {
+    QnDbTransactionLocker tran(getTransaction());
 
     int docId = 0;
     {
@@ -352,11 +360,18 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
         }
     }
 
-    flushRecords();
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        m_needReopenDB = true;
+        return false;
+    }
     return true;
 }
 
 bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
+    QnDbTransactionLocker tran(getTransaction());
+
     QSqlQuery cleanTagQuery(m_sdb);
     cleanTagQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid = ?");
     cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
@@ -378,11 +393,18 @@ bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
     if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM storage_bookmark)", m_sdb))
         return false;
 
-    flushRecords();
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        m_needReopenDB = true;
+        return false;
+    }
     return true;
 }
 
 bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) {
+    QWriteLocker lock(&m_mutex);
+
     QString filterStr;
     QStringList bindings;
 
@@ -472,6 +494,8 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
 }
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
+    QWriteLocker lock(&m_mutex);
+
     QVector<DeviceFileCatalogPtr> result;
 
     QSqlQuery query(m_sdb);
@@ -529,6 +553,8 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
 }
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
+    QWriteLocker lock(&m_mutex);
+
     QVector<DeviceFileCatalogPtr> result;
 
     QSqlQuery query(m_sdb);
