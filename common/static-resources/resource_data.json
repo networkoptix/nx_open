@@ -97,6 +97,12 @@
         },
         {
             "keys": [
+                "AXIS|AXISM7016*"
+            ],
+            "extraPtzCapabilities": "PresetsPtzCapability"
+        },
+        {
+            "keys": [
                 "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X", "DW|DWC-MPZ20XFM",
                 "ACTI|KCM8111", "*|FW3471-PS-E",
                 "*|FW3471-PS-E",
