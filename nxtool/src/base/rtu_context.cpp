@@ -384,7 +384,7 @@ void rtu::RtuContext::tryLoginWith(const QString &primarySystem
 
 QString rtu::RtuContext::toolDisplayName() const
 {
-    return QString(QN_APPLICATION_DISPLAY_NAME);
+    return QStringLiteral(QN_APPLICATION_DISPLAY_NAME);
 }
 
 bool rtu::RtuContext::isBeta() const
@@ -394,22 +394,22 @@ bool rtu::RtuContext::isBeta() const
 
 QString rtu::RtuContext::toolVersion() const
 {
-    return QString(QN_APPLICATION_VERSION);
+    return QStringLiteral(QN_APPLICATION_VERSION);
 }
 
 QString rtu::RtuContext::toolRevision() const
 {
-    return QString(QN_APPLICATION_REVISION);
+    return QStringLiteral(QN_APPLICATION_REVISION);
 }
 
-QString rtu::RtuContext::toolSupportMail() const
+QString rtu::RtuContext::toolSupportLink() const
 {
-    return QString(QN_SUPPORT_MAIL_ADDRESS);
+    return QStringLiteral(QN_SUPPORT_LINK);
 }
 
 QString rtu::RtuContext::toolCompanyUrl() const
 {
-    return QString(QN_COMPANY_URL);
+    return QStringLiteral(QN_COMPANY_URL);
 }
 
 int rtu::RtuContext::currentPage() const
