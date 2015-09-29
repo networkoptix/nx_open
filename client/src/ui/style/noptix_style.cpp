@@ -214,25 +214,16 @@ void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
 
     QFont font;
-    font.setPixelSize(12);
+    font.setPointSize(10);
     font.setStyle(QFont::StyleNormal);
     font.setWeight(QFont::Normal);
-#ifdef Q_OS_LINUX
-    if (!QFont::substitutes(lit("ubuntu")).isEmpty())
-        font.setFamily(lit("ubuntu")); // TODO: #Elric implement properly
-#endif
+    font.setFamily(lit("Roboto")); // TODO: #dklychkov Include Roboto font into resources
     application->setFont(font);
-
-    QFont menuFont;
-    menuFont.setPixelSize(18);
-    application->setFont(menuFont, "QMenu");
 
     m_customizer->customize(application);
 }
 
 void QnNoptixStyle::unpolish(QApplication *application) {
-    application->setFont(QFont(), "QMenu");
-
     base_type::unpolish(application);
 }
 
@@ -751,4 +742,4 @@ qreal QnNoptixStyle::hoverProgress(const QStyleOption *option, const QWidget *wi
     }
 
     return progress;
-}
+1}

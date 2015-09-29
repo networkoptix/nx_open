@@ -17,6 +17,7 @@
 
 #include "noptix_style.h"
 #include "noptix_icon_loader.h"
+#include "nx_style.h"
 
 QnSkin::QnSkin(QObject *parent):
     QObject(parent)
@@ -118,11 +119,7 @@ QPixmap QnSkin::pixmap(const char *name, const QSize &size, Qt::AspectRatioMode 
 }
 
 QStyle *QnSkin::newStyle() {
-    QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
-    if (!baseStyle)
-        qWarning() << "Bespin style could not be loaded";
-    QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
-    return style;
+    return new QnNoptixStyle(new QnNxStyle());
 }
 
 QMovie *QnSkin::newMovie(const QString &name, QObject *parent) {
