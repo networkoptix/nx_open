@@ -110,7 +110,7 @@ QnCameraBookmarkTags getRandomTags(const QStringList &dict) {
 }
 
 qint64 move() {
-    return random(1000, 3000);
+    return random(100000, 300000);
 }
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
@@ -128,17 +128,21 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
         dict << stream.readLine();
     }
  
-    int skip = 2000;
+    int skip = 8000;
+    int limit = 16000;
     int counter = 0;
 
     auto server = qnCommon->currentServer();
     for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(server, true)) {
+        qDebug() << "Camera" << camera->getName();
+
         QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(camera, false);
         if (!loader)
             continue;
 
         auto periods = loader->periods(Qn::RecordingContent);
         for (const QnTimePeriod &period: periods) {
+            qDebug() << "period" << period;
 
             qint64 start = period.startTimeMs;
             qint64 end = period.isInfinite()
@@ -151,8 +155,13 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
                         break;
 
                     ++counter;
-                    if (counter < skip)
+                    if (counter < skip) {
+                        if (counter % 500 == 0)
+                            qDebug() << "skipping counter" << counter;
                         continue;
+                    }
+                    if (counter > limit)
+                        return;
 
                     QnCameraBookmark bookmark;
                     bookmark.guid = QnUuid::createUuid();
@@ -169,6 +178,9 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
                     qnCameraBookmarksManager->addCameraBookmark(camera, bookmark, [this, start](bool success) {
                         qDebug() << "bookmark added " << success << QDateTime::fromMSecsSinceEpoch(start);
                     });
+
+                    if (counter % 10 == 0)
+                        qApp->processEvents();
                 }
 
                 start += move();
