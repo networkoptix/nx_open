@@ -635,10 +635,10 @@ void rtu::ApplyChangesTask::Impl::addActions()
     if (cmd == Constants::NoCommands)
         return;
 
-    static const auto kRestartOpDescription = QStringLiteral("Restart operation");
-    static const auto kRebootOpDescription = QStringLiteral("Reboot OS operation");
-    static const auto kButNetworkRequest = QStringLiteral("Reset to factory defaults\n but network operation");
-    static const auto kFactoryDefautls = QStringLiteral("Reset to factory defaults");
+    static const auto kRestartOpDescription = QStringLiteral("restart operation");
+    static const auto kRebootOpDescription = QStringLiteral("reboot OS operation");
+    static const auto kButNetworkRequest = QStringLiteral("reset to factory defaults\n but network operation");
+    static const auto kFactoryDefautls = QStringLiteral("reset to factory defaults");
 
     const QString &description = (cmd == Constants::RestartServerCmd ? kRestartOpDescription : 
         (cmd == Constants::RebootCmd ? kRebootOpDescription :
@@ -686,7 +686,7 @@ void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
             const auto &callback = [weak, &info, change, timestampMs]
                 (const RequestError errorCode, Constants::AffectedEntities affected)
             {
-                static const QString kTimeDescription = "Server time";
+                static const QString kTimeDescription = "server time";
                 static const QString kTimeTemplate("%1\n%2");
 
                 if (weak.expired())
