@@ -8,7 +8,7 @@ namespace ec2
 {
     namespace redundant 
     {
-        enum DaysOfWeek
+        enum DayOfWeek
         {
             NoDay       = 0,
             Monday      = 2,
@@ -18,6 +18,29 @@ namespace ec2
             Friday      = 32,
             Saturday    = 64,
             Sunday      = 128
+        };
+
+        inline DayOfWeek fromQtDOW(int qtDOW)
+        {
+            switch (qtDOW)
+            {
+            case 1:
+                return ec2::redundant::Monday;
+            case 2:
+                return ec2::redundant::Tuesday;
+            case 3:
+                return ec2::redundant::Wednsday;
+            case 4:
+                return ec2::redundant::Thursday;
+            case 5:
+                return ec2::redundant::Friday;
+            case 6:
+                return ec2::redundant::Saturday;
+            case 7:
+                return ec2::redundant::Sunday;
+            default:
+                return ec2::redundant::NoDay;
+            }
         };
     }
 
@@ -29,7 +52,7 @@ namespace ec2
         bool            usedForWriting;
         QString         storageType;
         bool            redundant;              // is storage redundant
-        int             redundantDaysOfTheWeek; // Days of the week mask. 0 if not set
+        int             redundantDaysOfTheWeek; // Days of the week mask. -1 if not set
         int             redundantStart;         // seconds from 00:00.
         int             redundantDuration;      // duration of synchronization period
 

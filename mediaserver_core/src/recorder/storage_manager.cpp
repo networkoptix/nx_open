@@ -765,8 +765,8 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 
 QnStorageManager::~QnStorageManager()
 {
+    stopRedundantSyncWatchdog();
     QnStorageManager_instance = nullptr;
-
     stopAsyncTasks();
 }
 
@@ -2069,7 +2069,7 @@ void QnStorageManager::synchronizeStorages(
             [this, &visitedCameras, qualityIndex]
             (QString &currentCamera, ChunkListType &currentCatalog)
             {
-                QnMutexLocker _(&m_mutexCatalog);
+                QnMutexLocker lk(&m_mutexCatalog);
                 const FileCatalogMap &currentMap = m_devFileCatalog[qualityIndex];
                 
                 for (auto it = currentMap.cbegin();
@@ -2101,7 +2101,7 @@ void QnStorageManager::synchronizeStorages(
         auto mergeNewChunks = 
             [this, qualityIndex](const QString &cameraID, const ChunkListType &newChunks)
             {
-                QnMutexLocker _(&m_mutexCatalog);
+                QnMutexLocker lk(&m_mutexCatalog);
                 FileCatalogMap currentMap = m_devFileCatalog[qualityIndex];
 
                 auto cameraCatalogIt = currentMap.find(cameraID);
@@ -2201,7 +2201,7 @@ void QnStorageManager::synchronizeStorages(
                     {
                         QString fromFileFullName;
                         {
-                            QnMutexLocker _(&m_mutexCatalog);
+                            QnMutexLocker lk(&m_mutexCatalog);
                             fromFileFullName = m_devFileCatalog[qualityIndex][currentCamera]->fullFileName(newChunk);
                         }
 
@@ -2284,13 +2284,20 @@ void QnStorageManager::synchronizeStorages(
     } // for quality index
 }
 
+void QnStorageManager::stopRedundantSyncWatchdog() 
+{ 
+    m_redundantSyncOn = false;
+    m_redundantFuture.wait();
+}
+
 void QnStorageManager::startRedundantSyncWatchdog()
 {
     static const auto 
     REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(10);
     m_redundantSyncOn = true;
 
-    std::thread(
+    m_redundantFuture = std::async(
+        std::launch::async,
         [this]
         {
             while (m_redundantSyncOn)
@@ -2320,35 +2327,12 @@ void QnStorageManager::startRedundantSyncWatchdog()
                             return;
                         }
                         
-                        auto fromQtDOW = [](int qtDOW)
-                        {
-                            switch (qtDOW)
-                            {
-                            case 1:
-                                return ec2::redundant::Monday;
-                            case 2:
-                                return ec2::redundant::Tuesday;
-                            case 3:
-                                return ec2::redundant::Wednsday;
-                            case 4:
-                                return ec2::redundant::Thursday;
-                            case 5:
-                                return ec2::redundant::Friday;
-                            case 6:
-                                return ec2::redundant::Saturday;
-                            case 7:
-                                return ec2::redundant::Sunday;
-                            default:
-                                return ec2::redundant::NoDay;
-                            }
-                        };
-
-                        auto isItTimeForSync = [fromQtDOW] (const QnStorageResource::RedundantSchedule &schedule)
+                        auto isItTimeForSync = [] (const QnStorageResource::RedundantSchedule &schedule)
                         {
                             QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
                             const auto curDate = now.date();
 
-                            if (fromQtDOW(curDate.dayOfWeek()) & schedule.daysOfTheWeek)
+                            if (ec2::redundant::fromQtDOW(curDate.dayOfWeek()) & schedule.daysOfTheWeek)
                             {
                                 const auto curTime = now.time();
                                 if (curTime.msecsSinceStartOfDay() > schedule.start * 1000 &&
@@ -2380,5 +2364,5 @@ void QnStorageManager::startRedundantSyncWatchdog()
                 );
             }
         }
-    ).detach();
+    );
 }

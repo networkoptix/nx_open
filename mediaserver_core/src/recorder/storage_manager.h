@@ -25,6 +25,8 @@
 #include "api/model/recording_stats_reply.h"
 
 #include <atomic>
+#include <future>
+#include <mutex>
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -175,7 +177,7 @@ private:
 
     // redundant storages
     void startRedundantSyncWatchdog();
-    void stopRedundantSyncWatchdog() { m_redundantSyncOn = false; }
+    void stopRedundantSyncWatchdog();
 
     template<typename NeedStopCB>
     void synchronizeStorages(
@@ -222,7 +224,8 @@ private:
     QElapsedTimer m_clearMotionTimer;
     QElapsedTimer m_removeEmtyDirTimer;
 
-    std::atomic<bool> m_redundantSyncOn;
+    std::atomic<bool>   m_redundantSyncOn;
+    std::future<void>   m_redundantFuture;
 };
 
 #define qnStorageMan QnStorageManager::instance()
