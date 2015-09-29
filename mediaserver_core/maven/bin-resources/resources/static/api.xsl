@@ -26,7 +26,7 @@
                 <link rel="stylesheet" href="styles/409938f1.vendor.css">
                 </link> <!-- This is strange hack, I know -->
 
-                <link rel="stylesheet" href="styles/3c6b089b.main.css">
+                <link rel="stylesheet" href="styles/3c8192ce.main.css">
 
                 </link><!-- This is strange hack, I know -->
 
