@@ -21,7 +21,8 @@ public:
     /// @param cameras          Set of target cameras.
     /// @param filter           Filter parameters.
     /// @param callback         Callback for receiving bookmarks data.
-    void getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
+    /// @returns                Internal id of the request.
+    int getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksInternalCallbackType callback);
 
     /// @brief                  Synchronously gathers locally cached bookmarks using specified filter.
     /// @param cameras          Set of target cameras.
@@ -66,7 +67,7 @@ public:
     void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
 private slots:
 
-    void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle);
+    void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int requestId);
 
     void handleBookmarkOperation(int status, const QnCameraBookmark &bookmark, int handle);
 private:
@@ -78,7 +79,16 @@ private:
     /// @param queryId          Target query id.
     void unregisterQuery(const QUuid &queryId);
 
+    /// @brief                  Clear all local cache data.
     void clearCache();
+
+    /// @brief                  Check if the single query should be updated.
+    /// @param queryId          Target query id.
+    /// @returns                True if the query is queued to update.
+    bool isQueryUpdateRequired(const QUuid &queryId);
+
+    /// @brief                  Check if queries should be updated and update if needed.
+    void checkQueriesUpdate();
 
     /// @brief                  Update query cached data based on local cache.
     void updateQueryLocal(const QUuid &queryId);
@@ -92,12 +102,13 @@ private:
     /// @brief                  Force recalculate value based on local data.
     QnCameraBookmarkList executeQueryInternal(const QnCameraBookmarksQueryPtr &query) const;
 
+    void executeCallbackDelayed(BookmarksInternalCallbackType callback);
     void executeCallbackDelayed(BookmarksCallbackType callback);
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
 
-    QMap<int, BookmarksCallbackType> m_requests;
+    QMap<int, BookmarksInternalCallbackType> m_requests;
 
     struct OperationInfo {
         enum class OperationType {
@@ -117,8 +128,18 @@ private:
     QMap<int, OperationInfo> m_operations;
 
     struct QueryInfo {
-        QnCameraBookmarksQueryWeakPtr queryRef;
-        QnCameraBookmarkList bookmarksCache;        
+        enum class QueryState {
+            Invalid,                                        /**< Query was not requested yet. */
+            Queued,                                         /**< Query will be requested when timeout will pass. */
+            Requested,                                      /**< Waiting for the server response. */
+            Actual                                          /**< Data is actual. */
+        };
+
+        QnCameraBookmarksQueryWeakPtr   queryRef;           /**< Weak reference to Query object. */
+        QnCameraBookmarkList            bookmarksCache;     /**< Cached bookmarks. */
+        QueryState                      state;              /**< Current query state. */
+        QElapsedTimer                   requestTimer;       /**< Time of the last request. */
+        int                             requestId;          /**< Id of the last request. */
 
         QueryInfo();
         QueryInfo(const QnCameraBookmarksQueryPtr &query);

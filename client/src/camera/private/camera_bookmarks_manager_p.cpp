@@ -13,9 +13,20 @@
 #include <core/resource/media_server_resource.h>
 
 #include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
 
 namespace {
+    /** Live queries should be updated once in a time even if data is actual. */
     const int updateLiveBookmarksTimeoutMs = 10000;
+
+    /** Each query can be updated no more often than once in that period. */
+    const int minimimumRequestTimeoutMs = 3000;
+
+    /** Timer precision to update all queries. */
+    const int queriesCheckTimoutMs = 1000;
+
+    /** Reserved value for invalid requests. */
+    const int invalidRequestId = 0;
 }
 
 
@@ -25,7 +36,7 @@ namespace {
 QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo()
     : operation(OperationType::Add)
     , callback()
-    , camera()    
+    , camera()
 {}
 
 QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(OperationType operation, OperationCallbackType callback, const QnVirtualCameraResourcePtr &camera)
@@ -41,6 +52,9 @@ QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(OperationType oper
 QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo() 
     : queryRef()
     , bookmarksCache()
+    , state(QueryState::Invalid)
+    , requestTimer()
+    , requestId(invalidRequestId)
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "This functions is not to be used directly");
 }
@@ -48,6 +62,9 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo()
 QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQueryPtr &query)
     : queryRef(query.toWeakRef())
     , bookmarksCache()
+    , state(QueryState::Invalid)
+    , requestTimer()
+    , requestId(invalidRequestId)
 {}
 
 
@@ -72,34 +89,28 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmar
      */
 
     QTimer* timer = new QTimer(this);
-    timer->setInterval(updateLiveBookmarksTimeoutMs);
+    timer->setInterval(queriesCheckTimoutMs);
     timer->setSingleShot(false);
-    connect(timer, &QTimer::timeout, this, [this]{
-        for (auto queryId: m_queries.keys()) {
-            updateQueryAsync(queryId);  //TODO: #GDM #bookmarks update only queries that require it and MERGE results
-                                        // also make sure we are not updating bookmarks that are already in update process
-        }
-    });
+    connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
     timer->start();
-
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
 {}
 
-void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
+int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
                                                         , const QnCameraBookmarkSearchFilter &filter
-                                                        , BookmarksCallbackType callback) {
+                                                        , BookmarksInternalCallbackType callback) {
     auto server = qnCommon->currentServer();
     if (!server) {
         executeCallbackDelayed(callback);
-        return;
+        return invalidRequestId; 
     }
 
     auto connection = server->apiConnection();
     if (!connection) {
         executeCallbackDelayed(callback);
-        return;
+        return invalidRequestId;
     }
 
     QnBookmarkRequestData requestData;
@@ -107,9 +118,10 @@ void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraRes
     requestData.format = Qn::JsonFormat;
     requestData.filter = filter;
 
-    int handle = connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
+    int requestId = connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
     if (callback)
-        m_requests[handle] = callback;
+        m_requests[requestId] = callback;
+    return requestId;
 }
 
 QnCameraBookmarkList QnCameraBookmarksManagerPrivate::getLocalBookmarks(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter) const {
@@ -175,6 +187,7 @@ void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnVirtualCamera
 }
 
 void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, const QnCameraBookmark &bookmark, int handle) {
+    Q_UNUSED(bookmark);
     if (!m_operations.contains(handle))
         return;
     
@@ -184,12 +197,12 @@ void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, const 
 }
 
 
-void QnCameraBookmarksManagerPrivate::handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int handle) {
-    if (!m_requests.contains(handle))
+void QnCameraBookmarksManagerPrivate::handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int requestId) {
+    if (!m_requests.contains(requestId))
         return;
 
-    auto callback = m_requests.take(handle);
-    callback(status == 0, bookmarks);
+    auto callback = m_requests.take(requestId);
+    callback(status == 0, bookmarks, requestId);
 }
 
 void QnCameraBookmarksManagerPrivate::clearCache() {
@@ -199,6 +212,48 @@ void QnCameraBookmarksManagerPrivate::clearCache() {
         updateQueryCache(queryId, QnCameraBookmarkList());
         updateQueryAsync(queryId);
     }
+}
+
+bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId) {
+    Q_ASSERT_X(m_queries.contains(queryId), Q_FUNC_INFO, "Query should be registered");
+    if (!m_queries.contains(queryId))
+        return false;
+
+    const QueryInfo info = m_queries[queryId];
+    QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+    Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+
+    switch (info.state) {
+    case QueryInfo::QueryState::Invalid:
+        return true;
+    case QueryInfo::QueryState::Queued:
+        return !info.requestTimer.isValid() || info.requestTimer.hasExpired(minimimumRequestTimeoutMs);
+    case QueryInfo::QueryState::Requested:
+        return false;
+    case QueryInfo::QueryState::Actual:
+        return (query->filter().endTimeMs > qnSyncTime->currentMSecsSinceEpoch()) && info.requestTimer.hasExpired(updateLiveBookmarksTimeoutMs);
+    default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        break;
+    }
+    return false;
+}
+
+
+void QnCameraBookmarksManagerPrivate::checkQueriesUpdate() {
+    for (auto queryId: m_queries.keys()) {
+        bool updateRequired = isQueryUpdateRequired(queryId);
+        if (!updateRequired)
+            continue;
+
+        const QueryInfo info = m_queries[queryId];
+        QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+        Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+        if (!query)
+            continue;
+
+        executeQueryRemoteAsync(query, BookmarksCallbackType());
+    }   
 }
 
 void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQueryPtr &query) {
@@ -236,14 +291,34 @@ QnCameraBookmarkList QnCameraBookmarksManagerPrivate::executeQueryLocal(const Qn
 
 void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback) {
     Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+    if (!query) {
+        executeCallbackDelayed(callback);
+        return;
+    }
 
     /* Do not store shared pointer here so it can be safely unregistered in the process. */
     QUuid queryId = query->id();
-    getBookmarksAsync(query->cameras(), query->filter(), [this, queryId, callback](bool success, const QnCameraBookmarkList &bookmarks) {
 
-        //TODO: #GDM #Bookmarks ensure query is the same as it was when we sent the request
-        if (success && m_queries.contains(queryId))
-            updateQueryCache(queryId, bookmarks);
+    Q_ASSERT_X(m_queries.contains(queryId), Q_FUNC_INFO, "Query must be registered");
+    if (!m_queries.contains(queryId)) {
+        executeCallbackDelayed(callback);
+        return;
+    }
+
+    QueryInfo &info = m_queries[queryId];
+    info.state = QueryInfo::QueryState::Requested;
+    info.requestTimer.restart(); 
+    info.requestId = getBookmarksAsync(query->cameras(), query->filter(), 
+        [this, queryId, callback](bool success, const QnCameraBookmarkList &bookmarks, int requestId) {      
+        if (success && m_queries.contains(queryId) && requestId != invalidRequestId) {
+            QueryInfo &info = m_queries[queryId];
+            if (info.requestId == requestId) {
+                updateQueryCache(queryId, bookmarks); //TODO: #GDM #bookmarks merge results
+                Q_ASSERT_X(info.state == QueryInfo::QueryState::Requested, Q_FUNC_INFO, "On state change we should clear request id.");               
+                if (info.state == QueryInfo::QueryState::Requested)
+                    info.state = QueryInfo::QueryState::Actual;
+            }
+        }
         if (callback)
             callback(success, bookmarks);
     });
@@ -274,12 +349,9 @@ void QnCameraBookmarksManagerPrivate::updateQueryAsync(const QUuid &queryId) {
     if (!m_queries.contains(queryId))
         return;
 
-    QnCameraBookmarksQueryPtr query = m_queries[queryId].queryRef.toStrongRef();
-    Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
-    if (!query)
-        return;
-
-    executeQueryRemoteAsync(query, BookmarksCallbackType());
+    QueryInfo &info = m_queries[queryId];
+    info.requestId = invalidRequestId; /*< Clean request id to make sure we will not process non-actual results. */
+    info.state = QueryInfo::QueryState::Queued;
 }
 
 void QnCameraBookmarksManagerPrivate::updateQueryCache(const QUuid &queryId, const QnCameraBookmarkList &bookmarks) {
@@ -308,6 +380,15 @@ QnCameraBookmarksQueryPtr QnCameraBookmarksManagerPrivate::createQuery(const QnV
     });
 
     return query;
+}
+
+void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksInternalCallbackType callback) {
+    if (!callback)
+        return;
+
+    executeDelayed([this, callback]{
+        callback(false, QnCameraBookmarkList(), invalidRequestId);
+    });
 }
 
 void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksCallbackType callback) {

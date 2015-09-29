@@ -19,7 +19,12 @@ void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSe
                                                  , BookmarksCallbackType callback)
 {
     Q_D(QnCameraBookmarksManager);
-    d->getBookmarksAsync(cameras, filter, callback);
+    auto internalCallback = [callback](bool success, const QnCameraBookmarkList &bookmarks, int requestId) {
+        Q_UNUSED(requestId);
+        if (callback)
+            callback(success, bookmarks);
+    };
+    d->getBookmarksAsync(cameras, filter, internalCallback);
 }
 
 
