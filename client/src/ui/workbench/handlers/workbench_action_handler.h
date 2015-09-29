@@ -179,6 +179,7 @@ protected slots:
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
     void at_thumbnailsSearchAction_triggered();
+    void at_bookmarksModeAction_triggered();
 
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();

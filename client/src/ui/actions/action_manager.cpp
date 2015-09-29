@@ -1708,6 +1708,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Show Thumbnails")).
         toggledText(tr("Hide Thumbnails"));
 
+    factory(Qn::BookmarksModeAction).
+        flags(Qn::NoTarget).
+        text(tr("Show Bookmarks")).
+        toggledText(tr("Hide Bookmarks"));
+
     factory(Qn::ToggleCalendarAction).
         flags(Qn::NoTarget).
         text(tr("Show Calendar")).

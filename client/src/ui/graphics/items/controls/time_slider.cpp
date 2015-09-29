@@ -490,6 +490,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     , m_lastLineBarMousePos()
     , m_lastLineBarValue()
     , m_bookmarksViewer(QnBookmarksViewer::create(parent))
+    , m_bookmarksVisible(false)
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -1302,6 +1303,19 @@ QnBookmarksViewer *QnTimeSlider::bookmarksViewer()
     return m_bookmarksViewer;
 }
 
+bool QnTimeSlider::isBookmarksVisible() const {
+    return m_bookmarksVisible;
+}
+
+void QnTimeSlider::setBookmarksVisible(bool bookmarksVisible) {
+    if (m_bookmarksVisible == bookmarksVisible)
+        return;
+
+    m_bookmarksVisible = bookmarksVisible;
+
+    update();
+}
+
 int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
     if (thumbnailsRect().contains(pos))
         return Qn::MainWindow_Thumbnails_Help;
@@ -1740,7 +1754,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
                 m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
-                m_lineData[line].timeStorage.aggregated(Qn::BookmarksContent),
+                m_bookmarksVisible ? m_lineData[line].timeStorage.aggregated(Qn::BookmarksContent) : QnTimePeriodList(),
                 lineRect
             );
 
@@ -2206,6 +2220,9 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
 //TODO: #GDM #Bookmarks check text overlapping - paint longest if overlaps
 //TODO: #GDM #Bookmarks move text from left edge a bit
 void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
+    if (!m_bookmarksVisible)
+        return;
+
     qint64 windowLength = m_windowEnd - m_windowStart;
     qint64 minBookmarkDuration = windowLength / 16;
     QnCameraBookmarkList displaying;

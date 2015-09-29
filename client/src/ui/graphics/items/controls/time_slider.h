@@ -185,6 +185,9 @@ public:
 
     QnBookmarksViewer *bookmarksViewer();
 
+    bool isBookmarksVisible() const;
+    void setBookmarksVisible(bool bookmarksVisible);
+
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -414,6 +417,7 @@ private:
     qreal m_lastLineBarValue;
 
     QnBookmarksViewer *m_bookmarksViewer;
+    bool m_bookmarksVisible;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

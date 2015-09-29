@@ -55,6 +55,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -169,6 +170,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
     if (m_camera)
         connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
+    connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateBookmarks);
 
     updateDisplay();
     updateDewarpingParams();
@@ -1502,21 +1504,28 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
 }
 
 void QnMediaResourceWidget::updateBookmarks() {
-    if (m_bookmarksQuery)
+    bool enable = navigator()->bookmarksModeEnabled();
+
+    if (!m_bookmarksQuery.isNull() == enable)
         return;
 
-    m_bookmarksQuery = qnCameraBookmarksManager->createQuery(QnVirtualCameraResourceSet() << m_camera);
+    if (enable) {
+        m_bookmarksQuery = qnCameraBookmarksManager->createQuery(QnVirtualCameraResourceSet() << m_camera);
 
-    connect(m_bookmarksQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, [this](const QnCameraBookmarkList &bookmarks) {
-        static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
+        connect(m_bookmarksQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, [this](const QnCameraBookmarkList &bookmarks) {
+            static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
 
-        QString text;
-        for (const QnCameraBookmark &bookmark: bookmarks) {
-            text += outputTemplate.arg(bookmark.name, bookmark.description);
-        }
-        setBookmarksLabelText(text);
-    });
+            QString text;
+            for (const QnCameraBookmark &bookmark: bookmarks) {
+                text += outputTemplate.arg(bookmark.name, bookmark.description);
+            }
+            setBookmarksLabelText(text);
+        });
 
+    } else {
+        m_bookmarksQuery.clear();
+        setBookmarksLabelText(QString());
+    }
 }
 
 qint64 QnMediaResourceWidget::getCurrentTime() const {

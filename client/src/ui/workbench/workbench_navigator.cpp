@@ -118,7 +118,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
-    m_bookmarkQuery(qnCameraBookmarksManager->createQuery()),
+    m_bookmarkQuery(nullptr),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0)
 {
@@ -206,8 +206,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
             QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
     });
-
-    connect(m_bookmarkQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, &QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged);
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -317,6 +315,38 @@ void QnWorkbenchNavigator::setDayTimeWidget(QnDayTimeWidget *dayTimeWidget) {
     }
 }
 
+bool QnWorkbenchNavigator::bookmarksModeEnabled() const {
+    return !m_bookmarkQuery.isNull();
+}
+
+void QnWorkbenchNavigator::setBookmarksModeEnabled(bool bookmarksModeEnabled) {
+    if (this->bookmarksModeEnabled() == bookmarksModeEnabled)
+        return;
+
+    m_timeSlider->setBookmarksVisible(bookmarksModeEnabled);
+
+    if (bookmarksModeEnabled) {
+        QnCameraBookmarkSearchFilter filter;
+        filter.startTimeMs = m_timeSlider->windowStart();
+        filter.endTimeMs = m_timeSlider->windowEnd();
+        if (m_searchQueryStrategy)
+            filter.text = m_searchQueryStrategy->query();
+
+        m_bookmarkQuery = qnCameraBookmarksManager->createQuery();
+        m_bookmarkQuery->setFilter(filter);
+        if (m_currentMediaWidget)
+            m_bookmarkQuery->setCamera(m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>());
+
+        connect(m_bookmarkQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, &QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged);
+    } else {
+        m_bookmarkQuery.clear();
+        m_timeSlider->setBookmarks(QnCameraBookmarkList());
+        m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
+    }
+
+    emit bookmarksModeEnabledChanged();
+}
+
 bool QnWorkbenchNavigator::isValid() {
     return m_timeSlider && m_timeScrollBar && m_calendar && m_bookmarksSearchWidget;
 }
@@ -348,6 +378,9 @@ void QnWorkbenchNavigator::initialize() {
 
     connect(m_timeSlider,   &QnTimeSlider::bookmarksUnderCursorUpdated,     this,   &QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated);
     connect(m_timeSlider,   &QnTimeSlider::windowChanged,                   this,   [this](qint64 windowStart, qint64 windowEnd) {
+        if (!m_bookmarkQuery)
+            return;
+
         auto filter = m_bookmarkQuery->filter();
         filter.startTimeMs = windowStart;
         filter.endTimeMs = windowEnd;
@@ -390,6 +423,9 @@ void QnWorkbenchNavigator::initialize() {
 
     connect(m_searchQueryStrategy, &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text)
     {
+        if (!m_bookmarkQuery)
+            return;
+
         auto filter = m_bookmarkQuery->filter();
         filter.text = text;
         m_bookmarkQuery->setFilter(filter);
@@ -426,8 +462,10 @@ void QnWorkbenchNavigator::deinitialize() {
     disconnect(context()->instance<QnWorkbenchServerTimeWatcher>(), NULL, this, NULL);
     disconnect(qnSettings->notifier(QnClientSettings::TIME_MODE), NULL, this, NULL);
 
-    m_bookmarkQuery->setCamera(QnVirtualCameraResourcePtr());
-    m_bookmarkQuery->setFilter(QnCameraBookmarkSearchFilter());
+    if (m_bookmarkQuery) {
+        m_bookmarkQuery->setCamera(QnVirtualCameraResourcePtr());
+        m_bookmarkQuery->setFilter(QnCameraBookmarkSearchFilter());
+    }
 
     m_currentWidget = NULL;
     m_currentWidgetFlags = 0;
@@ -921,7 +959,9 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
-    m_bookmarkQuery->setCamera(m_currentMediaWidget ? m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>() : QnVirtualCameraResourcePtr());
+
+    if (m_bookmarkQuery)
+        m_bookmarkQuery->setCamera(m_currentMediaWidget ? m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>() : QnVirtualCameraResourcePtr());
 
     updateCurrentWidgetFlags();
     updateLines();

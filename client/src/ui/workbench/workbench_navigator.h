@@ -69,6 +69,9 @@ public:
     QnDayTimeWidget *dayTimeWidget() const;
     void setDayTimeWidget(QnDayTimeWidget *dayTimeWidget);
 
+    bool bookmarksModeEnabled() const;
+    void setBookmarksModeEnabled(bool bookmarksModeEnabled);
+
     QnSearchLineEdit *bookmarksSearchWidget() const;
     void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
 
@@ -116,6 +119,7 @@ signals:
     void speedChanged();
     void speedRangeChanged();
     void positionChanged();
+    void bookmarksModeEnabledChanged();
 
 protected:
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;

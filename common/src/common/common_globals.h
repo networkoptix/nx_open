@@ -457,6 +457,7 @@ public:
         LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
+        LayoutBookmarksModeRole,                     /**< Role for layout's bookmarks mode state. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
