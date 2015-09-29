@@ -83,10 +83,6 @@ QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
         data.value<qreal>(lit("axisMaxZoomSpeed"), 100)
     );
 
-    Qn::PtzCapabilities extraCaps;
-    if(data.value(lit("extraPtzCapabilities"), &extraCaps))
-        m_capabilities |= extraCaps;
-    
     m_cacheUpdateTimer.invalidate();
 }
 
@@ -183,11 +179,15 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         m_capabilities &= ~Qn::AbsolutePtzCapabilities;
     }
 
-    QnResourceData data = qnCommon->dataPool()->data(m_resource);
-    Qn::PtzCapabilities extraCaps;
-    if(data.value(lit("extraPtzCapabilities"), &extraCaps))
-        m_capabilities |= extraCaps;
-
+    QByteArray body;
+    if (query(lit("com/ptz.cgi?info=1"), &body))
+    {
+        for (auto line: body.split('\n'))
+        {
+            if (line.trimmed().startsWith("gotoserverpresetno"))
+                m_capabilities |= Qn::PresetsPtzCapability;
+        }
+    }
 }
 
 CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
@@ -373,6 +373,7 @@ bool QnAxisPtzController::getPresets(QnPtzPresetList *presets)
         if (!rez)
             return rez;
         QMutexLocker lock(&m_mutex);
+        m_cachedData.clear();
         for(QByteArray line: body.split(L'\n').mid(1))
         {
             line = line.trimmed();
@@ -421,7 +422,7 @@ bool QnAxisPtzController::updatePreset(const QnPtzPreset &preset)
 {
     if (!(m_capabilities & Qn::PresetsPtzCapability))
         return base_type::updatePreset(preset);
-
+    m_cacheUpdateTimer.invalidate();
     return removePreset(preset.id) && createPreset(preset);
 }
 
@@ -429,7 +430,7 @@ bool QnAxisPtzController::removePreset(const QString &presetId)
 {
     if (!(m_capabilities & Qn::PresetsPtzCapability))
         return base_type::removePreset(presetId);
-
+    m_cacheUpdateTimer.invalidate();
     return query(lit("com/ptz.cgi?removeserverpresetno=%1").arg(extractPresetNum(presetId)));
 }
 
