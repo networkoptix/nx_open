@@ -255,6 +255,8 @@ namespace nx_http
         const BufferType& ha1,
         const BufferType& nonce)
     {
+        assert(ha1.size() + 1 + nonce.size() == 64);
+
         MD5_CTX md5Ctx;
         MD5_Init(&md5Ctx);
         MD5_Update(&md5Ctx, ha1.constData(), ha1.size());
