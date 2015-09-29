@@ -54,7 +54,7 @@ namespace ec2
         bool            redundant;              // is storage redundant
         int             redundantDaysOfTheWeek; // Days of the week mask. -1 if not set
         int             redundantStart;         // seconds from 00:00.
-        int             redundantDuration;      // duration of synchronization period
+        int             redundantDuration;      // duration of synchronization period in seconds
 
         std::vector<ApiResourceParamData> addParams;
     };
