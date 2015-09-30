@@ -5,21 +5,65 @@
 
 #include "authorization_manager.h"
 
+#include <utils/serialization/lexical.h>
+
+#include "managers/system_manager.h"
+#include "stree/cdb_ns.h"
+#include "stree/stree_manager.h"
+
 
 namespace nx {
 namespace cdb {
 
-
-bool AuthorizationManager::authorize(
-    const stree::AbstractResourceReader& /*dataToAuthorize*/,
-    EntityType /*requestedEntity*/,
-    DataActionType /*requestedAction*/,
-    stree::AbstractResourceWriter* const /*authzInfo*/ ) const
+AuthorizationManager::AuthorizationManager(
+    const StreeManager& stree,
+    const SystemManager& systemManager)
+:
+    m_stree(stree),
+    m_systemManager(systemManager)
 {
-    //TODO #ak
-    return true;
 }
 
+bool AuthorizationManager::authorize(
+    const stree::AbstractResourceReader& authenticationProperties,
+    const stree::AbstractResourceReader& dataToAuthorize,
+    EntityType /*requestedEntity*/,
+    DataActionType /*requestedAction*/,
+    stree::AbstractResourceWriter* const authzInfo ) const
+{
+    //TODO #ak add authAccountRightsOnSystem if appropriate
+    auto authenticatedAccountID = authenticationProperties.get<QnUuid>(attr::accountID);
+    auto requestedSystemID = dataToAuthorize.get<QnUuid>(attr::systemID);
+    stree::ResourceContainer auxSearchAttrs;
+    if (authenticatedAccountID && requestedSystemID)
+    {
+        //account requests access to the system
+        auxSearchAttrs.put(
+            attr::authAccountRightsOnSystem,
+            QnLexical::serialized(
+                m_systemManager.getAccountRightsForSystem(
+                    authenticatedAccountID.get(),
+                    requestedSystemID.get())));
+    }
+
+    //TODO #ak forward requestedEntity and requestedAction
+
+    stree::ResourceWriterProxy<bool> resProxy(authzInfo, attr::authorized);
+    m_stree.search(
+        StreeOperation::authorization,
+        stree::MultiSourceResourceReader(
+            authenticationProperties,
+            dataToAuthorize,
+            auxSearchAttrs),
+        &resProxy);
+
+    if (auto authorized = resProxy.take())
+        return authorized.get();
+    //no "autorized" attr has been set. This is actually error in authorization rules xml
+    Q_ASSERT(false);
+    NX_LOG(lit("No \"authorized\" attribute has been set by authorization tree traversal"), cl_logWARNING);
+    return false;
+}
 
 }   //cdb
 }   //nx

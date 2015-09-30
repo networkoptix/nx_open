@@ -215,10 +215,10 @@ private:
     //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer&& authInfo,
+        stree::ResourceContainer authInfo,
         const nx_http::Request& request,
         nx_http::Response* const /*response*/,
-        RequestCompletionHandlerType&& completionHandler ) override
+        RequestCompletionHandlerType completionHandler ) override
     {
         this->m_completionHandler = std::move( completionHandler );
         this->m_requestMethod = request.requestLine.method;
@@ -242,6 +242,7 @@ private:
 
         static_cast<Descendant*>(this)->processRequest(
             connection,
+            request,
             std::move( authInfo ),
             std::move( inputData ) );
     }

@@ -204,6 +204,45 @@ namespace stree
         MultiIteratableResourceReader(const MultiIteratableResourceReader&);
         MultiIteratableResourceReader& operator=(const MultiIteratableResourceReader&);
     };
+
+    //!Proxies every \a stree::AbstractResourceWriter::put call to the provided container and saves value of desired resource
+    template<class T>
+    class ResourceWriterProxy
+    :
+        public stree::AbstractResourceWriter
+    {
+    public:
+        ResourceWriterProxy(
+            stree::AbstractResourceWriter* target,
+            int resToCatchID)
+        :
+            m_target(target),
+            m_resToCatchID(resToCatchID)
+        {
+        }
+
+        virtual void put(int resID, const QVariant& value) override
+        {
+            if (resID == m_resToCatchID)
+                m_catchedVal = value.value<T>();
+            m_target->put(resID, value);
+        }
+
+        boost::optional<T> get() const
+        {
+            return m_catchedVal;
+        }
+
+        boost::optional<T> take()
+        {
+            return std::move(m_catchedVal);
+        }
+
+    private:
+        AbstractResourceWriter* m_target;
+        int m_resToCatchID;
+        boost::optional<T> m_catchedVal;
+    };
 }
 
 #endif  //RESOURCECONTAINER_H

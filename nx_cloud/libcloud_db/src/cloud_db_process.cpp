@@ -130,7 +130,9 @@ int CloudDBProcess::executeApplication()
             accountManager,
             systemManager);
 
-        AuthorizationManager authorizationManager;
+        AuthorizationManager authorizationManager(
+            streeManager,
+            systemManager);
     
         nx_http::MessageDispatcher httpMessageDispatcher;
         //registering HTTP handlers

@@ -43,13 +43,8 @@ namespace stree
         NX_LOG(lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResID), cl_logDEBUG2);
 
         QVariant value;
-        if (!in.get(m_matchResID, &value))
-        {
-            NX_LOG(lit("Stree. Presence Condition. Resource (%1) not found in input data").arg(m_matchResID), cl_logDEBUG2);
-            return;
-        }
-
-        const int intVal = value.toBool() ? 1 : 0;
+        const bool resPresentInInputData = in.get(m_matchResID, &value);
+        const int intVal = resPresentInInputData ? 1 : 0;
         if (!m_children[intVal])
         {
             NX_LOG(lit("Stree. Presence Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2);

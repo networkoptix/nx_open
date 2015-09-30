@@ -22,6 +22,7 @@ namespace cdb {
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(StreeOperation,
     (StreeOperation::authentication, "authentication")
+    (StreeOperation::authorization, "authorization")
 )
 
 

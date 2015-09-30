@@ -50,12 +50,12 @@ namespace nx_http
         */
         virtual void processRequest(
             const nx_http::HttpServerConnection& connection,
-            stree::ResourceContainer&& authInfo,
+            stree::ResourceContainer authInfo,
             const nx_http::Request& request,
             nx_http::Response* const response,
             std::function<void(
                 const nx_http::StatusCode::Value statusCode,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) = 0;
+                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler ) = 0;
 
     private:
         nx_http::Message m_requestMsg;

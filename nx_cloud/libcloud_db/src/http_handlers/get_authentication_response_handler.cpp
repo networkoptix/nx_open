@@ -9,7 +9,7 @@
 namespace nx {
 namespace cdb {
 
-const QString GetAuthenticationResponseHandler::HANDLER_PATH("/auth/authorize");
+const QString GetAuthenticationResponseHandler::HANDLER_PATH("/auth/get_authentication");
 
 }   //cdb
 }   //nx

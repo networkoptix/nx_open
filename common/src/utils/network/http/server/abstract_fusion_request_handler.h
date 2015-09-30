@@ -36,7 +36,8 @@ public:
     */
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer&& authInfo,
+        const nx_http::Request& request,
+        stree::ResourceContainer authInfo,
         Input inputData ) = 0;
 
     //!Call this method when processed request. \a outputData argument is missing when \a Output is \a void
@@ -63,18 +64,19 @@ public:
     */
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer&& authInfo ) = 0;
+        const nx_http::Request& request,
+        stree::ResourceContainer authInfo ) = 0;
 
 private:
     //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer&& authInfo,
+        stree::ResourceContainer authInfo,
         const nx_http::Request& request,
         nx_http::Response* const /*response*/,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler ) override
     {
         this->m_completionHandler = std::move( completionHandler );
         this->m_requestMethod = request.requestLine.method;
@@ -84,6 +86,7 @@ private:
 
         processRequest(
             connection,
+            request,
             std::move( authInfo ) );
     }
 };

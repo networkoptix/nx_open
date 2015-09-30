@@ -16,6 +16,9 @@
 namespace nx {
 namespace cdb {
 
+class StreeManager;
+class SystemManager;
+
 //!Performs request authorization based on authentication info, requested entity and requested action type
 /*!
     \note Requests from other classes of same module (same process) are authorized by \a AccessRole::cloudDB
@@ -24,16 +27,25 @@ namespace cdb {
 class AuthorizationManager
 {
 public:
+    AuthorizationManager(
+        const StreeManager& stree,
+        const SystemManager& systemManager);
+
     /*!
         \param dataToAuthorize Authorization information can contain data filter to restrict access to data
         \return \a true if authorized, \a false otherwise
         \note This method cannot block
     */
     bool authorize(
+        const stree::AbstractResourceReader& authenticationProperties,
         const stree::AbstractResourceReader& dataToAuthorize,
         EntityType requestedEntity,
         DataActionType requestedAction,
         stree::AbstractResourceWriter* const authzInfo ) const;
+
+private:
+    const StreeManager& m_stree;
+    const SystemManager& m_systemManager;
 };
 
 }   //cdb

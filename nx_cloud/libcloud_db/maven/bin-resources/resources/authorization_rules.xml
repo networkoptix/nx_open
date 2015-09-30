@@ -19,19 +19,52 @@
     </sequence>
 
     <sequence value="authorization">
-        <set resName="authorized" resValue="false"/>
+        <set resName="authorized" resValue="true"/>
 
         <condition resName="request.path">
-            <condition value="/share_system" resName="authAccountRightsOnSystem">
-                <set value="owner" resName="authorized" resValue="true"/>
-                <set value="editorWithSharing" resName="authorized" resValue="true"/>
-            </condition>
-            <condition value="/bind_system" resName="accountID" matchType="presence">
-                <set value="true" resName="authorized" resValue="true"/>
-            </condition>
-            <condition value="/unbind_system" resName="authAccountRightsOnSystem">
-                <set value="owner" resName="authorized" resValue="true"/>
-            </condition>
+            <sequence value="/account/register">
+                <!--
+                This request must be allowed for cloud portal only
+                <set resName="authorized" resValue="false"/>
+                -->
+            </sequence>
+            <sequence value="/account/activate">
+                <!--
+                This request must be allowed for cloud portal only
+                <set resName="authorized" resValue="false"/>
+                -->
+            </sequence>
+            <sequence value="/system/share">
+                <set resName="authorized" resValue="false"/>
+                <condition resName="authAccountRightsOnSystem">
+                    <set value="owner" resName="authorized" resValue="true"/>
+                    <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                </condition>
+            </sequence>
+            <sequence value="/system/bind">
+                <set resName="authorized" resValue="false"/>
+                <condition resName="accountID" matchType="presence">
+                    <set value="true" resName="authorized" resValue="true"/>
+                </condition>
+            </sequence>
+            <sequence value="/system/unbind">
+                <set resName="authorized" resValue="false"/>
+                <condition resName="authAccountRightsOnSystem">
+                    <set value="owner" resName="authorized" resValue="true"/>
+                </condition>
+            </sequence>
+            <sequence value="/auth/get_authentication">
+                <set resName="authorized" resValue="false"/>
+                <condition resName="systemID" matchType="presence">
+                    <set value="true" resName="authorized" resValue="true"/>
+                </condition>
+            </sequence>
+            <sequence value="/auth/get_nonce">
+                <set resName="authorized" resValue="false"/>
+                <condition resName="systemID" matchType="presence">
+                    <set value="true" resName="authorized" resValue="true"/>
+                </condition>
+            </sequence>
         </condition>
     </sequence>
 </condition>

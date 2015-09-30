@@ -39,10 +39,9 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
         case attr::systemID:
             *value = QVariant::fromValue(id);
             return true;
+        default:
+            return false;
     }
-
-    //TODO #ak
-    return false;
 }
 
 
@@ -50,10 +49,19 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 //// class SystemSharing
 ////////////////////////////////////////////////////////////
 
-bool SystemSharing::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
+bool SystemSharing::getAsVariant( int resID, QVariant* const value ) const
 {
-    //TODO #ak
-    return false;
+    switch (resID)
+    {
+        case attr::accountID:
+            *value = QVariant::fromValue(accountID);
+            return true;
+        case attr::systemID:
+            *value = QVariant::fromValue(systemID);
+            return true;
+        default:
+            return false;
+    }
 }
 
 

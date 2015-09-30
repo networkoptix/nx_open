@@ -17,6 +17,8 @@
 #include "access_control/authorization_manager.h"
 #include "access_control/auth_types.h"
 #include "managers/managers_types.h"
+#include "stree/http_request_attr_reader.h"
+#include "stree/socket_attr_reader.h"
 
 
 namespace nx {
@@ -47,19 +49,29 @@ protected:
     const AuthorizationManager& m_authorizationManager;
 
     bool authorize(
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request,
+        const stree::AbstractResourceReader& authenticationData,
         const stree::AbstractResourceReader& dataToAuthorize,
-        stree::AbstractResourceWriter* const authzInfo )
+        stree::ResourceContainer* const authzInfo )
     {
+        SocketResourceReader socketResources(*connection.socket());
+        HttpRequestResourceReader httpRequestResources(request);
+
         //performing authorization
         //  authorization is performed here since it can depend on input data which 
         //  needs to be deserialized depending on request type
         if( !m_authorizationManager.authorize(
-                dataToAuthorize,
+                authenticationData,
+                stree::MultiSourceResourceReader(
+                    socketResources,
+                    httpRequestResources,
+                    dataToAuthorize),
                 this->m_entityType,
                 this->m_actionType,
                 authzInfo ) )   //using same object since we can move it
         {
-            this->requestCompleted( nx_http::StatusCode::unauthorized );
+            this->requestCompleted(nx_http::StatusCode::forbidden);
             return false;
         }
         return true;
@@ -85,7 +97,7 @@ public:
         EntityType entityType,
         DataActionType actionType,
         const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc&& requestFunc )
+        ExecuteRequestFunc requestFunc )
     :
         detail::BaseFiniteMsgBodyHttpHandler<Input, Output>(
             entityType,
@@ -97,12 +109,16 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& /*connection*/,
-        stree::ResourceContainer&& authInfo,
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request,
+        stree::ResourceContainer authInfo,
         Input inputData ) override
     {
         if( !this->authorize(
-                stree::MultiSourceResourceReader( authInfo, inputData ),
+                connection,
+                request,
+                authInfo,
+                inputData,
                 &authInfo ) )
             return;
 
@@ -131,13 +147,13 @@ public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
         Input inputData,
-        std::function<void( api::ResultCode resultCode )>&& completionHandler )> ExecuteRequestFunc;
+        std::function<void( api::ResultCode resultCode )> completionHandler )> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
         const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc&& requestFunc )
+        ExecuteRequestFunc requestFunc )
     :
         detail::BaseFiniteMsgBodyHttpHandler<Input, void>(
             entityType,
@@ -149,15 +165,19 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& /*connection*/,
-        stree::ResourceContainer&& authInfo,
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request,
+        stree::ResourceContainer authInfo,
         Input inputData ) override
     {
         //performing authorization
         //  authorization is performed here since it can depend on input data which 
         //  needs to be deserialized depending on request type
         if( !this->authorize(
-                stree::MultiSourceResourceReader( authInfo, inputData ),
+                connection,
+                request,
+                authInfo,
+                inputData,
                 &authInfo ) )
             return;
 
@@ -185,13 +205,13 @@ class AbstractFiniteMsgBodyHttpHandler<void, Output>
 public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
-        std::function<void( api::ResultCode resultCode, Output outData )>&& completionHandler )> ExecuteRequestFunc;
+        std::function<void( api::ResultCode resultCode, Output outData )> completionHandler )> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
         const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc&& requestFunc )
+        ExecuteRequestFunc requestFunc )
     :
         detail::BaseFiniteMsgBodyHttpHandler<void, Output>(
             entityType,
@@ -203,10 +223,16 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& /*connection*/,
-        stree::ResourceContainer&& authInfo ) override
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request,
+        stree::ResourceContainer authInfo ) override
     {
-        if( !this->authorize( authInfo, &authInfo ) )
+        if (!this->authorize(
+                connection,
+                request,
+                authInfo,
+                stree::ResourceContainer(),
+                &authInfo))
             return;
 
         m_requestFunc(
@@ -232,13 +258,13 @@ class AbstractFiniteMsgBodyHttpHandler<void, void>
 public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
-        std::function<void( api::ResultCode resultCode )>&& completionHandler )> ExecuteRequestFunc;
+        std::function<void( api::ResultCode resultCode )> completionHandler )> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
         const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc&& requestFunc )
+        ExecuteRequestFunc requestFunc )
     :
         detail::BaseFiniteMsgBodyHttpHandler<void, void>(
             entityType,
@@ -250,10 +276,16 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& /*connection*/,
-        stree::ResourceContainer&& authInfo ) override
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request,
+        stree::ResourceContainer authInfo ) override
     {
-        if( !this->authorize( authInfo, &authInfo ) )
+        if (!this->authorize(
+                connection,
+                request,
+                authInfo,
+                stree::ResourceContainer(),
+                &authInfo))
             return;
 
         m_requestFunc(
@@ -266,7 +298,6 @@ public:
 private:
     ExecuteRequestFunc m_requestFunc;
 };
-
 
 }   //cdb
 }   //nx
