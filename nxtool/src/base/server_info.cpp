@@ -66,6 +66,9 @@ rtu::BaseServerInfo::BaseServerInfo()
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
+    const bool firstHasHdd = (first.flags & Constants::HasHdd);
+    const bool secondHasHdd = (second.flags & Constants::HasHdd);
+
     /// Do not compare flags, hostAddress and visibleAddress - it is Ok
     return ((first.id == second.id)
         && (first.name == second.name)
@@ -73,7 +76,8 @@ bool rtu::operator == (const BaseServerInfo &first
         && (first.systemName == second.systemName)
         && (first.version == second.version)
         && (first.runtimeId == second.runtimeId)
-        && (first.safeMode == second.safeMode));
+        && (first.safeMode == second.safeMode)
+        && (firstHasHdd == secondHasHdd));
 }
 
 bool rtu::operator != (const BaseServerInfo &first

@@ -381,6 +381,14 @@ bool rtu::parseModuleInformationReply(const QJsonObject &reply
             (*itHandler)(reply, baseInfo);
     }
 
+    static const auto kHasHddFlagMinVersion = QStringLiteral("2.4.1");
+    if (baseInfo.version < kHasHddFlagMinVersion)
+    {
+        /// Assume all versions less than kHasHddFlagMinVersion have hdd due
+        /// to we can't discover state through the rest api
+        baseInfo.flags |= Constants::HasHdd;
+    }
+
     return true;
 }
 

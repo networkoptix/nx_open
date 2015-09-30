@@ -240,6 +240,8 @@ namespace
         , kLoggedIn
         , kDefaultPassword
         , kBusyStateRoleId
+        , kSafeModeRoleId
+        , kHasHdd
 
         , kLastCustomRoleId
     };
@@ -264,6 +266,8 @@ namespace
         result.insert(kLoggedIn, "loggedIn");
         result.insert(kDefaultPassword, "defaultPassword");
         result.insert(kBusyStateRoleId, "isBusy");
+        result.insert(kSafeModeRoleId, "safeMode");
+        result.insert(kHasHdd, "hasHdd");
 
         return result;
     }();
@@ -543,6 +547,10 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
             return info.hasExtraInfo();
         case kBusyStateRoleId:
             return searchInfo.serverInfoIterator->locked;
+        case kSafeModeRoleId:
+            return searchInfo.serverInfoIterator->serverInfo.baseInfo().safeMode;
+        case kHasHdd:
+            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags && Constants::HasHdd);
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:

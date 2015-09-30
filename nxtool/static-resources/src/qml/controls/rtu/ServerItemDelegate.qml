@@ -12,10 +12,12 @@ Item
     id: thisComponent;
 
     property int selectedState;
+    property bool safeMode: true;
+    property bool hasHdd: false;
     property bool loggedIn;
     property string serverName;
-    property string macAddress;
-    
+    property string information;
+
     signal selectionStateShouldBeChanged(int currentItemIndex);
     signal explicitSelectionCalled(int currentItemIndex);
     
@@ -77,8 +79,8 @@ Item
             {
                 id: descriptionColumn;
 
-                height: serverNameText.height + textSpacer.height
-                    + (macAddressText.visible ? macAddressText.height : 0);
+                height: serverNameRow.height + textSpacer.height
+                    + (informationText.visible ? informationText.height : 0);
                 
                 anchors
                 {
@@ -86,47 +88,110 @@ Item
                     right: parent.right;
                     
                     leftMargin: Common.SizeManager.spacing.medium;
-                    rightMargin: Common.SizeManager.spacing.medium;
                 }
 
-                Base.Text
+                Item
                 {
-                    id: serverNameText;
-                    
+                    id: serverNameRow;
+                    height: serverNameText.height;
                     anchors
                     {
                         left: parent.left;
                         right: parent.right;
                     }
 
-                    text: serverName;
-                    font.pixelSize: Common.SizeManager.fontSizes.base;
+                    Base.Text
+                    {
+                        id: serverNameText;
+
+                        clip: true;
+                        anchors
+                        {
+                            left: parent.left;
+                            right: (safeModeMarker.visible ? safeModeMarker.left : parent.right);
+                            rightMargin: Common.SizeManager.spacing.base;
+                            verticalCenter: parent.verticalCenter;
+                        }
+
+                        wrapMode: Text.Wrap;
+                        text: serverName;
+                        font.pixelSize: Common.SizeManager.fontSizes.base;
+                    }
+
+                    Image
+                    {
+                        id: safeModeMarker;
+
+                        visible: safeMode;
+
+                        width: height;
+                        height: serverNameText.height;
+                        anchors
+                        {
+                            verticalCenter: parent.verticalCenter;
+                            right: parent.right;
+                        }
+
+                        source: "qrc:/resources/safe.png";
+                    }
                 }
-                
+
                 Item
                 {
                     id: textSpacer;
                     
                     width: parent.width;
                     height: (visible ? Common.SizeManager.spacing.small : 0);
-                    visible: macAddressText.visible;
+                    visible: informationText.visible;
                     
-                    anchors.top: serverNameText.bottom;
-                }
+                    anchors.top: serverNameRow.bottom;
+                 }
 
-                Base.Text
+                Item
                 {
-                    id: macAddressText;
-                    
+                    id: informationHolder;
+
+                    height: informationText.height;
+
                     anchors
                     {
                         left: parent.left;
                         right: parent.right;
                         top: textSpacer.bottom;
                     }
-                    visible: (text.length !== 0);
-                    text: macAddress;
-                    font.pixelSize: Common.SizeManager.fontSizes.small;
+
+                    Base.Text
+                    {
+                        id: informationText;
+
+                        anchors
+                        {
+                            left: parent.left;
+                            right: (noHddMarker.visible ? noHddMarker.left : parent.right);
+                        }
+
+                        visible: (text.length !== 0);
+                        text: information;
+                        font.pixelSize: Common.SizeManager.fontSizes.small;
+                    }
+
+                    Image
+                    {
+                        id: noHddMarker;
+
+                        visible: !hasHdd;
+
+                        width: height;
+                        height: informationText.height;
+
+                        anchors
+                        {
+                            verticalCenter: parent.verticalCenter;
+                            right: parent.right;
+                        }
+
+                        source: "qrc:/resources/no-hdd.png";
+                    }
                 }
             }
         }
