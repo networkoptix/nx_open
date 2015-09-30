@@ -15,6 +15,7 @@ public:
     qint64 recordedSecs;     // recorded archive in seconds
     qint64 averageBitrate;   // average bitrate in bytes/sec
     qint64 archiveDurationSecs; // archive calendar duration in seconds
+    QMap<QnUuid, qint64> recordedBytesPerStorage; // more detail data about recorded bytes
     
     void operator +=(const QnRecordingStatsData& right) {
         recordedBytes += right.recordedBytes;
@@ -23,7 +24,7 @@ public:
     }
 
 };
-#define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(averageBitrate)(archiveDurationSecs)
+#define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(averageBitrate)(archiveDurationSecs)(recordedBytesPerStorage)
 
 struct QnCamRecordingStatsData: public QnRecordingStatsData
 {

@@ -953,7 +953,11 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         {
             qreal persentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
             Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            auto storage = qnStorageMan->storageRoot(itrHiLeft->storageIndex);
             result.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
+            if (storage)
+                result.recordedBytesPerStorage[storage->getId()] += itrHiLeft->getFileSize() * persentUsage;
+
             result.recordedSecs += itrHiLeft->durationMs * persentUsage;
             if (itrHiLeft->startTimeMs >= bitrateThreshold) {
                 bitrateStats.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
@@ -965,8 +969,10 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         {
             qreal persentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
             Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            auto storage = qnStorageMan->storageRoot(itrLowLeft->storageIndex);
             result.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
-
+            if (storage)
+                result.recordedBytesPerStorage[storage->getId()] += itrLowLeft->getFileSize() * persentUsage;
             if (hasHi) 
             {
                 // do not include bitrate calculation if only LQ quality
