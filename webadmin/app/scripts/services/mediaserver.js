@@ -239,7 +239,7 @@ angular.module('webadminApp')
                     '&detail=' + detail +
                     '&periodsType=' + periodsType +
                     (limit?'&limit=' + limit:'') +
-                    '&flat');
+                    '&flat&keepSmallChunks');
             }
         };
     });
