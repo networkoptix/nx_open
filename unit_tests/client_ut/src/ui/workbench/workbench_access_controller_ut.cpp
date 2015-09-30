@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/resource_type.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -47,6 +48,15 @@ protected:
         return user;
     }
 
+    void loginAs(Qn::Permissions globalPermissions) {
+        auto user = addUser(userName1, globalPermissions);  
+        m_context->setUserName(userName1);
+    }
+
+    bool hasPermissions(const QnResourcePtr &resource, Qn::Permissions permissions) const {
+        return m_context->accessController()->hasPermissions(resource, permissions);
+    }
+
     // Declares the variables your tests want to use.
     QSharedPointer<QnClientModule> m_module;
     QSharedPointer<QnSkin> m_skin;
@@ -66,11 +76,22 @@ TEST_F( QnWorkbenchAccessControllerTest, init )
 /** Test for safe mode. Check if the user cannot create new layouts on server. */
 TEST_F( QnWorkbenchAccessControllerTest, safeDisableSaveLayoutAs )
 {
-    auto user = addUser(userName1, Qn::GlobalOwnerPermissions);  
-    m_context->setUserName(userName1);
+    loginAs(Qn::GlobalOwnerPermissions);
+    qnCommon->setReadOnly(true);
+    ASSERT_FALSE(hasPermissions(m_context->user(), Qn::CreateLayoutPermission));
+}
 
+/** Test for safe mode. Check if the user cannot save layout created with external permissions. */
+TEST_F( QnWorkbenchAccessControllerTest, safeCannotSaveExternalPermissionsLayout )
+{
+    loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
 
-    ASSERT_FALSE(m_context->accessController()->hasPermissions(user, Qn::CreateLayoutPermission));
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    layout->setId(QnUuid::createUuid());
+    layout->setData(Qn::LayoutPermissionsRole, Qn::ReadWriteSavePermission);
+    qnResPool->addResource(layout);
+
+    ASSERT_FALSE(hasPermissions(layout, Qn::SavePermission));
 }
 
