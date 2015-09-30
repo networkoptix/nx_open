@@ -27,6 +27,12 @@ public:
     QString logDir;
 };
 
+class Auth
+{
+public:
+    QString rulesXmlPath;
+};
+
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
@@ -45,6 +51,7 @@ public:
     const Logging& logging() const;
     const db::ConnectionOptions& dbConnectionOptions() const;
     const QnEmailSettings& email() const;
+    const Auth& auth() const;
     const QString& cloudBackendUrl() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
@@ -60,6 +67,7 @@ private:
     Logging m_logging;
     db::ConnectionOptions m_dbConnectionOptions;
     QnEmailSettings m_email;
+    Auth m_auth;
     QString m_cloudBackendUrl;
 
     void fillSupportedCmdParameters();

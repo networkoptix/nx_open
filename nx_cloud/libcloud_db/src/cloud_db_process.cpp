@@ -118,7 +118,7 @@ int CloudDBProcess::executeApplication()
         authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( VerifyEmailAddressHandler::HANDLER_PATH, AuthMethod::noAuth );
 
-        StreeManager streeManager;
+        StreeManager streeManager(settings.auth());
 
         AuthenticationManager authenticationManager( 
             accountManager,
@@ -126,14 +126,14 @@ int CloudDBProcess::executeApplication()
             authRestrictionList,
             streeManager );
 
-        AuthenticationProvider authProvider(
-            accountManager,
-            systemManager);
-
         AuthorizationManager authorizationManager(
             streeManager,
             systemManager);
     
+        AuthenticationProvider authProvider(
+            accountManager,
+            systemManager);
+
         nx_http::MessageDispatcher httpMessageDispatcher;
         //registering HTTP handlers
         registerApiHandlers(

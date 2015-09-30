@@ -26,7 +26,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(StreeOperation,
 )
 
 
-StreeManager::StreeManager() throw(std::runtime_error)
+StreeManager::StreeManager(const conf::Auth& authSettings) throw(std::runtime_error)
+:
+    m_authSettings(authSettings)
 {
     prepareNamespace();
     loadStree();
@@ -59,10 +61,6 @@ void StreeManager::prepareNamespace()
     m_rns.registerResource(attr::requestPath, "request.path", QVariant::String);
 }
 
-namespace {
-    const QString streeFilePath = ":/authorization_rules.xml";
-}
-
 void StreeManager::loadStree() throw(std::runtime_error)
 {
     stree::SaxHandler xmlHandler(m_rns);
@@ -71,16 +69,16 @@ void StreeManager::loadStree() throw(std::runtime_error)
     reader.setContentHandler(&xmlHandler);
     reader.setErrorHandler(&xmlHandler);
 
-    QFile xmlFile(streeFilePath);
+    QFile xmlFile(m_authSettings.rulesXmlPath);
     if (!xmlFile.open(QIODevice::ReadOnly))
         throw std::runtime_error("Failed to open stree xml file " +
-            streeFilePath.toStdString() + ": " + xmlFile.errorString().toStdString());
+            m_authSettings.rulesXmlPath.toStdString() + ": " + xmlFile.errorString().toStdString());
 
     QXmlInputSource input(&xmlFile);
-    NX_LOG(lit("Parsing stree xml file (%1)").arg(streeFilePath), cl_logDEBUG1);
+    NX_LOG(lit("Parsing stree xml file (%1)").arg(m_authSettings.rulesXmlPath), cl_logDEBUG1);
     if (!reader.parse(&input))
         throw std::runtime_error("Failed to parse stree xml file " +
-            streeFilePath.toStdString() + ": " + xmlFile.errorString().toStdString());
+            m_authSettings.rulesXmlPath.toStdString() + ": " + xmlFile.errorString().toStdString());
 
     m_stree = xmlHandler.releaseTree();
 }

@@ -72,6 +72,10 @@ namespace
     static const int DEFAULT_EMAIL_SMTP_TIMEOUT = 300;
     static const QLatin1String EMAIL_SIGNATURE( "email/signature" );
     static const QLatin1String EMAIL_SUPPORT_ADDRESS( "email/supportAddress" );
+
+    //auth settings
+    static const QLatin1String AUTH_XML_PATH("auth/rulesXmlPath");
+    static const QLatin1String DEFAULT_AUTH_XML_PATH(":/authorization_rules.xml");
 }
 
 
@@ -114,6 +118,11 @@ const db::ConnectionOptions& Settings::dbConnectionOptions() const
 const QnEmailSettings& Settings::email() const
 {
     return m_email;
+}
+
+const Auth& Settings::auth() const
+{
+    return m_auth;
 }
 
 const QString& Settings::cloudBackendUrl() const
@@ -207,6 +216,9 @@ void Settings::loadConfiguration()
         QnEmail::ConnectionType::Tls, &success );
     if( !success )
         m_email.connectionType = DEFAULT_EMAIL_SMTP_CONNECTION_TYPE;
+
+    //auth
+    m_auth.rulesXmlPath = m_settings.value(AUTH_XML_PATH, DEFAULT_AUTH_XML_PATH).toString();
 }
 
 }   //conf

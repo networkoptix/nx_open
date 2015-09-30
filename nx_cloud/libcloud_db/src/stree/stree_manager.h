@@ -14,10 +14,11 @@
 #include <plugins/videodecoder/stree/resourcenameset.h>
 #include <utils/common/model_functions_fwd.h>
 
+#include "settings.h"
+
 
 namespace nx {
 namespace cdb {
-
 
 enum class StreeOperation
 {
@@ -35,7 +36,7 @@ public:
         Performs initial parsing
         \throw \a std::runtime_error in case of parse error
     */
-    StreeManager() throw(std::runtime_error);
+    StreeManager(const conf::Auth& authSettings) throw(std::runtime_error);
 
     void search(
         StreeOperation,
@@ -43,6 +44,7 @@ public:
         stree::AbstractResourceWriter* const output) const;
 
 private:
+    const conf::Auth& m_authSettings;
     std::unique_ptr<stree::AbstractNode> m_stree;
     stree::ResourceNameSet m_rns;
 
