@@ -20,8 +20,10 @@ enum Value
     userName,
     userPassword,
     authAccountRightsOnSystem,
+    accountStatus,
     entity,
     action,
+    secureSource,
 
     socketIntfIP,
     socketRemoteIP,

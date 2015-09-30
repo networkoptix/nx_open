@@ -28,6 +28,12 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
     }
 }
 
+bool AccountActivationCode::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
+{
+    //TODO #ak
+    return false;
+}
+
 }   //data
 }   //cdb
 }   //nx

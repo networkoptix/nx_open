@@ -16,6 +16,7 @@
 namespace nx {
 namespace cdb {
 
+class AccountManager;
 class StreeManager;
 class SystemManager;
 
@@ -29,6 +30,7 @@ class AuthorizationManager
 public:
     AuthorizationManager(
         const StreeManager& stree,
+        const AccountManager& accountManager,
         const SystemManager& systemManager);
 
     /*!
@@ -44,6 +46,7 @@ public:
         stree::AbstractResourceWriter* const authzInfo ) const;
 
 private:
+    const AccountManager& m_accountManager;
     const StreeManager& m_stree;
     const SystemManager& m_systemManager;
 };

@@ -179,6 +179,8 @@ namespace stree
                     return createConditionNode<double>( matchType, res.id );
                 case QVariant::String:
                     return createConditionNodeForStringRes( matchType, res.id );
+                case QVariant::Bool:
+                    return createConditionNode<bool>(matchType, res.id);
                 default:
                     m_errorDescription = lit( "ConditionNode currently does not support resource of type %1 (resource name %2). Only %3 types are supported" )
                         .arg(res.type).arg(resName).arg(lit("int, double, string"));

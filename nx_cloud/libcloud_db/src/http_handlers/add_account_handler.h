@@ -25,7 +25,7 @@ class AccountManager;
 
 class AddAccountHttpHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::AccountData>
+    public AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::AccountActivationCode>
 {
 public:
     static const QString HANDLER_PATH;
@@ -34,7 +34,7 @@ public:
         AccountManager* const accountManager,
         const AuthorizationManager& authorizationManager )
     :
-        AbstractFiniteMsgBodyHttpHandler<data::AccountData>(
+        AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::AccountActivationCode>(
             EntityType::account,
             DataActionType::insert,
             authorizationManager,

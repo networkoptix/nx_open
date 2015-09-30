@@ -105,7 +105,7 @@ void AuthenticationProvider::getAuthenticationResponse(
     const auto account = m_accountManager.findAccountByUserName(authRequest.username.c_str());
     if (!account)
         return completionHandler(api::ResultCode::badUsername, api::AuthResponse());
-    if (account->statusCode != api::AccountStatus::asActivated)
+    if (account->statusCode != api::AccountStatus::activated)
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
 
     const auto systemAccessRole = m_systemManager.getAccountRightsForSystem(account->id, systemID);

@@ -3,15 +3,13 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "verify_email_address_handler.h"
+#include "activate_account_handler.h"
 
 
 namespace nx {
 namespace cdb {
 
-
-const QString VerifyEmailAddressHandler::HANDLER_PATH( "/account/verify_email" );
-
+const QString ActivateAccountHandler::HANDLER_PATH( "/account/activate" );
 
 }   //cdb
 }   //nx

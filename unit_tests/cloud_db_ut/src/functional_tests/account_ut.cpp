@@ -17,7 +17,12 @@
 namespace nx {
 namespace cdb {
 
-TEST_F(CdbFunctionalTest, createAccount)
+//TODO #ak following test fails :)
+//TEST_F(CdbFunctionalTest, accountActivation)
+//{
+//}
+
+TEST_F(CdbFunctionalTest, generalTest)
 {
     //waiting for cloud_db initialization
     waitUntilStarted();

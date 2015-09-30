@@ -18,12 +18,12 @@ namespace cdb {
 namespace api {
 
 
-enum AccountStatus
+enum class AccountStatus
 {
-    asInvalid = 0,
-    asAwaitingEmailConfirmation = 1,
-    asActivated = 2,
-    asBlocked = 3
+    invalid = 0,
+    awaitingActivation = 1,
+    activated = 2,
+    blocked = 3
 };
 
 class AccountData
@@ -39,9 +39,15 @@ public:
 
     AccountData()
     :
-        statusCode( asInvalid )
+        statusCode(AccountStatus::invalid)
     {
     }
+};
+
+class AccountActivationCode
+{
+public:
+    std::string code;
 };
 
 }   //api

@@ -1,70 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<condition resName="operation">
-    <sequence value="authentication">
-    <!-- TODO cloud modules authentication rules should be added here -->
-    <!-- TODO this section should be suitable for authentication by ip address and for password check -->
-        <set resName="authenticated" resValue="false"/>
-<!--        
-        <condition resName="socket.intf.ip">
-            <set value="127.0.0.1" resName="authenticated" resValue="true"/>
-        </condition>
--->        
-        <condition resName="user.name">
-            <set value="connection_mediator" resName="user.password" resValue="123456"/>
-            <!-- <sequence value="connection_mediator">
-                <set resName="user.realm" resValue="dwspectrum"/>
-                <set resName="user.ha1" resValue="111111111111111"/>
-            </sequence> -->
-        </condition>
-    </sequence>
 
-    <sequence value="authorization">
-        <set resName="authorized" resValue="true"/>
+<sequence>
+    <set resName="secureSource" resValue="false"/>
 
-        <condition resName="request.path">
-            <sequence value="/account/register">
-                <!--
-                This request must be allowed for cloud portal only
-                <set resName="authorized" resValue="false"/>
-                -->
-            </sequence>
-            <sequence value="/account/activate">
-                <!--
-                This request must be allowed for cloud portal only
-                <set resName="authorized" resValue="false"/>
-                -->
-            </sequence>
-            <sequence value="/system/share">
-                <set resName="authorized" resValue="false"/>
-                <condition resName="authAccountRightsOnSystem">
-                    <set value="owner" resName="authorized" resValue="true"/>
-                    <set value="editorWithSharing" resName="authorized" resValue="true"/>
+    <condition resName="socket.intf.ip">
+        <set value="127.0.0.1" resName="secureSource" resValue="true"/>
+    </condition>
+
+    <condition resName="operation">
+
+        <sequence value="authentication">
+            <!-- TODO cloud modules authentication rules should be added here -->
+            <!-- TODO this section should be suitable for authentication by ip address and for password check -->
+            <set resName="authenticated" resValue="false"/>
+        
+            <condition resName="user.name">
+                <set value="connection_mediator" resName="user.password" resValue="123456"/>
+                <!-- <sequence value="connection_mediator">
+                    <set resName="user.realm" resValue="dwspectrum"/>
+                    <set resName="user.ha1" resValue="111111111111111"/>
+                </sequence> -->
+            </condition>
+        </sequence>
+
+        <sequence value="authorization">
+            <set resName="authorized" resValue="true"/>
+
+            <condition resName="account.status">
+                <sequence value="1">
+                    <!-- account not activated -->
+                    <set resName="authorized" resValue="false"/>
+                    <condition resName="request.path">
+                        <set value="/account/activate" resName="authorized" resValue="true"/>
+                        <set value="/account/get" resName="authorized" resValue="true"/>
+                    </condition>
+                </sequence>
+            </condition>
+
+            <condition resName="authorized">
+                <!-- following section forbids authorization on some conditions -->
+                <condition value="true" resName="request.path">
+                    <sequence value="/account/register">
+                        <!--
+                        This request must be allowed for cloud portal only
+                        <set resName="authorized" resValue="false"/>
+                        -->
+                    </sequence>
+                    <sequence value="/account/activate">
+                        <!--
+                        This request must be allowed for cloud portal only
+                        <set resName="authorized" resValue="false"/>
+                        -->
+                    </sequence>
+                    <sequence value="/system/share">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="authAccountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                            <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/system/bind">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="accountID" matchType="presence">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/system/unbind">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="authAccountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/auth/get_authentication">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="systemID" matchType="presence">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/auth/get_nonce">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="systemID" matchType="presence">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
                 </condition>
-            </sequence>
-            <sequence value="/system/bind">
-                <set resName="authorized" resValue="false"/>
-                <condition resName="accountID" matchType="presence">
-                    <set value="true" resName="authorized" resValue="true"/>
-                </condition>
-            </sequence>
-            <sequence value="/system/unbind">
-                <set resName="authorized" resValue="false"/>
-                <condition resName="authAccountRightsOnSystem">
-                    <set value="owner" resName="authorized" resValue="true"/>
-                </condition>
-            </sequence>
-            <sequence value="/auth/get_authentication">
-                <set resName="authorized" resValue="false"/>
-                <condition resName="systemID" matchType="presence">
-                    <set value="true" resName="authorized" resValue="true"/>
-                </condition>
-            </sequence>
-            <sequence value="/auth/get_nonce">
-                <set resName="authorized" resValue="false"/>
-                <condition resName="systemID" matchType="presence">
-                    <set value="true" resName="authorized" resValue="true"/>
-                </condition>
-            </sequence>
-        </condition>
-    </sequence>
-</condition>
+            </condition>
+        </sequence>
+    </condition>
+</sequence>

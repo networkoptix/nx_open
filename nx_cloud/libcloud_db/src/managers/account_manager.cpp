@@ -15,10 +15,10 @@
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
-#include "stree/cdb_ns.h"
 #include "email_manager.h"
-#include "http_handlers/verify_email_address_handler.h"
+#include "http_handlers/activate_account_handler.h"
 #include "settings.h"
+#include "stree/cdb_ns.h"
 #include "version.h"
 
 
@@ -46,26 +46,30 @@ AccountManager::AccountManager(
 }
 
 void AccountManager::addAccount(
-    const AuthorizationInfo& /*authzInfo*/,
+    const AuthorizationInfo& authzInfo,
     data::AccountData accountData,
-    std::function<void(api::ResultCode)> completionHandler )
+    std::function<void(api::ResultCode, data::AccountActivationCode)> completionHandler )
 {
     accountData.id = QnUuid::createUuid();
 
+    //fetching request source
+    bool requestSourceSecured = false;
+    authzInfo.get(attr::secureSource, &requestSourceSecured);
+
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountData, data::EmailVerificationCode>(
+    m_dbManager->executeUpdate<data::AccountData, data::AccountActivationCode>(
         std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
         std::move(accountData),
-        std::bind(&AccountManager::accountAdded, this, _1, _2, _3, std::move(completionHandler)) );
+        std::bind(&AccountManager::accountAdded, this, requestSourceSecured, _1, _2, _3, std::move(completionHandler)) );
 }
 
-void AccountManager::verifyAccountEmailAddress(
+void AccountManager::activate(
     const AuthorizationInfo& /*authzInfo*/,
-    data::EmailVerificationCode emailVerificationCode,
+    data::AccountActivationCode emailVerificationCode,
     std::function<void(api::ResultCode)> completionHandler )
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::EmailVerificationCode, QnUuid>(
+    m_dbManager->executeUpdate<data::AccountActivationCode, QnUuid>(
         std::bind( &AccountManager::verifyAccount, this, _1, _2, _3 ),
         std::move( emailVerificationCode ),
         std::bind( &AccountManager::accountVerified, this, _1, _2, _3, std::move( completionHandler ) ) );
@@ -91,6 +95,11 @@ void AccountManager::getAccount(
 
     //very strange: account has been authenticated, but not found in the database
     completionHandler(api::ResultCode::notFound, data::AccountData());
+}
+
+boost::optional<data::AccountData> AccountManager::findAccountByID(const QnUuid& id) const
+{
+    return m_cache.find(id);
 }
 
 boost::optional<data::AccountData> AccountManager::findAccountByUserName(
@@ -153,7 +162,7 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
 db::DBResult AccountManager::insertAccount(
     QSqlDatabase* const connection,
     const data::AccountData& accountData,
-    data::EmailVerificationCode* const resultData )
+    data::AccountActivationCode* const resultData )
 {
     //TODO #ak should return specific error if email address already used for account
 
@@ -163,7 +172,9 @@ db::DBResult AccountManager::insertAccount(
         "INSERT INTO account (id, email, password_ha1, full_name, status_code) "
                     "VALUES  (:id, :email, :passwordHa1, :fullName, :statusCode)");
     QnSql::bind( accountData, &insertAccountQuery );
-    insertAccountQuery.bindValue( ":statusCode", api::asAwaitingEmailConfirmation );
+    insertAccountQuery.bindValue(
+        ":statusCode",
+        static_cast<int>(api::AccountStatus::awaitingActivation) );
     if( !insertAccountQuery.exec() )
     {
         NX_LOG( lit( "Could not insert account into DB. %1" ).
@@ -191,7 +202,7 @@ db::DBResult AccountManager::insertAccount(
     //sending confirmation email
     QVariantHash emailParams;
     QUrl confirmationUrl( m_settings.cloudBackendUrl() );   //TODO #ak use something like QN_CLOUD_BACKEND_URL;
-    confirmationUrl.setPath( VerifyEmailAddressHandler::HANDLER_PATH );
+    confirmationUrl.setPath( ActivateAccountHandler::HANDLER_PATH );
     confirmationUrl.setQuery( lit("code=%1").arg(QLatin1String(emailVerificationCode)) );  //TODO #ak replace with fusion::QnUrlQuery::serialized(*resultData)
     emailParams[CONFIRMATION_URL_PARAM] = confirmationUrl.toString();
     emailParams[CONFIRMATION_CODE_PARAM] = QString::fromStdString( resultData->code );
@@ -209,26 +220,33 @@ db::DBResult AccountManager::insertAccount(
 }
 
 void AccountManager::accountAdded(
+    bool requestSourceSecured,
     db::DBResult resultCode,
     data::AccountData accountData,
-    data::EmailVerificationCode /*resultData*/,
-    std::function<void(api::ResultCode)> completionHandler )
+    data::AccountActivationCode resultData,
+    std::function<void(api::ResultCode, data::AccountActivationCode)> completionHandler )
 {
+    accountData.statusCode = api::AccountStatus::awaitingActivation;
+
     if( resultCode == db::DBResult::ok )
     {
         //updating cache
         m_cache.insert( accountData.id, std::move(accountData) );
     }
-    
+
+    //adding activation code only in response to portal
     completionHandler(
         resultCode == db::DBResult::ok
         ? api::ResultCode::ok
-        : api::ResultCode::dbError );
+        : api::ResultCode::dbError,
+        requestSourceSecured
+            ? std::move(resultData)
+            : data::AccountActivationCode());
 }
 
 nx::db::DBResult AccountManager::verifyAccount(
     QSqlDatabase* const connection,
-    const data::EmailVerificationCode& verificationCode,
+    const data::AccountActivationCode& verificationCode,
     QnUuid* const resultAccountID )
 {
     QSqlQuery getAccountByVerificationCode( *connection );
@@ -260,7 +278,7 @@ nx::db::DBResult AccountManager::verifyAccount(
     QSqlQuery updateAccountStatus( *connection );
     updateAccountStatus.prepare( 
         "UPDATE account SET status_code = ? WHERE id = ?" );
-    updateAccountStatus.bindValue( 0, api::asActivated );
+    updateAccountStatus.bindValue( 0, static_cast<int>(api::AccountStatus::activated) );
     updateAccountStatus.bindValue( 1, QnSql::serialized_field(accountID) );
     if( !updateAccountStatus.exec() )
     {
@@ -277,7 +295,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 
 void AccountManager::accountVerified(
     nx::db::DBResult resultCode,
-    data::EmailVerificationCode /*verificationCode*/,
+    data::AccountActivationCode /*verificationCode*/,
     const QnUuid accountID,
     std::function<void(api::ResultCode)> completionHandler )
 {
@@ -285,7 +303,7 @@ void AccountManager::accountVerified(
     {
         m_cache.atomicUpdate(
             accountID, 
-            []( api::AccountData& account ){ account.statusCode = api::AccountStatus::asActivated; } );
+            []( api::AccountData& account ){ account.statusCode = api::AccountStatus::activated; } );
     }
 
     completionHandler( fromDbResultCode( resultCode ) );

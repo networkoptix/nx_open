@@ -8,7 +8,6 @@
 
 #include "access_control/auth_types.h"
 #include "base_http_handler.h"
-#include "data/email_verification_code.h"
 #include "managers/system_manager.h"
 #include "managers/managers_types.h"
 

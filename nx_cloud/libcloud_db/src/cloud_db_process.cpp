@@ -26,6 +26,7 @@
 
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
+#include "http_handlers/activate_account_handler.h"
 #include "http_handlers/add_account_handler.h"
 #include "http_handlers/bind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
@@ -33,7 +34,6 @@
 #include "http_handlers/get_cdb_nonce_handler.h"
 #include "http_handlers/get_authentication_response_handler.h"
 #include "http_handlers/ping.h"
-#include "http_handlers/verify_email_address_handler.h"
 #include "http_handlers/unbind_system_handler.h"
 #include "http_handlers/share_system_handler.h"
 #include "managers/account_manager.h"
@@ -116,7 +116,7 @@ int CloudDBProcess::executeApplication()
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow( PingHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
-        authRestrictionList.allow( VerifyEmailAddressHandler::HANDLER_PATH, AuthMethod::noAuth );
+        authRestrictionList.allow( ActivateAccountHandler::HANDLER_PATH, AuthMethod::noAuth );
 
         StreeManager streeManager(settings.auth());
 
@@ -124,10 +124,11 @@ int CloudDBProcess::executeApplication()
             accountManager,
             systemManager,
             authRestrictionList,
-            streeManager );
+            streeManager);
 
         AuthorizationManager authorizationManager(
             streeManager,
+            accountManager,
             systemManager);
     
         AuthenticationProvider authProvider(
@@ -229,10 +230,10 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<AddAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
-    msgDispatcher->registerRequestProcessor<VerifyEmailAddressHandler>(
-        VerifyEmailAddressHandler::HANDLER_PATH,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<VerifyEmailAddressHandler> {
-            return std::make_unique<VerifyEmailAddressHandler>( accountManager, authorizationManager );
+    msgDispatcher->registerRequestProcessor<ActivateAccountHandler>(
+        ActivateAccountHandler::HANDLER_PATH,
+        [accountManager, &authorizationManager]() -> std::unique_ptr<ActivateAccountHandler> {
+            return std::make_unique<ActivateAccountHandler>( accountManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<GetAccountHttpHandler>(

@@ -33,6 +33,15 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
+class AccountActivationCode
+:
+    public api::AccountActivationCode,
+    public stree::AbstractResourceReader
+{
+public:
+    virtual bool getAsVariant( int resID, QVariant* const value ) const override;
+};
+
 }   //data
 }   //cdb
 }   //nx

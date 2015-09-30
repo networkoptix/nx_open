@@ -7,6 +7,7 @@
 
 #include <utils/serialization/lexical.h>
 
+#include "managers/account_manager.h"
 #include "managers/system_manager.h"
 #include "stree/cdb_ns.h"
 #include "stree/stree_manager.h"
@@ -17,9 +18,11 @@ namespace cdb {
 
 AuthorizationManager::AuthorizationManager(
     const StreeManager& stree,
+    const AccountManager& accountManager,
     const SystemManager& systemManager)
 :
     m_stree(stree),
+    m_accountManager(accountManager),
     m_systemManager(systemManager)
 {
 }
@@ -35,15 +38,22 @@ bool AuthorizationManager::authorize(
     auto authenticatedAccountID = authenticationProperties.get<QnUuid>(attr::accountID);
     auto requestedSystemID = dataToAuthorize.get<QnUuid>(attr::systemID);
     stree::ResourceContainer auxSearchAttrs;
-    if (authenticatedAccountID && requestedSystemID)
+    if (authenticatedAccountID)
     {
-        //account requests access to the system
-        auxSearchAttrs.put(
-            attr::authAccountRightsOnSystem,
-            QnLexical::serialized(
-                m_systemManager.getAccountRightsForSystem(
-                    authenticatedAccountID.get(),
-                    requestedSystemID.get())));
+        //adding account status
+        if (auto account = m_accountManager.findAccountByID(authenticatedAccountID.get()))
+            auxSearchAttrs.put(attr::accountStatus, static_cast<int>(account->statusCode));
+
+        if (requestedSystemID)
+        {
+            //account requests access to the system
+            auxSearchAttrs.put(
+                attr::authAccountRightsOnSystem,
+                QnLexical::serialized(
+                    m_systemManager.getAccountRightsForSystem(
+                        authenticatedAccountID.get(),
+                        requestedSystemID.get())));
+        }
     }
 
     //forwarding requestedEntity and requestedAction

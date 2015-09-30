@@ -57,7 +57,14 @@ void StreeManager::prepareNamespace()
     m_rns.registerResource(attr::userName, "user.name", QVariant::String);
     m_rns.registerResource(attr::userPassword, "user.password", QVariant::String);
     m_rns.registerResource(attr::authAccountRightsOnSystem, "authAccountRightsOnSystem", QVariant::String);
+    m_rns.registerResource(attr::accountStatus, "account.status", QVariant::Int);
+    m_rns.registerResource(attr::entity, "entity", QVariant::String);
+    m_rns.registerResource(attr::action, "action", QVariant::String);
+    m_rns.registerResource(attr::secureSource, "secureSource", QVariant::Bool);
+
     m_rns.registerResource(attr::socketIntfIP, "socket.intf.ip", QVariant::String);
+    m_rns.registerResource(attr::socketRemoteIP, "socket.remoteIP", QVariant::String);
+
     m_rns.registerResource(attr::requestPath, "request.path", QVariant::String);
 }
 

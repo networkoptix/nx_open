@@ -3,12 +3,11 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef VERIFY_EMAIL_ADDRESS_HANDLER_H
-#define VERIFY_EMAIL_ADDRESS_HANDLER_H
+#ifndef NX_CDB_ACTIVATE_ACCOUNT_HANDLER_H
+#define NX_CDB_ACTIVATE_ACCOUNT_HANDLER_H
 
 #include "access_control/auth_types.h"
 #include "base_http_handler.h"
-#include "data/email_verification_code.h"
 #include "managers/account_manager.h"
 #include "managers/managers_types.h"
 
@@ -16,33 +15,29 @@
 namespace nx {
 namespace cdb {
 
-
-class AccountManager;
-
-class VerifyEmailAddressHandler
+class ActivateAccountHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::EmailVerificationCode>
+    public AbstractFiniteMsgBodyHttpHandler<data::AccountActivationCode>
 {
 public:
     static const QString HANDLER_PATH;
 
-    VerifyEmailAddressHandler(
+    ActivateAccountHandler(
         AccountManager* const accountManager,
         const AuthorizationManager& authorizationManager )
     :
-        AbstractFiniteMsgBodyHttpHandler<data::EmailVerificationCode>(
+        AbstractFiniteMsgBodyHttpHandler<data::AccountActivationCode>(
             EntityType::account,
             DataActionType::update,
             authorizationManager,
             std::bind( 
-                &AccountManager::verifyAccountEmailAddress, accountManager,
+                &AccountManager::activate, accountManager,
                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) )
     {
     }
 };
 
-
 }   //cdb
 }   //nx
 
-#endif  //VERIFY_EMAIL_ADDRESS_HANDLER_H
+#endif  //NX_CDB_ACTIVATE_ACCOUNT_HANDLER_H

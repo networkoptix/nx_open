@@ -115,7 +115,8 @@ void CdbFunctionalTest::addAccount(
 
         //adding account
         api::ResultCode result = api::ResultCode::ok;
-        std::tie(result) = makeSyncCall<api::ResultCode>(
+        api::AccountActivationCode activationCode;
+        std::tie(result, activationCode) = makeSyncCall<api::ResultCode, api::AccountActivationCode>(
             std::bind(
                 &nx::cdb::api::AccountManager::registerNewAccount,
                 connection->accountManager(),

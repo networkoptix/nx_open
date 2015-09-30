@@ -18,11 +18,22 @@ AccountManager::AccountManager(cc::CloudModuleEndPointFetcher* const cloudModule
 
 void AccountManager::registerNewAccount(
     const api::AccountData& accountData,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::AccountActivationCode)> completionHandler)
 {
     executeRequest(
         "/account/register",
         accountData,
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::AccountActivationCode()));
+}
+
+void AccountManager::activateAccount(
+    const api::AccountActivationCode& activationCode,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    executeRequest(
+        "/account/activate",
+        activationCode,
         completionHandler,
         completionHandler);
 }

@@ -14,11 +14,15 @@ namespace nx {
 namespace cdb {
 namespace api {
 
+////////////////////////////////////////////////////////////
+//// class AccountData
+////////////////////////////////////////////////////////////
+
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
-    (asInvalid, "invalid")
-    (asAwaitingEmailConfirmation, "awaitingEmailConfirmation")
-    (asActivated, "activated")
-    (asBlocked, "blocked")
+    (AccountStatus::invalid, "invalid")
+    (AccountStatus::awaitingActivation, "awaitingEmailConfirmation")
+    (AccountStatus::activated, "activated")
+    (AccountStatus::blocked, "blocked")
     )
 
 
@@ -31,8 +35,8 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData
     bool success = true;
     accountData->statusCode = urlQuery.hasQueryItem("statusCode")
         ? QnLexical::deserialized<api::AccountStatus>(
-            urlQuery.queryItemValue("statusCode"), api::asInvalid, &success )
-        : api::asInvalid;
+            urlQuery.queryItemValue("statusCode"), api::AccountStatus::invalid, &success )
+        : api::AccountStatus::invalid;
     return success;
 }
 
@@ -46,11 +50,28 @@ void serializeToUrlQuery(const AccountData& data, QUrlQuery* const urlQuery)
 }
 
 
+////////////////////////////////////////////////////////////
+//// class AccountActivationCode
+////////////////////////////////////////////////////////////
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountActivationCode* const data)
+{
+    if (!urlQuery.hasQueryItem("code"))
+        return false;
+    data->code = urlQuery.queryItemValue("code").toStdString();
+    return true;
+}
+
+void serializeToUrlQuery(const AccountActivationCode& data, QUrlQuery* const urlQuery)
+{
+    urlQuery->addQueryItem("code", QString::fromStdString(data.code));
+}
+
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccountData),
+    (AccountData)(AccountActivationCode),
     (json)(sql_record),
     _Fields )
-
 
 }   //api
 }   //cdb

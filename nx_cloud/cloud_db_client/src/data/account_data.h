@@ -22,6 +22,10 @@ namespace nx {
 namespace cdb {
 namespace api {
 
+////////////////////////////////////////////////////////////
+//// class AccountData
+////////////////////////////////////////////////////////////
+
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AccountStatus)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((AccountStatus), (lexical))
 
@@ -32,10 +36,18 @@ void serializeToUrlQuery(const AccountData&, QUrlQuery* const urlQuery);
 #define AccountData_Fields (id)(email)(passwordHa1)(fullName)(statusCode)
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (AccountData),
-    (json)(sql_record) )
+////////////////////////////////////////////////////////////
+//// class AccountActivationCode
+////////////////////////////////////////////////////////////
 
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountActivationCode* const data);
+void serializeToUrlQuery(const AccountActivationCode&, QUrlQuery* const urlQuery);
+
+#define AccountActivationCode_Fields (code)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (AccountData)(AccountActivationCode),
+    (json)(sql_record) )
 
 }   //api
 }   //cdb
