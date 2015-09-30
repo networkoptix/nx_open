@@ -12,13 +12,14 @@
 #include <base/server_info.h>
 #include <helpers/rest_client.h>
 #include <helpers/time_helper.h>
+#include <helpers/version_holder.h>
 
 #include <QDebug>
 
 namespace 
 {
     /// Extra abilities = SF_Has_Hdd flag and ability to execute script throug the /api/execute rest command
-    const QString kExtraAbilitiesMinVersion = QStringLiteral("2.4.1");
+    const rtu::VersionHolder kExtraAbilitiesMinVersion = rtu::VersionHolder(QStringLiteral("2.4.1"));
 
     const QString kApiNamespaceTag = "/api/";
     
@@ -88,7 +89,7 @@ namespace
         result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.port = object.value(kPortTag).toInt(); });
         result.insert(kVersionTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.version = object.value(kVersionTag).toString(); });
+            { info.version = rtu::VersionHolder(object.value(kVersionTag).toString()); });
         result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.safeMode = object.value(kSafeModeTag).toBool(); });
 

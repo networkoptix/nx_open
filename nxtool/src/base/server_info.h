@@ -10,6 +10,7 @@
 #include <QScopedPointer>
 
 #include <base/constants.h>
+#include <helpers/version_holder.h>
 
 namespace rtu
 {
@@ -51,7 +52,7 @@ namespace rtu
         QUuid runtimeId;
 
         bool safeMode;
-        QString version;
+        VersionHolder version;
         QString displayAddress;
         Constants::ServerFlags flags;
         
