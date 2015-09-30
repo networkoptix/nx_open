@@ -21,6 +21,9 @@ umount $DATAPART
 mkdir -p $MNTBOOTPART
 mount -t vfat $BOOTPART $MNTBOOTPART
 cp -f /root/tools/uboot/*.txt $MNTBOOTPART
+cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite /root/tools/nx/ecs_static.sqlite
+cp -f /root/tools/nx/ecs_static.sqlite $MNTBOOTPART/opt/$CUSTOMIZATION/mediaserver/var
+echo "statisticsReportAllowed=true" >> $MNTBOOTPART/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf
 umount $BOOTPART
 rm -Rf $MNTBOOTPART
 
