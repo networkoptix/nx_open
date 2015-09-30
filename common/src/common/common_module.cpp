@@ -143,7 +143,7 @@ void QnCommonModule::updateModuleInformation() {
         QnModuleInformation moduleInformation = server->getModuleInformation();
         moduleInformationCopy.port = moduleInformation.port;
         moduleInformationCopy.name = moduleInformation.name;
-        moduleInformationCopy.flags = moduleInformation.flags;
+        moduleInformationCopy.serverFlags = moduleInformation.serverFlags;
     }
 
     QnUserResourcePtr admin = qnResPool->getAdministrator();

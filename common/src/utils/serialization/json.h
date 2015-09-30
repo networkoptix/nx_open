@@ -137,7 +137,12 @@ namespace QJson {
         } else {
             if(found)
                 *found = true;
-            return QJson::deserialize(ctx, *pos, target);
+
+            bool ok = QJson::deserialize(ctx, *pos, target);
+            if (!ok && !optional)
+                qCritical() << lit("Can't deserialize field \"%1\" from value \"%2\"").arg(key).arg(pos.value().toString());
+
+            return ok || optional;
         }
     }
 

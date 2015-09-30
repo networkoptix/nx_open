@@ -111,7 +111,7 @@ private:
         const int transcodeID,
         int delayMSec );
     bool validateTranscodingParameters( const StreamingChunkCacheKey& transcodeParams );
-    QnTranscoder* createTranscoder(
+    std::unique_ptr<QnTranscoder> createTranscoder(
         const QnSecurityCamResourcePtr& mediaResource,
         const StreamingChunkCacheKey& transcodeParams );
 

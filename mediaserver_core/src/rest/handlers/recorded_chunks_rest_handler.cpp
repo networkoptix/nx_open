@@ -94,6 +94,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     qint64 startTime = -1;
     qint64 endTime = -1;
     qint64 detailLevel = -1;
+    bool keepSmallChunks = false;
     QnResourceList resList;
     QByteArray errStr;
     QByteArray errStrPhysicalId;
@@ -127,6 +128,8 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         }
         else if (params[i].first == "detail")
             detailLevel = params[i].second.toLongLong();
+        else if (params[i].first == "keepSmallChunks")
+            keepSmallChunks = true;
         else if (params[i].first == "format") 
         {
             if (params[i].second == "bin")
@@ -176,7 +179,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     case Qn::RecordingContent:
         {
             periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, 
-                                                       detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog, limit);
+                                                       detailLevel, keepSmallChunks, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog, limit);
             if (limit < periods.size())
                 periods.resize(limit);
 #ifdef QN_PERIODS_HIGHLOAD_TEST

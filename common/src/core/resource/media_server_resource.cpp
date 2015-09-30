@@ -424,7 +424,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.systemName = m_systemName;
     moduleInformation.port = QUrl(m_apiUrl).port();
     moduleInformation.id = getId();
-    moduleInformation.flags = getServerFlags();
+    moduleInformation.serverFlags = getServerFlags();
 
     return moduleInformation;
 }
