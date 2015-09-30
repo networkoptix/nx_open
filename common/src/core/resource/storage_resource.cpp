@@ -177,12 +177,14 @@ void QnStorageResource::setRedundantSchedule(
 void QnStorageResource::setRedundantSchedule(
     int rDOW, 
     int rStart, 
-    int rDuration
+    int rDuration,
+    int rBitrate
 )
 { 
     m_redundantSchedule.daysOfTheWeek = rDOW; 
     m_redundantSchedule.start = rStart;
     m_redundantSchedule.duration = rDuration;
+    m_redundantSchedule.bitrate = rBitrate;
 }
 
 const QnStorageResource::RedundantSchedule &

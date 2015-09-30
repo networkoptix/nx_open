@@ -540,6 +540,7 @@ void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     dst.redundantDaysOfTheWeek = rs.daysOfTheWeek;
     dst.redundantStart = rs.start;
     dst.redundantDuration = rs.duration;
+    dst.redundantBitrate = rs.bitrate;
 }
 
 void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
@@ -562,7 +563,8 @@ void fromApiToResource(const ApiStorageData &src, QnStorageResourcePtr &dst) {
     dst->setRedundantSchedule(
         src.redundantDaysOfTheWeek, 
         src.redundantStart, 
-        src.redundantDuration
+        src.redundantDuration,
+        src.redundantBitrate
     );
 }
 

@@ -53,8 +53,9 @@ namespace ec2
         QString         storageType;
         bool            redundant;              // is storage redundant
         int             redundantDaysOfTheWeek; // Days of the week mask. -1 if not set
-        int             redundantStart;         // seconds from 00:00.
+        int             redundantStart;         // seconds from 00:00:00.
         int             redundantDuration;      // duration of synchronization period in seconds
+        int             redundantBitrate;       // bitrate cap in bytes per second. -1 if not capped.
 
         std::vector<ApiResourceParamData> addParams;
     };

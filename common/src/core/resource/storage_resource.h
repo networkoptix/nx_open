@@ -18,6 +18,7 @@ public:
         int daysOfTheWeek; 
         int start;
         int duration;
+        int bitrate;
     };
 
 public:
@@ -75,7 +76,8 @@ public:
     void setRedundantSchedule(
         int rDOW = -1, 
         int rStart = -1, 
-        int rDuration = -1
+        int rDuration = -1,
+        int rBitrate = -1
     );
 
     const RedundantSchedule &getRedundantSchedule() const;

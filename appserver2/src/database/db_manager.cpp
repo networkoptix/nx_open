@@ -2973,7 +2973,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType, \
         s.redundant as redundant, s.redundant_days_of_the_week as redundantDaysOfTheWeek, s.redundant_start as redundantStart, \
-        s.redundant_duration as redundantDuration \
+        s.redundant_duration as redundantDuration, s.redundant_bitrate as redundantBitrate\
         FROM vms_resource r \
         JOIN vms_storage s on s.resource_ptr_id = r.id \
         %1 \
