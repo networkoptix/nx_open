@@ -140,7 +140,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
         result |= m_userPermissions; /* Add global permissions for current user. */
 
         if (m_readOnlyMode)
-            return result | Qn::ReadPermission | Qn::CreateLayoutPermission;
+            return result | Qn::ReadPermission;
 
         result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
         result |= Qn::CreateLayoutPermission; /* Everyone can create a layout for themselves */

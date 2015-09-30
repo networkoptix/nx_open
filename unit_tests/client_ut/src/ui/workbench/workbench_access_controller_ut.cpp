@@ -1,6 +1,8 @@
 #define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
+#include <common/common_module.h>
+
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 
@@ -45,8 +47,6 @@ protected:
         return user;
     }
 
-
-
     // Declares the variables your tests want to use.
     QSharedPointer<QnClientModule> m_module;
     QSharedPointer<QnSkin> m_skin;
@@ -54,8 +54,7 @@ protected:
 };
 
 
-
-/** Initial test. Check if empty helper is valid. */
+/** Initial test. Check if current user is set correctly. */
 TEST_F( QnWorkbenchAccessControllerTest, init )
 {
     auto user = addUser(userName1, Qn::GlobalOwnerPermissions);  
@@ -63,3 +62,15 @@ TEST_F( QnWorkbenchAccessControllerTest, init )
     
     ASSERT_EQ(user, m_context->user());
 }
+
+/** Test for safe mode. Check if the user cannot create new layouts on server. */
+TEST_F( QnWorkbenchAccessControllerTest, safeDisableSaveLayoutAs )
+{
+    auto user = addUser(userName1, Qn::GlobalOwnerPermissions);  
+    m_context->setUserName(userName1);
+
+    qnCommon->setReadOnly(true);
+
+    ASSERT_FALSE(m_context->accessController()->hasPermissions(user, Qn::CreateLayoutPermission));
+}
+
