@@ -17,6 +17,9 @@
 
 namespace 
 {
+    /// Extra abilities = SF_Has_Hdd flag and ability to execute script throug the /api/execute rest command
+    const QString kExtraAbilitiesMinVersion = QStringLiteral("2.4.1");
+
     const QString kApiNamespaceTag = "/api/";
     
     const QString kModuleInfoAuthCommand = kApiNamespaceTag + "moduleInformationAuthenticated";
@@ -37,6 +40,7 @@ namespace
     const QString kSystemNameTag = "systemName";
     const QString kPortTag = "port";
     const QString kFlagsTag = "flags";
+    const QString kServerFlagsTag = "serverFlags";
     const QString kLocalTimeFlagTag = "local";
     const QString kSafeModeTag = "ecDbReadOnly";
 
@@ -88,8 +92,8 @@ namespace
         result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.safeMode = object.value(kSafeModeTag).toBool(); });
 
-        result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            {
+        const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info)
+        {
                 typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
                 static const TextFlagsInfo kKnownFlags[] =
                 {
@@ -106,7 +110,14 @@ namespace
                     if (textFlags.contains(flagInfo.first))
                         info.flags |= flagInfo.second;
                 }
-            });
+        };
+
+        result.insert(kServerFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { parseFlags(object, info); });
+
+        /// Supports old versions of server where serverFlags field was "flags"
+        result.insert(kFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { parseFlags(object, info); });
         return result;
     }();
 }
@@ -331,8 +342,6 @@ namespace /// Parsers stuff
         , const rtu::OperationCallback &failedCallback
         , const qint64 timeout)
     {
-        static const auto minScriptAvailableVersion = QStringLiteral("2.4.1");
-
         const auto failed = [failedCallback](rtu::RequestError /* error */)
         {
             if (failedCallback)
@@ -342,7 +351,7 @@ namespace /// Parsers stuff
             }
         };
 
-        if (baseInfo->version < minScriptAvailableVersion)
+        if (baseInfo->version < kExtraAbilitiesMinVersion)
         {
             failed(rtu::RequestError::kRequestTimeout);
             return;
@@ -381,13 +390,16 @@ bool rtu::parseModuleInformationReply(const QJsonObject &reply
             (*itHandler)(reply, baseInfo);
     }
 
-    static const auto kHasHddFlagMinVersion = QStringLiteral("2.4.1");
-    if (baseInfo.version < kHasHddFlagMinVersion)
+    if (baseInfo.version < kExtraAbilitiesMinVersion)
     {
-        /// Assume all versions less than kHasHddFlagMinVersion have hdd due
+        /// Assume all versions less than kExtraAbilitiesMinVersion have hdd due
         /// to we can't discover state through the rest api
         baseInfo.flags |= Constants::HasHdd;
     }
+    /*
+    else
+        baseInfo.safeMode = true;   /// for debug!
+    */
 
     return true;
 }

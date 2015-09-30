@@ -9,6 +9,8 @@ Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
 
+    extraWarned: rtuContext.selection.safeMode;
+
     changed:  (maskedArea && maskedArea.changed?  true : false);
 
     function tryApplyChanges(warnings)

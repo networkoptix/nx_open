@@ -276,6 +276,20 @@ namespace
 
         return (currentTz != otherTz);
     }
+
+    bool calcSafeMode(const rtu::ServerInfoPtrContainer &servers)
+    {
+        if (servers.empty())
+            return false;
+        
+        const bool aggregatedSafeMode = getSelectionValue<bool>(servers, false, true
+            , std::equal_to<bool>(), [](const rtu::ServerInfo &info) -> int
+        {
+            return info.baseInfo().safeMode;
+        });
+        
+        return aggregatedSafeMode;
+    }
 }
 
 ///
@@ -301,6 +315,8 @@ struct rtu::Selection::Snapshot
     QDateTime dateTime;
     TimeZonesModelPtr timeZonesModel;
     
+    bool safeMode;
+
     rtu::Constants::SystemCommands sysCommands;
 
     Snapshot(rtu::ServersSelectionModel *model);
@@ -334,6 +350,8 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
             return (info.hasExtraInfo() ? info.extraInfo().sysCommands
                 : rtu::Constants::SystemCommand::NoCommands);
         }))
+
+    , safeMode(calcSafeMode(model->selectedServers()))
 {
 }
 
@@ -359,10 +377,13 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
     bool emitInterfacesChanged = (m_snapshot->count != otherSnapshot.count);
     bool emitActionsChanged = (m_snapshot->count != otherSnapshot.count);
 
+    bool safeModeChanged = (m_snapshot->safeMode != otherSnapshot.safeMode);
+
     /// Check differences in password/system name settings
     if (!emitSystemSettingsChanged
         && ((m_snapshot->systemName != otherSnapshot.systemName)
-            || (m_snapshot->password != otherSnapshot.password)))
+            || (m_snapshot->password != otherSnapshot.password)
+            || safeModeChanged))
     {
         emitSystemSettingsChanged = true;
     }
@@ -370,7 +391,8 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
     /// Check differences in password/system name settings
     if (!emitDateTimeChanged
         && ((std::abs(m_snapshot->dateTime.toMSecsSinceEpoch() - otherSnapshot.dateTime.toMSecsSinceEpoch()) > kEps)
-            || (timeZonesAreDifferent(m_snapshot->timeZonesModel, otherSnapshot.timeZonesModel))))
+            || (timeZonesAreDifferent(m_snapshot->timeZonesModel, otherSnapshot.timeZonesModel))
+            || safeModeChanged))
     {
         emitDateTimeChanged = true;
     }
@@ -379,7 +401,8 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
     if (!emitInterfacesChanged && 
         ((m_snapshot->port != otherSnapshot.port)
             || (m_snapshot->editableInterfaces != otherSnapshot.editableInterfaces)
-            || itfsAreDifferent(m_snapshot->itfModel, otherSnapshot.itfModel)))
+            || itfsAreDifferent(m_snapshot->itfModel, otherSnapshot.itfModel)
+            || safeModeChanged))
     {
         emitInterfacesChanged = true;
     }
@@ -406,6 +429,8 @@ void rtu::Selection::updateSelection(ServersSelectionModel *selectionModel)
     m_snapshot->timestamp = otherSnapshot.timestamp;
     m_snapshot->dateTime = otherSnapshot.dateTime;
     m_snapshot->timeZonesModel->resetTo(otherSnapshot.timeZonesModel.get());
+
+    m_snapshot->safeMode = otherSnapshot.safeMode;
 
     m_snapshot->sysCommands = otherSnapshot.sysCommands;
 
@@ -468,6 +493,11 @@ QDateTime rtu::Selection::dateTime() const
 QObject *rtu::Selection::timeZonesModel()
 {
     return m_snapshot->timeZonesModel.get();
+}
+
+bool rtu::Selection::safeMode() const
+{
+    return m_snapshot->safeMode;
 }
 
 bool rtu::Selection::editableInterfaces() const

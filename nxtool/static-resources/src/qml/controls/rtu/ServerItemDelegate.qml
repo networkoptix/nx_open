@@ -125,7 +125,7 @@ Item
                         visible: safeMode;
 
                         width: height;
-                        height: serverNameText.height;
+                        height: Common.SizeManager.clickableSizes.base * 0.7;
                         anchors
                         {
                             verticalCenter: parent.verticalCenter;
@@ -182,7 +182,7 @@ Item
                         visible: !hasHdd;
 
                         width: height;
-                        height: informationText.height;
+                        height: Common.SizeManager.clickableSizes.base * 0.7;
 
                         anchors
                         {

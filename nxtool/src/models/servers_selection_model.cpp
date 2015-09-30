@@ -527,11 +527,13 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
             return systemInfo.name;
         case kNameRoleId:
             if (info.baseInfo().displayAddress.isEmpty())
-                return QString("%1 (%2)").arg(info.baseInfo().name)
-                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST");  /// TODO: remove after inner testing
+                return QString("%1 (%2) %3").arg(info.baseInfo().name)
+                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST")
+                    .arg(info.baseInfo().version);  /// TODO: remove after inner testing
             else 
-                return QString("%1 (%2) (%3)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress)
-                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST");  /// TODO: remove after inner testing
+                return QString("%1 (%2) (%3) %4").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress)
+                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST")
+                    .arg(info.baseInfo().version);  /// TODO: remove after inner testing
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
