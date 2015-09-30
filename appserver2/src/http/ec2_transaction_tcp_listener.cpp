@@ -12,6 +12,7 @@
 #include "transaction/transaction_transport.h"
 #include "http/custom_headers.h"
 #include "audit/audit_manager.h"
+#include "settings.h"
 
 
 namespace ec2
@@ -75,6 +76,12 @@ void QnTransactionTcpProcessor::run()
          QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 
     ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+
+    if (peerType == Qn::PT_Server && ec2::Settings::instance()->dbReadOnly())
+    {
+        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+        return;
+    }
 
 
     if( d->request.requestLine.method == nx_http::Method::POST ||

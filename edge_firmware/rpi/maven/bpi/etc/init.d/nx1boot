@@ -94,7 +94,7 @@ start_server() {
 
 tweak_charger() {
     #tweak to enable battery charge function for AXP209
-    i2cset -f -y 0 0x34 0x35 0xa2
+i2cset -f -y 0 0x34 0x35 0x83
 }
 
 get_serial_number() {
