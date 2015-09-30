@@ -829,7 +829,7 @@ void DeviceFileCatalog::close()
 {
 }
 
-QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, int limit)
+QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmalChunks, int limit)
 {
     //qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");
 
@@ -868,7 +868,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         else if (qAbs(lastEndTime - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
             last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
         else {
-            if (last.durationMs < detailLevel && result.size() > 1)
+            if (last.durationMs < detailLevel && result.size() > 1 && !keepSmalChunks)
                 result.pop_back();
             if (result.size() >= limit)
                 break;

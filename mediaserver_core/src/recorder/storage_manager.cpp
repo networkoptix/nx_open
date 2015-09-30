@@ -785,10 +785,10 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
 }
 
 void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, 
-                                             qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
+                                             qint64 detailLevel, bool keepSmallChunks, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
-        periods << catalog->getTimePeriods(startTime, endTime, detailLevel);
+        periods << catalog->getTimePeriods(startTime, endTime, detailLevel, keepSmallChunks, INT_MAX);
         if (!periods.last().isEmpty())
         {
             QnTimePeriod& lastPeriod = periods.last().last();
@@ -826,7 +826,7 @@ bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, const 
     return catalog && catalog->containTime(period);
 }
 
-QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, 
+QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
                                                       const QList<QnServer::ChunksCatalog> &catalogs, int limit) 
 {
     QVector<QnTimePeriodList> periods;
@@ -842,7 +842,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
                     periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
             } else {
-                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog));
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, keepSmallChunks, getFileCatalog(cameraUniqueId, catalog));
             }
         }
 
