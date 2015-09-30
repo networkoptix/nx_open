@@ -36,6 +36,9 @@ enum class EntityType
     //...
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EntityType)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((EntityType), (lexical))
+
 enum class DataActionType
 {
     fetch,
@@ -44,6 +47,8 @@ enum class DataActionType
     _delete
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(DataActionType)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((DataActionType), (lexical))
 
 class DataFilter
 :

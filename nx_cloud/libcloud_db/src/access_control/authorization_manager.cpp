@@ -27,11 +27,11 @@ AuthorizationManager::AuthorizationManager(
 bool AuthorizationManager::authorize(
     const stree::AbstractResourceReader& authenticationProperties,
     const stree::AbstractResourceReader& dataToAuthorize,
-    EntityType /*requestedEntity*/,
-    DataActionType /*requestedAction*/,
+    EntityType requestedEntity,
+    DataActionType requestedAction,
     stree::AbstractResourceWriter* const authzInfo ) const
 {
-    //TODO #ak add authAccountRightsOnSystem if appropriate
+    //adding authAccountRightsOnSystem if appropriate
     auto authenticatedAccountID = authenticationProperties.get<QnUuid>(attr::accountID);
     auto requestedSystemID = dataToAuthorize.get<QnUuid>(attr::systemID);
     stree::ResourceContainer auxSearchAttrs;
@@ -46,7 +46,9 @@ bool AuthorizationManager::authorize(
                     requestedSystemID.get())));
     }
 
-    //TODO #ak forward requestedEntity and requestedAction
+    //forwarding requestedEntity and requestedAction
+    auxSearchAttrs.put(attr::entity, QnLexical::serialized(requestedEntity));
+    auxSearchAttrs.put(attr::action, QnLexical::serialized(requestedAction));
 
     stree::ResourceWriterProxy<bool> resProxy(authzInfo, attr::authorized);
     m_stree.search(

@@ -22,7 +22,6 @@ ResultCode httpStatusCodeToResultCode(nx_http::StatusCode::Value statusCode);
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ResultCode), (lexical))
 
-
 }   //api
 }   //cdb
 }   //nx

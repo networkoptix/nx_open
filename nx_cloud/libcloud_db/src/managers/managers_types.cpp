@@ -11,6 +11,22 @@
 namespace nx {
 namespace cdb {
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(EntityType,
+    (EntityType::none, "none")
+    (EntityType::module, "module")
+    (EntityType::account, "account")
+    (EntityType::system, "system")
+    (EntityType::subscription, "subscription")
+    (EntityType::product, "product")
+    )
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(DataActionType,
+    (DataActionType::fetch, "fetch")
+    (DataActionType::insert, "insert")
+    (DataActionType::update, "update")
+    (DataActionType::_delete, "delete")
+    )
+
 
 api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
 {
