@@ -64,7 +64,8 @@ void QnIncompatibleServerWatcher::start() {
 }
 
 void QnIncompatibleServerWatcher::stop() {
-    disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
+    if (QnCommonMessageProcessor::instance())
+        disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
     disconnect(qnResPool, 0, this, 0);
 
     QList<QnUuid> ids;
