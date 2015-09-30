@@ -68,6 +68,7 @@ namespace ec2
     (redundantDaysOfTheWeek)    \
     (redundantStart)            \
     (redundantDuration)         \
+    (redundantBitrate)          \
     (addParams)
 
 

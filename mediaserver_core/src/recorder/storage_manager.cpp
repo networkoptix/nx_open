@@ -2221,15 +2221,44 @@ void QnStorageManager::synchronizeStorages(
                         std::unique_ptr<QIODevice> toFile = std::unique_ptr<QIODevice>(
                             storage->open(
                                 storage->getUrl() + relativeFileName,
-                                QIODevice::WriteOnly
+                                QIODevice::WriteOnly | QIODevice::Append
                             )
                         );
 
                         if (!fromFile || !toFile)
                             return true;
 
-                        auto data = fromFile->readAll();
-                        toFile->write(data);
+                        int bitrate = storage->getRedundantSchedule().bitrate;
+                        if (bitrate == -1 || bitrate == 0) // not capped
+                        {
+                            auto data = fromFile->readAll();
+                            toFile->write(data);
+                        }
+                        else
+                        {
+                            Q_ASSERT(bitrate > 0);
+                            qint64 fileSize = fromFile->size();
+                            const qint64 timeToWrite = (fileSize / bitrate) * 1000;
+                            
+                            const qint64 CHUNK_SIZE = 4096;
+                            const qint64 chunksInFile = fileSize / CHUNK_SIZE;
+                            const qint64 timeOnChunk = timeToWrite / chunksInFile;
+
+                            while (fileSize > 0)
+                            {
+                                qint64 startTime = qnSyncTime->currentMSecsSinceEpoch();
+                                const qint64 writeSize = CHUNK_SIZE < fileSize ? CHUNK_SIZE : fileSize;
+                                auto data = fromFile->read(writeSize);
+                                if (toFile->write(data) == -1)
+                                    return true;
+                                fileSize -= writeSize;
+                                qint64 now = qnSyncTime->currentMSecsSinceEpoch();
+                                if (now - startTime < timeOnChunk)
+                                    std::this_thread::sleep_for(
+                                        std::chrono::milliseconds(timeOnChunk - (now - startTime))
+                                    );
+                            }
+                        }
                     }
 
                     newChunk.storageIndex = currentStorageIndex;
