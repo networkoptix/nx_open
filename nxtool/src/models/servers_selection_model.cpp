@@ -1219,9 +1219,12 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     {
         const Qt::CheckState selected = searchInfo.serverInfoIterator->selectedState;
 
+        const QString newSystemName = (baseInfo.flags & Constants::IsFactoryFlag
+            ? QString() : baseInfo.systemName);
+
         int targetSystemRow = 0;
         const bool targetSystemExists = 
-            (findSystemModelInfo(baseInfo.systemName, targetSystemRow) != nullptr);
+            (findSystemModelInfo(newSystemName, targetSystemRow) != nullptr);
 
         SystemModelInfo &system = *searchInfo.systemInfoIterator;
         const bool inplaceRename = !targetSystemExists && (system.servers.size() == 1);
@@ -1505,6 +1508,18 @@ void rtu::ServersSelectionModel::serverDiscovered(const BaseServerInfo &baseInfo
 
 void rtu::ServersSelectionModel::addServer(const BaseServerInfo &baseInfo)
 {
+    ItemSearchInfo searchInfo;
+    if (m_impl->findServer(baseInfo.id, searchInfo))
+    {
+        Q_ASSERT_X(searchInfo.serverInfoIterator->locked
+            , Q_FUNC_INFO, "Server should be locked in this situation");
+        if (searchInfo.serverInfoIterator->locked)
+            --searchInfo.serverInfoIterator->removeRequestsCounter;
+
+        m_impl->changeServer(baseInfo);
+        return;
+    }
+
     m_impl->addServer(ServerInfo(baseInfo));
 }
 
