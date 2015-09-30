@@ -332,7 +332,10 @@ ConnectionsGenerator::ConnectionsGenerator(
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
-    m_totalConnectionsEstablished( 0 )
+    m_totalConnectionsEstablished( 0 ),
+    m_randomEngine(m_randomDevice()),
+    m_errorEmulationDistribution(1, 100),
+    m_errorEmulationPercent(0)
 {
 }
 
@@ -363,6 +366,12 @@ void ConnectionsGenerator::join()
         if( !m_connections.front() )
             m_connections.pop_front();
     }
+}
+
+void ConnectionsGenerator::enableErrorEmulation(int errorPercent)
+{
+    //TODO #ak enabling this causes deadlock between aio threads due to blocking cancellation in ~TestConnection
+    m_errorEmulationPercent = errorPercent;
 }
 
 bool ConnectionsGenerator::start()
@@ -436,7 +445,10 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
                       std::placeholders::_1, std::prev(m_connections.end())) ) );
         m_connections.back().swap( connection );
-        if( !m_connections.back()->start() )
+        const bool emulatingError = 
+            m_errorEmulationPercent > 0 &&
+            m_errorEmulationDistribution(m_randomEngine) < m_errorEmulationPercent;
+        if (emulatingError || !m_connections.back()->start())
         {
             const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
             std::cerr<<"Failed to start test connection. "<<SystemError::toString(osErrorCode).toStdString()<<std::endl;

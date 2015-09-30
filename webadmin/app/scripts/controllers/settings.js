@@ -49,6 +49,8 @@ angular.module('webadminApp')
             });
         }
 
+
+
         function errorHandler(){
             alert ('Connection error');
             return false;
@@ -102,10 +104,39 @@ angular.module('webadminApp')
                 mediaserver.changePassword($scope.password, $scope.oldPassword).then(resultHandler, errorHandler);
             }
         };
-
+// execute/scryptname&mode
         $scope.restart = function () {
             if(confirm('Do you want to restart server now?')){
                 restartServer(false);
+            }
+        };
+        $scope.canHardwareRestart = false;
+        $scope.canRestoreSettings = false;
+        $scope.canRestoreSettingsNotNetwork = false;
+
+        mediaserver.getScripts().then(function(data){
+            if(data.data && data.data.reply) {
+                $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
+                $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
+                $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
+            }
+        });
+
+        $scope.hardwareRestart = function(){
+            if(confirm('Do you want to restart server\'s operation system?')){
+                mediaserver.execute('reboot').then(resultHandler, errorHandler);
+            }
+        };
+
+        $scope.restoreSettings = function(){
+            if(confirm('Do you want to restart all server\'s settings? Archive will be saved, but network settings will be reset.')){
+                mediaserver.execute('restore').then(resultHandler, errorHandler);
+            }
+        };
+
+        $scope.restoreSettingsNotNetwork = function(){
+            if(confirm('Do you want to restart all server\'s settings? Archive and network settings will be saved.')){
+                mediaserver.execute('restore_keep_ip').then(resultHandler, errorHandler);
             }
         };
 

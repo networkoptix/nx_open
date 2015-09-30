@@ -4,6 +4,12 @@
 #include "request_handler.h"
 #include "utils/common/util.h"
 
+QnRestRequestHandler::QnRestRequestHandler():
+    m_permissions(RestPermissions::anyUser)
+{
+
+}
+
 QString QnRestRequestHandler::extractAction(const QString &path) const {
     QString localPath = path;
     while(localPath.endsWith(L'/'))

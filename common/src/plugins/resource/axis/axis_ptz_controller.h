@@ -4,6 +4,7 @@
 #ifdef ENABLE_AXIS
 
 #include <QtCore/QHash>
+#include <QElapsedTimer>
 
 #include <core/ptz/basic_ptz_controller.h>
 #include <utils/math/functors.h>
@@ -28,6 +29,11 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
+    virtual bool getPresets(QnPtzPresetList *presets) override;
+    virtual bool activatePreset(const QString &presetId, qreal speed) override;
+    virtual bool createPreset(const QnPtzPreset &preset) override;
+    virtual bool updatePreset(const QnPtzPreset &preset) override;
+    virtual bool removePreset(const QString &presetId) override;
 private:
     void updateState();
     void updateState(const QnAxisParameterMap &params);
@@ -52,6 +58,9 @@ private:
 
     mutable QMutex m_mutex;
     QByteArray m_cookie;
+
+    QMap<QString, QString> m_cachedData;
+    QElapsedTimer m_cacheUpdateTimer;
 };
 
 #endif // #ifdef ENABLE_AXIS

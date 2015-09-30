@@ -251,12 +251,14 @@ system_restore () {
         mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
         rm -Rf $MNTBOOTHDDPART/mnt
         mkdir $MNTBOOTHDDPART/mnt
+        mv -f $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var/scripts $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/ 
         rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
         rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var/
         cp -f /root/tools/nx/mediaserver.conf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc
         cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
+        mv -f $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/scripts $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
         #restoring saved IP configuration
         if [ -f /var/tmp/interfaces ] && [ -f /var/tmp/keep_ip ]; then
             cp -f /var/tmp/interfaces $MNTBOOTHDDPART/etc/network
