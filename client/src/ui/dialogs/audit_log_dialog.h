@@ -36,12 +36,13 @@ public:
 private:
     void paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const;
     QSize defaultSizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const;
-    QSize sizeHintForText(const QStyleOptionViewItem & option, const QString& textData) const;
+    QSize sizeHintForText(const QStyleOptionViewItem & option, const QString& textData, bool isBold = false) const;
 private:
     int m_defaultSectionHeight;
     QSize m_playBottonSize;
     mutable int m_widthHint;
     mutable QHash<QString, int> m_sizeHintHash;
+    mutable QHash<QString, int> m_boldSizeHintHash;
 };
 
 

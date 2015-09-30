@@ -25,11 +25,7 @@ namespace rtu
         QString dns;
         Qt::CheckState useDHCP;
         
-        bool operator == (const InterfaceInfo &other);
-
         InterfaceInfo();
-
-        InterfaceInfo(bool initUseDHCP);
 
         InterfaceInfo(const QString &initName
             , const QString &initIp
@@ -59,6 +55,8 @@ namespace rtu
         QString systemName;
         QString hostAddress;
         int port;
+
+        bool accessibleByHttp;
     };
     
     bool operator == (const BaseServerInfo &first

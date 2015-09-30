@@ -1,11 +1,19 @@
 #include "custom_business_event.h"
+#include <utils/common/model_functions.h>
 
-QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState, qint64 timeStamp, const QString& resourceName, const QString& caption, const QString& description):
+QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState, 
+                                             qint64 timeStamp, const 
+                                             QString& resourceName, 
+                                             const QString& caption, 
+                                             const QString& description,
+                                             const QnEventMetaData& metadata):
     base_type(QnBusiness::UserDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
     m_resourceName(resourceName),
     m_caption(caption),
-    m_description(description)
+    m_description(description),
+    m_metadata(metadata)
 {
+    
 }
 
 bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const {
@@ -29,15 +37,17 @@ bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const Q
         return false;
     };
 
-    return mathKeywords(resourceNameKeywords, params.resourceName) &&
-           mathKeywords(captionKeywords, params.caption) &&
-           mathKeywords(descriptionKeywords, params.description);
+    return mathKeywords(resourceNameKeywords, m_resourceName) &&
+           mathKeywords(captionKeywords, m_caption) &&
+           mathKeywords(descriptionKeywords, m_description);
 }
 
-QnBusinessEventParameters QnCustomBusinessEvent::getRuntimeParams() const {
+QnBusinessEventParameters QnCustomBusinessEvent::getRuntimeParams() const 
+{
     QnBusinessEventParameters params = base_type::getRuntimeParams();
     params.resourceName = m_resourceName;
     params.caption = m_caption;
     params.description = m_description;
+    params.metadata = m_metadata;
     return params;
 }

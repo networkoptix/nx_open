@@ -73,7 +73,6 @@ public:
 signals:
     void hasChangesChanged();
     void modeChanged();
-    void scheduleExported(const QnVirtualCameraResourceList &);
     void resourcesChanged();
 
 private:

@@ -513,9 +513,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
+        mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules..."));
+
+    factory(Qn::OpenFailoverPriorityAction).
+        mode(QnActionTypes::DesktopMode).
+        flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Failover Priority..."));
 
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
@@ -814,7 +821,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::WebClientAction).
-        flags(Qn::Tree | Qn::NoTarget).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
         text(tr("Open Web Client...")).
         autoRepeat(false).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
@@ -1365,7 +1372,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         dynamicText(new QnDevicesNameActionTextFactory(tr("%1 Settings..."), this)).
-        requiredPermissions(Qn::WritePermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
              new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
              new QnPreviewSearchModeCondition(true, this),
@@ -1391,11 +1398,6 @@ QnActionManager::QnActionManager(QObject *parent):
             new QnResourceActionCondition(hasFlags(Qn::videowall), Qn::ExactlyOne, this),
             new QnAutoStartAllowedActionCodition(this),
             this));
-
-    factory(Qn::OpenInCameraSettingsDialogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        //: "Open in Cameras Settings Dialog..." or "Open in Devices Settings Dialog..."
-        dynamicText(new QnDevicesNameActionTextFactory(tr("Open in %1 Settings Dialog..."), this));
 
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
@@ -1439,7 +1441,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
-        requiredPermissions(Qn::WritePermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditServersPermissions).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),

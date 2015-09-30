@@ -13,6 +13,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
+#include <utils/common/log.h>
 #include <utils/common/string.h>
 #include <utils/fs/file.h>
 #include <utils/network/rtsp/rtsp_types.h>
@@ -34,6 +35,15 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
         return;
     }
 
+    if( urlQuery.hasQueryItem( Qn::CAMERA_GUID_HEADER_NAME ) ||
+        request->headers.find( Qn::CAMERA_GUID_HEADER_NAME ) != request->headers.end() )
+    {
+        //CAMERA_GUID_HEADER_NAME already present
+        return;
+    }
+
+    const bool liveStreamRequested = urlQuery.hasQueryItem( StreamingParams::LIVE_PARAM_NAME );
+
     QnResourcePtr cameraRes;
     if( findCameraGuid( *request, urlQuery, &cameraRes ) ||
         findCameraUniqueID( *request, urlQuery, &cameraRes ) )
@@ -42,25 +52,34 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
         Q_ASSERT( cameraRes );
 
         //checking for the time requested to select desired server
-        const qint64 timestampMs = fetchTimestamp( *request, urlQuery );
+        qint64 timestampMs = -1;
 
         QnMediaServerResourcePtr serverRes =
             cameraRes->getParentResource().dynamicCast<QnMediaServerResource>();
-        if( timestampMs != -1 )
+        if( !liveStreamRequested )
         {
-            QnVirtualCameraResourcePtr virtualCameraRes = cameraRes.dynamicCast<QnVirtualCameraResource>();
-            if( virtualCameraRes )
+            timestampMs = fetchTimestamp( *request, urlQuery );
+            if( timestampMs != -1 )
             {
-                QnMediaServerResourcePtr mediaServer =
-                    QnCameraHistoryPool::instance()->getMediaServerOnTime( virtualCameraRes, timestampMs );
-                if( mediaServer )
-                    serverRes = mediaServer;
+                //searching server for timestamp
+                QnVirtualCameraResourcePtr virtualCameraRes = cameraRes.dynamicCast<QnVirtualCameraResource>();
+                if( virtualCameraRes )
+                {
+                    QnMediaServerResourcePtr mediaServer = 
+                        QnCameraHistoryPool::instance()->getMediaServerOnTime( virtualCameraRes, timestampMs );
+                    if( mediaServer )
+                        serverRes = mediaServer;
+                }
             }
         }
         if( !serverRes )
             return; //no current server?
         if( serverRes->getId() == qnCommon->moduleGUID() )
             return; //target server is this one
+        NX_LOG(lit("auto_forward. Forwarding request %1 (resource %2, timestamp %3) to server %4").
+            arg(request->requestLine.url.path()).arg(cameraRes->getId().toString()).
+            arg(timestampMs == -1 ? QString::fromLatin1("live") : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate)).
+            arg(serverRes->getId().toString()), cl_logDEBUG2);
         request->headers.emplace(
             Qn::SERVER_GUID_HEADER_NAME,
             serverRes->getId().toByteArray() );
@@ -118,9 +137,13 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
     //trying luck with physical id
     *res = qnResPool->getResourceByUniqueId(resUniqueID);
     if( *res )
+    {
+        NX_LOG(lit("auto_forward. Found resource %1 by unique id %2 from path").
+            arg((*res)->getId().toString()).arg(resUniqueID), cl_logDEBUG2);
         return true;
+    }
     //searching by mac
-    *res = qnResPool->getResourceByMacAddress(resUniqueID);
+    //*res = qnResPool->getResourceByMacAddress(resUniqueID);
     return *res != nullptr;
 }
 

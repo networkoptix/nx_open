@@ -1470,7 +1470,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
 
     void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
-        const QSharedPointer<AbstractStreamSocket>& socket,
+    QSharedPointer<AbstractStreamSocket> socket,
         const ApiPeerData &/*remotePeer*/,
         qint64 /*remoteSystemIdentityTime*/,
         const nx_http::Request& request,
@@ -1491,7 +1491,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             if( transport->connectionGuid() == connectionGuid )
             {
                 transport->setIncomingTransactionChannelSocket(
-                    socket,
+                std::move(socket),
                     request,
                     requestBuf );
                 return;

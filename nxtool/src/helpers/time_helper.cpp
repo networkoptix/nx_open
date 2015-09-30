@@ -1,7 +1,5 @@
 #include "time_helper.h"
 
-#include <QDebug>
-
 enum { kMSecFactor = 1000 };
 
 QDateTime rtu::convertDateTime(const QDate &date
@@ -46,4 +44,12 @@ QString rtu::timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &
     static const QString tzTemplate("(%1) %2");
     const QString baseName(timeZone.id());      
     return tzTemplate.arg(timeZone.displayName(atDateTime, QTimeZone::OffsetName), baseName);
+}
+
+rtu::DateTime::DateTime(qint64 utcDateTimeMs
+    , const QByteArray &timeZoneId)
+
+    : utcDateTimeMs(utcDateTimeMs)
+    , timeZoneId(timeZoneId)
+{
 }

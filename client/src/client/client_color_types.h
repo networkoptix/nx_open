@@ -236,13 +236,25 @@ struct QnServerUpdatesColors {
 };
 #define QnServerUpdatesColors_Fields (latest)(target)(error)
 
+struct QnFailoverPriorityColors {
+    QnFailoverPriorityColors();
+
+    QColor never;
+    QColor low;
+    QColor medium;
+    QColor high;
+};
+#define QnFailoverPriorityColors_Fields (never)(low)(medium)(high)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnUserManagementColors) \
-    (QnServerUpdatesColors)(QnIoModuleColors)
+    (QnServerUpdatesColors)(QnIoModuleColors) \
+    (QnFailoverPriorityColors) \
+
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

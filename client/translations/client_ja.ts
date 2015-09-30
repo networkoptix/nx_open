@@ -5,7 +5,7 @@
     <name>AboutDialog</name>
     <message>
         <source>About</source>
-        <translation>HD Witnessについて</translation>
+        <translation>Nx Witnessについて</translation>
     </message>
     <message>
         <source>Information</source>
@@ -78,71 +78,71 @@
     <name>AuditLogDialog</name>
     <message>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>開始</translation>
     </message>
     <message>
         <source>till</source>
-        <translation type="unfinished"></translation>
+        <translation>迄</translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished">リフレッシュ</translation>
+        <translation>リフレッシュ</translation>
     </message>
     <message>
         <source>User actions</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーアクション</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブウォッチンング</translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオエクスポート</translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォッチングライブ</translation>
     </message>
     <message>
         <source>Login/logout</source>
-        <translation type="unfinished"></translation>
+        <translation>ログイン／ログアウト</translation>
     </message>
     <message>
         <source>Event rules</source>
-        <translation type="unfinished"></translation>
+        <translation>イベントルール</translation>
     </message>
     <message>
         <source>Server actions</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーアクション</translation>
     </message>
     <message>
         <source>E-mail settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Email設定</translation>
     </message>
     <message>
         <source>System actions</source>
-        <translation type="unfinished"></translation>
+        <translation>システムアクション</translation>
     </message>
     <message>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>全て選択</translation>
     </message>
     <message>
         <source>Sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>セッション</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">詳細</translation>
+        <translation>詳細</translation>
     </message>
     <message>
         <source>All Servers are offline.  Audit data are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>全サーバーオフライン　操作履歴データは利用できません.</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>操作履歴</translation>
     </message>
 </context>
 <context>
@@ -259,35 +259,35 @@
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation type="unfinished">サーバー:</translation>
+        <translation>選択サーバー:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished">サブネット検索(&amp;U)</translation>
+        <translation>サブネット検索(&amp;U)</translation>
     </message>
     <message>
         <source>Brand</source>
-        <translation type="unfinished"></translation>
+        <translation>ブランド</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation type="unfinished">モデル</translation>
+        <translation>モデル</translation>
     </message>
     <message>
         <source>New Scan...</source>
-        <translation type="unfinished">新規検索...</translation>
+        <translation>新規検索...</translation>
     </message>
     <message>
         <source>Add device(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス追加(s)...</translation>
     </message>
     <message>
         <source>Device Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスアドレス:</translation>
     </message>
     <message>
         <source>Discovered Devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>検索したデバイス:</translation>
     </message>
 </context>
 <context>
@@ -306,11 +306,11 @@
     </message>
     <message>
         <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
-        <translation type="unfinished"></translation>
+        <translation>このカメラではアドバンス設定が使用できません　カメラのwebページを直接確認してください.</translation>
     </message>
     <message>
         <source>Note: Any changes made will be applied instantly!</source>
-        <translation type="unfinished"></translation>
+        <translation>注：変更は直ぐに適用されます!</translation>
     </message>
 </context>
 <context>
@@ -404,19 +404,19 @@
     </message>
     <message>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished"></translation>
+        <translation>注： 画質とフレーム数のみで、録画スケジュールには影響しません.</translation>
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished">使用しない</translation>
+        <translation>使用しない</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>注：高画質を選択するとCPUおよびネットワーク負荷に影響を及ぼします.</translation>
     </message>
     <message>
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>注：システムパフォーマンスに対する影響を理解せずに変更は行わないでください.</translation>
     </message>
 </context>
 <context>
@@ -519,31 +519,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>録画スケジュール</translation>
     </message>
     <message>
         <source>Show Quality on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>スケジュールに画質表示</translation>
     </message>
     <message>
         <source>Show FPS on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>スケジュールにFPS表示</translation>
     </message>
     <message>
         <source>Motion + Low-Res </source>
-        <translation type="unfinished"></translation>
+        <translation>モーション + 低解像度</translation>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation type="unfinished">録画しない</translation>
+        <translation>録画しない</translation>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished">最低(日):</translation>
+        <translation>最低(日)</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished">最大(日):</translation>
+        <translation>最大(日)</translation>
     </message>
 </context>
 <context>
@@ -599,31 +599,31 @@ Short for &quot;seconds&quot;</extracomment>
     <name>CustomHorizontalHeader</name>
     <message>
         <source>5 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>5分</translation>
     </message>
     <message>
         <source>Hour</source>
-        <translation type="unfinished"></translation>
+        <translation>時</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
     <message>
         <source>Week</source>
-        <translation type="unfinished"></translation>
+        <translation>週</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>月</translation>
     </message>
     <message>
         <source>All data</source>
-        <translation type="unfinished"></translation>
+        <translation>全データ</translation>
     </message>
     <message>
         <source>Bitrate for the last recorded:</source>
-        <translation type="unfinished"></translation>
+        <translation>録画ビットレート:</translation>
     </message>
 </context>
 <context>
@@ -657,11 +657,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Event Log</source>
-        <translation type="unfinished">イベントログ</translation>
+        <translation>イベントログ</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation type="unfinished">フィルタークリア</translation>
+        <translation>フィルタークリア</translation>
     </message>
 </context>
 <context>
@@ -672,19 +672,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ceiling Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>天井設置</translation>
     </message>
     <message>
         <source>Wall Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>壁設置</translation>
     </message>
     <message>
         <source>Floor/Table Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>フロア/テーブル設置</translation>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished">カメラアングル修正:</translation>
+        <translation>カメラアングル修正</translation>
     </message>
 </context>
 <context>
@@ -723,31 +723,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished">5.1ch→2.1chへオーディオ変換:</translation>
+        <translation>5.1ch→2.1chへオーディオ変換</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation type="unfinished">自動一時停止:</translation>
+        <translation>自動一時停止</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished">分後</translation>
+        <translation>分後</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished">PC起動時にアプリケーション起動:</translation>
+        <translation>PC起動時にアプリケーション起動:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation type="unfinished">ダブルバッファリング:</translation>
+        <translation>ダブルバッファリング:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation type="unfinished">ログ参照</translation>
+        <translation>ログ参照</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation type="unfinished">ローカルキャッシュのクリア</translation>
+        <translation>ローカルキャッシュのクリア</translation>
     </message>
 </context>
 <context>
@@ -786,19 +786,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open audit trail log</source>
-        <translation type="unfinished"></translation>
+        <translation>操作履歴ログを開く</translation>
     </message>
     <message>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>シングルレイアウトで全サーバーモニター</translation>
     </message>
     <message>
         <source>System Backup and Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>システムバックアップとリストア</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>操作履歴</translation>
     </message>
 </context>
 <context>
@@ -813,66 +813,66 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation type="unfinished">スクロール</translation>
+        <translation>スクロール</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation type="unfinished">左端</translation>
+        <translation>左端</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation type="unfinished">右端</translation>
+        <translation>右端</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation type="unfinished">ページ左</translation>
+        <translation>ページ左</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation type="unfinished">ページ上</translation>
+        <translation>ページ上</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation type="unfinished">ページ右</translation>
+        <translation>ページ右</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation type="unfinished">ページ下</translation>
+        <translation>ページ下</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation type="unfinished">左スクロール</translation>
+        <translation>左スクロール</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation type="unfinished">スクロールアップ</translation>
+        <translation>スクロールアップ</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation type="unfinished">左スクロール</translation>
+        <translation>右スクロール</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation type="unfinished">スクロールダウン</translation>
+        <translation>スクロールダウン</translation>
     </message>
 </context>
 <context>
     <name>ImageControlWidget</name>
     <message>
         <source>Image Control</source>
-        <translation type="unfinished">イメージコントロール</translation>
+        <translation>イメージコントロール</translation>
     </message>
     <message>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished">アスペクト比固定:</translation>
+        <translation>アスペクト比固定:</translation>
     </message>
     <message>
         <source>Default rotation:</source>
-        <translation type="unfinished">回転初期値:</translation>
+        <translation>回転初期値:</translation>
     </message>
     <message>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished">魚眼レンズカメラ</translation>
+        <translation>魚眼レンズカメラ</translation>
     </message>
 </context>
 <context>
@@ -887,7 +887,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished">ローディング中...お待ちください.</translation>
+        <translation>ローディング中...お待ちください.</translation>
     </message>
 </context>
 <context>
@@ -942,77 +942,77 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation type="unfinished">レイアウトのロック</translation>
+        <translation>レイアウトのロック</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished">お待ちください.</translation>
+        <translation>お待ちください.</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished">アスペクト比を固定</translation>
+        <translation>アスペクト比を固定</translation>
     </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
     <message>
         <source>Server UR&amp;L:</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーUR&amp;L:</translation>
     </message>
     <message>
         <source>ldap(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation>ldap(s)://host:port</translation>
     </message>
     <message>
         <source>Ad&amp;min DN:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ad&amp;min DN:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation type="unfinished">パスワード(&amp;P):</translation>
+        <translation>パスワード(&amp;P):</translation>
     </message>
     <message>
         <source>Search Base:</source>
-        <translation type="unfinished"></translation>
+        <translation>検索ベース:</translation>
     </message>
     <message>
         <source>Search Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>検索フィルター:</translation>
     </message>
     <message>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>オプション</translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished">テスト中...</translation>
+        <translation>テスト中...</translation>
     </message>
     <message>
         <source>LDAP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP設定</translation>
     </message>
 </context>
 <context>
     <name>LdapUsersDialog</name>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAPよりユーザー登録...</translation>
     </message>
     <message>
         <source>Select users to import</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーのインポート</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation type="unfinished">フィルター...</translation>
+        <translation>フィルター...</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">ロード中...</translation>
+        <translation>ロード中...</translation>
     </message>
     <message>
         <source>Connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>接続エラー</translation>
     </message>
 </context>
 <context>
@@ -1043,7 +1043,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>このライセンスタイプでは高機能バージョンのソフトウェアーが必要です.</translation>
     </message>
 </context>
 <context>
@@ -1120,22 +1120,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation type="unfinished">無効なライセンスキー</translation>
+        <translation>無効なライセンスキー</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation type="unfinished">ライセンスファイル選択...</translation>
+        <translation>ライセンスファイル選択...</translation>
     </message>
 </context>
 <context>
     <name>LicensesProposeWidget</name>
     <message>
         <source>Licensing</source>
-        <translation type="unfinished">ライセンス</translation>
+        <translation>ライセンス</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation type="unfinished">ライセンスを追加する...</translation>
+        <translation>ライセンスを追加する...</translation>
     </message>
 </context>
 <context>
@@ -1179,7 +1179,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished">接続オプション(&amp;C):</translation>
+        <translation>接続オプション(&amp;C):</translation>
     </message>
 </context>
 <context>
@@ -1262,7 +1262,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation type="unfinished">タイムラインモード:</translation>
+        <translation>タイムラインモード:</translation>
     </message>
 </context>
 <context>
@@ -1293,7 +1293,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished">音声使用</translation>
+        <translation>音声使用</translation>
     </message>
 </context>
 <context>
@@ -1319,7 +1319,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation type="unfinished">アドミニストレーターのみに表示する</translation>
+        <translation>アドミニストレーターのみに表示</translation>
     </message>
 </context>
 <context>
@@ -1384,7 +1384,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation type="unfinished">ツアーが選択されていません</translation>
+        <translation>ツアーが選択されていません</translation>
     </message>
 </context>
 <context>
@@ -1426,7 +1426,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Position</source>
-        <translation type="unfinished">ポジション保存</translation>
+        <translation>ポジション保存</translation>
     </message>
 </context>
 <context>
@@ -1869,7 +1869,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>About...</source>
-        <translation>HD Witnessについて...</translation>
+        <translation>Nx Witnessについて...</translation>
     </message>
     <message>
         <source>F1</source>
@@ -2565,55 +2565,55 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation type="unfinished">Drop Resources into a New Layout</translation>
+        <translation>新規レイアウトにリソース追加</translation>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation type="unfinished">タイムサーバー選択</translation>
+        <translation>タイムサーバー選択</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation type="unfinished">PTZオブジェクト有効</translation>
+        <translation>PTZオブジェクト有効</translation>
     </message>
     <message>
         <source>User Management...</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー管理...</translation>
     </message>
     <message>
         <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
+        <translation>操作履歴...</translation>
     </message>
     <message>
         <source>Move %1</source>
-        <translation type="unfinished"></translation>
+        <translation>移動 %1</translation>
     </message>
     <message>
         <source>Check %1 Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 問題を確認してください...</translation>
     </message>
     <message>
         <source>%1 List...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 リスト...</translation>
     </message>
     <message>
         <source>%1 Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ルール...</translation>
     </message>
     <message>
         <source>%1 Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 設定...</translation>
     </message>
     <message>
         <source>Open in %1 Settings Dialog...</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 設定ダイアログを開く...</translation>
     </message>
     <message>
         <source>Add Device(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス追加(s)...</translation>
     </message>
     <message>
         <source>%1 List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー毎 %1 リスト...</translation>
     </message>
 </context>
 <context>
@@ -2661,216 +2661,216 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnAuditLogDialog</name>
     <message>
         <source>Play this</source>
-        <translation type="unfinished"></translation>
+        <translation>再生</translation>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップボードにコピー</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルにエクスポート...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished">全て選択</translation>
+        <translation>全て選択</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished">検索</translation>
+        <translation>検索</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished">情報</translation>
+        <translation>情報</translation>
     </message>
     <message>
         <source>No archive data for that position left</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブデータがありません</translation>
     </message>
     <message>
         <source>This resources already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation>このリソースは既にシステムから削除されました</translation>
     </message>
     <message>
         <source>Export selected records to a file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルにエクスポート</translation>
     </message>
     <message>
         <source>Audit log replay</source>
-        <translation type="unfinished"></translation>
+        <translation>操作履歴ログ再表示</translation>
     </message>
     <message>
         <source>%1 actions</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 アクション</translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
     <message>
         <source>%1d </source>
-        <translation type="unfinished"></translation>
+        <translation>%1d </translation>
     </message>
     <message>
         <source>%1h </source>
-        <translation type="unfinished"></translation>
+        <translation>%1h </translation>
     </message>
     <message>
         <source>%1m </source>
-        <translation type="unfinished"></translation>
+        <translation>%1m </translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">不明</translation>
+        <translation>不明</translation>
     </message>
     <message>
         <source>Unsuccessful login</source>
-        <translation type="unfinished"></translation>
+        <translation>ログイン失敗</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">ログイン</translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <source>User updated</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーアップデート</translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォッチングライブ</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation type="unfinished"></translation>
+        <translation>ウォッチングアーカイブ</translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオエクスポート</translation>
     </message>
     <message>
         <source>System name changed</source>
-        <translation type="unfinished"></translation>
+        <translation>システム名変更</translation>
     </message>
     <message>
         <source>System merge</source>
-        <translation type="unfinished"></translation>
+        <translation>システム統合</translation>
     </message>
     <message>
         <source>General settings updated</source>
-        <translation type="unfinished"></translation>
+        <translation>一般設定アップデート</translation>
     </message>
     <message>
         <source>Server updated</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーアップデート</translation>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation type="unfinished"></translation>
+        <translation>ビジネスルールアップデート</translation>
     </message>
     <message>
         <source>Server removed</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー削除</translation>
     </message>
     <message>
         <source>Business rule removed</source>
-        <translation type="unfinished"></translation>
+        <translation>ビジネスルール削除</translation>
     </message>
     <message>
         <source>User removed</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー削除</translation>
     </message>
     <message>
         <source>Business rule reseted</source>
-        <translation type="unfinished"></translation>
+        <translation>ビジネスルールリセット</translation>
     </message>
     <message>
         <source>Database restored</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースリストア</translation>
     </message>
     <message>
         <source>Play this</source>
-        <translation type="unfinished"></translation>
+        <translation>再生</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">設定</translation>
+        <translation>設定</translation>
     </message>
     <message>
         <source>%1 - %2, </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2, </translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n アクション(s)</numerusform>
         </translation>
     </message>
     <message>
         <source>Session begins</source>
-        <translation type="unfinished"></translation>
+        <translation>セッション開始</translation>
     </message>
     <message>
         <source>Session ends</source>
-        <translation type="unfinished"></translation>
+        <translation>セッション終了</translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>時間</translation>
     </message>
     <message>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <source>IP</source>
-        <translation type="unfinished"></translation>
+        <translation>IP</translation>
     </message>
     <message>
         <source>Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>アクティビティ</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>曜日</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>時間</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <source>View it</source>
-        <translation type="unfinished"></translation>
+        <translation>表示</translation>
     </message>
     <message>
         <source>Click to expand</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックで拡張</translation>
     </message>
     <message>
         <source>Red mark means that an archive is still available</source>
-        <translation type="unfinished"></translation>
+        <translation>赤マークはアーカイブ可能</translation>
     </message>
     <message>
         <source>E-mail settings changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Email設定変更</translation>
     </message>
     <message>
         <source>%1 updated</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 アップデート</translation>
     </message>
     <message>
         <source>%1 added</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 追加</translation>
     </message>
     <message>
         <source>%1 removed</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 削除</translation>
     </message>
     <message>
         <source>%1 name</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 名前</translation>
     </message>
 </context>
 <context>
@@ -2883,7 +2883,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation type="unfinished">新しい通知があります</translation>
+        <translation>新しい通知があります.</translation>
     </message>
 </context>
 <context>
@@ -2902,32 +2902,32 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation type="unfinished">インストールビルド</translation>
+        <translation>インストールビルド.</translation>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation type="unfinished">ビルド番号:</translation>
+        <translation>ビルド番号:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation type="unfinished">入力したパスワードは無効です</translation>
+        <translation>入力したパスワードは無効です.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
         <source>%n of %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n / %1</numerusform>
         </translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;全て %1&gt;</translation>
     </message>
     <message>
         <source>Select at least one %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>最低でも一つの %1.を選択してください.</translation>
     </message>
 </context>
 <context>
@@ -3007,27 +3007,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Administrators Only</source>
-        <translation type="unfinished">アドミニストレーターのみ</translation>
+        <translation>アドミニストレーターのみ</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished">全てのユーザー</translation>
+        <translation>全てのユーザー</translation>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation type="unfinished">サウンド選択</translation>
+        <translation>サウンド選択</translation>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation type="unfinished">テキスト入力</translation>
+        <translation>テキスト入力</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;全て %1&gt;</translation>
     </message>
     <message>
         <source>Select at least one %1</source>
-        <translation type="unfinished"></translation>
+        <translation>最低でも一つの %1.を選択してください</translation>
     </message>
 </context>
 <context>
@@ -3042,11 +3042,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;全て %1&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;選択 at least one %1&gt;</translation>
     </message>
 </context>
 <context>
@@ -3105,23 +3105,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation type="unfinished">ルールのリセット</translation>
+        <translation>ルールのリセット</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation type="unfinished">ルールの削除中にエラーが発生しました</translation>
+        <translation>ルールの削除中にエラーが発生しました.</translation>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished">確認して終了</translation>
+        <translation>確認して終了</translation>
     </message>
     <message>
         <source>filter by %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 でフィルタ...</translation>
     </message>
 </context>
 <context>
@@ -3209,81 +3209,81 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation type="unfinished">IPアドレス範囲を255以内にしてください.</translation>
+        <translation>IPアドレス範囲を255以内にしてください.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished">検索終了...</translation>
+        <translation>検索終了...</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation type="unfinished">サーバーオフライン　検索は異常終了しました.</translation>
+        <translation>サーバーオフライン　検索は異常終了しました.</translation>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished">サーバーは削除されました　検索は異常終了しました.</translation>
+        <translation>サーバーは削除されました　検索は異常終了しました.</translation>
     </message>
     <message>
         <source>Device addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス追加はサーバーオンライン時のみ可能.</translation>
     </message>
     <message>
         <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスアドレスにはURL、アドレス、RTSPリンク等を入力してください.</translation>
     </message>
     <message>
         <source>No devices selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスが選択されていません.</translation>
     </message>
     <message>
         <source>Please select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation>最低一つのデバイスを選択してください</translation>
     </message>
     <message numerus="yes">
         <source>%n devices added successfully.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n デバイスが追加されました.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n デバイス追加エラー.</numerusform>
         </translation>
     </message>
     <message>
         <source>Server is offline, devices can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスはサーバーがオンラインの時に追加できます.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーが削除されました-デバイスの追加ができません.</translation>
     </message>
     <message>
         <source>Error while searching for device(s).</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスの検索中にエラーが発生しました.</translation>
     </message>
     <message numerus="yes">
         <source>%n devices found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n デバイス検出</numerusform>
         </translation>
     </message>
     <message>
         <source>All devices are already in the resource tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>全てのデバイスは既にリソースツリーにあります.</translation>
     </message>
     <message>
         <source>No devices found.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスは検出されませんでした.</translation>
     </message>
     <message>
         <source>Add devices to %1</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 にデバイス追加</translation>
     </message>
     <message>
         <source>Add devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス追加...</translation>
     </message>
 </context>
 <context>
@@ -3308,15 +3308,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation type="unfinished">設定適応...</translation>
+        <translation>設定適応...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>ターゲットカメラのサービスが有効ではありません.　もう一度お願いします.</translation>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation type="unfinished">パラメーターを保存できません</translation>
+        <translation>パラメーターを保存できません.</translation>
     </message>
 </context>
 <context>
@@ -3359,11 +3359,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation type="unfinished">アーカイブを保持しない</translation>
+        <translation>アーカイブを保持しない.</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation type="unfinished">タグリストはカンマまたはスペースで区切られます</translation>
+        <translation>タグリストはカンマまたはスペースで区切られます.</translation>
     </message>
 </context>
 <context>
@@ -3382,33 +3382,33 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished">サーバーをチェック</translation>
+        <translation>サーバーをチェック.</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished">ストリームエラーをチェック</translation>
+        <translation>ストリームエラーをチェック.</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
-        <translation type="unfinished"></translation>
+        <translation>診断終了!</translation>
     </message>
     <message>
         <source>Diagnostics for %1 %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2.診断.</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 診断</translation>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 アクセス確認.</translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>ターゲット %1 のメディアストリーム確認.</translation>
     </message>
 </context>
 <context>
@@ -3443,15 +3443,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 List for &apos;%2&apos; - %3 found</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 リスト &apos;%2&apos; - %3 検出</translation>
     </message>
     <message>
         <source>%1 List - %2 found</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 リスト - %2 検出</translation>
     </message>
     <message>
         <source>Export selected %1 to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した%1 をファイルにエクスポート.</translation>
     </message>
 </context>
 <context>
@@ -3558,23 +3558,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>注：高い値は他 %1&apos;の録画期間が短くなります.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>モーション録画は無効または選択した %1 でサポートされません.　モーション設定が有効か確認してください.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this %1.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1.ではデュアルストリームはサポートされません.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1.ではデュアルストリームとモーション検知が有効ではありません.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>モーション録画は無効です　モーション設定画面で %1 のモーションエリアと感度を設定してください.</translation>
     </message>
 </context>
 <context>
@@ -3589,47 +3589,47 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished">録画設定変更は保存されませんでした　録画タイプ、FPS、画質をスケジュール設定してください.</translation>
+        <translation>録画設定変更は保存されませんでした　録画タイプ、FPS、画質をスケジュール設定してください.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished">変更は適用されません</translation>
+        <translation>変更は適用されません.</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation type="unfinished">モーション感度は変更されません　変更するにはイメージ中でエリアを指定してください.</translation>
+        <translation>モーション感度は変更されません　変更するにはイメージ中でエリアを指定してください.</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished">ライセンスを超過しています　変更は保存されますが適用されません.</translation>
+        <translation>ライセンスを超過しています　変更は保存されますが適用されません.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation type="unfinished">変更を適用をできません</translation>
+        <translation>変更を適用をできません.</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 設定</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 診断</translation>
     </message>
     <message>
         <source>%1 Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ルール</translation>
     </message>
     <message>
         <source>%1 not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 は保存されていません.</translation>
     </message>
     <message>
         <source>Save changes to the following %1?</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 の変更を保存しますか?</translation>
     </message>
     <message>
         <source>Could not save the following %1 to Server.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 が保存できません.</translation>
     </message>
 </context>
 <context>
@@ -3640,7 +3640,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No %1 selected.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 が選択されていません.</translation>
     </message>
 </context>
 <context>
@@ -3661,22 +3661,22 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnClockLabel</name>
     <message>
         <source>Server Time</source>
-        <translation type="unfinished">サーバー時間</translation>
+        <translation>サーバー時間</translation>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation type="unfinished">ローカルシステム時間</translation>
+        <translation>ローカルシステム時間</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation type="unfinished">サーバー構成</translation>
+        <translation>サーバー構成</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation type="unfinished">サーバー更新</translation>
+        <translation>サーバー更新</translation>
     </message>
 </context>
 <context>
@@ -3783,19 +3783,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished">入力したログイン情報は無効です.</translation>
+        <translation>入力したログイン情報は無効です.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">起動プロセスが見つかりません</translation>
+        <translation>起動プロセスが見つかりません.</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAPサーバー接続タイムアウト.</translation>
     </message>
 </context>
 <context>
@@ -3806,11 +3806,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation type="unfinished">リクエストタイムアウト.</translation>
+        <translation>リクエストタイムアウト</translation>
     </message>
     <message>
         <source>Test Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>テスト失敗</translation>
     </message>
 </context>
 <context>
@@ -3825,7 +3825,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished">名前とパスワード入力...</translation>
+        <translation>名前とパスワード入力...</translation>
     </message>
 </context>
 <context>
@@ -3896,15 +3896,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation type="unfinished">サーバーデータベースを &apos;%1&apos; にダンプ失敗</translation>
+        <translation>サーバーデータベースを &apos;%1&apos; にダンプ失敗.</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースをリストアしますか？　既存の全てのデータは削除されます.</translation>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished">バックアップ前にサーバーに接続してくだだい</translation>
+        <translation>バックアップ前にサーバーに接続してくだだい.</translation>
     </message>
 </context>
 <context>
@@ -3939,7 +3939,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation type="unfinished">スクリーン幅は8の倍数に設定して下さい.</translation>
+        <translation>スクリーン幅は8の倍数に設定して下さい.</translation>
     </message>
 </context>
 <context>
@@ -4029,11 +4029,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Any Action</source>
-        <translation type="unfinished">全てのアクション</translation>
+        <translation>全てのアクション</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;全て %1&gt;</translation>
     </message>
 </context>
 <context>
@@ -4076,7 +4076,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished">全てのユーザー</translation>
+        <translation>全てのユーザー</translation>
     </message>
 </context>
 <context>
@@ -4087,15 +4087,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Schedule motion type is not supported by some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1.でスケジュールモーションタイプはサポートされません.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1.で録画は有効になりません.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1.とスケジュール設定は互換性がありません.</translation>
     </message>
 </context>
 <context>
@@ -4141,11 +4141,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished">フォルダーは既に追加されています</translation>
+        <translation>フォルダーは既に追加されています.</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished">フォルダーは既に追加されています.</translation>
+        <translation>フォルダーは既に追加されています.</translation>
     </message>
 </context>
 <context>
@@ -4160,11 +4160,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open %1 List</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 リストを開く</translation>
     </message>
     <message>
         <source>%1 List</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 リスト</translation>
     </message>
 </context>
 <context>
@@ -4242,127 +4242,127 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnIOPortItemDelegate</name>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
     <message>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>入力</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>出力</translation>
     </message>
     <message>
         <source>Open circuit</source>
-        <translation type="unfinished"></translation>
+        <translation>NO</translation>
     </message>
     <message>
         <source>Grounded circuit</source>
-        <translation type="unfinished"></translation>
+        <translation>NC</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>フォーム</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortsViewModel</name>
     <message>
         <source>#</source>
-        <translation type="unfinished">#</translation>
+        <translation>#</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished">タイプ</translation>
+        <translation>タイプ</translation>
     </message>
     <message>
         <source>Default state</source>
-        <translation type="unfinished"></translation>
+        <translation>初期ステータス</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <source>Pulse time(ms)</source>
-        <translation type="unfinished"></translation>
+        <translation>パルス時間(ms)</translation>
     </message>
     <message>
         <source>Unknown</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished">不明</translation>
+        <translation>不明</translation>
     </message>
     <message>
         <source>Disabled</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
     <message>
         <source>Input</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>入力</translation>
     </message>
     <message>
         <source>Output</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>出力</translation>
     </message>
     <message>
         <source>Invalid</source>
         <comment>IO Port Type</comment>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
     <message>
         <source>Open Circuit</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>NO</translation>
     </message>
     <message>
         <source>Grounded circuit</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>NC</translation>
     </message>
     <message>
         <source>Invalid state</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished"></translation>
+        <translation>無効なステータス</translation>
     </message>
 </context>
 <context>
     <name>QnImageControlWidget</name>
     <message>
         <source>4:3</source>
-        <translation type="unfinished">4:3</translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation type="unfinished">16:9</translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <source>1:1</source>
-        <translation type="unfinished">1:1</translation>
+        <translation>1:1</translation>
     </message>
     <message>
         <source>%1 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 度</translation>
     </message>
 </context>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
         <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>IOポート &apos;%1&apos;出力ON失敗</translation>
     </message>
     <message>
         <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>IOポート &apos;%1&apos;出力OFF失敗</translation>
     </message>
     <message>
         <source>IO port error</source>
-        <translation type="unfinished"></translation>
+        <translation>IOポートエラー</translation>
     </message>
 </context>
 <context>
@@ -4377,11 +4377,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not create output file %1.</source>
-        <translation type="unfinished">出力ファイルを作成できません %1.</translation>
+        <translation>出力ファイルを作成できません %1.</translation>
     </message>
     <message>
         <source>Could not export %1 %2.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 %2.をエクスポートできません.</translation>
     </message>
 </context>
 <context>
@@ -4423,16 +4423,16 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapSettingsDialog</name>
     <message>
         <source>Test</source>
-        <translation type="unfinished">テスト</translation>
+        <translation>テスト</translation>
     </message>
     <message>
         <source>Test failed</source>
-        <translation type="unfinished"></translation>
+        <translation>テスト失敗</translation>
     </message>
     <message numerus="yes">
         <source>Test completed successfully: %n users found.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>テスト成功  %n ユーザー検出.</numerusform>
         </translation>
     </message>
 </context>
@@ -4440,73 +4440,73 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>設定は無効です.</translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>テストを実行できません.</translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーがインターネットに接続されていません.</translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation type="unfinished">タイムアウト</translation>
+        <translation>タイムアウト</translation>
     </message>
 </context>
 <context>
     <name>QnLdapUserListModel</name>
     <message>
         <source>Login</source>
-        <translation type="unfinished">ログイン</translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <source>Full Name</source>
-        <translation type="unfinished"></translation>
+        <translation>フルネーム</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation type="unfinished">Email</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>DN</source>
-        <translation type="unfinished"></translation>
+        <translation>DN</translation>
     </message>
 </context>
 <context>
     <name>QnLdapUsersDialog</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>設定は無効です.</translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>テストを実行できません.</translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーがインターネットに接続されていません.</translation>
     </message>
     <message>
         <source>Could not load users.</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーがロードできません.</translation>
     </message>
     <message>
         <source>Import users</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーインポート</translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation type="unfinished">タイムアウト</translation>
+        <translation>タイムアウト</translation>
     </message>
     <message>
         <source>Error while loading users.</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーロード中にエラーが発生しました.</translation>
     </message>
     <message>
         <source>No new users found.</source>
-        <translation type="unfinished"></translation>
+        <translation>新規ユーザーは検出されませんでした.</translation>
     </message>
 </context>
 <context>
@@ -4669,35 +4669,35 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation type="unfinished">サーバーからライセンス取得...</translation>
+        <translation>サーバーからライセンス取得...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスは既にアクティベートされています.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation type="unfinished">ライセンスのアクティベート中にネットワークエラーが発生しました.</translation>
+        <translation>ライセンスのアクティベート中にネットワークエラーが発生しました.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished">ライセンス %1 をアクティベートできません</translation>
+        <translation>ライセンス %1 をアクティベートできません</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished">サーバー %1 からライセンスを削除できません</translation>
+        <translation>サーバー %1 からライセンスを削除できません</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">このライセンスキーはハードウェアID %1. で既に使用されています.</translation>
+        <translation>このライセンスキーはハードウェアID %1. で既に使用されています.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation type="unfinished">ライセンスの自動アクティベーション中にネットワークエラーが発生しました.</translation>
+        <translation>ライセンスの自動アクティベーション中にネットワークエラーが発生しました.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation type="unfinished">選択したマニュアルアクティベーションキーは無効です.</translation>
+        <translation>選択したマニュアルアクティベーションキーは無効です.</translation>
     </message>
 </context>
 <context>
@@ -4762,13 +4762,13 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
         <source>Use analog licenses to view these %n cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n カメラの表示にアナログライセンスを使用</numerusform>
         </translation>
     </message>
     <message>
         <source>Use licenses for selected %1</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したd %1 にライセンス使用</translation>
     </message>
 </context>
 <context>
@@ -4827,19 +4827,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation type="unfinished">無効なパラメーター</translation>
+        <translation>無効なパラメーター</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation type="unfinished">接続設定は既に存在します</translation>
+        <translation>接続設定は既に存在します.</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished">同じ名前の接続設定が既に存在します　上書きしますか?</translation>
+        <translation>同じ名前の接続設定が既に存在します　上書きしますか?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation type="unfinished">接続設定の削除</translation>
+        <translation>接続設定の削除</translation>
     </message>
 </context>
 <context>
@@ -4902,7 +4902,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished">ファイル選択...</translation>
+        <translation>ファイル選択...</translation>
     </message>
 </context>
 <context>
@@ -4960,15 +4960,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO モジュール</translation>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation type="unfinished">ズーム画面</translation>
+        <translation>ズーム画面</translation>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation type="unfinished">低解像度</translation>
+        <translation>低解像度</translation>
     </message>
 </context>
 <context>
@@ -5066,19 +5066,21 @@ Short for &quot;seconds&quot;</extracomment>
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>注: スタートライセンスと統合します.
+システム統合後はシステムには１つのスタートライセンスしか追加できなくなります.
+宜しければ統合を行ってください.</translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished">テスト中...</translation>
+        <translation>テスト中...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation type="unfinished">システム統合...</translation>
+        <translation>システム統合...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished">検索されたシステム %1 は互換性のバージョン %2.</translation>
+        <translation>検索されたシステム %1 は互換性のバージョン %2.</translation>
     </message>
 </context>
 <context>
@@ -5095,11 +5097,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished">無効なスケジュール</translation>
+        <translation>無効なスケジュール</translation>
     </message>
     <message>
         <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラの2番目のストリームは無効です　モーション+低解像度オプションは適応されません　録画タイプを常時録画または録画しないに変更してください.</translation>
     </message>
 </context>
 <context>
@@ -5213,19 +5215,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Sound Files</source>
-        <translation type="unfinished">サウンドファイル</translation>
+        <translation>サウンドファイル</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished">ファイル選択...</translation>
+        <translation>ファイル選択...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation type="unfinished">新規タイトル入力:</translation>
+        <translation>新規タイトル入力:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation type="unfinished">フィイル削除の確認</translation>
+        <translation>フィイル削除の確認</translation>
     </message>
 </context>
 <context>
@@ -5298,19 +5300,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Open %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 を開く</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 設定</translation>
     </message>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">サーバー設定</translation>
+        <translation>サーバー設定</translation>
     </message>
     <message>
         <source>Open %1 Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 ウェブページを開く...</translation>
     </message>
 </context>
 <context>
@@ -5402,27 +5404,27 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation type="unfinished">カメラからポジションを取得できません</translation>
+        <translation>カメラからポジションを取得できません.</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation type="unfinished">カメラにポジションを登録できません</translation>
+        <translation>カメラにポジションを登録できません.</translation>
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation type="unfinished">プリセット削除</translation>
+        <translation>プリセット削除</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
-        <translation type="unfinished">%1.のPTZ管理</translation>
+        <translation>%1.のPTZ管理.</translation>
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished">PTZ設定が保存されていません</translation>
+        <translation>PTZ設定が保存されていません.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished">変更内容が保存されていません　保存しますか?</translation>
+        <translation>変更内容が保存されていません　保存しますか?</translation>
     </message>
 </context>
 <context>
@@ -5487,19 +5489,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation type="unfinished">新規ツアー%1</translation>
+        <translation>新規ツアー%1</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
-        <translation type="unfinished">ポジション%1保存</translation>
+        <translation>ポジション%1保存</translation>
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation type="unfinished">ツアーには最低2ポジション必要です</translation>
+        <translation>ツアーには最低2ポジション必要です.</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation type="unfinished">ツアー時間: %1</translation>
+        <translation>ツアー時間: %1.</translation>
     </message>
 </context>
 <context>
@@ -5529,11 +5531,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation type="unfinished">ホットキーはプリセット%1で使用されています</translation>
+        <translation>ホットキーはプリセット%1で使用されています.</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation type="unfinished">ホットキーはツアー%1で使用されています</translation>
+        <translation>ホットキーはツアー%1で使用されています.</translation>
     </message>
 </context>
 <context>
@@ -5624,90 +5626,90 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnRecordingStatisticsWidget</name>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップボードにコピー</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルにエクスポート...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished">全て選択</translation>
+        <translation>全て選択</translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation type="unfinished">選択したイベントをファイルにエクスポート</translation>
+        <translation>選択したイベントをファイルにエクスポート</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatsModel</name>
     <message numerus="yes">
         <source>%n years</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 年</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n months</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 月</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 日</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 時</numerusform>
         </translation>
     </message>
     <message>
         <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation type="unfinished"></translation>
+        <translation>記録開始からアーカイブされた期間</translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
-        <translation type="unfinished"></translation>
+        <translation>平均ビットレート</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished">スペース</translation>
+        <translation>スペース</translation>
     </message>
     <message>
         <source>Calendar Days</source>
-        <translation type="unfinished"></translation>
+        <translation>カレンダー</translation>
     </message>
     <message>
         <source>less than an hour</source>
-        <translation type="unfinished"></translation>
+        <translation>1時間以内</translation>
     </message>
     <message>
         <source>%1 Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Mbps</translation>
     </message>
     <message>
         <source>%1 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tb</translation>
     </message>
     <message>
         <source>%1 Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Gb</translation>
     </message>
     <message>
         <source>Total %1</source>
-        <translation type="unfinished"></translation>
+        <translation>合計 %1</translation>
     </message>
     <message>
         <source>%1 with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 とアーカイブ</translation>
     </message>
     <message>
         <source>Storage space occupied by %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ストレージ容量は %1 で使用</translation>
     </message>
 </context>
 <context>
@@ -5757,7 +5759,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Live %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ライブ %1</translation>
     </message>
 </context>
 <context>
@@ -5787,15 +5789,15 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation type="unfinished">ユーザー選択...</translation>
+        <translation>ユーザー選択...</translation>
     </message>
     <message>
         <source>Select Resources...</source>
-        <translation type="unfinished">リソース選択...</translation>
+        <translation>リソース選択...</translation>
     </message>
     <message>
         <source>Select %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 選択...</translation>
     </message>
 </context>
 <context>
@@ -5933,90 +5935,90 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>General</source>
-        <translation type="unfinished">一般</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>Storage Analytics</source>
-        <translation type="unfinished"></translation>
+        <translation>ストレージ解析</translation>
     </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
     <message>
         <source>Remove Storage</source>
-        <translation type="unfinished">ストレージ削除</translation>
+        <translation>ストレージ削除</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">ロード中...</translation>
+        <translation>ロード中...</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation type="unfinished">有効ではありません</translation>
+        <translation>有効ではありません</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation type="unfinished">アーカイブ再同期ルーチンを行おうとしています.</translation>
+        <translation>アーカイブ再同期ルーチンを行おうとしています.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished">注意!　再同期プロセスの過程でHDD使用率が増加します　サイズによっても異なりますが数時間を要します.</translation>
+        <translation>注意!　再同期プロセスの過程でHDD使用率が増加します　サイズによっても異なりますが数時間を要します.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">このプロセスはアーカイブフォルダーの移動、名前の変更または入替を行った場合のみ行います　キャンセルしてもﾃﾞｰﾀを紛失する事はありません.</translation>
+        <translation>このプロセスはアーカイブフォルダーの移動、名前の変更または入替を行った場合のみ行います　キャンセルしてもﾃﾞｰﾀを紛失する事はありません.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">実行すますか?</translation>
+        <translation>実行すますか?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">アーカイブインデックスのリビルド  &apos;%1&apos;</translation>
+        <translation>アーカイブインデックスのリビルド  &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">ストレージ  &apos;%1&apos; のアーカイブスキャン</translation>
+        <translation>ストレージ  &apos;%1&apos; のアーカイブスキャン</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished">終了</translation>
+        <translation>終了</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished">アーカイブインデックスの再リビルド終了.</translation>
+        <translation>アーカイブインデックスの再リビルド終了.</translation>
     </message>
     <message>
         <source>At least two servers are required for this feature.</source>
-        <translation type="unfinished">この機能には最低2台のサーバーが必要です.</translation>
+        <translation>この機能には最低2台のサーバーが必要です.</translation>
     </message>
     <message>
         <source>Could not load storages from server.</source>
-        <translation type="unfinished">サーバーからストレージをロードできません.</translation>
+        <translation>サーバーからストレージをロードできません.</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished">外部ストレージの追加...</translation>
+        <translation>外部ストレージの追加...</translation>
     </message>
     <message>
         <source>Enable failover (server will take %1 automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルオーバー有効（サーバーはオフラインサーバーから %1 を引き継ぎます）</translation>
     </message>
     <message>
         <source>Max. %1 on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>このサーバーで最大. %1:</translation>
     </message>
     <message>
         <source>This server already has more than max %1</source>
-        <translation type="unfinished"></translation>
+        <translation>このサーバーは既に最大 %1 </translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>誤動作を回避する為に最大数 %1</translation>
     </message>
 </context>
 <context>
@@ -6246,79 +6248,79 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>注：システムアップデートを週末に適用するのは推奨されません.</translation>
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation type="unfinished">最新バージョン:</translation>
+        <translation>最新バージョン:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation type="unfinished">ターゲットバージョン:</translation>
+        <translation>ターゲットバージョン:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation type="unfinished">更新終了... 100%</translation>
+        <translation>更新終了... 100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントをマニュアルで更新してください.</translation>
     </message>
     <message>
         <source>Please update the client manually using an installation package.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントをインストーラーパッケージよりマニュアルで更新してください.</translation>
     </message>
     <message>
         <source>Update Succeeded.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新成功.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">起動プロセスが見つかりません</translation>
+        <translation>起動プロセスが見つかりません.</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation type="unfinished">更新キャンセル</translation>
+        <translation>更新キャンセル</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished">更新は正常に終了</translation>
+        <translation>更新成功.</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished">既に更新が開始されています.</translation>
+        <translation>既に更新が開始されています.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished">インターネット接続問題</translation>
+        <translation>インターネット接続問題</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
-        <translation type="unfinished"></translation>
+        <translation>アップデートサーバーではそのビルドは有効ではありません.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished">更新が開始できません　1台か複数台のサーバーが見つかりません.</translation>
+        <translation>更新が開始できません　1台か複数台のサーバーが見つかりません.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished">更新が開始できません　クライアントが見つかりません.</translation>
+        <translation>更新が開始できません　クライアントが見つかりません.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新ファイルがありません.</translation>
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished">インターネット経由で確認できません.</translation>
+        <translation>インターネット経由で確認できません.</translation>
     </message>
     <message>
         <source>Available Update:</source>
-        <translation type="unfinished"></translation>
+        <translation>有効な更新:</translation>
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished">マニュアル更新を行うには次のリンクよりアーカイブをダウンロード:</translation>
+        <translation>マニュアル更新を行うには次のリンクよりアーカイブをダウンロード:</translation>
     </message>
 </context>
 <context>
@@ -6333,58 +6335,58 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation type="unfinished">ウォーターマークが見つかりません</translation>
+        <translation>ウォーターマークが見つかりません</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation type="unfinished">ウォーターマークが一致しました</translation>
+        <translation>ウォーターマークが一致しました</translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished"></translation>
+        <translation>FPS値が高すぎます</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>スケジュールグリッドの %1. FPSは最大 %2.になります.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ソフトウェアモーションに2FPSが2番目のストリームで予約されます　現在の %1. FPS は %2.となります.</translation>
     </message>
     <message>
         <source>Invalid schedule</source>
-        <translation type="unfinished">無効なスケジュール</translation>
+        <translation>無効なスケジュール</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished">カメラの2番目のストリームが有効ではありません　モーション+常時低解像度は適応されません　常時録画に変更するか2番目のストリームを有効に変更してください.</translation>
+        <translation>カメラの2番目のストリームが有効ではありません　モーション+常時低解像度は適応されません　常時録画に変更するか2番目のストリームを有効に変更してください.</translation>
     </message>
     <message>
         <source>Confirm motion regions reset</source>
-        <translation type="unfinished"></translation>
+        <translation>モーションエリアにリセット確認</translation>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>モーションエリアをリセットしますか?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished">このアクションは取消せません!</translation>
+        <translation>このアクションは取消せません!</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished">ハードウェア（カメラ組込み）</translation>
+        <translation>ハードウェア（カメラ組込み）</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation type="unfinished">モーションを録画しない</translation>
+        <translation>モーションを録画しない</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 設定</translation>
     </message>
 </context>
 <context>
@@ -6435,23 +6437,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">パラメータが無効でテストできません.</translation>
+        <translation>パラメータが無効でテストできません.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">タイムアウト</translation>
+        <translation>タイムアウト</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished">Emailは有効ではありません</translation>
+        <translation>Emailは有効ではありません</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished">プリセットが見つかりません　アドバンスオプションを使用してください</translation>
+        <translation>プリセットが見つかりません　アドバンスオプションを使用してください.</translation>
     </message>
     <message>
         <source>Support email is not valid.</source>
-        <translation type="unfinished">サポートEmailが有効ではありません</translation>
+        <translation>サポートEmailが有効ではありません.</translation>
     </message>
 </context>
 <context>
@@ -6493,31 +6495,31 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No video stream</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオストリームなし</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished">診断...</translation>
+        <translation>診断...</translation>
     </message>
     <message>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>有効</translation>
     </message>
     <message>
         <source>Activate license...</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスアクティベート...</translation>
     </message>
     <message>
         <source>Module is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>無効モジュール</translation>
     </message>
     <message>
         <source>Server Offline</source>
-        <translation type="unfinished">サーバーオフライン</translation>
+        <translation>サーバーオフライン</translation>
     </message>
     <message>
         <source>Please check authentication information in %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 設定の承認情報を確認してください</translation>
     </message>
 </context>
 <context>
@@ -6539,23 +6541,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished">Windowsネットワーク共有リソース</translation>
+        <translation>Windowsネットワーク共有リソース</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>他のサーバーも同じNASを使用しています 複数サーバーで同じNASに保存する事は推奨されません.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <source>Add storage</source>
-        <translation type="unfinished"></translation>
+        <translation>ストレージ追加</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished">このストレージパスでは外部ストレージを設定できません.</translation>
+        <translation>このストレージパスでは外部ストレージを設定できません.</translation>
     </message>
 </context>
 <context>
@@ -6606,18 +6608,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Users</source>
-        <translation type="unfinished">ユーザー</translation>
+        <translation>ユーザー</translation>
     </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable %1 and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 有効　サーバー自動検索</translation>
     </message>
     <message>
         <source>Allow system to optimize %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 設定の最適化を許可</translation>
     </message>
 </context>
 <context>
@@ -6861,105 +6863,105 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnUserListModel</name>
     <message>
         <source>LDAP user</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAPサーバー</translation>
     </message>
     <message>
         <source>Normal user</source>
-        <translation type="unfinished"></translation>
+        <translation>一般ﾕｰｻﾞｰ</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>有効</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
     <message>
         <source>Edit user</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー編集</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <source>Permissions</source>
-        <translation type="unfinished"></translation>
+        <translation>権限</translation>
     </message>
     <message>
         <source>LDAP</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP</translation>
     </message>
 </context>
 <context>
     <name>QnUserListModelPrivate</name>
     <message>
         <source>Owner</source>
-        <translation type="unfinished">オーナー</translation>
+        <translation>オーナー</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished">アドミニストレーター</translation>
+        <translation>アドミニストレーター</translation>
     </message>
     <message>
         <source>View live video</source>
-        <translation type="unfinished"></translation>
+        <translation>ライブビデオ表示</translation>
     </message>
     <message>
         <source>Use PTZ controls</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZコントロール</translation>
     </message>
     <message>
         <source>View video archives</source>
-        <translation type="unfinished"></translation>
+        <translation>再生表示</translation>
     </message>
     <message>
         <source>Export video</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオエクスポート</translation>
     </message>
     <message>
         <source>Edit Video Walls</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール編集</translation>
     </message>
     <message>
         <source>Adjust %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 設定調整</translation>
     </message>
 </context>
 <context>
     <name>QnUserManagementWidget</name>
     <message>
         <source>LDAP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP設定...</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation type="unfinished">フィルター...</translation>
+        <translation>フィルター...</translation>
     </message>
     <message>
         <source>New User...</source>
-        <translation type="unfinished">新規ユーザー...</translation>
+        <translation>新規ユーザー...</translation>
     </message>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAPよりユーザー登録...</translation>
     </message>
     <message>
         <source>Enable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>選択を有効</translation>
     </message>
     <message>
         <source>Disable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>選択を無効</translation>
     </message>
     <message>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>選択を削除</translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation type="unfinished">選択クリア</translation>
+        <translation>選択クリア</translation>
     </message>
 </context>
 <context>
@@ -7042,15 +7044,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To modify your password, please enter existing one.</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードの変更を行うには現在のパスワードを入力.</translation>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation type="unfinished">ユーザーは変更されました　パスワードを更新してください.</translation>
+        <translation>ユーザーは変更されました　パスワードを更新してください.</translation>
     </message>
     <message>
         <source>Can adjust %1 settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 設定の調整可能</translation>
     </message>
 </context>
 <context>
@@ -7108,11 +7110,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished">Windows起動時にビデオウォールを開始する</translation>
+        <translation>Windows起動時にビデオウォールを開始する.</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
-        <translation type="unfinished"></translation>
+        <translation>デスクトップにショートカットを作成.</translation>
     </message>
 </context>
 <context>
@@ -7326,69 +7328,69 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished">新規レイアウト</translation>
+        <translation>新規レイアウト</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished">新規レイアウト%1</translation>
+        <translation>新規レイアウト%1</translation>
     </message>
     <message>
         <source>Open File</source>
-        <translation type="unfinished">ファイルを開く</translation>
+        <translation>ファイルを開く</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished">検索表示を実行できません</translation>
+        <translation>検索表示を実行できません.</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished">プロセス処理中</translation>
+        <translation>プロセス処理中...</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation type="unfinished">同じ名前のビデオウォールが既に存在します</translation>
+        <translation>同じ名前のビデオウォールが既に存在します.</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation type="unfinished">背景更新</translation>
+        <translation>背景更新...</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished">イメージプロセッッシングには時間を要します.</translation>
+        <translation>イメージプロセッッシングには時間を要します.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ベータバージョン%1.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished">起動プロセスが見つかりません</translation>
+        <translation>起動プロセスが見つかりません.</translation>
     </message>
     <message>
         <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 をサーバー%2. に移動できません.</translation>
     </message>
     <message>
         <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 サーバーは検出されません、また %2. にアクセスできません 移動しますか？</translation>
     </message>
     <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスの追加中ですがキャンセルしますか?</translation>
     </message>
     <message>
         <source>These %1 are auto-discovered.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 が自動検索されました.</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %1 の%n が自動検索されました.</numerusform>
         </translation>
     </message>
     <message>
         <source>Do you really want to delete the following %1?</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 を削除しますか?</translation>
     </message>
 </context>
 <context>
@@ -7407,19 +7409,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation type="unfinished">ブックマークはオンラインサーバーのみ追加可能.</translation>
+        <translation>ブックマークはオンラインサーバーのみ追加可能.</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation type="unfinished">ブックマークはオンラインサーバーのみ編集可能.</translation>
+        <translation>ブックマークはオンラインサーバーのみ編集可能.</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation type="unfinished">ブックマークはオンラインサーバーのみ削除可能.</translation>
+        <translation>ブックマークはオンラインサーバーのみ削除可能.</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished">削除確認</translation>
+        <translation>削除確認</translation>
     </message>
 </context>
 <context>
@@ -7469,15 +7471,15 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation type="unfinished">エラー: %1の為に録画が開始されません</translation>
+        <translation>エラー: %1の為に録画が開始されません</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished">ファイル%1の上書きができません　他の名前を使用してください.</translation>
+        <translation>ファイル%1の上書きができません　他の名前を使用してください.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation type="unfinished">何かのキーでツアー停止</translation>
+        <translation>何かのキーでツアー停止.</translation>
     </message>
 </context>
 <context>
@@ -7594,71 +7596,71 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>File is in use.</source>
-        <translation type="unfinished">ファイルは使用されています</translation>
+        <translation>ファイルは使用されています.</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをエクスポートできません.</translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告!</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished">タイムスタンプなし</translation>
+        <translation>タイムスタンプなし</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation type="unfinished">左上（トランスコーディング必要）</translation>
+        <translation>左上（トランスコーディング必要）</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation type="unfinished">右上（トランスコーディング必要）</translation>
+        <translation>右上（トランスコーディング必要）</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation type="unfinished">左下（トランスコーディング必要）</translation>
+        <translation>左下（トランスコーディング必要）</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation type="unfinished">右下（トランスコーディング必要）</translation>
+        <translation>右下（トランスコーディング必要）</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation type="unfinished">フィルター機能でのエクスポートにはトランスコーディングが必要で時間を要しますが宜しいですか?</translation>
+        <translation>フィルター機能でのエクスポートにはトランスコーディングが必要で時間を要しますが宜しいですか?</translation>
     </message>
     <message>
         <source>Export Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポート終了</translation>
     </message>
     <message>
         <source>Export Successful</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポート成功</translation>
     </message>
     <message>
         <source>Unable to export layout.</source>
-        <translation type="unfinished"></translation>
+        <translation>レイアウトをエクスポートできません.</translation>
     </message>
     <message>
         <source>Unable to save layout.</source>
-        <translation type="unfinished"></translation>
+        <translation>レイアウトを保存できません.</translation>
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation type="unfinished">名前を付けてローカルファイルを保存...</translation>
+        <translation>名前を付けてローカルファイルを保存...</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation type="unfinished">読取り専用</translation>
+        <translation>読取り専用.</translation>
     </message>
     <message>
         <source>Export Successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポート成功.</translation>
     </message>
     <message>
         <source>Unable to export video.</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポートできません.</translation>
     </message>
 </context>
 <context>
@@ -7712,23 +7714,25 @@ If you would like to disable this feature you can do so in the System Settings d
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>注: スタートライセンスと統合します.
+システム統合後はシステムには１つのスタートライセンスしか追加できなくなります.
+宜しければ統合を行ってください.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <source>Merge</source>
-        <translation type="unfinished"></translation>
+        <translation>統合</translation>
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished">前にリクエストしたサーバーが追加されるまでお待ちください.</translation>
+        <translation>前にリクエストしたサーバーが追加されるまでお待ちください.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation type="unfinished">選択したサーバーは正常にシステムに接続されました！</translation>
+        <translation>選択したサーバーは正常にシステムに接続されました！</translation>
     </message>
 </context>
 <context>
@@ -7787,23 +7791,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation type="unfinished">レウアイトは既に存在します</translation>
+        <translation>レウアイトは既に存在します.</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation type="unfinished">同じ名前のレイアウトは既に存在しますまた上書きする権限がありません.</translation>
+        <translation>同じ名前のレイアウトは既に存在しますまた上書きする権限がありません.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation type="unfinished">レイアウト名を入力:</translation>
+        <translation>レイアウト名を入力:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished">同じ名前のレイアウトが既に存在します　上書きしますか？</translation>
+        <translation>同じ名前のレイアウトが既に存在します　上書きしますか？</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished">新規レイアウト%1</translation>
+        <translation>新規レイアウト%1</translation>
     </message>
 </context>
 <context>
@@ -7830,7 +7834,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>All %1</source>
-        <translation type="unfinished"></translation>
+        <translation>全て%1</translation>
     </message>
 </context>
 <context>
@@ -7853,15 +7857,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished">カメラからポジションを取得できません</translation>
+        <translation>カメラからポジションを取得できません.</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished">カメラからポジションを登録できません</translation>
+        <translation>カメラにポジションを登録できません.</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラのポジションを登録できません.</translation>
     </message>
 </context>
 <context>
@@ -7904,35 +7908,35 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished">タイムスタンプなし</translation>
+        <translation>タイムスタンプなし</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation type="unfinished">左上</translation>
+        <translation>左上</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation type="unfinished">右上</translation>
+        <translation>右上</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation type="unfinished">左下</translation>
+        <translation>左下</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation type="unfinished">右下</translation>
+        <translation>右下</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation type="unfinished">ファイルを上書きできません</translation>
+        <translation>ファイルを上書きできません.</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation type="unfinished">スクリーンショットを保存できません</translation>
+        <translation>スクリーンショットを保存できません.</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished">スクリーンショット &apos;%1&apos;.保存中にエラーが発生しました.</translation>
+        <translation>スクリーンショット &apos;%1&apos;.保存中にエラーが発生しました.</translation>
     </message>
 </context>
 <context>
@@ -7963,15 +7967,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished">新規バージョンに更新できます</translation>
+        <translation>新規バージョンに更新できます.</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished">更新を推奨</translation>
+        <translation>更新を推奨.</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished">更新の通知を行わない.</translation>
+        <translation>更新の通知を行わない.</translation>
     </message>
 </context>
 <context>
@@ -8073,43 +8077,43 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation type="unfinished">コントロールセッションは既に起動しています</translation>
+        <translation>コントロールセッションは既に起動しています.</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation type="unfinished">予期せぬエラーが発生しました　設定は保存されません.</translation>
+        <translation>予期せぬエラーが発生しました　設定は保存されません.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation type="unfinished">オフラインのビデオウォールアイテムはありません.</translation>
+        <translation>オフラインのビデオウォールアイテムはありません.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished">ビデオウォールが開始されます　 %1 クライアントを終了しますか？</translation>
+        <translation>ビデオウォールが開始されます　 %1 クライアントを終了しますか？</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
-        <translation type="unfinished"></translation>
+        <translation>追加ライセンスが必要です.</translation>
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished">有効にするにはビデオウォールライセンスをアクティベートしてください.</translation>
+        <translation>有効にするにはビデオウォールライセンスをアクティベートしてください.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished">有効にするにはビデオウォールライセンスをアクティベートしてください.</translation>
+        <translation>有効にするにはビデオウォールライセンスをアクティベートしてください.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation type="unfinished">ビデオウォールは既に存在します</translation>
+        <translation>ビデオウォールは既に存在します.</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation type="unfinished">同じ名前のビデオウォールが既に存在します</translation>
+        <translation>同じ名前のビデオウォールが既に存在します.</translation>
     </message>
     <message>
         <source>%n items</source>
-        <translation type="unfinished"></translation>
+        <translation>%n アイテム</translation>
     </message>
 </context>
 <context>
@@ -8120,7 +8124,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished">接続がリストアされるまでお待ちください...</translation>
+        <translation>接続がリストアされるまでお待ちください...</translation>
     </message>
 </context>
 <context>
@@ -8143,11 +8147,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation type="unfinished">プリレコーディング:</translation>
+        <translation>プリレコーディング:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation type="unfinished">ポストレコーディング:</translation>
+        <translation>ポストレコーディング:</translation>
     </message>
 </context>
 <context>
@@ -8254,58 +8258,58 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>最高画質の解像度にはスペックの高いPCを推奨します.</translation>
     </message>
 </context>
 <context>
     <name>RecordingStatisticsWidget</name>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished">リフレッシュ</translation>
+        <translation>リフレッシュ</translation>
     </message>
     <message>
         <source>10 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>10 Tb</translation>
     </message>
     <message>
         <source>Forecast for full storage(s) usage</source>
-        <translation type="unfinished"></translation>
+        <translation>スルストレージ使用予測</translation>
     </message>
     <message>
         <source>0 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Tb</translation>
     </message>
     <message>
         <source>Additional storage:</source>
-        <translation type="unfinished"></translation>
+        <translation>追加ストレージ:</translation>
     </message>
     <message>
         <source>1000 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>1000 Tb</translation>
     </message>
     <message>
         <source>100 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>100 Tb</translation>
     </message>
     <message>
         <source>Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>Tb</translation>
     </message>
     <message>
         <source>1 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tb</translation>
     </message>
     <message>
         <source>Current usage</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の使用</translation>
     </message>
     <message>
         <source>Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>予測</translation>
     </message>
     <message>
         <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーオフラインで統計は無効です.</translation>
     </message>
 </context>
 <context>
@@ -8368,98 +8372,99 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>ServerSettingsDialog</name>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">サーバー設定</translation>
+        <translation>サーバー設定</translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">名前:</translation>
+        <translation>名前:</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation type="unfinished">IPアドレス:</translation>
+        <translation>IPアドレス:</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation type="unfinished">Ping</translation>
+        <translation>Ping</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished">ポート:</translation>
+        <translation>ポート:</translation>
     </message>
     <message>
         <source>9000</source>
-        <translation type="unfinished">9000</translation>
+        <translation>9000</translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation type="unfinished">フェイルオーバー</translation>
+        <translation>フェイルオーバー</translation>
     </message>
     <message>
         <source>Storages</source>
-        <translation type="unfinished">ストレージ</translation>
+        <translation>ストレージ</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation type="unfinished">使用</translation>
+        <translation>使用</translation>
     </message>
     <message>
         <source>Protocol</source>
-        <translation type="unfinished"></translation>
+        <translation>プロトコル</translation>
     </message>
     <message>
         <source>Path</source>
-        <translation type="unfinished">パス</translation>
+        <translation>パス</translation>
     </message>
     <message>
         <source>Capacity</source>
-        <translation type="unfinished">容量</translation>
+        <translation>容量</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">ログイン</translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished">スペース</translation>
+        <translation>スペース</translation>
     </message>
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>チェックしていないストレージには影響ありませんが書込みは停止します.
+ドライブの古い記録データは削除されません.</translation>
     </message>
     <message>
         <source>Rebuild archive index</source>
-        <translation type="unfinished">アーカイブインデックスのリビルド</translation>
+        <translation>アーカイブインデックスのリビルド</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished">開始</translation>
+        <translation>開始</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation type="unfinished">ウォーターマーク チェック</translation>
+        <translation>ウォーターマーク チェック</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation type="unfinished">チェックしたファイル:</translation>
+        <translation>チェックしたファイル:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation type="unfinished">チェック結果:</translation>
+        <translation>チェック結果:</translation>
     </message>
 </context>
 <context>
@@ -8546,47 +8551,47 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>IO ports</source>
-        <translation type="unfinished"></translation>
+        <translation>IOポート</translation>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished">音声使用</translation>
+        <translation>音声使用</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished">このカメラではモーションが使用できません</translation>
+        <translation>このカメラではモーションが使用できません.</translation>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation type="unfinished">モーション設定</translation>
+        <translation>モーション設定</translation>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation type="unfinished">モーション検知:</translation>
+        <translation>モーション検知</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation type="unfinished"></translation>
+        <translation>ソフトウェア　最大FPSはサーバーで少し減少します</translation>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished">モーションマスク(0)</translation>
+        <translation>モーションマスク(0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished">カメラモーションウェブページ:</translation>
+        <translation>カメラモーションウェブページ:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished">モーションエリアのリセット</translation>
+        <translation>モーションエリアのリセット</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished">ハードウェア（カメラ組込)</translation>
+        <translation>ハードウェア（カメラ組込)</translation>
     </message>
     <message>
         <source>Fisheye</source>
-        <translation type="unfinished"></translation>
+        <translation>魚眼</translation>
     </message>
 </context>
 <context>
@@ -8673,19 +8678,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">システムの説明を入力してください...</translation>
+        <translation>システムの説明を入力してください.</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">安全でない接続</translation>
+        <translation>安全でない接続</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">TLSでの安全な接続</translation>
+        <translation>TLSでの安全な接続.</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">SSLでの安全な接続</translation>
+        <translation>SSLでの安全な接続.</translation>
     </message>
 </context>
 <context>
@@ -8726,19 +8731,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">注意　録画スケジュールのFPSと画質設定は適応されません!</translation>
+        <translation>注意　録画スケジュールのFPSと画質設定は適応されません!</translation>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation type="unfinished">(推奨)</translation>
+        <translation>(推奨)</translation>
     </message>
     <message>
         <source>Enable audit trail</source>
-        <translation type="unfinished"></translation>
+        <translation>操作履歴有効</translation>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation type="unfinished"></translation>
+        <translation>anonymou使用とクラッシュ統計をソフトウェア開発に送信</translation>
     </message>
 </context>
 <context>
@@ -8749,11 +8754,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation type="unfinished">現在のシステム時間:</translation>
+        <translation>現在のシステム時間:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>インターネットアクセスができない場合にローカルサーバーをタイムサーバーとして選択:</translation>
     </message>
 </context>
 <context>
@@ -8792,11 +8797,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished"></translation>
+        <translation>E&amp;mail:</translation>
     </message>
     <message>
         <source>Enabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>有効:</translation>
     </message>
 </context>
 <context>
@@ -8815,11 +8820,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>スケジュール</translation>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished">注: スケジュールはサーバー時間を使用</translation>
+        <translation>注: スケジュールはサーバー時間を使用.</translation>
     </message>
 </context>
 </TS>

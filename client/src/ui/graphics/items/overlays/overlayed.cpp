@@ -133,19 +133,23 @@ void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate) {
         if(overlay.visibility == UserVisible)
             continue;
 
-        qreal opacity;
-        if(overlay.visibility == Invisible) {
-            opacity = 0.0;
-        } else if(overlay.visibility == Visible) {
-            opacity = 1.0;
-        } else {
-            opacity = m_overlayVisible ? 1.0 : 0.0;
-        }
+        bool visible = m_overlayVisible;
 
-        if(animate) {
-            opacityAnimator(overlay.widget, 1.0)->animateTo(opacity);
-        } else {
-            overlay.widget->setOpacity(opacity);
-        }
+        if(overlay.visibility == Invisible) {
+            visible = false;
+        } else if(overlay.visibility == Visible) {
+            visible = true;
+        } 
+        setOverlayWidgetVisible(overlay.widget, visible, animate);
+    }
+}
+
+void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/, bool animate /*= true*/) {
+    qreal opacity = visible ? 1.0 : 0.0;
+
+    if(animate) {
+        opacityAnimator(widget, 1.0)->animateTo(opacity);
+    } else {
+        widget->setOpacity(opacity);
     }
 }

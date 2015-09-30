@@ -353,6 +353,18 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
                 }
             }
         }
+        else if (lines[i].startsWith("a=x-dimensions:"))
+        {
+            QList<QByteArray> values = lines[i].split(':');
+            if (values.size() > 1)
+            {
+                QList<QByteArray> dimension = values[1].split(',');
+                if (dimension.size() == 2) {
+                    m_sdpWidth = dimension[0].trimmed().toInt();
+                    m_sdpHeight = dimension[1].trimmed().toInt();
+                }
+            }
+        }
     }
 }
 
@@ -398,6 +410,11 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     int jpegQ = *curPtr++;
     int width = *curPtr++;
     int height = *curPtr++;
+
+    if (width == 0 && m_sdpWidth > 0)
+        width = m_sdpWidth / 8;
+    if (height == 0 && m_sdpHeight > 0)
+        height = m_sdpHeight / 8;
 
     bytesLeft-=8;
 

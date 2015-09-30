@@ -765,9 +765,25 @@ bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
     return d1 == d2;
 }
 
+bool QnAuditLogModel::isDetailDataSupported(const QnAuditRecord *record) const
+{
+    switch (record->eventType)
+    {
+        case Qn::AR_ViewArchive:
+        case Qn::AR_ViewLive:
+        case Qn::AR_ExportVideo:
+        case Qn::AR_CameraInsert:
+        case Qn::AR_CameraUpdate:
+            return true;
+        default:
+            return false;
+    }
+    return false;
+}
+
 QString QnAuditLogModel::descriptionTooltip(const QnAuditRecord *record) const
 {
-    if (record->resources.empty())
+    if (record->resources.empty() || !isDetailDataSupported(record))
         return QString();
 
     QString result;

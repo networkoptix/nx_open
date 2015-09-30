@@ -4,18 +4,13 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 
-#include <api/app_server_connection.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/camera_user_attribute_pool.h>
-#include <core/resource/user_resource.h>
+#include <core/resource_management/resources_changes_manager.h>
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_provider.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/actions/action_manager.h>
 
 #include <ui/dialogs/resource_list_dialog.h>
 
@@ -23,14 +18,12 @@
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_selection_watcher.h>
 
 #include <utils/license_usage_helper.h>
-#include "core/resource_management/resource_properties.h"
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
-    m_selectionUpdatePending(false),
-    m_selectionScope(Qn::SceneScope),
     m_ignoreAccept(false)
 {
     m_settingsWidget = new QnCameraSettingsWidget(this);
@@ -62,14 +55,19 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     connect(m_diagnoseButton,   &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_diagnoseButton_clicked);
     connect(m_rulesButton,      &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_rulesButton_clicked);
 
-    connect(m_settingsWidget,   &QnCameraSettingsWidget::scheduleExported, this,    &QnCameraSettingsDialog::saveCameras);
     connect(m_settingsWidget,   &QnCameraSettingsWidget::resourcesChanged, this,   &QnCameraSettingsDialog::updateReadOnly);
     
     connect(context(),          &QnWorkbenchContext::userChanged,          this,   &QnCameraSettingsDialog::updateReadOnly);
 
-    connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
+    auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources) {
+        if (isHidden())
+            return;
 
-    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, &QnCameraSettingsDialog::at_cameras_properties_saved);
+        auto cameras = resources.filtered<QnVirtualCameraResource>();
+        if (!cameras.isEmpty())
+            setCameras(cameras);
+    });  
 
     at_settingsWidget_hasChangesChanged();
     retranslateUi();
@@ -241,43 +239,31 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) 
     }
 
     /* Submit and save it. */
-    m_settingsWidget->submitToResources();
     saveCameras(cameras);
-}
-
-void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList& cameras) {
-    if( errorCode == ec2::ErrorCode::ok )
-        return;
-
-    QnResourceListDialog::exec(this, cameras,
-        tr("Error"),
-        //: "Could not apply changes for the following 5 cameras." or "Could not apply changes for the following IO Module.", etc
-        tr("Could not apply changes for the following %1.").arg(getNumericDevicesName(cameras, false)),
-        QDialogButtonBox::Ok);
-}
-
-void QnCameraSettingsDialog::at_cameras_properties_saved(int requestId, ec2::ErrorCode errorCode) 
-{
-    QN_UNUSED(requestId);
-    if( errorCode == ec2::ErrorCode::ok )
-        return;
 }
 
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras) {
     if (cameras.isEmpty())
         return;
-    QList<QnUuid> idList = idListFromResList(cameras);
-    for( const QnVirtualCameraResourcePtr& camera: cameras )
-        if( camera->preferedServerId().isNull() )
-            camera->setPreferedServerId( camera->getParentId() );
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
-        QnCameraUserAttributePool::instance()->getAttributesList(idList),
-        this,
-        [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
-            Q_UNUSED(reqID);
-            at_cameras_saved(errorCode, cameras); 
-    } );
-    propertyDictionary->saveParamsAsync(idList);
+
+    auto applyChanges = [this, cameras] {
+        m_settingsWidget->submitToResources();
+        for (const QnVirtualCameraResourcePtr &camera: cameras)
+            if( camera->preferedServerId().isNull() )
+                camera->setPreferedServerId( camera->getParentId() );
+    };
+
+    auto rollback = [this, cameras](){
+        if (!isVisible())
+            return;
+
+        if (m_settingsWidget->cameras() != cameras)
+            return;
+
+        m_settingsWidget->updateFromResources();
+    };
+
+    qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges, rollback);   
 }
 
 void QnCameraSettingsDialog::at_openButton_clicked() {
@@ -285,42 +271,4 @@ void QnCameraSettingsDialog::at_openButton_clicked() {
     menu()->trigger(Qn::OpenInNewLayoutAction, cameras);
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
-    m_selectionUpdatePending = false;
 }
-
-void QnCameraSettingsDialog::updateCamerasFromSelection() {
-    if(!m_selectionUpdatePending)
-        return;
-
-    m_selectionUpdatePending = false;
-
-    if (isHidden())
-        return;
-
-    QnActionTargetProvider *provider = menu()->targetProvider();
-    if(!provider)
-        return;
-
-    Qn::ActionScope scope = provider->currentScope();
-    if(scope != Qn::SceneScope && scope != Qn::TreeScope) {
-        scope = m_selectionScope;
-    } else {
-        m_selectionScope = scope;
-    }
-
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentParameters(scope));
-}
-
-void QnCameraSettingsDialog::at_selectionChangeAction_triggered() {
-    if(isHidden() || m_selectionUpdatePending)
-        return;
-
-    m_selectionUpdatePending = true;
-    QTimer::singleShot(50, this, SLOT(updateCamerasFromSelection()));
-}
-
-void QnCameraSettingsDialog::at_camera_settings_saved(
-        int /*httpStatusCode*/, const QList<QPair<QString, bool> >& /*operationResult*/) {
-
-}
-

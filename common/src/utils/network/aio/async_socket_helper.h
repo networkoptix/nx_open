@@ -111,8 +111,7 @@ public:
         //TODO #ak what's the difference of this method from cancelAsyncIO( aio::etNone ) ?
 
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
-        std::atomic_thread_fence(std::memory_order_acquire);
-        if( m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId() )
+        if( this->m_socket->impl()->aioThread.load() == QThread::currentThread() )
         {
             HostAddressResolver::instance()->cancel( this, true );    //TODO #ak must not block here!
 
@@ -240,16 +239,21 @@ public:
 
         if (waitForRunningHandlerCompletion)
         {
-            std::promise<void> terminatedPromise;
-            std::future<void> teminatedFuture = terminatedPromise.get_future();
+            QMutex mtx;
+            QWaitCondition cond;
+            bool done = false;
             aio::AIOService::instance()->dispatch(
                 this->m_socket,
-                [this, &terminatedPromise, eventType]() {
+                [this, &mtx, &cond, &done, eventType]() {
                     stopPollingSocket(this->m_socket, eventType);
-                    terminatedPromise.set_value();
+                    QMutexLocker lk(&mtx);
+                    done = true;
+                    cond.wakeAll();
                 });
 
-            teminatedFuture.wait();
+            QMutexLocker lk(&mtx);
+            while(!done)
+                cond.wait(lk.mutex());
         }
         else
         {

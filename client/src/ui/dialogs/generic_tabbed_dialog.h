@@ -27,7 +27,6 @@ protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
     void setPageEnabled(int key, bool enabled);
 
-    bool tryAccept();
     virtual void loadData();
     virtual void submitData();
 
@@ -36,6 +35,8 @@ protected:
 
     virtual bool hasChanges() const;
 
+    virtual QString confirmMessageTitle() const;
+    virtual QString confirmMessageText() const;
 private:
     void initializeTabWidget();
 

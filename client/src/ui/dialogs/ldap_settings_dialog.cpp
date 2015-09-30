@@ -221,6 +221,8 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 
     d->updateFromSettings();
     updateTestButton();
+
+    setHelpTopic(this, Qn::UserSettings_LdapIntegration_Help);
 }
 
 QnLdapSettingsDialog::~QnLdapSettingsDialog() {}

@@ -5,14 +5,23 @@
 ## This command will run each time after networkoptix-embedded-tools is installed
 
 export CUSTOMIZATION=${deb.customization.company.name}
-export BOOTPART=/dev/mmcblk0p2
+export DATAPART=/dev/mmcblk0p2
+export MNTDATAPART=/mnt/data
+export BOOTPART=/dev/mmcblk0p1
 export MNTBOOTPART=/mnt/boot
+
+mkdir -p $MNTDATAPART
+mount -t ext4 $DATAPART $MNTDATAPART
+rm -Rf $MNTDATAPART/opt/$CUSTOMIZATION
+tar xfv /tmp/$DISTRIB.tar.gz -C $MNTDATAPART
+mkdir -p $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
+cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite $MNTDATAPART/opt/$CUSTOMIZATION/mediaserver/var
+umount $DATAPART
+
 mkdir -p $MNTBOOTPART
-mount -t ext4 $BOOTPART $MNTBOOTPART
-rm -Rf $MNTBOOTPART/opt/$CUSTOMIZATION
-tar xfv /tmp/$DISTRIB.tar.gz -C $MNTBOOTPART
-mkdir -p $MNTBOOTPART/opt/$CUSTOMIZATION/mediaserver/var
-cp -f /opt/$CUSTOMIZATION/mediaserver/var/ecs_static.sqlite $MNTBOOTPART/opt/$CUSTOMIZATION/mediaserver/var
+mount -t vfat $BOOTPART $MNTBOOTPART
+cp -f /root/tools/uboot/*.txt $MNTBOOTPART
 umount $BOOTPART
+rm -Rf $MNTBOOTPART
 
 exit 0

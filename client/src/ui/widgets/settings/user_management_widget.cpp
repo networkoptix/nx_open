@@ -4,18 +4,20 @@
 #include <QtCore/QSortFilterProxyModel>
 
 #include <api/global_settings.h>
-#include <api/app_server_connection.h>
 
 #include <common/common_module.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 
 #include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/models/user_list_model.h>
 #include <ui/style/globals.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
@@ -71,11 +73,17 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     m_sortModel->setFilterKeyColumn(-1);
     connect(ui->filterLineEdit,  &QLineEdit::textChanged, this, [this](const QString &text) {
         m_sortModel->setFilterWildcard(text);
-        updateSelection();
     });
 
-    connect(m_sortModel, &QAbstractItemModel::rowsInserted, this, &QnUserManagementWidget::updateSelection);
-    connect(m_sortModel, &QAbstractItemModel::rowsRemoved, this, &QnUserManagementWidget::updateSelection);
+    connect(m_sortModel, &QAbstractItemModel::rowsInserted, this,   &QnUserManagementWidget::updateSelection);
+    connect(m_sortModel, &QAbstractItemModel::rowsRemoved,  this,   &QnUserManagementWidget::updateSelection);
+    connect(m_sortModel, &QAbstractItemModel::dataChanged,  this,   &QnUserManagementWidget::updateSelection);
+
+    setHelpTopic(this,                                                  Qn::SystemSettings_UserManagement_Help);
+    setHelpTopic(ui->enableSelectedButton, ui->disableSelectedButton,   Qn::UserSettings_DisableUser_Help);
+    setHelpTopic(ui->ldapSettingsButton,                                Qn::UserSettings_LdapIntegration_Help);
+    setHelpTopic(ui->fetchButton,                                       Qn::UserSettings_LdapFetch_Help);
+
 }
 
 QnUserManagementWidget::~QnUserManagementWidget() {
@@ -202,13 +210,11 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
     }
     else if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */ {
         m_usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, user);
-        updateSelection(); //TODO: #GDM it should be automatically updated by signals from model
     }
 }
 
 void QnUserManagementWidget::clearSelection() {
     m_usersModel->setCheckState(Qt::Unchecked);
-    updateSelection(); //TODO: #GDM it should be automatically updated by signals from model
 }
 
 void QnUserManagementWidget::setSelectedEnabled(bool enabled) {
@@ -217,10 +223,11 @@ void QnUserManagementWidget::setSelectedEnabled(bool enabled) {
             continue;
         if (!accessController()->hasPermissions(user, Qn::WritePermission))
             continue;
-        user->setEnabled(enabled);
-        QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, []{} );
+        
+        qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user) {
+            user->setEnabled(enabled);
+        });
     }
-    updateSelection();
 }
 
 void QnUserManagementWidget::enableSelected() {
@@ -245,7 +252,6 @@ void QnUserManagementWidget::deleteSelected() {
         return;
 
     menu()->trigger(Qn::RemoveFromServerAction, usersToDelete);
-    updateSelection();
 }
 
 

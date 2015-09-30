@@ -4,8 +4,8 @@
 #include <functional>
 
 #include <base/types.h>
-#include <base/server_info.h>
-#include <models/servers_selection_model.h>
+#include <base/selection.h>
+#include <helpers/model_change_helper.h>
 
 namespace
 {
@@ -24,6 +24,8 @@ namespace
         , kLastCustomRoleId
     };
     
+    enum { kSingleSelection = 1 };
+
     const rtu::Roles kRoles = []() -> rtu::Roles
     {
         rtu::Roles result;
@@ -37,64 +39,22 @@ namespace
         result.insert(kReadableNameRoleId, "readableName");
         return result;
     }();
-    
-    typedef std::function<void (int first, int last)> IndexedDataActionFunc;
-    typedef std::function<void ()> DataActionFunc;
-    
-    enum { kSingleSelection = 1 };
-    rtu::InterfaceInfoList extractFromSelectionModel(rtu::ServersSelectionModel *model)
-    {
-        const rtu::ServerInfoPtrContainer &servers = model->selectedServers();
-        
-        if (servers.empty())
-            return rtu::InterfaceInfoList();
-        
-        const rtu::ServerInfo &firstServerInfo = **servers.begin();
-        if (!firstServerInfo.hasExtraInfo())
-            return rtu::InterfaceInfoList();
-        
-        if (servers.size() == kSingleSelection)
-            return (firstServerInfo.extraInfo().interfaces);
-    
-        const rtu::InterfaceInfoList &interfaces = firstServerInfo.extraInfo().interfaces;
-        if (interfaces.empty())
-            return rtu::InterfaceInfoList();
-        
-        const Qt::CheckState initialUseDHCP = interfaces.begin()->useDHCP;
-        
-        const bool diffUseDHCP = (servers.end() == std::find_if(servers.begin(), servers.end()
-            , [initialUseDHCP](const rtu::ServerInfo *info)
-        {
-            const rtu::InterfaceInfoList &addresses = info->extraInfo().interfaces;
-            return (addresses.end() == std::find_if(addresses.begin(), addresses.end()
-                , [initialUseDHCP](const rtu::InterfaceInfo &addr)
-                { return (addr.useDHCP != initialUseDHCP); }));
-        }));
-    
-        const Qt::CheckState useDHCP = (diffUseDHCP ? Qt::PartiallyChecked : initialUseDHCP);
-        rtu::InterfaceInfoList addresses;
-        addresses.push_back(rtu::InterfaceInfo(useDHCP));
-        return addresses;
-    }
 }
 
 ///
 
-class rtu::IpSettingsModel::Impl : public QObject
+class rtu::IpSettingsModel::Impl
 {
 public:
-    Impl(ServersSelectionModel *selectionModel
-        , QObject *parent
-        , const IndexedDataActionFunc &dataChanged
-        , const IndexedDataActionFunc &beginInsertRow
-        , const DataActionFunc &endInsertRow
-        , const DataActionFunc &beginResetModel
-        , const DataActionFunc &endResetModel);
+    Impl(bool singleSelection
+        , const InterfaceInfoList &interfaces);
     
     virtual ~Impl();
     
     bool isSingleSelection() const;
     
+    const InterfaceInfoList &interfaces() const;
+
     int rowCount() const;
     
     QVariant data(const QModelIndex &index
@@ -102,33 +62,14 @@ public:
     
 private:
     const bool m_isSingleSelection;
-    const rtu::InterfaceInfoList m_addresses;
-    
-    const IndexedDataActionFunc m_dataChanged;
-    const IndexedDataActionFunc m_beginInsertRow;
-    const DataActionFunc m_endInsertRow;
-    const DataActionFunc m_beginResetModel;
-    const DataActionFunc m_endResetModel;
+    const InterfaceInfoList m_addresses;
 };
 
 
-rtu::IpSettingsModel::Impl::Impl(ServersSelectionModel *selectionModel
-    , QObject *parent
-    , const IndexedDataActionFunc &dataChanged
-    , const IndexedDataActionFunc &beginInsertRow
-    , const DataActionFunc &endInsertRow
-    , const DataActionFunc &beginResetModel
-    , const DataActionFunc &endResetModel)
-
-    : QObject(parent)
-    , m_isSingleSelection(selectionModel->selectedCount() <= kSingleSelection)
-    , m_addresses(extractFromSelectionModel(selectionModel))
-    
-    , m_dataChanged(dataChanged)
-    , m_beginInsertRow(beginInsertRow)
-    , m_endInsertRow(endInsertRow)
-    , m_beginResetModel(beginResetModel)
-    , m_endResetModel(endResetModel)    
+rtu::IpSettingsModel::Impl::Impl(bool singleSelection
+    , const InterfaceInfoList &interfaces)
+    : m_isSingleSelection(singleSelection)
+    , m_addresses(interfaces)
 {
 }
 
@@ -137,6 +78,11 @@ rtu::IpSettingsModel::Impl::~Impl() {}
 bool rtu::IpSettingsModel::Impl::isSingleSelection() const
 {
     return m_isSingleSelection;
+}
+
+const rtu::InterfaceInfoList &rtu::IpSettingsModel::Impl::interfaces() const
+{
+    return m_addresses;
 }
 
 int rtu::IpSettingsModel::Impl::rowCount() const
@@ -178,16 +124,12 @@ QVariant rtu::IpSettingsModel::Impl::data(const QModelIndex &index
 
 ///
 
-rtu::IpSettingsModel::IpSettingsModel(ServersSelectionModel *selectionModel
+rtu::IpSettingsModel::IpSettingsModel(int count
+    , const InterfaceInfoList &interfaces
     , QObject *parent)
     : QAbstractListModel(parent)
-    , m_impl(new Impl(selectionModel, this
-        , [this](int first, int last){ emit dataChanged(index(first), index(last)); }
-        , [this](int first, int last){ emit beginInsertRows(QModelIndex(), first, last); }
-        , [this](){ emit endInsertRows(); }
-        , [this](){ emit beginResetModel();}
-        , [this](){ emit endResetModel();}
-        ))
+    , m_helper(CREATE_MODEL_CHANGE_HELPER(this))
+    , m_impl(new Impl(count <= kSingleSelection, interfaces))
 {
 }
 
@@ -198,6 +140,22 @@ rtu::IpSettingsModel::~IpSettingsModel()
 bool rtu::IpSettingsModel::isSingleSelection() const
 {
     return m_impl->isSingleSelection();
+}
+
+const rtu::InterfaceInfoList &rtu::IpSettingsModel::interfaces() const
+{
+    return m_impl->interfaces();
+}
+
+void rtu::IpSettingsModel::resetTo(IpSettingsModel *source)
+{
+    if (!source)
+        return;
+
+    const auto resetGuard = m_helper->resetModelGuard();
+    Q_UNUSED(resetGuard);
+
+    m_impl.reset(new Impl(source->isSingleSelection(), source->interfaces()));
 }
 
 int rtu::IpSettingsModel::rowCount(const QModelIndex &parent) const

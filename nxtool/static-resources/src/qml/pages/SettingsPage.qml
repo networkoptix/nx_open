@@ -1,4 +1,4 @@
-import QtQuick 2.1;
+import QtQuick 2.4;
 import QtQuick.Controls 1.1;
 
 import "../common" as Common
@@ -18,7 +18,8 @@ FocusScope
         || ipPortSettings.changed || dateTimeSettings.changed;
 
     anchors.fill: parent;
-   
+    activeFocusOnTab: false;
+
     Dialogs.MessageDialog
     {
         id: warningDialog;
@@ -26,6 +27,8 @@ FocusScope
         title: "Warning";
         buttons: (NxRtu.Buttons.Cancel | NxRtu.Buttons.Ok);
         styledButtons: NxRtu.Buttons.Ok;
+        cancelButton: NxRtu.Buttons.Cancel;
+        
         dontShowText: "Do not show warnings";
 
         function showWarnings(warnings, onFinishedCallback, onCanceledCallback)
@@ -122,14 +125,30 @@ FocusScope
         }
     }
     
+    Connections
+    {
+        target: rtuContext.selection;
+
+        function processChanges(item)
+        {
+            var updateFunc = function() { item.recreate(); }
+
+            if (item.warned && !item.changed)
+                updateFunc();
+            else
+                outdatedWarning.addOnUpdateAction(updateFunc);
+        }
+
+        onInterfaceSettingsChanged: { processChanges(ipPortSettings); }
+        onDateTimeSettingsChanged: { processChanges(dateTimeSettings); }
+        onSystemSettingsChanged: { processChanges(systemAndPasswordSettings); }
+    }
+
     Rtu.OutdatedWarningPanel
     {
         id: outdatedWarning;
 
-        show: rtuContext.selectionModel().selectionOutdated;
         width: parent.width;
-
-        onUpdateClicked: { rtuContext.selectionModel().selectionChanged(); }
     }
 
     ScrollView
@@ -142,6 +161,7 @@ FocusScope
         }
         
         clip: true;
+        activeFocusOnTab: false;
 
         Flickable
         {
@@ -244,13 +264,19 @@ FocusScope
             Base.Button
             {
                 text: "Cancel";
-    
+
                 anchors.verticalCenter: parent.verticalCenter;
                 height: Common.SizeManager.clickableSizes.medium;
                 width: height * 3;
                 
+                Keys.onTabPressed: {}
+
                 enabled: applyButton.enabled;
-                onClicked: rtuContext.selectionChanged();
+                onClicked:
+                {
+                    rtuContext.selectionChanged();
+                    rtuContext.changesManager().clearChanges();
+                }
             }
         }
     }

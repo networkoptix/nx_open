@@ -8,6 +8,15 @@
 #include <utils/common/model_functions_fwd.h>
 #include <utils/common/uuid.h>
 
+struct QnEventMetaData
+{
+    //! Cameras list which associated with event. EventResourceId may be POS terminal, but this is a camera list which should be shown with this event
+    std::vector<QnUuid> cameraRefs;
+};
+#define QnEventMetaData_Fields (cameraRefs)
+QN_FUSION_DECLARE_FUNCTIONS(QnEventMetaData, (ubjson)(json)(eq)(xml)(csv_record));
+
+
 struct QnBusinessEventParameters {
 
     QnBusinessEventParameters();
@@ -21,8 +30,8 @@ struct QnBusinessEventParameters {
     QnUuid eventResourceId;
     
     /* Resource name with cause a event. 
-    /* resourceName is used if no resource actually registered in our system.
-    /* External custom event can provide some resource name with doesn't match resourceId in our system. At this case resourceName is filled and resourceId stay empty
+    *  resourceName is used if no resource actually registered in our system.
+    *  External custom event can provide some resource name with doesn't match resourceId in our system. At this case resourceName is filled and resourceId stay empty
     */
     QString resourceName;
 
@@ -44,13 +53,15 @@ struct QnBusinessEventParameters {
     //! long event description. Used for camera/server conflict as long description (conflict list). Used in ReasonedEvents as reason description. Used in custom events as long description
     QString description;
 
+    //! Cameras list which associated with event. EventResourceId may be POS terminal, but this is a camera list which should be shown with this event
+    QnEventMetaData metadata;
 
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
 };
 
 #define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId)\
-    (reasonCode)(inputPortId)(caption)(description)
+    (reasonCode)(inputPortId)(caption)(description)(metadata)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 

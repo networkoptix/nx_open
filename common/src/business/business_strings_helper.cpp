@@ -65,7 +65,7 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     using namespace QnBusiness;
 
     if (value >= UserDefinedEvent) {
-        QString result = tr("User Defined");
+        QString result = tr("Generic Event");
         if (value > UserDefinedEvent)
             result += tr(" (%1)").arg((int)value - (int)UserDefinedEvent); // reserved for future use
         return result;
@@ -160,17 +160,18 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     QString result;
     result += tr("Event: %1").arg(eventName(eventType));
 
-    result += delimiter;
-    result += tr("Source: %1").arg(getFullResourceName(eventSource(params), useIp));
+    QString sourceText = getFullResourceName(eventSource(params), useIp);
+    if (sourceText.isNull())
+        sourceText = params.resourceName;
+    if (!sourceText.isEmpty()) {
+        result += delimiter;
+        result += tr("Source: %1").arg(sourceText);
+    }
 
     if (eventType == QnBusiness::UserDefinedEvent) {
         if (!params.caption.isEmpty()) {
             result += delimiter;
             result += tr("Caption: %1").arg(params.caption);
-        }
-        if (!params.description.isEmpty()) {
-            result += delimiter;
-            result += tr("Description: %1").arg(params.description);
         }
     }
 
@@ -261,7 +262,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case ServerStartEvent: 
         break;
     case UserDefinedEvent:
-        result += params.description.isEmpty() ? params.caption : params.description;
+        result += !params.description.isEmpty() ? params.description : params.caption;
         break;
     default:
         break;
@@ -503,7 +504,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(
     return result;
 }
 
-QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool /*isPublic*/) {
+QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
     QnUuid id = params.eventResourceId;
     if (id.isNull())
         return QString();
@@ -516,19 +517,28 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!mserverRes)
         return QString();
     
-    quint64 timeStampMs = params.eventTimestampUsec / 1000;
+    quint64 timeStampUSec = params.eventTimestampUsec;
+	quint64 timeStampMs = params.eventTimestampUsec / 1000;
     QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(camera, timeStampMs);
     if (newServer)
         mserverRes = newServer;
 
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    if (resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
-        QUrl mserverUrl = mserverRes->getUrl();
-        appServerUrl.setHost(mserverUrl.host());
+    if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
+        appServerUrl = mserverRes->getApiUrl();
+        if (isPublic) {
+            QString publicIP = mserverRes->getProperty(Qn::PUBLIC_IP);
+            if (!publicIP.isEmpty()) {
+                QStringList parts = publicIP.split(L':');
+                appServerUrl.setHost(parts[0]);
+                if (parts.size() > 1)
+                    appServerUrl.setPort(parts[1].toInt());
+            }
+        }
     }
 
-    QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getPhysicalId()).arg(timeStampMs);
+    QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
+    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
 
     return result;
 }
@@ -540,7 +550,7 @@ QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState stat
     case QnBusiness::InactiveState:
         return tr("stop");
     case QnBusiness::UndefinedState:
-        return tr("undefined");
+        return QString();
     default:
         break;
     }

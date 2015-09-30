@@ -587,6 +587,7 @@ namespace ec2
         bool m_needResyncbRules;
         bool m_needResyncUsers;
         bool m_needResyncStorages;
+        bool m_needResyncClientInfoData;
         bool m_dbReadOnly;
     };
 };

@@ -195,13 +195,19 @@ namespace nx_hls
         const QString& path = request.requestLine.url.path();
         int fileNameStartIndex = path.lastIndexOf(QChar('/'));
         if( fileNameStartIndex == -1 )
+        {
+            NX_LOG(lit("HLS. Not found file name in path %1").arg(path), cl_logDEBUG1);
             return StatusCode::notFound;
+        }
         QStringRef fileName;
         if( fileNameStartIndex == path.size()-1 )   //path ends with /. E.g., /hls/camera1.m3u/. Skipping trailing /
         {
             int newFileNameStartIndex = path.midRef(0, path.size()-1).lastIndexOf(QChar('/'));
             if( newFileNameStartIndex == -1 )
+            {
+                NX_LOG(lit("HLS. Not found file name (2) in path %1").arg(path), cl_logDEBUG1);
                 return StatusCode::notFound;
+            }
             fileName = path.midRef( newFileNameStartIndex+1, fileNameStartIndex-(newFileNameStartIndex+1) );
         }
         else
@@ -306,6 +312,7 @@ namespace nx_hls
             }
         }
 
+        NX_LOG(lit("HLS. Unknown file type has been requested: \"%1\"").arg(extension.toString()), cl_logDEBUG1);
         return StatusCode::notFound;
     }
 
@@ -408,7 +415,7 @@ namespace nx_hls
                     : MEDIA_Quality_Low;
             }
 
-            if( !camResource->hasDualStreaming() )
+            if( !camResource->hasDualStreaming2() )
             {
                 if( streamQuality == MEDIA_Quality_Low )
                 {
@@ -456,15 +463,6 @@ namespace nx_hls
         nx_hls::VariantPlaylist playlist;
 
         QUrl baseUrl;
-        nx_http::HttpHeaders::const_iterator hostIter = request.headers.find( "Host" );
-        if( hostIter != request.headers.end() )
-        {
-            SocketAddress sockAddress( hostIter->second );
-            baseUrl.setHost( sockAddress.address.toString() );
-            if( sockAddress.port > 0 )
-                baseUrl.setPort( sockAddress.port );
-            baseUrl.setScheme( QLatin1String("http") );
-        }
 
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
@@ -596,15 +594,6 @@ namespace nx_hls
         }
 
         QUrl baseChunkUrl;
-        nx_http::HttpHeaders::const_iterator hostIter = request.headers.find( "Host" );
-        if( hostIter != request.headers.end() )
-        {
-            SocketAddress sockAddress( hostIter->second );
-            baseChunkUrl.setHost( sockAddress.address.toString() );
-            if( sockAddress.port > 0 )
-                baseChunkUrl.setPort( sockAddress.port );
-            baseChunkUrl.setScheme( QLatin1String("http") );
-        }
         baseChunkUrl.setPath( HLS_PREFIX + camResource->getUniqueId() );
 
         //if needed, adding proxy information to playlist url
@@ -847,8 +836,11 @@ namespace nx_hls
         requiredQualities.reserve( 2 );
         if( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Auto )
             requiredQualities.push_back( MEDIA_Quality_High );
-        if( streamQuality == MEDIA_Quality_Low || streamQuality == MEDIA_Quality_Auto )
+        if( (streamQuality == MEDIA_Quality_Low) || 
+            (streamQuality == MEDIA_Quality_Auto && camResource->hasDualStreaming2()) )
+        {
             requiredQualities.push_back( MEDIA_Quality_Low );
+        }
 
         boost::optional<quint64> startTimestamp;
         std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME);

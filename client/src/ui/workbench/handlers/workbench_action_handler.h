@@ -42,7 +42,6 @@ class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
-class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
 class QnCameraAdditionDialog;
 class QnPopupCollectionWidget;
@@ -50,60 +49,6 @@ class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 class QnSystemAdministrationDialog;
 class QnGraphicsMessageBox;
-
-// TODO: #Elric get rid of these processors here
-namespace detail {
-    class QnResourceStatusReplyProcessor: public QObject {
-        Q_OBJECT
-    public:
-        std::atomic<int> awaitedResponseCount;
-
-        QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources);
-
-    public slots:
-        void at_replyReceived(int handle, ec2::ErrorCode errorCode, const QnResourceList& resources);
-
-    private:
-        QPointer<QnWorkbenchActionHandler> m_handler;
-        QnVirtualCameraResourceList m_resources;
-    };
-
-    class QnResourceReplyProcessor: public QObject {
-        Q_OBJECT
-    public:
-        QnResourceReplyProcessor(QObject *parent = NULL);
-
-        int status() const {
-            return m_status;
-        }
-
-        const QByteArray &errorString() const {
-            return m_errorString;
-        }
-
-        const QnResourceList &resources() const {
-            return m_resources;
-        }
-
-        int handle() const {
-            return m_handle;
-        }
-
-    signals:
-        void finished(int status, const QnResourceList &resources, int handle);
-
-    public slots:
-        void at_replyReceived(int status, const QnResourceList &resources, int handle);
-
-    private:
-        int m_handle;
-        int m_status;
-        QByteArray m_errorString;
-        QnResourceList m_resources;
-    };
-
-} // namespace detail
-
 
 // TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
@@ -155,8 +100,6 @@ protected:
     void rotateItems(int degrees);
 
     void setResolutionMode(Qn::ResolutionMode resolutionMode);
-
-    QnCameraSettingsDialog *cameraSettingsDialog() const;
 
     QnBusinessRulesDialog *businessRulesDialog() const;
 
@@ -224,7 +167,7 @@ protected slots:
     void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
     void at_userSettingsAction_triggered();
-    void at_cameraSettingsAction_triggered();
+    
     void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
@@ -232,7 +175,6 @@ protected slots:
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
-    void at_serverSettingsAction_triggered();
     void at_serverLogsAction_triggered();
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
@@ -258,11 +200,6 @@ protected slots:
 
     void at_setAsBackgroundAction_triggered();
     void setCurrentLayoutBackground(const QString &filename);
-
-    void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources );
-    void at_resources_properties_saved( int handle, ec2::ErrorCode errorCode );
-    void at_resource_deleted( int handle, ec2::ErrorCode errorCode );
-    void at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources);
 
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
@@ -292,6 +229,7 @@ private:
     void notifyAboutUpdate();
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
+    void openFailoverPriorityDialog();
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
@@ -305,13 +243,10 @@ private:
 
     void closeApplication(bool force = false);
 private:
-    friend class detail::QnResourceStatusReplyProcessor;
-
     QPointer<QWidget> m_widget;
     QPointer<QMenu> m_mainMenu;
     QPointer<QMenu> m_currentUserLayoutsMenu;
 
-    QPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
 	QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
@@ -337,9 +272,9 @@ private:
     struct CameraMovingInfo 
     {
         CameraMovingInfo() {}
-        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
+        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnMediaServerResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
         QnVirtualCameraResourceList cameras;
-        QnResourcePtr dstServer;
+        QnMediaServerResourcePtr dstServer;
     };
     QMap<int, CameraMovingInfo> m_awaitingMoveCameras;
 };

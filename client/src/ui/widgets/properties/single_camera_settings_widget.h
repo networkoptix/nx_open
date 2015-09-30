@@ -84,7 +84,6 @@ public:
 
 signals:
     void hasChangesChanged();
-    void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
     virtual void showEvent(QShowEvent *event) override;

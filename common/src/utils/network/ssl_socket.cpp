@@ -165,6 +165,10 @@ static BIO_METHOD Proxy_server_socket =
 
 namespace {
 
+
+class OpenSSLGlobalLockManager;
+static std::unique_ptr<OpenSSLGlobalLockManager> openSSLGlobalLockManagerInstance;
+
 // SSL global lock. This is a must even if the compilation has configured with THREAD for OpenSSL.
 // Based on the documentation of OpenSSL, it internally uses lots of global data structure. Apart
 // from this, I have suffered the wired access violation when not give OpenSSL lock callback. The
@@ -172,59 +176,58 @@ namespace {
 // must since OpenSSL configured with thread support will give default version. Additionally, the
 // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
-    void OpenSSLGlobalLock( int mode , int type , const char* file , int line );
-    typedef void (*OpensslLockCallbackFuncType)( int , int , const char* , int );
+class OpenSSLGlobalLockManager
+{
+public:
+    typedef void(*OpenSSLLockingCallbackType)(int mode, int type, const char *file, int line);
 
-    class OpenSSLGlobalLockContext
-    {
-    public:
-        std::unique_ptr<std::mutex[]> locks;
+    std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
 
-        OpenSSLGlobalLockContext()
-        :
-            m_opensslLockCallbackBak(nullptr)
-        {
-            m_opensslLockCallbackBak = CRYPTO_get_locking_callback();
-            // not safe here, new can throw exception 
-            locks.reset( new std::mutex[CRYPTO_num_locks()] );
-            CRYPTO_set_locking_callback( OpenSSLGlobalLock );
-        }
-
-        ~OpenSSLGlobalLockContext()
-        {
-            CRYPTO_set_locking_callback( m_opensslLockCallbackBak );
-            m_opensslLockCallbackBak = nullptr;
-        }
-
-    private:
-        OpensslLockCallbackFuncType m_opensslLockCallbackBak;
-    };
-
-    static std::unique_ptr<OpenSSLGlobalLockContext> kOpenSSLGlobalLock;
-
-    void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
-        Q_UNUSED(file);
-        Q_UNUSED(line);
-        Q_ASSERT( kOpenSSLGlobalLock.get() != nullptr );
-        if( mode & CRYPTO_LOCK ) {
-            kOpenSSLGlobalLock->locks.get()[type].lock();
-        } else {
-            kOpenSSLGlobalLock->locks.get()[type].unlock();
-        }
-    }
-
-    void OpenSSLInitGlobalLockInternal()
+    OpenSSLGlobalLockManager()
+    :
+        m_initialLockingCallback(CRYPTO_get_locking_callback())
     {
         Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
         // not safe here, new can throw exception 
-        kOpenSSLGlobalLock.reset( new OpenSSLGlobalLockContext() );
+        kOpenSSLGlobalLock.reset(new std::mutex[CRYPTO_num_locks()]);
+        CRYPTO_set_locking_callback(&OpenSSLGlobalLockManager::openSSLGlobalLock);
     }
-}
+
+    ~OpenSSLGlobalLockManager()
+    {
+        CRYPTO_set_locking_callback(m_initialLockingCallback);
+        m_initialLockingCallback = nullptr;
+    }
+
+    static void openSSLGlobalLock(int mode, int type, const char* file, int line)
+    {
+        Q_UNUSED(file);
+        Q_UNUSED(line);
+        Q_ASSERT(openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get() != nullptr);
+        if (mode & CRYPTO_LOCK)
+        {
+            openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].lock();
+        }
+        else
+        {
+            openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].unlock();
+        }
+    }
+
+private:
+    OpenSSLLockingCallbackType m_initialLockingCallback;
+};
+
 
 static std::once_flag kOpenSSLGlobalLockFlag;
 
-void InitOpenSSLGlobalLock() {
-    std::call_once(kOpenSSLGlobalLockFlag, OpenSSLInitGlobalLockInternal);
+void initOpenSSLGlobalLock()
+{
+    std::call_once(
+        kOpenSSLGlobalLockFlag,
+        []() { openSSLGlobalLockManagerInstance.reset(new OpenSSLGlobalLockManager()); });
+}
+
 }
 
 SystemError::ErrorCode kSSLInternalError = 100;
@@ -1134,7 +1137,7 @@ QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide)
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     init();
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
     d->async_ssl_ptr.reset( new AsyncSSL(d->ssl.get(),d->wrappedSocket,isServerSide) );
 }
 
@@ -1146,7 +1149,7 @@ QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrapped
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     init();
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
 }
 
 void QnSSLSocket::init()
@@ -1719,7 +1722,7 @@ TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect)
     TCPServerSocket(),
     m_allowNonSecureConnect(allowNonSecureConnect)
 {
-    InitOpenSSLGlobalLock();
+    initOpenSSLGlobalLock();
 }
 
 AbstractStreamSocket* TCPSslServerSocket::accept()

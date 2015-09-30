@@ -6,6 +6,8 @@
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnWorkbenchStateDelegate;
+class QnServerSettingsWidget;
+class QnRecordingStatisticsWidget;
 
 namespace Ui {
     class ServerSettingsDialog;
@@ -24,32 +26,25 @@ public:
         PageCount
     };
 
-    typedef std::function<void()> AcceptCallback;
-    
-    /// @brief Prevents wrong using of dialog
-    static void showNonModal(const QnMediaServerResourcePtr &server
-        , const AcceptCallback &callback
-        , QWidget *parent = nullptr);
-
-    bool tryClose(bool force);
-
-private:
-    QnServerSettingsDialog(const QnMediaServerResourcePtr &server
-        , const AcceptCallback &callback
-        , QWidget *parent);
-
+    QnServerSettingsDialog(QWidget *parent = NULL);
     virtual ~QnServerSettingsDialog();
+   
+    QnMediaServerResourcePtr server() const;
+    void setServer(const QnMediaServerResourcePtr &server);
 
-    void submitData() override;
+protected:
+    virtual void loadData() override;
 
-    void accept() override;
-
+    virtual QString confirmMessageTitle() const override;
+    virtual QString confirmMessageText() const override;
 private:
     Q_DISABLE_COPY(QnServerSettingsDialog)
 
     QScopedPointer<Ui::ServerSettingsDialog> ui;
-    const AcceptCallback m_onAcceptClickedCallback;
     QnMediaServerResourcePtr m_server;
 
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
+    QnServerSettingsWidget* m_generalPage;
+    QnRecordingStatisticsWidget* m_statisticsPage;
+    QPushButton* m_webPageButton;
 };

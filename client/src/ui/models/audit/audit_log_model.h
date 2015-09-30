@@ -108,6 +108,7 @@ private:
     static QnVirtualCameraResourceList getCameras(const std::vector<QnUuid>& resources);
     static QString searchData(const Column& column, const QnAuditRecord* data);
     QString descriptionTooltip(const QnAuditRecord *record) const;
+    bool isDetailDataSupported(const QnAuditRecord *record) const;
 protected:
     QScopedPointer<DataIndex> m_index;
     QList<Column> m_columns;

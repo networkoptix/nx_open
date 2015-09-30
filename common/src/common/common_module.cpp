@@ -39,6 +39,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     m_transcodingDisabled = false;
     m_systemIdentityTime = 0;
     m_lowPriorityAdminPassword = false;
+    m_localPeerType = Qn::PT_NotDefined;
 }
 
 QnCommonModule::~QnCommonModule() {
@@ -101,19 +102,33 @@ QString QnCommonModule::localSystemName() const
     return moduleInformation().systemName;
 }
 
+void QnCommonModule::setReadOnly(bool value) {
+    QnModuleInformation info = moduleInformation();
+    info.ecDbReadOnly = value;
+    setModuleInformation(info);
+}
+
+bool QnCommonModule::isReadOnly() const {
+    return moduleInformation().ecDbReadOnly;
+}
+
 void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation)
 {
     bool isSystemNameChanged = false;
+    bool isReadOnlyChanged = false;
     {
         QnMutexLocker lk( &m_mutex );
         if (m_moduleInformation == moduleInformation)
             return;
 
         isSystemNameChanged = m_moduleInformation.systemName != moduleInformation.systemName;
+        isReadOnlyChanged = m_moduleInformation.ecDbReadOnly != moduleInformation.ecDbReadOnly;
         m_moduleInformation = moduleInformation;
     }
     if (isSystemNameChanged)
         emit systemNameChanged(moduleInformation.systemName);
+    if (isReadOnlyChanged)
+        emit readOnlyChanged(moduleInformation.ecDbReadOnly);
     emit moduleInformationChanged();
 }
 
@@ -196,4 +211,14 @@ void QnCommonModule::updateRunningInstanceGuid()
 {
     QnMutexLocker lock(&m_mutex);
     m_runUuid = QnUuid::createUuid();
+}
+
+void QnCommonModule::setLocalPeerType(Qn::PeerType peerType)
+{
+    m_localPeerType = peerType;
+}
+
+Qn::PeerType QnCommonModule::localPeerType() const
+{
+    return m_localPeerType;
 }

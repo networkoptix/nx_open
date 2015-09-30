@@ -9,7 +9,6 @@
 #include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <crash_reporter.h>
 
 #include "http/auto_request_forwarder.h"
 #include "http/progressive_downloading_server.h"
@@ -29,6 +28,9 @@ struct QnModuleInformation;
 class QnModuleFinder;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
+namespace ec2 {
+    class CrashReporter;
+}
 
 class MediaServerProcess : public QnLongRunnable
 {
@@ -40,10 +42,12 @@ public:
 
     void stopObjects();
     void run();
+    int getTcpPort() const;
 
     /** Entry point */
     static int main(int argc, char* argv[]);
-
+signals:
+    void started();
 public slots:
     void stopAsync();
     void stopSync();

@@ -3,8 +3,8 @@
 angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
-        mediaserver.checkAdmin().then(function(isAdmin){
-            if(!isAdmin){
+        mediaserver.getUser().then(function(user){
+            if(!user.isAdmin){
                 $location.path('/info'); //no admin rights - redirect
                 return;
             }
@@ -26,7 +26,7 @@ angular.module('webadminApp')
         $scope.confirmPassword = '';
 
         $scope.openJoinDialog = function () {
-            var modalInstance = $modal.open({
+            $modal.open({
                 templateUrl: 'views/join.html',
                 controller: 'JoinCtrl',
                 resolve: {
@@ -34,36 +34,6 @@ angular.module('webadminApp')
                         return $scope.settings;
                     }
                 }
-            });
-
-            modalInstance.result.then(function (settings) {
-                $log.info(settings);
-                mediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
-                    if(r.data.error!=='0'){
-                        var errorToShow = r.data.errorString;
-                        switch(errorToShow){
-                            case 'FAIL':
-                                errorToShow = 'System is unreachable or doesn\'t exist.';
-                                break;
-                            case 'UNAUTHORIZED':
-                            case 'password':
-                            case 'PASSWORD':
-                                errorToShow = 'Wrong password.';
-                                break;
-                            case 'INCOMPATIBLE':
-                                errorToShow = 'Found system has incompatible version.';
-                                break;
-                            case 'url':
-                            case 'URL':
-                                errorToShow = 'Wrong url.';
-                                break;
-                        }
-                        alert('Merge failed: ' + errorToShow);
-                    }else {
-                        alert('Merge succeed.');
-                        window.location.reload();
-                    }
-                });
             });
         };
 
@@ -78,6 +48,8 @@ angular.module('webadminApp')
                 }
             });
         }
+
+
 
         function errorHandler(){
             alert ('Connection error');
@@ -132,10 +104,39 @@ angular.module('webadminApp')
                 mediaserver.changePassword($scope.password, $scope.oldPassword).then(resultHandler, errorHandler);
             }
         };
-
+// execute/scryptname&mode
         $scope.restart = function () {
             if(confirm('Do you want to restart server now?')){
                 restartServer(false);
+            }
+        };
+        $scope.canHardwareRestart = false;
+        $scope.canRestoreSettings = false;
+        $scope.canRestoreSettingsNotNetwork = false;
+
+        mediaserver.getScripts().then(function(data){
+            if(data.data && data.data.reply) {
+                $scope.canHardwareRestart = data.data.result.indexOf('reboot') >= 0;
+                $scope.canRestoreSettings = data.data.result.indexOf('restore') >= 0;
+                $scope.canRestoreSettingsNotNetwork = data.data.result.indexOf('restore_keep_ip') >= 0;
+            }
+        });
+
+        $scope.hardwareRestart = function(){
+            if(confirm('Do you want to restart server\'s operation system?')){
+                mediaserver.execute('reboot').then(resultHandler, errorHandler);
+            }
+        };
+
+        $scope.restoreSettings = function(){
+            if(confirm('Do you want to restart all server\'s settings? Archive will be saved, but network settings will be reset.')){
+                mediaserver.execute('restore').then(resultHandler, errorHandler);
+            }
+        };
+
+        $scope.restoreSettingsNotNetwork = function(){
+            if(confirm('Do you want to restart all server\'s settings? Archive and network settings will be saved.')){
+                mediaserver.execute('restore_keep_ip').then(resultHandler, errorHandler);
             }
         };
 

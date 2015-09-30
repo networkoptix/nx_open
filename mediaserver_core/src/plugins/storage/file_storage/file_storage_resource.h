@@ -47,7 +47,10 @@ public:
 
     virtual void setUrl(const QString& url) override;
 
-    QString getLocalPath() const {return m_localPath;}
+    QString getLocalPath() const
+    {
+        return m_localPath.isEmpty() ? getPath() : m_localPath;
+    }
 
 private:
     virtual QString getPath() const override;

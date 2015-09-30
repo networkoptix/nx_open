@@ -1,6 +1,5 @@
 'use strict';
 
-'use strict';
 /**
  * This is smart video-plugin.
  * 1. It gets list of possible video-sources in different formats (each requires mime-type)
@@ -129,25 +128,23 @@ angular.module('webadminApp')
                         case 'Microsoft Internet Explorer':
                             // Check version here
 
-
-                            /*if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
-                                return "flashls"; //TODO: support flashls for IE!
-                            }*/
-
+                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
+                                return "flashls";
+                            }
 
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
 
-                            /*if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
+                            if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
                                 scope.flashOrWebmRequired = true;
-                                return false; //TODO: support flashls for IE!
+                                return false;
                             }
 
                             if(weHaveHls) {
                                 scope.flashRequired = true;
-                                return false;//TODO: support flashls for IE!
-                            }*/
+                                return false;
+                            }
 
                             if(weHaveWebm && (window.jscd.osVersion < 10))
                             {
@@ -199,11 +196,21 @@ angular.module('webadminApp')
                 var activePlayer = null;
                 function recyclePlayer(player){
                     if(activePlayer != player) {
+                        if(scope.vgApi && scope.vgApi.destroy){
+                            scope.vgApi.destroy(); // try to destroy
+                        }
                         element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                     }
-                    activePlayer = player;
 
+                    if(activePlayer == 'flashls' && player == 'webm'){
+                        // This is hack! When switching from flashls to webm video - webm player stucks. Seems like chrome issue.
+                        activePlayer = player;
+                        return false;
+                    }
+
+                    activePlayer = player;
+                    return true;
                 }
 
                 // TODO: Create common interface for each player, html5 compatible or something
@@ -219,13 +226,13 @@ angular.module('webadminApp')
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
-
                             $timeout(function () {
                                 scope.loading = !!format;
                             });
+
                             scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
-                            scope.vgApi.addEventListener("timeupdate", function (event, arg2, arg3) {
+                            scope.vgApi.addEventListener("timeupdate", function (event) {
                                 var video = event.srcElement || event.originalTarget;
                                 scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 if (scope.loading) {
@@ -233,6 +240,11 @@ angular.module('webadminApp')
                                         scope.loading = false;
                                     });
                                 }
+                            });
+
+                            scope.vgApi.addEventListener("ended",function(event){
+                                scope.vgUpdateTime({$currentTime: null, $duration: null});
+
                             });
                         }
 
@@ -336,7 +348,6 @@ angular.module('webadminApp')
                         });
 
                         if (scope.vgSrc) {
-                            //console.log('play',scope.vgSrc[2].src);
                             scope.vgApi.play(scope.vgSrc[2].src);
                         }
 
@@ -347,13 +358,16 @@ angular.module('webadminApp')
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
                 var format = null;
 
-                scope.$watch("vgSrc",function(){
+                function srcChanged(){
                     scope.loading = false;
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         format = detectBestFormat();
 
-                        recyclePlayer(format);// Remove or recycle old player.
+                        if(!recyclePlayer(format)){ // Remove or recycle old player.
+                            // Some problem happened. We must reload video here
+                            $timeout(srcChanged);
+                        };
 
                         if(!format){
                             scope.native = false;
@@ -387,7 +401,9 @@ angular.module('webadminApp')
                     //if(scope.vgApi && scope.vgSrc ) {
                     //    scope.vgApi.load(scope.vgSrc[0].src);
                     //}
-                });
+                }
+
+                scope.$watch("vgSrc",srcChanged);
             }
         }
     }]);

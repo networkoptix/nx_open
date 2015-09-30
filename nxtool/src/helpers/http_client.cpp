@@ -46,14 +46,12 @@ namespace
 #else
 #define logReply(...)
 #endif
-
-    const qint64 defaultRequestTimeoutMs = 10 * 1000;
 }
 
 class rtu::HttpClient::Impl : public QObject
 {
 public:
-    Impl(QObject *parent);
+    Impl(int defaultTimeoutMs);
     
     virtual ~Impl();
     
@@ -85,12 +83,14 @@ private:
     };
     typedef QMap<QNetworkReply *, ReplyInfo> RepliesMap;
     
+    const int m_defaultTimeoutMs;
     QNetworkAccessManager * const m_manager;
     RepliesMap m_replies;
 };
 
-rtu::HttpClient::Impl::Impl(QObject *parent)
-    : QObject(parent)
+rtu::HttpClient::Impl::Impl(int defaultTimeoutMs)
+    : QObject()
+    , m_defaultTimeoutMs(defaultTimeoutMs)
     , m_manager(new QNetworkAccessManager(this))
     , m_replies()
 {
@@ -126,12 +126,13 @@ void rtu::HttpClient::Impl::sendPost(const QUrl &url
         , ReplyInfo(successfullCallback, errorCallback));
 }
 
-void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs) {
-    if (timeoutMs < kUseDefaultTimeout)
+void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs) 
+{
+    if ((timeoutMs < 0) && (timeoutMs != RestClient::kUseStandardTimeout))
         return;
 
-    if (timeoutMs == kUseDefaultTimeout)
-        timeoutMs = defaultRequestTimeoutMs;
+    if (timeoutMs == RestClient::kUseStandardTimeout)
+        timeoutMs = m_defaultTimeoutMs;
 
     QPointer<QNetworkReply> replyPtr(reply);
     QTimer::singleShot(timeoutMs, [replyPtr] {
@@ -152,12 +153,6 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
         return;
     }
     
-    enum
-    {
-        kHttpSuccessCodeFirst = 200
-        , kHttpSuccessCodeLast = 299
-    };
-    
     const QNetworkReply::NetworkError errorCode = reply->error();
     const int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     const bool isRequestError = (errorCode != QNetworkReply::NoError);
@@ -170,15 +165,29 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
         const ErrorCallback &errorCallback = it->error;
         if (errorCallback)
         {
-            const QVariant &httpErrorVar = 
-                reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute);
-            const QString &httpError = (httpErrorVar.isValid() ? 
-                httpErrorVar.toString() : QString());
+            switch(errorCode)
+            {
+            case QNetworkReply::AuthenticationRequiredError:
+                errorCallback(RequestError::kUnauthorized);
+                break;
+            case QNetworkReply::OperationCanceledError:
+            case QNetworkReply::TimeoutError:
+                errorCallback(RequestError::kRequestTimeout);
+                break;
+            case QNetworkReply::NoError:
+            {
+                if (!isHttpError)
+                    errorCallback(RequestError::kSuccess);
+                else if (httpCode == kHttpUnauthorized)
+                    errorCallback(RequestError::kUnauthorized);
+                else 
+                    errorCallback(RequestError::kUnspecified);
 
-            //TODO: #tr #ynikitenkov Strings must be generated in the UI class, not in the network one
-            const QString &errorReason = (!httpError.isEmpty()? httpError 
-                : QString("Network Error: %1").arg(errorCodeToString(errorCode)));
-            errorCallback(errorReason, httpCode);
+                break;
+            }
+            default:
+                errorCallback(RequestError::kUnspecified);
+            }
         }
     }
     else if (const ReplyCallback &successCallback = it->success)
@@ -190,9 +199,8 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
 
 ///
 
-rtu::HttpClient::HttpClient(QObject *parent)
-    : QObject(parent)
-    , m_impl(new Impl(this))
+rtu::HttpClient::HttpClient(int defaultTimeoutMs)
+    : m_impl(new Impl(defaultTimeoutMs))
 {
 }
 

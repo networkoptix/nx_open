@@ -683,11 +683,12 @@ int QnRtspConnectionProcessor::composeDescribe()
     sdp << "v=0" << ENDL;
     sdp << "s=" << d->mediaRes->toResource()->getName() << ENDL;
     sdp << "c=IN IP4 " << d->socket->getLocalAddress().address.toString() << ENDL;
+#if 0
     QUrl sessionControlUrl = d->request.requestLine.url;
     if( sessionControlUrl.port() == -1 )
         sessionControlUrl.setPort( MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() );
     sdp << "a=control:" << sessionControlUrl.toString() << ENDL;
-
+#endif
     int i = 0;
     for (; i < numVideo + numAudio; ++i)
     {
@@ -750,7 +751,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 
         //sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << 0 << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
-#if 0
+#if 1
         sdp << "a=control:trackID=" << i << ENDL;
 #else
         QUrl subSessionControlUrl = sessionControlUrl;

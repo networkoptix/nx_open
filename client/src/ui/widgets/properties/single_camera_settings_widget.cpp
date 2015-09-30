@@ -90,7 +90,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->recordingTab,                                          Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->motionTab,                                             Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
-    setHelpTopic(ui->ioSettingsTab,                                         Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
@@ -110,7 +109,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
     connect(ui->motionWebPageLabel,     SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
@@ -261,7 +259,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     if (hasDbChanges()) {
         QString name = ui->nameEdit->text().trimmed();
         if (!name.isEmpty())
-            m_camera->setCameraName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
+            m_camera->setName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 
         //m_camera->setUrl(ui->ipAddressEdit->text());
@@ -508,6 +506,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     setReadOnly(ui->cameraMotionButton, readOnly);
     if(m_motionWidget)
         setReadOnly(m_motionWidget, readOnly);
+    setReadOnly(ui->imageControlWidget, readOnly);
     setReadOnly(ui->advancedSettingsWidget, readOnly);
     setReadOnly(ui->ioPortSettingsWidget, readOnly);
     m_readOnly = readOnly;

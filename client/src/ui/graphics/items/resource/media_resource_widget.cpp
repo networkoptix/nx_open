@@ -22,8 +22,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/camera_user_attributes.h>
-#include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/preset_ptz_controller.h>
@@ -738,8 +737,9 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             updateCurrentTime(kInvalidTime);
         }
 
-        updateInfoTextLater();
+
     }
+	updateInfoTextLater();
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
@@ -953,6 +953,19 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
 // Handlers
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
+
+    auto isIoModule = [this]() {
+        if (!m_resource->toResource()->flags().testFlag(Qn::io_module))
+            return false;
+         
+        if (m_camera 
+            && m_display 
+            && !m_camera->hasVideo(m_display->mediaProvider()))
+                return true;
+
+        return (m_ioModuleOverlayWidget && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
+    };
+
     if (action(Qn::ToggleTourModeAction)->isChecked())
         return Qn::MainWindow_Scene_TourInProgress_Help;
 
@@ -964,6 +977,8 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
     } else if(statusOverlay == Qn::UnauthorizedOverlay) {
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
+    } else if (statusOverlay == Qn::IoModuleDisabledOverlay) {
+        return Qn::IOModules_Help;
     } else if(options() & ControlPtz) {
         if(m_dewarpingParams.enabled) {
             return Qn::MainWindow_MediaItem_Dewarping_Help;
@@ -977,11 +992,14 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::CameraSettings_Motion_Help;
     } else if(options() & DisplayMotion) {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
+    } else if (isIoModule()){
+        return Qn::IOModules_Help;
     } else if(m_resource->toResource()->flags() & Qn::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
     } else if (m_camera && m_camera->isDtsBased()) {
         return Qn::MainWindow_MediaItem_AnalogCamera_Help;
-    } else {
+    }
+    else {
         return Qn::MainWindow_MediaItem_Help;
     }
 }
@@ -1066,7 +1084,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         /* Do not show time for regular media files. */
         timeString = m_display->camDisplay()->isRealTimeSource() 
             ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(m_currentTime).toString(lit("hh:mm:ss.zzz"));
+            : QDateTime::fromMSecsSinceEpoch(m_currentTime).toString(lit("yyyy-MM-dd hh:mm:ss"));
+        
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
     {
@@ -1515,20 +1534,14 @@ void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
         return;
 
     if (m_camera->isLicenseUsed())
+        return;  
+
+    if (QnCamLicenseUsageHelper(m_camera, true).isOverflowForCamera(m_camera))
         return;
-
-    if (!QnCamLicenseUsageHelper(m_camera, true).isOverflowForCamera(m_camera)) {
-        m_camera->setLicenseUsed(true);
-
-        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << m_camera)),
-            this,
-            [this]( int reqID, ec2::ErrorCode errorCode ) {
-                Q_UNUSED(reqID);
-                if (errorCode != ec2::ErrorCode::ok)
-                    m_camera->setLicenseUsed(false);
-        } );
-    }
+        
+    qnResourcesChangesManager->saveCamera(m_camera, [](const QnVirtualCameraResourcePtr &camera){
+        camera->setLicenseUsed(true);
+    });
 
     updateIoModuleVisibility(true);
 }

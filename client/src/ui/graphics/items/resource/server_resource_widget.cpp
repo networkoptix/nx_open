@@ -437,7 +437,8 @@ protected:
             /* Draw text values on the right side */
             {
                 qreal opacity = painter->opacity();
-                painter->setOpacity(opacity * m_widget->m_infoOpacity);
+                qreal baseOpacity = m_widget->isLegendVisible() ? 1.0 : 0.0;
+                painter->setOpacity(opacity * baseOpacity);
 
                 qreal xRight = offsetX + ow + itemSpacing * 2;
                 foreach(QString key, m_widget->m_sortedKeys) {
@@ -474,7 +475,6 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered),
-    m_infoOpacity(0.0),
     m_hddCount(0),
     m_networkCount(0)
 {
@@ -515,12 +515,12 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     connect(checkIssuesButton, SIGNAL(clicked()), this, SLOT(at_checkIssuesButton_clicked()));
     buttonBar()->addButton(CheckIssuesButton, checkIssuesButton);
 
-    connect(headerOverlayWidget(), SIGNAL(opacityChanged()), this, SLOT(updateInfoOpacity()));
+//    connect(headerOverlayWidget(), SIGNAL(opacityChanged()), this, SLOT(updateInfoOpacity()));
 
     /* Run handlers. */
     updateButtonsVisibility();
     updateTitleText();
-    updateInfoOpacity();
+    //updateInfoOpacity();
     at_statistics_received();
 }
 
@@ -606,7 +606,7 @@ void QnServerResourceWidget::addOverlays() {
 
     for (int i = 0; i < ButtonBarCount; i++) {
         m_legendButtonBar[i] = new QnImageButtonBar(this, 0, Qt::Horizontal);
-        m_legendButtonBar[i]->setOpacity(m_infoOpacity);
+        m_legendButtonBar[i]->setOpacity(0.0);
 
         connect(m_legendButtonBar[i], SIGNAL(checkedButtonsChanged()), this, SLOT(updateGraphVisibility()));
 
@@ -699,11 +699,12 @@ void QnServerResourceWidget::updateGraphVisibility() {
     }
 }
 
+/*
 void QnServerResourceWidget::updateInfoOpacity() {
     m_infoOpacity = headerOverlayWidget()->opacity();
     for (int i = 0; i < ButtonBarCount; i++)
         m_legendButtonBar[i]->setOpacity(m_infoOpacity);
-}
+}*/
 
 void QnServerResourceWidget::updateColors() {
     QHash<Qn::StatisticsDeviceType, int> indexes;
@@ -753,6 +754,22 @@ void QnServerResourceWidget::tick(int deltaMSecs) {
         }
     }
 }
+
+bool QnServerResourceWidget::isLegendVisible() const {
+    bool detailsVisible = options().testFlag(DisplayInfo);
+    return detailsVisible || isHovered();
+}
+
+
+void QnServerResourceWidget::updateHud(bool animate /*= true*/) {
+    base_type::updateHud(animate);
+    bool visible = isLegendVisible();
+
+    for (int i = 0; i < ButtonBarCount; i++)
+        setOverlayWidgetVisible(m_legendButtonBar[i], visible, animate);
+        //m_legendButtonBar[i]->setOpacity(m_infoOpacity);
+}
+
 
 QString QnServerResourceWidget::calculateTitleText() const {
     QString name = getFullResourceName(m_resource, true);

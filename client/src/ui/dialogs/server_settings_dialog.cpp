@@ -8,94 +8,106 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/server_settings_widget.h>
 #include <ui/widgets/properties/recording_statistics_widget.h>
+
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <ui/dialogs/non_modal_dialog_constructor.h>
+#include <ui/workbench/watchers/workbench_selection_watcher.h>
 
-namespace
-{
-    typedef QHash<QnUuid, QnServerSettingsDialog *> DialogsContainer;
-
-    DialogsContainer g_currentShowingDialogs;
-}
-
-void QnServerSettingsDialog::showNonModal(const QnMediaServerResourcePtr &server
-    , const AcceptCallback &callback
-    , QWidget *parent)
-{
-    auto it = std::find_if(g_currentShowingDialogs.begin(), g_currentShowingDialogs.end()
-        , [server](QnServerSettingsDialog *dialog)
-    {
-        return (dialog->m_server->getId() == server->getId());
-    });
-
-    if (it == g_currentShowingDialogs.end())
-        it = g_currentShowingDialogs.insert(server->getId(), new QnServerSettingsDialog(server, callback, parent));
-
-    QnShowDialogHelper::showNonModalDialog(it.value());
-}
-
-QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server
-    , const AcceptCallback &callback
-    , QWidget *parent)
+QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
     , ui(new Ui::ServerSettingsDialog)
-    , m_onAcceptClickedCallback(callback)
-    , m_server(server)
+    , m_server()
     , m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
+    , m_generalPage(new QnServerSettingsWidget(this))
+    , m_statisticsPage(new QnRecordingStatisticsWidget(this))
+    , m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
 {
     ui->setupUi(this);
   
-    addPage(SettingsPage, new QnServerSettingsWidget(server, this), tr("General"));
-    addPage(StatisticsPage, new QnRecordingStatisticsWidget(server, this), tr("Storage Analytics"));
+    addPage(SettingsPage, m_generalPage, tr("General"));
+    addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
 
-    QPushButton* webPageButton = new QPushButton(this);
-    webPageButton->setText(tr("Open Web Page..."));
-    webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
 
-    connect(m_server, &QnResource::statusChanged, this, [this, webPageButton] {
-        webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
-    });
-
-    connect(webPageButton, &QPushButton::clicked, this, [this] {
-        menu()->trigger(Qn::WebClientAction);
+    connect(m_webPageButton, &QPushButton::clicked, this, [this] {
+        menu()->trigger(Qn::WebClientAction, m_server);
     });
 
 
-    ui->buttonBox->addButton(webPageButton, QDialogButtonBox::HelpRole);
-    setHelpTopic(webPageButton, Qn::ServerSettings_WebClient_Help);
+    ui->buttonBox->addButton(m_webPageButton, QDialogButtonBox::HelpRole);
+    setHelpTopic(m_webPageButton, Qn::ServerSettings_WebClient_Help);
+
+    auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources) {
+        if (isHidden())
+            return;
+
+        auto servers = resources.filtered<QnMediaServerResource>([](const QnMediaServerResourcePtr &server){
+            return server->getStatus() != Qn::Incompatible;
+        });
+
+        if (!servers.isEmpty())
+            setServer(servers.first());
+    });  
+}
+
+QnServerSettingsDialog::~QnServerSettingsDialog() 
+{}
+
+QnMediaServerResourcePtr QnServerSettingsDialog::server() const {
+    return m_server;
+}
+
+void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
+    if (m_server == server)
+        return;
+
+    if (!tryClose(false))
+        return;
+
+    m_generalPage->setServer(server);
+    m_statisticsPage->setServer(server);
+
+    if (m_server)
+        disconnect(m_server, nullptr, this, nullptr);
+
+    m_server = server;
+
+    m_webPageButton->setEnabled(server && server->getStatus() == Qn::Online);
+
+    if (m_server) {
+        connect(m_server, &QnResource::statusChanged, this, [this] {
+            m_webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
+        });
+    }
 
     loadData();
 }
 
-QnServerSettingsDialog::~QnServerSettingsDialog() 
-{
+void QnServerSettingsDialog::loadData() {
+    base_type::loadData();
+    
+    if (m_server) {
+        bool readOnly = !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
+        setWindowTitle(readOnly
+            ? tr("Server Settings - %1 (readonly)").arg(m_server->getName())
+            : tr("Server Settings - %1").arg(m_server->getName())
+            );
+
+    } else {
+        setWindowTitle(tr("Server Settings"));
+    }
+
 }
 
-bool QnServerSettingsDialog::tryClose(bool force)
-{
-    if (!base_type::tryClose(force))
-        return false;
-
-    g_currentShowingDialogs.remove(m_server->getId());
-    deleteLater();
-
-    return true;
+QString QnServerSettingsDialog::confirmMessageTitle() const {
+    return tr("Server not saved");
 }
 
-void QnServerSettingsDialog::submitData()
-{
-    base_type::submitData();
-    if (m_onAcceptClickedCallback)
-        m_onAcceptClickedCallback();
-}
-
-void QnServerSettingsDialog::accept()
-{
-    if (!base_type::tryAccept())
-        return;
-
-    g_currentShowingDialogs.remove(m_server->getId());
-    deleteLater();
+QString QnServerSettingsDialog::confirmMessageText() const {
+    Q_ASSERT_X(m_server, Q_FUNC_INFO, "Server must exist here");
+    return tr("Apply changes to the server %1?").arg(m_server
+        ? m_server->getName()
+        : QString());    
 }

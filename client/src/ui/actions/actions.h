@@ -183,6 +183,11 @@ namespace Qn {
         OpenBusinessRulesAction,
 
         /**
+         * Opens the Failover Priority dialog.
+         */
+        OpenFailoverPriorityAction,
+
+        /**
          * Opens videowall control layouts for all items in the provided QnVideoWallItemIndexList.
          */
         StartVideoWallControlAction,
@@ -575,11 +580,6 @@ namespace Qn {
          * Opens layout settings dialog.
          */
         LayoutSettingsAction,
-
-        /**
-         * Opens provided resources in an existing camera settings dialog.
-         */
-        OpenInCameraSettingsDialogAction,
 
         /**
          * Opens server settings dialog.

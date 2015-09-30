@@ -34,7 +34,8 @@ namespace Qn
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
-            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult)
+            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            FailoverPriority)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -344,7 +345,8 @@ public:
         SF_IfListCtrl   = 0x8,
         SF_timeCtrl     = 0x10,
         SF_AutoSystemName = 0x20,
-        SF_ArmServer      = 0x40
+        SF_ArmServer      = 0x40,
+        SF_Has_HDD      = 0x80,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -470,6 +472,7 @@ public:
         ItemFrameDistinctionColorRole,              /**< Role for item's frame distinction color. Value of type QColor. */
         ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
+        ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
@@ -542,8 +545,9 @@ public:
         
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-        RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
-        RecordingStatColorsDataRole,                /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
+        //RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
+        RecordingStatChartColorDataRole,            /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
+        //RecordingStatColorsDataRole,                /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
         
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */
@@ -615,11 +619,11 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 
     enum PeerType {
+        PT_NotDefined = -1,
         PT_Server = 0,
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
         PT_MobileClient = 3,
-
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -715,6 +719,17 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
 
+    enum FailoverPriority {
+        FP_Never,
+        FP_Low,
+        FP_Medium,
+        FP_High,
+
+        FP_Count
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
+    static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -765,7 +780,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
         (Qn::BookmarkSearchStrategy)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult),
+        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
+        (Qn::FailoverPriority)
+        ,
     (metatype)(lexical)
 )
 

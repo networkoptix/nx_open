@@ -101,15 +101,18 @@ void QnTransactionTcpProcessor::run()
             return;
         }
 
+        //we must pass socket to QnTransactionMessageBus atomically, but QSharedPointer has move operator only,
+        //  but not move initializer. So, have to declare localSocket
+        auto localSocket = std::move(d->socket);
+        d->socket.clear();
         QnTransactionMessageBus::instance()->gotIncomingTransactionsConnectionFromRemotePeer(
             connectionGuid,
-            d->socket,
+            std::move(localSocket),
             remotePeer,
             remoteSystemIdentityTime,
             d->request,
             d->clientRequest );
         sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
-        d->socket.clear();
         return;
     }
 

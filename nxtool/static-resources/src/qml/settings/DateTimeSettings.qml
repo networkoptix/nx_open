@@ -27,7 +27,7 @@ Expandable.MaskedSettingsPanel
 
     onMaskedAreaChanged:
     {
-        if (!warned)
+        if (!warned || !maskedArea)
             return;
 
         var flagged = maskedArea.flaggedItem;
@@ -119,7 +119,7 @@ Expandable.MaskedSettingsPanel
                             newTime = nowConverted;
                         }
 
-                        rtuContext.changesManager().addDateTimeChange(newDate, newTime, timeZoneId);
+                        rtuContext.changesManager().changeset().addDateTimeChange(newDate, newTime, timeZoneId);
                         return true;
                     }
 
@@ -167,7 +167,7 @@ Expandable.MaskedSettingsPanel
 
                         pseudoEnabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
 
-                        model: rtuContext.timeZonesModel(this);
+                        model: rtuContext.selection.timeZonesModel;
                         initIndex: timeZonePicker.model.initIndex;
     
                         onTimeZoneChanged:

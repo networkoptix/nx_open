@@ -3,38 +3,56 @@ import QtQuick.Window 2.0;
 
 import "../common" as Common;
 import "../controls/base" as Base;
-import "../controls/rtu" as Rtu;
+import "." as Dialogs;
 
-Window
+import networkoptix.rtu 1.0 as NxRtu;
+
+Dialogs.Dialog
 {
     id: thisComponent;
 
     signal loginClicked(string password);
     signal cancelClicked();
-    
-    flags: Qt.WindowTitleHint | Qt.MSWindowsFixedSizeDialogHint;
-    
-    title: qsTr("Login to server");
 
-    width: spacer.width + Common.SizeManager.spacing.medium;
-    height: spacer.height + Common.SizeManager.spacing.medium;
-    
-    onVisibleChanged:
+    buttons: NxRtu.Buttons.Ok | NxRtu.Buttons.Cancel;
+    styledButtons: NxRtu.Buttons.Ok;
+    cancelButton: NxRtu.Buttons.Cancel;
+
+    onButtonClicked:
     {
-        if (visible)
+        switch(id)
         {
-            password.text = "";
-            showPasswordCheckbox.checked = false;
-            password.focus = true;
+        case NxRtu.Buttons.Ok:
+            loginClicked(area.password);
+            return;
+        default:
+            cancelClicked();
         }
     }
 
-    Base.Column
+    title: qsTr("Login to server");
+
+    onVisibleChanged:
+    {
+        if (!visible)
+            return;
+
+        area.showPasswordControl.checked = false;
+        area.passwordControl.text = "";
+        area.passwordControl.forceActiveFocus();
+    }
+
+    areaDelegate: Base.Column
     {
         id: spacer;
 
+        readonly property alias password: passwordEnter.text;
+        readonly property alias passwordControl: passwordEnter;
+        readonly property alias showPasswordControl: showPasswordCheckbox;
+
         anchors.centerIn: parent;        
         spacing: Common.SizeManager.spacing.base;
+
         Row
         {
             id: row;
@@ -42,14 +60,16 @@ Window
             spacing: Common.SizeManager.spacing.base;
             Base.Text
             {
-                text: "Password:"
                 anchors.verticalCenter: parent.verticalCenter;
+
+                text: "Password:"
+                font.pixelSize: Common.SizeManager.fontSizes.medium;
                 width: height * 4;
             }
             
             Base.TextField
             {
-                id: password;
+                id: passwordEnter;
                 
                 width: height * 4;
                 focus: true;
@@ -57,53 +77,21 @@ Window
                 echoMode: (showPasswordCheckbox.checked ? TextInput.Normal : TextInput.Password);
                 onAccepted:
                 {
-                    loginClicked(password.text);
+                    if (!text.trim().length)
+                        return;
+
+                    loginClicked(passwordEnter.text);
                     thisComponent.close();
                 }
             }
         }
-        
+
         Base.CheckBox
         {
             id: showPasswordCheckbox;
 
             anchors.right: parent.right;
-            
             text: qsTr("Show password");
-        }
-
-        Row
-        {
-            layoutDirection: Qt.RightToLeft;
-            
-            spacing: Common.SizeManager.spacing.base;
-            anchors.right: parent.right;
-            
-            Base.StyledButton
-            {
-                id: okButton;
-                text: qsTr("Ok");
-
-                width: height * 3;
-                
-                onClicked:
-                {
-                    loginClicked(password.text);
-                    thisComponent.close();
-                }                    
-            }
-            
-            Base.Button
-            {
-                text: qsTr("Cancel");
-                width: height * 3;
-                
-                onClicked:
-                {
-                    cancelClicked();
-                    thisComponent.close();
-                }
-            }
         }
     }     
 }

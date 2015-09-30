@@ -115,8 +115,8 @@ void QnLicenseWidget::setFreeLicenseAvailable(bool available) {
     ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline());
 }
 
-void QnLicenseWidget::setHardwareId(const QByteArray& hardwareId) {
-    ui->hardwareIdEdit->setText(QLatin1String(hardwareId));
+void QnLicenseWidget::setHardwareId(const QString& hardwareId) {
+    ui->hardwareIdEdit->setText(hardwareId);
     ui->copyHwidButton->setEnabled(!hardwareId.isEmpty());
 }
 

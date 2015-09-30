@@ -196,34 +196,6 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     return false;
 }
 
-bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
-{
-    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
-    if( xServerGuidIter != request.headers.end() )
-    {
-        const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;
-        const QByteArray localServerGUID = qnCommon->moduleGUID().toByteArray();
-        return desiredServerGuid != localServerGUID;
-    }
-
-    nx_http::BufferType desiredCameraGuid;
-    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
-    if( xCameraGuidIter != request.headers.end() )
-    {
-        desiredCameraGuid = xCameraGuidIter->second;
-    }
-    else {
-        desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
-    }
-    if (!desiredCameraGuid.isEmpty()) {
-        QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);
-        return camera != 0;
-    }
-
-    return false;
-}
-
-
 void QnServerMessageProcessor::registerProxySender(QnUniversalTcpListener* tcpListener) {
     m_universalTcpListener = tcpListener;
 }

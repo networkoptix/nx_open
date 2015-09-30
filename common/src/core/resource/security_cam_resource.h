@@ -30,21 +30,6 @@ public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
-    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes) of
-    virtual QString getName() const override;
-    //!Overrides \a QnResource::setName. Just calls \a QnSecurityCamResource::setCameraName
-    /*!
-        TODO get rid of this override, since mediaserver and client must call different methods (setName and setCameraName respectively)
-    */
-    virtual void setName( const QString& name ) override;
-    //!Set camera name (the one is show to the user in client)
-    /*!
-        This name is set by user.
-        Resource name is generally set automatically (e.g., by server)
-        Can differ from resource name
-    */
-    void setCameraName( const QString& newCameraName );
-
     QnMediaServerResourcePtr getParentServer() const;
 
     Qn::MotionTypes supportedMotionType() const;
@@ -162,6 +147,9 @@ public:
     bool isLicenseUsed() const;
     void setLicenseUsed(bool value);
 
+    Qn::FailoverPriority failoverPriority() const;
+    void setFailoverPriority(Qn::FailoverPriority value);
+
     bool isAudioEnabled() const;
     bool isAudioForced() const;
     void setAudioEnabled(bool value);
@@ -270,6 +258,7 @@ signals:
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
+    void failoverPriorityChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 

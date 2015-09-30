@@ -13,11 +13,12 @@ static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
 
-const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
+const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
-    QString str = value.toUpper().trimmed();
+    const QString str = value.toUpper().trimmed();
+
     for (uint i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
         if (str == QLatin1String(qn_logLevelNames[i]))
             return QnLogLevel(i);
@@ -55,7 +56,7 @@ public:
         m_file.setFileName(currFileName());
 
         bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered);
-        if (rez)
+        if (rez && m_file.size() == 0)
             m_file.write(UTF8_BOM);
         return rez;
     }
@@ -214,6 +215,12 @@ public:
         return log;
     }
 
+    bool exists( int logID )
+    {
+        QnMutexLocker lk( &m_mutex );
+        return m_logs.find(logID) != m_logs.cend();
+    }
+
     bool put( int logID, QnLog* log )
     {
         QnMutexLocker lk( &m_mutex );
@@ -242,6 +249,10 @@ QnLog::~QnLog()
 QnLog* QnLog::instance( int logID )
 {
     return qn_logsInstance()->get(logID);
+}
+
+bool QnLog::instanceExists( int logID ) {
+    return qn_logsInstance()->exists(logID);
 }
 
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {

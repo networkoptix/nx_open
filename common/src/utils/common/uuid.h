@@ -35,6 +35,7 @@ public:
     const QByteArray& toByteArray() const;
     const QByteArray& toRfc4122() const;
     const QString& toString() const;
+    QUuid toQUuid() const { return m_uuid; }
 
     bool operator!=( const QnUuid& other ) const
     {
@@ -57,7 +58,7 @@ public:
     }
 
     static QnUuid fromRfc4122( const QByteArray& bytes );
-    static QnUuid fromHardwareId( const QByteArray& bytes );
+    static QnUuid fromHardwareId( const QString& hwid );
     static QnUuid createUuid();
 
     /** Construct QnUuid from pool of id's. Pool is determined by base id and individual offset. */

@@ -417,6 +417,18 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
     return OperationResult::Success;
 }
 
+int QnTranscoder::finalize(QnByteArray* const result)
+{
+    if (!m_initialized)
+        return OperationResult::Success;
+
+    m_internalBuffer.clear();
+    finalizeInternal(result);
+    if (result)
+        result->write(m_internalBuffer.data(), m_internalBuffer.size());
+    return OperationResult::Success;
+}
+
 bool QnTranscoder::addTag( const QString& /*name*/, const QString& /*value*/ )
 {
     return false;

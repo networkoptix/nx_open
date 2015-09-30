@@ -20,6 +20,8 @@
 #endif
 #include "core/resource_management/resource_pool.h"
 #include "http/custom_headers.h"
+#include "common/common_module.h"
+#include "utils/gzip/gzip_compressor.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -525,7 +527,9 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     if (result.id.isNull())
         result.id = QnUuid::createUuid();
 
-    result.userHost = d->socket->getForeignAddress().address.toString();
+    result.userHost = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::USER_HOST_HEADER_NAME));
+    if (result.userHost.isEmpty())
+        result.userHost = d->socket->getForeignAddress().address.toString();
     result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, "User-Agent"));
 
     int trimmedPos = result.userAgent.indexOf(lit("/"));
@@ -535,4 +539,42 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     }
 
     return result;
+}
+
+void QnTCPConnectionProcessor::sendUnauthorizedResponse(bool isProxy, const QByteArray& messageBody)
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    if( d->request.requestLine.method == nx_http::Method::GET ||
+        d->request.requestLine.method == nx_http::Method::HEAD )
+    {
+        d->response.messageBody = messageBody;
+    }
+    if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
+        d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
+
+    auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
+    QByteArray contentEncoding;
+    if( acceptEncodingHeaderIter != d->request.headers.end() )
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
+        if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
+        {
+            contentEncoding = "identity";
+        }
+        else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
+        {
+            contentEncoding = "gzip";
+            if( !d->response.messageBody.isEmpty() )
+                d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
+        }
+        else
+        {
+            //TODO #ak not supported encoding requested
+        }
+    }
+    sendResponse(
+        isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
+        d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
+        contentEncoding );
 }

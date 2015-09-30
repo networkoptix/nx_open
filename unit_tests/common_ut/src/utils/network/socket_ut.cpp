@@ -104,8 +104,7 @@ protected:
 TEST( Socket, AsyncOperationCancellation )
 {
     static const std::chrono::milliseconds TEST_DURATION( 200 );
-    //static const int TEST_RUNS = 37;
-    static const int TEST_RUNS = 37;
+    static const int TEST_RUNS = 17;
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
@@ -224,14 +223,20 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
 TEST( Socket, HostNameResolve3 )
 {
     {
-        nx_http::HttpClient httpClient;
-        ASSERT_TRUE( httpClient.doGet( QUrl( "http://ya.ru" ) ) );
-        ASSERT_TRUE( httpClient.response() != nullptr );
+        HostAddress resolvedAddress;
+        ASSERT_TRUE(
+            HostAddressResolver::instance()->resolveAddressSync(
+                QLatin1String("ya.ru"),
+                &resolvedAddress) );
+        ASSERT_TRUE(resolvedAddress.ipv4() != 0);
     }
 
     {
-        nx_http::HttpClient httpClient;
-        ASSERT_TRUE( !httpClient.doGet( QUrl( "http://hren2349jf234.ru" ) ) );
+        HostAddress resolvedAddress;
+        ASSERT_FALSE(
+            HostAddressResolver::instance()->resolveAddressSync(
+                QLatin1String("hren2349jf234.ru"),
+                &resolvedAddress));
     }
 }
 
@@ -280,10 +285,9 @@ TEST( Socket, BadHostNameResolve )
     }
 }
 
-#if 0
 TEST( Socket, postCancellation )
 {
-    static const int TEST_RUNS = 200;
+    static const int TEST_RUNS = 10;
 
     std::atomic<size_t> postCalls( 0 );
 
@@ -323,4 +327,3 @@ TEST( Socket, postCancellation )
     for( auto& f: futures )
         f.wait();
 }
-#endif

@@ -1,11 +1,11 @@
 
 #include "time_zones_model.h"
 
-#include <QDebug>
 #include <QTimeZone>
 
 #include <base/server_info.h>
 #include <helpers/time_helper.h>
+#include <helpers/model_change_helper.h>
 
 namespace
 {
@@ -57,12 +57,15 @@ namespace
     }
 }
 
-class rtu::TimeZonesModel::Impl : public QObject
+class rtu::TimeZonesModel::Impl
 {
 public:
     Impl(rtu::TimeZonesModel *owner
         , const rtu::ServerInfoPtrContainer &selectedServers);
     
+    Impl(rtu::TimeZonesModel *owner
+        , const Impl &other);
+
     virtual ~Impl();
     
 public:
@@ -110,8 +113,7 @@ private:
 
 rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
     , const rtu::ServerInfoPtrContainer &selectedServers)
-    : QObject(owner)
-    , m_owner(owner)
+    : m_owner(owner)
     , m_timeZones()
     , m_initTimeZoneId(selectionTimeZoneId(selectedServers))
     , m_initIndex(0)
@@ -128,6 +130,16 @@ rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
         m_initIndex = 0;
     }
 }
+
+rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
+    , const Impl &other)
+    : m_owner(owner)
+    , m_timeZones(other.m_timeZones)
+    , m_initTimeZoneId(other.m_initTimeZoneId)
+    , m_initIndex(other.m_initIndex)
+{
+}
+
 
 rtu::TimeZonesModel::Impl::~Impl()
 {
@@ -263,6 +275,7 @@ QByteArray rtu::TimeZonesModel::Impl::timeZoneIdByIndex(int index) const {
 rtu::TimeZonesModel::TimeZonesModel(const ServerInfoPtrContainer &selectedServers
     , QObject *parent)
     : QAbstractListModel(parent)
+    , m_helper(CREATE_MODEL_CHANGE_HELPER(this))
     , m_impl(new Impl(this, selectedServers))
 {
     
@@ -277,7 +290,7 @@ int rtu::TimeZonesModel::initIndex() const
     return m_impl->initIndex();
 }
 
-int rtu::TimeZonesModel::currentTimeZoneIndex()
+int rtu::TimeZonesModel::currentTimeZoneIndex() const
 {
     return m_impl->currentTimeZoneIndex();
 }
@@ -298,6 +311,18 @@ int rtu::TimeZonesModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/)
 QVariant rtu::TimeZonesModel::data(const QModelIndex &index , int role /*= Qt::DisplayRole*/) const {
     return m_impl->data(index, role);
 }
+
+void rtu::TimeZonesModel::resetTo(TimeZonesModel *source)
+{
+    if (!source)
+        return;
+
+    const auto resetHelper = m_helper->resetModelGuard();
+    Q_UNUSED(resetHelper);
+
+    m_impl.reset(new Impl(this, *source->m_impl));
+}
+
 
 QByteArray rtu::TimeZonesModel::timeZoneIdByIndex(int index) const {
     return m_impl->timeZoneIdByIndex(index);
