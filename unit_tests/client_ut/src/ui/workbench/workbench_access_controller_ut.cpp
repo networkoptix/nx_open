@@ -17,9 +17,17 @@
 
 #include <ui/style/skin.h>
 
+#include <utils/common/model_functions.h>
+
 namespace {
     const QString userName1 = QStringLiteral("unit_test_user_1");
     const QString userName2 = QStringLiteral("unit_test_user_2");
+}
+
+
+
+void PrintTo(const Qn::Permissions& val, ::std::ostream* os) {
+    *os << QnLexical::serialized(val).toStdString();
 }
 
 class QnWorkbenchAccessControllerTest : public testing::Test {
@@ -168,6 +176,28 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged )
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     /* But their name is fixed. */
     Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission | Qn::RemovePermission;
+    desired &= ~forbidden;
+
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Check permissions for unsaved layouts when the user is logged in. */
+TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn )
+{
+    loginAs(Qn::GlobalLiveViewerPermissions);
+
+    /* Unsaved layout that we have just created. */
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    layout->setId(QnUuid::createUuid());
+    layout->addFlags(Qn::local);
+    layout->setParentId(m_context->user()->getId());
+    layout->setUserCanEdit(true);
+    qnResPool->addResource(layout);
+
+    ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
+         
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = Qn::RemovePermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
