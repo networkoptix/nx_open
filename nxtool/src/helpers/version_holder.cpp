@@ -55,8 +55,8 @@ rtu::VersionHolder::VersionHolder(const QString &str)
     const auto setData = [this](const int index, int value)
         { m_data[index] = value; };
 
-    const int count = (versionParts.size() > m_data.size() ? m_data.size() : versionParts.size());
-    for (int i = 0; i != count; ++i)
+    const std::size_t count = (versionParts.size() > m_data.size() ? m_data.size() : versionParts.size());
+    for (std::size_t i = 0; i != count; ++i)
         setData(i, versionParts.at(i).toInt());
 }
 
@@ -71,27 +71,21 @@ QString rtu::VersionHolder::toString() const
 
 bool rtu::VersionHolder::operator < (const VersionHolder &other) const
 {
-    for (int i = 0; i < m_data.size(); ++i)
-    {
-        if (m_data[i] < other.m_data[i])
-            return true;
-    }
-
-    return false;
+    return (m_data < other.m_data);
 }
 
 bool rtu::VersionHolder::operator > (const VersionHolder &other) const
 {
-    return (other < *this);
+    return (m_data > other.m_data);
 }
 
 bool rtu::VersionHolder::operator == (const VersionHolder &other) const
 {
-    return !(*this < other) && !(*this > other);
+    return (m_data == other.m_data);
 }
 
 bool rtu::VersionHolder::operator != (const VersionHolder &other) const
 {
-    return !(*this == other);
+    return (m_data != other.m_data);
 }
 
