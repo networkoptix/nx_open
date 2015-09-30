@@ -20,8 +20,6 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "nx_ec/ec_proto_version.h"
-#include <network/authenticate_helper.h>
-
 
 class QnMediaServerResourceGuard: public QObject {
 public:

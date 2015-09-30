@@ -6,9 +6,9 @@
 #include <utils/common/synctime.h>
 #include <utils/network/http/auth_tools.h>
 
-
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
+
 
 QnUserResource::QnUserResource():
     m_permissions(0),
@@ -303,48 +303,19 @@ qint64 QnUserResource::passwordExpirationTimestamp() const
     return m_passwordExpirationTimestamp;
 }
 
+void QnUserResource::prolongatePassword(qint64 value)
+{
+    QnMutexLocker lk( &m_mutex );
+    if (value == PasswordProlongationAuto)
+        m_passwordExpirationTimestamp = qnSyncTime->currentMSecsSinceEpoch() + LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC;
+    else
+        m_passwordExpirationTimestamp = value;
+}
+
 bool QnUserResource::passwordExpired() const
 {
     if( !isLdap() )
         return false;
 
     return passwordExpirationTimestamp() < qnSyncTime->currentMSecsSinceEpoch();
-}
-
-Qn::AuthResult QnUserResource::doPasswordProlongation()
-{
-    if( !isLdap() )
-        return Qn::Auth_OK;
-
-    QString name;
-    QString digest;
-    {
-        QnMutexLocker lk( &m_mutex );
-        name = m_name;
-        digest = QLatin1String(m_digest);
-    }
-
-    auto errorCode = QnLdapManager::instance()->authenticateWithDigest( name, digest );
-    if( errorCode != Qn::Auth_OK ) {
-        if (!passwordExpired())
-            return Qn::Auth_OK;
-        else
-            return errorCode;
-    }
-
-    QnMutexLocker lk( &m_mutex );
-    if( m_name != name || QLatin1String(m_digest) != digest )  //user data has been updated somehow while performing ldap request
-        return m_passwordExpirationTimestamp > qnSyncTime->currentMSecsSinceEpoch() ? Qn::Auth_OK : Qn::Auth_PasswordExpired;
-    m_passwordExpirationTimestamp =
-        qnSyncTime->currentMSecsSinceEpoch() +
-        LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC;
-    return Qn::Auth_OK;
-}
-
-Qn::AuthResult QnUserResource::checkDigestValidity( const QByteArray& digest )
-{
-    if( !isLdap() )
-        return Qn::Auth_OK;
-
-    return QnLdapManager::instance()->authenticateWithDigest( getName(), QLatin1String(digest) );
 }
