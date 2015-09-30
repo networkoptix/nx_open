@@ -54,8 +54,15 @@ protected:
         m_context->setUserName(userName1);
     }
 
-    bool hasPermissions(const QnResourcePtr &resource, Qn::Permissions permissions) const {
-        return m_context->accessController()->hasPermissions(resource, permissions);
+    void checkPermissions(const QnResourcePtr &resource, Qn::Permissions desired, Qn::Permissions forbidden) const {
+        Qn::Permissions actual = m_context->accessController()->permissions(resource);
+        ASSERT_EQ(desired, actual);
+        ASSERT_EQ(forbidden & actual, 0);
+    }
+
+    void checkForbiddenPermissions(const QnResourcePtr &resource, Qn::Permissions forbidden) const {
+        Qn::Permissions actual = m_context->accessController()->permissions(resource);
+        ASSERT_EQ(forbidden & actual, 0);
     }
 
     // Declares the variables your tests want to use.
@@ -79,7 +86,7 @@ TEST_F( QnWorkbenchAccessControllerTest, safeDisableSaveLayoutAs )
 {
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
-    ASSERT_FALSE(hasPermissions(m_context->user(), Qn::CreateLayoutPermission));
+    checkForbiddenPermissions(m_context->user(), Qn::CreateLayoutPermission);
 }
 
 /** Test for safe mode. Check if the user cannot save layout created with external permissions. */
@@ -93,7 +100,7 @@ TEST_F( QnWorkbenchAccessControllerTest, safeCannotSaveExternalPermissionsLayout
     layout->setData(Qn::LayoutPermissionsRole, Qn::ReadWriteSavePermission);
     qnResPool->addResource(layout);
 
-    ASSERT_FALSE(hasPermissions(layout, Qn::SavePermission));
+    checkForbiddenPermissions(layout, Qn::SavePermission);
 }
 
 /** Fix permissions for exported layouts (files). */
@@ -107,19 +114,61 @@ TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayouts )
 
     ASSERT_TRUE(QnWorkbenchLayoutSnapshotManager::isFile(layout));
 
-    /* Exported layouts can be edited even by live users in safe mode. */
+    /* Exported layouts can be edited when we are not logged in. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     /* But their name is fixed. */
-    Qn::Permission forbidden = Qn::WriteNamePermission;
+    Qn::Permissions forbidden = Qn::WriteNamePermission;
     desired &= ~forbidden;
 
-    ASSERT_TRUE(hasPermissions(layout, desired));
-    ASSERT_FALSE(hasPermissions(layout, forbidden));
+    checkPermissions(layout, desired, forbidden);
 
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
 
     /* Result is the same even for live users in safe mode. */
-    ASSERT_TRUE(hasPermissions(layout, desired));
-    ASSERT_FALSE(hasPermissions(layout, forbidden));
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Fix permissions for locked exported layouts (files). */
+TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked )
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    layout->setId(QnUuid::createUuid());
+    layout->setUrl("path/to/file");
+    layout->addFlags(Qn::url | Qn::local);
+    layout->setLocked(true);
+    qnResPool->addResource(layout);
+
+    ASSERT_TRUE(QnWorkbenchLayoutSnapshotManager::isFile(layout));
+
+    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+    Qn::Permissions forbidden = (Qn::FullLayoutPermissions ^ desired) & Qn::FullLayoutPermissions;
+
+    checkPermissions(layout, desired, forbidden);
+
+    loginAs(Qn::GlobalLiveViewerPermissions);
+    qnCommon->setReadOnly(true);
+
+    /* Result is the same even for live users in safe mode. */
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Check permissions for layouts when the user is not logged in. */
+TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged )
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    layout->setId(QnUuid::createUuid());
+    layout->addFlags(Qn::local);
+    qnResPool->addResource(layout);
+    
+    ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
+    ASSERT_TRUE(m_context->user().isNull());
+
+    /* Exported layouts can be edited even by live users in safe mode. */
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    /* But their name is fixed. */
+    Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission | Qn::RemovePermission;
+    desired &= ~forbidden;
+
+    checkPermissions(layout, desired, forbidden);
 }
