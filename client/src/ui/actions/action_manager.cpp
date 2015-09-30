@@ -81,6 +81,11 @@ public:
     }
 
     QnActionBuilder shortcut(const QKeySequence &keySequence, ActionPlatform platform, bool replaceExisting) {
+        QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
+
+        if (!guiApp)
+            return *this;
+
         if (keySequence.isEmpty())
             return *this;
 
