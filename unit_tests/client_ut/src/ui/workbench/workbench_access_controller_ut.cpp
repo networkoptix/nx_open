@@ -13,6 +13,7 @@
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <ui/style/skin.h>
 
@@ -95,3 +96,30 @@ TEST_F( QnWorkbenchAccessControllerTest, safeCannotSaveExternalPermissionsLayout
     ASSERT_FALSE(hasPermissions(layout, Qn::SavePermission));
 }
 
+/** Fix permissions for exported layouts (files). */
+TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayouts )
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    layout->setId(QnUuid::createUuid());
+    layout->setUrl("path/to/file");
+    layout->addFlags(Qn::url);
+    qnResPool->addResource(layout);
+
+    ASSERT_TRUE(QnWorkbenchLayoutSnapshotManager::isFile(layout));
+
+    /* Exported layouts can be edited even by live users in safe mode. */
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    /* But their name is fixed. */
+    Qn::Permission forbidden = Qn::WriteNamePermission;
+    desired &= ~forbidden;
+
+    ASSERT_TRUE(hasPermissions(layout, desired));
+    ASSERT_FALSE(hasPermissions(layout, forbidden));
+
+    loginAs(Qn::GlobalLiveViewerPermissions);
+    qnCommon->setReadOnly(true);
+
+    /* Result is the same even for live users in safe mode. */
+    ASSERT_TRUE(hasPermissions(layout, desired));
+    ASSERT_FALSE(hasPermissions(layout, forbidden));
+}
