@@ -10,4 +10,4 @@ include( ${libdir}/gtest.pri )
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
 
-INCLUDEPATH += ${root.dir}/mediaserver_core/src
+INCLUDEPATH += ${root.dir}/client/src

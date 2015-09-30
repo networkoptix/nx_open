@@ -84,9 +84,11 @@ ListView
             {
                 loggedIn: model.loggedIn && !model.isBusy;
                 serverName: model.name;
-                macAddress: model.macAddress;
+                information: model.macAddress;
                 selectedState: model.selectedState;
-                
+                hasHdd: model.hasHdd;
+                safeMode: model.safeMode;
+
                 onExplicitSelectionCalled: 
                 {
                     thisComponent.tryChangeSelectedServers(function()

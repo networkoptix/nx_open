@@ -22,7 +22,7 @@ namespace rtu
         Q_PROPERTY(bool isBeta READ isBeta NOTIFY toolInfoChanged)
         Q_PROPERTY(QString toolVersion READ toolVersion NOTIFY toolInfoChanged)
         Q_PROPERTY(QString toolRevision READ toolRevision NOTIFY toolInfoChanged)
-        Q_PROPERTY(QString toolSupportMail READ toolSupportMail NOTIFY toolInfoChanged)
+        Q_PROPERTY(QString toolSupportLink READ toolSupportLink NOTIFY toolInfoChanged)
         Q_PROPERTY(QString toolCompanyUrl READ toolCompanyUrl NOTIFY toolInfoChanged)
 
         Q_PROPERTY(bool showWarnings READ showWarnings WRITE setShowWarnings NOTIFY showWarningsChanged)
@@ -90,8 +90,8 @@ namespace rtu
 
         QString toolRevision() const;
 
-        QString toolSupportMail() const;
-
+        QString toolSupportLink() const;
+        
         QString toolCompanyUrl() const;
 
     signals:

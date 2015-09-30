@@ -75,7 +75,7 @@ FocusScope
         border.color: thisComponent.activeFocus ? "#47b" : "#999"
     }
 
-    width: row.width * 1.1;
+    width: row.width * 1.2;
     height: Common.SizeManager.clickableSizes.medium;
 
     MouseArea
