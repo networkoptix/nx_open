@@ -115,6 +115,7 @@ public:
     int lastPositionRequestTime;
     int newPositionRequestTime;
     bool tourGetPosWorkaround;
+    bool canReadPosition;
 };
 
 QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
@@ -127,7 +128,8 @@ QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate():
     needPositionUpdate(false),
     waitingForNewPosition(false),
     lastPositionRequestTime(0),
-    newPositionRequestTime(0)
+    newPositionRequestTime(0),
+    canReadPosition(false)
 {}
 
 QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
@@ -160,10 +162,13 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     tourGetPosWorkaround = resourceData.value<bool>(lit("tourGetPosWorkaround"), false);
 }
 
-void QnTourPtzExecutorPrivate::updateDefaults() {
+void QnTourPtzExecutorPrivate::updateDefaults() 
+{
     defaultSpace = baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
     defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
     defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
+
+    canReadPosition = baseController->hasCapabilities(Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability);
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
@@ -307,7 +312,11 @@ void QnTourPtzExecutorPrivate::activateCurrentSpot() {
     baseController->activatePreset(spot.presetId, spot.speed);
 }
 
-void QnTourPtzExecutorPrivate::requestPosition() {
+void QnTourPtzExecutorPrivate::requestPosition() 
+{
+    if (!canReadPosition)
+        return;
+
     QVector3D position;
     baseController->getPosition(defaultSpace, &position);
 
@@ -332,8 +341,13 @@ bool QnTourPtzExecutorPrivate::handleTimer(int timerId) {
     }
 }
 
-void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) {
-    if(command == defaultCommand)
+void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) 
+{
+    if (!canReadPosition && command == Qn::ActivatePresetPtzCommand) {
+        moveTimer.stop();
+        startWaiting();
+    }
+    else if(command == defaultCommand)
         processMoving(data.isValid(), data.value<QVector3D>());
 }
 
