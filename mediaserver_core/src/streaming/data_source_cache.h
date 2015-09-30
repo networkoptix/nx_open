@@ -6,6 +6,7 @@
 #define DATA_SOURCE_CACHE_H
 
 #include <map>
+#include <memory>
 
 #include <QtCore/QMutex>
 #include <QtCore/QSharedPointer>
@@ -21,14 +22,14 @@ class DataSourceContext
 {
 public:
     AbstractOnDemandDataProviderPtr mediaDataProvider;
-    QnTranscoderPtr transcoder;
+    std::unique_ptr<QnTranscoder> transcoder;
 
     DataSourceContext(
         AbstractOnDemandDataProviderPtr _mediaDataProvider,
-        QnTranscoderPtr _transcoder )
+        std::unique_ptr<QnTranscoder> _transcoder )
     :
         mediaDataProvider( _mediaDataProvider ),
-        transcoder( _transcoder )
+        transcoder( std::move(_transcoder) )
     {
     }
 };
@@ -44,7 +45,7 @@ public:
     DataSourceCache();
     virtual ~DataSourceCache();
 
-    DataSourceContextPtr find( const StreamingChunkCacheKey& key );
+    DataSourceContextPtr take( const StreamingChunkCacheKey& key );
     void put(
         const StreamingChunkCacheKey& key,
         DataSourceContextPtr data,
