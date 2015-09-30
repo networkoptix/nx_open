@@ -60,6 +60,7 @@ angular.module('webadminApp')
                     scope.ieNoWebm = false;
                     scope.loading = false;
                     scope.ieWin10 = false;
+                    scope.ubuntuNX = false;
 
                     if(scope.debugMode && scope.debugFormat){
                         return scope.debugFormat;
@@ -166,8 +167,13 @@ angular.module('webadminApp')
                                 return "native-hls";
                             }
 
-                        case "Chrome":
                         case "Firefox":
+                            if(weHaveHls && window.jscd.os === 'Linux'){
+                                scope.ubuntuNX = true;
+                                return false;
+                            }
+
+                        case "Chrome":
                         case "Opera":
                         case "Webkit":
                         default:
