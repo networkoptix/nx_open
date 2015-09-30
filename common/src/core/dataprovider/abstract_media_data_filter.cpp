@@ -32,4 +32,9 @@ quint64 AbstractMediaDataFilter::currentPos() const
     return m_dataSource->currentPos();
 }
 
+void AbstractMediaDataFilter::put(QnAbstractDataPacketPtr packet)
+{
+    return m_dataSource->put(std::move(packet));
+}
+
 #endif // ENABLE_DATA_PROVIDERS

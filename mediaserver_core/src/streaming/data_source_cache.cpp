@@ -30,7 +30,7 @@ DataSourceCache::~DataSourceCache()
         TimerManager::instance()->joinAndDeleteTimer( val.first );
 }
 
-DataSourceContextPtr DataSourceCache::find( const StreamingChunkCacheKey& key )
+DataSourceContextPtr DataSourceCache::take( const StreamingChunkCacheKey& key )
 {
     TimerManager::TimerGuard timerGuard;
     QMutexLocker lk( &m_mutex );
@@ -38,13 +38,7 @@ DataSourceContextPtr DataSourceCache::find( const StreamingChunkCacheKey& key )
     //searching reader in cache
     for( auto it = m_cachedDataProviders.begin(); it != m_cachedDataProviders.end(); )
     {
-        if( it->first.srcResourceUniqueID() == key.srcResourceUniqueID() &&
-            it->first.channel() == key.channel() &&
-            it->first.streamQuality() == key.streamQuality() &&
-            it->first.pictureSizePixels() == key.pictureSizePixels() &&
-            it->first.containerFormat() == key.containerFormat() &&
-            it->first.videoCodec() == key.videoCodec() &&
-            it->first.audioCodec() == key.audioCodec() &&
+        if( it->first.mediaStreamParamsEqualTo(key) &&
             it->first.live() == key.live() &&
             it->second.first->mediaDataProvider->currentPos() == key.startTimestamp() )
         {
@@ -53,7 +47,7 @@ DataSourceContextPtr DataSourceCache::find( const StreamingChunkCacheKey& key )
             timerGuard = TimerManager::TimerGuard( it->second.second );
             //timerGuard will remove timer after unlocking mutex
             m_timers.erase( timerGuard.get() );
-            m_cachedDataProviders.erase( it++ );
+            it = m_cachedDataProviders.erase( it );
             return item;
         }
         else

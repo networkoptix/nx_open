@@ -114,7 +114,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     chunk->openForModification();
 
-    DataSourceContextPtr dataSourceCtx = m_dataSourceCache.find( transcodeParams );
+    DataSourceContextPtr dataSourceCtx = m_dataSourceCache.take( transcodeParams );
     if( dataSourceCtx )
     {
         NX_LOG( lit("Taking reader for resource %1, start timestamp %2, duration %3 from cache").
@@ -188,16 +188,16 @@ bool StreamingChunkTranscoder::transcodeAsync(
             //TODO #ak this is not always required, and should be done in createTranscoder method
 
         //creating transcoder
-        QnTranscoderPtr transcoder( createTranscoder( cameraResource, transcodeParams ) );
-        if( !transcoder )
+        auto transcoder = createTranscoder(cameraResource, transcodeParams);
+        if (!transcoder)
         {
-            NX_LOG( lit("StreamingChunkTranscoder::transcodeAsync. Failed to create transcoder. resource %1, format %2, video codec %3").
-                arg(transcodeParams.srcResourceUniqueID()).arg(transcodeParams.containerFormat()).arg(transcodeParams.videoCodec()), cl_logWARNING );
-            chunk->doneModification( StreamingChunk::rcError );
+            NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Failed to create transcoder. resource %1, format %2, video codec %3").
+                arg(transcodeParams.srcResourceUniqueID()).arg(transcodeParams.containerFormat()).arg(transcodeParams.videoCodec()), cl_logWARNING);
+            chunk->doneModification(StreamingChunk::rcError);
             return false;
         }
 
-        dataSourceCtx = DataSourceContextPtr( new DataSourceContext( mediaDataProvider, transcoder ) );
+        dataSourceCtx = DataSourceContextPtr( new DataSourceContext( mediaDataProvider, std::move(transcoder) ) );
     }
 
     if( transcodeParams.live() )
@@ -325,13 +325,13 @@ bool StreamingChunkTranscoder::validateTranscodingParameters( const StreamingChu
     return true;
 }
 
-QnTranscoder* StreamingChunkTranscoder::createTranscoder(
+std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
     const QnSecurityCamResourcePtr& mediaResource,
     const StreamingChunkCacheKey& transcodeParams )
 {
     //launching transcoding:
         //creating transcoder
-    std::unique_ptr<QnFfmpegTranscoder> transcoder( new QnFfmpegTranscoder() );
+    std::unique_ptr<QnTranscoder> transcoder( new QnFfmpegTranscoder() );
     if( transcoder->setContainer( transcodeParams.containerFormat() ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with container \"%1\" to transcode chunk (%2 - %3) of resource %4").
@@ -394,7 +394,7 @@ QnTranscoder* StreamingChunkTranscoder::createTranscoder(
         //}
     }
 
-    return transcoder.release();
+    return transcoder;
 }
 
 void StreamingChunkTranscoder::onTranscodingFinished(
