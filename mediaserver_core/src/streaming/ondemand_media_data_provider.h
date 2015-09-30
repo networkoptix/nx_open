@@ -5,8 +5,8 @@
 #ifndef ONDEMAND_MEDIA_DATA_PROVIDER_H
 #define ONDEMAND_MEDIA_DATA_PROVIDER_H
 
+#include <deque>
 #include <memory>
-#include <queue>
 
 #include <utils/thread/mutex.h>
 #include <QSharedPointer>
@@ -32,6 +32,8 @@ public:
     virtual bool tryRead( QnAbstractDataPacketPtr* const data ) override;
     //!Implementation of AbstractOnDemandDataProvider::currentPos
     virtual quint64 currentPos() const override;
+    //!Implementation of AbstractOnDemandDataProvider::put
+    virtual void put(QnAbstractDataPacketPtr packet) override;
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     /*!
@@ -47,7 +49,7 @@ public:
 private:
     QSharedPointer<QnAbstractStreamDataProvider> m_dataProvider;
     mutable QnMutex m_mutex;
-    std::queue<QnAbstractDataPacketPtr> m_dataQueue;
+    std::deque<QnAbstractDataPacketPtr> m_dataQueue;
     qint64 m_prevPacketTimestamp;
 };
 

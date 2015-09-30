@@ -786,10 +786,10 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
 }
 
 void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, 
-                                             qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
+                                             qint64 detailLevel, bool keepSmallChunks, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
-        periods.push_back(catalog->getTimePeriods(startTime, endTime, detailLevel));
+        periods.push_back(catalog->getTimePeriods(startTime, endTime, detailLevel, keepSmallChunks, INT_MAX));
         if (!periods.rbegin()->empty())
         {
             QnTimePeriod& lastPeriod = periods.rbegin()->last();
@@ -827,7 +827,7 @@ bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, const 
     return catalog && catalog->containTime(period);
 }
 
-QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, 
+QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
                                                       const QList<QnServer::ChunksCatalog> &catalogs, int limit) 
 {
     std::vector<QnTimePeriodList> periods;
@@ -843,7 +843,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
                     periods.push_back(camera->getDtsTimePeriods(startTime, endTime, detailLevel));
             } else {
-                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog));
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, keepSmallChunks, getFileCatalog(cameraUniqueId, catalog));
             }
         }
 
@@ -954,7 +954,11 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         {
             qreal persentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
             Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            auto storage = qnStorageMan->storageRoot(itrHiLeft->storageIndex);
             result.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
+            if (storage)
+                result.recordedBytesPerStorage[storage->getId()] += itrHiLeft->getFileSize() * persentUsage;
+
             result.recordedSecs += itrHiLeft->durationMs * persentUsage;
             if (itrHiLeft->startTimeMs >= bitrateThreshold) {
                 bitrateStats.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
@@ -966,8 +970,10 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         {
             qreal persentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
             Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            auto storage = qnStorageMan->storageRoot(itrLowLeft->storageIndex);
             result.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
-
+            if (storage)
+                result.recordedBytesPerStorage[storage->getId()] += itrLowLeft->getFileSize() * persentUsage;
             if (hasHi) 
             {
                 // do not include bitrate calculation if only LQ quality

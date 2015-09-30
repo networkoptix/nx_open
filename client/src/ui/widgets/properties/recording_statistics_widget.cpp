@@ -42,6 +42,7 @@ namespace {
     const qint64 SECS_PER_WEEK = SECS_PER_DAY * 7;
     const qint64 BYTES_IN_GB = 1000000000ll;
     const qint64 BYTES_IN_TB = 1000ll * BYTES_IN_GB;
+    const qint64 FINAL_STEP_SECONDS = 1000000000ll * 10;
 
     //TODO: #rvasilenko refactor all algorithms working with EXTRA_DATA_BASE to STL
     const std::array<qint64, 5> EXTRA_DATA_BASE = { 
@@ -580,7 +581,16 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraS
         cameraForecast.stats.uniqueId = cameraStats.uniqueId;
         cameraForecast.stats.averageBitrate = cameraStats.averageBitrate;
         forecastData.cameras.push_back(std::move(cameraForecast));
-        forecastData.totalSpace += cameraStats.recordedBytes; // 2.1 add current archive space
+        //forecastData.totalSpace += cameraStats.recordedBytes; // 2.1 add current archive space
+
+        for (auto itr = cameraStats.recordedBytesPerStorage.begin(); itr != cameraStats.recordedBytesPerStorage.end(); ++itr)
+        {
+            for (const auto& storageSpaceData: m_availStorages) 
+            {
+                if (storageSpaceData.storageId == itr.key() && storageSpaceData.isUsedForWriting && storageSpaceData.isWritable) 
+                    forecastData.totalSpace += itr.value();
+            }
+        }
     }
 
     if (!hasExpaned)
@@ -620,7 +630,7 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::doForecast(ForecastData forec
         if (camera.maxDays > 0)
             steps.insert(camera.maxDays * SECS_PER_DAY);
     }
-    steps.insert(INT_MAX); // final step for all cameras
+    steps.insert(FINAL_STEP_SECONDS); // final step for all cameras
 
     for (qint64 seconds: steps) {
         spendData(forecastData, seconds, [seconds](const ForecastDataPerCamera& stats)
