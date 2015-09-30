@@ -101,7 +101,7 @@ get_serial_number() {
     mkdir -p $MNTBOOTPART
     mount -t vfat $BOOTPART $MNTBOOTPART
     ln -s $MNTBOOTPART/backup/bootloader /tmp/fw_printenv
-    rm /tmp/serial
+    if [ -f /tmp/serial ]; then rm /tmp/serial; fi
     SERIAL=$(/tmp/fw_printenv serial | sed 's/serial=//')
     echo $SERIAL > /tmp/serial
     echo "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >&2 >/dev/kmsg
