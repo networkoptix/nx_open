@@ -85,6 +85,11 @@ QIcon QnNoptixIconLoader::polish(const QIcon &icon) {
 }
 
 QIcon QnNoptixIconLoader::load(const QString &name, const QString &checkedName) {
+
+    QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
+    if (!guiApp)
+        return QIcon();
+
     QString key = name + lit("=^_^=") + checkedName;
     if(m_iconByKey.contains(key))
         return m_iconByKey.value(key);
@@ -100,7 +105,7 @@ QIcon QnNoptixIconLoader::load(const QString &name, const QString &checkedName) 
     builder.addPixmap(skin->pixmap(name), QnIcon::Normal, QnIcon::Off);
 
     path = prefix + lit("_hovered") + suffix;
-    if(qnSkin->hasFile(path)) 
+    if(skin->hasFile(path)) 
         builder.addPixmap(skin->pixmap(path), QnIcon::Active);
 
     path = prefix + lit("_disabled") + suffix;

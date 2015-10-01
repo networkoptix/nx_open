@@ -54,8 +54,11 @@ private slots:
     void at_user_resourceChanged(const QnResourcePtr &resource);
     void at_user_permissionsChanged(const QnResourcePtr &user);
 private:
+
     void setCurrentUser(const QnUserResourcePtr &currentUser);
     bool isReconnectRequired(const QnUserResourcePtr &user);
+
+    QnUserResourcePtr calculateCurrentUser() const;
 
 private:
     QString m_userName;
