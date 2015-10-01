@@ -31,3 +31,7 @@
 <div class="container" ng-if="alertVisible && !isActive('/view') && !session.serverInfoAlertHidden">
     <alert type="info" close="closeAlert()">You are currently connected to the system '{{settings.systemName}}' through '{{settings.name}}' server as user '{{user.name}}'</alert>
 </div>
+
+<div class="container" ng-if="settings.ecDbReadOnly">
+    <alert type="warning" >The system is running in sage mode. Changes are impossible.</alert>
+</div>
