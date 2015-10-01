@@ -9,6 +9,12 @@ angular.module('webadminApp')
                 $location.path('/info'); //no admin rights - redirect
             }
         });
+        mediaserver.getSettings().then(function (r) {
+            if(r.data.reply.ecDbReadOnly){
+                $location.path('/info'); //readonly - redirect
+                return;
+            }
+        });
 
         function formatUrl(url){
             return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,''));
