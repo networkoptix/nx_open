@@ -16,10 +16,13 @@
 
 
 namespace nx {
+
+namespace cc {
+class CloudModuleEndPointFetcher;
+}
+
 namespace cdb {
 namespace cl {
-
-class cc::CloudModuleEndPointFetcher;
 
 class AccountManager
 :

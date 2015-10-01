@@ -115,9 +115,10 @@ void AuthenticationProvider::getAuthenticationResponse(
     api::AuthResponse response;
     response.nonce = authRequest.nonce;
     response.accessRole = systemAccessRole;
-    response.intermediateResponse = nx_http::calcIntermediateResponse(
+    const auto intermediateResponse = nx_http::calcIntermediateResponse(
         account->passwordHa1.c_str(),
         authRequest.nonce.c_str());
+    response.intermediateResponse.assign(intermediateResponse.constData(), intermediateResponse.size());
 
     completionHandler(api::ResultCode::ok, std::move(response));
 }

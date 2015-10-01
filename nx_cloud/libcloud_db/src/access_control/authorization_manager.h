@@ -46,8 +46,8 @@ public:
         stree::AbstractResourceWriter* const authzInfo ) const;
 
 private:
-    const AccountManager& m_accountManager;
     const StreeManager& m_stree;
+    const AccountManager& m_accountManager;
     const SystemManager& m_systemManager;
 };
 

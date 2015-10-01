@@ -29,7 +29,20 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
             return nx_http::StatusCode::forbidden;
         case ResultCode::dbError:
             return nx_http::StatusCode::internalServerError;
+        case ResultCode::networkError:
+            return nx_http::StatusCode::internalServerError;
+        case ResultCode::notImplemented:
+            return nx_http::StatusCode::notImplemented;
+        case ResultCode::unknownRealm:
+        case ResultCode::invalidNonce:
+            return nx_http::StatusCode::forbidden;
+        case ResultCode::badUsername:
+        case ResultCode::badRequest:
+            return nx_http::StatusCode::badRequest;
+        case ResultCode::unknownError:
+            return nx_http::StatusCode::internalServerError;
     }
+
     return nx_http::StatusCode::internalServerError;
 }
 

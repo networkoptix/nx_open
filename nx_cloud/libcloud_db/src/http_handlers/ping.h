@@ -47,7 +47,7 @@ private:
         std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler)
     {
         api::ModuleInfo data;
-        data.realm = AuthenticationManager::realm();
+        data.realm = AuthenticationManager::realm().constData();
         completionHandler(api::ResultCode::ok, std::move(data));
     }
 };
