@@ -95,7 +95,7 @@ void QnUserManagementWidget::updateFromSettings() {
     bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
     ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
     ui->fetchButton->setVisible(!currentUserIsLdap);
-    ui->ldapSettingsButton->setEnabled(~qnCommon->isReadOnly());
+    ui->ldapSettingsButton->setEnabled(!qnCommon->isReadOnly());
     ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
     ui->fetchButton->setEnabled(!qnCommon->isReadOnly());
     updateSelection();
