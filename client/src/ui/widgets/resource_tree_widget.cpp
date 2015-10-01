@@ -391,6 +391,9 @@ QAbstractItemView* QnResourceTreeWidget::treeView() const {
 }
 
 void QnResourceTreeWidget::updateColumns() {
+    if (!model())
+        return;
+
     const int checkBoxSize = 16;
     ui->resourcesTreeView->header()->setStretchLastSection(false);
 
