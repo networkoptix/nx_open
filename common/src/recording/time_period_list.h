@@ -145,8 +145,34 @@ public:
 
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
 
-private:
+    /**
+     * Include a period to the period list
+     *
+     * \param[in] period                A period to be included.
+     *
+     * The function includes the given period to the list.
+     * If the period overlaps the other periods, all of them will be merged.
+     * If the period list is unsorted or contains overlapping periods
+     * the result is undefined.
+     */
+    void includeTimePeriod(const QnTimePeriod &period);
+
+    /**
+     * Exclude a period to the period list
+     *
+     * \param[in] period                A period to be excluded.
+     *
+     * The function excludes the given period from the list.
+     * If the period overlaps the other periods, intersected pieces or whole periods will be romoved.
+     * If the period list is unsorted or contains overlapping periods
+     * the result is undefined.
+     */
     void excludeTimePeriod(const QnTimePeriod &period);
+
+    /**
+     * Converts any period list to a simple list: sorted and containing only non-overlapped periods.
+     */
+    QnTimePeriodList simplified() const;
 };
 
 struct MultiServerPeriodData

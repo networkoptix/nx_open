@@ -318,28 +318,75 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
     return result;
 }
 
+void QnTimePeriodList::includeTimePeriod(const QnTimePeriod &period) {
+    if (period.isEmpty())
+        return;
 
-void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period) {
-    /* Trim live period. */
-    auto last = cend() - 1;
-    if (last->isInfinite() && period.endTimeMs() >= last->startTimeMs) {
-        QnTimePeriod trimmed(last->startTimeMs, std::max(0ll, period.startTimeMs - last->startTimeMs));
-        removeLast();
-        if (trimmed.isValid()) {
-            push_back(trimmed);
-            return;
-        }
+    if (empty()) {
+        push_back(period);
+        return;
     }
 
-    /* Trim old periods. */
-    Q_ASSERT_X(!period.isInfinite(), Q_FUNC_INFO, "We are not supposed to get infinite period here");
-    Q_ASSERT_X(!period.isEmpty(), Q_FUNC_INFO, "We are not supposed to get empty period here");
+    auto startIt = std::lower_bound(begin(), end(), period.startTimeMs);
+    if (startIt != begin() && period.startTimeMs <= (startIt - 1)->endTimeMs())
+        --startIt;
+
+    qint64 periodEndMs = period.endTimeMs();
+
+    auto endIt = startIt;
+    while (endIt != end() && endIt->startTimeMs <= periodEndMs)
+        ++endIt;
+
+    if (startIt == endIt) {
+        insert(startIt, period);
+        return;
+    }
+
+    periodEndMs = std::max(periodEndMs, startIt->endTimeMs());
+    startIt->startTimeMs = std::min(period.startTimeMs, startIt->startTimeMs);
+
+    auto it = startIt + 1;
+    for (int count = std::distance(it, endIt); count > 0; --count) {
+        qint64 endMs = it->endTimeMs();
+        if (periodEndMs < endMs)
+            periodEndMs = endMs;
+
+        it = erase(it);
+    }
+
+    startIt->durationMs = periodEndMs - startIt->startTimeMs;
+}
+
+void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period) {
+    if (empty() || period.isEmpty())
+        return;
 
     qint64 endTimeMs = period.endTimeMs();
-    auto eraseIter = std::lower_bound(begin(), end(), period.startTimeMs);
-    while (eraseIter != end() && eraseIter->startTimeMs < endTimeMs)
-        eraseIter = erase(eraseIter);
 
+    auto it = std::lower_bound(begin(), end(), period.startTimeMs);
+    if (it != begin() && period.startTimeMs <= (it - 1)->endTimeMs())
+        --it;
+
+    while (it != end() && it->startTimeMs < endTimeMs) {
+        bool contains = true;
+
+        if (it->startTimeMs < period.startTimeMs) {
+            it->durationMs = period.startTimeMs - it->startTimeMs;
+            contains = false;
+        }
+
+        qint64 currentEndMs = it->endTimeMs();
+        if (currentEndMs > endTimeMs) {
+            it->durationMs = currentEndMs - endTimeMs;
+            it->startTimeMs = endTimeMs;
+            contains = false;
+        }
+
+        if (contains)
+            it = erase(it);
+        else
+            ++it;
+    }
 }
 
 void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList& tail, qint64 dividerPoint) {
@@ -535,4 +582,13 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
         }
     }
     return result;
+}
+
+QnTimePeriodList QnTimePeriodList::simplified() const {
+    QnTimePeriodList newList;
+
+    for (const QnTimePeriod &period: *this)
+        newList.includeTimePeriod(period);
+
+    return newList;
 }
