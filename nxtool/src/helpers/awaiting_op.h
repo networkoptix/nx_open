@@ -45,6 +45,8 @@ namespace rtu
 
         int changesCount() const;
 
+        void resetChangesCount();
+
     signals:
         void timeout();
 
@@ -57,10 +59,10 @@ namespace rtu
 
     private:
         const QUuid m_serverId;
-        const int m_changesCount;
         const qint64 m_creationTimestamp;
         const qint64 m_timeout;
 
+        int m_changesCount;
         ServerDiscoveredAction m_discovered;
         Callback m_disappeared;
         UnknownAddedHandler m_unknownAdded;

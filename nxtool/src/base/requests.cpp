@@ -177,7 +177,7 @@ namespace /// Parsers stuff
 
     bool needRestart(const QJsonObject &object)
     {
-        static const auto kNeedRestartTag = "needRestart";
+        static const auto kNeedRestartTag = "rebootNeeded";
 
         const auto body = extractReplyBody(object).toObject();
         return (body.contains(kNeedRestartTag) 

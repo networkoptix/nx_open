@@ -32,10 +32,10 @@ rtu::AwaitingOp::AwaitingOp(const QUuid &serverId
     , qint64 timeout)
     
     : m_serverId(serverId)
-    , m_changesCount(changesCount)
     , m_timeout(timeout)
     , m_creationTimestamp(timeoutCounter.elapsed())
 
+    , m_changesCount(changesCount)
     , m_discovered()
     , m_disappeared()
     , m_unknownAdded()
@@ -98,6 +98,11 @@ const QUuid &rtu::AwaitingOp::serverId() const
 int rtu::AwaitingOp::changesCount() const
 {
     return m_changesCount;
+}
+
+void rtu::AwaitingOp::resetChangesCount()
+{
+    m_changesCount = 0;
 }
 
 
