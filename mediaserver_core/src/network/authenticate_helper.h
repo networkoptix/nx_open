@@ -16,9 +16,10 @@
 #include "utils/common/uuid.h"
 #include "utils/network/http/httptypes.h"
 #include "utils/thread/mutex.h"
+#include "utils/network/auth_restriction_list.h"
 
-#include "auth_restriction_list.h"
 #include "ldap/ldap_manager.h"
+
 
 struct QnLdapDigestAuthContext;
 
