@@ -57,6 +57,21 @@ protected:
         return user;
     }
 
+    QnLayoutResourcePtr createLayout(Qn::ResourceFlags flags, bool locked = false, bool userCanEdit = true, const QnUuid &parentId = QnUuid()) {
+        QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+        layout->setId(QnUuid::createUuid());
+        layout->addFlags(flags);
+        layout->setLocked(locked);
+        layout->setUserCanEdit(userCanEdit);
+
+        if (!parentId.isNull())
+            layout->setParentId(parentId);
+        else if (m_context->user())
+            layout->setParentId(m_context->user()->getId());
+
+        return layout;
+    }
+
     void loginAs(Qn::Permissions globalPermissions) {
         auto user = addUser(userName1, globalPermissions);  
         m_context->setUserName(userName1);
@@ -103,8 +118,7 @@ TEST_F( QnWorkbenchAccessControllerTest, safeCannotSaveExternalPermissionsLayout
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
 
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
+    auto layout = createLayout(0);
     layout->setData(Qn::LayoutPermissionsRole, Qn::ReadWriteSavePermission);
     qnResPool->addResource(layout);
 
@@ -118,10 +132,8 @@ TEST_F( QnWorkbenchAccessControllerTest, safeCannotSaveExternalPermissionsLayout
 /** Fix permissions for exported layouts (files). */
 TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayouts )
 {
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
+    auto layout = createLayout(Qn::url | Qn::local);
     layout->setUrl("path/to/file");
-    layout->addFlags(Qn::url);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(QnWorkbenchLayoutSnapshotManager::isFile(layout));
@@ -144,11 +156,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayouts )
 /** Fix permissions for locked exported layouts (files). */
 TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked )
 {
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
+    auto layout = createLayout(Qn::url | Qn::local, true);
     layout->setUrl("path/to/file");
-    layout->addFlags(Qn::url | Qn::local);
-    layout->setLocked(true);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(QnWorkbenchLayoutSnapshotManager::isFile(layout));
@@ -172,9 +181,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked )
 /** Check permissions for layouts when the user is not logged in. */
 TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged )
 {
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
+    auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
     
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -198,12 +205,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
+    
+    auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -220,12 +223,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsAsAdmin )
 {
     loginAs(Qn::GlobalOwnerPermissions);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
+    auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -242,13 +240,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(true);
+    auto layout = createLayout(Qn::local, true);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -265,13 +257,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsAsAdmin )
 {
     loginAs(Qn::GlobalOwnerPermissions);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(true);
+    auto layout = createLayout(Qn::local, true);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -293,12 +279,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode )
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
+    auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -316,12 +297,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsAsAdminSafeMode )
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
+    auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -338,14 +314,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedInSafeMode
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(true);
+    
+    auto layout = createLayout(Qn::local, true);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -362,14 +332,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsAsAdminSafeMode 
 {
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::local);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(true);
+    
+    auto layout = createLayout(Qn::local, true);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
@@ -390,12 +354,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkRemoteLayoutAsAdmin )
 {
     loginAs(Qn::GlobalOwnerPermissions);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
+    auto layout = createLayout(Qn::remote);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -410,14 +369,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkRemoteLayoutAsAdmin )
 TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsAdmin )
 {
     loginAs(Qn::GlobalOwnerPermissions);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(true);
+    
+    auto layout = createLayout(Qn::remote, true);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -434,13 +387,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkRemoteLayoutAsAdminSafeMode )
 {
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
+    
+    auto layout = createLayout(Qn::remote);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -457,14 +405,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsAdminSafeMode 
 {
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(true);
+    
+    auto layout = createLayout(Qn::remote, true);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -484,13 +426,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsAdminSafeMode 
 TEST_F( QnWorkbenchAccessControllerTest, checkRemoteLayoutAsViewer )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
+    
+    auto layout = createLayout(Qn::remote);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -506,13 +443,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsViewer )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(true);
+    auto layout = createLayout(Qn::remote, true);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -530,12 +461,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkRemoteLayoutAsViewerSafeMode )
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
+    auto layout = createLayout(Qn::remote);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -553,13 +479,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsViewerSafeMode
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(true);
+    auto layout = createLayout(Qn::remote, true);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -580,12 +500,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyRemoteLayoutAsViewer )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(false);
+    auto layout = createLayout(Qn::remote, false, false);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -601,14 +516,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyRemoteLayoutAsViewer )
 TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyLockedRemoteLayoutAsViewer )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(false);
-    layout->setLocked(true);
+    
+    auto layout = createLayout(Qn::remote, true, false);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -625,13 +534,8 @@ TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyRemoteLayoutAsViewerSafeMo
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(false);
+    
+    auto layout = createLayout(Qn::remote, false, false);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -649,13 +553,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyLockedRemoteLayoutAsViewer
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
 
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(m_context->user()->getId());
-    layout->setUserCanEdit(false);
-    layout->setLocked(true);
+    auto layout = createLayout(Qn::remote, true, false);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
@@ -676,14 +574,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkNonOwnRemoteLayoutAsViewer )
     loginAs(Qn::GlobalLiveViewerPermissions);
 
     auto anotherUser = addUser(userName2, Qn::GlobalLiveViewerPermissions);
-
-    /* Unsaved layout that we have just created. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
-    layout->setId(QnUuid::createUuid());
-    layout->addFlags(Qn::remote);
-    layout->setParentId(anotherUser->getId());
-    layout->setUserCanEdit(true);
-    layout->setLocked(false);
+    auto layout = createLayout(Qn::remote, false, true, anotherUser->getId());
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
