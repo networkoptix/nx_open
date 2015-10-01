@@ -141,7 +141,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayouts )
     /* Exported layouts can be edited when we are not logged in. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     /* But their name is fixed. */
-    Qn::Permissions forbidden = Qn::WriteNamePermission;
+    Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::RemovePermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
@@ -162,8 +162,9 @@ TEST_F( QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked )
 
     ASSERT_TRUE(QnWorkbenchLayoutSnapshotManager::isFile(layout));
 
-    Qn::Permissions desired = Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
-    Qn::Permissions forbidden = (Qn::FullLayoutPermissions ^ desired) & Qn::FullLayoutPermissions;
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::AddRemoveItemsPermission | Qn::RemovePermission;
+    desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
 

@@ -220,7 +220,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     }
     
     if (QnWorkbenchLayoutSnapshotManager::isFile(layout))
-        return checkLocked(Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
+        return checkLocked(Qn::ReadWriteSavePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
     
     /* Calculate base layout permissions */
     auto base = [&]() -> Qn::Permissions {
