@@ -304,7 +304,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode )
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::RemovePermission | Qn::SavePermission;
+    Qn::Permissions forbidden = Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
@@ -327,7 +327,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsAsAdminSafeMode )
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::RemovePermission | Qn::SavePermission;
+    Qn::Permissions forbidden = Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
@@ -351,7 +351,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedInSafeMode
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission;
+    Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
@@ -375,7 +375,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsAsAdminSafeMode 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission;
+    Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);

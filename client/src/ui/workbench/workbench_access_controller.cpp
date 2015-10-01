@@ -187,7 +187,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     auto checkReadOnly = [this, layout](Qn::Permissions permissions) {
         if (!m_readOnlyMode)
             return permissions;
-        return permissions - Qn::SavePermission;
+        return permissions - (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
     };
 
     auto checkLoggedIn = [this, layout](Qn::Permissions permissions) {
@@ -233,6 +233,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
                ); 
 
     if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
+
+        return checkLocked(checkReadOnly(Qn::FullLayoutPermissions)); 
+
         if (m_readOnlyMode)
             return checkLocked(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission); /* Can structurally modify but cannot save. */;
 
