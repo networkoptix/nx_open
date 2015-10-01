@@ -18,11 +18,6 @@ angular.module('webadminApp')
                 ecDbReadOnly:r.data.reply.ecDbReadOnly
             };
 
-            if($scope.settings.ecDbReadOnly){
-                $location.path('/info'); //readonly - redirect
-                return;
-            }
-
             $scope.oldSystemName = r.data.reply.systemName;
             $scope.oldPort = r.data.reply.port;
         });
