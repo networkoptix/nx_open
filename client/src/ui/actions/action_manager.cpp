@@ -650,7 +650,11 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
             text(tr("User...")).
             pulledText(tr("New User...")).
-            condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this)).
+            condition(new QnConjunctionActionCondition(
+                new QnTreeNodeTypeCondition(Qn::UsersNode, this),
+                new QnForbiddenInSafeModeCondition(this),
+                this)
+                ).
             autoRepeat(false);
 
         factory(Qn::NewVideoWallAction).
@@ -658,6 +662,7 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
             text(tr("Video Wall...")).
             pulledText(tr("New Video Wall...")).
+            condition(new QnForbiddenInSafeModeCondition(this)).
             autoRepeat(false);
 
     } factory.endSubMenu();
