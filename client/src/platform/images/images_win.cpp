@@ -234,9 +234,17 @@ namespace {
 QnWindowsImages::QnWindowsImages(QObject *parent):
     QnPlatformImages(parent)
 {
-    m_copyDragCursor = QCursor(QPixmap(copyDragCursorXpmC), 0, 0);
-    m_moveDragCursor = QCursor(QPixmap(moveDragCursorXpmC), 0, 0);
-    m_linkDragCursor = QCursor(QPixmap(linkDragCursorXpmC), 0, 0);
+    QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
+
+    if (guiApp) {
+        m_copyDragCursor = QCursor(QPixmap(copyDragCursorXpmC), 0, 0);
+        m_moveDragCursor = QCursor(QPixmap(moveDragCursorXpmC), 0, 0);
+        m_linkDragCursor = QCursor(QPixmap(linkDragCursorXpmC), 0, 0);
+    } else {
+        m_copyDragCursor = QCursor(Qt::DragCopyCursor);
+        m_moveDragCursor = QCursor(Qt::DragMoveCursor);
+        m_linkDragCursor = QCursor(Qt::DragLinkCursor);
+    }
 }
 
 QCursor QnWindowsImages::bitmapCursor(Qt::CursorShape shape) const {
