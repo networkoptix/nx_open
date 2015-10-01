@@ -220,9 +220,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     }
     
     if (QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
-        if (layout->locked())
-            return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission;
+//         if (layout->locked())
+//             return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+        return checkLocked(Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
     }
     
     /* Can do whatever with local layouts except removing from server. */
