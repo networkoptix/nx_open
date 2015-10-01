@@ -220,6 +220,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     }
     
     if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
+        if(snapshotManager()->isLocal(layout))
+            return checkLoggedIn(Qn::FullLayoutPermissions - Qn::RemovePermission); /* Can do whatever with local layouts except removing from server. */
+
         if (!snapshotManager()->isLocal(layout) && m_readOnlyMode)
             return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */;
 
