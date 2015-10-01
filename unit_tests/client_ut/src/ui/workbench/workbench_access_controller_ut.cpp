@@ -608,7 +608,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyLockedRemoteLayoutAsViewer
     layout->addFlags(Qn::remote);
     layout->setParentId(m_context->user()->getId());
     layout->setUserCanEdit(false);
-    layout->setLocked(false);
+    layout->setLocked(true);
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
