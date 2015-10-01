@@ -196,6 +196,12 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         return permissions - (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
     };
 
+    auto checkLocked = [this, layout](Qn::Permissions permissions) {
+        if (!layout->locked())
+            return permissions;
+        return permissions - (Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
+    };
+
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if(permissions.isValid() && permissions.canConvert<int>()) {
         return checkReadOnly(static_cast<Qn::Permissions>(permissions.toInt())); // TODO: #Elric listen to changes
@@ -219,8 +225,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission;
     }
     
+    /* Can do whatever with local layouts except removing from server. */
     if(snapshotManager()->isLocal(layout))
-        return checkLoggedIn(Qn::FullLayoutPermissions - Qn::RemovePermission); /* Can do whatever with local layouts except removing from server. */
+        return checkLocked(
+                    checkLoggedIn(
+                        Qn::FullLayoutPermissions - Qn::RemovePermission
+                    ) 
+               ); 
 
     if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
         if (m_readOnlyMode)
