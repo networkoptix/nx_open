@@ -18,6 +18,7 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     base_type(parent),
@@ -39,6 +40,9 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     addPage(TimeServerSelection, new QnTimeServerSelectionWidget(this), tr("Time Synchronization"));
 
     loadData();
+
+    QnWorkbenchSafeModeWatcher* watcher = new QnWorkbenchSafeModeWatcher(this);
+    watcher->addControlledButton(QDialogButtonBox::Ok);
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}

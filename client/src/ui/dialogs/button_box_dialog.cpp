@@ -41,6 +41,10 @@ bool QnButtonBoxDialog::event(QEvent *event) {
     return result;
 }
 
+QDialogButtonBox* QnButtonBoxDialog::buttonBox() const {
+    return m_buttonBox.data();
+}
+
 void QnButtonBoxDialog::initializeButtonBox() {
     if(m_buttonBox)
         return; /* Already initialized with a direct call to setButtonBox in derived class's constructor. */

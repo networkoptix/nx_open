@@ -12,6 +12,8 @@
 
 #include <ui/workbench/workbench_state_manager.h>
 
+class QnWorkbenchSafeModeWatcher;
+
 #define COMMA ,
 #define ID(x) x
 
@@ -59,6 +61,13 @@ public:
 
 protected:
     virtual void retranslateUi() {}
+
+    void makeReadOnlyModeAware(QList<QWidget*> disabledWidgets = QList<QWidget*>());
+    void makeReadOnlyModeAware(QWidget* disabledWidget);
+    void makeReadOnlyModeAware(QDialogButtonBox::StandardButton button);
+
+private:
+    QnWorkbenchSafeModeWatcher* m_safeModeWatcher;
 };
 
 

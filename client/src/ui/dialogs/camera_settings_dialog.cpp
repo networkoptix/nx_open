@@ -4,6 +4,8 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 
+#include <common/common_module.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
@@ -71,6 +73,9 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
 
     at_settingsWidget_hasChangesChanged();
     retranslateUi();
+
+    makeReadOnlyModeAware(m_okButton);
+    makeReadOnlyModeAware(m_applyButton);
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
@@ -117,15 +122,16 @@ void QnCameraSettingsDialog::reject() {
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
     bool hasChanges = m_settingsWidget->hasDbChanges();
-    m_applyButton->setEnabled(hasChanges);
+    m_applyButton->setEnabled(hasChanges && !qnCommon->isReadOnly());
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
-    m_okButton->setEnabled(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_openButton->setVisible(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_diagnoseButton->setVisible(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
+    bool isValidMode = (mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
+    m_okButton->setEnabled(isValidMode && !qnCommon->isReadOnly());
+    m_openButton->setVisible(isValidMode);
+    m_diagnoseButton->setVisible(isValidMode);
     m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement
 }
 
