@@ -66,9 +66,6 @@ namespace ec2
         QString nx1mac;
         QString nx1serial;
 
-        QString nx1mac;
-        QString nx1serial;
-
         bool updateStarted;
     };
 
