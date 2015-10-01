@@ -202,3 +202,25 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn )
 
     checkPermissions(layout, desired, forbidden);
 }
+
+/** Check permissions for unsaved layouts when the user is logged in. */
+TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsAsAdmin )
+{
+    loginAs(Qn::GlobalOwnerPermissions);
+
+    /* Unsaved layout that we have just created. */
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    layout->setId(QnUuid::createUuid());
+    layout->addFlags(Qn::local);
+    layout->setParentId(m_context->user()->getId());
+    layout->setUserCanEdit(true);
+    qnResPool->addResource(layout);
+
+    ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = Qn::RemovePermission;
+    desired &= ~forbidden;
+
+    checkPermissions(layout, desired, forbidden);
+}
