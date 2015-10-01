@@ -15,7 +15,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <api/global_settings.h>
-#include <network/auth_restriction_list.h>
+#include <utils/network/auth_restriction_list.h>
 #include <utils/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/log.h>

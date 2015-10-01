@@ -9,8 +9,8 @@
 
 #include <boost/optional.hpp>
 
-#include <network/auth_restriction_list.h>
 #include <utils/common/app_info.h>
+#include <utils/network/auth_restriction_list.h>
 #include <utils/network/http/auth_tools.h>
 
 #include "stree/cdb_ns.h"
