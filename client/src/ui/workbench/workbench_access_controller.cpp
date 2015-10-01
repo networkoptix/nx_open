@@ -247,28 +247,20 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         if(user != m_user)
             return 0; /* Viewer can't view other's layouts. */
 
-        if (m_readOnlyMode) {
+        auto base = [&]() -> Qn::Permissions {     
             if (layout->userCanEdit()) {
-                if (layout->locked())
-                    return Qn::ReadPermission | Qn::WritePermission; /* Can structurally modify but cannot save. */;
-                return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */;
-            }
+                return Qn::FullLayoutPermissions; /* Can structurally modify layout with this flag. */
+            } 
+            return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */        
+        };
 
-            if (layout->locked())
-                return Qn::ReadPermission | Qn::WritePermission;
-
-            return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Read-only layout */
-        }
-       
-        if (layout->userCanEdit()) {
-            if (layout->locked())
-                return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
-            return Qn::FullLayoutPermissions; /* Can structurally modify layout with this flag. */
-        } 
-
-        if (layout->locked())
-            return Qn::ReadPermission | Qn::WritePermission;
-        return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */        
+        return checkLocked(
+                    checkLoggedIn(
+                        checkReadOnly(
+                            base()
+                        )
+                    ) 
+                ); 
     }
 }
 
