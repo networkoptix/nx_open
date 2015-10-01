@@ -233,15 +233,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
                ); 
 
     if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
-
-        return checkLocked(checkReadOnly(Qn::FullLayoutPermissions)); 
-
-        if (m_readOnlyMode)
-            return checkLocked(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission); /* Can structurally modify but cannot save. */;
-
-        if (layout->locked())
-            return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
-        return Qn::FullLayoutPermissions;
+        return checkLocked(
+                    checkLoggedIn(
+                        checkReadOnly(
+                            Qn::FullLayoutPermissions
+                        )
+                    ) 
+                ); 
     }
     
     /* Default branch */
