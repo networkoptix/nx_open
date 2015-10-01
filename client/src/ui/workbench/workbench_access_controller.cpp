@@ -219,11 +219,11 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission;
     }
     
-    if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
-        if(snapshotManager()->isLocal(layout))
-            return checkLoggedIn(Qn::FullLayoutPermissions - Qn::RemovePermission); /* Can do whatever with local layouts except removing from server. */
+    if(snapshotManager()->isLocal(layout))
+        return checkLoggedIn(Qn::FullLayoutPermissions - Qn::RemovePermission); /* Can do whatever with local layouts except removing from server. */
 
-        if (!snapshotManager()->isLocal(layout) && m_readOnlyMode)
+    if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
+        if (m_readOnlyMode)
             return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */;
 
         if (layout->locked())
@@ -242,10 +242,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
                 return Qn::ReadPermission | Qn::WritePermission; /* Can structurally modify but cannot save. */;
             return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */;
         }
-
-        if(snapshotManager()->isLocal(layout))
-            return checkLoggedIn(Qn::FullLayoutPermissions - Qn::RemovePermission); /* Can do whatever with local layouts except removing from server. */
-        
+       
         if (layout->userCanEdit()) {
             if (layout->locked())
                 return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
