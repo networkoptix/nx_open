@@ -217,7 +217,7 @@ Item
                                 }
 
                                 horizontalAlignment: Text.AlignHCenter;
-                                text: qsTr("Applying changes...");
+                                text: model.operationText;
                             }
 
                             ProgressBar

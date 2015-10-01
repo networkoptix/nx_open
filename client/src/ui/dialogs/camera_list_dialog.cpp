@@ -138,9 +138,13 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
         if (QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>())
             resources.push_back(resource);
 
+
     QScopedPointer<QMenu> menu;
     if (!resources.isEmpty()) {
-        menu.reset(context()->menu()->newMenu(Qn::TreeScope, this, resources, QnActionManager::DontReuseActions)); /* We'll be changing hotkeys, so we cannot reuse global actions. */
+        QnActionParameters parameters(resources);
+        parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+
+        menu.reset(context()->menu()->newMenu(Qn::TreeScope, this, parameters, QnActionManager::DontReuseActions)); /* We'll be changing hotkeys, so we cannot reuse global actions. */
         foreach(QAction *action, menu->actions())
             action->setShortcut(QKeySequence());
     }

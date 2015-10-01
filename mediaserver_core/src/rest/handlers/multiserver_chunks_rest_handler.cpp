@@ -102,7 +102,7 @@ void QnMultiserverChunksRestHandler::loadLocalData(MultiServerPeriodDataList& ou
 {
     MultiServerPeriodData record;
     record.guid = qnCommon->moduleGUID();
-    record.periods = qnStorageMan->getRecordedPeriods(ctx->request.resList, ctx->request.startTimeMs, ctx->request.endTimeMs, ctx->request.detailLevel,
+    record.periods = qnStorageMan->getRecordedPeriods(ctx->request.resList, ctx->request.startTimeMs, ctx->request.endTimeMs, ctx->request.detailLevel, ctx->request.keepSmallChunks,
         QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog,
         ctx->request.limit);
 

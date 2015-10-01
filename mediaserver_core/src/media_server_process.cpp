@@ -215,6 +215,11 @@
 #include "nx1/info.h"
 #endif
 
+
+#ifdef __arm__
+#include "nx1/info.h"
+#endif
+
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
@@ -1946,7 +1951,7 @@ void MediaServerProcess::run()
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
-    selfInformation.flags = m_mediaServer->getServerFlags();
+    selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
     qnCommon->setModuleInformation(selfInformation);

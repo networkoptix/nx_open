@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -11,9 +12,15 @@
 #include <base/server_info.h>
 #include <helpers/rest_client.h>
 #include <helpers/time_helper.h>
+#include <helpers/version_holder.h>
+
+#include <QDebug>
 
 namespace 
 {
+    /// Extra abilities = SF_Has_Hdd flag and ability to execute script throug the /api/execute rest command
+    const rtu::VersionHolder kExtraAbilitiesMinVersion = rtu::VersionHolder(QStringLiteral("2.4.1"));
+
     const QString kApiNamespaceTag = "/api/";
     
     const QString kModuleInfoAuthCommand = kApiNamespaceTag + "moduleInformationAuthenticated";
@@ -22,16 +29,21 @@ namespace
     const QString kSetTimeCommand = kApiNamespaceTag + "settime";
     const QString kGetTimeCommand = kApiNamespaceTag + "gettime";
     const QString kIfListCommand = kApiNamespaceTag + "iflist";
-    const QString kGetServerExtraInfoCommand = kApiNamespaceTag + "aggregator";
     const QString kRestartCommand = kApiNamespaceTag + "restart";
+    const QString kScriptsList = kApiNamespaceTag + "scriptList";
+    const QString kExecuteCommand = kApiNamespaceTag + "execute";
 
     const QString kIDTag = "id";
     const QString kSeedTag = "seed";
+    const QString kRuntimeIdTag = "runtimeId";
+    const QString kVersionTag = "version";
     const QString kNameTag = "name";
     const QString kSystemNameTag = "systemName";
     const QString kPortTag = "port";
     const QString kFlagsTag = "flags";
+    const QString kServerFlagsTag = "serverFlags";
     const QString kLocalTimeFlagTag = "local";
+    const QString kSafeModeTag = "ecDbReadOnly";
 
     QUrl makeUrl(const QString &host
         , const int port
@@ -68,22 +80,28 @@ namespace
             { info.id = QUuid(object.value(kIDTag).toString()); });
         result.insert(kSeedTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.id = QUuid(object.value(kSeedTag).toString()); });
+        result.insert(kRuntimeIdTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.runtimeId = QUuid(object.value(kRuntimeIdTag).toString()); });
         result.insert(kNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.name = object.value(kNameTag).toString(); });
         result.insert(kSystemNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.systemName = object.value(kSystemNameTag).toString(); });
         result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.port = object.value(kPortTag).toInt(); });
+        result.insert(kVersionTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.version = rtu::VersionHolder(object.value(kVersionTag).toString()); });
+        result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.safeMode = object.value(kSafeModeTag).toBool(); });
 
-
-        result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            {
+        const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info)
+        {
                 typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
                 static const TextFlagsInfo kKnownFlags[] =
                 {
                     TextFlagsInfo("SF_timeCtrl", rtu::Constants::ServerFlag::AllowChangeDateTimeFlag)
                     , TextFlagsInfo("SF_IfListCtrl", rtu::Constants::ServerFlag::AllowIfConfigFlag)
-                    , TextFlagsInfo("SF_AutoSystemName" , rtu::Constants::ServerFlag::IsFactoryFlag)
+                    , TextFlagsInfo("SF_AutoSystemName", rtu::Constants::ServerFlag::IsFactoryFlag)
+                    , TextFlagsInfo("SF_Has_HDD", rtu::Constants::ServerFlag::HasHdd)
                 };
 
                 info.flags = rtu::Constants::ServerFlag::NoFlags;
@@ -93,7 +111,14 @@ namespace
                     if (textFlags.contains(flagInfo.first))
                         info.flags |= flagInfo.second;
                 }
-            });
+        };
+
+        result.insert(kServerFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { parseFlags(object, info); });
+
+        /// Supports old versions of server where serverFlags field was "flags"
+        result.insert(kFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { parseFlags(object, info); });
         return result;
     }();
 }
@@ -108,18 +133,7 @@ namespace /// Parsers stuff
 
         return (object.value(kErrorTag).toInt() != 0);
     }
-   
-    /*
-    ///
-
-    QString getErrorDescription(const QJsonObject &object)
-    {
-        static const QString &kReasonTag = "errorString";
-        return (object.contains(kReasonTag) ? 
-            object.value(kReasonTag).toString() : QString());
-    }
-    */
-    ///
+  
     typedef std::function<bool (const QJsonObject &object
         , rtu::ExtraServerInfo &extraInfo)> ParseFunction;
 
@@ -242,6 +256,7 @@ namespace /// Parsers stuff
     }
 
     ///
+
     rtu::RestClient::SuccessCallback makeSuccessCallback(const rtu::OperationCallback &callback
         , rtu::Constants::AffectedEntities affected)
     {
@@ -283,6 +298,84 @@ namespace /// Parsers stuff
         rtu::RestClient::sendGet(request);
     }
 
+    ///
+
+    rtu::ExtraServerInfo extractScriptInfoFromAnswer(const QJsonObject &object)
+    {
+        typedef QMultiMap<QString, rtu::Constants::SystemCommand> ScriptCmdMap;
+        static ScriptCmdMap kMapping = []() -> ScriptCmdMap
+        {
+            ScriptCmdMap result;
+            result.insert("reboot", rtu::Constants::SystemCommand::RebootCmd);
+            result.insert("restore", rtu::Constants::SystemCommand::FactoryDefaultsCmd);
+            result.insert("restore_keep_ip", rtu::Constants::SystemCommand::FactoryDefaultsButNetworkCmd);
+            return result;
+        }();
+
+        rtu::ExtraServerInfo result;
+
+        const QJsonArray &scripts = extractReplyBody(object).toArray();
+        for(const QJsonValue &script: scripts)
+        {
+            const auto scriptFullName = script.toString();
+
+            /// Scripts could have different extensions in the different OS. 
+            const auto scriptId = QFileInfo(scriptFullName).completeBaseName();
+            const auto range = kMapping.equal_range(scriptId);
+            if (range.first != kMapping.end())
+            {
+                std::for_each(range.first, range.second
+                    , [&result, &scriptFullName](ScriptCmdMap::mapped_type sysCmd)
+                {
+                    result.sysCommands |= sysCmd;
+                    result.scriptNames[sysCmd] = scriptFullName;
+                });
+            }
+        }
+
+        result.sysCommands |= rtu::Constants::RestartServerCmd;
+        return result;
+    }
+
+    void getScriptInfos(const rtu::BaseServerInfoPtr &baseInfo
+        , const QString &password
+        , const rtu::ExtraServerInfoSuccessCallback &successCallback
+        , const rtu::OperationCallback &failedCallback
+        , const qint64 timeout)
+    {
+        const auto failed = [failedCallback](rtu::RequestError /* error */)
+        {
+            if (failedCallback)
+            {
+                failedCallback(rtu::RequestError::kInternalAppError
+                    , rtu::Constants::kNoEntitiesAffected);
+            }
+        };
+
+        if (baseInfo->version < kExtraAbilitiesMinVersion)
+        {
+            failed(rtu::RequestError::kRequestTimeout);
+            return;
+        }
+
+        const auto id = baseInfo->id;
+        const auto success = [id, successCallback, failed](const QByteArray &data)
+        {
+            const QJsonObject &object = QJsonDocument::fromJson(data).object();
+            if (isErrorReply(object))
+            {
+                failed(rtu::RequestError::kInternalAppError);
+                return;
+            }
+
+            if (successCallback)
+                successCallback(id, extractScriptInfoFromAnswer(object));
+        };
+
+        const rtu::RestClient::Request request(baseInfo, password
+            , kScriptsList, QUrlQuery(), timeout, success, failed);
+        rtu::RestClient::sendGet(request);
+    }
 }
 
 ///
@@ -297,6 +390,17 @@ bool rtu::parseModuleInformationReply(const QJsonObject &reply
         if (itHandler != parser.end())
             (*itHandler)(reply, baseInfo);
     }
+
+    if (baseInfo.version < kExtraAbilitiesMinVersion)
+    {
+        /// Assume all versions less than kExtraAbilitiesMinVersion have hdd due
+        /// to we can't discover state through the rest api
+        baseInfo.flags |= Constants::HasHdd;
+    }
+    /*
+    else
+        baseInfo.safeMode = true;   /// for debug!
+    */
 
     return true;
 }
@@ -402,36 +506,62 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
     static const Constants::AffectedEntities affected = (Constants::kAllAddressFlagsAffected 
         | Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
 
+    typedef std::shared_ptr<ExtraServerInfo> ExtraServerInfoPtr;
+    const ExtraServerInfoPtr extraInfoStorage(new ExtraServerInfo());
+
     const auto &getTimeFailed = [failed](const RequestError errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
         if (failed)
             failed(errorCode, affected);
     };
 
-    const auto &getTimeSuccessfull = [baseInfo, password, successful, timeout]
+    const auto &getTimeSuccessfull = [extraInfoStorage, baseInfo, password, successful, timeout]
         (const QUuid &id, const rtu::ExtraServerInfo &extraInfo) 
     {
         /// getTime command is successfully executed up to now
-        const auto &ifListFailed = [successful, id, extraInfo](const RequestError /* errorCode */
-            , Constants::AffectedEntities  /* affectedEntities */)
+
+        extraInfoStorage->timeZoneId = extraInfo.timeZoneId;
+        extraInfoStorage->timestampMs = extraInfo.timestampMs;
+        extraInfoStorage->utcDateTimeMs = extraInfo.utcDateTimeMs;
+
+        enum { kParallelCommandsCount = 2 };
+        const IntPointer commandsLeft(new int(kParallelCommandsCount));
+
+        const auto condCallSuccessfull = [commandsLeft, successful]
+            (const QUuid &id, const ExtraServerInfo &info)
         {
-            if (successful)
-                successful(id, extraInfo);
+            if ((--(*commandsLeft) == 0) && successful)
+                successful(id, info);
         };
 
-        const auto &ifListSuccessful = [successful, extraInfo](const QUuid &id, const rtu::ExtraServerInfo &ifListExtraInfo)
+        const auto &extraCommandsFailed = [extraInfoStorage, condCallSuccessfull, id]
+            (const RequestError /* errorCode */, Constants::AffectedEntities /* affectedEntities */)
         {
-            if (successful)
-            {
-                successful(id, ExtraServerInfo(extraInfo.password, extraInfo.timestampMs
-                    , extraInfo.utcDateTimeMs, extraInfo.timeZoneId, ifListExtraInfo.interfaces));
-            }
+            /// Calls successfull, anyway, for old servers not supporting ifList
+            condCallSuccessfull(id, *extraInfoStorage);
         };
 
-        getIfList(baseInfo, password, ifListSuccessful, ifListFailed, timeout);
+        const auto &ifListSuccessful = [extraInfoStorage, condCallSuccessfull]
+            (const QUuid &id, const rtu::ExtraServerInfo &extraInfo)
+        {
+            extraInfoStorage->interfaces = extraInfo.interfaces;
+            condCallSuccessfull(id, *extraInfoStorage);
+        };
+
+        const auto &extraFlagsSuccessful = [extraInfoStorage, condCallSuccessfull]
+            (const QUuid &id, const ExtraServerInfo &extraInfo)
+        {
+            extraInfoStorage->sysCommands = extraInfo.sysCommands;
+            extraInfoStorage->scriptNames = extraInfo.scriptNames;
+            condCallSuccessfull(id, *extraInfoStorage);
+        };
+
+        getIfList(baseInfo, password, ifListSuccessful, extraCommandsFailed, timeout);
+        getScriptInfos(baseInfo, password, extraFlagsSuccessful, extraCommandsFailed, timeout);
     };
 
-    const auto &callback = [failed, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout]
+    const auto &callback = [extraInfoStorage, failed, baseInfo, password
+        , getTimeSuccessfull, getTimeFailed, timeout]
         (const RequestError errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
         if (errorCode != RequestError::kSuccess)
@@ -441,6 +571,7 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
             return;
         }
 
+        extraInfoStorage->password = password;
         getTime(baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
     };
 
@@ -479,6 +610,46 @@ void rtu::sendRestartRequest(const BaseServerInfoPtr &info
 { 
     const RestClient::Request request(info, password, kRestartCommand
         , QUrlQuery(), RestClient::kUseStandardTimeout
+        , makeSuccessCallback(callback, Constants::kNoEntitiesAffected)
+        , makeErrorCallback(callback, Constants::kNoEntitiesAffected));
+
+    RestClient::sendGet(request);
+}
+
+void rtu::sendSystemCommand(const BaseServerInfoPtr &info
+    , const QString &password
+    , const Constants::SystemCommand sysCommand
+    , const OperationCallback &callback)
+{
+    QString cmd;
+    switch(sysCommand)
+    {
+    case Constants::SystemCommand::RestartServerCmd:
+        sendRestartRequest(info, password, callback);
+        return;
+
+    case Constants::SystemCommand::RebootCmd:
+        cmd = QStringLiteral("reboot");
+        break;
+    case Constants::SystemCommand::FactoryDefaultsCmd:
+        cmd = QStringLiteral("restore");
+        break;
+    case Constants::SystemCommand::FactoryDefaultsButNetworkCmd:
+        cmd = QStringLiteral("restore_keep_ip");
+        break;
+    default:
+    {
+        if (callback)
+            callback(RequestError::kInternalAppError, Constants::kNoEntitiesAffected);
+        return;
+    }
+
+    };
+
+    static const auto kExecutePathTemplate = QStringLiteral("%1/%2").arg(kExecuteCommand);
+    
+    const auto path = kExecutePathTemplate.arg(cmd);
+    const RestClient::Request request(info, password, path, QUrlQuery(), RestClient::kUseStandardTimeout
         , makeSuccessCallback(callback, Constants::kNoEntitiesAffected)
         , makeErrorCallback(callback, Constants::kNoEntitiesAffected));
 

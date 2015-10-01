@@ -24,6 +24,7 @@ Rectangle
     height: panel.height;
     color: "#35A0DA";
 
+    visible: (state == "visible");
     state: (show ? "visible" : "hidden");
     states:
     [
