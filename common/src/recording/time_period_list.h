@@ -93,26 +93,23 @@ public:
      * Average compressed QnTimePeriod size is close to 6 bytes in high-optimized mode and 7 bytes otherwise.
      * 
      * \param stream                    Byte array to compress time periods to. 
-     * \param intersected               Disables high-optimized mode. That allow time periods to be intersected.
      */
-    bool encode(QByteArray &stream, bool intersected = false);
+    bool encode(QByteArray &stream);
     
     /** 
      * Decode (decompress) data from a byte array. 
      * 
      * \param[in] stream                Byte array to decompress time periods from.
-     * \param[in] intersected           Flag that incoming time periods were encoded as intersected values.
      */
-    bool decode(QByteArray &stream, bool intersected = false);
+    bool decode(QByteArray &stream);
 
     /**
      * Decode (decompress) data from a byte array. 
      * 
      * \param[in] data                  Compressed data pointer.
      * \param[in] dataSize              Size of the compressed data.
-     * \param[in] intersected           Flag that incoming time periods were encoded as intersected values.
      */
-    bool decode(const quint8 *data, int dataSize, bool intersected = false);
+    bool decode(const quint8 *data, int dataSize);
 
     /** 
      * Find nearest period for specified time.

@@ -56,11 +56,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     {
         case ChunkFormat_Binary:
             result.append("BIN");
-            periods.encode(result, false);
-            break;
-        case ChunkFormat_BinaryIntersected:
-            result.append("BII");
-            periods.encode(result, true);
+            periods.encode(result);
             break;
         case ChunkFormat_XML:
             result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
