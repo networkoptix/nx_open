@@ -16,7 +16,7 @@
 namespace
 {
     const QByteArray UT_SERVER_GUID("{9DBF7579-3235-4910-A66C-0EB5DE8C443B}");
-    const int MT_REQUESTS = 20;
+    const int MT_REQUESTS = 10;
 
 }
 
