@@ -25,6 +25,18 @@
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
 
+Qn::Permissions operator-(Qn::Permissions minuend, Qn::Permissions subrahend) {
+    return static_cast<Qn::Permissions>(minuend & ~subrahend);
+}
+
+Qn::Permissions operator-(Qn::Permissions minuend, Qn::Permission subrahend) {
+    return static_cast<Qn::Permissions>(minuend & ~subrahend);
+}
+
+Qn::Permissions operator-(Qn::Permission minuend, Qn::Permission subrahend) {
+    return static_cast<Qn::Permissions>(minuend & ~subrahend);
+}
+
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -175,7 +187,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     auto checkReadOnly = [this, layout](Qn::Permissions permissions) {
         if (!m_readOnlyMode)
             return permissions;
-        return permissions &= ~(Qn::SavePermission);
+        return permissions - Qn::SavePermission;
+    };
+
+    auto checkLoggedIn = [this, layout](Qn::Permissions permissions) {
+        if (context()->user())
+            return permissions;
+        return permissions - (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
     };
 
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
@@ -222,16 +240,16 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
             return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */;
         }
 
+        if(snapshotManager()->isLocal(layout))
+            return checkLoggedIn(Qn::FullLayoutPermissions - Qn::RemovePermission); /* Can do whatever with local layouts except removing from server. */
+        
         if (layout->userCanEdit()) {
             if (layout->locked())
                 return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
             return Qn::FullLayoutPermissions; /* Can structurally modify layout with this flag. */
-        } else if(snapshotManager()->isLocal(layout)) {
-            return Qn::ReadPermission | Qn::WritePermission | Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can do whatever with local layouts. */
-        }
-        else {
-            return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */
-        }
+        } 
+
+        return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */        
     }
 }
 
