@@ -31,6 +31,11 @@ namespace rtu
         Q_PROPERTY(QDateTime dateTime READ dateTime NOTIFY changed)
         Q_PROPERTY(QObject *timeZonesModel READ timeZonesModel NOTIFY changed)
 
+        Q_PROPERTY(bool safeMode READ safeMode NOTIFY changed)
+
+        /// We can't change something on actions page now. Thus, we could update extraFlags value immediately 
+        Q_PROPERTY(int SystemCommands READ SystemCommands NOTIFY actionsSettingsChanged)    
+
     public:
         explicit Selection(ServersSelectionModel *selectionModel
             , QObject *parent = nullptr);
@@ -47,6 +52,8 @@ namespace rtu
         int count() const;
         
         int flags() const;
+
+        int SystemCommands() const;
 
         ///
 
@@ -70,7 +77,11 @@ namespace rtu
 
         QDateTime dateTime() const;
 
-        QObject *timeZonesModel();        
+        QObject *timeZonesModel();       
+
+        /// 
+
+        bool safeMode() const;
 
     signals:
         void changed(); /// fake signal
@@ -80,6 +91,8 @@ namespace rtu
         void interfaceSettingsChanged();
 
         void dateTimeSettingsChanged();
+
+        void actionsSettingsChanged();
 
     private:
         struct Snapshot;

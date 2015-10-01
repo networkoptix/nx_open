@@ -15,15 +15,30 @@ namespace rtu
         
         enum ServerFlag
         {
-            NoFlags                    = 0x0
-            , AllowChangeDateTimeFlag  = 0x1
-            , AllowIfConfigFlag        = 0x2
-            , IsFactoryFlag            = 0x4
-            
-            , AllFlags                 = 0xFFFF
+            NoFlags                             = 0x00
+            , AllowChangeDateTimeFlag           = 0x01
+            , AllowIfConfigFlag                 = 0x02
+            , IsFactoryFlag                     = 0x04
+            , HasHdd                            = 0x08
+
+            , AllFlags                          = 0xFF
         };
         Q_ENUMS(ServerFlag)
         Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
+
+        enum SystemCommand
+        {
+            NoCommands                          = 0x00
+
+            , RestartServerCmd                  = 0x01
+            , RebootCmd                         = 0x02
+            , FactoryDefaultsCmd                = 0x04
+            , FactoryDefaultsButNetworkCmd      = 0x08
+
+            , AllCommands                       = 0xFF       
+        };
+        Q_ENUMS(SystemCommand)
+        Q_DECLARE_FLAGS(SystemCommands, SystemCommand)
 
         enum Pages
         {

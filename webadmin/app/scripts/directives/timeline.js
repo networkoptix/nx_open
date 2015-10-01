@@ -1496,7 +1496,9 @@ angular.module('webadminApp')
                 }
                 if(scope.playbackNotSupported) {
                     scope.$watch('positionProvider.playedPosition', function (mode) {
-                        scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
+                        if(scope.positionProvider) {
+                            scope.playingTime = dateFormat(scope.positionProvider.playedPosition, timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
+                        }
                     });
                 }
 

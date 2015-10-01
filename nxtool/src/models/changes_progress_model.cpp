@@ -14,6 +14,7 @@ namespace
         , kTotalChangesCount
         , kAppliedChagnesCount
         , kErrorsCount
+        , kOperationText
         
         , kLastCustomRoleId        
     };
@@ -27,6 +28,7 @@ namespace
         roles.insert(kTotalChangesCount, "totalChangesCount");
         roles.insert(kAppliedChagnesCount, "appliedChangesCount");
         roles.insert(kErrorsCount, "errorsCount");
+        roles.insert(kOperationText, "operationText");
         return roles;
     }();
 }
@@ -167,6 +169,8 @@ QVariant rtu::ChangesProgressModel::data(const QModelIndex &index
         return task->appliedChangesCount();
     case kErrorsCount:
         return task->errorsCount();
+    case kOperationText:
+        return task->minimizedText();
     default:
         return QVariant();
     }

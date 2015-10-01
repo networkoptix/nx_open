@@ -1,4 +1,5 @@
 #include "authutil.h"
+#include <QCryptographicHash>
 
 //!Splits \a data by \a delimiter not closed within quotes
 /*!
@@ -64,5 +65,43 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char deli
     }
 
     return result;
+}
+
+QByteArray createUserPasswordDigest(
+    const QString& userName,
+    const QString& password,
+    const QString& realm )
+{
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(QString(lit("%1:%2:%3")).arg(userName, realm, password).toLatin1());
+    return md5.result().toHex();
+}
+
+QByteArray createHttpQueryAuthParam(
+    const QString& userName,
+    const QString& password,
+    const QString& realm,
+    const QByteArray& method,
+    QByteArray nonce)
+{
+    //calculating user digest
+    const QByteArray& ha1 = createUserPasswordDigest( userName, password, realm );
+
+    //calculating "HA2"
+    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+    md5Hash.addData( method );
+    md5Hash.addData( ":" );
+    const QByteArray nedoHa2 = md5Hash.result().toHex();
+
+    //calculating auth digest
+    md5Hash.reset();
+    md5Hash.addData( ha1 );
+    md5Hash.addData( ":" );
+    md5Hash.addData( nonce );
+    md5Hash.addData( ":" );
+    md5Hash.addData( nedoHa2 );
+    const QByteArray& authDigest = md5Hash.result().toHex();
+
+    return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
 }
 

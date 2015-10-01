@@ -153,6 +153,7 @@ bool QnEnumLexicalSerializerData::deserializeFlags(const QString &value, int *ta
     QStringList names = value.split(L'|');
 
     *target = 0;
+    bool valid = true;
 
     for(const QString &name: names) {
         QString trimmedName = name.trimmed();
@@ -170,17 +171,20 @@ bool QnEnumLexicalSerializerData::deserializeFlags(const QString &value, int *ta
             if(trimmedName.size() >= 3 && trimmedName.startsWith(QStringLiteral("0x"))) {
                 bool ok = false;
                 nameValue = trimmedName.toInt(&ok, 16);
-                if(!ok)
-                    return false;
+                if(!ok) {
+                    valid = false;
+                    continue;
+                }
             } else {
-                return false;
+                valid = false;
+                continue;
             }
         }
 
         *target |= nameValue;
     }
 
-    return true;
+    return valid;
 }
 
 void QnEnumLexicalSerializerData::serialize(int value, QString *target) const {

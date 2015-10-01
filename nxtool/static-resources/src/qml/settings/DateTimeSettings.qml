@@ -11,11 +11,13 @@ import networkoptix.rtu 1.0 as NxRtu;
 Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
-    
+
+    property bool pseudoEnabled: enabled; /// Have to use this property to allow tooltips under time zone control
+
     changed:  (maskedArea && maskedArea.changed?  true : false);
 
     extraWarned: !((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
-        || (rtuContext.selection.count === 1));
+        || (rtuContext.selection.count === 1)) || rtuContext.selection.safeMode;
 
     function tryApplyChanges(warnings)
     {
@@ -165,7 +167,8 @@ Expandable.MaskedSettingsPanel
                     {
                         id: timeZonePicker;
 
-                        pseudoEnabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+                        pseudoEnabled: ((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                            && thisComponent.pseudoEnabled);
 
                         model: rtuContext.selection.timeZonesModel;
                         initIndex: timeZonePicker.model.initIndex;
@@ -205,8 +208,8 @@ Expandable.MaskedSettingsPanel
                             initDate: (rtuContext.selection && rtuContext.selection !== null ?
                                 rtuContext.selection.dateTime : new Date());
 
-                            enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
-                                && !useCurrentTimeCheckbox.checked;
+                            enabled: ((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                                && !useCurrentTimeCheckbox.checked && thisComponent.pseudoEnabled);
 
                             KeyNavigation.tab: selectDateButton;
                             KeyNavigation.backtab: timeZonePicker;
@@ -221,8 +224,9 @@ Expandable.MaskedSettingsPanel
                             width: datePicker.height;
                             height: datePicker.height;
 
-                            enabled: !useCurrentTimeCheckbox.checked
-                                && (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+                            enabled: (!useCurrentTimeCheckbox.checked
+                                && (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                                && thisComponent.pseudoEnabled);
 
                             Dialogs.CalendarDialog
                             {
@@ -242,6 +246,9 @@ Expandable.MaskedSettingsPanel
                                 id: name
                                 anchors.centerIn: parent;
                                 source: "qrc:/resources/calendar.png";
+
+                                enabled: parent.enabled;
+                                opacity: (enabled ? 1.0 : 0.5);
                             }
 
                             KeyNavigation.tab: timePicker;
@@ -253,8 +260,8 @@ Expandable.MaskedSettingsPanel
                     {
                         id: timePicker;
                         
-                        enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
-                            && !useCurrentTimeCheckbox.checked;
+                        enabled: ((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                            && !useCurrentTimeCheckbox.checked && thisComponent.pseudoEnabled);
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
 
@@ -271,7 +278,8 @@ Expandable.MaskedSettingsPanel
 
                         text: qsTr("Set current date/time");
                         initialCheckedState: Qt.Unchecked;
-                        enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+                        enabled: ((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                            && thisComponent.pseudoEnabled);
 
                         onCheckedChanged: 
                         {
