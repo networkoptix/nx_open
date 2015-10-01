@@ -10,7 +10,7 @@ class QnProxyReceiverConnection: public QnTCPConnectionProcessor
 {
 public:
     QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
-                              QnUniversalTcpListener* owner);
+                              QnHttpConnectionListener* owner);
     virtual bool isTakeSockOwnership() const override;
 protected:
     virtual void run();
