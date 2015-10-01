@@ -1,5 +1,5 @@
-#ifndef __UNIVERSAL_TCP_LISTENER_H__
-#define __UNIVERSAL_TCP_LISTENER_H__
+#ifndef __HTTP_CONNECTION_LISTENER_H__
+#define __HTTP_CONNECTION_LISTENER_H__
 
 #include <QMultiMap>
 #include <utils/thread/wait_condition.h>
@@ -10,19 +10,19 @@
 #include "utils/network/http/httptypes.h"
 
 
-class QnUniversalTcpListener;
+class QnHttpConnectionListener;
 
 template <class T>
-QnTCPConnectionProcessor* handlerInstance(QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner)
+QnTCPConnectionProcessor* handlerInstance(QSharedPointer<AbstractStreamSocket> socket, QnHttpConnectionListener* owner)
 {
     return new T(socket, owner);
 };
 
-class QnUniversalTcpListener: public QnTcpListener
+class QnHttpConnectionListener: public QnTcpListener
 {
 private:
 public:
-    typedef QnTCPConnectionProcessor* (*InstanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner);
+    typedef QnTCPConnectionProcessor* (*InstanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnHttpConnectionListener* owner);
     struct HandlerInfo
     {
         QByteArray protocol;
@@ -32,12 +32,12 @@ public:
 
     static const int DEFAULT_RTSP_PORT = 554;
 
-    explicit QnUniversalTcpListener(
+    explicit QnHttpConnectionListener(
         const QHostAddress& address = QHostAddress::Any,
         int port = DEFAULT_RTSP_PORT,
         int maxConnections = QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         bool useSsl = false );
-    virtual ~QnUniversalTcpListener();
+    virtual ~QnHttpConnectionListener();
     
     template <class T> 
     void addHandler(const QByteArray& protocol, const QString& path)
@@ -68,8 +68,6 @@ public:
 
     /* proxy support functions */
 
-    void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
-
     bool registerProxyReceiverConnection(const QString& url, QSharedPointer<AbstractStreamSocket> socket);
 
     typedef std::function<void(int count)> SocketRequest;
@@ -79,8 +77,9 @@ public:
     void disableAuth();
 
     bool isProxy(const nx_http::Request& request);
+    bool needAuth() const;
+
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket) override;
     virtual void doPeriodicTasks() override;
 
 private:
@@ -110,4 +109,4 @@ private:
     bool m_needAuth;
 };
 
-#endif // __UNIVERSAL_TCP_LISTENER_H__
+#endif // __HTTP_CONNECTION_LISTENER_H__

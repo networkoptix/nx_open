@@ -1,11 +1,10 @@
 
-#include "universal_tcp_listener.h"
+#include "http_connection_listener.h"
+
+#include <QtCore/QUrl>
 
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/common/log.h"
-#include <QtCore/QUrl>
-#include "universal_request_processor.h"
-#include "proxy_sender_connection_processor.h"
 #include "utils/network/socket.h"
 #include "common/common_module.h"
 
@@ -15,7 +14,7 @@ static const int PROXY_CONNECTIONS_TO_REQUEST = 3;
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
-QnUniversalTcpListener::QnUniversalTcpListener(
+QnHttpConnectionListener::QnHttpConnectionListener(
     const QHostAddress& address,
     int port,
     int maxConnections,
@@ -26,17 +25,22 @@ QnUniversalTcpListener::QnUniversalTcpListener(
 {
 }
 
-QnUniversalTcpListener::~QnUniversalTcpListener()
+QnHttpConnectionListener::~QnHttpConnectionListener()
 {
     stop();
 }
 
-bool QnUniversalTcpListener::isProxy(const nx_http::Request& request)
+bool QnHttpConnectionListener::isProxy(const nx_http::Request& request)
 {
     return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(request));
 }
 
-QnUniversalTcpListener::InstanceFunc QnUniversalTcpListener::findHandler(
+bool QnHttpConnectionListener::needAuth() const
+{
+    return m_needAuth;
+}
+
+QnHttpConnectionListener::InstanceFunc QnHttpConnectionListener::findHandler(
         const QByteArray& protocol, const nx_http::Request& request)
 {
     if (isProxy(request))
@@ -79,30 +83,10 @@ QnUniversalTcpListener::InstanceFunc QnUniversalTcpListener::findHandler(
     return 0;
 }
 
-QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
-{
-    return new QnUniversalRequestProcessor(clientSocket, this, m_needAuth);
-}
-
-void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& proxyUrl, int size)
-{
-    if (m_needStop)
-        return;
-
-    NX_LOG(lit("QnUniversalTcpListener: %1 reverse connection(s) to %2 is(are) needed")
-            .arg(size).arg(proxyUrl.toString()), cl_logDEBUG1);
-
-    for (int i = 0; i < size; ++i) {
-        auto connect = new QnProxySenderConnection(proxyUrl, qnCommon->moduleGUID(), this);
-        connect->start();
-        addOwnership(connect);
-    }
-}
-
-QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
+QSharedPointer<AbstractStreamSocket> QnHttpConnectionListener::getProxySocket(
         const QString& guid, int timeout, const SocketRequest& socketRequest)
 {
-    NX_LOG(lit("QnUniversalTcpListener: reverse connection from %1 is needed")
+    NX_LOG(lit("QnHttpConnectionListener: reverse connection from %1 is needed")
             .arg(guid), cl_logDEBUG1);
 
     QnMutexLocker lock( &m_proxyMutex );
@@ -116,7 +100,7 @@ QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
             const auto elapsed = timer.elapsed();
             if (elapsed >= timeout)
             {
-                NX_LOG(lit("QnUniversalTcpListener: reverse connection from %1 was waited too long (%2 ms)")
+                NX_LOG(lit("QnHttpConnectionListener: reverse connection from %1 was waited too long (%2 ms)")
                         .arg(guid).arg(elapsed), cl_logERROR);
                 return QSharedPointer<AbstractStreamSocket>();
             }
@@ -135,20 +119,20 @@ QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
 
     auto socket = serverPool.available.front().socket;
     serverPool.available.pop_front();
-    NX_LOG(lit("QnUniversalTcpListener: reverse connection from %1 is used, %2 more avaliable")
+    NX_LOG(lit("QnHttpConnectionListener: reverse connection from %1 is used, %2 more avaliable")
             .arg(guid).arg(serverPool.available.size()), cl_logDEBUG1);
 
     socket->setNonBlockingMode(false);
     return socket;
 }
 
-bool QnUniversalTcpListener::registerProxyReceiverConnection(
+bool QnHttpConnectionListener::registerProxyReceiverConnection(
         const QString& guid, QSharedPointer<AbstractStreamSocket> socket)
 {
     QnMutexLocker lock(&m_proxyMutex);
     auto serverPool = m_proxyPool.find(guid);
     if (serverPool == m_proxyPool.end() || serverPool->requested == 0) {
-        NX_LOG(lit("QnUniversalTcpListener: reverse connection was not requested from %1")
+        NX_LOG(lit("QnHttpConnectionListener: reverse connection was not requested from %1")
                .arg(guid), cl_logWARNING);
         return false;
     }
@@ -156,14 +140,14 @@ bool QnUniversalTcpListener::registerProxyReceiverConnection(
     socket->setNonBlockingMode(true);
     serverPool->requested -= 1;
     serverPool->available.push_back(AwaitProxyInfo(socket));
-    NX_LOG(lit("QnUniversalTcpListener: got new reverse connection from %1, there is(are) %2 avaliable and %3 requested")
+    NX_LOG(lit("QnHttpConnectionListener: got new reverse connection from %1, there is(are) %2 avaliable and %3 requested")
            .arg(guid).arg(serverPool->available.size()).arg(serverPool->requested), cl_logDEBUG1);
 
     m_proxyCondition.wakeAll();
     return true;
 }
 
-void QnUniversalTcpListener::doPeriodicTasks()
+void QnHttpConnectionListener::doPeriodicTasks()
 {
     QnTcpListener::doPeriodicTasks();
 
@@ -174,7 +158,7 @@ void QnUniversalTcpListener::doPeriodicTasks()
             serverPool.available.pop_front();
 }
 
-void QnUniversalTcpListener::disableAuth()
+void QnHttpConnectionListener::disableAuth()
 {
     m_needAuth = false;
 }
