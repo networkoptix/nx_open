@@ -888,7 +888,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+        condition(new QnConjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::ServersNode, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)
+            );
 
     factory().
         flags(Qn::Main).
@@ -1463,6 +1467,7 @@ QnActionManager::QnActionManager(QObject *parent):
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::All, this),
             new QnFakeServerActionCondition(true, this),
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
+            new QnForbiddenInSafeModeCondition(this),
             this));
 
     factory().
