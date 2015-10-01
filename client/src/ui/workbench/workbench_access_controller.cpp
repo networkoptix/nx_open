@@ -216,52 +216,35 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 
         /* Layouts with desktop cameras are not to be modified. */
         if (hasDesktopCamera)
-            return Qn::ReadPermission | Qn::RemovePermission; 
+            return checkReadOnly(Qn::ReadPermission | Qn::RemovePermission);
     }
     
     if (QnWorkbenchLayoutSnapshotManager::isFile(layout))
         return checkLocked(Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
     
-    /* Can do whatever with local layouts except removing from server. */
-    if(snapshotManager()->isLocal(layout))
-        return checkLocked(
-                    checkLoggedIn(
-                        checkReadOnly(
-                            Qn::FullLayoutPermissions - Qn::RemovePermission
-                        )
-                    ) 
-               ); 
+    /* Calculate base layout permissions */
+    auto base = [&]() -> Qn::Permissions {
+        /* User can do everything with local layouts except removing from server. */
+        if (snapshotManager()->isLocal(layout))
+            return Qn::FullLayoutPermissions - Qn::RemovePermission;
 
-    if (m_userPermissions & Qn::GlobalEditLayoutsPermission)
-        return checkLocked(
-                    checkLoggedIn(
-                        checkReadOnly(
-                            Qn::FullLayoutPermissions
-                        )
-                    ) 
-                ); 
-    
-    /* Default branch */
-    {
-        QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
-        if(user != m_user)
-            return 0; /* Viewer can't view other's layouts. */
+        /* Admin can do whatever he wants. */
+        if (m_userPermissions.testFlag(Qn::GlobalEditLayoutsPermission))
+            return Qn::FullLayoutPermissions;
 
-        auto base = [&]() -> Qn::Permissions {     
-            if (layout->userCanEdit()) {
-                return Qn::FullLayoutPermissions; /* Can structurally modify layout with this flag. */
-            } 
-            return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */        
-        };
+        /* Viewer cannot view other user's layouts. */
+        if(m_user && layout->getParentId() != m_user->getId())
+            return 0;
 
-        return checkLocked(
-                    checkLoggedIn(
-                        checkReadOnly(
-                            base()
-                        )
-                    ) 
-                ); 
-    }
+        /* User can do whatever he wants with own layouts. */
+        if (layout->userCanEdit())
+            return Qn::FullLayoutPermissions; 
+        
+        /* Can structurally modify but cannot save. */
+        return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; 
+    };
+
+    return checkLocked(checkLoggedIn(checkReadOnly(base()))); 
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &camera) const {
