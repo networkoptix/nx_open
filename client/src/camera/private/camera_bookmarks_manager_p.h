@@ -3,7 +3,7 @@
 #include <functional>
 
 #include <camera/camera_bookmarks_manager_fwd.h>
-
+#include <utils/common/id.h>
 #include <utils/common/connective.h>
 
 class QnCameraBookmarksManagerPrivate : public Connective<QObject> {
@@ -148,5 +148,5 @@ private:
     /** Cached bookmarks by query. */
     QHash<QUuid, QueryInfo> m_queries;
 
-    QHash<QnVirtualCameraResourcePtr, QnCameraBookmarkList> m_bookmarksByCamera;
+    QHash<QString, QnCameraBookmarkList> m_bookmarksByCamera;
 };

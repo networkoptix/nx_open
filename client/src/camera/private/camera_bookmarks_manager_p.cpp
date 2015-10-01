@@ -131,10 +131,10 @@ QnCameraBookmarkList QnCameraBookmarksManagerPrivate::getLocalBookmarks(const Qn
     MultiServerCameraBookmarkList result;
 
     for (const QnVirtualCameraResourcePtr &camera: cameras) {
-        if (!m_bookmarksByCamera.contains(camera))
+        if (!m_bookmarksByCamera.contains(camera->getUniqueId()))
             continue;
 
-        QnCameraBookmarkList cameraBookmarks = m_bookmarksByCamera[camera];
+        QnCameraBookmarkList cameraBookmarks = m_bookmarksByCamera[camera->getUniqueId()];
 
         auto startIter = std::lower_bound(cameraBookmarks.cbegin(), cameraBookmarks.cend(), filter.startTimeMs);
         auto endIter = std::upper_bound(cameraBookmarks.cbegin(), cameraBookmarks.cend(), filter.endTimeMs, [](qint64 value, const QnCameraBookmark &other) {
@@ -313,10 +313,19 @@ void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBook
         if (success && m_queries.contains(queryId) && requestId != invalidRequestId) {
             QueryInfo &info = m_queries[queryId];
             if (info.requestId == requestId) {
-                updateQueryCache(queryId, bookmarks); //TODO: #GDM #bookmarks merge results
+                updateQueryCache(queryId, bookmarks);
                 Q_ASSERT_X(info.state == QueryInfo::QueryState::Requested, Q_FUNC_INFO, "On state change we should clear request id.");               
                 if (info.state == QueryInfo::QueryState::Requested)
                     info.state = QueryInfo::QueryState::Actual;
+
+                for (const QnCameraBookmark &bookmark: bookmarks) {
+                    QnCameraBookmarkList &bookmarkList = m_bookmarksByCamera[bookmark.cameraId];
+                    auto it = std::lower_bound(bookmarkList.begin(), bookmarkList.end(), bookmark);
+                    if (it->guid == bookmark.guid)
+                        *it = bookmark;
+                    else
+                        bookmarkList.insert(it, bookmark);
+                }
             }
         }
         if (callback)
@@ -330,7 +339,7 @@ QnCameraBookmarkList QnCameraBookmarksManagerPrivate::executeQueryInternal(const
 
     if (!query->isValid())
         return QnCameraBookmarkList();
-    return getLocalBookmarks(query->cameras(), query->filter());   
+    return getLocalBookmarks(query->cameras(), query->filter());
 }
 
 void QnCameraBookmarksManagerPrivate::updateQueryLocal(const QUuid &queryId) {
