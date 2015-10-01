@@ -490,7 +490,10 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
         if (resource) {
-            menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));
+            QnActionParameters parameters(resource);
+            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+
+            menu = manager->newMenu(Qn::TreeScope, this, parameters);
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }

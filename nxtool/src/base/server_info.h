@@ -10,6 +10,7 @@
 #include <QScopedPointer>
 
 #include <base/constants.h>
+#include <helpers/version_holder.h>
 
 namespace rtu
 {
@@ -48,6 +49,10 @@ namespace rtu
     struct BaseServerInfo
     {
         QUuid id;
+        QUuid runtimeId;
+
+        bool safeMode;
+        VersionHolder version;
         QString displayAddress;
         Constants::ServerFlags flags;
         
@@ -57,6 +62,9 @@ namespace rtu
         int port;
 
         bool accessibleByHttp;
+
+        BaseServerInfo();
+
     };
     
     bool operator == (const BaseServerInfo &first
@@ -64,7 +72,8 @@ namespace rtu
     
     bool operator != (const BaseServerInfo &first
         , const BaseServerInfo &second);
-    
+
+
     struct ExtraServerInfo
     {
         QString password;
@@ -72,14 +81,21 @@ namespace rtu
         qint64 utcDateTimeMs;
         QByteArray timeZoneId;
         InterfaceInfoList interfaces;
-        
+
+        Constants::SystemCommands sysCommands;
+
+        typedef QHash<Constants::SystemCommands, QString> ScriptNames;
+        ScriptNames scriptNames;
+
         ExtraServerInfo();
         
         ExtraServerInfo(const QString &initPassword
             , const qint64 &initTimestampMs
             , const qint64 &initUtcDateTimeMs
             , const QByteArray &initTimeZoneId
-            , const InterfaceInfoList initInterfaces);
+            , const InterfaceInfoList initInterfaces
+            , const Constants::SystemCommands initSysCommands
+            , const ScriptNames &initScriptNames);
     };
     
     class ServerInfo

@@ -46,6 +46,7 @@
 #define QN_LICENSING_MAIL_ADDRESS       "${company.license.address}"
 #define QN_COMPANY_URL                  "${company.url}"
 #define QN_SUPPORT_MAIL_ADDRESS         "${company.support.address}"
+#define QN_SUPPORT_LINK                 "${company.support.link}"
 #define QN_FREE_LICENSE_COUNT           ${freeLicenseCount}
 #define QN_FREE_LICENSE_KEY             "${freeLicenseKey}"
 #define QN_FREE_LICENSE_IS_TRIAL        ${freeLicenseIsTrial}

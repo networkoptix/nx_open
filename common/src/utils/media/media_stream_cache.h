@@ -116,7 +116,8 @@ public:
 
     //!Time (millis) from last usage of this object
     qint64 inactivityPeriod() const;
-
+protected:
+    virtual bool needConfigureProvider() const override { return false; }
 private:
     std::shared_ptr<detail::MediaStreamCache> m_sharedImpl;
 };
