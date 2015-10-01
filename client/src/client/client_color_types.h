@@ -28,6 +28,8 @@ public:
 
     QColor pastBookmark;
     QColor futureBookmark;
+    QColor pastBookmarkBound;
+    QColor futureBookmarkBound;
 
     QColor separator;
 
@@ -40,7 +42,7 @@ public:
 #define QnTimeSliderColors_Fields (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)\
     (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
     (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute)\
-    (pastBookmark)(futureBookmark)
+    (pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)
 
 struct QnTimeScrollBarColors {
     QnTimeScrollBarColors();

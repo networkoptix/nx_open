@@ -329,7 +329,9 @@ private:
     Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
     Q_SLOT void clearThumbnails();
 
-    void updateVisibleBookmarks();
+    void mergeBookmarks();
+    void mergeBookmarksDelayed();
+    void calculateCoveringBookmarks();
 
     void animateStepValues(int deltaMSecs);
     void animateThumbnails(int deltaMSecs);
@@ -380,7 +382,9 @@ private:
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
     QnCameraBookmarkList m_bookmarks;
-    QnCameraBookmarkList m_visibleBookmarks;
+    QnCameraBookmarkList m_coveringBookmarks;
+    QnCameraBookmarkList m_mergedBookmarks;
+    QTimer *m_bookmarksMergeTimer;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
