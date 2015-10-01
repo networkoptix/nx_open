@@ -6,6 +6,7 @@
 #ifndef CLOUD_DB_PROCESS_H
 #define CLOUD_DB_PROCESS_H
 
+#include <atomic>
 #include <memory>
 
 #include <qtsinglecoreapplication.h>
@@ -36,6 +37,7 @@ class AuthenticationProvider;
 
 class CloudDBProcess
 :
+    public QObject,
     public QtService<QtSingleCoreApplication>,
     public QnStoppable
 {
@@ -50,9 +52,12 @@ protected:
     virtual void start() override;
     virtual void stop() override;
 
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
     int m_argc;
     char** m_argv;
+    std::atomic<bool> m_terminated;
 
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(

@@ -60,7 +60,8 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
 : 
     QtService<QtSingleCoreApplication>(argc, argv, QN_APPLICATION_NAME),
     m_argc( argc ),
-    m_argv( argv )
+    m_argv( argv ),
+    m_terminated( false )
 {
     setServiceDescription(QN_APPLICATION_NAME);
 
@@ -70,7 +71,9 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
 
 void CloudDBProcess::pleaseStop()
 {
-    application()->quit();
+    m_terminated = true;
+    if (application())
+        application()->quit();
 }
 
 int CloudDBProcess::executeApplication()
@@ -157,11 +160,18 @@ int CloudDBProcess::executeApplication()
     
         if( !multiAddressHttpServer.listen() )
             return 5;
+
+        application()->installEventFilter(this);
+        if (m_terminated)
+            return 0;
     
         NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );
-    
+
         //TODO #ak remove qt event loop
         //application's main loop
+
+        //starting timer to check for m_terminated again after event loop start
+        application()->startTimer(0);
         const int result = application()->exec();
     
         return result;
@@ -187,7 +197,15 @@ void CloudDBProcess::start()
 
 void CloudDBProcess::stop()
 {
-    application()->quit();
+    pleaseStop();
+    //TODO #ak wait for executeApplication to return?
+}
+
+bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
+{
+    if (m_terminated)
+        exit(0);
+    return false;
 }
 
 void CloudDBProcess::initializeLogging( const conf::Settings& settings )
