@@ -19,6 +19,7 @@ struct QnChunksRequestData
     qint64 startTimeMs;
     qint64 endTimeMs;
     qint64 detailLevel;
+    bool keepSmallChunks;
     QString filter;
     bool isLocal;
     Qn::SerializationFormat format;

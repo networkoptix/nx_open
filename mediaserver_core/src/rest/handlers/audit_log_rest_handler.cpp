@@ -15,11 +15,23 @@ int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamL
 
     QnUuid sessionId = QnUuid(params.value("sessionId"));
     QnTimePeriod period;
-    period.startTimeMs = params.value("startTimeMs").toLongLong();
+    period.startTimeMs = parseDateTime(params.value("from")) / 1000;
     period.durationMs = -1;
-    qint64 endTimeMs = params.value("endTimeMs").toLongLong();
-    if (endTimeMs > 0)
-        period.durationMs = endTimeMs - period.startTimeMs;
+    if (params.contains("to")) {
+        qint64 endTimeMs = parseDateTime(params.value("to")) / 1000;
+        if (endTimeMs > 0)
+            period.durationMs = endTimeMs - period.startTimeMs;
+    }
+
+    // for compatibility with previous version
+    if (params.contains("startTimeMs"))
+        period.startTimeMs = params.value("startTimeMs").toLongLong();
+    if (params.contains("endTimeMs")) {
+        qint64 endTimeMs = params.value("endTimeMs").toLongLong();
+        if (endTimeMs > 0)
+            period.durationMs = endTimeMs - period.startTimeMs;
+    }
+
 
     QnAuditRecordList outputData = qnEventsDB->getAuditData(period, sessionId);
     for(QnAuditRecord& record: outputData)

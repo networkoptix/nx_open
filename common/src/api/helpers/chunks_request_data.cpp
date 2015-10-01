@@ -14,6 +14,7 @@ namespace {
     const QString startTimeKey(lit("startTime"));
     const QString endTimeKey(lit("endTime"));
     const QString detailKey(lit("detail"));
+    const QString keepSmallChunksKey(lit("keepSmallChunks"));
     const QString periodsTypeKey(lit("periodsType"));
     const QString filterKey(lit("filter"));
     const QString localKey(lit("local"));
@@ -31,6 +32,7 @@ QnChunksRequestData::QnChunksRequestData() :
     startTimeMs(0), 
     endTimeMs(DATETIME_NOW), 
     detailLevel(1), 
+    keepSmallChunks(false),
     isLocal(false), 
     format(Qn::JsonFormat),
     limit(INT_MAX),
@@ -54,6 +56,8 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
 
     if (params.contains(detailKey))
         request.detailLevel = params.value(detailKey).toLongLong();
+    if (params.contains(keepSmallChunksKey))
+        request.keepSmallChunks = true;
 
     if (params.contains(periodsTypeKey))
         request.periodsType = static_cast<Qn::TimePeriodContent>(params.value(periodsTypeKey).toInt());
@@ -93,6 +97,8 @@ QnRequestParamList QnChunksRequestData::toParams() const
     result.insert(startTimeKey,     QString::number(startTimeMs));
     result.insert(endTimeKey,       QString::number(endTimeMs));
     result.insert(detailKey,        QString::number(detailLevel));
+    if (keepSmallChunks)
+        result.insert(keepSmallChunksKey, QString());
     result.insert(periodsTypeKey,   QString::number(periodsType));
     result.insert(filterKey,        filter);
     result.insert(limitKey,         QString::number(limit));

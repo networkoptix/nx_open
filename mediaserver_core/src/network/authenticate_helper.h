@@ -20,27 +20,7 @@
 #include "auth_restriction_list.h"
 #include "ldap/ldap_manager.h"
 
-
 struct QnLdapDigestAuthContext;
-
-class HttpAuthenticationClientContext
-{
-public:
-    boost::optional<nx_http::header::WWWAuthenticate> authenticateHeader;
-    int responseStatusCode;
-
-    HttpAuthenticationClientContext()
-    :
-        responseStatusCode( nx_http::StatusCode::ok )
-    {
-    }
-
-    void clear()
-    {
-        authenticateHeader.reset();
-        responseStatusCode = nx_http::StatusCode::ok;
-    }
-};
 
 class QnAuthHelper: public QObject
 {
@@ -57,24 +37,7 @@ public:
 
     //!Authenticates request on server side
     Qn::AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
-    //!Authenticates request on client side
-    /*!
-        Usage:\n
-        - client sends request with no authentication information
-        - client receives response with 401 or 407 status code
-        - client calls this method supplying received response. This method adds necessary headers to request
-        - client sends request to server
-    */
-    Qn::AuthResult authenticate(
-        const QAuthenticator& auth,
-        const nx_http::Response& response,
-        nx_http::Request* const request,
-        HttpAuthenticationClientContext* const authenticationCtx );
-    //!Same as above, but uses cached authentication info
-    Qn::AuthResult authenticate(
-        const QAuthenticator& auth,
-        nx_http::Request* const request,
-        const HttpAuthenticationClientContext* const authenticationCtx );
+    
     Qn::AuthResult authenticate(const QString& login, const QByteArray& digest) const;
 
     QnAuthMethodRestrictionList* restrictionList();
@@ -86,26 +49,6 @@ public:
         \note pair<query key name, key value>. Returned key is only valid for \a path
     */
     QPair<QString, QString> createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis );
-
-    //!Calculates HA1 (see rfc 2617)
-    /*!
-        \warning \a realm is not used currently
-    */
-    static QByteArray createUserPasswordDigest(
-        const QString& userName,
-        const QString& password,
-        const QString& realm );
-    static QByteArray createHttpQueryAuthParam(
-        const QString& userName,
-        const QString& password,
-        const QString& realm,
-        const QByteArray& method,
-        QByteArray nonce = QByteArray() );
-    static QByteArray createHttpQueryAuthParam(
-        const QString& userName,
-        const QByteArray& digest,
-        const QByteArray& method,
-        QByteArray nonce = QByteArray());
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 
@@ -194,6 +137,14 @@ private:
     void applyClientCalculatedPasswordHashToResource(
         const QnUserResourcePtr& userResource,
         const UserDigestData& userDigestData );
+    Qn::AuthResult doPasswordProlongation(QnUserResourcePtr userResource);
+
+    /*!
+        \return \a true if password expiration timestamp has been increased
+    */
+    //!Check \a digest validity with external authentication service (LDAP currently)
+    Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest );
+
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

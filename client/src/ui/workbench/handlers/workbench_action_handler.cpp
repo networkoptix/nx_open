@@ -151,7 +151,7 @@
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
-#include "network/authenticate_helper.h"
+#include "network/authutil.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -1460,10 +1460,11 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
     QUrlQuery urlQuery(url);
+    auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
     urlQuery.addQueryItem(
         lit("auth"),
-        QLatin1String(QnAuthHelper::createHttpQueryAuthParam(
-            login, password, server->realm(), nx_http::Method::GET)));
+        QLatin1String(createHttpQueryAuthParam(
+            login, password, server->realm(), nx_http::Method::GET, nonce)));
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
     url = QnNetworkProxyFactory::instance()->urlToResource(url, server);

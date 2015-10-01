@@ -1147,8 +1147,12 @@ void QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested(const QPoint&)
     {
         QnResourcePtr resource = gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
+       
         if (resource) {
-            menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));
+            QnActionParameters parameters(resource);
+            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+
+            menu = manager->newMenu(Qn::TreeScope, this, parameters);
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }

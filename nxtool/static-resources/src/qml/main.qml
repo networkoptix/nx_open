@@ -56,8 +56,7 @@ Window
         {
             property var currentTask: rtuContext.progressTask;
 
-            caption: (!changesCount ? qsTr("Applying changes...")
-                : qsTr("Applying changes (%1/%2)").arg(currentCount.toString()).arg(changesCount.toString()));
+            caption: currentTask.progressPageHeaderText.arg(currentCount.toString()).arg(changesCount.toString());
             changesCount: (currentTask ? currentTask.totalChangesCount : 0);
             currentCount: (currentTask ? currentTask.appliedChangesCount : 0);
         }

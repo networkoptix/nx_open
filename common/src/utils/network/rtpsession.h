@@ -21,7 +21,7 @@ extern "C"
 #include <QtCore/QUrl>
 #include "../common/threadqueue.h"
 #include "utils/camera/camera_diagnostics.h"
-#include <network/authenticate_helper.h>
+#include "network/client_authenticate_helper.h"
 
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM

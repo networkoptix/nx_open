@@ -29,6 +29,8 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 #include "transaction/runtime_transaction_log.h"
+#include "settings.h"
+
 
 namespace ec2
 {
@@ -1315,7 +1317,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             const QUrl& url = itr.key();
             RemoteUrlConnectInfo& connectInfo = itr.value();
             bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
-            if (isTimeout && !isPeerUsing(url) && !m_restartPending)
+            if (isTimeout && !isPeerUsing(url) && !m_restartPending && !ec2::Settings::instance()->dbReadOnly())
             {
                 if (!connectInfo.discoveredPeer.isNull() ) 
                 {

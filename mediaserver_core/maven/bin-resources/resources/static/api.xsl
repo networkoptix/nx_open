@@ -26,7 +26,7 @@
                 <link rel="stylesheet" href="styles/409938f1.vendor.css">
                 </link> <!-- This is strange hack, I know -->
 
-                <link rel="stylesheet" href="styles/092a3cdd.main.css">
+                <link rel="stylesheet" href="styles/3c8192ce.main.css">
 
                 </link><!-- This is strange hack, I know -->
 
@@ -52,7 +52,7 @@
                 <div class="container">
                     <div class="row">
                         <nav class="col-sm-4 bs-docs-sidebar hidden-xs">
-                            <ul class="nav nav-stacked fixed" id="sidebar">
+                            <ul class="nav nav-stacked fixed-lg" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">
                                     <xsl:variable name="groupName"
                                         select="translate(groupName, ' ()', '___')"/>

@@ -11,7 +11,7 @@ angular.module('webadminApp')
         if(location.search.indexOf('proxy=')>0){
             var params = location.search.replace('?','').split('&');
             for (var i=0;i<params.length;i++) {
-                var pair = params[i].split("=");
+                var pair = params[i].split('=');
                 if(pair[0] === 'proxy'){
                     proxy = '/proxy/' + pair[1];
                     if(pair[1] == 'demo'){
@@ -84,7 +84,7 @@ angular.module('webadminApp')
             });
             obj.abort = function(reason){
                 if(canceller) {
-                    canceller.resolve("abort request: " + reason);
+                    canceller.resolve('abort request: ' + reason);
                 }
             };
             return obj;
@@ -136,6 +136,12 @@ angular.module('webadminApp')
                     deferred.resolve({isAdmin:isAdmin,name:result.data.reply.name});
                 });
                 return deferred.promise;
+            },
+            getScripts:function(){
+                return $http.get('/api/scriptList');
+            },
+            execute:function(script,mode){
+                return $http.post('/api/execute/' + script + '?' + (mode||''));
             },
             getSettings: function(url) {
                 url = url || proxy;
@@ -198,11 +204,11 @@ angular.module('webadminApp')
                 return wrapGet(proxy + '/api/gettime');
             },
             logLevel:function(logId,level){
-                return wrapGet(proxy + '/api/logLevel?id=' + logId + (level?"&value=" + level:''));
+                return wrapGet(proxy + '/api/logLevel?id=' + logId + (level?'&value=' + level:''));
             },
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
-                //console.log("getRecords",serverUrl,physicalId,startTime,endTime,detail,periodsType);
+                //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);
                 var d = new Date();
                 if(typeof(startTime)==='undefined'){
                     startTime = d.getTime() - 30*24*60*60*1000;
@@ -233,7 +239,7 @@ angular.module('webadminApp')
                     '&detail=' + detail +
                     '&periodsType=' + periodsType +
                     (limit?'&limit=' + limit:'') +
-                    '&flat');
+                    '&flat&keepSmallChunks');
             }
         };
     });

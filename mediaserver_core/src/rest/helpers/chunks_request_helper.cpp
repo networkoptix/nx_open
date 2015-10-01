@@ -40,7 +40,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
                 }
             } else {
                 //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
+                periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel, request.keepSmallChunks,
                     QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog,
                     request.limit).simplified();
             }
@@ -48,7 +48,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
         }
     case Qn::RecordingContent:
     default:
-        periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
+        periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel, request.keepSmallChunks,
             QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog,
             request.limit);
         break;
