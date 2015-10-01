@@ -9,6 +9,8 @@ Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
 
+    extraWarned: rtuContext.selection.safeMode;
+
     changed:  (maskedArea && maskedArea.changed?  true : false);
 
     function tryApplyChanges(warnings)
@@ -120,7 +122,6 @@ Expandable.MaskedSettingsPanel
                 id: password;
 
                 KeyNavigation.backtab: systemName;
-               // KeyNavigation.tab: password;
 
                 readonly property string kDifferentPasswords: qsTr("<different passwords>");
 

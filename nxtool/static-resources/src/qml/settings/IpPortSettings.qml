@@ -12,6 +12,8 @@ Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
 
+    extraWarned: rtuContext.selection.safeMode;
+
     editBtnPrevTabIsSelf: true;
     activeFocusOnTab: false;
     changed:  (maskedArea && maskedArea.changed?  true : false);

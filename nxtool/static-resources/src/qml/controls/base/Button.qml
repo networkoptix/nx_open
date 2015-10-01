@@ -9,6 +9,7 @@ QtControls.Button
 {
     id: thisComponent;
 
+    property bool thin: false;
     property color textColor: "#000000";
 
     property color normalColor: "#FFFFFF";
@@ -47,7 +48,7 @@ QtControls.Button
         {
             id: styleLabel;
 
-            thin: false;
+            thin: thisComponent.thin;
             text: thisComponent.text;
             color: thisComponent.textColor;
             verticalAlignment: Text.AlignVCenter;

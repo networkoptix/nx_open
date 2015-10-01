@@ -102,9 +102,7 @@ Item
         {
             anchors.right: parent.right;
 
-            caption: rtuContext.toolSupportMail;
-            hyperlink: qsTr("mailto:%1?Subject=Support request [%2 ver.%3]").arg(
-                rtuContext.toolSupportMail).arg(rtuContext.toolDisplayName).arg(softwareVersion.version);
+            hyperlink: rtuContext.toolSupportLink;
         }
     }
 }

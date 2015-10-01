@@ -43,14 +43,41 @@ rtu::InterfaceInfo::InterfaceInfo(const QString &initName
     , useDHCP(initUseDHCP)
 {}
 
+
+rtu::BaseServerInfo::BaseServerInfo()
+    : id()
+    , runtimeId()
+
+    , safeMode(false)
+    , version()
+    , displayAddress()
+    , flags(Constants::NoFlags)
+        
+    , name()
+    , systemName()
+    , hostAddress()
+    , port(0)
+
+    , accessibleByHttp(true)
+{
+}
+
+
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
+    const bool firstHasHdd = (first.flags & Constants::HasHdd);
+    const bool secondHasHdd = (second.flags & Constants::HasHdd);
+
     /// Do not compare flags, hostAddress and visibleAddress - it is Ok
     return ((first.id == second.id)
         && (first.name == second.name)
         && (first.port == second.port)
-        && (first.systemName == second.systemName));
+        && (first.systemName == second.systemName)
+        && (first.version == second.version)
+        && (first.runtimeId == second.runtimeId)
+        && (first.safeMode == second.safeMode)
+        && (firstHasHdd == secondHasHdd));
 }
 
 bool rtu::operator != (const BaseServerInfo &first
@@ -67,6 +94,8 @@ rtu::ExtraServerInfo::ExtraServerInfo()
     , utcDateTimeMs(0)
     , timeZoneId()
     , interfaces()
+    , sysCommands(Constants::SystemCommand::NoCommands)
+    , scriptNames()
 {
 }
 
@@ -74,12 +103,16 @@ rtu::ExtraServerInfo::ExtraServerInfo(const QString &initPassword
     , const qint64 &initTimestampMs
     , const qint64 &initUtcDateTimeMs
     , const QByteArray &initTimeZoneId
-    , const InterfaceInfoList initInterfaces)
+    , const InterfaceInfoList initInterfaces
+    , const Constants::SystemCommands initSysCommands
+    , const ScriptNames &initScriptNames)
     : password(initPassword)
     , timestampMs(initTimestampMs)
     , utcDateTimeMs(initUtcDateTimeMs)
     , timeZoneId(initTimeZoneId)
     , interfaces(initInterfaces)
+    , sysCommands(initSysCommands)
+    , scriptNames(initScriptNames)
 {
 }
 
