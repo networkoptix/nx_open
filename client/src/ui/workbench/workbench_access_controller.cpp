@@ -232,7 +232,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
                     ) 
                ); 
 
-    if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
+    if (m_userPermissions & Qn::GlobalEditLayoutsPermission)
         return checkLocked(
                     checkLoggedIn(
                         checkReadOnly(
@@ -240,7 +240,6 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
                         )
                     ) 
                 ); 
-    }
     
     /* Default branch */
     {
@@ -249,9 +248,16 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
             return 0; /* Viewer can't view other's layouts. */
 
         if (m_readOnlyMode) {
+            if (layout->userCanEdit()) {
+                if (layout->locked())
+                    return Qn::ReadPermission | Qn::WritePermission; /* Can structurally modify but cannot save. */;
+                return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */;
+            }
+
             if (layout->locked())
-                return Qn::ReadPermission | Qn::WritePermission; /* Can structurally modify but cannot save. */;
-            return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */;
+                return Qn::ReadPermission | Qn::WritePermission;
+
+            return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Read-only layout */
         }
        
         if (layout->userCanEdit()) {
@@ -260,6 +266,8 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
             return Qn::FullLayoutPermissions; /* Can structurally modify layout with this flag. */
         } 
 
+        if (layout->locked())
+            return Qn::ReadPermission | Qn::WritePermission;
         return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */        
     }
 }
