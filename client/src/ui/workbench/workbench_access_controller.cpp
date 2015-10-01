@@ -234,7 +234,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 
     if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
         if (m_readOnlyMode)
-            return Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify but cannot save. */;
+            return checkLocked(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission); /* Can structurally modify but cannot save. */;
 
         if (layout->locked())
             return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
