@@ -666,3 +666,29 @@ TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyLockedRemoteLayoutAsViewer
 
     checkPermissions(layout, desired, forbidden);
 }
+
+/************************************************************************/
+/* Checking non-own remote (saved) layouts as viewer                    */
+/************************************************************************/
+/** Check permissions for locked common layout when the user is logged in as viewer (safemode). */
+TEST_F( QnWorkbenchAccessControllerTest, checkNonOwnRemoteLayoutAsViewer )
+{
+    loginAs(Qn::GlobalLiveViewerPermissions);
+
+    auto anotherUser = addUser(userName2, Qn::GlobalLiveViewerPermissions);
+
+    /* Unsaved layout that we have just created. */
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    layout->setId(QnUuid::createUuid());
+    layout->addFlags(Qn::remote);
+    layout->setParentId(anotherUser->getId());
+    layout->setUserCanEdit(true);
+    layout->setLocked(false);
+    qnResPool->addResource(layout);
+
+    ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
+
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::FullLayoutPermissions;
+    checkPermissions(layout, desired, forbidden);
+}
