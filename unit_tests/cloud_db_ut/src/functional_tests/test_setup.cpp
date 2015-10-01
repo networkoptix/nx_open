@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <functional>
+#include <future>
 #include <sstream>
 #include <thread>
 #include <tuple>
@@ -42,13 +43,19 @@ CdbFunctionalTest::CdbFunctionalTest()
     *b = strdup("-db/name"); *b = strdup(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
 
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
-
-    m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcess>(
-        static_cast<int>(m_args.size()), m_args.data());
+    
+    std::promise<void> cdbInstantiatedPromise;
+    auto cdbInstantiatedfuture = cdbInstantiatedPromise.get_future();
 
     m_cdbProcessFuture = std::async(
         std::launch::async,
-        std::bind(&CloudDBProcess::exec, m_cdbInstance.get()));
+        [this, &cdbInstantiatedPromise](){
+            m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcess>(
+                static_cast<int>(m_args.size()), m_args.data());
+            cdbInstantiatedPromise.set_value();
+            m_cdbInstance->exec();
+        });
+    cdbInstantiatedfuture.wait();
 }
 
 CdbFunctionalTest::~CdbFunctionalTest()
@@ -91,16 +98,17 @@ api::ModuleInfo CdbFunctionalTest::moduleInfo() const
     return m_moduleInfo;
 }
 
-void CdbFunctionalTest::addAccount(
+api::ResultCode CdbFunctionalTest::addAccount(
     api::AccountData* const accountData,
-    std::string* const password)
+    std::string* const password,
+    api::AccountActivationCode* const activationCode)
 {
     std::ostringstream ss;
-    ss<<"test_"<<rand()<<"@networkoptix.com";
+    ss << "test_" << rand() << "@networkoptix.com";
     accountData->email = ss.str();
 
     ss = std::ostringstream();
-    ss<<rand();
+    ss << rand();
     *password = ss.str();
 
     accountData->fullName = "Test Test";
@@ -109,35 +117,74 @@ void CdbFunctionalTest::addAccount(
         moduleInfo().realm.c_str(),
         password->c_str());
 
-    //initializing connection
-    {
-        auto connection = connectionFactory()->createConnection("", "");
+    auto connection = connectionFactory()->createConnection("", "");
 
-        //adding account
-        api::ResultCode result = api::ResultCode::ok;
-        api::AccountActivationCode activationCode;
-        std::tie(result, activationCode) = makeSyncCall<api::ResultCode, api::AccountActivationCode>(
+    //adding account
+    api::ResultCode result = api::ResultCode::ok;
+    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, api::AccountActivationCode>(
+        std::bind(
+            &nx::cdb::api::AccountManager::registerNewAccount,
+            connection->accountManager(),
+            *accountData,
+            std::placeholders::_1));
+    return result;
+}
+
+api::ResultCode CdbFunctionalTest::activateAccount(
+    const api::AccountActivationCode& activationCode)
+{
+    //activating account
+    auto connection = connectionFactory()->createConnection("", "");
+
+    //adding account
+    api::ResultCode result = api::ResultCode::ok;
+    std::tie(result) = makeSyncCall<api::ResultCode>(
+        std::bind(
+            &nx::cdb::api::AccountManager::activateAccount,
+            connection->accountManager(),
+            activationCode,
+            std::placeholders::_1));
+    return result;
+}
+
+api::ResultCode CdbFunctionalTest::getAccount(
+    const std::string& email,
+    const std::string& password,
+    api::AccountData* const accountData)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *accountData) =
+        makeSyncCall<api::ResultCode, nx::cdb::api::AccountData>(
             std::bind(
-                &nx::cdb::api::AccountManager::registerNewAccount,
+                &nx::cdb::api::AccountManager::getAccount,
                 connection->accountManager(),
-                *accountData,
                 std::placeholders::_1));
-        ASSERT_EQ(result, api::ResultCode::ok);
-    }
+    return resCode;
+}
 
-    //fetching account
-    {
-        auto connection = connectionFactory()->createConnection(accountData->email, *password);
+api::ResultCode CdbFunctionalTest::addActivatedAccount(
+    api::AccountData* const accountData,
+    std::string* const password)
+{
+    api::AccountActivationCode activationCode;
+    auto resCode = addAccount(
+        accountData,
+        password,
+        &activationCode);
+    if (resCode != api::ResultCode::ok)
+        return resCode;
 
-        api::ResultCode resCode = api::ResultCode::ok;
-        std::tie(resCode, *accountData) =
-            makeSyncCall<api::ResultCode, nx::cdb::api::AccountData>(
-                std::bind(
-                    &nx::cdb::api::AccountManager::getAccount,
-                    connection->accountManager(),
-                    std::placeholders::_1));
-        //ASSERT_EQ(resCode, api::ResultCode::ok);
-    }
+    resCode = activateAccount(activationCode);
+    if (resCode != api::ResultCode::ok)
+        return resCode;
+
+    resCode = getAccount(
+        accountData->email,
+        *password,
+        accountData);
+    return resCode;
 }
 
 api::ResultCode CdbFunctionalTest::bindRandomSystem(

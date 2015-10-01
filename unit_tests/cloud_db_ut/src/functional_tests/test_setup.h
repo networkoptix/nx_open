@@ -35,7 +35,17 @@ protected:
     nx::cdb::api::ConnectionFactory* connectionFactory();
     api::ModuleInfo moduleInfo() const;
 
-    void addAccount(
+    api::ResultCode addAccount(
+        api::AccountData* const accountData,
+        std::string* const password,
+        api::AccountActivationCode* const activationCode);
+    api::ResultCode activateAccount(
+        const api::AccountActivationCode& activationCode);
+    api::ResultCode getAccount(
+        const std::string& email,
+        const std::string& password,
+        api::AccountData* const accountData);
+    api::ResultCode addActivatedAccount(
         api::AccountData* const accountData,
         std::string* const password);
     api::ResultCode bindRandomSystem(

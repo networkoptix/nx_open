@@ -17,23 +17,55 @@
 namespace nx {
 namespace cdb {
 
-//TODO #ak following test fails :)
-//TEST_F(CdbFunctionalTest, accountActivation)
-//{
-//}
+TEST_F(CdbFunctionalTest, accountActivation)
+{
+    //waiting for cloud_db initialization
+    waitUntilStarted();
+
+    api::ResultCode result = api::ResultCode::ok;
+
+    api::AccountData account1;
+    std::string account1Password;
+    api::AccountActivationCode activationCode;
+    result = addAccount(&account1, &account1Password, &activationCode);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_TRUE(!activationCode.code.empty());
+
+    //only get_account is allowed for not activated account
+
+    //adding system1 to account1
+    api::SystemData system1;
+    result = bindRandomSystem(account1.email, account1Password, &system1);
+    ASSERT_EQ(result, api::ResultCode::forbidden);
+
+    result = getAccount(account1.email, account1Password, &account1);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.statusCode, api::AccountStatus::awaitingActivation);
+
+    result = activateAccount(activationCode);
+    ASSERT_EQ(result, api::ResultCode::ok);
+
+    result = getAccount(account1.email, account1Password, &account1);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
+}
 
 TEST_F(CdbFunctionalTest, generalTest)
 {
     //waiting for cloud_db initialization
     waitUntilStarted();
 
+    api::ResultCode result = api::ResultCode::ok;
+
     api::AccountData account1;
     std::string account1Password;
-    addAccount(&account1, &account1Password);
+    result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(result, api::ResultCode::ok);
 
     api::AccountData account2;
     std::string account2Password;
-    addAccount(&account2, &account2Password);
+    result = addActivatedAccount(&account2, &account2Password);
+    ASSERT_EQ(result, api::ResultCode::ok);
 
     //adding system1 to account1
     api::SystemData system1;
@@ -82,7 +114,8 @@ TEST_F(CdbFunctionalTest, generalTest)
     //adding account3
     api::AccountData account3;
     std::string account3Password;
-    addAccount(&account3, &account3Password);
+    result = addActivatedAccount(&account3, &account3Password);
+    ASSERT_EQ(result, api::ResultCode::ok);
 
     {
         //trying to share system1 from account2 to account3
