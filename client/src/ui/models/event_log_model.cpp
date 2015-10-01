@@ -464,7 +464,7 @@ QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& ac
     if (action.eventParams.eventType != QnBusiness::CameraMotionEvent)
         return QString();
 
-    return QnBusinessStringsHelper::motionUrl(action.eventParams, true);
+    return QnBusinessStringsHelper::urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
 }
 
 QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const

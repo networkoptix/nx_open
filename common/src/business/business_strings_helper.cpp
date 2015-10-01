@@ -27,16 +27,6 @@
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
     static const QString htmlDelimiter(lit("<br>"));
-
-    static const QString tpProductName(lit("productName"));
-    static const QString tpEvent(lit("event"));
-    static const QString tpSource(lit("source"));
-    static const QString tpUrlInt(lit("urlint"));
-    static const QString tpUrlExt(lit("urlext"));
-    static const QString tpTimestamp(lit("timestamp"));
-    static const QString tpReason(lit("reason"));
-    static const QString tpAggregated(lit("aggregated"));
-    static const QString tpInputPort(lit("inputPort"));
 }
 
 QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
@@ -178,31 +168,13 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
 
     if (useHtml && eventType == QnBusiness::CameraMotionEvent) {
         result += delimiter;
-        result += tr("Url: %1").arg(motionUrl(params, true));
+        result += tr("Url: %1").arg(urlForCamera(params.eventResourceId, params.eventTimestampUsec, true));
     }
 
     result += delimiter;
     result += aggregatedEventDetails(action, aggregationInfo, delimiter);
 
     return result;
-}
-
-QVariantHash QnBusinessStringsHelper::eventDescriptionMap(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, bool useIp) {
-    QnBusinessEventParameters params = action->getRuntimeParams();
-    QnBusiness::EventType eventType = params.eventType;
-
-    QVariantHash contextMap;
-
-    contextMap[tpProductName] = QnAppInfo::productNameLong();
-    contextMap[tpEvent] = eventName(eventType);
-    contextMap[tpSource] = getFullResourceName(eventSource(params), useIp);
-    if (eventType == QnBusiness::CameraMotionEvent) {
-        contextMap[tpUrlInt] = motionUrl(params, false);
-        contextMap[tpUrlExt] = motionUrl(params, true);
-    }
-    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, useIp);
-
-    return contextMap;
 }
 
 QString QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) {
@@ -270,88 +242,6 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     }
     return result;
 }
-
-QVariantHash QnBusinessStringsHelper::eventDetailsMap(
-    const QnAbstractBusinessActionPtr& action,
-    const QnInfoDetail& aggregationData,
-    bool useIp,
-    bool addSubAggregationData )
-{
-    using namespace QnBusiness;
-
-    const QnBusinessEventParameters& params = aggregationData.runtimeParams();
-    const int aggregationCount = aggregationData.count();
-
-    QVariantHash detailsMap;
-
-    if( addSubAggregationData )
-    {
-        const QnBusinessAggregationInfo& subAggregationData = aggregationData.subAggregationData();
-        detailsMap[tpAggregated] = !subAggregationData.isEmpty()
-            ? aggregatedEventDetailsMap(action, subAggregationData, useIp)
-            : (QVariantList() << eventDetailsMap(action, aggregationData, useIp, false));
-    }
-
-    detailsMap[tpTimestamp] = eventTimestampShort(params, aggregationCount);
-
-    switch (params.eventType) {
-    case CameraDisconnectEvent: {
-        detailsMap[tpSource] = getFullResourceName(eventSource(params), useIp);
-        break;
-    }
-
-    case CameraInputEvent: {
-        detailsMap[tpInputPort] = params.inputPortId;
-        break;
-    }
-    case StorageFailureEvent:
-    case NetworkIssueEvent:
-    case ServerFailureEvent: 
-    case LicenseIssueEvent:
-    {
-        detailsMap[tpReason] = eventReason(params);
-        break;
-    }
-    case CameraIpConflictEvent: {
-        detailsMap[lit("cameraConflictAddress")] = params.caption;
-        QVariantList conflicts;
-        int n = 0;
-        foreach (const QString& mac, params.description.split(QnConflictBusinessEvent::Delimiter)) {
-            QVariantHash conflict;
-            conflict[lit("number")] = ++n;
-            conflict[lit("mac")] = mac;
-            conflicts << conflict;
-        }
-        detailsMap[lit("cameraConflicts")] = conflicts;
-
-        break;
-    }
-    case ServerConflictEvent: {
-        QnCameraConflictList conflicts;
-        conflicts.sourceServer = params.caption;
-        conflicts.decode(params.description);
-
-        QVariantList conflictsList;
-        int n = 0;
-        for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
-            const QString &server = itr.key();
-            foreach (const QString &camera, conflicts.camerasByServer[server]) {
-                QVariantHash conflict;
-                conflict[lit("number")] = ++n;
-                conflict[lit("ip")] = server;
-                conflict[lit("mac")] = camera;
-                conflictsList << conflict;
-            }
-        }
-        detailsMap[lit("msConflicts")] = conflictsList;
-        break;
-    }
-    default:
-        break;
-    }
-    return detailsMap;
-}
-
 
 QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount) {
     quint64 ts = params.eventTimestampUsec;
@@ -480,33 +370,7 @@ QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusiness
     return result;
 }
 
-QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
-                                              const QnBusinessAggregationInfo& aggregationInfo,
-                                              bool useIp) {
-    QVariantList result;
-    if (aggregationInfo.isEmpty()) {
-        result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), useIp);
-    }
-
-    for (const QnInfoDetail& detail: aggregationInfo.toList()) {
-        result << eventDetailsMap(action, detail, useIp);
-    }
-    return result;
-}
-
-QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(
-    const QnAbstractBusinessActionPtr& action,
-    const QList<QnInfoDetail>& aggregationDetailList,
-    bool useIp )
-{
-    QVariantList result;
-    for (const QnInfoDetail& detail: aggregationDetailList)
-        result << eventDetailsMap(action, detail, useIp);
-    return result;
-}
-
-QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
-    QnUuid id = params.eventResourceId;
+QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic) {
     QnNetworkResourcePtr res = !id.isNull() ? 
                             qnResPool->getResourceById<QnNetworkResource>(id) : 
                             QnNetworkResourcePtr();
@@ -518,7 +382,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
         return QString();
 
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    quint64 timeStampMSec = params.eventTimestampUsec / 1000;
+    quint64 timeStampMSec = timestampUsec / 1000;
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
     if (history) {
