@@ -727,7 +727,16 @@
             <groupName>Server API</groupName>
             <urlPrefix>/api</urlPrefix>
             <groupDescription>This group contains functions related to a single server</groupDescription>
-            <functions>
+            <functions>  
+                <function proprietary="true">
+                    <name>getHardwareInfo</name>
+                    <description>Get hardware information</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>Returns hardware information in JSON form</caption>
+                    </result>
+                </function>            
                 <function proprietary="true">
                     <name>execAction</name>
                     <description>Execute business action. Action data should be in a internal
