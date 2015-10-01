@@ -219,17 +219,16 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
             return Qn::ReadPermission | Qn::RemovePermission; 
     }
     
-    if (QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
-//         if (layout->locked())
-//             return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+    if (QnWorkbenchLayoutSnapshotManager::isFile(layout))
         return checkLocked(Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::EditLayoutSettingsPermission);
-    }
     
     /* Can do whatever with local layouts except removing from server. */
     if(snapshotManager()->isLocal(layout))
         return checkLocked(
                     checkLoggedIn(
-                        Qn::FullLayoutPermissions - Qn::RemovePermission
+                        checkReadOnly(
+                            Qn::FullLayoutPermissions - Qn::RemovePermission
+                        )
                     ) 
                ); 
 
