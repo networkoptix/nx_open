@@ -1837,8 +1837,18 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_storage (space_limit, used_for_writing, storage_type, resource_ptr_id) \
-        VALUES (:spaceLimit, :usedForWriting, :storageType, :internalId)\
+        INSERT OR REPLACE INTO vms_storage ( \
+            space_limit, \
+            used_for_writing, \
+            storage_type, \
+            backup, \
+            resource_ptr_id) \
+        VALUES ( \
+            :spaceLimit, \
+            :usedForWriting, \
+            :storageType, \
+            :backup, \
+            :internalId) \
     ");
     QnSql::bind(tran.params, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -2086,17 +2096,26 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaSe
 ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& data)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server_user_attributes ( \
-            server_guid,                    \
-            server_name,                    \
-            max_cameras,                    \
-            redundancy)                     \
-        VALUES(                             \
-            :serverID,                      \
-            :serverName,                    \
-            :maxCameras,                    \
-            :allowAutoRedundancy)           \
+    insQuery.prepare("                                              \
+        INSERT OR REPLACE INTO vms_server_user_attributes (         \
+            server_guid,                                            \
+            server_name,                                            \
+            max_cameras,                                            \
+            redundancy,                                             \
+            backup_days_of_the_week,                             \
+            backup_start,                                        \
+            backup_duration,                                     \
+            backup_bitrate                                       \
+        )                                                           \
+        VALUES(                                                     \
+            :serverID,                                              \
+            :serverName,                                            \
+            :maxCameras,                                            \
+            :allowAutoRedundancy,                                   \
+            :backupDaysOfTheWeek,                                \
+            :backupStart,                                        \
+            :backupDuration,                                     \
+            :backupBitrate                                       \
         ");
     QnSql::bind(data, &insQuery);
 
@@ -2992,8 +3011,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     queryStorage.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType, \
-        s.redundant as redundant, s.redundant_days_of_the_week as redundantDaysOfTheWeek, s.redundant_start as redundantStart, \
-        s.redundant_duration as redundantDuration, s.redundant_bitrate as redundantBitrate \
+        s.backup as backup \
         FROM vms_resource r \
         JOIN vms_storage s on s.resource_ptr_id = r.id \
         %1 \
@@ -3306,14 +3324,18 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
         filterStr = QString("WHERE server_guid = %1").arg(guidToSqlString(mServerId));
 
     query.prepare( lit("\
-        SELECT                                \
-            server_guid as serverID,          \
-            server_name as serverName,        \
-            max_cameras as maxCameras,        \
-            redundancy as allowAutoRedundancy \
-        FROM vms_server_user_attributes       \
-        %1                                    \
-        ORDER BY server_guid                  \
+        SELECT                                                      \
+            server_guid as serverID,                                \
+            server_name as serverName,                              \
+            max_cameras as maxCameras,                              \
+            redundancy as allowAutoRedundancy,                      \
+            backup_days_of_the_week as backupDaysOfTheWeek,         \
+            backup_start as backupStart,                            \
+            backup_duration as backupDuration,                      \
+            backup_bitrate as backupBitrate                         \
+        FROM vms_server_user_attributes                             \
+        %1                                                          \
+        ORDER BY server_guid                                        \
     ").arg(filterStr));
     if( !query.exec() )
     {

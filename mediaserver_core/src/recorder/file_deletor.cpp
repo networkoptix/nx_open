@@ -41,9 +41,15 @@ void QnFileDeletor::run()
         
         static const int RAND_RANGE = 5; // in range [-5..+5] seconds
         int thresholdSecs = (SPACE_CLEARANCE_INTERVAL - RAND_RANGE) + rand() % (RAND_RANGE*2 + 1);
-        if (qnStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
+        if (qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
         {
-            qnStorageMan->clearSpace();
+            qnNormalStorageMan->clearSpace();
+            m_storagesTimer.restart();
+        }
+
+        if (qnBackupStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
+        {
+            qnBackupStorageMan->clearSpace();
             m_storagesTimer.restart();
         }
 

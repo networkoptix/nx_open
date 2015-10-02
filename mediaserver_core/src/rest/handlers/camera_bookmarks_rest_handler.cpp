@@ -32,7 +32,7 @@ int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams 
     if (id.isEmpty() || !QJson::deserialize(body, &bookmark))
         return CODE_INVALID_PARAMETER;
 
-    if (!qnStorageMan->addBookmark(id.toUtf8(), bookmark)) 
+    if (!qnNormalStorageMan->addBookmark(id.toUtf8(), bookmark) && !qnBackupStorageMan->addBookmark(id.toUtf8(), bookmark)) 
         return CODE_INVALID_PARAMETER;
 
     result.setReply(bookmark);
@@ -46,7 +46,7 @@ int QnCameraBookmarksRestHandler::updateCameraBookmarkAction(const QnRequestPara
     if (id.isEmpty() || !QJson::deserialize(body, &bookmark))
         return CODE_INVALID_PARAMETER;
 
-    if (!qnStorageMan->updateBookmark(id.toUtf8(), bookmark)) 
+    if (!qnNormalStorageMan->updateBookmark(id.toUtf8(), bookmark) && !qnBackupStorageMan->updateBookmark(id.toUtf8(), bookmark)) 
         return CODE_INVALID_PARAMETER;
 
     result.setReply(bookmark);
@@ -59,7 +59,7 @@ int QnCameraBookmarksRestHandler::deleteCameraBookmarkAction(const QnRequestPara
     if (id.isEmpty() || !QJson::deserialize(body, &bookmark))
         return CODE_INVALID_PARAMETER;
 
-    if (!qnStorageMan->deleteBookmark(id.toUtf8(), bookmark))
+    if (!qnNormalStorageMan->deleteBookmark(id.toUtf8(), bookmark) && !qnBackupStorageMan->deleteBookmark(id.toUtf8(), bookmark))
         return CODE_INVALID_PARAMETER;
 
     result.setReply(bookmark);

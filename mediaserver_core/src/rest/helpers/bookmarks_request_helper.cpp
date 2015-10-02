@@ -10,7 +10,8 @@ QnCameraBookmarkList QnBookmarksRequestHelper::load(const QnBookmarkRequestData&
     MultiServerCameraBookmarkList multiBookmarks;
     for (const auto &camera: request.cameras) {
         QnCameraBookmarkList bookmarks;
-        if (!qnStorageMan->getBookmarks(camera->getPhysicalId().toUtf8(), request.filter, bookmarks))
+        if (!qnNormalStorageMan->getBookmarks(camera->getPhysicalId().toUtf8(), request.filter, bookmarks) && 
+            !qnBackupStorageMan->getBookmarks(camera->getPhysicalId().toUtf8(), request.filter, bookmarks))
             continue;
         multiBookmarks.push_back(std::move(bookmarks));
     }

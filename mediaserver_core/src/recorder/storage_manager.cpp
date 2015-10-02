@@ -253,9 +253,11 @@ TestStorageThread* QnStorageManager::m_testStorageThread;
 // -------------------- QnStorageManager --------------------
 
 
-static QnStorageManager* QnStorageManager_instance = nullptr;
+static QnStorageManager* QnNormalStorageManager_instance = nullptr;
+static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
-QnStorageManager::QnStorageManager():
+QnStorageManager::QnStorageManager(QnServer::ArchiveKind kind):
+    m_kind(kind),
     m_mutexStorages(QnMutex::Recursive),
     m_mutexCatalog(QnMutex::Recursive),
     m_storagesStatisticsReady(false),
@@ -268,8 +270,17 @@ QnStorageManager::QnStorageManager():
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
 
-    assert( QnStorageManager_instance == nullptr );
-    QnStorageManager_instance = this;
+    if (m_kind == QnServer::ArchiveKind::Normal)
+    {
+        assert( QnNormalStorageManager_instance == nullptr );
+        QnNormalStorageManager_instance = this;
+    }
+    else if (m_kind == QnServer::ArchiveKind::Backup)
+    {
+        assert( QnBackupStorageManager_instance == nullptr );
+        QnBackupStorageManager_instance = this;
+    }
+
     m_oldStorageIndexes = deserializeStorageFile();
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
@@ -280,7 +291,7 @@ QnStorageManager::QnStorageManager():
     m_clearMotionTimer.restart();
     m_removeEmtyDirTimer.restart();
 
-    startRedundantSyncWatchdog();
+    //startRedundantSyncWatchdog();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -441,7 +452,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             DeviceFileCatalogPtr newCatalog(
                 new DeviceFileCatalog(
                     it.key(), 
-                    catalog
+                    catalog,
+                    m_kind
                 )
             );
             
@@ -468,7 +480,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         else {
             currentPos.save(); // save to persistent storage
             qint64 rebuildEndTime = qnSyncTime->currentMSecsSinceEpoch() - QnRecordingManager::RECORDING_CHUNK_LEN * 1250;
-            DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(cameraUniqueId, catalog));
+            DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(cameraUniqueId, catalog, QnServer::ArchiveKind::None));
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
         
@@ -677,7 +689,10 @@ public:
     AddStorageTask(QnStorageResourcePtr storage): m_storage(storage) {}
     void run()
     {
-        qnStorageMan->addStorage(m_storage);
+        if (m_storage->isBackup())
+            qnBackupStorageMan->addStorage(m_storage);
+        else if (!m_storage->isBackup())
+            qnNormalStorageMan->addStorage(m_storage);
     }
 private:
     QnStorageResourcePtr m_storage;
@@ -694,7 +709,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == qnCommon->moduleGUID())  {
+    if (storage && storage->getParentId() == qnCommon->moduleGUID()) {
         removeStorage(storage);
         updateStorageStatistics();
     }
@@ -768,14 +783,23 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 
 QnStorageManager::~QnStorageManager()
 {
-    stopRedundantSyncWatchdog();
-    QnStorageManager_instance = nullptr;
+    // stopRedundantSyncWatchdog();
+    if (m_kind == QnServer::ArchiveKind::Normal)
+        QnNormalStorageManager_instance = nullptr;
+    else if (m_kind == QnServer::ArchiveKind::Backup)
+        QnBackupStorageManager_instance = nullptr;
+
     stopAsyncTasks();
 }
 
-QnStorageManager* QnStorageManager::instance()
+QnStorageManager* QnStorageManager::normalInstance()
 {
-    return QnStorageManager_instance;
+    return QnNormalStorageManager_instance;
+}
+
+QnStorageManager* QnStorageManager::backupInstance()
+{
+    return QnBackupStorageManager_instance;
 }
 
 QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator)
@@ -1443,45 +1467,7 @@ void QnStorageManager::updateStorageStatistics()
     m_warnSended = false;
 }
 
-std::vector<QnStorageResourcePtr> QnStorageManager::getRedundantLiveStorages() const
-{
-    std::vector<QnStorageResourcePtr> result;
-    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
-
-    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); 
-        itr != storages.constEnd(); 
-        ++itr)
-    {
-        QnStorageResourcePtr storage = *itr;
-        if (storage->isRedundant() && 
-            storage->getRedundantSchedule().daysOfTheWeek == -1)
-        {
-            result.push_back(storage);
-        }
-    }
-    return result;
-}
-
-std::vector<QnStorageResourcePtr> QnStorageManager::getRedundantSyncStorages() const
-{
-    std::vector<QnStorageResourcePtr> result;
-    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
-
-    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); 
-        itr != storages.constEnd(); 
-        ++itr)
-    {
-        QnStorageResourcePtr storage = *itr;
-        if (storage->isRedundant() && 
-            storage->getRedundantSchedule().daysOfTheWeek != -1)
-        {
-            result.push_back(storage);
-        }
-    }
-    return result;
-}
-
-QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
+QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider *provider)
 {
     QnStorageResourcePtr result;
     float minBitrate = (float) INT_MAX;
@@ -1492,12 +1478,10 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QVector<QnStorageResourcePtr> candidates;
 
     // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
-    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    QSet<QnStorageResourcePtr> storages = getWritableStorages();
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr storage = *itr;
-        if (storage->isRedundant())
-            continue;
         qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
         float bitrate = storage->bitrate() / storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);
@@ -1610,7 +1594,13 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& cam
     DeviceFileCatalogPtr fileCatalog = catalogMap[cameraUniqueId];
     if (fileCatalog == 0)
     {
-        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(cameraUniqueId, catalog));
+        fileCatalog = DeviceFileCatalogPtr(
+            new DeviceFileCatalog(
+                cameraUniqueId, 
+                catalog,
+                m_kind
+            )
+       );
         catalogMap[cameraUniqueId] = fileCatalog;
     }
     return fileCatalog;
@@ -1713,7 +1703,15 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     int storageIndex;
     QString quality, mac;
 
-    QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, mac, quality);
+    QnStorageResourcePtr storage = extractStorageFromFileName(
+        storageIndex, 
+        fileName, 
+        mac, 
+        quality
+    );
+    if (!storage)
+        return false;
+
     if (storageIndex == -1)
         return false;
     storage->addBitrate(provider);
@@ -1791,7 +1789,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
     for(QFileInfo fi: list)
     {
         QByteArray mac = fi.fileName().toUtf8();
-        DeviceFileCatalogPtr catalogFile(new DeviceFileCatalog(mac, catalogType));
+        DeviceFileCatalogPtr catalogFile(new DeviceFileCatalog(mac, catalogType, m_kind));
         QString catalogName = closeDirPath(fi.absoluteFilePath()) + lit("title.csv");
         QVector<DeviceFileCatalog::Chunk> notMigratedChunks;
         if (catalogFile->fromCSVFile(catalogName))
@@ -1907,7 +1905,7 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
 
 bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
     //TODO: #GDM #Bookmarks #API #High make sure guid is present and exists in the database
-    DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
+    DeviceFileCatalogPtr catalog = getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     int idx = catalog->findFileIndex(bookmark.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
     if (idx < 0)
         return false;
@@ -1931,7 +1929,7 @@ bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBook
 
 bool QnStorageManager::deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
     //TODO: #GDM #Bookmarks #API #High make sure guid is present and exists in the database
-    DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
+    DeviceFileCatalogPtr catalog = getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     if (!catalog)
         return false;
 
@@ -2332,69 +2330,69 @@ void QnStorageManager::startRedundantSyncWatchdog()
         std::launch::async,
         [this]
         {
-            while (m_redundantSyncOn)
-            {
-                std::this_thread::sleep_for(
-                    REDUNDANT_SYNC_TIMEOUT
-                );
-                auto redundantSyncStorages = getRedundantSyncStorages();
+            //while (m_redundantSyncOn)
+            //{
+            //    std::this_thread::sleep_for(
+            //        REDUNDANT_SYNC_TIMEOUT
+            //    );
+            //    auto redundantSyncStorages = getRedundantSyncStorages();
 
-                std::for_each(
-                    redundantSyncStorages.begin(),
-                    redundantSyncStorages.end(),
-                    [this](QnStorageResourcePtr &storage)
-                    {
-                        if (!m_redundantSyncOn)
-                            return;
+            //    std::for_each(
+            //        redundantSyncStorages.begin(),
+            //        redundantSyncStorages.end(),
+            //        [this](QnStorageResourcePtr &storage)
+            //        {
+            //            if (!m_redundantSyncOn)
+            //                return;
 
-                        const auto &schedule = storage->getRedundantSchedule();
-                        if (schedule.daysOfTheWeek == -1 ||
-                            schedule.start == -1 ||
-                            schedule.duration == -1)
-                        {
-                            NX_LOG(
-                                lit("Redundant storage %1 wrong schedule").arg(storage->getUrl()), 
-                                cl_logDEBUG1
-                            );
-                            return;
-                        }
-                        
-                        auto isItTimeForSync = [] (const QnStorageResource::RedundantSchedule &schedule)
-                        {
-                            QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
-                            const auto curDate = now.date();
+            //            const auto &schedule = storage->getRedundantSchedule();
+            //            if (schedule.daysOfTheWeek == -1 ||
+            //                schedule.start == -1 ||
+            //                schedule.duration == -1)
+            //            {
+            //                NX_LOG(
+            //                    lit("Redundant storage %1 wrong schedule").arg(storage->getUrl()), 
+            //                    cl_logDEBUG1
+            //                );
+            //                return;
+            //            }
+            //            
+            //            auto isItTimeForSync = [] (const QnStorageResource::RedundantSchedule &schedule)
+            //            {
+            //                QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
+            //                const auto curDate = now.date();
 
-                            if (ec2::redundant::fromQtDOW(curDate.dayOfWeek()) & schedule.daysOfTheWeek)
-                            {
-                                const auto curTime = now.time();
-                                if (curTime.msecsSinceStartOfDay() > schedule.start * 1000 &&
-                                    curTime.msecsSinceStartOfDay() < schedule.start * 1000 + schedule.duration * 1000)
-                                {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        };
+            //                if (ec2::redundant::fromQtDOW(curDate.dayOfWeek()) & schedule.daysOfTheWeek)
+            //                {
+            //                    const auto curTime = now.time();
+            //                    if (curTime.msecsSinceStartOfDay() > schedule.start * 1000 &&
+            //                        curTime.msecsSinceStartOfDay() < schedule.start * 1000 + schedule.duration * 1000)
+            //                    {
+            //                        return true;
+            //                    }
+            //                }
+            //                return false;
+            //            };
 
-                        if (isItTimeForSync(schedule)) // we are there
-                        {
-                            // get current time point again. Copying file might take some time
-                            synchronizeStorages(
-                                storage,
-                                [this, isItTimeForSync, &schedule]
-                                {
-                                    if (!m_redundantSyncOn || // stop forced
-                                        !isItTimeForSync(schedule)) // synchronization period is over
-                                    {
-                                       return true;
-                                    }
-                                    return false;
-                                }
-                            );
-                        }
-                    }
-                );
-            }
+            //            if (isItTimeForSync(schedule)) // we are there
+            //            {
+            //                // get current time point again. Copying file might take some time
+            //                synchronizeStorages(
+            //                    storage,
+            //                    [this, isItTimeForSync, &schedule]
+            //                    {
+            //                        if (!m_redundantSyncOn || // stop forced
+            //                            !isItTimeForSync(schedule)) // synchronization period is over
+            //                        {
+            //                           return true;
+            //                        }
+            //                        return false;
+            //                    }
+            //                );
+            //            }
+            //        }
+            //    );
+            //}
         }
     );
 }

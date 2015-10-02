@@ -70,7 +70,11 @@ public:
     // TODO: #Elric #enum
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
-    DeviceFileCatalog(const QString &cameraUniqueId, QnServer::ChunksCatalog catalog);
+    DeviceFileCatalog(
+        const QString           &cameraUniqueId, 
+        QnServer::ChunksCatalog catalog, 
+        QnServer::ArchiveKind   kind
+    );
     //void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     Chunk updateDuration(int durationMs, qint64 fileSize);
@@ -142,6 +146,9 @@ public:
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
+
+    QnServer::ArchiveKind getKind() const;
+    void setArchiveKind(QnServer::ArchiveKind kind);
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
@@ -156,8 +163,11 @@ private:
     void removeChunks(int storageIndex);
     void removeRecord(int idx);
     int detectTimeZone(qint64 startTimeMs, const QString& fileName);
-private:
+    
     friend class QnStorageManager;
+
+    QnStorageManager *getMyStorageMan() const;
+private:
 
     mutable QnMutex m_mutex;
     //QFile m_file;
@@ -181,6 +191,7 @@ private:
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
     QnMutex m_IOMutex;
+    QnServer::ArchiveKind m_kind;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

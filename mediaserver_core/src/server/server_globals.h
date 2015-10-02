@@ -27,6 +27,13 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ChunksCatalog)
 
+    enum ArchiveKind
+    {
+        Normal  = 0,
+        Backup  = 1,
+        None    = 2
+    };
+
 } // namespace QnServer
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )

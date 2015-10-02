@@ -72,6 +72,16 @@ public:
     void setRedundancy(bool value);
     bool isRedundancy() const;
 
+    int getBackupDOW() const;
+    int getBackupStart() const;
+    int getBackupDuration() const;
+    int getBackupBitrate() const;
+
+    void setBackupDOW(int value);
+    void setBackupStart(int value);
+    void setBackupDuration(int value);
+    void setBackupBitrate(int value);
+
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
 

@@ -886,7 +886,7 @@ void QnStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider
 
 QString QnStreamRecorder::fixedFileName() const
 {
-    return m_fixedFileName;
+    return m_fixedFileName ? m_recordingContextVector[0].fileName : lit("");
 }
 
 void QnStreamRecorder::setEofDateTime(qint64 value)

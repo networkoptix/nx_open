@@ -6,7 +6,7 @@
 
 namespace ec2
 {
-    namespace redundant 
+    namespace backup 
     {
         enum DayOfWeek
         {
@@ -25,21 +25,21 @@ namespace ec2
             switch (qtDOW)
             {
             case 1:
-                return ec2::redundant::Monday;
+                return Monday;
             case 2:
-                return ec2::redundant::Tuesday;
+                return Tuesday;
             case 3:
-                return ec2::redundant::Wednsday;
+                return Wednsday;
             case 4:
-                return ec2::redundant::Thursday;
+                return Thursday;
             case 5:
-                return ec2::redundant::Friday;
+                return Friday;
             case 6:
-                return ec2::redundant::Saturday;
+                return Saturday;
             case 7:
-                return ec2::redundant::Sunday;
+                return Sunday;
             default:
-                return ec2::redundant::NoDay;
+                return NoDay;
             }
         };
     }
@@ -51,11 +51,7 @@ namespace ec2
         qint64          spaceLimit;
         bool            usedForWriting;
         QString         storageType;
-        bool            redundant;              // is storage redundant
-        int             redundantDaysOfTheWeek; // Days of the week mask. -1 if not set
-        int             redundantStart;         // seconds from 00:00:00.
-        int             redundantDuration;      // duration of synchronization period in seconds
-        int             redundantBitrate;       // bitrate cap in bytes per second. -1 if not capped.
+        bool            backup;              // is storage used for backup
 
         std::vector<ApiResourceParamData> addParams;
     };
@@ -64,11 +60,7 @@ namespace ec2
     (spaceLimit)                \
     (usedForWriting)            \
     (storageType)               \
-    (redundant)                 \
-    (redundantDaysOfTheWeek)    \
-    (redundantStart)            \
-    (redundantDuration)         \
-    (redundantBitrate)          \
+    (backup)                    \
     (addParams)
 
 
@@ -98,10 +90,26 @@ namespace ec2
         QString         serverName;
         int             maxCameras;
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
+
+        // redundant storage settings
+        int             backupDaysOfTheWeek; // Days of the week mask. -1 if not set
+        int             backupStart;         // seconds from 00:00:00. Error if rDOW set and this is not set
+        int             backupDuration;      // duration of synchronization period in seconds. -1 if not set.
+        int             backupBitrate;       // bitrate cap in bytes per second. -1 if not capped.
     };
 
-#define ApiMediaServerUserAttributesData_Fields_Short (maxCameras)(allowAutoRedundancy)
-#define ApiMediaServerUserAttributesData_Fields (serverID) (serverName) ApiMediaServerUserAttributesData_Fields_Short
+#define ApiMediaServerUserAttributesData_Fields_Short   \
+    (maxCameras)                                        \
+    (allowAutoRedundancy)                               \
+    (backupDaysOfTheWeek)                               \
+    (backupStart)                                       \
+    (backupDuration)                                    \
+    (backupBitrate)
+
+#define ApiMediaServerUserAttributesData_Fields     \
+    (serverID)                                      \
+    (serverName)                                    \
+    ApiMediaServerUserAttributesData_Fields_Short
 
 
     struct ApiMediaServerDataEx

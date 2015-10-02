@@ -157,38 +157,12 @@ QString QnStorageResource::toNativeDirPath(const QString &dirPath)
     return result;
 }
 
-void QnStorageResource::setRedundant(bool v) 
+void QnStorageResource::setBackup(bool v) 
 {
-    m_redundant = v; 
+    m_backup = v; 
 }
 
-bool QnStorageResource::isRedundant() const 
+bool QnStorageResource::isBackup() const 
 { 
-    return m_redundant; 
-}
-
-void QnStorageResource::setRedundantSchedule(
-    const RedundantSchedule &schedule
-)
-{
-    m_redundantSchedule = schedule;
-}
-
-void QnStorageResource::setRedundantSchedule(
-    int rDOW, 
-    int rStart, 
-    int rDuration,
-    int rBitrate
-)
-{ 
-    m_redundantSchedule.daysOfTheWeek = rDOW; 
-    m_redundantSchedule.start = rStart;
-    m_redundantSchedule.duration = rDuration;
-    m_redundantSchedule.bitrate = rBitrate;
-}
-
-const QnStorageResource::RedundantSchedule &
-QnStorageResource::getRedundantSchedule() const 
-{ 
-    return m_redundantSchedule; 
+    return m_backup; 
 }

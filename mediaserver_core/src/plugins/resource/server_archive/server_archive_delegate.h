@@ -52,12 +52,12 @@ private:
     qint64 m_lastPacketTime;
     
     qint64 m_skipFramesToTime;
-    DeviceFileCatalogPtr m_catalogHi;
-    DeviceFileCatalogPtr m_catalogLow;
+    DeviceFileCatalogPtr m_catalogHi[2];
+    DeviceFileCatalogPtr m_catalogLow[2];
     //QnChunkSequence* m_chunkSequenceHi;
     //QnChunkSequence* m_chunkSequenceLow;
     DeviceFileCatalog::Chunk m_currentChunk;
-    DeviceFileCatalogPtr m_currentChunkCatalog;
+    DeviceFileCatalogPtr m_currentChunkCatalog[2];
 
     QnAviArchiveDelegatePtr m_aviDelegate;
     QnAviResourcePtr m_fileRes;

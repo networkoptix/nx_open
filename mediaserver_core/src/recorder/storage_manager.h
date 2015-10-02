@@ -43,12 +43,13 @@ public:
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
-
-
-    QnStorageManager();
+    
+    QnStorageManager(QnServer::ArchiveKind kind);
     virtual ~QnStorageManager();
-    static QnStorageManager* instance();
+    static QnStorageManager* normalInstance();
+    static QnStorageManager* backupInstance();
     void removeStorage(const QnStorageResourcePtr &storage);
+
 
     /*
     * Remove storage if storage is absent in specified list
@@ -81,10 +82,8 @@ public:
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
-
-    QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
-    std::vector<QnStorageResourcePtr> getRedundantLiveStorages() const;
-    std::vector<QnStorageResourcePtr> getRedundantSyncStorages() const;
+    
+    QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider *provider);
 
     QnStorageResourceList getStorages() const;
     QnStorageResourceList getStoragesInLexicalOrder() const;
@@ -185,8 +184,9 @@ private:
         NeedStopCB             needStop
     );
 private:
-    StorageMap m_storageRoots;
-    FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
+    QnServer::ArchiveKind   m_kind;
+    StorageMap              m_storageRoots;
+    FileCatalogMap          m_devFileCatalog[QnServer::ChunksCatalogCount];
 
     mutable QnMutex m_mutexStorages;
     mutable QnMutex m_mutexCatalog;
@@ -228,6 +228,7 @@ private:
     std::future<void>   m_redundantFuture;
 };
 
-#define qnStorageMan QnStorageManager::instance()
+#define qnNormalStorageMan QnStorageManager::normalInstance()
+#define qnBackupStorageMan QnStorageManager::backupInstance()
 
 #endif // __STORAGE_MANAGER_H__

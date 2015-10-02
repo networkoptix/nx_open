@@ -77,11 +77,16 @@ void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
     durationMs = qMax(0ll, timeMs - startTimeMs);
 }
 
-DeviceFileCatalog::DeviceFileCatalog(const QString &cameraUniqueId, QnServer::ChunksCatalog catalog):
+DeviceFileCatalog::DeviceFileCatalog(
+    const QString           &cameraUniqueId, 
+    QnServer::ChunksCatalog catalog, 
+    QnServer::ArchiveKind   kind
+) :
     m_mutex(QnMutex::Recursive),
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
-    m_recordingChunkTime(-1)
+    m_recordingChunkTime(-1),
+    m_kind(kind)
 {
 }
 
@@ -336,10 +341,33 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
         }
 
         //chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
-        chunk = Chunk(startTimeMs, qnStorageMan->getStorageIndex(storage), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
+        chunk = Chunk(startTimeMs, getMyStorageMan()->getStorageIndex(storage), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
     }
     delete avi;
     return chunk;
+}
+
+QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
+{
+    QnStorageManager *storageMan = nullptr;
+    if (m_kind == QnServer::ArchiveKind::Normal)
+        storageMan = qnNormalStorageMan;
+    else if (m_kind == QnServer::ArchiveKind::Backup)
+        storageMan = qnBackupStorageMan;
+
+    return storageMan;
+}
+
+QnServer::ArchiveKind DeviceFileCatalog::getKind() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_kind;
+}
+
+void DeviceFileCatalog::setArchiveKind(QnServer::ArchiveKind kind)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_kind = kind;
 }
 
 QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName)
@@ -394,10 +422,10 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     QnAbstractStorageResource::FileInfoList files;
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
     {
-        while (!qnStorageMan->needToStopMediaScan() && needRebuildPause())
+        while (!getMyStorageMan()->needToStopMediaScan() && needRebuildPause())
             QnLongRunnable::msleep(100);
 
-        if (qnStorageMan->needToStopMediaScan() || QnResource::isStopping())
+        if (getMyStorageMan()->needToStopMediaScan() || QnResource::isStopping())
             return; // cancceled
 
         if (fi.isDir()) {
@@ -496,7 +524,7 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
     //m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QMap<qint64, Chunk> allChunks;
-    if (qnStorageMan->needToStopMediaScan())
+    if (getMyStorageMan()->needToStopMediaScan())
         return false;
     
     QVector<EmptyFileInfo> emptyFileList;
@@ -674,7 +702,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
 
         if (!m_chunks.empty()) 
         {
-            storage = qnStorageMan->storageRoot(m_chunks[0].storageIndex);
+            storage = getMyStorageMan()->storageRoot(m_chunks[0].storageIndex);
             delFileName = fullFileName(m_chunks[0]);
             deletedChunk = m_chunks[0];
 
@@ -736,7 +764,7 @@ QString DeviceFileCatalog::Chunk::fileName() const
 
 QString DeviceFileCatalog::fileDir(const Chunk& chunk) const
 {
-    QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
+    QnStorageResourcePtr storage = getMyStorageMan()->storageRoot(chunk.storageIndex);
     if (!storage)
         return QString();
 

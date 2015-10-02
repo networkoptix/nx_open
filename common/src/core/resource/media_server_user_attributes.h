@@ -15,15 +15,33 @@
 class QnMediaServerUserAttributes
 {
 public:
-    QnUuid serverID;
-    int maxCameras;
-    bool isRedundancyEnabled;
+    QnUuid  serverID;
+    int     maxCameras;
+    bool    isRedundancyEnabled;
     QString name;
 
+    // backup storage settings
+    int     backupDaysOfTheWeek; // Days of the week mask. -1 if not set
+    int     backupStart;         // seconds from 00:00:00. Error if rDOW set and this is not set
+    int     backupDuration;      // duration of synchronization period in seconds. -1 if not set.
+    int     backupBitrate;       // bitrate cap in bytes per second. -1 if not capped.
+
     QnMediaServerUserAttributes();
-    void assign( const QnMediaServerUserAttributes& right, QSet<QByteArray>* const modifiedFields );
+    void assign(
+        const QnMediaServerUserAttributes   &right, 
+        QSet<QByteArray>                    *const modifiedFields
+    );
 };
-#define QnMediaServerUserAttributes_Fields (serverID)(maxCameras)(isRedundancyEnabled)(name)
+#define QnMediaServerUserAttributes_Fields  \
+    (serverID)                              \
+    (maxCameras)                            \
+    (isRedundancyEnabled)                   \
+    (name)                                  \
+    (backupDaysOfTheWeek)            \
+    (backupStart)                    \
+    (backupDuration)                 \
+    (backupBitrate)
+
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaServerUserAttributes, (eq))
 
 Q_DECLARE_METATYPE(QnMediaServerUserAttributes)

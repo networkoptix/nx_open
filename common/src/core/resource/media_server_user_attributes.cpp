@@ -13,13 +13,28 @@ QnMediaServerUserAttributes::QnMediaServerUserAttributes()
 {
 }
 
-void QnMediaServerUserAttributes::assign( const QnMediaServerUserAttributes& right, QSet<QByteArray>* const modifiedFields )
+void QnMediaServerUserAttributes::assign(
+    const QnMediaServerUserAttributes   &right, 
+    QSet<QByteArray>                    *const modifiedFields
+)
 {
     if (isRedundancyEnabled != right.isRedundancyEnabled)
         modifiedFields->insert("redundancyChanged");
 
     if (name != right.name)
         modifiedFields->insert("nameChanged");
+
+    if (backupDaysOfTheWeek != right.backupDaysOfTheWeek)
+        modifiedFields->insert("redundantDaysOfTheWeekChanged");
+
+    if (backupBitrate != right.backupBitrate)
+        modifiedFields->insert("redundantBitrateChanged");
+
+    if (backupDuration != right.backupDuration)
+        modifiedFields->insert("redundantDurationChanged");
+
+    if (backupStart != right.backupStart)
+        modifiedFields->insert("redundantStartChanged");
 
     *this = right;
 }

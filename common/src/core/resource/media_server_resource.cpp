@@ -349,6 +349,85 @@ int QnMediaServerResource::getMaxCameras() const
     return (*lk)->maxCameras;
 }
 
+int QnMediaServerResource::getBackupDOW() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    return (*lk)->backupDaysOfTheWeek;
+}
+
+int QnMediaServerResource::getBackupStart() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    return (*lk)->backupStart;
+}
+
+int QnMediaServerResource::getBackupDuration() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    return (*lk)->backupDuration;
+}
+
+int QnMediaServerResource::getBackupBitrate() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    return (*lk)->backupBitrate;
+}
+
+void QnMediaServerResource::setBackupDOW(int value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    (*lk)->backupDaysOfTheWeek = value;
+}
+
+void QnMediaServerResource::setBackupStart(int value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    (*lk)->backupStart = value;
+}
+void QnMediaServerResource::setBackupDuration(int value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    (*lk)->backupDuration = value;
+}
+
+void QnMediaServerResource::setBackupBitrate(int value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    (*lk)->backupBitrate = value;
+}
+
 void QnMediaServerResource::setRedundancy(bool value)
 {
     {

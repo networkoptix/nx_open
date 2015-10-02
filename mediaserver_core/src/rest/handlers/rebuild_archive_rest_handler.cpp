@@ -12,13 +12,13 @@
 int QnRebuildArchiveRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path);
-
+    // TODO: #akulikov #backup storages. Make this work for two storage managers
     QString method = params.value("action");
-    auto reply = QnStorageManager::instance()->rebuildInfo();
+    auto reply = qnNormalStorageMan->rebuildInfo();
     if (method == "start")
-        reply = QnStorageManager::instance()->rebuildCatalogAsync();
+        reply = qnNormalStorageMan->rebuildCatalogAsync();
     else if (method == "stop")
-        QnStorageManager::instance()->cancelRebuildCatalogAsync();
+        qnNormalStorageMan->cancelRebuildCatalogAsync();
 
     result.setReply(reply);
     return CODE_OK;

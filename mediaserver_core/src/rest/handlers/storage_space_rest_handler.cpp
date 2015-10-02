@@ -37,7 +37,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
 
     QList<QString> storagePaths;
-    for(const QnStorageResourcePtr &storage: qnStorageMan->getStorages()) {
+    // TODO: #akulikov #backup storages: alter this for two managers
+    for(const QnStorageResourcePtr &storage: qnNormalStorageMan->getStorages()) {
         QString path;
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource>(storage);
         if (fileStorage != nullptr)

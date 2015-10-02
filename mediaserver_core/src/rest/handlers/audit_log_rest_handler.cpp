@@ -44,7 +44,8 @@ int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamL
                 QnTimePeriod period;
                 period.startTimeMs = record.rangeStartSec * 1000ll;
                 period.durationMs = (record.rangeEndSec - record.rangeStartSec) * 1000ll;
-                bool exists = res && qnStorageMan->isArchiveTimeExists(res->getUniqueId(), period);
+                // TODO: #akulikov #backup storages. Make this work for two storage managers
+                bool exists = res && qnNormalStorageMan->isArchiveTimeExists(res->getUniqueId(), period);
                 playbackFlags.append(exists ? '1' : '0');
             }
             record.addParam("archiveExist", playbackFlags);

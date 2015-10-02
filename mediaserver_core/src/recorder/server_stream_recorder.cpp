@@ -243,7 +243,7 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
     }
 
     const QnScheduleTask task = currentScheduleTask();
-    bool isRecording = task.getRecordingType() != Qn::RT_Never && qnStorageMan->isWritableStoragesAvailable();
+    bool isRecording = task.getRecordingType() != Qn::RT_Never && qnNormalStorageMan->isWritableStoragesAvailable();
     if (!m_device->hasFlags(Qn::foreigner)) {
         if (isRecording) {
             if(m_device->getStatus() == Qn::Online)
@@ -529,45 +529,83 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 
 void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
 {
-    if (m_fixedFileName)
+    if (!m_fixedFileName)
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();
         std::vector<QnStorageResourcePtr> storages;
         
+        storages.push_back(qnNormalStorageMan->getOptimalStorageRoot(provider));
         if (m_recordRedundant)
-            storages = qnStorageMan->getRedundantLiveStorages();
-        storages.push_back(qnStorageMan->getOptimalStorageRoot(provider));
+            storages.push_back(qnBackupStorageMan->getOptimalStorageRoot(provider));
 
         if (!storages.empty())
             setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
-        for (size_t i = 0; i < storages.size(); ++i)
-        {
+
+        if (storages[QnServer::ArchiveKind::Normal])
             m_recordingContextVector.emplace_back(
-                qnStorageMan->getFileName(
+                qnNormalStorageMan->getFileName(
                     m_startDateTime/1000, 
                     m_currentTimeZone, 
                     netResource, 
                     DeviceFileCatalog::prefixByCatalog(m_catalog), 
-                    storages[i]
-                ),
-                storages[i]
+                    storages[QnServer::ArchiveKind::Normal]
+                ), 
+                storages[QnServer::ArchiveKind::Normal]
             );
-        }
+
+        if (storages[QnServer::ArchiveKind::Backup])
+            m_recordingContextVector.emplace_back(
+                qnBackupStorageMan->getFileName(
+                    m_startDateTime/1000, 
+                    m_currentTimeZone, 
+                    netResource, 
+                    DeviceFileCatalog::prefixByCatalog(m_catalog), 
+                    storages[QnServer::ArchiveKind::Backup]
+                ), 
+                storages[QnServer::ArchiveKind::Backup]
+            );
     }
 }
 
 void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
 {
     if (m_truncateInterval != 0)
-        qnStorageMan->fileFinished(durationMs, fileName, provider, fileSize);
+    {
+        qnNormalStorageMan->fileFinished(
+            durationMs, 
+            fileName, 
+            provider, 
+            fileSize
+        );
+
+        qnBackupStorageMan->fileFinished(
+            durationMs, 
+            fileName, 
+            provider, 
+            fileSize
+        );
+    }
 };
 
 void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
-    if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(startTimeMs, timeZone, fileName, provider);
+    if (m_truncateInterval > 0) 
+    {
+        qnNormalStorageMan->fileStarted(
+            startTimeMs, 
+            timeZone, 
+            fileName, 
+            provider
+        );
+
+        qnBackupStorageMan->fileStarted(
+            startTimeMs, 
+            timeZone, 
+            fileName, 
+            provider
+        );
     }
 }
 

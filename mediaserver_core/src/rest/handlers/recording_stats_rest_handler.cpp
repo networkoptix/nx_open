@@ -14,6 +14,8 @@ int QnRecordingStatsRestHandler::executeGet(const QString &path, const QnRequest
 
     qint64 bitrateAnalizePeriodMs = params.value("bitrateAnalizePeriodMs").toLongLong();
 
-    result.setReply( qnStorageMan->getChunkStatistics(bitrateAnalizePeriodMs));
+    // TODO: #akulikov #backup storages. Alter this for two storage managers
+    auto normalStatistics = qnNormalStorageMan->getChunkStatistics(bitrateAnalizePeriodMs);
+    result.setReply(normalStatistics);
     return nx_http::StatusCode::ok;
 }

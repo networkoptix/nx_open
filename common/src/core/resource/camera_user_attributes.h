@@ -41,6 +41,7 @@ public:
     QString groupName;
     QnMediaDewarpingParams dewarpingParams;
     Qn::FailoverPriority failoverPriority;
+    bool redundantSyncOn;
 
     QnCameraUserAttributes();
 

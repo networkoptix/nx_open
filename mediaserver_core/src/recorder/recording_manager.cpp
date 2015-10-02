@@ -177,7 +177,14 @@ bool QnRecordingManager::updateCameraHistory() {
         return true;
     m_updateCameraHistoryTimer.restart();
 
-    std::vector<QnUuid> archivedListNew = qnStorageMan->getCamerasWithArchive();
+    std::vector<QnUuid> archivedListNew = qnNormalStorageMan->getCamerasWithArchive();
+    std::vector<QnUuid> archivedListNewBackup = qnBackupStorageMan->getCamerasWithArchive();
+    archivedListNew.insert(
+        archivedListNew.begin(),
+        archivedListNewBackup.begin(),
+        archivedListNewBackup.end()
+    );
+
     std::vector<QnUuid> archivedListOld = qnCameraHistoryPool->getServerFootageData(qnCommon->moduleGUID());
     if (archivedListOld == archivedListNew) 
         return true;
@@ -268,8 +275,7 @@ bool QnRecordingManager::startOrStopRecording(
 
     bool someRecordingIsPresent = false;
 
-    //QnStorageManager* storageMan = QnStorageManager::instance();
-    if (needRecordCamera && res->getStatus() != Qn::Offline /* && storageMan->rebuildState() == QnStorageManager::RebuildState_None*/)
+    if (needRecordCamera && res->getStatus() != Qn::Offline)
     {
         QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
         QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
@@ -446,7 +452,8 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (physicalStorage) {
-        qnStorageMan->removeStorage(physicalStorage);
+        qnNormalStorageMan->removeStorage(physicalStorage);
+        qnBackupStorageMan->removeStorage(physicalStorage);
         return;
     }
 

@@ -13,6 +13,7 @@
 
 QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
 {
+    // TODO: #akulikov #backup storages: Alter this for two storage managers kinds.
     QnTimePeriodList periods;
     switch (request.periodsType) {
     case Qn::MotionContent:
@@ -36,7 +37,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
                 for (const QnVirtualCameraResourcePtr& res: request.resList)
                 {
                     QnTimePeriodList periods;
-                    if (qnStorageMan->getBookmarks(res->getPhysicalId().toUtf8(), bookmarksFilter, bookmarks)) {
+                    if (qnNormalStorageMan->getBookmarks(res->getPhysicalId().toUtf8(), bookmarksFilter, bookmarks)) {
                         for (const QnCameraBookmark &bookmark: bookmarks)
                             periods.push_back(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs));
                     }
@@ -45,7 +46,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
                 periods = QnTimePeriodList::mergeTimePeriods(tmpData);
             } else {
                 //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
+                periods = qnNormalStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
                     QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog,
                     request.limit);
             }
@@ -53,7 +54,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
         }
     case Qn::RecordingContent:
     default:
-        periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
+        periods = qnNormalStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
             QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog,
             request.limit);
         break;

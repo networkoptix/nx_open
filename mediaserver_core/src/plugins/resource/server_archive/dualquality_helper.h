@@ -18,8 +18,8 @@ public:
     void findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& resultChunk, DeviceFileCatalogPtr& resultCatalog, DeviceFileCatalog::FindMethod findMethod, bool preciseFind);
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 private:
-    DeviceFileCatalogPtr m_catalogHi;
-    DeviceFileCatalogPtr m_catalogLow;
+    DeviceFileCatalogPtr m_catalogHi[2];
+    DeviceFileCatalogPtr m_catalogLow[2];
     MediaQuality m_quality;
     bool m_alreadyOnAltChunk;
 };

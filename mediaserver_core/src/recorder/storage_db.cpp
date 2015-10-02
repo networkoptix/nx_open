@@ -256,7 +256,14 @@ void QnStorageDb::addCatalogFromMediaFolder(
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId)) {
-            result << DeviceFileCatalogPtr(new DeviceFileCatalog(uniqueId, catalog));
+            result 
+                << DeviceFileCatalogPtr(
+                        new DeviceFileCatalog(
+                            uniqueId, 
+                            catalog,
+                            QnServer::ArchiveKind::None
+                        )
+                    );
         }
     }
 }
@@ -507,7 +514,13 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
 
             prevCatalog = catalog;
             prevId = id;
-            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(QString::fromUtf8(id), catalog));
+            fileCatalog = DeviceFileCatalogPtr(
+                new DeviceFileCatalog(
+                    QString::fromUtf8(id), 
+                    catalog,
+                    QnServer::ArchiveKind::None // It's not important here
+                )
+            );
         }
         qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
         qint64 filesize = query.value(filesizeFieldIdx).toLongLong();
@@ -554,7 +567,13 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
                 chunks.clear();
             }
             prevId = id;
-            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(QString::fromUtf8(id), QnServer::BookmarksCatalog));
+            fileCatalog = DeviceFileCatalogPtr(
+                new DeviceFileCatalog(
+                    QString::fromUtf8(id), 
+                    QnServer::BookmarksCatalog,
+                    QnServer::ArchiveKind::None
+                )
+            );
         }
         qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
         int durationMs = query.value(durationFieldIdx).toInt();
