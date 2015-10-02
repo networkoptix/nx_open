@@ -9,12 +9,15 @@ void restartServer(int restartTimeout);
 int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *) {
     Q_UNUSED(path)
     Q_UNUSED(params)
-
-    // TODO: #dklychkov refactor this to use a timeout.
-    // We can't just write timeout here because this thread doesn't have an event loop.
-    restartServer(0);
-
     result.setError(QnJsonRestResult::NoError);
-
     return CODE_OK;
+}
+
+void QnRestartRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor*)
+{
+    Q_UNUSED(path)
+    Q_UNUSED(params)
+    Q_UNUSED(body)
+
+    restartServer(0);
 }
