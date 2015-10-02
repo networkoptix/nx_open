@@ -77,14 +77,6 @@ namespace {
     const int timelineWindowNearLive = 10 * 1000;
 
     QAtomicInt qn_threadedMergeHandle(1);
-
-    QnCameraBookmarkList getBookmarksAtPosition(const QnCameraBookmarkList &bookmarks, qint64 position) {
-        QnCameraBookmarkList result;
-        std::copy_if(bookmarks.cbegin(), bookmarks.cend(), std::back_inserter(result), [position](const QnCameraBookmark &bookmark) {
-            return bookmark.startTimeMs <= position && position < bookmark.endTimeMs();
-        });
-        return result;
-    }
 }
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
@@ -1514,10 +1506,7 @@ void QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated(const QPoin
 
     const qint64 position = m_timeSlider->valueFromPosition(pos);
     const QnActionParameters params(currentTarget(Qn::SliderScope));
-    QnCameraBookmarkList bookmarks;
-    if (m_currentMediaWidget && m_timeSlider->timePeriods(QnWorkbenchNavigator::CurrentLine, Qn::BookmarksContent).containTime(position))
-        bookmarks = getBookmarksAtPosition(m_timeSlider->bookmarks(), position);
-
+    QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
     m_timeSlider->bookmarksViewer()->updateBookmarks(bookmarks, params);
 }
 
@@ -1544,7 +1533,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
     if (m_currentWidget && m_timeSlider->timePeriods(CurrentLine, Qn::BookmarksContent).containTime(position)) {
-        QnCameraBookmarkList bookmarks = getBookmarksAtPosition(m_timeSlider->bookmarks(), position);
+        QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
         if (!bookmarks.isEmpty())
             parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
     }

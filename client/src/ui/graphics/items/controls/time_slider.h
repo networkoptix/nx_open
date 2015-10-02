@@ -187,6 +187,7 @@ public:
 
     bool isBookmarksVisible() const;
     void setBookmarksVisible(bool bookmarksVisible);
+    QnCameraBookmarkList bookmarksAtPosition(qint64 position) const;
 
 signals:
     void windowMoved();
@@ -275,6 +276,16 @@ private:
         qreal selection;
         bool hiding;
         bool selecting;
+    };
+
+    struct BookmarkCluster {
+        qint64 startTimeMs;
+        qint64 endTimeMs;
+        int firstBookmarkIndex;
+        int lastBookmarkIndex;
+
+        BookmarkCluster();
+        BookmarkCluster(const QnCameraBookmark &bookmark, int index);
     };
 
 private:
@@ -382,7 +393,7 @@ private:
     QVector<LineData> m_lineData;
     QnCameraBookmarkList m_bookmarks;
     QnCameraBookmarkList m_coveringBookmarks;
-    QnCameraBookmarkList m_mergedBookmarks;
+    QList<BookmarkCluster> m_mergedBookmarks;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;

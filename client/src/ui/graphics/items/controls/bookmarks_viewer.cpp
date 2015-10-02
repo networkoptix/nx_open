@@ -693,11 +693,6 @@ void QnBookmarksViewer::Impl::resetTimer()
 
 ///
 
-QnBookmarksViewer *QnBookmarksViewer::create(QGraphicsItem *parent)
-{
-    return (new QnBookmarksViewer(parent));
-}
-
 QnBookmarksViewer::QnBookmarksViewer(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
     , m_impl(new Impl(this))
