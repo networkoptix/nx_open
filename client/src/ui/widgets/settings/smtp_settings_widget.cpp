@@ -91,9 +91,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     connect(ui->okTestButton,               &QPushButton::clicked,              this,   &QnSmtpSettingsWidget::finishTesting);
     connect(m_timeoutTimer,                 &QTimer::timeout,                   this,   &QnSmtpSettingsWidget::at_timer_timeout);
     connect(ui->simpleEmailLineEdit,        &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailSimple);
-    connect(ui->simpleSupportEmailLineEdit, &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailSimple);
     connect(ui->emailLineEdit,              &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailAdvanced);
-    connect(ui->supportEmailLineEdit,       &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailAdvanced);
     connect(QnGlobalSettings::instance(),   &QnGlobalSettings::emailSettingsChanged, this,  &QnSmtpSettingsWidget::updateFromSettings);
 
     m_timeoutTimer->setSingleShot(false);
@@ -133,8 +131,8 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     }
     ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
 
-    ui->supportEmailLineEdit->setPlaceholderText(QnAppInfo::supportAddress());
-    ui->simpleSupportEmailLineEdit->setPlaceholderText(QnAppInfo::supportAddress());
+    ui->supportLinkLineEdit->setPlaceholderText(QnAppInfo::supportLink());
+    ui->simpleSupportLinkLineEdit->setPlaceholderText(QnAppInfo::supportLink());
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
@@ -155,8 +153,8 @@ void QnSmtpSettingsWidget::updateFromSettings() {
     ui->simplePasswordLineEdit->setText(settings.password);
     ui->signatureLineEdit->setText(settings.signature);
     ui->simpleSignatureLineEdit->setText(settings.signature);
-    ui->supportEmailLineEdit->setText(settings.supportEmail);
-    ui->simpleSupportEmailLineEdit->setText(settings.supportEmail);
+    ui->supportLinkLineEdit->setText(settings.supportEmail);
+    ui->simpleSupportLinkLineEdit->setText(settings.supportEmail);
     ui->advancedCheckBox->setChecked(!settings.simple);
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
         ? AdvancedPage
@@ -186,7 +184,7 @@ void QnSmtpSettingsWidget::setReadOnlyInternal(bool readOnly) {
     setReadOnly(ui->simpleEmailLineEdit, readOnly);
     setReadOnly(ui->simplePasswordLineEdit, readOnly);
     setReadOnly(ui->simpleSignatureLineEdit, readOnly);
-    setReadOnly(ui->simpleSupportEmailLineEdit, readOnly);
+    setReadOnly(ui->simpleSupportLinkLineEdit, readOnly);
 
     setReadOnly(ui->advancedCheckBox, readOnly);
 
@@ -199,7 +197,7 @@ void QnSmtpSettingsWidget::setReadOnlyInternal(bool readOnly) {
     setReadOnly(ui->sslRadioButton, readOnly);
     setReadOnly(ui->unsecuredRadioButton, readOnly);
     setReadOnly(ui->signatureLineEdit, readOnly);
-    setReadOnly(ui->supportEmailLineEdit, readOnly);
+    setReadOnly(ui->supportLinkLineEdit, readOnly);
 }
 
 
@@ -215,7 +213,7 @@ QnEmailSettings QnSmtpSettingsWidget::settings() const {
         result.password = ui->simplePasswordLineEdit->text();
         result.simple = true;
         result.signature = ui->simpleSignatureLineEdit->text();
-        result.supportEmail = ui->simpleSupportEmailLineEdit->text();
+        result.supportEmail = ui->simpleSupportLinkLineEdit->text();
         return result;
     }
 
@@ -231,7 +229,7 @@ QnEmailSettings QnSmtpSettingsWidget::settings() const {
               : QnEmail::Unsecure;
     result.simple = false;
     result.signature = ui->signatureLineEdit->text();
-    result.supportEmail = ui->supportEmailLineEdit->text();
+    result.supportEmail = ui->supportLinkLineEdit->text();
     return result;
 }
 
@@ -322,13 +320,13 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         ui->emailLineEdit->setText(value);
         ui->passwordLineEdit->setText(ui->simplePasswordLineEdit->text());
         ui->signatureLineEdit->setText(ui->simpleSignatureLineEdit->text());
-        ui->supportEmailLineEdit->setText(ui->simpleSupportEmailLineEdit->text());
+        ui->supportLinkLineEdit->setText(ui->simpleSupportLinkLineEdit->text());
         validateEmailAdvanced();
     } else {
         ui->simpleEmailLineEdit->setText(ui->emailLineEdit->text());
         ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
         ui->simpleSignatureLineEdit->setText(ui->signatureLineEdit->text());
-        ui->simpleSupportEmailLineEdit->setText(ui->supportEmailLineEdit->text());
+        ui->simpleSupportLinkLineEdit->setText(ui->supportLinkLineEdit->text());
         validateEmailSimple();
     }
     ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
@@ -418,7 +416,6 @@ void QnSmtpSettingsWidget::validateEmailSimple() {
     QString errorText;
 
     const QString targetEmail = ui->simpleEmailLineEdit->text();
-    const QString supportEmail = ui->simpleSupportEmailLineEdit->text();
 
     if (!targetEmail.isEmpty()) {
         QnEmailAddress email(targetEmail); 
@@ -427,12 +424,6 @@ void QnSmtpSettingsWidget::validateEmailSimple() {
         else if (email.smtpServer().isNull())
             errorText = tr("No preset found. Use 'Advanced' option.");
     }
-
-    if (errorText.isEmpty() && !supportEmail.isEmpty()) {
-        QnEmailAddress support(supportEmail);
-        if (!support.isValid())
-            errorText = tr("Support email is not valid.");
-    } 
 
     ui->detectErrorLabel->setText(errorText);
 }
@@ -444,18 +435,11 @@ void QnSmtpSettingsWidget::validateEmailAdvanced() {
     QString errorText;
 
     const QString targetEmail = ui->emailLineEdit->text();
-    const QString supportEmail = ui->supportEmailLineEdit->text();
 
     if (!targetEmail.isEmpty()) {
         QnEmailAddress email(targetEmail); 
         if (!email.isValid())
             errorText = tr("E-Mail is not valid");
-    }
-
-    if (errorText.isEmpty() && !supportEmail.isEmpty()) {
-        QnEmailAddress support(supportEmail);
-        if (!support.isValid())
-            errorText = tr("Support email is not valid.");
     }
 
     ui->supportEmailWarningLabel->setText(errorText);

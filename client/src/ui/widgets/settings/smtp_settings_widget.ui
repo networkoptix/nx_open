@@ -23,16 +23,7 @@
       <item>
        <widget class="QWidget" name="controlsWidget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
@@ -81,16 +72,7 @@
           <property name="fieldGrowthPolicy">
            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
           </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
+          <property name="margin">
            <number>0</number>
           </property>
           <item row="0" column="0">
@@ -148,7 +130,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="simpleSupportEmailLineEdit"/>
+           <widget class="QLineEdit" name="simpleSupportLinkLineEdit"/>
           </item>
           <item row="4" column="1">
            <widget class="QLabel" name="detectErrorLabel">
@@ -161,31 +143,13 @@
         </widget>
         <widget class="QWidget" name="advancedPage">
          <layout class="QVBoxLayout" name="verticalLayout">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
+          <property name="margin">
            <number>0</number>
           </property>
           <item>
            <widget class="QFrame" name="horizontalFrame">
             <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
+             <property name="margin">
               <number>0</number>
              </property>
              <item>
@@ -362,7 +326,7 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QLineEdit" name="supportEmailLineEdit"/>
+             <widget class="QLineEdit" name="supportLinkLineEdit"/>
             </item>
             <item row="2" column="1">
              <widget class="QLabel" name="supportEmailWarningLabel">
@@ -377,16 +341,7 @@
         </widget>
         <widget class="QWidget" name="testPage">
          <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
+          <property name="margin">
            <number>0</number>
           </property>
           <item>
@@ -575,7 +530,7 @@
   <tabstop>simpleEmailLineEdit</tabstop>
   <tabstop>simplePasswordLineEdit</tabstop>
   <tabstop>simpleSignatureLineEdit</tabstop>
-  <tabstop>simpleSupportEmailLineEdit</tabstop>
+  <tabstop>simpleSupportLinkLineEdit</tabstop>
   <tabstop>emailLineEdit</tabstop>
   <tabstop>serverLineEdit</tabstop>
   <tabstop>userLineEdit</tabstop>
@@ -585,7 +540,7 @@
   <tabstop>sslRadioButton</tabstop>
   <tabstop>unsecuredRadioButton</tabstop>
   <tabstop>signatureLineEdit</tabstop>
-  <tabstop>supportEmailLineEdit</tabstop>
+  <tabstop>supportLinkLineEdit</tabstop>
   <tabstop>testButton</tabstop>
   <tabstop>advancedCheckBox</tabstop>
   <tabstop>okTestButton</tabstop>
