@@ -1469,10 +1469,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
-            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::All, this),
-            new QnFakeServerActionCondition(true, this),
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
             new QnForbiddenInSafeModeCondition(this),
+            new QnMergeToCurrentSystemActionCondition(this),
             this));
 
     factory().

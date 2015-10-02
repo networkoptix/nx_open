@@ -73,6 +73,11 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
         return CODE_OK;
     }
 
+    if (moduleInformation.ecDbReadOnly) {        
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("SAFE_MODE"));
+        return CODE_OK;
+    }
+
     /* Check if there is a valid starter license in the local system. */
     QnLicenseListHelper helper(qnLicensePool->getLicenses());
     if (helper.totalLicenseByType(Qn::LC_Start) > 0) {
