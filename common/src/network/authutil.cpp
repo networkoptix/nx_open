@@ -107,9 +107,15 @@ QByteArray createHttpQueryAuthParam(
     const QByteArray& method,
     QByteArray nonce)
 {
-    //calculating user digest
-    const QByteArray& ha1 = createUserPasswordDigest( userName, password, realm );
+    return createHttpQueryAuthParam(userName, createUserPasswordDigest(userName, password, realm), method, nonce);
+}
 
+QByteArray createHttpQueryAuthParam(
+    const QString& userName,
+    const QByteArray& digest,
+    const QByteArray& method,
+    QByteArray nonce)
+{
     //calculating "HA2"
     QCryptographicHash md5Hash( QCryptographicHash::Md5 );
     md5Hash.addData( method );
@@ -118,7 +124,7 @@ QByteArray createHttpQueryAuthParam(
 
     //calculating auth digest
     md5Hash.reset();
-    md5Hash.addData( ha1 );
+    md5Hash.addData( digest );
     md5Hash.addData( ":" );
     md5Hash.addData( nonce );
     md5Hash.addData( ":" );
@@ -127,4 +133,3 @@ QByteArray createHttpQueryAuthParam(
 
     return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
 }
-

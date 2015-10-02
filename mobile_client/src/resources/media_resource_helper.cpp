@@ -13,9 +13,9 @@
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 #include "common/common_module.h"
+#include "network/authutil.h"
 #include "utils/common/model_functions.h"
 #include "watchers/user_watcher.h"
-#include <network/authenticate_helper.h>
 #include <mobile_client/mobile_client_settings.h>
 
 namespace {
@@ -50,7 +50,7 @@ namespace {
     }
 
     QString getAuth(const QnUserResourcePtr &user, QnMediaResourceHelper::Protocol protocol) {
-        return QString::fromLatin1(QnAuthHelper::createHttpQueryAuthParam(user->getName(), user->getDigest(), methodForProtocol(protocol)));
+        return QString::fromLatin1(createHttpQueryAuthParam(user->getName(), user->getDigest(), methodForProtocol(protocol), QByteArray()));
     }
 
     qint64 convertPosition(qint64 position, QnMediaResourceHelper::Protocol protocol) {

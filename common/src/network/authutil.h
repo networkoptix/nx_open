@@ -24,6 +24,12 @@ class HttpAuthenticationClientContext;
 
  QByteArray createHttpQueryAuthParam(
      const QString& userName,
+     const QByteArray &digest,
+     const QByteArray& method,
+     QByteArray nonce);
+
+ QByteArray createHttpQueryAuthParam(
+     const QString& userName,
      const QString& password,
      const QString& realm,
      const QByteArray& method,
