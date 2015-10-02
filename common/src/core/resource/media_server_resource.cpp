@@ -22,6 +22,13 @@
 #include "nx_ec/ec_proto_version.h"
 #include <network/authenticate_helper.h>
 
+namespace {
+
+    const QString protoVersionPropertyName = lit("protoVersion");
+    const QString safeModePropertyName = lit("ecDbReadOnly");
+
+}
+
 
 class QnMediaServerResourceGuard: public QObject {
 public:
@@ -412,10 +419,13 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = false;
-    moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     moduleInformation.name = getName();
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+
+    if (hasProperty(safeModePropertyName))
+        moduleInformation.ecDbReadOnly = QnLexical::deserialized(getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
     
     QMutexLocker lock(&m_mutex);
 
@@ -427,6 +437,30 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.serverFlags = getServerFlags();
 
     return moduleInformation;
+}
+
+void QnMediaServerResource::setModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
+    Q_ASSERT_X(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
+
+    QList<QHostAddress> addressList;
+    for (const QString &address: moduleInformation.remoteAddresses)
+        addressList.append(QHostAddress(address));
+    setNetAddrList(addressList);
+
+    if (!addressList.isEmpty()) {
+        QString address = addressList.first().toString();
+        quint16 port = moduleInformation.port;
+        QString url = QString(lit("http://%1:%2")).arg(address).arg(port);
+        setApiUrl(url);
+        setUrl(url);
+    }
+    if (!moduleInformation.name.isEmpty())
+        setName(moduleInformation.name);
+    setVersion(moduleInformation.version);
+    setSystemInfo(moduleInformation.systemInformation);
+    setSystemName(moduleInformation.systemName);
+    setProperty(protoVersionPropertyName, QString::number(moduleInformation.protoVersion));
+    setProperty(safeModePropertyName, QnLexical::serialized(moduleInformation.ecDbReadOnly));
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
@@ -464,6 +498,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         {
             QMutexLocker lock(&m_mutex);
             m_statusTimer.restart();
+            Q_ASSERT_X(newStatus == Qn::Incompatible || m_originalGuid.isNull(), Q_FUNC_INFO, "Incompatible servers should not take any status but incompatible");
         }
 
         QnResource::setStatus(newStatus, silenceMode);

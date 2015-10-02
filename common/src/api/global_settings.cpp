@@ -70,7 +70,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
     m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(namePassword, QString(), this);
     m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSignature, QString(), this);
-    m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportAddress(), this);
+    m_supportLinkAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportLink(), this);
     m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(nameConnectionType, QnEmail::Unsecure, this);
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
@@ -89,7 +89,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_userAdaptor
         << m_passwordAdaptor
         << m_signatureAdaptor
-        << m_supportEmailAdaptor
+        << m_supportLinkAdaptor
         << m_connectionTypeAdaptor
         << m_portAdaptor
         << m_timeoutAdaptor
@@ -232,7 +232,7 @@ QnEmailSettings QnGlobalSettings::emailSettings() const {
     result.password = m_passwordAdaptor->value();
     result.connectionType = m_connectionTypeAdaptor->value();
     result.signature = m_signatureAdaptor->value();
-    result.supportEmail = m_supportEmailAdaptor->value();
+    result.supportEmail = m_supportLinkAdaptor->value();
     result.simple = m_simpleAdaptor->value();
     result.timeout = m_timeoutAdaptor->value();
     return result;
@@ -246,7 +246,7 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings) {
     m_passwordAdaptor->setValue(settings.isValid() ? settings.password : QString());
     m_connectionTypeAdaptor->setValue(settings.connectionType);
     m_signatureAdaptor->setValue(settings.signature);
-    m_supportEmailAdaptor->setValue(settings.supportEmail);
+    m_supportLinkAdaptor->setValue(settings.supportEmail);
     m_simpleAdaptor->setValue(settings.simple);
     m_timeoutAdaptor->setValue(settings.timeout);   
 }

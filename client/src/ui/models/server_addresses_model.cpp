@@ -5,9 +5,10 @@
 #include "utils/common/util.h"
 #include "utils/common/string.h"
 
-QnServerAddressesModel::QnServerAddressesModel(QObject *parent) :
-    base_type(parent),
-    m_port(-1)
+QnServerAddressesModel::QnServerAddressesModel(QObject *parent) 
+    : base_type(parent)
+    , m_readOnly(false)
+    , m_port(-1)
 {
 }
 
@@ -80,6 +81,20 @@ void QnServerAddressesModel::removeAddressAtIndex(const QModelIndex &index) {
     endRemoveRows();
 }
 
+bool QnServerAddressesModel::isReadOnly() const {
+    return m_readOnly;
+}
+
+void QnServerAddressesModel::setReadOnly(bool readOnly) {
+    if (m_readOnly == readOnly)
+        return;
+
+    beginResetModel();
+    m_readOnly = readOnly;
+    endResetModel();
+}
+
+
 void QnServerAddressesModel::resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses, int port) {
     beginResetModel();
     m_addresses = addresses;
@@ -144,6 +159,9 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
 
 bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     Q_UNUSED(role)
+
+    if (m_readOnly)
+        return false;
 
     switch (index.column()) {
     case AddressColumn: {
@@ -242,6 +260,9 @@ Qt::ItemFlags QnServerAddressesModel::flags(const QModelIndex &index) const {
 
     Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
+    if (isReadOnly())
+        return flags;
+
     switch (index.column()) {
     case AddressColumn:
         if (index.row() >= m_addresses.size())
@@ -287,7 +308,6 @@ QUrl QnServerAddressesModel::addressAtIndex(const QModelIndex &index, int defaul
 
     return url;
 }
-
 
 QnSortedServerAddressesModel::QnSortedServerAddressesModel(QObject *parent) : QSortFilterProxyModel(parent) {}
 

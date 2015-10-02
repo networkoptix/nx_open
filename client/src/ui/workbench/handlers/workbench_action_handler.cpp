@@ -2227,6 +2227,9 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
+    if (qnCommon->isReadOnly())
+        return;
+
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if(!watcher->hasMismatches())
         return;
@@ -2308,6 +2311,10 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
 
     /* Check if user already made a decision. */
     if (ec2::Ec2StaticticsReporter::isDefined(servers))
+        return;
+
+    /* User cannot disable statistics collecting, so don't make him sorrow. */
+    if (qnCommon->isReadOnly())
         return;
 
     /* Suppress notification if no server has internet access. */

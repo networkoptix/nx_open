@@ -53,6 +53,7 @@ namespace rtu
 
         bool safeMode;
         VersionHolder version;
+        QString os;
         QString displayAddress;
         Constants::ServerFlags flags;
         

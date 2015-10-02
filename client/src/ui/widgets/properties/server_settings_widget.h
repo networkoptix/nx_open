@@ -35,6 +35,10 @@ public:
 
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
+
+protected:
+    void setReadOnlyInternal(bool readOnly) override;
+
 private:
     void addTableItem(const QnStorageSpaceData &item);
     void setTableItems(const QList<QnStorageSpaceData> &items);
@@ -49,7 +53,6 @@ private:
     void updateRebuildUi(const QnStorageScanData& reply);
     void updateFailoverLabel();
     
-    bool isReadOnly() const;
     void updateReadOnly();
 
 private slots:
