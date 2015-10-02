@@ -34,6 +34,8 @@
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "core/resource/resource_name.h"
+#include "business/events/mserver_conflict_business_event.h"
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -46,6 +48,24 @@ namespace {
     const QString tpImageMimeType(lit("image/png"));
     const QString tpScreenshotFilename(lit("screenshot"));
     const QString tpScreenshot(lit("screenshot.jpeg"));
+    const QString tpScreenshotNum(lit("screenshot%1.jpeg"));
+
+    static const QString tpProductName(lit("productName"));
+    static const QString tpEvent(lit("event"));
+    static const QString tpSource(lit("source"));
+    static const QString tpUrlInt(lit("urlint"));
+    static const QString tpUrlExt(lit("urlext"));
+    static const QString tpTimestamp(lit("timestamp"));
+    static const QString tpReason(lit("reason"));
+    static const QString tpAggregated(lit("aggregated"));
+    static const QString tpInputPort(lit("inputPort"));
+    static const QString tpHasCameras(lit("hasCameras"));
+    static const QString tpCameras(lit("cameras"));
+
+    static const QString tpCaption(lit("caption"));
+    static const QString tpDescription(lit("description"));
+
+    static const QSize SCREENSHOT_SIZE(640, 480);
 };
 
 struct QnEmailAttachmentData {
@@ -100,6 +120,11 @@ struct QnEmailAttachmentData {
         case QnBusiness::LicenseIssueEvent:
             templatePath = lit(":/email_templates/license_issue.mustache");
             imageName = lit("license.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::UserDefinedEvent:
+            templatePath = lit(":/email_templates/generic_event.mustache");
+            imageName = lit("server.png");
             imagePath = lit(":/skin/email_attachments/server.png");
             break;
         default:
@@ -333,7 +358,7 @@ bool QnBusinessRuleProcessor::containResource(const QnResourceList& resList, con
 
 bool QnBusinessRuleProcessor::checkRuleCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule) const
 {
-    if (!bEvent->checkCondition(rule->eventState(), rule->eventParams()))
+    if (!bEvent->checkCondition(rule->eventState(), rule->eventParams(), rule->actionType()))
         return false;
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         return false;
@@ -516,9 +541,10 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(const QnAbstractBusinessAc
     //TODO: #vasilenko implement me
 }
 
-QByteArray QnBusinessRuleProcessor::getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const
+QByteArray QnBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const
 {
-    Q_UNUSED(params);
+    Q_UNUSED(id);
+    Q_UNUSED(timestampUsec);
     Q_UNUSED(dstSize);
 
     return QByteArray();
@@ -582,6 +608,176 @@ void QnBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggregationKe
     m_aggregatedEmails.erase( aggregatedActionIter );
 }
 
+QVariantList QnBusinessRuleProcessor::aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
+                                                                const QnBusinessAggregationInfo& aggregationInfo,
+                                                                bool useIp) 
+{
+    QVariantList result;
+    if (aggregationInfo.isEmpty()) {
+        result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), useIp);
+    }
+
+    for (const QnInfoDetail& detail: aggregationInfo.toList()) {
+        result << eventDetailsMap(action, detail, useIp);
+    }
+    return result;
+}
+
+QVariantList QnBusinessRuleProcessor::aggregatedEventDetailsMap(
+    const QnAbstractBusinessActionPtr& action,
+    const QList<QnInfoDetail>& aggregationDetailList,
+    bool useIp )
+{
+    QVariantList result;
+    for (const QnInfoDetail& detail: aggregationDetailList)
+        result << eventDetailsMap(action, detail, useIp);
+    return result;
+}
+
+
+QVariantHash QnBusinessRuleProcessor::eventDetailsMap(
+    const QnAbstractBusinessActionPtr& action,
+    const QnInfoDetail& aggregationData,
+    bool useIp,
+    bool addSubAggregationData )
+{
+    using namespace QnBusiness;
+
+    const QnBusinessEventParameters& params = aggregationData.runtimeParams();
+    const int aggregationCount = aggregationData.count();
+
+    QVariantHash detailsMap;
+
+    if( addSubAggregationData )
+    {
+        const QnBusinessAggregationInfo& subAggregationData = aggregationData.subAggregationData();
+        detailsMap[tpAggregated] = !subAggregationData.isEmpty()
+            ? aggregatedEventDetailsMap(action, subAggregationData, useIp)
+            : (QVariantList() << eventDetailsMap(action, aggregationData, useIp, false));
+    }
+
+    detailsMap[tpTimestamp] = QnBusinessStringsHelper::eventTimestampShort(params, aggregationCount);
+
+    switch (params.eventType) {
+    case CameraDisconnectEvent: {
+        detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+        break;
+    }
+
+    case CameraInputEvent: {
+        detailsMap[tpInputPort] = params.inputPortId;
+        break;
+    }
+    case StorageFailureEvent:
+    case NetworkIssueEvent:
+    case ServerFailureEvent: 
+    case LicenseIssueEvent:
+        {
+            detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+            break;
+        }
+    case CameraIpConflictEvent: {
+        detailsMap[lit("cameraConflictAddress")] = params.caption;
+        QVariantList conflicts;
+        int n = 0;
+        foreach (const QString& mac, params.description.split(QnConflictBusinessEvent::Delimiter)) {
+            QVariantHash conflict;
+            conflict[lit("number")] = ++n;
+            conflict[lit("mac")] = mac;
+            conflicts << conflict;
+        }
+        detailsMap[lit("cameraConflicts")] = conflicts;
+
+        break;
+                                }
+    case ServerConflictEvent: {
+        QnCameraConflictList conflicts;
+        conflicts.sourceServer = params.caption;
+        conflicts.decode(params.description);
+
+        QVariantList conflictsList;
+        int n = 0;
+        for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
+            const QString &server = itr.key();
+            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+                QVariantHash conflict;
+                conflict[lit("number")] = ++n;
+                conflict[lit("ip")] = server;
+                conflict[lit("mac")] = camera;
+                conflictsList << conflict;
+            }
+        }
+        detailsMap[lit("msConflicts")] = conflictsList;
+        break;
+                              }
+    default:
+        break;
+    }
+    return detailsMap;
+}
+
+QVariantHash QnBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, QnEmailAttachmentList& attachments, bool useIp)
+{
+    QnBusinessEventParameters params = action->getRuntimeParams();
+    QnBusiness::EventType eventType = params.eventType;
+
+    QVariantHash contextMap;
+
+    contextMap[tpProductName] = QnAppInfo::productNameLong();
+    contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
+    contextMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+    if (eventType == QnBusiness::CameraMotionEvent) {
+        contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
+        contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
+        
+        QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
+        if (!screenshotData.isNull()) {
+            QBuffer screenshotStream(&screenshotData);
+            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+        }
+
+    }
+    else if (eventType == QnBusiness::UserDefinedEvent) 
+    {
+        auto metadata = action->getRuntimeParams().metadata;
+        if (!metadata.cameraRefs.empty()) 
+        {
+            QVariantList cameras;
+            int screenshotNum = 1;
+            for (const QnUuid& cameraId: metadata.cameraRefs)
+            {
+                if (QnResourcePtr res = qnResPool->getResourceById(cameraId))
+                {
+                    QVariantMap camera;
+
+                    camera[QLatin1String("name")] = getFullResourceName(res, useIp);
+                    camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
+                    camera[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, true);
+
+                    QByteArray screenshotData = getEventScreenshotEncoded(cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE);
+                    if (!screenshotData.isNull()) {
+                        QBuffer screenshotStream(&screenshotData);
+                        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshotNum.arg(screenshotNum), screenshotStream, lit("image/jpeg"))));
+                        camera[QLatin1String("screenshot")] = lit("cid:") + tpScreenshotNum.arg(screenshotNum++);
+                    }
+
+                    cameras << camera;
+                }
+            }
+            if (!cameras.isEmpty()) 
+            {
+                contextMap[tpHasCameras] = lit("1");
+                contextMap[tpCameras] = cameras;
+            }
+        }
+    }
+
+    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, useIp);
+
+    return contextMap;
+}
+
 bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPtr& action, int aggregatedResCount )
 {
     Q_ASSERT( action );
@@ -616,12 +812,12 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
-    QVariantHash contextMap = QnBusinessStringsHelper::eventDescriptionMap(action, action->aggregationInfo(), true);
+    QnEmailAttachmentList attachments;
+    QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments, true);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);
 
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 
-    QnEmailAttachmentList attachments;
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
@@ -631,12 +827,9 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
     contextMap[tpSupportEmail] = emailSettings.supportEmail;
     contextMap[tpSystemName] = emailSettings.signature;
 
-    QByteArray screenshotData = this->getEventScreenshotEncoded(action->getRuntimeParams(), QSize(640, 480));
-    if (!screenshotData.isNull()) {
-        QBuffer screenshotStream(&screenshotData);
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-        contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
-    }
+    contextMap[tpCaption] = action->getRuntimeParams().caption;
+    contextMap[tpDescription] = action->getRuntimeParams().description;
+    contextMap[tpSource] = action->getRuntimeParams().resourceName;
 
     QString messageBody = renderTemplateFromFile(attachmentData.templatePath, contextMap);
 
@@ -668,7 +861,7 @@ void QnBusinessRuleProcessor::sendEmailAsync(const ec2::ApiEmailData& data)
         broadcastBusinessAction(action);
         NX_LOG(lit("Error processing action SendMail."), cl_logWARNING);
     }
-};
+}
 
 void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec2::ErrorCode errorCode )
 {
