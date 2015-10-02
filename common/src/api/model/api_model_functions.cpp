@@ -41,8 +41,7 @@
     (QnRecordingStatsData)\
     (QnCamRecordingStatsData)\
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnIOPortData)(QnCameraPortsData)(QnIOStateData)(QnCameraIOStateData), (eq)(ubjson)(json), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnAuditRecord), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnAuthSession), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields)
-
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnIOPortData)(QnCameraPortsData)(QnIOStateData)(QnCameraIOStateData), (eq)(ubjson)(json), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnAuditRecord), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnAuthSession), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields, (optional, true))

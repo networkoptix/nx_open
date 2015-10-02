@@ -16,6 +16,8 @@ public:
 
     virtual ~QnSearchQueryStrategy();
 
+    QString query() const;
+
 signals:
     void queryUpdated(const QString &query);
 

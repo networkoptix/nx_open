@@ -34,6 +34,10 @@ namespace ec2
             return peerType == Qn::PT_Server;
         }
 
+        bool isMobileClient() const {
+            return peerType == Qn::PT_MobileClient;
+        }
+
         /** Unique ID of the peer. */ 
         QnUuid id;
 

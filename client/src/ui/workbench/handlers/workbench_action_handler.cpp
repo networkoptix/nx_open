@@ -106,6 +106,7 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/workbench_navigator.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
@@ -240,6 +241,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
+    connect(action(Qn::BookmarksModeAction),                    &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_bookmarksModeAction_triggered);
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
@@ -1354,6 +1356,15 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     resourcePool()->addResource(layout);
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+}
+
+void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
+    bool enable = action(Qn::BookmarksModeAction)->isChecked();
+
+    if (enable)
+        menu()->trigger(Qn::StopSmartSearchAction, QnActionParameters(display()->widgets()));
+
+    navigator()->setBookmarksModeEnabled(enable);
 }
 
 void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {

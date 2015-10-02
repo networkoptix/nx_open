@@ -3,9 +3,10 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QByteArray>
+#include <QStringList>
 
 QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter);
-
+QStringList smartSplit(const QString& data, const QChar delimiter);
 QByteArray unquoteStr(const QByteArray& v);
 
 QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter);
@@ -20,6 +21,12 @@ class HttpAuthenticationClientContext;
     const QString& userName,
     const QString& password,
     const QString& realm );
+
+ QByteArray createHttpQueryAuthParam(
+     const QString& userName,
+     const QByteArray &digest,
+     const QByteArray& method,
+     QByteArray nonce);
 
  QByteArray createHttpQueryAuthParam(
      const QString& userName,

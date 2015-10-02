@@ -22,6 +22,10 @@
 #define O_LARGEFILE 0
 #endif
 
+#ifdef Q_OS_IOS
+#define stat64 stat
+#define fstat64 fstat
+#endif
 
 void makeUnixOpenFlags( 
     const QIODevice::OpenMode& oflag,
@@ -127,7 +131,7 @@ bool QnFile::seek( qint64 offset)
         return false;
 
 
-#ifdef Q_OS_DARWIN
+#if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
     return lseek( (long)m_impl, offset, SEEK_SET) != -1;
 #else
     return lseek64( (long)m_impl, offset, SEEK_SET) != -1;
@@ -136,7 +140,7 @@ bool QnFile::seek( qint64 offset)
 
 bool QnFile::truncate( qint64 newFileSize )
 {
-#ifdef Q_OS_DARWIN
+#if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
 	return ftruncate( (long)m_impl, newFileSize ) == 0;
 #else
 	return ftruncate64( (long)m_impl, newFileSize ) == 0;

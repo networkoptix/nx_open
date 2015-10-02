@@ -2258,11 +2258,11 @@ void QnWorkbenchVideoWallHandler::at_navigator_positionChanged() {
     if (display()->isChangingLayout())
         return;
 
-    if (navigator()->position() == qint64(AV_NOPTS_VALUE))
+    if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPositionChanged);
-    message[positionKey] = QString::number(navigator()->position());
+    message[positionKey] = QString::number(navigator()->positionUsec());
     sendMessage(message);
 }
 
@@ -2273,12 +2273,12 @@ void QnWorkbenchVideoWallHandler::at_navigator_speedChanged() {
     if (display()->isChangingLayout())
         return;
 
-    if (navigator()->position() == qint64(AV_NOPTS_VALUE))
+    if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorSpeedChanged);
     message[speedKey] = QString::number(navigator()->speed());
-    message[positionKey] = QString::number(navigator()->position());
+    message[positionKey] = QString::number(navigator()->positionUsec());
     sendMessage(message);
 }
 

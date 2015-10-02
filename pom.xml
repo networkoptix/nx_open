@@ -24,6 +24,7 @@
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
+        <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
         <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${product.name} Launcher</applauncher.name>
@@ -56,6 +57,7 @@
         <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
+        <newmobile></newmobile>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
         <!-- compile.option2. See profile angle  -->
@@ -322,6 +324,9 @@
                 <os>
                     <family>!mac</family>
                 </os>
+                <property>
+                    <name>!newmobile</name>
+                </property>
             </activation>
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
@@ -488,19 +493,36 @@
                 <!--<module>plugins/xvbadecoder</module>-->
             </modules>
         </profile>
+
         <profile>
-            <id>macosx</id>
+            <id>mac_common</id>
             <activation>
                 <os>
                     <family>mac</family>
                 </os>
             </activation>
             <properties>
-                <platform>macosx</platform>
                 <additional.compiler>clang</additional.compiler>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+                <python.executable>python</python.executable>
+                <python.virtualenv>virtualenv</python.virtualenv>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>macosx</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+                <property>
+                    <name>!newmobile</name>
+                </property>
+            </activation>
+            <properties>
+                <platform>macosx</platform>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -663,7 +685,6 @@
                 <module>edge_firmware/rpi</module>
             </modules>
         </profile>
-
         <profile>
             <id>linux-x64</id>
             <activation>
@@ -761,6 +782,95 @@
             </activation>
             <properties>
                 <compile.option2>-angle</compile.option2>
+            </properties>
+        </profile> 
+
+        <!-- Mobile client profiles -->
+        <profile>
+            <id>mobile-common</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>newmobile</name>
+                </property>
+            </activation>
+            <modules>
+                <module>client.core</module>
+                <module>mobile_client</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>newmobile</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <build>
+                <directory>target</directory>
+            </build>
+            <properties>
+                <platform>android</platform>
+                <toolchain.version>android</toolchain.version>
+                <qt.spec>android-g++</qt.spec>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+                <libdir>${root.dir}/build_environment/target</libdir>
+                <compiler>gcc</compiler>
+                <additional.compiler>gcc</additional.compiler>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
+                <android.sdk>${environment.dir}/android/android-sdk</android.sdk>
+                <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
+                <android.ndk.host>linux-x86_64</android.ndk.host>
+                <android.toolchain.version>4.8</android.toolchain.version>
+                <openssl.version>1.0.1p-SNAPSHOT</openssl.version>
+                <compile.option1/>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-android-desktop</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>newmobile</name>
+                    <value>android-desktop</value>
+                </property>
+            </activation>
+            <properties>
+                <qt.classifier>${platform}-${arch}-release</qt.classifier>
+                <additional.compiler>${compiler}</additional.compiler>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>mac</family>
+                </os>
+                <property>
+                    <name>newmobile</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <build>
+                <directory>target</directory>
+            </build>
+            <properties>
+                <platform>ios</platform>
+                <toolchain.version>ios</toolchain.version>
+                <qt.spec>macx-ios-clang</qt.spec>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+                <libdir>${root.dir}/build_environment/target</libdir>
+                <compiler>clang</compiler>
+                <additional.compiler>clang</additional.compiler>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
+                <openssl.version>1.0.1i-SNAPSHOT</openssl.version>
+                <compile.option1/>
             </properties>
         </profile>
     </profiles>

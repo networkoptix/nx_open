@@ -12,12 +12,12 @@ public:
 };
 
 QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
-                                                     QnUniversalTcpListener* owner):
+                                                     QnHttpConnectionListener* owner):
     QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket)
 {
     Q_D(QnProxyReceiverConnection);
 
-    d->owner = owner;
+    d->owner = static_cast<QnUniversalTcpListener*>(owner);
     d->takeSocketOwnership = false;
     setObjectName( lit("QnProxyReceiverConnection") );
 }

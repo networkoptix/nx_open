@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>266</width>
-    <height>86</height>
+    <width>304</width>
+    <height>92</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,11 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="deviceNameEdit"/>
+      <widget class="QLineEdit" name="deviceNameEdit">
+       <property name="placeholderText">
+        <string>Keywords separated by space</string>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
@@ -34,7 +38,11 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="captionEdit"/>
+      <widget class="QLineEdit" name="captionEdit">
+       <property name="placeholderText">
+        <string>Keywords separated by space</string>
+       </property>
+      </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_3">
@@ -44,7 +52,11 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="descriptionEdit"/>
+      <widget class="QLineEdit" name="descriptionEdit">
+       <property name="placeholderText">
+        <string>Keywords separated by space</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

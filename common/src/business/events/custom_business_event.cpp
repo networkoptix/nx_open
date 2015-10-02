@@ -1,5 +1,6 @@
 #include "custom_business_event.h"
 #include <utils/common/model_functions.h>
+#include "network/authutil.h"
 
 QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState, 
                                              qint64 timeStamp, const 
@@ -21,9 +22,9 @@ bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const Q
     if (!stateOK)
         return false;
 
-    QStringList resourceNameKeywords = params.resourceName.split(L' ', QString::SkipEmptyParts);
-    QStringList captionKeywords      = params.caption.split(L' ', QString::SkipEmptyParts);
-    QStringList descriptionKeywords  = params.description.split(L' ', QString::SkipEmptyParts);
+    QStringList resourceNameKeywords = smartSplit(params.resourceName, L' ');
+    QStringList captionKeywords      = smartSplit(params.caption, L' ');
+    QStringList descriptionKeywords  = smartSplit(params.description, L' ');
 
     auto mathKeywords = [](const QStringList& keywords, const QString& pattern) 
     {

@@ -528,6 +528,9 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     
 #ifdef USE_JSON
     q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
+#else
+    if (m_localPeer.isMobileClient())
+        q.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
 #endif
     m_httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_GUID_HEADER_NAME,
@@ -543,6 +546,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     // Client reconnects to the server
     if( m_localPeer.isClient() ) {
         q.removeQueryItem("isClient");
+        q.removeQueryItem("isMobile");
         q.addQueryItem("isClient", QString());
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
@@ -1192,17 +1196,20 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     //checking remote server protocol version
     nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter = 
         client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
-    const int remotePeerEcProtoVersion = ec2ProtoVersionIter == client->response()->headers.end()
-        ? nx_ec::INITIAL_EC2_PROTO_VERSION
-        : ec2ProtoVersionIter->second.toInt();
-    if( nx_ec::EC2_PROTO_VERSION != remotePeerEcProtoVersion )
-    {
-        NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
-            "Local peer version: %2, remote peer version: %3").
-            arg(client->url().toString()).arg(nx_ec::EC2_PROTO_VERSION).arg(remotePeerEcProtoVersion),
-            cl_logWARNING );
-        cancelConnecting();
-        return;
+
+    if (!m_localPeer.isMobileClient()) {
+        const int remotePeerEcProtoVersion = ec2ProtoVersionIter == client->response()->headers.end()
+             ? nx_ec::INITIAL_EC2_PROTO_VERSION
+             : ec2ProtoVersionIter->second.toInt();
+
+        if (nx_ec::EC2_PROTO_VERSION != remotePeerEcProtoVersion) {
+            NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
+                "Local peer version: %2, remote peer version: %3").
+                arg(client->url().toString()).arg(nx_ec::EC2_PROTO_VERSION).arg(remotePeerEcProtoVersion),
+                cl_logWARNING );
+            cancelConnecting();
+            return;
+        }
     }
     
     m_remotePeer.id = QnUuid(itrGuid->second);
@@ -1214,7 +1221,10 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     #ifdef USE_JSON
         m_remotePeer.dataFormat = Qn::JsonFormat;
     #else
-        m_remotePeer.dataFormat = Qn::UbjsonFormat;
+        if (m_localPeer.isMobileClient())
+            m_remotePeer.dataFormat = Qn::JsonFormat;
+        else
+            m_remotePeer.dataFormat = Qn::UbjsonFormat;
     #endif
 
     emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);

@@ -45,7 +45,7 @@ namespace ec2
                                   impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
-        virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) override;
+        virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) override;
         virtual void setContext( const ResourceContext& resCtx ) override;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) override;
 

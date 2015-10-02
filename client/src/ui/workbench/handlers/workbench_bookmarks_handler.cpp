@@ -4,6 +4,7 @@
 #include <api/common_message_processor.h>
 
 #include <camera/camera_data_manager.h>
+#include <camera/camera_bookmarks_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -37,14 +38,12 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTags);
 
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.append(tags);
-        m_tags.removeDuplicates();
+        m_tags.unite(tags);
         context()->navigator()->setBookmarkTags(m_tags);
     });
 
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
-        for (const QString &tag: tags)
-            m_tags.removeAll(tag);
+        m_tags.subtract(tags);
         context()->navigator()->setBookmarkTags(m_tags);
     });
 }
@@ -69,20 +68,6 @@ QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tags() const {
     return m_tags;
 }
 
-
-QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const {
-    QnMediaServerResourcePtr currentServer = camera->getParentServer();
-
-    if (time == DATETIME_NOW)
-        return currentServer;
-
-    QnMediaServerResourcePtr mediaServer = qnCameraHistoryPool->getMediaServerOnTime(camera, time);
-    if (!mediaServer)
-        return currentServer;
-
-    return mediaServer;
-}
-
 ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
@@ -96,7 +81,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
-    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, period.startTimeMs);
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
@@ -117,8 +102,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
-    int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
-    m_processingBookmarks[handle] = camera;
+    qnCameraBookmarksManager->addCameraBookmark(camera, bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
@@ -130,7 +114,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
@@ -145,8 +129,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
-    int handle = server->apiConnection()->updateBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkUpdated(int, const QnCameraBookmark &, int)));
-    m_processingBookmarks[handle] = camera;
+    qnCameraBookmarksManager->updateCameraBookmark(camera, bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
@@ -158,7 +141,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
@@ -173,10 +156,10 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
             QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
-    int handle = server->apiConnection()->deleteBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkDeleted(int, const QnCameraBookmark &, int)));
-    m_processingBookmarks[handle] = camera;
+    qnCameraBookmarksManager->deleteCameraBookmark(camera, bookmark);
 }
 
+/*
 void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle) {
     auto camera = m_processingBookmarks.take(handle);
     if (status != 0 || !camera)
@@ -185,9 +168,6 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     m_tags.append(bookmark.tags);
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
-
-//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
-//         loader->addBookmark(bookmark);
 }
 
 
@@ -212,4 +192,4 @@ void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraB
 //     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
 //         loader->removeBookmark(bookmark);
 }
-
+*/

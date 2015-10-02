@@ -81,6 +81,11 @@ public:
     }
 
     QnActionBuilder shortcut(const QKeySequence &keySequence, ActionPlatform platform, bool replaceExisting) {
+        QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
+
+        if (!guiApp)
+            return *this;
+
         if (keySequence.isEmpty())
             return *this;
 
@@ -647,7 +652,11 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
             text(tr("User...")).
             pulledText(tr("New User...")).
-            condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this)).
+            condition(new QnConjunctionActionCondition(
+                new QnTreeNodeTypeCondition(Qn::UsersNode, this),
+                new QnForbiddenInSafeModeCondition(this),
+                this)
+                ).
             autoRepeat(false);
 
         factory(Qn::NewVideoWallAction).
@@ -655,6 +664,7 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
             text(tr("Video Wall...")).
             pulledText(tr("New Video Wall...")).
+            condition(new QnForbiddenInSafeModeCondition(this)).
             autoRepeat(false);
 
     } factory.endSubMenu();
@@ -882,7 +892,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+        condition(new QnConjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::ServersNode, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)
+            );
 
     factory().
         flags(Qn::Main).
@@ -1454,6 +1468,7 @@ QnActionManager::QnActionManager(QObject *parent):
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::All, this),
             new QnFakeServerActionCondition(true, this),
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
+            new QnForbiddenInSafeModeCondition(this),
             this));
 
     factory().
@@ -1707,6 +1722,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Show Thumbnails")).
         toggledText(tr("Hide Thumbnails"));
+
+    factory(Qn::BookmarksModeAction).
+        flags(Qn::NoTarget).
+        text(tr("Show Bookmarks")).
+        toggledText(tr("Hide Bookmarks"));
 
     factory(Qn::ToggleCalendarAction).
         flags(Qn::NoTarget).
