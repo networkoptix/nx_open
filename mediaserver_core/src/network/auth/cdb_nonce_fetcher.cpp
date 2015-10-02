@@ -78,12 +78,15 @@ bool CdbNonceFetcher::isNonceValid(const QByteArray& nonce) const
             MAGIC_BYTES,
             sizeof(MAGIC_BYTES)) == 0))
     {
-        const auto cdbNonce = nonce.mid(0, nonce.size() - NONCE_TRAILER_LEN);
         QnMutexLocker lk(&m_mutex);
-        for (const auto& nonceCtx: m_cdbNonceQueue)
-            if (nonceCtx.nonce == cdbNonce)
-                return true;
-        return false;
+        removeExpiredNonce(&lk);
+        if (!m_cdbNonceQueue.empty())
+        {
+            const auto cdbNonce = nonce.mid(0, nonce.size() - NONCE_TRAILER_LEN);
+            for (const auto& nonceCtx: m_cdbNonceQueue)
+                if (nonceCtx.nonce == cdbNonce)
+                    return true;
+        }
     }
 
     return m_defaultGenerator->isNonceValid(nonce);
