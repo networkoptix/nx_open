@@ -21,13 +21,7 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     m_reconnectOnPasswordChange(true)
 {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {       
-        for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
-            if ( user->getName().toLower() != m_userName.toLower() )
-                continue;
-            setCurrentUser(user);
-            return;
-        }
-        setCurrentUser(QnUserResourcePtr());
+        setCurrentUser(calculateCurrentUser());
     });
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
@@ -65,6 +59,7 @@ void QnWorkbenchUserWatcher::setUserName(const QString &name) {
     if(m_userName == name)
         return;
     m_userName = name;
+    setCurrentUser(calculateCurrentUser());
 }
 
 void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
@@ -79,6 +74,16 @@ void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool reconnect) {
     m_reconnectOnPasswordChange = reconnect;
     if (reconnect && m_user && isReconnectRequired(m_user))
         emit reconnectRequired();
+}
+
+
+QnUserResourcePtr QnWorkbenchUserWatcher::calculateCurrentUser() const {
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
+        if ( user->getName().toLower() != m_userName.toLower() )
+            continue;
+        return user;
+    }
+    return QnUserResourcePtr();
 }
 
 void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -135,3 +140,4 @@ void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &use
     if (reconnect)
         emit reconnectRequired();
 }
+

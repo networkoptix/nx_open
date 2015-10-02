@@ -182,6 +182,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->resourceTreeWidget->setEditingEnabled();
 //    ui->resourceTreeWidget->setFilterVisible(); //TODO: #Elric why don't we enable this? looks good and useful
 
+    ui->searchTreeWidget->setCheckboxesVisible(false);
+
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 

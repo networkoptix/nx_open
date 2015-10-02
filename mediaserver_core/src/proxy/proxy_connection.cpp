@@ -31,20 +31,24 @@ static const int MAX_PROXY_TTL = 8;
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner):
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnHttpConnectionListener* owner)
+:
     QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, socket)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->owner = owner;
+    d->owner = static_cast<QnUniversalTcpListener*>(owner);
 }
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-        QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
-        QnUniversalTcpListener* owner):
+    QnProxyConnectionProcessorPrivate* priv,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnHttpConnectionListener* owner)
+:
     QnTCPConnectionProcessor(priv, socket)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->owner = owner;
+    d->owner = static_cast<QnUniversalTcpListener*>(owner);
 }
 
 

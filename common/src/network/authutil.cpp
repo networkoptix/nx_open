@@ -38,6 +38,29 @@ QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
     return rez;
 }
 
+QStringList smartSplit(const QString& data, const QChar delimiter)
+{
+    bool quoted = false;
+    QStringList rez;
+    if (data.isEmpty())
+        return rez;
+
+    int lastPos = 0;
+    for (int i = 0; i < data.size(); ++i)
+    {
+        if (data[i] == L'\"')
+            quoted = !quoted;
+        else if (data[i] == delimiter && !quoted)
+        {
+            rez << data.mid(lastPos, i - lastPos);
+            lastPos = i + 1;
+        }
+    }
+    rez << data.mid(lastPos, data.size() - lastPos);
+
+    return rez;
+}
+
 QByteArray unquoteStr(const QByteArray& v)
 {
     QByteArray value = v.trimmed();

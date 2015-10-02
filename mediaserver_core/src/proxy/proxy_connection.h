@@ -12,11 +12,13 @@ class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnProxyConnectionProcessor(
-            QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner);
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnHttpConnectionListener* owner);
 
     QnProxyConnectionProcessor(
-            QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
-            QnUniversalTcpListener* owner);
+        QnProxyConnectionProcessorPrivate* priv,
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnHttpConnectionListener* owner);
 
     virtual ~QnProxyConnectionProcessor();
 protected:
