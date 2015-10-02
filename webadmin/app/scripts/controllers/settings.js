@@ -14,7 +14,8 @@ angular.module('webadminApp')
             $scope.settings = {
                 systemName: r.data.reply.systemName,
                 port: r.data.reply.port,
-                id: r.data.reply.id
+                id: r.data.reply.id,
+                ecDbReadOnly:r.data.reply.ecDbReadOnly
             };
 
             $scope.oldSystemName = r.data.reply.systemName;

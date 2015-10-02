@@ -145,7 +145,7 @@ private slots:
 
 
 protected:
-    virtual QByteArray getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const;
+    virtual QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const;
     
     bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
@@ -170,7 +170,8 @@ private:
     bool needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
-
+    
+    QVariantHash eventDescriptionMap(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, QnEmailAttachmentList& attachments, bool useIp);
 private:
     class SendEmailAggregationKey
     {
@@ -250,6 +251,22 @@ private:
     void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
     bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
     void sendEmailAsync(const ec2::ApiEmailData& data);
+
+private:
+    static QVariantHash eventDetailsMap(
+        const QnAbstractBusinessActionPtr& action,
+        const QnInfoDetail& aggregationData,
+        bool useIp,
+        bool addSubAggregationData = true );
+
+    static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
+        const QnBusinessAggregationInfo& aggregationInfo,
+        bool useIp);
+    static QVariantList aggregatedEventDetailsMap(
+        const QnAbstractBusinessActionPtr& action,
+        const QList<QnInfoDetail>& aggregationDetailList,
+        bool useIp );
+
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()
