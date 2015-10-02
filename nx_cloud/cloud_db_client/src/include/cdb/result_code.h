@@ -14,7 +14,7 @@ namespace api {
 
 enum class ResultCode
 {
-    ok,
+    ok = 0,
     //!Provided credentials are invalid
     notAuthorized,
     //!Requested operation is not allowed with credentials provided

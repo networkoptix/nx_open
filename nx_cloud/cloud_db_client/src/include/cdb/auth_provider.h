@@ -46,6 +46,11 @@ public:
     std::string intermediateResponse;
     //!Authorized access role
     SystemAccessRole accessRole;
+    //!period, \a intermediateResponse usage should be limited to
+    /*!
+        This period is introduced to force vms server to verify periodically password at cloud_db
+    */
+    std::chrono::seconds validPeriod;
 
     AuthResponse()
     :

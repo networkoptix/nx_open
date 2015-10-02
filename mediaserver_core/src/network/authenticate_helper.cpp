@@ -4,6 +4,7 @@
 #include <QtCore/QCryptographicHash>
 
 #include <utils/common/app_info.h>
+#include <utils/common/cpp14.h>
 #include <utils/common/uuid.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -23,6 +24,8 @@
 #include <utils/network/rtsp/rtsp_types.h>
 #include "network/auth/time_based_nonce_provider.h"
 #include "network/auth/generic_user_data_provider.h"
+#include "network/auth/cdb_nonce_fetcher.h"
+#include "network/auth/cloud_user_authenticator.h"
 
 
 ////////////////////////////////////////////////////////////
@@ -44,8 +47,6 @@ bool QnAuthHelper::UserDigestData::empty() const
 
 
 
-QnAuthHelper* QnAuthHelper::m_instance;
-
 static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
 static const QString COOKIE_DIGEST_AUTH( lit( "Authorization=Digest" ) );
 static const QString TEMP_AUTH_KEY_NAME = lit( "authKey" );
@@ -55,8 +56,8 @@ const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 *
 
 QnAuthHelper::QnAuthHelper()
 :
-    m_nonceProvider(new TimeBasedNonceProvider()),
-    m_userDataProvider(new GenericUserDataProvider())
+    m_nonceProvider(new CdbNonceFetcher(std::make_unique<TimeBasedNonceProvider>())),
+    m_userDataProvider(new CloudUserAuthenticator(std::make_unique<GenericUserDataProvider>()))
 {
 #ifndef USE_USER_RESOURCE_PROVIDER
     connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
@@ -70,17 +71,6 @@ QnAuthHelper::~QnAuthHelper()
 #ifndef USE_USER_RESOURCE_PROVIDER
     disconnect(qnResPool, NULL, this, NULL);
 #endif
-}
-
-void QnAuthHelper::initStaticInstance(QnAuthHelper* instance)
-{
-    delete m_instance;
-    m_instance = instance;
-}
-
-QnAuthHelper* QnAuthHelper::instance()
-{
-    return m_instance;
 }
 
 Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy, QnUuid* authUserId, AuthMethod::Value* usedAuthMethod)

@@ -145,6 +145,7 @@
 #include <rtsp/rtsp_connection.h>
 
 #include <utils/common/command_line_parser.h>
+#include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
@@ -212,6 +213,7 @@
 #include "crash_reporter.h"
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
+#include "cloud/cloud_connection_manager.h"
 
 
 #ifdef __arm__
@@ -1561,7 +1563,8 @@ void MediaServerProcess::run()
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
-    QnAuthHelper::initStaticInstance(new QnAuthHelper());
+    CloudConnectionManager cloudConnectionManager;
+    auto authHelper = std::make_unique<QnAuthHelper>();
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
@@ -2389,7 +2392,7 @@ void MediaServerProcess::run()
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
     QnSSLSocket::releaseSSLEngine();
-    QnAuthHelper::initStaticInstance(NULL);
+    authHelper.reset();
 
     globalSettings.reset();
 

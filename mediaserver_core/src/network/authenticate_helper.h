@@ -15,6 +15,7 @@
 #include "utils/common/id.h"
 #include "utils/common/timermanager.h"
 #include "utils/common/uuid.h"
+#include "utils/common/singleton.h"
 #include "utils/network/http/httptypes.h"
 #include "utils/thread/mutex.h"
 #include "utils/network/auth_restriction_list.h"
@@ -29,7 +30,10 @@
 
 struct QnLdapDigestAuthContext;
 
-class QnAuthHelper: public QObject
+class QnAuthHelper
+:
+    public QObject,
+    public Singleton<QnAuthHelper>
 {
     Q_OBJECT
     
@@ -38,9 +42,6 @@ public:
 
     QnAuthHelper();
     virtual ~QnAuthHelper();
-
-    static void initStaticInstance(QnAuthHelper* instance);
-    static QnAuthHelper* instance();
 
     //!Authenticates request on server side
     Qn::AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
@@ -128,7 +129,6 @@ private:
     Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
     mutable QnMutex m_mutex;
-    static QnAuthHelper* m_instance;
 #ifndef USE_USER_RESOURCE_PROVIDER
     QMap<QnUuid, QnUserResourcePtr> m_users;
     QMap<QnUuid, QnMediaServerResourcePtr> m_servers;

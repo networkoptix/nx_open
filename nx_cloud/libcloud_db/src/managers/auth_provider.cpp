@@ -22,9 +22,12 @@
 namespace nx {
 namespace cdb {
 
-static const char SECRET_NONCE_KEY[] = "neurod.ru";
-static const std::chrono::minutes NONCE_VALIDITY_PERIOD(5);
-static const size_t CDB_NONCE_SIZE = 31;
+namespace {
+    const char SECRET_NONCE_KEY[] = "neurod.ru";
+    const std::chrono::hours NONCE_VALIDITY_PERIOD(4);
+    const std::chrono::minutes INTERMEDIATE_RESPONSE_VALIDITY_PERIOD(5);
+    const size_t CDB_NONCE_SIZE = 31;
+}
 
 AuthenticationProvider::AuthenticationProvider(
     const AccountManager& accountManager,
@@ -119,6 +122,7 @@ void AuthenticationProvider::getAuthenticationResponse(
         account->passwordHa1.c_str(),
         authRequest.nonce.c_str());
     response.intermediateResponse.assign(intermediateResponse.constData(), intermediateResponse.size());
+    response.validPeriod = INTERMEDIATE_RESPONSE_VALIDITY_PERIOD;
 
     completionHandler(api::ResultCode::ok, std::move(response));
 }

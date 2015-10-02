@@ -21,17 +21,17 @@ int QnSaveCloudSystemCredentialsHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor*)
 {
-    const QString cloudSystemID = params.value(lit("cloudSystemID"));
+    const QString cloudSystemID = params.value(Qn::CLOUD_SYSTEM_ID);
     if (cloudSystemID.isEmpty())
     {
-        result.setError(QnJsonRestResult::MissingParameter, lit("cloudSystemID"));
+        result.setError(QnJsonRestResult::MissingParameter, Qn::CLOUD_SYSTEM_ID);
         return CODE_OK;
     }
 
-    const QString cloudAuthKey = params.value(lit("cloudAuthKey"));
+    const QString cloudAuthKey = params.value(Qn::CLOUD_SYSTEM_AUTH_KEY);
     if (cloudSystemID.isEmpty())
     {
-        result.setError(QnJsonRestResult::MissingParameter, lit("cloudAuthKey"));
+        result.setError(QnJsonRestResult::MissingParameter, Qn::CLOUD_SYSTEM_AUTH_KEY);
         return CODE_OK;
     }
 
@@ -71,8 +71,8 @@ int QnSaveCloudSystemCredentialsHandler::executeGet(
         return CODE_OK;
     }
 
-    admin->setProperty("cloudSystemID", cloudSystemID);
-    admin->setProperty("cloudAuthKey", cloudAuthKey);
+    admin->setProperty(Qn::CLOUD_SYSTEM_ID, cloudSystemID);
+    admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, cloudAuthKey);
 
     //TODO #ak check error code when propertyDictionary->saveParams supports it
     propertyDictionary->saveParams(admin->getId());

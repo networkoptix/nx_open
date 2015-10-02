@@ -47,6 +47,7 @@ void Connection::setCredentials(
 {
     m_accountManager->setCredentials(login, password);
     m_systemManager->setCredentials(login, password);
+    m_authProvider->setCredentials(login, password);
 }
 
 void Connection::ping(

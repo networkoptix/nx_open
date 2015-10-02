@@ -124,6 +124,15 @@ quint64 TimerManager::addTimer(
     return timerID;
 }
 
+quint64 TimerManager::addTimer(
+    std::function<void(quint64)> taskHandler,
+    std::chrono::milliseconds delay)
+{
+    return addTimer(
+        std::move(taskHandler),
+        delay.count());
+}
+
 bool TimerManager::modifyTimerDelay(
     quint64 timerID,
     const unsigned int newDelayMillis )
@@ -145,6 +154,11 @@ bool TimerManager::modifyTimerDelay(
 
     m_impl->addTaskNonSafe( timerID, taskHandler, newDelayMillis );
     return true;
+}
+
+bool TimerManager::modifyTimerDelay(quint64 timerID, std::chrono::milliseconds delay)
+{
+    return modifyTimerDelay(timerID, delay.count());
 }
 
 void TimerManager::deleteTimer( const quint64& timerID )

@@ -6,6 +6,7 @@
 #ifndef TIMERMANAGER_H
 #define TIMERMANAGER_H
 
+#include <chrono>
 #include <functional>
 
 #include <QtCore/QThread>
@@ -97,13 +98,17 @@ public:
     quint64 addTimer(
         std::function<void(quint64)> taskHandler,
         const unsigned int delayMillis );
+    quint64 addTimer(
+        std::function<void(quint64)> taskHandler,
+        std::chrono::milliseconds delay);
     //!Modifies delay on existing timer
     /*!
         If timer is being executed currently, nothing is done.
         Otherwise, timer will be called in \a newDelayMillis from now
         \return \a true, if timer delay has been changed
     */
-    bool modifyTimerDelay( quint64 timerID, const unsigned int newDelayMillis );
+    bool modifyTimerDelay(quint64 timerID, const unsigned int newDelayMillis);
+    bool modifyTimerDelay(quint64 timerID, std::chrono::milliseconds delay);
     /*!
         If task is already running, it can be still running after method return
         If timer handler is being executed at the moment, it can still be executed after return of this method
