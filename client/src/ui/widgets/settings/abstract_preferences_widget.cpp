@@ -1,5 +1,9 @@
 #include "abstract_preferences_widget.h"
 
+QnAbstractPreferencesWidget::QnAbstractPreferencesWidget(QWidget *parent /*= 0*/) 
+    : QWidget(parent)
+    , m_readOnly(false)
+{}
 
 void QnAbstractPreferencesWidget::submitToSettings() {
 }

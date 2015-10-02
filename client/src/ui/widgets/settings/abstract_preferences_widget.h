@@ -8,8 +8,7 @@ class QnAbstractPreferencesWidget: public QWidget {
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
 public:
-    explicit QnAbstractPreferencesWidget(QWidget *parent = 0):
-        QWidget(parent) {}
+    explicit QnAbstractPreferencesWidget(QWidget *parent = 0);
 
     /**
      * @brief submitToSettings                  Save widget elements' values to client settings.
@@ -44,7 +43,7 @@ public:
      */
     virtual void retranslateUi();
 
-    bool isReadOnly() const;;
+    bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
 protected:
