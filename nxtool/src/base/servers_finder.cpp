@@ -131,7 +131,6 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
         
-     //   return false;
 //        if (!jsonObject.value("systemName").toString().contains("000_nx1_"))
 //            return false;
 
@@ -257,7 +256,17 @@ void rtu::ServersFinder::Impl::updateServerByMulticast(const QUuid &id
     const auto successful = [this, address](const BaseServerInfo &info)
         { processNewServer(info, address, false); };
 
-    multicastModuleInformation(id, successful, OperationCallback(), kMulticastUpdatePeriod / 2);
+    const auto failed = [this, address](const RequestError errorCode
+        , Constants::AffectedEntities affectedEntities)
+    {
+        if (m_knownHosts.find(address) != m_knownHosts.end())
+            return;
+
+        if (onEntityDiscovered(address, m_unknownHosts))
+            emit m_owner->unknownAdded(address);
+    };
+
+    multicastModuleInformation(id, successful, failed, kMulticastUpdatePeriod / 2);
 }
 void rtu::ServersFinder::Impl::updateOutdatedByMulticast()
 {

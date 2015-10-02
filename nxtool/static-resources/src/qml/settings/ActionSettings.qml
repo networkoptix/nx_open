@@ -1,6 +1,7 @@
 import QtQuick 2.1;
 
 import "../common" as Common;
+import "../dialogs" as Dialogs;
 import "../controls/base" as Base;
 import "../controls/expandable" as Expandable;
 
@@ -33,6 +34,25 @@ Expandable.GenericSettingsPanel
             font.pixelSize: Common.SizeManager.fontSizes.medium;
         }
 
+        Dialogs.MessageDialog
+        {
+            id: confirmationDialog;
+
+            property var confirmedHandler;
+
+            buttons: (NxRtu.Buttons.Yes | NxRtu.Buttons.No);
+            styledButtons: NxRtu.Buttons.Yes;
+            cancelButton: NxRtu.Buttons.No;
+
+            onButtonClicked:
+            {
+                if ((id == NxRtu.Buttons.Yes) && confirmedHandler)
+                    confirmedHandler();
+
+                confirmedHandler = undefined;
+            }
+        }
+
         Row
         {
             spacing: Common.SizeManager.spacing.base;
@@ -45,8 +65,13 @@ Expandable.GenericSettingsPanel
 
                 onClicked:
                 {
-                    rtuContext.changesManager().changeset().addSoftRestartAction();
-                    rtuContext.changesManager().applyChanges();
+                    confirmationDialog.message = qsTr("Are you sure you want to restart server(s)?");
+                    confirmationDialog.confirmedHandler = function()
+                    {
+                        rtuContext.changesManager().changeset().addSoftRestartAction();
+                        rtuContext.changesManager().applyChanges();
+                    }
+                    confirmationDialog.show();
                 }
             }
 
@@ -61,8 +86,13 @@ Expandable.GenericSettingsPanel
 
                 onClicked:
                 {
-                    rtuContext.changesManager().changeset().addOsRestartAction();
-                    rtuContext.changesManager().applyChanges();
+                    confirmationDialog.message = qsTr("Are you sure you want to reboot server(s)?");
+                    confirmationDialog.confirmedHandler = function()
+                    {
+                        rtuContext.changesManager().changeset().addOsRestartAction();
+                        rtuContext.changesManager().applyChanges();
+                    }
+                    confirmationDialog.show();
                 }
             }
         }
@@ -91,8 +121,13 @@ Expandable.GenericSettingsPanel
 
                 onClicked:
                 {
-                    rtuContext.changesManager().changeset().addFactoryDefaultsAction();
-                    rtuContext.changesManager().applyChanges();
+                    confirmationDialog.message = qsTr("Are you sure you want to restore factory default settings on selected server(s)?");
+                    confirmationDialog.confirmedHandler = function()
+                    {
+                        rtuContext.changesManager().changeset().addFactoryDefaultsAction();
+                        rtuContext.changesManager().applyChanges();
+                    }
+                    confirmationDialog.show();
                 }
             }
 
@@ -109,8 +144,13 @@ Expandable.GenericSettingsPanel
 
                 onClicked:
                 {
-                    rtuContext.changesManager().changeset().addFactoryDefaultsButNetworkAction();
-                    rtuContext.changesManager().applyChanges();
+                    confirmationDialog.message = qsTr("Are you sure you want to restore factory default settings on selected server(s)?");
+                    confirmationDialog.confirmedHandler = function()
+                    {
+                        rtuContext.changesManager().changeset().addFactoryDefaultsButNetworkAction();
+                        rtuContext.changesManager().applyChanges();
+                    }
+                    confirmationDialog.show();
                 }
             }
         }
