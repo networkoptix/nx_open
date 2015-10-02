@@ -11,7 +11,7 @@ class QnBookmarksViewer : public QGraphicsWidget
 {
     Q_OBJECT
 public:
-    static QnBookmarksViewer *create(QGraphicsItem *parent);
+    QnBookmarksViewer(QGraphicsItem *parent);
 
     virtual ~QnBookmarksViewer();
 
@@ -42,9 +42,6 @@ public slots:
 
     /// @brief Hides tooltips after inner defined timeout expired
     void hideDelayed();
-
-private:
-    QnBookmarksViewer(QGraphicsItem *parent);
 
 private:
     class Impl;

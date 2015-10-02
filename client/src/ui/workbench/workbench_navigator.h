@@ -9,6 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
+#include <camera/camera_bookmark_aggregation.h>
 
 #include <client/client_globals.h>
 
@@ -220,6 +221,7 @@ private:
 
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
+    void updateSliderBookmarks();
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
@@ -272,6 +274,8 @@ private:
     QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
     QnCameraBookmarksQueryPtr m_bookmarkQuery;
+    QnCameraBookmarkAggregation m_bookmarkAggregation;
+    QTimer *m_sliderBookmarksRefreshTimer;
 
     QnCameraDataManager* m_cameraDataManager;
 

@@ -441,6 +441,7 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
                      book.name as name, \
                      book.description as description, \
                      book.timeout as timeout, \
+                     book.unique_id as cameraId, \
                      tag.name as tagName \
                      FROM storage_bookmark book \
                      LEFT JOIN storage_bookmark_tag tag \
