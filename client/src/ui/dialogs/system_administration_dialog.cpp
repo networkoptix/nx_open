@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QMessageBox>
 
+#include <common/common_module.h>
+
 #include <ui/widgets/settings/popup_settings_widget.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/system_settings_widget.h>
@@ -50,6 +52,11 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     safeModeWatcher->addAutoReadOnlyWidget(generalWidget);
     safeModeWatcher->addAutoReadOnlyWidget(smtpWidget);
     safeModeWatcher->addAutoReadOnlyWidget(routingWidget);
+
+    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, [this](bool readOnly){
+        setPageEnabled(UpdatesPage, !readOnly);
+    });
+    setPageEnabled(UpdatesPage, !qnCommon->isReadOnly());
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}
