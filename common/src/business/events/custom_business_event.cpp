@@ -1,6 +1,7 @@
 #include "custom_business_event.h"
 #include <utils/common/model_functions.h>
 #include "network/authutil.h"
+#include <business/actions/abstract_business_action.h>
 
 QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState, 
                                              qint64 timeStamp, const 
@@ -17,8 +18,8 @@ QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState,
     
 }
 
-bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const {
-    bool stateOK =  state == QnBusiness::UndefinedState || state == getToggleState();
+bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params, QnBusiness::ActionType actionType) const {
+    bool stateOK =  state == QnBusiness::UndefinedState || state == getToggleState() || QnBusiness::hasToggleState(actionType);
     if (!stateOK)
         return false;
 
