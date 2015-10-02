@@ -8,6 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <business/business_event_parameters.h>
+#include <business/business_action_parameters.h>
 
 
 namespace QnBusiness
@@ -76,7 +77,7 @@ public:
      * @param params            Parameters of an event that are selected in rule.
      * @return                  True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters& params) const = 0;
+    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters& params, QnBusiness::ActionType actionType) const = 0;
 
     virtual QnBusinessEventParameters getRuntimeParams() const;
 
