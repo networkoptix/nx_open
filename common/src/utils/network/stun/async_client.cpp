@@ -19,14 +19,15 @@ AsyncClient::AsyncClient( const SocketAddress& endpoint, bool useSsl, Timeouts t
 
 AsyncClient::~AsyncClient()
 {
+    std::unique_ptr< AbstractStreamSocket > connectingSocket;
     {
         QnMutexLocker lock( &m_mutex );
-        if( m_state == State::disconnected )
-            return;
-
+        connectingSocket = std::move(m_connectingSocket);
         m_state = State::terminated;
     }
 
+    if(connectingSocket)
+        connectingSocket->terminateAsyncIO(true);
     m_baseConnection.reset();
 }
 
