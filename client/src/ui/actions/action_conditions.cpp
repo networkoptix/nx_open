@@ -108,6 +108,13 @@ Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameter
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnForbiddenInSafeModeCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+    if (qnCommon->isReadOnly())
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
 QnConjunctionActionCondition::QnConjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
     QnActionCondition(parent),
     m_conditions(conditions)
@@ -126,6 +133,15 @@ QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *co
     m_conditions.append(condition1);
     m_conditions.append(condition2);
     m_conditions.append(condition3);
+}
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QnActionCondition *condition4, QObject *parent):
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+    m_conditions.append(condition3);
+    m_conditions.append(condition4);
 }
 
 Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameters &parameters) {

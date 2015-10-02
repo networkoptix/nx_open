@@ -233,7 +233,7 @@ namespace nx_http
     namespace Method
     {
         typedef StringType ValueType;
-
+    
         extern const StringType GET;
         extern const StringType HEAD;
         extern const StringType POST;
