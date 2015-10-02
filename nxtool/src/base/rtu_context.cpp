@@ -301,7 +301,7 @@ bool rtu::RtuContext::isValidSubnetMask(const QString &mask) const
 bool rtu::RtuContext::isDiscoverableFromCurrentNetwork(const QString &ip
     , const QString &mask) const
 {
-    if (!isValidSubnetMask(mask) || !isValidIpV4Address(ip))
+    if (!isValidIpV4Address(ip))
         return false;
 
     const auto &allInterfaces = QNetworkInterface::allInterfaces();
@@ -322,7 +322,8 @@ bool rtu::RtuContext::isDiscoverableFromCurrentNetwork(const QString &ip
             if (!isValidIpV4Address(itfIp) || !isValidSubnetMask(itfMask))
                 continue;
 
-            if (isDiscoverableFromNetwork(ip, mask, itfIp, itfMask))
+            const auto checkingMask = (mask.isEmpty() ? itfMask : mask);
+            if (isDiscoverableFromNetwork(ip, checkingMask, itfIp, itfMask))
                 return true;
         }
     }

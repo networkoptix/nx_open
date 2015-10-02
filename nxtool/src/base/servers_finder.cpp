@@ -130,7 +130,8 @@ namespace
             (itNativeType != jsonObject.end() && itNativeType.value().toString() == kMediaServerType);
         if (!isCorrectApp && !isCorrectNative)
             return false;
-
+        
+     //   return false;
 //        if (!jsonObject.value("systemName").toString().contains("000_nx1_"))
 //            return false;
 
@@ -532,7 +533,7 @@ bool rtu::ServersFinder::Impl::processNewServer(rtu::BaseServerInfo info
         m_infos.insert(info.id, ServerInfoData(timestamp, info));
         emit m_owner->serverAdded(info);
     }
-    else if (accessibleByHttp                                      ///< Gives change to http to discover server.
+    else if (accessibleByHttp                                      ///< Gives chance to http to discover server.
         || ((timestamp - it->timestamp) > kMulticastUpdatePeriod)) /// Http access method has priority under multicast
                                                                                             
     {

@@ -44,6 +44,7 @@ namespace
     const QString kServerFlagsTag = "serverFlags";
     const QString kLocalTimeFlagTag = "local";
     const QString kSafeModeTag = "ecDbReadOnly";
+    const QString kSysInfoTag = "systemInformation";
 
     QUrl makeUrl(const QString &host
         , const int port
@@ -93,7 +94,32 @@ namespace
         result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.safeMode = object.value(kSafeModeTag).toBool(); });
 
-        const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info)
+        result.insert(kSysInfoTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+        {
+            const auto val = object.value(kSysInfoTag);
+            const auto sysInfo = val.toObject();
+            if (sysInfo.isEmpty())
+            {
+                info.os = val.toString();
+            }
+            else
+            {
+                static const auto kPlatformKey = QStringLiteral("platform");
+                static const auto kModKey = QStringLiteral("modification");
+                static const auto kArchKey = QStringLiteral("arch");
+
+                const QString platform = (sysInfo.keys().contains(kPlatformKey) 
+                    ? sysInfo.value(kPlatformKey).toString() : QString());
+                const QString modification = (sysInfo.keys().contains(kModKey) 
+                    ? sysInfo.value(kModKey).toString() : QString());
+                const QString arch = (sysInfo.keys().contains(kArchKey) 
+                    ? sysInfo.value(kArchKey).toString() : QString());
+
+                info.os = QStringLiteral("%1 %2 %3").arg(platform, arch, modification);
+            }
+        });
+
+        const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info, const QString &tagName)
         {
                 typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
                 static const TextFlagsInfo kKnownFlags[] =
@@ -105,7 +131,7 @@ namespace
                 };
 
                 info.flags = rtu::Constants::ServerFlag::NoFlags;
-                const QString textFlags = object.value(kFlagsTag).toString();
+                const QString textFlags = object.value(tagName).toString();
                 for (const TextFlagsInfo &flagInfo: kKnownFlags)
                 {
                     if (textFlags.contains(flagInfo.first))
@@ -114,11 +140,11 @@ namespace
         };
 
         result.insert(kServerFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { parseFlags(object, info); });
+            { parseFlags(object, info, kServerFlagsTag); });
 
         /// Supports old versions of server where serverFlags field was "flags"
         result.insert(kFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { parseFlags(object, info); });
+            { parseFlags(object, info, kFlagsTag); });
         return result;
     }();
 }

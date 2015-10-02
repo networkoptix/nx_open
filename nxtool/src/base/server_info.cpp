@@ -50,6 +50,7 @@ rtu::BaseServerInfo::BaseServerInfo()
 
     , safeMode(false)
     , version()
+    , os()
     , displayAddress()
     , flags(Constants::NoFlags)
         
