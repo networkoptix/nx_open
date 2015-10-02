@@ -10,6 +10,7 @@ namespace Ui {
 
 class QnSystemSettingsWidget: public QnAbstractPreferencesWidget {
     Q_OBJECT
+
 public:
     QnSystemSettingsWidget(QWidget *parent = NULL);
     virtual ~QnSystemSettingsWidget();
@@ -19,6 +20,9 @@ public:
 
     virtual bool hasChanges() const override;
     virtual void retranslateUi() override;
+
+protected:
+    virtual void setReadOnlyInternal(bool readOnly) override;
 private:
     QScopedPointer<Ui::SystemSettingsWidget> ui;
 };

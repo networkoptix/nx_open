@@ -3,6 +3,7 @@
 #include <common/common_module.h>
 
 #include <ui/common/palette.h>
+#include <ui/common/read_only.h>
 #include <ui/style/warning_style.h>
 
 QnWorkbenchSafeModeWatcher::QnWorkbenchSafeModeWatcher(QWidget *parentWidget /*= nullptr*/) : QObject(parentWidget) 
@@ -20,16 +21,10 @@ void QnWorkbenchSafeModeWatcher::updateReadOnlyMode() {
 
     for (QWidget* widget: m_autoHiddenWidgets)
         widget->setVisible(!readOnly);
-}
 
-void QnWorkbenchSafeModeWatcher::addAutoHiddenWidget(QWidget *widget) {
-    m_autoHiddenWidgets << widget;
-    updateReadOnlyMode();
-}
-
-void QnWorkbenchSafeModeWatcher::addAutoHiddenWidgets(QList<QWidget*> widgets) {
-    m_autoHiddenWidgets.append(widgets);
-    updateReadOnlyMode();
+    using ::setReadOnly;
+    for (QWidget* widget: m_autoReadOnlyWidgets)
+        setReadOnly(widget, readOnly);
 }
 
 void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox) {
@@ -43,5 +38,15 @@ void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox) {
 
     layout->insertWidget(0, m_warnLabel);
 
+    updateReadOnlyMode();
+}
+
+void QnWorkbenchSafeModeWatcher::addAutoHiddenWidget(QWidget *widget) {
+    m_autoHiddenWidgets << widget;
+    updateReadOnlyMode();
+}
+
+void QnWorkbenchSafeModeWatcher::addAutoReadOnlyWidget(QWidget *widget) {
+    m_autoReadOnlyWidgets << widget;
     updateReadOnlyMode();
 }

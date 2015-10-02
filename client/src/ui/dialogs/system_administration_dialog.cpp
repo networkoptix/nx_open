@@ -30,8 +30,9 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     setHelpTopic(this, Qn::Administration_Help);
 
     m_updatesWidget = new QnServerUpdatesWidget(this);
+    auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
 
-    addPage(GeneralPage, new QnGeneralSystemAdministrationWidget(this), tr("General"));
+    addPage(GeneralPage, generalWidget, tr("General"));
     addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
     addPage(SmtpPage, new QnSmtpSettingsWidget(this), tr("Email"));
     addPage(UpdatesPage, m_updatesWidget, tr("Updates"));
@@ -44,6 +45,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
     safeModeWatcher->addAutoHiddenWidget(ui->buttonBox->button(QDialogButtonBox::Ok));
+    safeModeWatcher->addAutoReadOnlyWidget(generalWidget);
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}

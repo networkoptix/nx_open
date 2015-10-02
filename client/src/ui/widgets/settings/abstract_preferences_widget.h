@@ -5,6 +5,8 @@
 
 class QnAbstractPreferencesWidget: public QWidget {
     Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
+
 public:
     explicit QnAbstractPreferencesWidget(QWidget *parent = 0):
         QWidget(parent) {}
@@ -12,35 +14,44 @@ public:
     /**
      * @brief submitToSettings                  Save widget elements' values to client settings.
      */
-    virtual void submitToSettings() {}
+    virtual void submitToSettings();
 
     /**
      * @brief updateFromSettings                Read widget elements' values from client settings.
      */
-    virtual void updateFromSettings() {}
+    virtual void updateFromSettings();
 
     /**
      * @brief confirm                           Check that all values are correct so saving is possible.
      * @return                                  False if saving should be aborted, true otherwise.
      */
-    virtual bool confirm() {return true;}
+    virtual bool confirm();
 
     /**
      * @brief discard                           Check that all values can be discarded safely.
      * @return                                  False if discarding should be aborted, true otherwise.
      */
-    virtual bool discard() { return true; }
+    virtual bool discard();
 
     /**
      * @brief hasChanges                        Check if there are modified values.
      * @return                                  True if something is changed, false otherwise.
      */
-    virtual bool hasChanges() const {return false; }
+    virtual bool hasChanges() const;
 
     /**
      * @brief retranslateUi                     Update UI strings (if required).
      */
-    virtual void retranslateUi() {}
+    virtual void retranslateUi();
+
+    bool isReadOnly() const;;
+    void setReadOnly(bool readOnly);
+
+protected:
+    virtual void setReadOnlyInternal(bool readOnly);
+
+private:
+    bool m_readOnly;
 };
 
 #endif // ABSTRACT_PREFERENCES_WIDGET_H
