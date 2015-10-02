@@ -5,14 +5,14 @@ class QnWorkbenchSafeModeWatcher: public QObject {
 public:
     QnWorkbenchSafeModeWatcher(QWidget *parentWidget = nullptr);
 
-    void updateReadOnlyMode(bool readOnly);
+    void updateReadOnlyMode();
 
-    void addControlledWidget(QWidget *widget);
-    void addControlledWidgets(QList<QWidget*> widgets);
-    void addControlledButton(QDialogButtonBox::StandardButton button);
+    void addWarningLabel(QDialogButtonBox *buttonBox);
+
+    void addAutoHiddenWidget(QWidget *widget);
+    void addAutoHiddenWidgets(QList<QWidget*> widgets);
 private:
     QWidget* m_parentWidget;
     QLabel* m_warnLabel;
-    QDialogButtonBox* m_buttonBox;
-    QList<QWidget*> m_controlledWidgets;
+    QList<QWidget*> m_autoHiddenWidgets;
 };

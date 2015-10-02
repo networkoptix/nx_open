@@ -21,6 +21,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
+#include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -74,8 +75,10 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     at_settingsWidget_hasChangesChanged();
     retranslateUi();
 
-    makeReadOnlyModeAware(m_okButton);
-    makeReadOnlyModeAware(m_applyButton);
+    auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
+    safeModeWatcher->addWarningLabel(m_buttonBox);
+    safeModeWatcher->addAutoHiddenWidget(m_okButton);
+    safeModeWatcher->addAutoHiddenWidget(m_applyButton);
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
@@ -122,14 +125,14 @@ void QnCameraSettingsDialog::reject() {
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
     bool hasChanges = m_settingsWidget->hasDbChanges();
-    m_applyButton->setEnabled(hasChanges && !qnCommon->isReadOnly());
+    m_applyButton->setEnabled(hasChanges);
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_okButton->setEnabled(isValidMode && !qnCommon->isReadOnly());
+    m_okButton->setEnabled(isValidMode);
     m_openButton->setVisible(isValidMode);
     m_diagnoseButton->setVisible(isValidMode);
     m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement

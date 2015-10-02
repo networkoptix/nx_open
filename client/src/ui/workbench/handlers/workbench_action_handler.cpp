@@ -2227,6 +2227,9 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
+    if (qnCommon->isReadOnly())
+        return;
+
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if(!watcher->hasMismatches())
         return;

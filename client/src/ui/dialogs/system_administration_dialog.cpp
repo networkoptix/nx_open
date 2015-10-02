@@ -41,8 +41,9 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
 
     loadData();
 
-    QnWorkbenchSafeModeWatcher* watcher = new QnWorkbenchSafeModeWatcher(this);
-    watcher->addControlledButton(QDialogButtonBox::Ok);
+    QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
+    safeModeWatcher->addWarningLabel(ui->buttonBox);
+    safeModeWatcher->addAutoHiddenWidget(ui->buttonBox->button(QDialogButtonBox::Ok));
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}
