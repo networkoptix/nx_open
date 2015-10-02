@@ -31,14 +31,16 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
 
     m_updatesWidget = new QnServerUpdatesWidget(this);
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
+    auto smtpWidget = new QnSmtpSettingsWidget(this);
+    auto routingWidget = new QnRoutingManagementWidget(this);
 
-    addPage(GeneralPage, generalWidget, tr("General"));
-    addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
-    addPage(SmtpPage, new QnSmtpSettingsWidget(this), tr("Email"));
-    addPage(UpdatesPage, m_updatesWidget, tr("Updates"));
-    addPage(UserManagement, new QnUserManagementWidget(this), tr("Users"));
-    addPage(RoutingManagement, new QnRoutingManagementWidget(this), tr("Routing Management"));
-    addPage(TimeServerSelection, new QnTimeServerSelectionWidget(this), tr("Time Synchronization"));
+    addPage(GeneralPage,            generalWidget,                          tr("General"));
+    addPage(LicensesPage,           new QnLicenseManagerWidget(this),       tr("Licenses"));
+    addPage(SmtpPage,               smtpWidget,                             tr("Email"));
+    addPage(UpdatesPage,            m_updatesWidget,                        tr("Updates"));
+    addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
+    addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
+    addPage(TimeServerSelection,    new QnTimeServerSelectionWidget(this),  tr("Time Synchronization"));
 
     loadData();
 
@@ -46,6 +48,8 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     safeModeWatcher->addWarningLabel(ui->buttonBox);
     safeModeWatcher->addAutoHiddenWidget(ui->buttonBox->button(QDialogButtonBox::Ok));
     safeModeWatcher->addAutoReadOnlyWidget(generalWidget);
+    safeModeWatcher->addAutoReadOnlyWidget(smtpWidget);
+    safeModeWatcher->addAutoReadOnlyWidget(routingWidget);
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}

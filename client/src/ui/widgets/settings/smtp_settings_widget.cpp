@@ -7,23 +7,24 @@
 #include <api/global_settings.h>
 #include "api/model/test_email_settings_reply.h"
 
-#include <nx_ec/ec_api.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
-#include <ui/style/warning_style.h>
+#include <nx_ec/ec_api.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/warning_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 #include <utils/common/scoped_value_rollback.h>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
 
 namespace {
     enum WidgetPages {
@@ -163,6 +164,9 @@ void QnSmtpSettingsWidget::updateFromSettings() {
 }
 
 void QnSmtpSettingsWidget::submitToSettings() {
+    if (isReadOnly())
+        return;
+
     QnGlobalSettings::instance()->setEmailSettings(settings());
 }
 
@@ -175,6 +179,29 @@ bool QnSmtpSettingsWidget::discard() {
     finishTesting();
     return base_type::discard();
 }
+
+void QnSmtpSettingsWidget::setReadOnlyInternal(bool readOnly) {
+    using ::setReadOnly;
+
+    setReadOnly(ui->simpleEmailLineEdit, readOnly);
+    setReadOnly(ui->simplePasswordLineEdit, readOnly);
+    setReadOnly(ui->simpleSignatureLineEdit, readOnly);
+    setReadOnly(ui->simpleSupportEmailLineEdit, readOnly);
+
+    setReadOnly(ui->advancedCheckBox, readOnly);
+
+    setReadOnly(ui->serverLineEdit, readOnly);
+    setReadOnly(ui->emailLineEdit, readOnly);
+    setReadOnly(ui->portComboBox, readOnly);
+    setReadOnly(ui->userLineEdit, readOnly);
+    setReadOnly(ui->passwordLineEdit, readOnly);
+    setReadOnly(ui->tlsRadioButton, readOnly);
+    setReadOnly(ui->sslRadioButton, readOnly);
+    setReadOnly(ui->unsecuredRadioButton, readOnly);
+    setReadOnly(ui->signatureLineEdit, readOnly);
+    setReadOnly(ui->supportEmailLineEdit, readOnly);
+}
+
 
 QnEmailSettings QnSmtpSettingsWidget::settings() const {
 
@@ -317,7 +344,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     }
 
     QnMediaServerConnectionPtr serverConnection;
-    for(const QnMediaServerResourcePtr server: qnResPool->getAllServers()) {
+    for(const QnMediaServerResourcePtr &server: qnResPool->getAllServers()) {
         if (server->getStatus() != Qn::Online)
             continue;
 
