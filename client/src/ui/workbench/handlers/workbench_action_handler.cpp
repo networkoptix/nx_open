@@ -2313,6 +2313,10 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (ec2::Ec2StaticticsReporter::isDefined(servers))
         return;
 
+    /* User cannot disable statistics collecting, so don't make him sorrow. */
+    if (qnCommon->isReadOnly())
+        return;
+
     /* Suppress notification if no server has internet access. */
     bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr &server) {
         return (server->getServerFlags() & Qn::SF_HasPublicIP);
