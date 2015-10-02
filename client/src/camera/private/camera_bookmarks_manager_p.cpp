@@ -134,19 +134,14 @@ QnCameraBookmarkList QnCameraBookmarksManagerPrivate::getLocalBookmarks(const Qn
         if (!m_bookmarksByCamera.contains(camera->getUniqueId()))
             continue;
 
-        QnCameraBookmarkList cameraBookmarks = m_bookmarksByCamera[camera->getUniqueId()];
-
-        auto startIter = std::lower_bound(cameraBookmarks.cbegin(), cameraBookmarks.cend(), filter.startTimeMs);
-        auto endIter = std::upper_bound(cameraBookmarks.cbegin(), cameraBookmarks.cend(), filter.endTimeMs, [](qint64 value, const QnCameraBookmark &other) {
-            return value < other.endTimeMs();
-        });
-
         QnCameraBookmarkList filtered;
-        Q_ASSERT_X(startIter <= endIter, Q_FUNC_INFO, "Check if bookmarks are sorted and query is valid");
-        for (auto iter = startIter; iter != endIter; ++iter)
-            filtered << *iter;
-        result.push_back(std::move(filtered));        
 
+        for (const QnCameraBookmark &bookmark: m_bookmarksByCamera[camera->getUniqueId()].bookmarkList()) {
+            if (bookmark.endTimeMs() > filter.startTimeMs && bookmark.startTimeMs < filter.endTimeMs)
+                filtered.append(bookmark);
+        }
+
+        result.push_back(std::move(filtered));        
     }
 
     return QnCameraBookmark::mergeCameraBookmarks(result, filter.limit, filter.strategy);
@@ -318,14 +313,8 @@ void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBook
                 if (info.state == QueryInfo::QueryState::Requested)
                     info.state = QueryInfo::QueryState::Actual;
 
-                for (const QnCameraBookmark &bookmark: bookmarks) {
-                    QnCameraBookmarkList &bookmarkList = m_bookmarksByCamera[bookmark.cameraId];
-                    auto it = std::lower_bound(bookmarkList.begin(), bookmarkList.end(), bookmark);
-                    if (it->guid == bookmark.guid)
-                        *it = bookmark;
-                    else
-                        bookmarkList.insert(it, bookmark);
-                }
+                for (const QnCameraBookmark &bookmark: bookmarks)
+                    m_bookmarksByCamera[bookmark.cameraId].addBookmark(bookmark);
             }
         }
         if (callback)

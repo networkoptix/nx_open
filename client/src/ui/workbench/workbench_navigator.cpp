@@ -119,6 +119,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
     m_bookmarkQuery(nullptr),
+    m_sliderBookmarksRefreshTimer(new QTimer(this)),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0)
 {
@@ -206,6 +207,10 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
             QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
     });
+
+    m_sliderBookmarksRefreshTimer->setInterval(2000);
+    m_sliderBookmarksRefreshTimer->setSingleShot(true);
+    connect(m_sliderBookmarksRefreshTimer, &QTimer::timeout, this, &QnWorkbenchNavigator::updateSliderBookmarks);
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -338,12 +343,11 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool bookmarksModeEnabled) {
         m_bookmarkQuery->setFilter(filter);
         if (m_currentMediaWidget)
             m_bookmarkQuery->setCamera(m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>());
-
-        
     } else {
         if (m_bookmarkQuery)
             disconnect(m_bookmarkQuery, nullptr, this, nullptr);
         m_bookmarkQuery.clear();
+        m_bookmarkAggregation.clear();
         m_timeSlider->setBookmarks(QnCameraBookmarkList());
         m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
     }
@@ -386,8 +390,8 @@ void QnWorkbenchNavigator::initialize() {
             return;
 
         auto filter = m_bookmarkQuery->filter();
-        filter.startTimeMs = windowStart;
-        filter.endTimeMs = windowEnd;
+        filter.startTimeMs = qMax(m_timeSlider->minimum(), windowStart);
+        filter.endTimeMs = qMin(m_timeSlider->maximum(), windowEnd);
         m_bookmarkQuery->setFilter(filter);
     });
 
@@ -469,6 +473,7 @@ void QnWorkbenchNavigator::deinitialize() {
     if (m_bookmarkQuery) {
         m_bookmarkQuery->setCamera(QnVirtualCameraResourcePtr());
         m_bookmarkQuery->setFilter(QnCameraBookmarkSearchFilter());
+        m_bookmarkAggregation.clear();
     }
 
     m_currentWidget = NULL;
@@ -964,8 +969,10 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
 
-    if (m_bookmarkQuery)
+    if (m_bookmarkQuery) {
+        m_bookmarkAggregation.clear();
         m_bookmarkQuery->setCamera(m_currentMediaWidget ? m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>() : QnVirtualCameraResourcePtr());
+    }
 
     updateCurrentWidgetFlags();
     updateLines();
@@ -1714,7 +1721,17 @@ void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked() {
 }
 
 void QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks) {
-    m_timeSlider->setBookmarks(bookmarks);
+    m_bookmarkAggregation.mergeBookmarkList(bookmarks);
+
+    if (m_timeSlider->bookmarks().isEmpty()) {
+        m_timeSlider->setBookmarks(m_bookmarkAggregation.bookmarkList());
+        return;
+    }
+
+    if (m_sliderBookmarksRefreshTimer->isActive())
+        return;
+
+    m_sliderBookmarksRefreshTimer->start();
 }
 
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
@@ -1890,6 +1907,13 @@ void QnWorkbenchNavigator::updateHistoryForCamera(const QnVirtualCameraResourceP
         if (!success)
             m_updateHistoryQueue.insert(camera);
     });
+}
+
+void QnWorkbenchNavigator::updateSliderBookmarks() {
+    if (!bookmarksModeEnabled())
+        return;
+
+    m_timeSlider->setBookmarks(m_bookmarkAggregation.bookmarkList());
 }
 
 /* Bookmark methods. */

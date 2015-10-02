@@ -480,7 +480,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_selecting(false),
     m_lineCount(0),
     m_totalLineStretch(0.0),
-    m_bookmarksMergeTimer(new QTimer(this)),
     m_msecsPerPixel(1.0),
     m_animationUpdateMSecsPerPixel(1.0),
     m_thumbnailsAspectRatio(-1.0),
@@ -543,10 +542,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     updateMinimalWindow();
     updatePixmapCache();
     sliderChange(SliderRangeChange);
-
-    connect(m_bookmarksMergeTimer, &QTimer::timeout, this, &QnTimeSlider::mergeBookmarks);
-    m_bookmarksMergeTimer->setInterval(2000);
-    m_bookmarksMergeTimer->setSingleShot(true);
 }
 
 QnTimeSlider::~QnTimeSlider() {
@@ -889,7 +884,6 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
             updateToolTipVisibility();
             updateMSecsPerPixel();
             updateThumbnailsPeriod();
-            mergeBookmarksDelayed();
         }
     }
 }
@@ -1288,13 +1282,6 @@ void QnTimeSlider::mergeBookmarks() {
         while (!pendingBookmarks.isEmpty())
             m_mergedBookmarks.append(pendingBookmarks.takeFirst());
     }
-}
-
-void QnTimeSlider::mergeBookmarksDelayed() {
-    if (m_bookmarksMergeTimer->isActive())
-        return;
-
-    m_bookmarksMergeTimer->start();
 }
 
 void QnTimeSlider::calculateCoveringBookmarks() {
