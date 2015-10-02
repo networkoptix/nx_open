@@ -1424,6 +1424,7 @@ QnActionManager::QnActionManager(QObject *parent):
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
+                      new QnForbiddenInSafeModeCondition(this),
                       this));
 
     factory(Qn::CameraListByServerAction).
