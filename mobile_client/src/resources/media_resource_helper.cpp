@@ -15,6 +15,7 @@
 #include "common/common_module.h"
 #include "network/authutil.h"
 #include "utils/common/model_functions.h"
+#include "utils/common/synctime.h"
 #include "watchers/user_watcher.h"
 #include <mobile_client/mobile_client_settings.h>
 
@@ -50,7 +51,8 @@ namespace {
     }
 
     QString getAuth(const QnUserResourcePtr &user, QnMediaResourceHelper::Protocol protocol) {
-        return QString::fromLatin1(createHttpQueryAuthParam(user->getName(), user->getDigest(), methodForProtocol(protocol), QByteArray()));
+        auto nonce = QByteArray::number(qnSyncTime->currentUSecsSinceEpoch(), 16);
+        return QString::fromLatin1(createHttpQueryAuthParam(user->getName(), user->getDigest(), methodForProtocol(protocol), nonce));
     }
 
     qint64 convertPosition(qint64 position, QnMediaResourceHelper::Protocol protocol) {
