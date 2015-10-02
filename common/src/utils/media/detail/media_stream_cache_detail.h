@@ -6,6 +6,8 @@
 #ifndef MEDIA_STREAM_CACHE_DETAIL_H
 #define MEDIA_STREAM_CACHE_DETAIL_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <deque>
 #include <map>
 
@@ -123,5 +125,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif  //MEDIA_STREAM_CACHE_DETAIL_H
