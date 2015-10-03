@@ -29,7 +29,7 @@ Expandable.GenericSettingsPanel
         Base.Text
         {
             thin: false;
-            text: "Restart server";
+            text: "Restart";
             font.pixelSize: Common.SizeManager.fontSizes.medium;
         }
 
@@ -41,7 +41,7 @@ Expandable.GenericSettingsPanel
             {
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
-                text: "Software Restart";
+                text: "Restart Server";
 
                 onClicked:
                 {
@@ -57,7 +57,7 @@ Expandable.GenericSettingsPanel
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
-                text: "Hardware Restart";
+                text: "Reboot";
 
                 onClicked:
                 {
@@ -87,7 +87,7 @@ Expandable.GenericSettingsPanel
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
-                text: "Reset All";
+                text: "Full Restore";
 
                 onClicked:
                 {
@@ -103,7 +103,7 @@ Expandable.GenericSettingsPanel
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
-                text: "Reset All But Network";
+                text: "Restore Everything But Network";
 
                 KeyNavigation.tab: thisComponent.nextTab;
 
