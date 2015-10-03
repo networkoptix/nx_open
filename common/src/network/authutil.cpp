@@ -1,7 +1,7 @@
 #include "authutil.h"
 
 template <class T, class T2>
-QList<T> smartSplitInternal(const T& data, const T2 delimiter, const T2 quoteChar)
+QList<T> smartSplitInternal(const T& data, const T2 delimiter, const T2 quoteChar, bool keepEmptyParts)
 {
     bool quoted = false;
     QList<T> rez;
@@ -15,7 +15,9 @@ QList<T> smartSplitInternal(const T& data, const T2 delimiter, const T2 quoteCha
             quoted = !quoted;
         else if (data[i] == delimiter && !quoted)
         {
-            rez << data.mid(lastPos, i - lastPos);
+            T value = data.mid(lastPos, i - lastPos);
+            if (!value.isEmpty() || keepEmptyParts)
+                rez << value;
             lastPos = i + 1;
         }
     }
@@ -26,12 +28,12 @@ QList<T> smartSplitInternal(const T& data, const T2 delimiter, const T2 quoteCha
 
 QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
 {
-    return smartSplitInternal(data, delimiter, '\"');
+    return smartSplitInternal(data, delimiter, '\"', true);
 }
 
-QStringList smartSplit(const QString& data, const QChar delimiter)
+QStringList smartSplit(const QString& data, const QChar delimiter, QString::SplitBehavior splitBehavior )
 {
-    return smartSplitInternal(data, delimiter, QChar(L'\"'));
+    return smartSplitInternal(data, delimiter, QChar(L'\"'), splitBehavior == QString::KeepEmptyParts);
 }
 
 template <class T, class T2>

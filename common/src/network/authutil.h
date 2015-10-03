@@ -20,7 +20,7 @@
     \endcode
 */
 QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter);
-QStringList smartSplit(const QString& data, const QChar delimiter);
+QStringList smartSplit(const QString& data, const QChar delimiter, QString::SplitBehavior splitBehavior = QString::KeepEmptyParts);
 
 QByteArray unquoteStr(const QByteArray& v);
 QString unquoteStr(const QString& v);

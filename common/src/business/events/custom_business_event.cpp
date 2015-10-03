@@ -31,9 +31,9 @@ bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const Q
         return result;
     };
 
-    QStringList resourceNameKeywords = unquote(smartSplit(params.resourceName, L' '));
-    QStringList captionKeywords      = unquote(smartSplit(params.caption, L' '));
-    QStringList descriptionKeywords  = unquote(smartSplit(params.description, L' '));
+    QStringList resourceNameKeywords = unquote(smartSplit(params.resourceName, L' ', QString::SkipEmptyParts));
+    QStringList captionKeywords      = unquote(smartSplit(params.caption, L' ', QString::SkipEmptyParts));
+    QStringList descriptionKeywords  = unquote(smartSplit(params.description, L' ', QString::SkipEmptyParts));
 
     auto mathKeywords = [](const QStringList& keywords, const QString& pattern) 
     {
