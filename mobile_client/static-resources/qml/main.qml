@@ -74,6 +74,12 @@ Window {
     Item {
         id: navigationBarPlaceholder
 
+        property real realWidth: 0
+        property real realHeight: 0
+
+        width: realWidth == 0 ? 1 : realWidth
+        height: realHeight == 0 ? 1 : realHeight
+
         anchors.bottom: parent.bottom
         anchors.right: parent.right
     }
@@ -218,11 +224,11 @@ Window {
         var navBarSize = getNavigationBarHeight()
 
         if (isPhone && Screen.primaryOrientation == Qt.LandscapeOrientation) {
-            navigationBarPlaceholder.width = navBarSize
-            navigationBarPlaceholder.height = 1
+            navigationBarPlaceholder.realWidth = navBarSize
+            navigationBarPlaceholder.realHeight = 1
         } else {
-            navigationBarPlaceholder.width = 1
-            navigationBarPlaceholder.height = navBarSize
+            navigationBarPlaceholder.realWidth = 1
+            navigationBarPlaceholder.realHeight = navBarSize
         }
     }
 
