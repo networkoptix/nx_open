@@ -49,12 +49,12 @@ public:
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer&& authInfo,
+        stree::ResourceContainer authInfo,
         const nx_http::Request& request,
         nx_http::Response* const response,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler )
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
     {
         std::async(
             std::launch::async,
@@ -112,12 +112,12 @@ public:
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer&& authInfo,
+        stree::ResourceContainer authInfo,
         const nx_http::Request& request,
         nx_http::Response* const response,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler )
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
     {
         response->headers.emplace(
             "Seq",

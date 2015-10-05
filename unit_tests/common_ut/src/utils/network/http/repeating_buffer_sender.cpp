@@ -21,12 +21,12 @@ RepeatingBufferSender::RepeatingBufferSender(
 
 void RepeatingBufferSender::processRequest(
     const nx_http::HttpServerConnection& /*connection*/,
-    stree::ResourceContainer&& /*authInfo*/,
+    stree::ResourceContainer /*authInfo*/,
     const nx_http::Request& /*request*/,
     nx_http::Response* const /*response*/,
     std::function<void(
         const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler )
+        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
 {
     completionHandler(
         nx_http::StatusCode::ok,
