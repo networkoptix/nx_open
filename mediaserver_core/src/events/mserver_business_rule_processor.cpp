@@ -28,7 +28,7 @@
 
 #include <QtConcurrent>
 #include <utils/email/email.h>
-#include <utils/email/email_manager_impl.h>
+#include <nxemail/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"
 #include <utils/common/timermanager.h>
 #include <core/resource/user_resource.h>

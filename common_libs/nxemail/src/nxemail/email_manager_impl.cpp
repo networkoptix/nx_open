@@ -4,13 +4,13 @@
 
 #include <api/global_settings.h>
 #include <api/model/email_attachment.h>
-
-#include <nxemail/smtpclient/smtpclient.h>
-#include <nxemail/smtpclient/QnSmtpMime>
+#include <nx_ec/data/api_email_data.h>
 #include <utils/common/log.h>
+#include <utils/email/email.h>
 
-#include "nx_ec/data/api_email_data.h"
-#include "utils/email/email.h"
+#include "smtpclient/smtpclient.h"
+#include "smtpclient/QnSmtpMime"
+
 
 namespace {
     SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct) {
