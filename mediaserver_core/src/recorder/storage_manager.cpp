@@ -873,6 +873,18 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
                                                       const QList<QnServer::ChunksCatalog> &catalogs, int limit) 
 {
     std::vector<QnTimePeriodList> periods;
+    qnNormalStorageMan->getRecordedPeriodsInternal(periods, cameras, startTime, endTime, detailLevel, catalogs, limit);
+    qnBackupStorageMan->getRecordedPeriodsInternal(periods, cameras, startTime, endTime, detailLevel, catalogs, limit);
+    return QnTimePeriodList::mergeTimePeriods(periods, limit);
+}
+
+void QnStorageManager::getRecordedPeriodsInternal(
+    std::vector<QnTimePeriodList>& periods, 
+    const QnVirtualCameraResourceList &cameras, qint64 
+    startTime, qint64 endTime, qint64 detailLevel, 
+    const QList<QnServer::ChunksCatalog> &catalogs, 
+    int limit)
+{
     for (const QnVirtualCameraResourcePtr &camera: cameras) {
         QString cameraUniqueId = camera->getUniqueId();
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
@@ -890,8 +902,6 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
         }
 
     }
-
-    return QnTimePeriodList::mergeTimePeriods(periods, limit);
 }
 
 QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 bitrateAnalizePeriodMs)

@@ -77,7 +77,7 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
 
-    QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs, int limit);
+    static QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs, int limit);
     QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalizePeriodMs);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
@@ -141,6 +141,10 @@ public slots:
 private:
     friend class TestStorageThread;
 
+    void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods, 
+                                    const QnVirtualCameraResourceList &cameras, 
+                                    qint64 startTime, qint64 endTime, qint64 detailLevel, 
+                                    const QList<QnServer::ChunksCatalog> &catalogs, int limit);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, const QnTimePeriod period);
     int detectStorageIndex(const QString& path);
