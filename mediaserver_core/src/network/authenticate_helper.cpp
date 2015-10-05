@@ -267,7 +267,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 *usedAuthMethod = AuthMethod::httpDigest;
 
             authResult = doDigestAuth(
-                request.requestLine.method, authorizationHeader, response, isProxy, authUserId, ',');
+                request.requestLine.method, authorizationHeader, response, isProxy, authUserId);
         }
         else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic) {
             if (usedAuthMethod)
@@ -345,7 +345,6 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     nx_http::Response& responseHeaders,
     bool isProxy,
     QnUuid* authUserId,
-    char delimiter,
     QnUserResourcePtr* const outUserResource)
 {
     const QByteArray userName = authorization.digest->userid;
@@ -576,10 +575,9 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     else
     {
         nx_http::header::Authorization authorization(nx_http::header::AuthScheme::digest);
-        authorization.digest->parse(authData);
+        authorization.digest->parse(authData, ';');
         authResult = doDigestAuth(
-            method, authorization, tmpHeaders, false, authUserId, ';',
-            &outUserResource);
+            method, authorization, tmpHeaders, false, authUserId, &outUserResource);
     }
     if( authResult != Qn::Auth_OK)
     {

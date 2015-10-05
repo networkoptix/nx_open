@@ -414,7 +414,7 @@ namespace nx_http
         public:
             QMap<BufferType, BufferType> params;
 
-            bool parse( const BufferType& str );
+            bool parse( const BufferType& str, char separator = ',' );
             void serialize( BufferType* const dstBuffer ) const;
         };
 
