@@ -251,11 +251,13 @@ namespace nx_http
         return calculatedResponseIter.value() == responseIter.value();
     }
 
+    static const size_t MD5_CHUNK_LEN = 64;
+
     BufferType calcIntermediateResponse(
         const BufferType& ha1,
         const BufferType& nonce)
     {
-        assert(ha1.size() + 1 + nonce.size() == 64);
+        assert((ha1.size() + 1 + nonce.size()) % MD5_CHUNK_LEN == 0);
 
         MD5_CTX md5Ctx;
         MD5_Init(&md5Ctx);
@@ -271,9 +273,10 @@ namespace nx_http
     BufferType calcResponseFromIntermediate(
         const BufferType& intermediateResponse,
         size_t intermediateResponseNonceLen,
+        const BufferType& nonceTrailer,
         const BufferType& ha2)
     {
-        assert((MD5_DIGEST_LENGTH*2 + 1 + intermediateResponseNonceLen) % MD5_DIGEST_LENGTH == 0);
+        assert((MD5_DIGEST_LENGTH*2 + 1 + intermediateResponseNonceLen) % MD5_CHUNK_LEN == 0);
 
         const auto intermediateResponseBin = QByteArray::fromHex(intermediateResponse);
 
@@ -281,6 +284,8 @@ namespace nx_http
         memset(&md5Ctx, 0, sizeof(md5Ctx));
         memcpy(&md5Ctx, intermediateResponseBin.constData(), MD5_DIGEST_LENGTH);
         md5Ctx.Nl = (MD5_DIGEST_LENGTH * 2 + 1 + intermediateResponseNonceLen) << 3;
+        //as if we have just passed ha1:nonceBase to MD5_Update
+        MD5_Update(&md5Ctx, nonceTrailer.constData(), nonceTrailer.size());
         MD5_Update(&md5Ctx, ":", 1);
         MD5_Update(&md5Ctx, ha2.constData(), ha2.size());
         BufferType response;

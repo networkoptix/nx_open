@@ -57,7 +57,9 @@ const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 *
 QnAuthHelper::QnAuthHelper()
 :
     m_nonceProvider(new CdbNonceFetcher(std::make_unique<TimeBasedNonceProvider>())),
-    m_userDataProvider(new CloudUserAuthenticator(std::make_unique<GenericUserDataProvider>()))
+    m_userDataProvider(new CloudUserAuthenticator(
+        std::make_unique<GenericUserDataProvider>(),
+        static_cast<const CdbNonceFetcher&>(*m_nonceProvider.get())))
 {
 #ifndef USE_USER_RESOURCE_PROVIDER
     connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
@@ -209,6 +211,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
         nx_http::header::Authorization authorizationHeader;
         if( !authorizationHeader.parse( authorization ) )
             return Qn::Auth_Forbidden;
+        //TODO #ak better call m_userDataProvider->authorize here
         QnUserResourcePtr userResource = findUserByName( authorizationHeader.userid() );
 
         QString desiredRealm = QnAppInfo::realm();

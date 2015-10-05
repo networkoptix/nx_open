@@ -78,17 +78,22 @@ namespace nx_http
 
     /*!
         \param ha1 That's what \a calcHa1 has returned
+        \warning ha1.size() + 1 + nonce.size() MUST be divisible by 64! This is requirement of MD5 algorithm
     */
     BufferType calcIntermediateResponse(
         const BufferType& ha1,
         const BufferType& nonce);
     /*!
+        Calculates MD5(ha1:nonce:ha2).
+        \a nonce is concatenation of \a nonceBase and \a nonceTrailer
+        \a intermediateResponse is MD5_modified(ha1:nonceBase)
         \param intermediateResponse Calculated with \a calcIntermediateResponse
         \param intermediateResponseNonceLen Length of nonce (bytes) used to generate \a intermediateResponse
     */
     BufferType calcResponseFromIntermediate(
         const BufferType& intermediateResponse,
         size_t intermediateResponseNonceLen,
+        const BufferType& nonceTrailer,
         const BufferType& ha2);
 }
 

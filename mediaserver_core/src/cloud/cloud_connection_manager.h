@@ -30,6 +30,7 @@ public:
 
     bool bindedToCloud() const;
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection();
+    const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
 signals:
     void cloudBindingStatusChanged(bool bindedToCloud);

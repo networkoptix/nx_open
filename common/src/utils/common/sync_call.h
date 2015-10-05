@@ -7,6 +7,7 @@
 #define NX_MAKE_SYNC_CALL_H
 
 #include <functional>
+#include <future>
 
 
 //TODO #ak introduce generic implementation using variadic templates (when available)

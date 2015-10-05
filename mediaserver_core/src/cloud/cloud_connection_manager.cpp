@@ -44,7 +44,12 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
         m_cloudAuthKey.toStdString());
 }
 
-bool CloudConnectionManager::bindedToCloud(QnMutexLockerBase* const lk) const
+const nx::cdb::api::ConnectionFactory& CloudConnectionManager::connectionFactory() const
+{
+    return *m_cdbConnectionFactory;
+}
+
+bool CloudConnectionManager::bindedToCloud(QnMutexLockerBase* const /*lk*/) const
 {
     return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
 }
