@@ -6,7 +6,7 @@
 #include "email_manager.h"
 
 #include <api/global_settings.h>
-#include <mustache/mustache_helper.h>
+#include <nxemail/mustache/mustache_helper.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/email/email_manager_impl.h>
