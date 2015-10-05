@@ -376,7 +376,8 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     contextMap[tpDescription] = action->getRuntimeParams().description;
     contextMap[tpSource] = action->getRuntimeParams().resourceName;
 
-    QString messageBody = renderTemplateFromFile(attachmentData.templatePath, contextMap);
+    QString messageBody;
+    renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
 
     ec2::ApiEmailData data(
         recipients,
