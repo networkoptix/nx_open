@@ -5,8 +5,8 @@
 #include <api/global_settings.h>
 #include <api/model/email_attachment.h>
 
-#include <smtpclient/smtpclient.h>
-#include <smtpclient/QnSmtpMime>
+#include <nxemail/smtpclient/smtpclient.h>
+#include <nxemail/smtpclient/QnSmtpMime>
 #include <utils/common/log.h>
 
 #include "nx_ec/data/api_email_data.h"

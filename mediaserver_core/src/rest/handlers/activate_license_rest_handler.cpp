@@ -17,7 +17,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include <utils/serialization/json_functions.h>
 #include <utils/common/app_info.h>
-#include "mustache/mustache_helper.h"
+#include <nxemail/mustache/mustache_helper.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 

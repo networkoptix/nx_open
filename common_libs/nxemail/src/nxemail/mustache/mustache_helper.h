@@ -1,7 +1,7 @@
 #ifndef _MUSTACHE_MUSTACHE_HELPER_H_
 #define _MUSTACHE_MUSTACHE_HELPER_H_
 
-#include "mustache/mustache.h"
+#include "mustache.h"
 
 QString renderTemplateFromFile(const QString& filename, const QVariantHash& contextMap);
 
