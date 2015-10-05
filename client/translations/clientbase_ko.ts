@@ -1,206 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="vi_VN" sourcelanguage="en_US">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
         <source>About</source>
-        <translation>đối với</translation>
+        <translation>상세</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <source>Credits</source>
-        <translation>yếu tố</translation>
+        <translation>생성</translation>
     </message>
     <message>
         <source>GPU Information</source>
-        <translation>GPU tin tức</translation>
+        <translation>GPU 정보</translation>
     </message>
     <message>
         <source>Connected servers</source>
-        <translation>Máy chủ kết nối</translation>
+        <translation>연결된 서버</translation>
     </message>
     <message>
         <source>Support</source>
-        <translation>ủng hộ</translation>
+        <translation>지원</translation>
     </message>
 </context>
 <context>
     <name>AdjustVideoDialog</name>
     <message>
         <source>Image Enhancement</source>
-        <translation>image Enhancement</translation>
+        <translation>이미지 향상</translation>
     </message>
     <message>
         <source>Enable image enhancement</source>
-        <translation>Cho phép nâng cao hình ảnh</translation>
+        <translation>이미지 향상 활성화</translation>
     </message>
     <message>
         <source>Gamma</source>
-        <translation>gamma</translation>
+        <translation>감마</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>tự động</translation>
+        <translation>자동</translation>
     </message>
     <message>
         <source>Black level</source>
-        <translation>Đen Cấp</translation>
+        <translation>블랙 레벨</translation>
     </message>
     <message>
         <source>White level</source>
-        <translation>Trắng Cấp</translation>
+        <translation>화이트 레벨</translation>
     </message>
 </context>
 <context>
     <name>AggregationWidget</name>
     <message>
         <source>Check to set aggregation period</source>
-        <translation>Nhấn vào đây để thiết lập các hành động trong thời gian</translation>
+        <translation>집계 기간을 설정하세요</translation>
     </message>
     <message>
         <source>Interval of action :</source>
-        <translation>Hành động Interval:</translation>
+        <translation>동작 간격:</translation>
     </message>
     <message>
         <source>No more than once per</source>
-        <translation>hơn một lần</translation>
+        <translation>한번에 값이상은 동작 안됨</translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation>ngay</translation>
+        <translation>긴급</translation>
     </message>
 </context>
 <context>
     <name>AuditLogDialog</name>
     <message>
         <source>From</source>
-        <translation>từ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>till</source>
-        <translation>đến</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation>Làm mới</translation>
+        <translation type="unfinished">새로고침</translation>
     </message>
     <message>
         <source>User actions</source>
-        <translation>hành động người dùng</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation>xem lưu trữ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation>xuất ra video</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation>xem trực tiếp</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Login/logout</source>
-        <translation>Đăng nhập / đăng xuất</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Event rules</source>
-        <translation>quy định tổ chức sự kiện</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server actions</source>
-        <translation>hành động máy chủ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>E-mail settings</source>
-        <translation>Cài đặt e-mail</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>System actions</source>
-        <translation>hành động hệ thống</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select all</source>
-        <translation>Chọn tất cả</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sessions</source>
-        <translation>Sessions</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>chi tiết</translation>
+        <translation type="unfinished">상세</translation>
     </message>
     <message>
         <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Tất cả máy chủ đang offline. Dữ liệu kiểm toán không có sẵn.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation>Đường mòn kiểm toán</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>BusinessRuleWidget</name>
     <message>
         <source>Event</source>
-        <translatorcomment>biến cố</translatorcomment>
-        <translation>biến cố</translation>
+        <translation>이벤트</translation>
     </message>
     <message>
         <source>at</source>
-        <translation>於</translation>
+        <translation>항목</translation>
     </message>
     <message>
         <source>Schedule...</source>
-        <translatorcomment>lịch trình...</translatorcomment>
-        <translation>lịch trình...</translation>
+        <translation>일정...</translation>
     </message>
     <message>
         <source>Action</source>
-        <translatorcomment>hoạt động</translatorcomment>
-        <translation>hoạt động</translation>
+        <translation>동작</translation>
     </message>
     <message>
         <source>Comments:</source>
-        <translatorcomment>lời nói:</translatorcomment>
-        <translation>lời nói:</translation>
+        <translation>비고:</translation>
     </message>
     <message>
         <source>When</source>
-        <translation>khi nào</translation>
+        <translation>시점</translation>
     </message>
     <message>
         <source>Do</source>
-        <translation>làm</translation>
+        <translation>실행</translation>
     </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
     <message>
         <source>Alarm/Event Rules</source>
-        <translation>Alarm / Quy định tổ chức sự kiện</translation>
+        <translation>알람/이벤트 정책</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>thêm</translation>
+        <translation>추가</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>xóa bỏ</translation>
+        <translation>삭제</translation>
     </message>
     <message>
         <source>Event log</source>
-        <translation>ghi sự kiện</translation>
+        <translation>이벤트 로그</translation>
     </message>
     <message>
         <source>Advanced...</source>
-        <translation>nâng cao…</translation>
+        <translation>고급...</translation>
     </message>
     <message>
         <source>X</source>
@@ -211,177 +207,176 @@
     <name>CameraAdditionDialog</name>
     <message>
         <source>IP, hostname, RTSP link...</source>
-        <translation>IP, nơi, RTSP liên kết…</translation>
+        <translation></translation>
     </message>
     <message>
         <source>S&amp;tart IP:</source>
-        <translation>&amp;bắt đầu IP:</translation>
+        <translation>시작 IP(&amp;T):</translation>
     </message>
     <message>
         <source>&amp;End IP:</source>
-        <translation>&amp;đầu IP:</translation>
+        <translation>종료 IP(&amp;E):</translation>
     </message>
     <message>
         <source>&amp;Login:</source>
-        <translation>&amp;Đăng nhập:</translation>
+        <translation>로그인(&amp;L):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
+        <translation>비밀번호(&amp;P):</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>tự động</translation>
+        <translation>자동</translation>
     </message>
     <message>
         <source>&amp;Discovery Port:</source>
-        <translation>&amp;cổng truyền thông:</translation>
+        <translation>검색 포트(&amp;D):</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translatorcomment>dừng lại</translatorcomment>
-        <translation>dừng lại</translation>
+        <translation>정지</translation>
     </message>
     <message>
         <source>&amp;Scan</source>
-        <translation>&amp;quét</translation>
+        <translation>찾기(&amp;S)</translation>
     </message>
     <message>
         <source>Scanning...</source>
-        <translation>quét…</translation>
+        <translation>찾는중...</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>địa chỉ</translation>
+        <translation>주소</translation>
     </message>
     <message>
         <source>Server is offline</source>
-        <translation>máy chủ đang ẩn</translation>
+        <translation>오프라인</translation>
     </message>
     <message>
         <source>&amp;Add selected</source>
-        <translation>&amp;Thêm lựa chọn</translation>
+        <translation>추가 선택(&amp;A)</translation>
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation>Máy chủ đã chọn:</translation>
+        <translation type="unfinished">선택된 서버:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation>子&amp;quét mạng</translation>
+        <translation type="unfinished">서브넷 검색 (&amp;u)</translation>
     </message>
     <message>
         <source>Brand</source>
-        <translation>Nhãn hiệu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Model</source>
-        <translation>kiểu mẫu</translation>
+        <translation type="unfinished">모델</translation>
     </message>
     <message>
         <source>New Scan...</source>
-        <translation>quét…</translation>
+        <translation type="unfinished">새로 찾기...</translation>
     </message>
     <message>
         <source>Add device(s)...</source>
-        <translation>Thêm thiết bị (s) ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Device Address:</source>
-        <translation>thiết bị Địa chỉ:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Discovered Devices:</source>
-        <translation>Thiết bị phát hiện:</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CameraAdvancedSettingsWidget</name>
     <message>
         <source>Advanced settings for this camera cannot be loaded</source>
-        <translation>Cài đặt nâng cao cho máy ảnh này không thể được nạp</translation>
+        <translation>이 카메라의 고급 설정을 사용할 수 없습니다</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation>loài</translation>
+        <translation>카테고리</translation>
     </message>
     <message>
         <source>about:blank</source>
-        <translation>trắng</translation>
+        <translation>상세 </translation>
     </message>
     <message>
         <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
-        <translation>cài đặt nâng cao không có sẵn cho máy ảnh này. Kiểm tra các trang web camera trực tiếp cho nhiều lựa chọn hơn.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Note: Any changes made will be applied instantly!</source>
-        <translation>Lưu ý: Bất kỳ thay đổi này sẽ được áp dụng ngay lập tức!</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
         <source>No connection to Server %1.</source>
-        <translation>Không có kết nối đến Server %1.</translation>
+        <translation>%1 서버를 접속할 수 없습니다.</translation>
     </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
         <source>I have read the manual and understand the risks</source>
-        <translation>Tôi đã đọc hướng dẫn và đã nhận thức được những rủi ro</translation>
+        <translation>설명서를 읽고 리스크의 이해 필요</translation>
     </message>
     <message>
         <source>Camera Settings Control</source>
-        <translation>Cài đặt camera kiểm soát</translation>
+        <translation>카메라 설정 조정</translation>
     </message>
     <message>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>Camera Retention streaming và cài đặt liên quan</translation>
+        <translation>카메라 스트림과 프로파일 설정 유지</translation>
     </message>
     <message>
         <source>Secondary Stream Control</source>
-        <translation>Việc kiểm soát dòng thứ hai</translation>
+        <translation>보조 스트림 제어</translation>
     </message>
     <message>
         <source>Override secondary stream quality</source>
-        <translation>Ghi đè lên dòng chất lượng thứ</translation>
+        <translation>보조 스트림의 화질 조정</translation>
     </message>
     <message>
         <source>Low quality</source>
-        <translation>chất lượng thấp</translation>
+        <translation>저화질</translation>
     </message>
     <message>
         <source>Medium quality</source>
-        <translation>chất lượng</translation>
+        <translation>일반화질</translation>
     </message>
     <message>
         <source>High quality</source>
-        <translation>High Definition</translation>
+        <translation>고화질</translation>
     </message>
     <message>
         <source>Archive control</source>
-        <translation>Kiểm soát lưu trữ</translation>
+        <translation>저장 제어</translation>
     </message>
     <message>
         <source>Do not archive primary stream</source>
-        <translation>Không lưu trữ luồng chính</translation>
+        <translation>주 스트림을 저장하지 않음</translation>
     </message>
     <message>
         <source>Do not archive secondary stream</source>
-        <translation>Không lưu trữ dòng thứ cấp</translation>
+        <translation>보조 스트림을 저장하지 않음</translation>
     </message>
     <message>
         <source>Media streaming control</source>
-        <translation>Kiểm soát phương tiện truyền thông</translation>
+        <translation>미디어 스트리밍 제어</translation>
     </message>
     <message>
         <source>RTP transport:</source>
-        <translation>RTP giao thông vận tải:</translation>
+        <translation>RTP 전송:</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>tự động</translation>
+        <translation>자동</translation>
     </message>
     <message>
         <source>TCP</source>
@@ -393,379 +388,398 @@
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation>Khôi phục mặc định</translation>
+        <translation>초기값 복구</translation>
     </message>
     <message>
         <source>Warning! Low quality may result in low resolution image.</source>
-        <translation>Cảnh báo! Chất lượng thấp có thể dẫn đến hình ảnh độ phân giải thấp.</translation>
+        <translation>주의! 낮은 해상도는 이미지 품질이 낮은 결과를 얻을 수 있습니다.</translation>
     </message>
     <message>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;Cho phép hệ thống để tối ưu hóa các cài đặt máy ảnh&quot; bị vô hiệu hóa trong Quản trị hệ thống.</translation>
+        <translation>&quot;카메라 자동 설정 허용&quot; 설정은 시스템 관리에서 비활성화됩니다.</translation>
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>Tính toán bitrate mỗi GOP thay vì bitrate mỗi giây (Nó sẽ làm tăng tốc độ bit cho máy ảnh)</translation>
+        <translation>BPS기준이 아닌 GOP기준으로 계산</translation>
     </message>
     <message>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation>Cảnh báo! Điều này sẽ làm cho chất lượng và tỷ lệ khung hình (FPS) thiết lập trong Biểu ghi không liên quan.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do not use</source>
-        <translation>không sử dụng</translation>
+        <translation type="unfinished">사용안함</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation>Cảnh báo! Lựa chọn chất lượng cao có thể ảnh hưởng đến CPU của bạn và hiệu suất mạng và có thể gây ra các vấn đề bổ sung.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>Cảnh báo! Không thay đổi các thiết lập này, trừ khi bạn hoàn toàn chắc chắn về tác động tiềm năng của họ về hiệu năng hệ thống của bạn.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
         <source>Input ID:</source>
-        <translatorcomment>vào ID:</translatorcomment>
-        <translation>vào ID:</translation>
+        <translation>ID 입력:</translation>
     </message>
 </context>
 <context>
     <name>CameraListDialog</name>
     <message>
         <source>Filter:</source>
-        <translatorcomment>Lọc:</translatorcomment>
-        <translation>Lọc:</translation>
+        <translation>필터:</translation>
     </message>
 </context>
 <context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <source>&amp;Output ID:</source>
-        <translation>&amp;xuất khẩu ID:</translation>
+        <translation>출력 ID(&amp;O):</translation>
     </message>
     <message>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation>&amp;tự động reset (thứ hai):</translation>
+        <translation>자동-리셋 시간 (&amp;A):</translation>
     </message>
 </context>
 <context>
     <name>CameraScheduleWidget</name>
     <message>
         <source>Enable Recording</source>
-        <translation>cho phép video</translation>
+        <translation>녹화 시작</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation>Nhận quyền nhiều hơn(giấy phép)…</translation>
+        <translation>라이센스 추가...</translation>
     </message>
     <message>
         <source>Panic Mode: </source>
-        <translation>Chế độ khẩn cấp:</translation>
+        <translation>긴급모드:</translation>
     </message>
     <message>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation>Lưu ý: Các máy chủ video theo thời gian biểu cho</translation>
+        <translation>참고: 녹화 일정은 서버 시간을 기준으로함</translation>
     </message>
     <message>
         <source>Schedule Settings</source>
-        <translation>Lịch tập</translation>
+        <translation>일정 설정</translation>
     </message>
     <message>
         <source>FPS</source>
-        <translation>FPS</translation>
+        <translation>프레임</translation>
     </message>
     <message>
         <source>Quality</source>
-        <translation>hình ảnh</translation>
+        <translation>화질</translation>
     </message>
     <message>
         <source>Record Always</source>
-        <translation>video liên tục</translation>
+        <translation>상시 녹화</translation>
     </message>
     <message>
         <source>Motion Only</source>
-        <translation>Chỉ phát hiện di dời</translation>
+        <translation>움직임 녹화</translation>
     </message>
     <message>
         <source>Fixed Archive Length</source>
-        <translation>Cố định Archive Length</translation>
+        <translation>녹화 범위 설정</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>tự động</translation>
+        <translation>자동</translation>
     </message>
     <message>
         <source>Motion Recording</source>
-        <translation>ghi chuyển động</translation>
+        <translation>움직임 녹화</translation>
     </message>
     <message>
         <source>Pre-Recording</source>
-        <translation>Pre-Recording</translation>
+        <translation>사전녹화</translation>
     </message>
     <message>
         <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;
-----------
-Short for &quot;seconds&quot;</extracomment>
-        <translation>s</translation>
+        <extracomment>Short for &quot;seconds&quot;</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>Post-Recording</source>
-        <translation>video liên tục</translation>
+        <translation>사후녹화</translation>
     </message>
     <message>
         <source>Copy Schedule...</source>
-        <translation>Lịch sao chép…</translation>
+        <translation>일정 복사...</translation>
     </message>
     <message>
         <source>Apply changes before copying schedule</source>
-        <translation>Áp dụng trước khi thay đổi lịch trình sao chép</translation>
+        <translation>일정 복사 전 변경된 사항을 적용하세요</translation>
     </message>
     <message>
         <source>Recording Schedule</source>
-        <translation>Lịch trình ghi âm</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show Quality on Schedule</source>
-        <translation>Hiện chất lượng đúng tiến độ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show FPS on Schedule</source>
-        <translation>Hiện FPS trên lịch</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Motion + Low-Res </source>
-        <translation>Motion + Low-Res </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation>làm Video</translation>
+        <translation type="unfinished">녹화안함</translation>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation>Tối thiểu (ngày)</translation>
+        <translation type="unfinished">최소 저장일:</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation>Tối đa (ngày)</translation>
+        <translation type="unfinished">최대 저장일:</translation>
     </message>
 </context>
 <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
         <source>Installing version %1</source>
-        <translation>phiên bản cài đặt %1</translation>
+        <translation>설치된 버젼 %1</translation>
     </message>
     <message>
         <source>Installation failed</source>
-        <translation>không cài đặt được</translation>
+        <translation>설치오류</translation>
     </message>
     <message>
         <source>Could not cancel installation</source>
-        <translation>Không thể hủy bỏ cài đặt</translation>
+        <translation>설치를 취소할 수 없습니다</translation>
     </message>
     <message>
         <source>Installation completed</source>
-        <translation>cài đặt hoàn tất</translation>
+        <translation>설치 완료</translation>
     </message>
     <message>
         <source>Installation has been cancelled</source>
-        <translation>Việc cài đặt đã bị hủy</translation>
+        <translation>설치가 취소되었습니다</translation>
     </message>
 </context>
 <context>
     <name>ConnectionNameDialog</name>
     <message>
         <source>Save connection as...</source>
-        <translation>Kết nối thông tin được lưu trữ…</translation>
+        <translation>연결 저장...</translation>
     </message>
     <message>
         <source>Enter name:</source>
-        <translation>nhập tên:</translation>
+        <translation>이름 입력:</translation>
     </message>
     <message>
         <source>Save password</source>
-        <translation>Lưu mật khẩu</translation>
+        <translation>비밀번호 저장</translation>
     </message>
 </context>
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
         <source>Connection Test</source>
-        <translation>Kiểm tra kết nối</translation>
+        <translation>연결 테스트</translation>
     </message>
     <message>
         <source>Testing connection...</source>
-        <translation>Kiểm tra kết nối trong…</translation>
+        <translation>연결 테스트...</translation>
+    </message>
+</context>
+<context>
+    <name>CustomBusinessEventWidget</name>
+    <message>
+        <source>Source contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords separated by space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CustomHorizontalHeader</name>
     <message>
         <source>5 minutes</source>
-        <translation>5 phút</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hour</source>
-        <translation>giờ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Day</source>
-        <translation>ngày</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Week</source>
-        <translation>tuần</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Month</source>
-        <translation>tháng</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All data</source>
-        <translation>Tất cả các dữ liệu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Bitrate for the last recorded:</source>
-        <translation>Bitrate cho thu âm cuối cùng:</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
         <source>Create Backup...</source>
-        <translation>tạo một bản sao lưu…</translation>
+        <translation>백업 파일 만들기...</translation>
     </message>
     <message>
         <source>Restore from Backup...</source>
-        <translation>Trả lời từ bản sao lưu…</translation>
+        <translation>백업파일 복구...</translation>
     </message>
 </context>
 <context>
     <name>EventLogDialog</name>
     <message>
         <source>-</source>
-        <translation>-</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation>Làm mới</translation>
+        <translation>새로고침</translation>
     </message>
     <message>
         <source>Alarm/Event Rules</source>
-        <translation>Alarm / Quy định tổ chức sự kiện</translation>
+        <translation>알람/이벤트 정책</translation>
     </message>
     <message>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation>Tất cả máy chủ đang offline. Logs là không có sẵn.</translation>
+        <translation>모든 서버가 오프라인 상태입니다. 로그를 사용할 수 없습니다.</translation>
     </message>
     <message>
         <source>Event Log</source>
-        <translation>ghi sự kiện</translation>
+        <translation type="unfinished">이벤트 로그</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation>rõ ràng Lọc</translation>
+        <translation type="unfinished">필터 초기화</translation>
     </message>
 </context>
 <context>
     <name>FisheyeSettingsWidget</name>
     <message>
         <source>Calibration</source>
-        <translation>Hiệu chuẩn</translation>
+        <translation>측정</translation>
     </message>
     <message>
         <source>Ceiling Mount</source>
-        <translation>Giá treo máy chiếu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Wall Mount</source>
-        <translation>Tường núi</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Floor/Table Mount</source>
-        <translation>Tầng / Bảng Núi</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation>Chỉnh góc độ máy ảnh</translation>
+        <translation type="unfinished">카메라 각도 보정:</translation>
     </message>
 </context>
 <context>
     <name>GeneralPreferencesWidget</name>
     <message>
         <source>Main Media Folder</source>
-        <translation>Các thư mục phương tiện truyền thông chính</translation>
+        <translation>주 저장 위치 설정</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
-        <translation>&amp;Duyệt…</translation>
+        <translation>찾기(&amp;B)...</translation>
     </message>
     <message>
         <source>Extra Media Folders</source>
-        <translation>Thêm thông mục</translation>
+        <translation>추가 저장 위치 설정</translation>
     </message>
     <message>
         <source>&amp;Add...</source>
-        <translation>&amp;thêm...</translation>
+        <translation>추가(&amp;A)...</translation>
     </message>
     <message>
         <source>&amp;Remove</source>
-        <translation>&amp;tẩy</translation>
+        <translation>삭제(&amp;R)</translation>
     </message>
     <message>
         <source>Misc</source>
-        <translation>khác</translation>
+        <translation>기타</translation>
     </message>
     <message>
         <source>after</source>
-        <translation>sau đó</translation>
+        <translation>후</translation>
     </message>
     <message>
         <source>Restart required</source>
-        <translation>Khởi động lại yêu cầu</translation>
+        <translation>재 시작 요청</translation>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation>Những âm thanh từ 5.1 giảm 2.1</translation>
+        <translation type="unfinished">오디오 채널 5.1채널에서 2.1채널:</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation>Hình ảnh tự động treo</translation>
+        <translation type="unfinished">자동 정지 설정:</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation>phút nhàn rỗi</translation>
+        <translation type="unfinished">비활성 시간(분)</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation>Với các máy tính bắt đầu thực hiện các phần mềm:</translation>
+        <translation type="unfinished">PC시작 시 자동 실행:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation>Đôi đệm:</translation>
+        <translation type="unfinished">추가 버퍼링:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation>lịch sử</translation>
+        <translation type="unfinished">찾기 로그</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation>Bộ nhớ cache của địa phương rõ ràng</translation>
+        <translation type="unfinished">캐쉬 초기화</translation>
     </message>
 </context>
 <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
         <source>Administration</source>
-        <translation>Quản trị</translation>
+        <translation>관리</translation>
     </message>
     <message>
         <source>&amp;Alarm/Event Rules</source>
-        <translation>&amp;Alarm/Event Rules</translation>
+        <translation>알람/이벤트 정책(&amp;A)</translation>
     </message>
     <message>
         <source>Ctrl+E</source>
@@ -773,7 +787,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Event Log</source>
-        <translation>&amp;Event Log</translation>
+        <translation>이벤트 로그(&amp;E)</translation>
     </message>
     <message>
         <source>Ctrl+L</source>
@@ -785,163 +799,163 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Health Monitoring</source>
-        <translation>&amp;Health Monitoring</translation>
+        <translation>상태 보기(&amp;H)</translation>
     </message>
     <message>
         <source>System Settings</source>
-        <translation>Cài đặt hệ thống</translation>
+        <translation>시스템설정</translation>
     </message>
     <message>
         <source>Open audit trail log</source>
-        <translation>Mở đường mòn kiểm toán log</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation>Giám sát tất cả các máy chủ trên một diện đơn</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>System Backup and Restore</source>
-        <translation>Sao lưu hệ thống và phục hồi</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation>Đường mòn kiểm toán</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
     <message>
         <source>Top</source>
-        <translation>đỉnh</translation>
+        <translation>최상단</translation>
     </message>
     <message>
         <source>Bottom</source>
-        <translation>đáy</translation>
+        <translation>최하단</translation>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation>Trong cuốn này</translation>
+        <translation type="unfinished">현 위치 돌리기</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation>cạnh trái</translation>
+        <translation type="unfinished">왼쪽 끝</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation>cạnh phải</translation>
+        <translation type="unfinished">오른쪽 끝</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation>trang trái</translation>
+        <translation type="unfinished">페이지 좌측</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation>trang</translation>
+        <translation type="unfinished">페이지 위</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation>trang bên phải</translation>
+        <translation type="unfinished">페이지 우측</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation>trang tiếp theo</translation>
+        <translation type="unfinished">페이지 아래</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation>Di chuyển sang trái</translation>
+        <translation type="unfinished">좌측으로 돌리기</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation>Di chuyển lên</translation>
+        <translation type="unfinished">위로 돌리기</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation>Di chuyển sang phải</translation>
+        <translation type="unfinished">우측으로 돌리기</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation>cuộn xuống</translation>
+        <translation type="unfinished">아래로 돌리기</translation>
     </message>
 </context>
 <context>
     <name>ImageControlWidget</name>
     <message>
         <source>Image Control</source>
-        <translation>điều khiển hình ảnh</translation>
+        <translation type="unfinished">이미지 제어</translation>
     </message>
     <message>
         <source>Force aspect ratio to:</source>
-        <translation>Tỷ lệ màn hình Buộc:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Default rotation:</source>
-        <translation>Mặc định quay:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This is a fish-eye lens camera</source>
-        <translation>Đây là một mắt cá (180 độ) camera</translation>
+        <translation type="unfinished">어안 렌즈 커메라 사용</translation>
     </message>
 </context>
 <context>
     <name>ImagePreviewDialog</name>
     <message>
         <source>Image View</source>
-        <translation>Xem hình ảnh</translation>
+        <translation>이미지 보기</translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
-        <translation>&lt;Không có hình ảnh&gt;</translation>
+        <translation>&lt;이미지 없음&gt;</translation>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation>Đang tải hình ảnh ... Xin vui lòng chờ đợi.</translation>
+        <translation type="unfinished">이미지 로딩중...기다려주세요.</translation>
     </message>
 </context>
 <context>
     <name>LayoutSettingsDialog</name>
     <message>
         <source>Layout Settings</source>
-        <translation>Giao diện thiết lập</translation>
+        <translation>레이아웃 설정</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Cài đặt chung</translation>
+        <translation>일반 설정</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation>lý lịch</translation>
+        <translation>배경</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>Duyệt…</translation>
+        <translation>찾기...</translation>
     </message>
     <message>
         <source>View...</source>
-        <translation>buổi diễn…</translation>
+        <translation>보기...</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation>tẩy</translation>
+        <translation>초기화</translation>
     </message>
     <message>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation>&amp;Thay đổi tỉ lệ màn hình</translation>
+        <translation>모니터에 맞춰 비율 조정(&amp;C)</translation>
     </message>
     <message>
         <source>&amp;Width:</source>
-        <translation>&amp;chiều rộng:</translation>
+        <translation>너비(&amp;W):</translation>
     </message>
     <message>
         <source> cells</source>
-        <translation>tế bào</translation>
+        <translation>항목</translation>
     </message>
     <message>
         <source>&amp;Height:</source>
-        <translation>&amp;chiều cao:</translation>
+        <translation>높이(&amp;H):</translation>
     </message>
     <message>
         <source>&amp;Opacity:</source>
-        <translation>&amp;tính mờ:</translation>
+        <translation>투명도(&amp;H):</translation>
     </message>
     <message>
         <source>%</source>
@@ -949,200 +963,200 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation>Layout bị khóa</translation>
+        <translation type="unfinished">레이아웃 잠금</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation>Xử lý hình ảnh ... Xin vui lòng chờ .</translation>
+        <translation type="unfinished">이미지 처리중...기다려주세요.</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation>Giữ tỉ lệ</translation>
+        <translation type="unfinished">비율 유지</translation>
     </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
     <message>
         <source>Server UR&amp;L:</source>
-        <translation>máy chủ UR&amp;L:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>ldap(s)://host:port</source>
-        <translation>ldap(s)://host:port</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Ad&amp;min DN:</source>
-        <translation>Ad&amp;min DN:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search Base:</source>
-        <translation>Tìm kiếm cơ sở:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search Filter:</source>
-        <translation>Tìm kiếm bộ lọc:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Optional</source>
-        <translation>không bắt buộc</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation>thử nghiệm ...</translation>
+        <translation type="unfinished">시험...</translation>
     </message>
     <message>
         <source>LDAP Settings</source>
-        <translation>LDAP Cài đặt</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>LdapUsersDialog</name>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation>Người dùng lấy từ LDAP ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select users to import</source>
-        <translation>Chọn người dùng để nhập khẩu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation>Lọc...</translation>
+        <translation type="unfinished">필터...</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Đang tải...</translation>
+        <translation type="unfinished">읽는 중...</translation>
     </message>
     <message>
         <source>Connection error</source>
-        <translation>Lôi kêt nôi</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>LicenseDetailsDialog</name>
     <message>
         <source>License Details</source>
-        <translation>Chi tiết thông tin cấp phép</translation>
+        <translation>인증키 정보</translation>
     </message>
     <message>
         <source>Generic</source>
-        <translation>chung</translation>
+        <translation>일반</translation>
     </message>
     <message>
         <source>License Type:</source>
-        <translation>Loại giấy phép:</translation>
+        <translation>인증키 방식:</translation>
     </message>
     <message>
         <source>License Key:</source>
-        <translation>License Key:</translation>
+        <translation>인증키:</translation>
     </message>
     <message>
         <source>Locked to Hardware ID:</source>
-        <translation>Khóa để ID phần cứng:</translation>
+        <translation>하드웨어 ID 잠금:</translation>
     </message>
     <message>
         <source>Features</source>
-        <translation>Features</translation>
+        <translation>기능</translation>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation>Loại giấy phép này đòi hỏi phiên bản phần mềm cao hơn.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
     <message>
         <source>Active Licenses</source>
-        <translation>Giấy phép hoạt động (License)</translation>
+        <translation>제품키 인증</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>tẩy</translation>
+        <translation>제거</translation>
     </message>
     <message>
         <source>Selected License Details</source>
-        <translation>Chi tiết Giấy phép lựa chọn</translation>
+        <translation>제품키 상세</translation>
     </message>
     <message>
         <source>New License</source>
-        <translation>ủy quyền mới</translation>
+        <translation>신규 제품키</translation>
     </message>
 </context>
 <context>
     <name>LicenseNotificationDialog</name>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
+        <translation>주의</translation>
     </message>
 </context>
 <context>
     <name>LicenseWidget</name>
     <message>
         <source>Automatic Activation via Internet</source>
-        <translation>Bắt đầu tự động thông qua Internet</translation>
+        <translation>인터넷을 통한 자동 활성화</translation>
     </message>
     <message>
         <source>Manual Activation</source>
-        <translation>Kích hoạt bằng tay</translation>
+        <translation>수동 인증</translation>
     </message>
     <message>
         <source>License Key:</source>
-        <translation>License Key:</translation>
+        <translation>인증키:</translation>
     </message>
     <message>
         <source>Hardware ID:</source>
-        <translation>Phần cứng ID:</translation>
+        <translation>하드웨어 ID:</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>Duyệt…</translation>
+        <translation>찾기...</translation>
     </message>
     <message>
         <source>Activation Key File:</source>
-        <translation>Bắt đầu tập tin quan trọng:</translation>
+        <translation>인증키 파일:</translation>
     </message>
     <message>
         <source>Paste from Clipboard</source>
-        <translation>Dán từ Clipboard</translation>
+        <translation>클립보드 붙여넣기</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Sao chép vào Clipboard</translation>
+        <translation>클립보드 복사</translation>
     </message>
     <message>
         <source>License will be bound to the current server</source>
-        <translation>Giấy phép sẽ bị ràng buộc vào các máy chủ hiện hành</translation>
+        <translation>인증키는 현재 서버에 사용됩니다</translation>
     </message>
     <message>
         <source>Activate Free License</source>
-        <translation>Bắt đầu cấp giấy phép miễn phí</translation>
+        <translation>데모 제품키 인증</translation>
     </message>
     <message>
         <source>Activate License</source>
-        <translation>Bắt đầu Authorization </translation>
+        <translation>제품키 인증</translation>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation>Key bản quyền là không hợp lệ</translation>
+        <translation type="unfinished">인증키 오류</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation>Chọn tập tin giấy phép ...</translation>
+        <translation type="unfinished">인증 파일 선택...</translation>
     </message>
 </context>
 <context>
     <name>LicensesProposeWidget</name>
     <message>
         <source>Licensing</source>
-        <translation>ủy quyền</translation>
+        <translation type="unfinished">인증 중</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation>Nhận quyền nhiều hơn(giấy phép)…</translation>
+        <translation type="unfinished">라이센스 추가...</translation>
     </message>
 </context>
 <context>
@@ -1150,94 +1164,94 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server</source>
         <comment>Groupbox Title</comment>
-        <translation>Kết nối đến Server</translation>
+        <translation>서버 연결</translation>
     </message>
     <message>
         <source>Save...</source>
-        <translation>cửa hàng...</translation>
+        <translation>저장...</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>xóa bỏ</translation>
+        <translation>삭제</translation>
     </message>
     <message>
         <source>&amp;Host:</source>
-        <translation>&amp;nơi:</translation>
+        <translation>호스트(&amp;H):</translation>
     </message>
     <message>
         <source>P&amp;ort:</source>
-        <translation>&amp;cổng truyền thông:</translation>
+        <translation>포트(&amp;o):</translation>
     </message>
     <message>
         <source>&amp;Login:</source>
-        <translation>&amp;Đăng nhập:</translation>
+        <translation>로그인(&amp;L):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
+        <translation>비밀번호(&amp;P):</translation>
     </message>
     <message>
         <source>&amp;Test</source>
-        <translation>&amp;Kiểm tra kết nối</translation>
+        <translation>테스트(&amp;T)</translation>
     </message>
     <message>
         <source>&amp;Auto-Login</source>
-        <translation>&amp;Ghi nhớ tôi</translation>
+        <translation>자동-로그인(&amp;A)</translation>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation>&amp;Lựa chọn kết nối:</translation>
+        <translation type="unfinished">접속 옵션(&amp;C):</translation>
     </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
         <source>Look and Feel</source>
-        <translation>điều chỉnh thị giác</translation>
+        <translation>화면 설정</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation>ngôn ngữ:</translation>
+        <translation>언어:</translation>
     </message>
     <message>
         <source>Show IP in tree:</source>
-        <translation>Hiện IP trong danh sách:</translation>
+        <translation>목록에서 IP 표기:</translation>
     </message>
     <message>
         <source>Skin:</source>
-        <translation>Bối cảnh:</translation>
+        <translation>스킨:</translation>
     </message>
     <message>
         <source>Tour sequence cycle time:</source>
-        <translation>Thời gian chu kỳ bánh xe hop:</translation>
+        <translation>투어 전환 간격 시간:</translation>
     </message>
     <message>
         <source>Restart required.</source>
-        <translation>Cần phải khởi động lại.</translation>
+        <translation>재 시작 요청.</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation>thứ hai</translation>
+        <translation>초</translation>
     </message>
     <message>
         <source>Background Animation</source>
-        <translation>Bối cảnh Animation</translation>
+        <translation>배경 효과</translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
-        <translation>cho phép Bối cảnh Animation</translation>
+        <translation>배경 효과 사용</translation>
     </message>
     <message>
         <source>Color:</source>
-        <translation>màu sắc:</translation>
+        <translation>색상:</translation>
     </message>
     <message>
         <source>Select color...</source>
-        <translation>Chọn màu ...</translation>
+        <translation>색상 선택...</translation>
     </message>
     <message>
         <source>Intensity:</source>
-        <translation>cường độ:</translation>
+        <translation>강도:</translation>
     </message>
     <message>
         <source>%</source>
@@ -1245,222 +1259,206 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Background Image</source>
-        <translation>hình nền</translation>
+        <translation>배경 이미지</translation>
     </message>
     <message>
         <source>Enable Background Image</source>
-        <translation>cho phép hình nền</translation>
+        <translation>배경 이미지 사용</translation>
     </message>
     <message>
         <source>Image:</source>
-        <translation>hình ảnh:</translation>
+        <translation>이미지:</translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
-        <translation>&lt;không có ảnh&gt;</translation>
+        <translation>&lt;이미지 없음&gt;</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>Duyệt…</translation>
+        <translation>찾기...</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>chế độ:</translation>
+        <translation>모드:</translation>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation>Chế độ cột thời gian:</translation>
+        <translation type="unfinished">시간 표기 기준:</translation>
     </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
     <message>
         <source>General</source>
-        <translation>chung</translation>
+        <translation>일반</translation>
     </message>
     <message>
         <source>Authentication</source>
-        <translation>xác nhận</translation>
+        <translation>인증</translation>
     </message>
     <message>
         <source>Login:</source>
-        <translation>Đăng nhập:</translation>
+        <translation>로그인:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>mật khẩu:</translation>
+        <translation>비밀번호:</translation>
     </message>
     <message>
         <source>Recording</source>
-        <translation>Recording</translation>
+        <translation>저장</translation>
     </message>
     <message>
         <source>Expert</source>
-        <translation>xuất khẩu</translation>
+        <translation>전문가</translation>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation>cho phép âm thanh</translation>
+        <translation type="unfinished">오디오 사용</translation>
     </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
         <source>Manage...</source>
-        <translation>Quản lý ...</translation>
+        <translation>저장...</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>thể tích:</translation>
+        <translation>음량:</translation>
     </message>
     <message>
         <source>Test...</source>
-        <translation>thử…</translation>
+        <translation>테스트...</translation>
     </message>
 </context>
 <context>
     <name>PopupBusinessActionWidget</name>
     <message>
         <source>Global Notification Settings...</source>
-        <translation>Thông báo cài đặt toàn cầu…</translation>
+        <translation>알림 설정...</translation>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation>Hiện chỉ có các nhà quản lý</translation>
+        <translation type="unfinished">관리자에게만 출력</translation>
     </message>
 </context>
 <context>
     <name>PopupSettingsWidget</name>
     <message>
         <source>Show all notifications</source>
-        <translation>Hiển thị tất cả các thông báo</translation>
+        <translation>모든 알림 보기</translation>
     </message>
     <message>
         <source>Alarms/Events</source>
-        <translation>Báo động / Sự kiện</translation>
+        <translation>알람/이벤트</translation>
     </message>
     <message>
         <source>System Notifications</source>
-        <translation>hệ thống Thông báo</translation>
+        <translation>시스템 알림</translation>
     </message>
 </context>
 <context>
     <name>PreferencesDialog</name>
     <message>
         <source>Local Settings</source>
-        <translation>địa phương thiết lập</translation>
+        <translation>내부 설정</translation>
     </message>
 </context>
 <context>
     <name>PtzManageDialog</name>
     <message>
         <source>Save Current Position</source>
-        <translation>Lưu vị trí hiện tại</translation>
+        <translation>현재 위치 저장</translation>
     </message>
     <message>
         <source>Go To Position</source>
-        <translation>đến vị trí</translation>
+        <translation>위치로 이동</translation>
     </message>
     <message>
         <source>Create Tour</source>
-        <translation>Thiết lập hành trình</translation>
+        <translation>투어 생성</translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation>Bắt đầu bay</translation>
+        <translation>투어 시작</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>xóa bỏ</translation>
+        <translation>삭제</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>chi tiết</translation>
+        <translation>상세</translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation>Xem trước</translation>
+        <translation>미리보기</translation>
     </message>
     <message>
         <source>No preview available</source>
-        <translation>Không có xem trước giấy phép</translation>
+        <translation>가능한 미리보기 없음</translation>
     </message>
     <message>
         <source>Get Preview</source>
-        <translation>lấy Preview</translation>
+        <translation>미리보기 얻어오기</translation>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation>Không có sự lựa chọn hành trình</translation>
+        <translation type="unfinished">투어 선택 안됨</translation>
     </message>
 </context>
 <context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
-        <translation>phóng to</translation>
+        <translation>줌 인</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation>Thu nhỏ</translation>
+        <translation>줌 아웃</translation>
     </message>
     <message>
         <source>Focus Far</source>
-        <translation>tập trung xa</translation>
+        <translation>원거리 초첨</translation>
     </message>
     <message>
         <source>Focus Near</source>
-        <translation>tập trung gần</translation>
+        <translation>근거리 초점</translation>
     </message>
     <message>
         <source>Auto Focus</source>
-        <translation>tự động lấy nét</translation>
+        <translation>자동 초점</translation>
     </message>
     <message>
         <source>Change Dewarping Mode</source>
-        <translation>thay đổi chế độ dewarping</translation>
+        <translation>디와핑 모드 변경</translation>
     </message>
 </context>
 <context>
     <name>PtzPresetDialog</name>
     <message>
         <source>Name:</source>
-        <translation>tên:</translation>
+        <translation>이름:</translation>
     </message>
     <message>
         <source>Hotkey:</source>
-        <translation>Hotkey:</translation>
+        <translation>단축키:</translation>
     </message>
     <message>
         <source>Save Position</source>
-        <translation>lưu trữ Location</translation>
+        <translation type="unfinished">위치 저장</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>Stops</source>
-        <translation>dừng lại</translation>
-    </message>
-    <message>
-        <source>Starts</source>
-        <translation>bắt đầu</translation>
-    </message>
-    <message>
-        <source>Starts/Stops</source>
-        <translation>bắt đầu / dừng lại</translation>
-    </message>
-    <message>
         <source>None</source>
-        <translation>không</translation>
-    </message>
-    <message>
-        <source>Occurs</source>
-        <translation>xảy ra</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Parameter 1 is null.</source>
-        <translation>Thông số 1 là null.</translation>
+        <translation>변수 1은 null입니다.</translation>
     </message>
 </context>
 <context>
@@ -1468,49 +1466,49 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%n millisecond(s)</source>
         <translation>
-            <numerusform>%n phần nghìn giây (s)</numerusform>
+            <numerusform>%n 밀리초</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n second(s)</source>
         <translation>
-            <numerusform>%n thứ hai (s)</numerusform>
+            <numerusform>%n 초</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n minute(s)</source>
         <translation>
-            <numerusform>%n phút (s)</numerusform>
+            <numerusform>%n 분</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
         <translation>
-            <numerusform>%n giờ (s)</numerusform>
+            <numerusform>%n 시간</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
         <translation>
-            <numerusform>%n ngày (s)</numerusform>
+            <numerusform>%n 일</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
         <translation>
-            <numerusform>%n tuần (s)</numerusform>
+            <numerusform>%n 주</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n month(s)</source>
         <translation>
-            <numerusform>%n tháng (s)</numerusform>
+            <numerusform>%n 달</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
         <translation>
-            <numerusform>%n năm (s)</numerusform>
+            <numerusform>%n 년</numerusform>
         </translation>
     </message>
 </context>
@@ -1518,1366 +1516,1371 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnAboutDialog</name>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Sao chép vào Clipboard</translation>
+        <translation>상세보기 복사</translation>
     </message>
     <message>
         <source>%1 uses the following external libraries:</source>
-        <translation>%1 sử dụng các thư viện bên ngoài sau đây:</translation>
+        <translation>다음 외부 라이브러리에 %1 사용:</translation>
     </message>
     <message>
         <source>OpenGL version</source>
-        <translation>phiên bản OpenGL</translation>
+        <translation></translation>
     </message>
     <message>
         <source>OpenGL renderer</source>
-        <translation>OpenGL renderer</translation>
+        <translation></translation>
     </message>
     <message>
         <source>OpenGL vendor</source>
-        <translation>nhà cung cấp OpenGL</translation>
+        <translation></translation>
     </message>
     <message>
         <source>OpenGL max texture size</source>
-        <translation>OpenGL kích thước kết cấu max</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Support</source>
-        <translation>ủng hộ</translation>
+        <translation>지원</translation>
     </message>
     <message>
         <source>Server at %2: v%1</source>
-        <translation>Máy chủ tại %2: v%1</translation>
+        <translation>%2 서버 :v%1</translation>
     </message>
     <message>
         <source>%1 version %2 (%3).</source>
-        <translation>%1 phiên bản %2 (%3).</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Built for %1-%2 with %3.</source>
-        <translation>Được xây dựng cho%1-%2% với %3.</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Client is not connected to any server</source>
-        <translation>Khách hàng không kết nối với bất kỳ máy chủ</translation>
+        <translation>클라이언트는 어떤 서버에도 접속하지 못함</translation>
     </message>
 </context>
 <context>
     <name>QnAbstractPtzDialog</name>
     <message>
         <source>Loading...</source>
-        <translation>Đang tải...</translation>
+        <translation>읽는 중...</translation>
     </message>
     <message>
         <source>Saving...</source>
-        <translation>cửa hàng...</translation>
+        <translation>저장중...</translation>
     </message>
 </context>
 <context>
     <name>QnActionManager</name>
     <message>
         <source>Show FPS</source>
-        <translation>buổi diễn FPS</translation>
+        <translation>프레임 보기</translation>
     </message>
     <message>
         <source>Hide FPS</source>
-        <translation>giấu FPS</translation>
+        <translation>프레임 숨김</translation>
     </message>
     <message>
         <source>Ctrl+Alt+F</source>
-        <translation>Ctrl + Alt + F</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Drop Resources</source>
-        <translation>Tài Discard</translation>
+        <translation>리스소 이동</translation>
     </message>
     <message>
         <source>Delayed Drop Resources</source>
-        <translation>Trì hoãn bỏ nguồn</translation>
+        <translation>리소스 이동 지연</translation>
     </message>
     <message>
         <source>Instant Drop Resources</source>
-        <translation>Tài ngay lập tức loại bỏ</translation>
+        <translation>리소스 바로 이동</translation>
     </message>
     <message>
         <source>Next Layout</source>
-        <translation>việc bố trí tiếp theo</translation>
+        <translation>다음 레이아웃</translation>
     </message>
     <message>
         <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Previous Layout</source>
-        <translation>cựu bố trí</translation>
+        <translation>이전 레이아웃</translation>
     </message>
     <message>
         <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>chọn tất cả</translation>
+        <translation>전체 선택</translation>
     </message>
     <message>
         <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selection Changed</source>
-        <translation>Tùy chọn đã được thay đổi</translation>
+        <translation>선택 항목 변경</translation>
     </message>
     <message>
         <source>Reconnect to Server</source>
-        <translation>Kết nối đến máy chủ</translation>
+        <translation>서버 재접속</translation>
     </message>
     <message>
         <source>Go to Freespace Mode</source>
-        <translation>Chuyển sang chế độ không gian miễn phí</translation>
+        <translation>여유 공간 모드로 이동</translation>
     </message>
     <message>
         <source>F11</source>
-        <translation>F11</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Help</source>
-        <translation>sự trông cậy</translation>
+        <translation>도움말</translation>
     </message>
     <message>
         <source>Alarm/Event Rules...</source>
-        <translation>Alarm / Quy định tổ chức sự kiện...</translation>
+        <translation>알람/이벤트정책...</translation>
     </message>
     <message>
         <source>Control Video Wall</source>
-        <translation>Kiểm soát bức tường video</translation>
+        <translation>비디오 월 조정</translation>
     </message>
     <message>
         <source>Push my screen</source>
-        <translation>Đẩy màn hình của tôi</translation>
+        <translation>화면 적용</translation>
     </message>
     <message>
         <source>Restart application</source>
-        <translation>Khởi động lại ứng dụng</translation>
+        <translation>프로그램 재시작</translation>
     </message>
     <message>
         <source>Fit in View</source>
-        <translation>điền view</translation>
+        <translation>화면 체우기</translation>
     </message>
     <message>
         <source>Main Menu</source>
-        <translation>menu chính</translation>
+        <translation>주 메뉴</translation>
     </message>
     <message>
         <source>Alt+Space</source>
-        <translation>Alt+Space</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation>Kết nối đến máy chủ...</translation>
+        <translation>서버 연결...</translation>
     </message>
     <message>
         <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Logout</source>
-        <translation>Đăng xuất</translation>
+        <translation>로그아웃</translation>
     </message>
     <message>
         <source>Start Panic Recording</source>
-        <translation>Video bắt khẩn cấp</translation>
+        <translation>긴급 녹화 시작</translation>
     </message>
     <message>
         <source>Stop Panic Recording</source>
-        <translation>Dừng khẩn cấp video</translation>
+        <translation>긴급 녹화 멈춤</translation>
     </message>
     <message>
         <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
+        <translation></translation>
     </message>
     <message>
         <source>New...</source>
-        <translation>thêm...</translation>
+        <translation>신규...</translation>
     </message>
     <message>
         <source>Layout...</source>
-        <translation>bố trí...</translation>
+        <translation>레이아웃...</translation>
     </message>
     <message>
         <source>New Layout...</source>
-        <translation>việc bố trí mới...</translation>
+        <translation>신규 레이아웃...</translation>
     </message>
     <message>
         <source>Tab</source>
-        <translation>Tab</translation>
+        <translation>탭</translation>
     </message>
     <message>
         <source>New Tab</source>
-        <translation>Tab thêm</translation>
+        <translation>신규 탭</translation>
     </message>
     <message>
         <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Window</source>
-        <translation>cửa sổ</translation>
+        <translation>윈도우</translation>
     </message>
     <message>
         <source>New Window</source>
-        <translation>Cửa sổ mới được mở ra</translation>
+        <translation>신규 윈도우</translation>
     </message>
     <message>
         <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
+        <translation></translation>
     </message>
     <message>
         <source>User...</source>
-        <translation>người sử dụng…</translation>
+        <translation>사용자...</translation>
     </message>
     <message>
         <source>New User...</source>
-        <translation>Người dùng mới…</translation>
+        <translation>신규 사용자...</translation>
     </message>
     <message>
         <source>Video Wall...</source>
-        <translation>tường video ...</translation>
+        <translation>비디오 월...</translation>
     </message>
     <message>
         <source>New Video Wall...</source>
-        <translation>Tường video mới ...</translation>
+        <translation>새로운 비디오 월...</translation>
     </message>
     <message>
         <source>Open Layout...</source>
-        <translation>mở bố trí…</translation>
+        <translation>레이아웃열기...</translation>
     </message>
     <message>
         <source>Open...</source>
-        <translation>mở...</translation>
+        <translation>열기...</translation>
     </message>
     <message>
         <source>File(s)...</source>
-        <translation>văn khố...</translation>
+        <translation>파일...</translation>
     </message>
     <message>
         <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Layout(s)...</source>
-        <translation>layout...</translation>
+        <translation>레이아웃...</translation>
     </message>
     <message>
         <source>Folder...</source>
-        <translation>Table of Contents...</translation>
+        <translation>폴더...</translation>
     </message>
     <message>
         <source>Save Current Layout</source>
-        <translation>Lưu lại giao diện hiện tại</translation>
+        <translation>현재 레이아웃 저장</translation>
     </message>
     <message>
         <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save Current Layout As...</source>
-        <translation>Lưu lại giao diện hiện tại…</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
+        <translation>현재 레이아웃 다른이름으로 저장...</translation>
     </message>
     <message>
         <source>Ctrl+Alt+S</source>
-        <translation>Ctrl + Alt + S</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
-        <translation>lưu video xem tường</translation>
+        <translation>비디어 월 화면 저장</translation>
     </message>
     <message>
         <source>Start Screen Recording</source>
-        <translation>Màn hình khởi quay video</translation>
+        <translation>화면 저장 시작</translation>
     </message>
     <message>
         <source>Stop Screen Recording</source>
-        <translation>Dừng Screen Video Capture</translation>
+        <translation>화면 저장 멈춤</translation>
     </message>
     <message>
         <source>Alt+R</source>
-        <translation>Alt+R</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Esc</source>
-        <translation>Esc</translation>
+        <translation>취소</translation>
     </message>
     <message>
         <source>Stop current action</source>
-        <translation>Ngừng các hành động hiện tại</translation>
+        <translation>현재 동작 멈춤</translation>
     </message>
     <message>
         <source>Go to Fullscreen</source>
-        <translation>Chuyển sang màn hình đầy đủ</translation>
+        <translation>전체화면으로 이동</translation>
     </message>
     <message>
         <source>Exit Fullscreen</source>
-        <translation>Để lại toàn màn hình</translation>
+        <translation>전체화면 나가기</translation>
     </message>
     <message>
         <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Minimize</source>
-        <translation>giảm thiểu</translation>
+        <translation>최소화</translation>
     </message>
     <message>
         <source>Maximize</source>
-        <translation>Tối đa hóa</translation>
+        <translation>최대화</translation>
     </message>
     <message>
         <source>Restore Down</source>
-        <translation>Phục hồi dựa trên Windows</translation>
+        <translation>복원</translation>
     </message>
     <message>
         <source>Show Message</source>
-        <translation>hiển thị tin nhắn</translation>
+        <translation>메세지 보기</translation>
     </message>
     <message>
         <source>Show Version Mismatch Message</source>
-        <translation>Hiển thị phiên bản không phù hợp nhắn</translation>
+        <translation>버젼 정보 오류 보기</translation>
     </message>
     <message>
         <source>Open in Browser...</source>
-        <translation>Trong mở trình duyệt…</translation>
+        <translation>브라우져 열기...</translation>
     </message>
     <message>
         <source>Open Web Client...</source>
-        <translation>Mở một khách hàng web…</translation>
+        <translation>웹 클라이언트 열기...</translation>
     </message>
     <message>
         <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
+        <translation></translation>
     </message>
     <message>
         <source>How-to Videos and FAQ...</source>
-        <translation>Hỏi đáp về video và giảng dạy...</translation>
+        <translation>사용법 동영상과 FAQ...</translation>
     </message>
     <message>
         <source>About...</source>
-        <translation>đối với...</translation>
+        <translation>상세...</translation>
     </message>
     <message>
         <source>F1</source>
-        <translation>F1</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>Exit</translation>
+        <translation>나가기</translation>
     </message>
     <message>
         <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>đóng cửa</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
-    </message>
-    <message>
-        <source>Close All But This</source>
-        <translation>Đóng tất cả các khác</translation>
-    </message>
-    <message>
-        <source>Open in Layout</source>
-        <translation>Bật trong cách bố trí</translation>
-    </message>
-    <message>
-        <source>Show Debug</source>
-        <translation>Hiện gỡ lỗi</translation>
-    </message>
-    <message>
-        <source>Hide Debug</source>
-        <translation>hide gỡ lỗi</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
-    </message>
-    <message>
-        <source>Delayed Open Video Wall</source>
-        <translation>Trì hoãn bức tường video mở</translation>
-    </message>
-    <message>
-        <source>Filter...</source>
-        <translation>Lọc...</translation>
-    </message>
-    <message>
-        <source>Event Log...</source>
-        <translation>ghi sự kiện ...</translation>
-    </message>
-    <message>
-        <source>System Administration...</source>
-        <translation>quản trị hệ thống ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
-    </message>
-    <message>
-        <source>System Update...</source>
-        <translation>Cập nhật hệ thống ...</translation>
-    </message>
-    <message>
-        <source>Local Settings...</source>
-        <translation>thiết lập địa phương ...</translation>
-    </message>
-    <message>
-        <source>Merge Systems...</source>
-        <translation>hợp nhất các hệ thống ...</translation>
-    </message>
-    <message>
-        <source>Server...</source>
-        <translation>máy chủ ...</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation>mở</translation>
-    </message>
-    <message>
-        <source>Monitor</source>
-        <translation>Monitor</translation>
-    </message>
-    <message>
-        <source>Open in New Tab</source>
-        <translation>Mở trong một tab mới</translation>
-    </message>
-    <message>
-        <source>Monitor in a New Tab</source>
-        <translation>Hiển thị trong một tab mới</translation>
-    </message>
-    <message>
-        <source>Open in New Window</source>
-        <translation>Mở trong một cửa sổ mới</translation>
-    </message>
-    <message>
-        <source>Monitor in a New Window</source>
-        <translation>Hiển thị trong một cửa sổ mới</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>Mở một tab mới bố trí</translation>
-    </message>
-    <message>
-        <source>Open Layouts</source>
-        <translation>mở bố trí</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>Bố trí mở trong một cửa sổ mới</translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>Đang mở trong một bố trí cửa sổ mới</translation>
-    </message>
-    <message>
-        <source>Open Layout(s)</source>
-        <translation>mở bố trí</translation>
-    </message>
-    <message>
-        <source>Open Video Wall(s)</source>
-        <translation>tường mở video (s)</translation>
-    </message>
-    <message>
-        <source>Open Containing Folder</source>
-        <translation>Mở thư mục tập tin</translation>
-    </message>
-    <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
-        <source>Identify</source>
-        <translation>Xác định</translation>
-    </message>
-    <message>
-        <source>Attach to Video Wall...</source>
-        <translation>gắn vào tường video ...</translation>
-    </message>
-    <message>
-        <source>Switch to Video Wall mode...</source>
-        <translation>chuyển sang chế độ tường video ...</translation>
-    </message>
-    <message>
-        <source>Save Current Matrix</source>
-        <translation>Lưu ma trận hiện tại</translation>
-    </message>
-    <message>
-        <source>Load Matrix</source>
-        <translation>tải ma trận</translation>
-    </message>
-    <message>
-        <source>Update Layout</source>
-        <translation>Cập nhật bố trí</translation>
-    </message>
-    <message>
-        <source>Stop Video Wall</source>
-        <translation>Bức tường video stop</translation>
-    </message>
-    <message>
-        <source>Detach Layout</source>
-        <translation>Tháo bố trí</translation>
-    </message>
-    <message>
-        <source>Save Layout</source>
-        <translation>Cách bài trí cửa</translation>
-    </message>
-    <message>
-        <source>Save Layout As...</source>
-        <translation>Lưu bố trí…</translation>
-    </message>
-    <message>
-        <source>Maximize Item</source>
-        <translation>Tối đa hóa dự án</translation>
-    </message>
-    <message>
-        <source>Enter</source>
-        <translation>vào</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>trở về</translation>
-    </message>
-    <message>
-        <source>Restore Item</source>
-        <translation>trở lại với dự án</translation>
-    </message>
-    <message>
-        <source>Show Info</source>
-        <translation>Thông tin hiển thị</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
-    </message>
-    <message>
-        <source>Hide Info</source>
-        <translation>Thông tin ẩn</translation>
-    </message>
-    <message>
-        <source>Toggle Info</source>
-        <translation>chuyển đổi thông tin</translation>
-    </message>
-    <message>
-        <source>Change Resolution...</source>
-        <translation>Thay đổi Nghị quyết...</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation>tự động</translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <translation>thấp</translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation>cao</translation>
-    </message>
-    <message>
-        <source>PTZ...</source>
-        <translation>PTZ...</translation>
-    </message>
-    <message>
-        <source>Save Current Position...</source>
-        <translation>Lưu vị trí hiện tại...</translation>
-    </message>
-    <message>
-        <source>Go To Saved Position</source>
-        <translation>Chỉ vị trí đã lưu</translation>
-    </message>
-    <message>
-        <source>Activate PTZ Tour</source>
-        <translation>Bắt đầu lên PTZ Cruise</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>Thông điệp cảnh báo được hiển thị Beta</translation>
-    </message>
-    <message>
-        <source>Manage...</source>
-        <translation>quản lý…</translation>
-    </message>
-    <message>
-        <source>Calibrate Fisheye</source>
-        <translation>Correction Fish-Eye</translation>
-    </message>
-    <message>
-        <source>Toggle Resolution Mode</source>
-        <translation>Chuyển đổi chế độ phân giải</translation>
-    </message>
-    <message>
-        <source>Show Motion/Smart Search</source>
-        <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
-    </message>
-    <message>
-        <source>Show Motion</source>
-        <translation>Display chuyển</translation>
-    </message>
-    <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
-        <source>Hide Motion/Smart Search</source>
-        <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
-    </message>
-    <message>
-        <source>Hide Motion</source>
-        <translation>Hide chuyển</translation>
-    </message>
-    <message>
-        <source>Clear Motion Selection</source>
-        <translation>Lựa chọn Clear Motion Detection</translation>
-    </message>
-    <message>
-        <source>Toggle Smart Search</source>
-        <translation>Chuyển khôn ngoan Search</translation>
-    </message>
-    <message>
-        <source>Check File Watermark</source>
-        <translation>Kiểm tra các tập tin watermark</translation>
-    </message>
-    <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
-        <source>Take Screenshot</source>
-        <translation>Screen Capture</translation>
-    </message>
-    <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
-        <source>Image Enhancement...</source>
-        <translation>image Enhancement...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
-    </message>
-    <message>
-        <source>Create Zoom Window</source>
-        <translation>Thiết lập cửa sổ zoom</translation>
-    </message>
-    <message>
-        <source>Rotate to...</source>
-        <translation>xoay camera...</translation>
-    </message>
-    <message>
-        <source>0 degrees</source>
-        <translation>0 trình độ</translation>
-    </message>
-    <message>
-        <source>90 degrees</source>
-        <translation>90 trình độ</translation>
-    </message>
-    <message>
-        <source>180 degrees</source>
-        <translation>180 trình độ</translation>
-    </message>
-    <message>
-        <source>270 degrees</source>
-        <translation>270 trình độ</translation>
-    </message>
-    <message>
-        <source>Remove from Layout</source>
-        <translation>Gỡ bỏ khỏi bố trí</translation>
-    </message>
-    <message>
-        <source>Del</source>
-        <translation>xóa bỏ</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>xóa bỏ</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>đổi tên</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
-    </message>
-    <message>
-        <source>Delete from Disk</source>
-        <translation>Xóa từ ổ đĩa cứng</translation>
-    </message>
-    <message>
-        <source>Set as Layout Background</source>
-        <translation>Hãy bố trí nền (đồ điện tử)</translation>
-    </message>
-    <message>
-        <source>User Settings...</source>
-        <translation>thiết lập người dùng...</translation>
-    </message>
-    <message>
-        <source>Layout Settings...</source>
-        <translation>Giao diện thiết lập...</translation>
-    </message>
-    <message>
-        <source>Video Wall Settings...</source>
-        <translation>thiết lập bức tường video ...</translation>
-    </message>
-    <message>
-        <source>Ping...</source>
-        <translation>Ping...</translation>
-    </message>
-    <message>
-        <source>Server Logs...</source>
-        <translation>máy chủ bản ghi...</translation>
-    </message>
-    <message>
-        <source>Server Diagnostics...</source>
-        <translation>Chẩn đoán máy chủ...</translation>
-    </message>
-    <message>
-        <source>Server Settings...</source>
-        <translation>cài đặt máy chủ...</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation>Hợp nhất để kết nối hệ thống Hiện nay ...</translation>
+        <translation>현재 연결된 시스템 병합...</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>닫기</translation>
+    </message>
+    <message>
+        <source>Ctrl+W</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Close All But This</source>
+        <translation>현재창을 제외한 모든 창 닫기</translation>
+    </message>
+    <message>
+        <source>Open in Layout</source>
+        <translation>레이아웃 열기</translation>
+    </message>
+    <message>
+        <source>Show Debug</source>
+        <translation>디버그 보기</translation>
+    </message>
+    <message>
+        <source>Hide Debug</source>
+        <translation>디버그 숨기기</translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+D</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Delayed Open Video Wall</source>
+        <translation>출력 중인 비디어 월 열기</translation>
+    </message>
+    <message>
+        <source>Filter...</source>
+        <translation>필터...</translation>
+    </message>
+    <message>
+        <source>Event Log...</source>
+        <translation>이벤트 로그...</translation>
+    </message>
+    <message>
+        <source>System Administration...</source>
+        <translation>관리자...</translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+A</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>System Update...</source>
+        <translation>시스템 업데이트...</translation>
+    </message>
+    <message>
+        <source>Local Settings...</source>
+        <translation>내부 설정...</translation>
+    </message>
+    <message>
+        <source>Merge Systems...</source>
+        <translation>시스템 조정...</translation>
+    </message>
+    <message>
+        <source>Server...</source>
+        <translation>서버...</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>열기</translation>
+    </message>
+    <message>
+        <source>Monitor</source>
+        <translation>모니터</translation>
+    </message>
+    <message>
+        <source>Open in New Tab</source>
+        <translation>새탭 열기</translation>
+    </message>
+    <message>
+        <source>Monitor in a New Tab</source>
+        <translation>신규 탭 모니터</translation>
+    </message>
+    <message>
+        <source>Open in New Window</source>
+        <translation>새 윈도우 열기</translation>
+    </message>
+    <message>
+        <source>Monitor in a New Window</source>
+        <translation>신규 윈도우 모니터</translation>
+    </message>
+    <message>
+        <source>Open Layout in a New Tab</source>
+        <translation>새탭으로 레이아웃 열기</translation>
+    </message>
+    <message>
+        <source>Open Layouts</source>
+        <translation>레이아웃 열기</translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in a New Window</source>
+        <translation>새 윈도우로 레이아웃 열기</translation>
+    </message>
+    <message>
+        <source>Open Current Layout in a New Window</source>
+        <translation>현재 레이아웃 신규 윈도우로 열기</translation>
+    </message>
+    <message>
+        <source>Open Layout(s)</source>
+        <translation>레이아웃 열기</translation>
+    </message>
+    <message>
+        <source>Open Video Wall(s)</source>
+        <translation>비디오 월 열기</translation>
+    </message>
+    <message>
+        <source>Open Containing Folder</source>
+        <translation>연결된 폴더 열기</translation>
+    </message>
+    <message>
+        <source>Ctrl+Enter</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Identify</source>
+        <translation>확인</translation>
+    </message>
+    <message>
+        <source>Attach to Video Wall...</source>
+        <translation>비디오 월에 배속...</translation>
+    </message>
+    <message>
+        <source>Switch to Video Wall mode...</source>
+        <translation>비디오 월 모드 전환...</translation>
+    </message>
+    <message>
+        <source>Save Current Matrix</source>
+        <translation>현재 매트릭스 저장</translation>
+    </message>
+    <message>
+        <source>Load Matrix</source>
+        <translation>매트릭스 읽어오기</translation>
+    </message>
+    <message>
+        <source>Update Layout</source>
+        <translation>레이아웃 업데이트</translation>
+    </message>
+    <message>
+        <source>Stop Video Wall</source>
+        <translation>비디오 월 정지</translation>
+    </message>
+    <message>
+        <source>Detach Layout</source>
+        <translation>레이아웃 분리하기</translation>
+    </message>
+    <message>
+        <source>Save Layout</source>
+        <translation>레이아웃 저장</translation>
+    </message>
+    <message>
+        <source>Save Layout As...</source>
+        <translation>레이아웃 다른이름으로 저장...</translation>
+    </message>
+    <message>
+        <source>Maximize Item</source>
+        <translation>최대화</translation>
+    </message>
+    <message>
+        <source>Enter</source>
+        <translation>확인</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <translation>되돌리기</translation>
+    </message>
+    <message>
+        <source>Restore Item</source>
+        <translation>복원</translation>
+    </message>
+    <message>
+        <source>Show Info</source>
+        <translation>정보 보기</translation>
+    </message>
+    <message>
+        <source>Alt+I</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Hide Info</source>
+        <translation>정보 숨김</translation>
+    </message>
+    <message>
+        <source>Toggle Info</source>
+        <translation>정보</translation>
+    </message>
+    <message>
+        <source>Change Resolution...</source>
+        <translation>해상도 변경...</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>낮게</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>높음</translation>
+    </message>
+    <message>
+        <source>PTZ...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Save Current Position...</source>
+        <translation>현재 위치 저장...</translation>
+    </message>
+    <message>
+        <source>Go To Saved Position</source>
+        <translation>위치 저장</translation>
+    </message>
+    <message>
+        <source>Activate PTZ Tour</source>
+        <translation>PTZ 투어 활성화</translation>
+    </message>
+    <message>
+        <source>Show Beta Version Warning Message</source>
+        <translation>베타버전의 경고 메세지보기</translation>
+    </message>
+    <message>
+        <source>Manage...</source>
+        <translation>조정...</translation>
+    </message>
+    <message>
+        <source>Calibrate Fisheye</source>
+        <translation>어안렌즈 교정</translation>
+    </message>
+    <message>
+        <source>Toggle Resolution Mode</source>
+        <translation>해상도 모드</translation>
+    </message>
+    <message>
+        <source>Show Motion/Smart Search</source>
+        <translation>움직임/스마트 검색 보기</translation>
+    </message>
+    <message>
+        <source>Show Motion</source>
+        <translation>움직임 보기</translation>
+    </message>
+    <message>
+        <source>Alt+G</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Hide Motion/Smart Search</source>
+        <translation>모션/스마트 검색 숨김</translation>
+    </message>
+    <message>
+        <source>Hide Motion</source>
+        <translation>움직임 숨김</translation>
+    </message>
+    <message>
+        <source>Clear Motion Selection</source>
+        <translation>모션영역 초기화</translation>
+    </message>
+    <message>
+        <source>Toggle Smart Search</source>
+        <translation>스마트 검색</translation>
+    </message>
+    <message>
+        <source>Check File Watermark</source>
+        <translation>파일 변조 확인</translation>
+    </message>
+    <message>
+        <source>Alt+C</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Take Screenshot</source>
+        <translation>스크린 샷</translation>
+    </message>
+    <message>
+        <source>Alt+S</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Image Enhancement...</source>
+        <translation>이미지 향상...</translation>
+    </message>
+    <message>
+        <source>Alt+J</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Create Zoom Window</source>
+        <translation>디지털줌 별도창 생성</translation>
+    </message>
+    <message>
+        <source>Rotate to...</source>
+        <translation>회전...</translation>
+    </message>
+    <message>
+        <source>0 degrees</source>
+        <translation>0도</translation>
+    </message>
+    <message>
+        <source>90 degrees</source>
+        <translation>90도</translation>
+    </message>
+    <message>
+        <source>180 degrees</source>
+        <translation>180도</translation>
+    </message>
+    <message>
+        <source>270 degrees</source>
+        <translation>270도</translation>
+    </message>
+    <message>
+        <source>Remove from Layout</source>
+        <translation>레이아웃 제거</translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <translation>제거</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+S</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>삭제</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>이름변경</translation>
+    </message>
+    <message>
+        <source>F2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Delete from Disk</source>
+        <translation>디스크에서 삭제</translation>
+    </message>
+    <message>
+        <source>Set as Layout Background</source>
+        <translation>레이아웃 배경 설정</translation>
+    </message>
+    <message>
+        <source>User Settings...</source>
+        <translation>사용자 설정...</translation>
+    </message>
+    <message>
+        <source>Layout Settings...</source>
+        <translation>레이아웃 설정...</translation>
+    </message>
+    <message>
+        <source>Video Wall Settings...</source>
+        <translation>비디오 월 설정...</translation>
+    </message>
+    <message>
+        <source>Ping...</source>
+        <translation>핑테스트...</translation>
+    </message>
+    <message>
+        <source>Server Logs...</source>
+        <translation>서버 로그...</translation>
+    </message>
+    <message>
+        <source>Server Diagnostics...</source>
+        <translation>서버 진단...</translation>
+    </message>
+    <message>
+        <source>Server Settings...</source>
+        <translation>서버 설정...</translation>
     </message>
     <message>
         <source>Change Cell Aspect Ratio...</source>
-        <translation>thay đổi Cell Aspect Ratio...</translation>
+        <translation>셀 종횡비 변경...</translation>
     </message>
     <message>
         <source>Change Cell Spacing...</source>
-        <translation>thay đổi Cell Spacing...</translation>
+        <translation>셀 여백 변경...</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>không</translation>
+        <translation>None</translation>
     </message>
     <message>
         <source>Small</source>
-        <translation>nhỏ</translation>
+        <translation>작게</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation>trong</translation>
+        <translation>일반화</translation>
     </message>
     <message>
         <source>Large</source>
-        <translation>lớn</translation>
+        <translation>크게</translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation>Vòng đầu nhảy</translation>
+        <translation>전환 시작</translation>
     </message>
     <message>
         <source>Stop Tour</source>
-        <translation>Ngừng nhảy vòng</translation>
+        <translation>전환 멈춤</translation>
     </message>
     <message>
         <source>Alt+T</source>
-        <translation>Alt+T</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Mark Selection Start</source>
-        <translation>Chọn đánh dấu sự khởi đầu</translation>
+        <translation>시작 위치</translation>
     </message>
     <message>
         <source>[</source>
-        <translation>[</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Mark Selection End</source>
-        <translation>End của các marker chọn lọc</translation>
+        <translation>종료 위치</translation>
     </message>
     <message>
         <source>]</source>
-        <translation>]</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation>rõ ràng Selection</translation>
+        <translation>선택항목 초기화</translation>
     </message>
     <message>
         <source>Zoom to Selection</source>
-        <translation>Kéo dài đến vùng lựa chọn</translation>
+        <translation>선택 영역 확대</translation>
     </message>
     <message>
         <source>Bookmark Selection...</source>
-        <translation>dấu trang lựa chọn ...</translation>
+        <translation>북마크 선택...</translation>
     </message>
     <message>
         <source>Edit Bookmark...</source>
-        <translation>Chỉnh sửa dấu trang ...</translation>
+        <translation>북마크 조정...</translation>
     </message>
     <message>
         <source>Remove Bookmark...</source>
-        <translation>loại bỏ các dấu trang ...</translation>
+        <translation>북마크 삭제...</translation>
     </message>
     <message>
         <source>Export Selected Area...</source>
-        <translation>Xuất chọn múi...</translation>
+        <translation>선택영역 백업...</translation>
     </message>
     <message>
         <source>Export Multi-Video...</source>
-        <translation>Xuất khẩu nhiều hình ảnh...</translation>
+        <translation>다중채널 백업...</translation>
     </message>
     <message>
         <source>Preview Search...</source>
-        <translation>Preview Tìm kiếm...</translation>
+        <translation>미리보기 검색...</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift+ +</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Increment Debug Counter</source>
-        <translation>Quầy gỡ lỗi gia tăng</translation>
+        <translation>디버그 횟수 증분</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+ -</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Decrement Debug Counter</source>
-        <translation>Giảm debug counter</translation>
+        <translation>디버그 횟수 감소</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+ R</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Show Resource Pool</source>
-        <translation>Hồ bơi tài nguyên hiển thị</translation>
+        <translation>리스소 공간 보기</translation>
     </message>
     <message>
         <source>Calibrate PTZ</source>
-        <translation>Correction PTZ</translation>
+        <translation>PTZ 교정</translation>
     </message>
     <message>
         <source>Get PTZ Position</source>
-        <translation>Có được vị trí PTZ</translation>
+        <translation>PTZ 위치 가져오기</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Debug Control Panel</source>
-        <translation>debug (DEBUG) giao diện điều khiển bảng điều khiển</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Space</source>
-        <translation>Spacebar</translation>
+        <translation>여유공간</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation>Broadcast</translation>
+        <translation>재생</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation>giờ nghĩ giảo lao</translation>
+        <translation>일시정지</translation>
     </message>
     <message>
         <source>Ctrl+Left</source>
-        <translation>Ctrl+Left</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Previous Frame</source>
-        <translation>Trên một khung</translation>
+        <translation>이전 프레임</translation>
     </message>
     <message>
         <source>Ctrl+Right</source>
-        <translation>Ctrl+Righ</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Next Frame</source>
-        <translation>Các khung hình tiếp theo</translation>
+        <translation>다음 프레임</translation>
     </message>
     <message>
         <source>Z</source>
-        <translation>Z</translation>
+        <translation></translation>
     </message>
     <message>
         <source>To Start</source>
-        <translation>đến điểm khởi</translation>
+        <translation>시작</translation>
     </message>
     <message>
         <source>X</source>
-        <translation>X</translation>
+        <translation></translation>
     </message>
     <message>
         <source>To End</source>
-        <translation>Để một điểm kết thúc</translation>
+        <translation>종료</translation>
     </message>
     <message>
         <source>Ctrl+Up</source>
-        <translation>Ctrl+Up</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Volume Down</source>
-        <translation>volume Down</translation>
+        <translation>볼륨 낮춤</translation>
     </message>
     <message>
         <source>Ctrl+Down</source>
-        <translation>Ctrl+Down</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Volume Up</source>
-        <translation>tăng cường khối lượng</translation>
+        <translation>볼륨 높임</translation>
     </message>
     <message>
         <source>M</source>
-        <translation>M</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Toggle Mute</source>
-        <translation>Chuyển chế độ im lặng</translation>
+        <translation>음소거</translation>
     </message>
     <message>
         <source>L</source>
-        <translation>L</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Jump to Live</source>
-        <translation>Chuyển sang hình ảnh thời gian thực</translation>
+        <translation>라이브 점프</translation>
     </message>
     <message>
         <source>S</source>
-        <translation>S</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
-        <translation>Đồng bộ hóa tất cả các dòng</translation>
+        <translation>스트림 동기화</translation>
     </message>
     <message>
         <source>Disable Stream Synchronization</source>
-        <translation>Đồng bộ hóa tất cả các dòng</translation>
+        <translation>스트림 동기화 사용안함</translation>
     </message>
     <message>
         <source>Show Thumbnails</source>
-        <translation>thumbnail Display</translation>
+        <translation>미리보기 사용</translation>
     </message>
     <message>
         <source>Hide Thumbnails</source>
-        <translation>Không hiển thị thumbnail</translation>
+        <translation>미리보기 숨김</translation>
     </message>
     <message>
         <source>Show Calendar</source>
-        <translation>Hiện lịch</translation>
+        <translation>달력 보기</translation>
     </message>
     <message>
         <source>Hide Calendar</source>
-        <translation>Không hiển thị lịch</translation>
+        <translation>달력 숨김</translation>
     </message>
     <message>
         <source>Show Title Bar</source>
-        <translation>Hiển thị đề cột</translation>
+        <translation>타이틀바 보기</translation>
     </message>
     <message>
         <source>Hide Title Bar</source>
-        <translation>Thanh tiêu đề Hide</translation>
+        <translation>타이틀 숨김</translation>
     </message>
     <message>
         <source>Pin Tree</source>
-        <translation>Cây hiển thị cố định</translation>
+        <translation>트리 고정</translation>
     </message>
     <message>
         <source>Unpin Tree</source>
-        <translation>Không có cây hiển thị cố định</translation>
+        <translation>트리 비고정</translation>
     </message>
     <message>
         <source>Show Tree</source>
-        <translation>Hiện Tree</translation>
+        <translation>트리보기</translation>
     </message>
     <message>
         <source>Hide Tree</source>
-        <translation>Không hiển thị một cây</translation>
+        <translation>트리 숨김</translation>
     </message>
     <message>
         <source>Show Timeline</source>
-        <translation>Hiển thị Time cột</translation>
+        <translation>타임 라인 보기</translation>
     </message>
     <message>
         <source>Hide Timeline</source>
-        <translation>Thời gian cột không hiển thị</translation>
+        <translation>시간 표기 숨김</translation>
     </message>
     <message>
         <source>Pin Notifications</source>
-        <translation>Thông báo hiển thị cố định</translation>
+        <translation>알림창 고정</translation>
     </message>
     <message>
         <source>Unpin Notifications</source>
-        <translation>Hiển thị một thông báo là không cố định</translation>
+        <translation>알림 비고정</translation>
     </message>
     <message>
         <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
-        <translation>Vô hiệu hóa hình ảnh động nền</translation>
+        <translation>배경 효과 사용안함</translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
-        <translation>Kích hoạt tính năng hoạt hình nền</translation>
+        <translation>배경 효과 사용</translation>
     </message>
     <message>
         <source>Show Search Panel</source>
-        <translation>Hiển thị bảng tìm kiếm</translation>
+        <translation>검색 판넬 보기</translation>
     </message>
     <message>
         <source>Hide Search Panel</source>
-        <translation>Ẩn bảng điều khiển tìm kiếm</translation>
-    </message>
-    <message>
-        <source>File Settings...</source>
-        <translation>Cài đặt tập tin ...</translation>
+        <translation>검색 판넬 숨기기</translation>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation>Hỏi về kê Reporting</translation>
+        <translation>통계현활 문의</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation>파일 설정</translation>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation>Vứt bỏ các nguồn lực để bố trí mới</translation>
+        <translation type="unfinished">새로운 탭으로 리스소 이동</translation>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation>Chọn máy chủ thời gian</translation>
+        <translation type="unfinished">시간 서버 선택</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation>Kích hoạt PTZ đối tượng</translation>
+        <translation type="unfinished">PTZ 대상 활성화</translation>
     </message>
     <message>
         <source>User Management...</source>
-        <translation>Quản lý người sử dụng ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Audit Trail...</source>
-        <translation>Đường mòn kiểm toán...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Move %1</source>
-        <translation>chuyển động %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Check %1 Issues...</source>
-        <translation>Kiểm tra vấn đề %1 ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 List...</source>
-        <translation>%1 danh sách...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Rules...</source>
-        <translation>%1 Nội quy...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Settings...</source>
-        <translation>%1 Cài đặt...</translation>
-    </message>
-    <message>
-        <source>Open in %1 Settings Dialog...</source>
-        <translation>Open in %1 Cài đặt Dialog ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Add Device(s)...</source>
-        <translation>Thêm thiết bị (s) ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 List by Server...</source>
-        <translation>%1 Danh sách bởi máy chủ ...</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
     <message>
         <source>Image Enhancement</source>
-        <translation>image Enhancement</translation>
+        <translation>이미지 향상</translation>
     </message>
     <message>
         <source>Image Enhancement - %1</source>
-        <translation>image Enhancement - %1</translation>
+        <translation>이미지 향상 - %1</translation>
     </message>
 </context>
 <context>
     <name>QnAggregationWidget</name>
     <message>
         <source>sec</source>
-        <translation>thứ hai</translation>
+        <translation>초</translation>
     </message>
     <message>
         <source>min</source>
-        <translation>chi nhánh</translation>
+        <translation>분</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation>thời gian</translation>
+        <translation>시간</translation>
     </message>
     <message>
         <source>days</source>
-        <translation>sơn mài Nhật</translation>
+        <translation>일</translation>
     </message>
 </context>
 <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
         <source>Attach to Video Wall...</source>
-        <translation>Đính kèm với bức tường video ...</translation>
+        <translation>비디오 월 첨부...</translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation>Xem trước</translation>
+        <translation>미리보기</translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogDialog</name>
     <message>
         <source>Play this</source>
-        <translation>chơi này</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Sao chép vào clipboard lựa chọn</translation>
+        <translation type="unfinished">클립보드로 복사</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation>Lựa chọn Export to File...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>chọn tất cả</translation>
+        <translation type="unfinished">전체 선택</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation>tìm kiếm</translation>
+        <translation type="unfinished">검색</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation type="unfinished">정보</translation>
     </message>
     <message>
         <source>No archive data for that position left</source>
-        <translation>Không có dữ liệu lưu trữ cho vị trí đó lại</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This resources already removed from the system</source>
-        <translation>Nguồn tài nguyên này đã được gỡ bỏ khỏi hệ thống</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Export selected records to a file</source>
-        <translation>Xuất khẩu chọn lọc hồ sơ vào một tập tin</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Audit log replay</source>
-        <translation>Kiểm toán log replay</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 actions</source>
-        <translation>%1 hành động</translation>
+        <extracomment>&quot;Camera actions&quot; or &quot;Device actions&quot;</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
     <message>
         <source>%1d </source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1h </source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1m </source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>không biết</translation>
+        <translation type="unfinished">알려지지 않음</translation>
     </message>
     <message>
         <source>Unsuccessful login</source>
-        <translation>đăng nhập không thành công</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Login</source>
-        <translation>đăng nhập</translation>
+        <translation type="unfinished">로그인</translation>
     </message>
     <message>
         <source>User updated</source>
-        <translation>người sử dụng cập nhật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation>xem trực tiếp</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation>xem lưu trữ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation>xuất ra video</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>System name changed</source>
-        <translation>Tên hệ thống thay đổi</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>System merge</source>
-        <translation>hệ thống hợp nhất</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>General settings updated</source>
-        <translation>Cài đặt chung cập nhật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server updated</source>
-        <translation>máy chủ cập nhật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation>Quy tắc kinh doanh cập nhật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server removed</source>
-        <translation>Quy tắc kinh doanh cập nhật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Business rule removed</source>
-        <translation>Quy luật kinh doanh bỏ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>User removed</source>
-        <translation>người dùng xóa</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Business rule reseted</source>
-        <translation>Business rule reseted</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Database restored</source>
-        <translation>Cơ sở dữ liệu phục hồi</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Play this</source>
-        <translation>chơi này</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation>thiết lập</translation>
+        <translation type="unfinished">설정</translation>
     </message>
     <message>
         <source>%1 - %2, </source>
-        <translation>%1 - %2, </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
-        <translation>
-            <numerusform>%n hoạt động</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Session begins</source>
-        <translation>Session bắt đầu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Session ends</source>
-        <translation>Session đầu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation>thời gian</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>User</source>
-        <translation>người sử dụng</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>IP</source>
-        <translation>IP</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Activity</source>
-        <translation>hoạt động</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>ngày tháng</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Time</source>
-        <translation>thời gian</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Description</source>
-        <translation>miêu tả</translation>
+        <translation type="unfinished">상세</translation>
     </message>
     <message>
         <source>View it</source>
-        <translation>xem nó</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Click to expand</source>
-        <translation>Nhấn vào đây để mở rộng</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Red mark means that an archive is still available</source>
-        <translation>Đánh dấu màu đỏ có nghĩa là một kho lưu trữ vẫn còn có sẵn</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>E-mail settings changed</source>
-        <translation>Cài đặt e-mail thay đổi</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 updated</source>
-        <translation>%1 cập nhật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 added</source>
-        <translation>%1 thêm</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 removed</source>
-        <translation>%1 loại bỏ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 name</source>
-        <translation>%1 tên</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2885,12 +2888,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>You have %n notifications</source>
         <translation>
-            <numerusform>Bạn có %n thông báo</numerusform>
+            <numerusform>%n 알림이 있음</numerusform>
         </translation>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation>Bạn có thông báo mới.</translation>
+        <translation type="unfinished">새로운 알림이 있음</translation>
     </message>
 </context>
 <context>
@@ -2901,527 +2904,532 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Password:</source>
-        <translation>mật khẩu:</translation>
+        <translation>비밀번호:</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation>Cài đặt xây dựng cụ thể.</translation>
+        <translation type="unfinished">특정 빌드 설치</translation>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation>Xây dựng số:</translation>
+        <translation type="unfinished">빌드 버젼:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation>Mật khẩu bạn đã nhập không hợp lệ.</translation>
+        <translation type="unfinished">입력하신 비밀번호가 유효하지 않습니다</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
         <source>%n of %1</source>
-        <translation>
-            <numerusform>%n of %1</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation>&lt;bất kỳ %1&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select at least one %1.</source>
-        <translation>Chọn ít nhất một %1.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
         <source>For All Users</source>
-        <translation>Đối với tất cả người dùng</translation>
+        <translation>모든 사용자</translation>
     </message>
     <message>
         <source>For Administrators Only</source>
-        <translation>Đối với nhà quản lý</translation>
+        <translation>관리자만</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
         <source>&lt;System&gt;</source>
-        <translation>&lt;hệ thống&gt;</translation>
+        <translation>&lt;시스템&gt;</translation>
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>lỗi: %1</translation>
+        <translation>오류:%1</translation>
     </message>
     <message>
         <source>&lt;Any Server&gt;</source>
-        <translation>&lt;bất kỳ máy chủ&gt;</translation>
+        <translation>&lt;모든 서버&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
         <translation>
-            <numerusform>%n Servers</numerusform>
+            <numerusform>%n 서버</numerusform>
         </translation>
     </message>
     <message>
         <source>Not Applied</source>
-        <translation>không áp dụng</translation>
+        <translation>적용안됨</translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation>ngay</translation>
+        <translation>긴급</translation>
     </message>
     <message numerus="yes">
         <source>Every %n days</source>
         <translation>
-            <numerusform>mỗi %n ngày</numerusform>
+            <numerusform>%n일 마다</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n hours</source>
         <translation>
-            <numerusform>mỗi %n giờ</numerusform>
+            <numerusform>%n시간 마다</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n minutes</source>
         <translation>
-            <numerusform>mỗi %n phút</numerusform>
+            <numerusform>%n분 마다</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n seconds</source>
         <translation>
-            <numerusform>mỗi %n thứ hai</numerusform>
+            <numerusform>%n초 마다</numerusform>
         </translation>
     </message>
     <message>
         <source>Stops</source>
-        <translation>dừng lại</translation>
+        <translation>정지</translation>
     </message>
     <message>
         <source>Starts</source>
-        <translation>bắt đầu</translation>
-    </message>
-    <message>
-        <source>Starts/Stops</source>
-        <translation>bắt đầu / dừng lại</translation>
+        <translation>시작</translation>
     </message>
     <message>
         <source>Administrators Only</source>
-        <translation>chỉ có các nhà quản lý</translation>
+        <translation type="unfinished">관리자만</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation>Tất cả người dùng</translation>
+        <translation type="unfinished">모든 사용자</translation>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation>Chọn một giọng nói</translation>
+        <translation type="unfinished">음원 선택</translation>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation>nhập văn bản</translation>
+        <translation type="unfinished">텍스트 입력</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation>&lt;bất kỳ %1&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select at least one %1</source>
-        <translation>Chọn ít nhất một %1</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Occures</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
-        <translation>đến</translation>
+        <translation>에</translation>
     </message>
     <message>
         <source>to</source>
-        <translation>đến</translation>
+        <translation>로</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation>&lt;bất kỳ %1&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&lt;Select at least one %1&gt;</source>
-        <translation>Chọn ít nhất một %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRulesDialog</name>
     <message>
         <source>Reset Default Rules</source>
-        <translation>Thiết lập lại các quy tắc mặc định</translation>
+        <translation>기본규칙으로 초기화</translation>
     </message>
     <message>
         <source>Unsaved changes will be lost. Save?</source>
-        <translation>Những thay đổi chưa được lưu sẽ bị mất, lưu trữ nó?</translation>
+        <translation>변경 내용이 손실되어 저장할 수 없습니다. 진행하시겠습니까?</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Error while receiving rules.</source>
-        <translation>Khi nhận được các quy tắc lỗi.</translation>
+        <translation>규칙을 받는 동안 오류 발생.</translation>
     </message>
     <message>
         <source>Error while saving rule.</source>
-        <translation>Lỗi lưu quy tắc.</translation>
+        <translation>규칙을 저장하는 동안 오류 발생.</translation>
     </message>
     <message>
         <source>Hide Advanced</source>
-        <translation>Hide nâng cao</translation>
+        <translation>고급 설정 숨김</translation>
     </message>
     <message>
         <source>Show Advanced</source>
-        <translation>Hiển thị chi tiết</translation>
+        <translation>고급 설정보기</translation>
     </message>
     <message>
         <source>&amp;New...</source>
-        <translation>&amp;thêm...</translation>
+        <translation>신규(&amp;N)...</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation>&amp;xóa bỏ</translation>
+        <translation>삭제(&amp;D)</translation>
     </message>
     <message>
         <source>&amp;Schedule...</source>
-        <translation>&amp;lịch trình...</translation>
+        <translation>일정(&amp;S)...</translation>
     </message>
     <message>
         <source>Some rules are not valid. Should they be disabled?</source>
-        <translation>Một phần của nguyên tắc là không hợp lệ, nếu không sử dụng chúng?</translation>
+        <translation>약간의 규칙은 유효하지 않습니다. 비활성화 하시겠습니까?</translation>
     </message>
     <message>
         <source>Are you sure you want to reset rules to the defaults?</source>
-        <translation>Bạn có chắc chắn muốn thiết lập lại quy tắc để mặc định?</translation>
+        <translation>규칙을 기본값으로 다시 설정하시겠습니까?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation>Hành động này không thể khôi phục!</translation>
+        <translation>이 작업은 취소할 수 없음!</translation>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation>Thiết lập lại để xác nhận các quy tắc</translation>
+        <translation type="unfinished">규칙 초기화 확인</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation>Đã xảy ra lỗi khi xóa các quy tắc.</translation>
+        <translation type="unfinished">규칙을 삭제하는 동안 오류 발생</translation>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation>Xác nhận cửa hàng</translation>
+        <translation type="unfinished">확인 및 저장</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation>Xác nhận Exit</translation>
+        <translation type="unfinished">종료 확인</translation>
     </message>
     <message>
         <source>filter by %1...</source>
-        <translation>lọc theo %1 ...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
         <source>#</source>
-        <translation>#</translation>
+        <translation></translation>
     </message>
     <message>
         <source>On</source>
-        <translation>mở</translation>
+        <translation>켬</translation>
     </message>
     <message>
         <source>Event</source>
-        <translation>biến cố</translation>
+        <translation>이벤트</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation>nguồn</translation>
+        <translation>소스</translation>
     </message>
     <message>
         <source>-&gt;</source>
-        <translation>-&gt;</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Action</source>
-        <translation>hoạt động</translation>
+        <translation>동작</translation>
     </message>
     <message>
         <source>Target</source>
-        <translation>Mục đích</translation>
+        <translation>대상</translation>
     </message>
     <message>
         <source>Interval of Action</source>
-        <translation>khoảng thời gian hành động</translation>
+        <translation>동작 간격</translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdditionDialog</name>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation>đóng</translation>
+        <translation>완료</translation>
     </message>
     <message>
         <source>Initializing scan...</source>
-        <translation>quét ban đầu…</translation>
+        <translation>찾기 초기화중...</translation>
     </message>
     <message>
         <source>First address in range is greater than the last one.</source>
-        <translation>Địa chỉ đầu tiên trong phạm vi lớn hơn so với lần trước.</translation>
+        <translation>범위내의 첫번째 주소가 이전보다 큽니다.</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>sự thành công</translation>
-    </message>
-    <message>
-        <source>Select target server...</source>
-        <translation>Chọn mục tiêu máy chủ ...</translation>
+        <translation>성공</translation>
     </message>
     <message>
         <source>Scanning online hosts...</source>
-        <translation>Tổ dòng quét…</translation>
+        <translation>온라인 호스트를 검색 중...</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Scanning hosts... (%1)</source>
-        <translation>
-            <numerusform>%nquét máy chủ…(%1)</numerusform>
-        </translation>
+        <translation type="unfinished">%n온라인 호스트를 검색 중...(%1)</translation>
+    </message>
+    <message>
+        <source>Select target server...</source>
+        <translation>대상 서버 선택...</translation>
     </message>
     <message>
         <source>Examples:</source>
-        <translation>Ví dụ:</translation>
+        <translation>예시:</translation>
     </message>
     <message>
         <source>Server is offline.</source>
-        <translation>máy chủ đang ẩn.</translation>
+        <translation>오프라인.</translation>
     </message>
     <message>
         <source>It might take a few moments to populate them in the tree.</source>
-        <translation>Nó có thể mất một vài phút để định vị chúng trong cây.</translation>
+        <translation>목록에 추가하는데 시간이 소요됩니다.</translation>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation>Các địa chỉ IP được chỉ định là lớn hơn 255 địa chỉ.</translation>
+        <translation type="unfinished">지정된 IP주소의 범위가 255이상을 포함하고 있습니다.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation>quét End…</translation>
+        <translation type="unfinished">검색 종요중...</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation>Các máy chủ đã được loại bỏ, tìm kiếm không thành.</translation>
+        <translation type="unfinished">서버가 오프라인되어, 검색이 중단됨.</translation>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation>máy chủ đang ẩn, tìm kiếm thất bại.</translation>
+        <translation type="unfinished">서버가 삭제되어, 검색이 중단됨.</translation>
     </message>
     <message>
         <source>Device addition is possible for online servers only.</source>
-        <translation>Ngoài ra thiết bị là có thể cho chỉ máy chủ trực tuyến.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation>Thiết bị trường địa chỉ bạn cần phải chứa một URL hợp lệ, địa chỉ IP, hoặc liên kết RTSP.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No devices selected.</source>
-        <translation>Không có thiết bị được lựa chọn.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Please select at least one device</source>
-        <translation>Vui lòng chọn ít nhất một thiết bị</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>%n devices added successfully.</source>
-        <translation>
-            <numerusform>%n thiết bị thêm thành công.</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
-        <translation>
-            <numerusform>Lỗi khi thêm %n thiết bị.</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Server is offline, devices can only be added to an online server.</source>
-        <translation>máy chủ đang ẩn, thiết bị này chỉ có thể được thêm vào một máy chủ trực tuyến.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server has been removed - cannot add devices.</source>
-        <translation>máy chủ đã được gỡ bỏ - không thể thêm các thiết bị.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Error while searching for device(s).</source>
-        <translation>Lỗi trong khi tìm kiếm thiết bị (s).</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>%n devices found</source>
-        <translation>
-            <numerusform>%n thiết bị được tìm</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>All devices are already in the resource tree.</source>
-        <translation>Tất cả các thiết bị đã có trong cây tài nguyên.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No devices found.</source>
-        <translation>Không tìm thấy thiết bị.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Add devices to %1</source>
-        <translation>Thêm thiết bị cho %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Add devices...</source>
-        <translation>Thêm thiết bị ...</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning host... (%1)</source>
+        <extracomment>Scanning host... (0 devices found)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
         <source>Server returned the following error code : </source>
-        <translation>Máy chủ trả về mã lỗi sau đây:</translation>
+        <translation>서버로부터 오류 코드 반송:</translation>
     </message>
     <message>
         <source>Failed to save the following parameters (%1):
 %2</source>
-        <translation>lưu trữ thông số (%1)：%2 thất bại</translation>
+        <translation>현재의 변수의 적용에 실패하였습니다 (%1): %2</translation>
     </message>
     <message>
         <source>Please wait while settings are being loaded.</source>
-        <translation>Xin vui lòng chờ trong khi cài đặt đang được nạp.</translation>
+        <translation>설정을 불러오는 동안 잠시 기다려주세요.</translation>
     </message>
     <message>
         <source>This can take a lot of time.</source>
-        <translation>Điều này có thể mất rất nhiều thời gian.</translation>
+        <translation>많은 시간이 소요될 수 있습니다.</translation>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation>Áp dụng các thiết lập ...</translation>
+        <translation type="unfinished">설정 적용 중...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
-        <translation>Dịch vụ máy ảnh của mục tiêu là không có. Thử lại.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation>Không thể lưu thông số.</translation>
+        <translation type="unfinished">해당 변수를 저장할 수 없습니다</translation>
     </message>
 </context>
 <context>
     <name>QnCameraBookmarkDialog</name>
     <message>
         <source>Bookmark</source>
-        <translation>Bookmark</translation>
+        <translation>북마크</translation>
     </message>
     <message>
         <source>&amp;Name</source>
-        <translation>&amp;tên</translation>
+        <translation>이름(&amp;N)</translation>
     </message>
     <message>
         <source>&amp;Description</source>
-        <translation>&amp;miêu tả</translation>
+        <translation>설명(&amp;D)</translation>
     </message>
     <message>
         <source>&amp;Timeout</source>
-        <translation>&amp;Timeout</translation>
+        <translation>시간제한(&amp;T)</translation>
     </message>
     <message>
         <source>T&amp;ags</source>
-        <translation>T&amp;ags</translation>
+        <translation>태그(&amp;A)</translation>
     </message>
     <message>
         <source>1 month</source>
-        <translation>1 tháng</translation>
+        <translation>1달</translation>
     </message>
     <message>
         <source>3 month</source>
-        <translation>3 tháng</translation>
+        <translation>3달</translation>
     </message>
     <message>
         <source>6 month</source>
-        <translation>6 tháng</translation>
+        <translation>6달</translation>
     </message>
     <message>
         <source>year</source>
-        <translation>năm</translation>
+        <translation>년</translation>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation>Không khóa lưu trữ.</translation>
+        <translation type="unfinished">저장일수 제한하지 않음</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation>Danh sách các thẻ chia bằng dấu phẩy hoặc dấu cách.</translation>
+        <translation type="unfinished">쉼표나 태그로 태그의 목록 구분</translation>
     </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Sao chép vào Clipboard</translation>
+        <translation>상세 정보 복사</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>xác nhận</translation>
+        <translation></translation>
     </message>
     <message>
         <source>FAILED: %1</source>
-        <translation>thất bại：%1</translation>
+        <translation>실패: %1</translation>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation>Kiểm tra tính sẵn sàng chủ.</translation>
+        <translation type="unfinished">서버 가용성 확인</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation>Kiểm tra các lỗi dòng phương tiện truyền thông.</translation>
+        <translation type="unfinished">오류에 대한 미디어 스트림 확인 중</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
-        <translation>Diagnostics hoàn tất!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Diagnostics for %1 %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
-        <translation>Chẩn đoán cho %1 %2.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
-        <translation>%1 Chẩn đoán</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <translation>Xác nhận %1 có thể truy cập.</translation>
+        <extracomment>&quot;Confirming camera is accessible.&quot; or &quot;Confirming device is accessible.&quot;</extracomment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <translation>Khẳng định mục tiêu %1 cung cấp dòng phương tiện truyền thông.</translation>
+        <extracomment>&quot;Confirming target camera provides media stream.&quot; or &quot;Confirming target device provides media stream.&quot;</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
         <source>&lt;automatic&gt;</source>
-        <translation>&lt;tự động&gt;</translation>
+        <translation>&lt;자동&gt;</translation>
     </message>
 </context>
 <context>
@@ -3429,7 +3437,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%1 have no input ports</source>
         <translation>
-            <numerusform>%1 Không có cổng đầu vào%n</numerusform>
+            <numerusform>%1 입력 포트가 없음%%n</numerusform>
         </translation>
     </message>
 </context>
@@ -3437,81 +3445,81 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraListDialog</name>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Sẽ chọn Copy to clipboard</translation>
+        <translation>클립보드로 복사</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation>Lựa chọn Export to File...</translation>
+        <translation>파일로 내보내기...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>chọn tất cả</translation>
+        <translation>전체 선택</translation>
     </message>
     <message>
         <source>%1 List for &apos;%2&apos; - %3 found</source>
-        <translation>%1 List for &apos;%2&apos; - %3 found</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 List - %2 found</source>
-        <translation>%1 List - %2 found</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Export selected %1 to a file.</source>
-        <translation>Xuất khẩu chọn lọc %1 vào một tập tin.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCameraListModel</name>
     <message>
         <source>Recording</source>
-        <translation>Recording</translation>
+        <translation>저장</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>tên</translation>
+        <translation>이름</translation>
     </message>
     <message>
         <source>Vendor</source>
-        <translation>Nhà cung cấp</translation>
+        <translation>수요자</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation>kiểu mẫu</translation>
+        <translation>모델</translation>
     </message>
     <message>
         <source>Firmware</source>
-        <translation>firmware</translation>
+        <translation>펌웨어</translation>
     </message>
     <message>
         <source>IP/Name</source>
-        <translation>IP / tên</translation>
+        <translation>IP/이름</translation>
     </message>
     <message>
         <source>MAC address</source>
-        <translation>MAC address</translation>
+        <translation>MAC 정보</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation>máy chủ</translation>
+        <translation>서버</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMotionMaskWidget</name>
     <message>
         <source>Too many motion windows</source>
-        <translation>Quá nhiều cửa sổ chuyển</translation>
+        <translation>윈도우 창에 너무 많은 움직임이 검출됨</translation>
     </message>
     <message>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
-        <translation>máy chụp hình nhất %1 cửa sổ chuyển động, nhưng chọn %2 cửa sổ chuyển động.</translation>
+        <translation>현재 카메라의 모션 윈도우는 %1 이나, 선택된 모션 윈도우는 %2이다.</translation>
     </message>
     <message>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
-        <translation>máy chụp hình nhất %1 nhạy cảm chuyển động khác nhau, nhưng chọn %2 nhạy cảm chuyển động.</translation>
+        <translation>현재 카메라의 서로 다른 움직임 감도는  %1 이나, 선택된 움직임 감도는 %2이다.</translation>
     </message>
     <message>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
-        <translation>máy chụp hình nhất %1 cửa sổ mặt nạ chuyển động, nhưng chọn %2 cửa sổ mặt nạ chuyển động.</translation>
+        <translation>현재 카메라의 움직임 마크 윈도우는 %1 이나, 선택된 모션 마크 윈도우는 %2이다.</translation>
     </message>
 </context>
 <context>
@@ -3519,7 +3527,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform>%1  Video bên giám sát hoặc chức năng dịch chuyển không thể được sử dụng%n</numerusform>
+            <numerusform>%1의 녹화와 움직임 검출이 비활성화됩니다.%n</numerusform>
         </translation>
     </message>
 </context>
@@ -3527,7 +3535,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
         <source>&lt;automatic&gt;</source>
-        <translation>&lt;tự động&gt;</translation>
+        <translation>&lt;자동&gt;</translation>
     </message>
 </context>
 <context>
@@ -3535,7 +3543,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%1 have no output relays</source>
         <translation>
-            <numerusform>%1 không có rơ le đầu ra%n</numerusform>
+            <numerusform>%1의 출력 알람이 없음.%n</numerusform>
         </translation>
     </message>
 </context>
@@ -3544,7 +3552,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
         <translation>
-            <numerusform>%1 video thể%n</numerusform>
+            <numerusform>%1의 저장이 비활성화 됩니다.%n</numerusform>
         </translation>
     </message>
 </context>
@@ -3552,625 +3560,660 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraScheduleWidget</name>
     <message>
         <source>Off</source>
-        <translation>tắt</translation>
+        <translation>끔</translation>
     </message>
     <message>
         <source>On</source>
-        <translation>mở</translation>
+        <translation>켬</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
-    </message>
-    <message>
-        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation>Cảnh báo! Giá trị tối thiểu cao có thể làm giảm thời hạn khác ghi %1.</translation>
+        <translation>주의</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>Chuyển động ghi âm bị vô hiệu hóa hoặc không được hỗ trợ bởi một số các %1 chọn. Xin vui lòng đến trang thiết lập chuyển động để đảm bảo nó được hỗ trợ và kích hoạt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this %1.</source>
-        <translation>Dual-streaming không được hỗ trợ bởi %1 này.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
-        <translation>Dual-Streaming và Motion Detection là không có sẵn cho %1 này.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
-        <translation>Chuyển động ghi âm bị vô hiệu hóa. Xin vui lòng đến trang thiết lập chuyển động đến khu vực thiết lập chuyển động của %1 và nhạy cảm.</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
     <message>
         <source>Open in New Tab</source>
-        <translation>Mở một tab mới</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>새 탭 열기</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation>Những thay đổi tích đã không được lưu. Pick mong muốn Loại Recording, FPS, và chất lượng và đánh dấu những thay đổi về lịch trình.</translation>
+        <translation type="unfinished">변경 사항이 저장되지 않았습니다. 원하는 유형의 녹화, FPS, 품질을 선택하신 후 일정표에 변경사항을 표시하여 주십시오.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation>Không áp dụng các thay đổi.</translation>
+        <translation type="unfinished">변경 사항이 적용되지 않음</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation>Độ nhạy phát hiện chuyển động đã không được thay đổi. Hãy Marquee Tool và thay đổi độ nhạy chuyển trên màn hình.</translation>
+        <translation type="unfinished">실제 모션 감도 변경이 되지 않았습니다. 모션 변경 감도 이미지에 사각형을 그려주십시오.</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation>Vượt quá giới hạn cho phép. Để lưu thay đổi của bạn, nhưng sẽ không có hiệu lực.</translation>
+        <translation type="unfinished">인증키 제한을 넘었습니다. 설정값은 저장하지만, 설정의 영향을 받지 않습니다.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation>Không thể áp dụng các thay đổi.</translation>
+        <translation type="unfinished">변경 사항을 적용할 수 없음</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>%1 Cài đặt</translation>
+        <extracomment>&quot;Cameras settings&quot; or &quot;Devices settings&quot; or &quot;IO Module Settings&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
-        <translation>%1 Chẩn đoán</translation>
+        <extracomment>&quot;Cameras Diagnostics&quot; or &quot;Devices Diagnostics&quot; or &quot;IO Module Diagnostics&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Rules</source>
-        <translation>%1 Nội quy</translation>
+        <extracomment>&quot;Cameras Rules&quot; or &quot;Devices Rules&quot; or &quot;IO Module Rules&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 not saved.</source>
-        <translation>%1 không được lưu.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save changes to the following %1?</source>
-        <translation>Lưu thay đổi vào các %1 sau?</translation>
-    </message>
-    <message>
-        <source>Could not save the following %1 to Server.</source>
-        <translation>Không thể lưu %1 sau để Server.</translation>
+        <source>Apply changes to the following %1?</source>
+        <extracomment>&quot;Apply changes to the following 5 cameras?&quot; or &quot;Apply changes to the following IO module?&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCameraSettingsWidget</name>
     <message>
         <source>Cannot edit properties for items of different types.</source>
-        <translation>Bởi vì các loại khác nhau của các dự án không thể chỉnh sửa các thuộc tính.</translation>
+        <translation>다른 유형의 항목에 대한 속성을 변경할 수 없습니다.</translation>
     </message>
     <message>
         <source>No %1 selected.</source>
-        <translation>Không %1 chọn.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCheckableMessageBox</name>
     <message>
         <source>Do not ask again</source>
-        <translation>Đừng hỏi</translation>
+        <translation>다시 요청하지 않습니다</translation>
     </message>
 </context>
 <context>
     <name>QnClientVideoCamera</name>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation>Loại tài nguyên xuất khẩu dữ liệu không hợp lệ.</translation>
+        <translation>데이터 내보내기를 위한 리소스가 유효하지 않습니다.</translation>
     </message>
 </context>
 <context>
     <name>QnClockLabel</name>
     <message>
         <source>Server Time</source>
-        <translation>thời gian máy chủ</translation>
+        <translation type="unfinished">서버시간</translation>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation>Hiện hệ thống địa phương</translation>
+        <translation type="unfinished">로컬 타임</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation>Cấu hình máy chủ (s)</translation>
+        <translation type="unfinished">구성 서버</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation>Đang cập nhật máy chủ (s)</translation>
+        <translation type="unfinished">업데이트 서버</translation>
     </message>
 </context>
 <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation>Bạn đang cố gắng để kết nối với không tương thích Server.</translation>
+        <translation>호환되지 않는 서버입니다.</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation>máy chủ</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <source>Client</source>
-        <translation>khách hàng</translation>
+        <translation>클라이언트</translation>
     </message>
     <message>
         <source>Failure</source>
-        <translation>thất bại</translation>
+        <translation>실패</translation>
     </message>
     <message>
         <source>Connection to the Server could not be established.</source>
-        <translation>Kết nối với máy chủ không thể được thiết lập.</translation>
+        <translation>서버에 연결을 설정할 수 없습니다.</translation>
     </message>
     <message>
         <source>Connection details that you have entered are incorrect, please try again.</source>
-        <translation>Chi tiết kết nối mà bạn đã nhập không chính xác, vui lòng thử lại.</translation>
+        <translation>연결 정보 입력이 유효하지 않습니다, 다시 시도해 주세요.</translation>
     </message>
     <message>
         <source>If this error persists, please contact your VMS administrator.</source>
-        <translation>Nếu lỗi này vẫn còn, xin vui lòng liên hệ với quản trị viên của bạn VMS.</translation>
+        <translation>오류가 지속될 경우, 관리자에게 문의하시기 바랍니다.</translation>
     </message>
     <message>
         <source> - Client version: %1.</source>
-        <translation>- Phiên bản Client: %1.</translation>
+        <translation></translation>
     </message>
     <message>
         <source> - Server version: %1.</source>
-        <translation>- Phiên bản Server: %1.</translation>
+        <translation></translation>
     </message>
     <message>
         <source>You are about to connect to Server which has a different version:</source>
-        <translation>Bạn muốn kết nối với máy chủ trong đó có một phiên bản khác nhau:</translation>
+        <translation>연결하려는 서버의 버전이 다름:</translation>
     </message>
     <message>
         <source>These versions are not compatible. Please update your %1.</source>
-        <translation>Những phiên bản này không tương thích. Vui lòng cập nhật của bạn %1.</translation>
+        <translation>호환되지 않는 버젼입니다.%1 의 업데이트가 필요합니다.</translation>
     </message>
     <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
-        <translation>Chế độ tương thích cho các phiên bản thấp hơn %1 không được hỗ trợ.</translation>
+        <translation>%1 보다 낮은 버젼은 호환성 모드를 지원하지 않습니다.</translation>
     </message>
     <message>
         <source>Selected Server has a different version:</source>
-        <translation>Máy chủ đã chọn có một phiên bản khác nhau:</translation>
+        <translation>선택된 서버의 버젼이 다름:</translation>
     </message>
     <message>
         <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation>Các phiên bản khác của khách hàng là cần thiết để thiết lập kết nối đến máy chủ này.</translation>
+        <translation>다른 버전의 클라이언트는 이 서버에 연결을 설정하기 위해 필요합니다.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to restart in compatibility mode.</source>
-        <translation>Một lỗi đã xảy ra trong khi cố gắng khởi động lại trong chế độ tương thích.</translation>
+        <translation>호환성 모드에서 다시 시작하는 동안 오류가 발생 하였습니다.</translation>
     </message>
     <message>
         <source>Client version %1 is required to connect to this Server.</source>
-        <translation>Phiên bản client %1 là cần thiết để kết nối với máy chủ này.</translation>
+        <translation>이 서버에 접속하려면 %1 클라이언트의 버전이 필요합니다.</translation>
     </message>
     <message>
         <source>Download version %1?</source>
-        <translation>Tải về phiên bản %1?</translation>
+        <translation>다운로드 버전 %1?</translation>
     </message>
     <message>
         <source>Would you like to restart the Client in compatibility mode?</source>
-        <translation>Bạn có muốn khởi động lại các khách hàng trong chế độ tương thích?</translation>
+        <translation>호환성 모드에서 클라이언트를 다시 시작하시겠습니까?</translation>
     </message>
     <message>
         <source>Cannot restart the Client in compatibility mode.</source>
-        <translation>Không thể khởi động lại các khách hàng trong chế độ tương thích.</translation>
+        <translation>호환성 모드에서 클라이언트를 다시 시작할 수 없습니다.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>Xin hãy đóng ứng dụng và khởi động nó lại bằng cách sử dụng phím tắt trong menu start.</translation>
+        <translation>프로그램을 닫아주세요, 그리고 시작메뉴의 바로가기를 통해 다시 시작해 주세요.</translation>
     </message>
     <message>
         <source>Failed to launch compatibility version %1</source>
-        <translation>Không thể khởi động phiên bản tương thích %1</translation>
+        <translation>%1 호환성 버젼의 시작을 실패하였습니다</translation>
     </message>
     <message>
         <source>Try to restore version %1?</source>
-        <translation>Hãy cố gắng khôi phục lại phiên bản %1?</translation>
+        <translation>%1 버전으로 복원하시겠습니까?</translation>
     </message>
     <message>
         <source>Server has a different version:</source>
-        <translation>máy chủ có một phiên bản khác nhau:</translation>
+        <translation>다른 버전의 서버:</translation>
     </message>
     <message>
         <source>You will be asked to restart the client in compatibility mode.</source>
-        <translation>Bạn sẽ được yêu cầu khởi động lại máy khách ở chế độ tương thích.</translation>
+        <translation>호환성 모드에서 클라이언트를 다시 시작해야 합니다.</translation>
     </message>
     <message>
         <source>You will be asked to update your %1</source>
-        <translation>Bạn sẽ được yêu cầu cập nhật %1 của bạn</translation>
+        <translation>%1로의 업데이트가 필요함</translation>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation>Đăng nhập Tên đăng nhập hoặc mật khẩu không đúng, vui lòng thử lại.</translation>
+        <translation type="unfinished">입력된 로그인 또는 비밀번호가 맞지 않습니다, 다시 시도해 주세요.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
-        <translation>Không thể kết nối đến máy chủ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Quá trình phóng không được tìm thấy.</translation>
+        <translation type="unfinished">시작 프로세서를 찾을 수 없음</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
-        <translation>Kết nối LDAP Server time out.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnConnectionTestingDialog</name>
     <message>
         <source>Success</source>
-        <translation>sự thành công</translation>
+        <translation>성공</translation>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation>Yêu cầu thời gian ra</translation>
+        <translation type="unfinished">요청 시간 초과.</translation>
     </message>
     <message>
         <source>Test Failed</source>
-        <translation>Không thử nghiệm</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCredentialsDialog</name>
     <message>
         <source>User:</source>
-        <translation>người sử dụng:</translation>
+        <translation>사용자:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>mật khẩu:</translation>
+        <translation>비밀번호:</translation>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation>Nhập tên người dùng và mật khẩu ...</translation>
+        <translation type="unfinished">사용자 이름과 비밀번호를 입력하세요...</translation>
     </message>
 </context>
 <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation>Bạn có thể thiết lập một tập hợp các tập tin hệ thống và có thể phục hồi sau khi một lỗi hệ thống.</translation>
+        <translation>시스템 복원을 실패할 경우 시스템 구성에 대한 백업 파일을 만들 수 있습니다.</translation>
     </message>
     <message>
         <source>Save Database Backup...</source>
-        <translation>Sao lưu cơ sở dữ liệu lưu trữ...</translation>
+        <translation>데이터베이스 백업 저장...</translation>
     </message>
     <message>
         <source>Database Backup Files (*.db)</source>
-        <translation>Cơ sở dữ liệu tập tin sao lưu (*.db)</translation>
+        <translation>데이터베이스 백업 파일 (*.db)</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Could not open file &apos;%1&apos; for writing.</source>
-        <translation>Không thể mở tập tin %1 cho văn bản.</translation>
+        <translation>&apos;%1&apos; 쓰기위한 파일을 열수 없습니다.</translation>
     </message>
     <message>
         <source>Downloading Database Backup</source>
-        <translation>Tải về sao lưu Library</translation>
+        <translation>데이터베이스 백업 다운로드</translation>
     </message>
     <message>
         <source>Database backup is being downloaded from the server. Please wait.</source>
-        <translation>Tải về Thư viện từ các máy chủ sao lưu. Xin lỗi đợi tôi một chút.</translation>
+        <translation>데이터베이스 백업이 서버로부터 다운로드 되고 있습니다. 잠시만 기다려주세요.</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <source>Database was successfully backed up into file &apos;%1&apos;.</source>
-        <translation>Cơ sở dữ liệu đã được sao lưu thành công lên tập tin %1.</translation>
+        <translation>&apos;%1&apos; 파일에 데이터베이스 백업이 완료되었습니다.</translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
-        <translation>Mở cơ sở dữ liệu sao lưu...</translation>
+        <translation>데이터베이스 백업 열기...</translation>
     </message>
     <message>
         <source>Could not open file &apos;%1&apos; for reading.</source>
-        <translation>Không thể mở tập tin %1 để đọc.</translation>
+        <translation>&apos;%1&apos; 읽기위한 파일을 열수 없습니다.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
+        <translation>주의</translation>
     </message>
     <message>
         <source>Restoring Database Backup</source>
-        <translation>Cơ sở dữ liệu sao lưu và khôi phục lại</translation>
+        <translation>데이터베이스 백업 복원</translation>
     </message>
     <message>
         <source>Database backup is being uploaded to the server. Please wait.</source>
-        <translation>Sao lưu cơ sở dữ liệu đã được tải lên máy chủ. Xin lỗi đợi tôi một chút.</translation>
+        <translation>데이터베이스 백업 서버에 업로드 되고 있습니다. 잠시만 기다려주세요.</translation>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation>Cơ sở dữ liệu được phục hồi thành công từ tập tin &apos;%1&apos;. Máy chủ Media sẽ được khởi động lại.</translation>
+        <translation>%1 파일로 부터 데이터 베이스의 복원이 완료 되었습니다. 저장서버를 다시 시작하여 주십시오.</translation>
     </message>
     <message>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation>Một lỗi đã xảy ra trong khi khôi phục lại cơ sở dữ liệu từ tập tin &apos;%1&apos;.</translation>
+        <translation>%1 파일로 부터 데이터 베이스를 복원하는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation>Không thể đổ cơ sở dữ liệu máy chủ để %1.</translation>
+        <translation type="unfinished">%1로의 서버 데이터 베이스 덤프 실패</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
-        <translation>Bạn có chắc chắn bạn muốn khôi phục lại cơ sở dữ liệu? Tất cả các dữ liệu hiện có sẽ bị mất.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation>Bạn cần phải kết nối với một máy chủ sao lưu trước khi làm.</translation>
+        <translation type="unfinished">백업을 실행 하기 전 먼저 서버를 연결 하십시오</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>44.1kHz và 48Khz định dạng âm thanh không được hỗ trợ bởi thiết bị âm thanh chụp! Hãy chọn thiết bị âm thanh khác hoặc giá trị không có trong cài đặt ghi lại màn hình</translation>
+        <translation>오디오 장치에서 44.1Khz와 48Khz 포멧을 지원하지 않습니다! 다른 오디오 장치를 선택하시거나 화면 녹화 설정에서 &apos;none&apos;값으로 설정을 변경하십시오</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Không thể tìm thấy các bộ mã hóa video &apos;%1&apos;。</translation>
+        <translation>%1 비디어 엔코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation>Không thể khởi tạo bộ mã hóa video.</translation>
+        <translation>비디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Không thể tìm thấy các coder audio &apos;%1&apos;。</translation>
+        <translation>%1 오디오 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+        <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Không thể khởi tạo thiết bị âm thanh &apos;%1&apos;。</translation>
+        <translation>&apos;%1&apos; 오디오 장비를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
-        <translation>Không thể khởi động các thiết bị âm thanh chính.</translation>
+        <translation>주 오디오 장치를 시작할 수 없습니다.</translation>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation>Chiều rộng màn hình phải có một số nhân của 8.</translation>
+        <translation type="unfinished">화면 너비는 반드시 8의 승수여야 합니다.</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation>44.1kHz và 48Khz định dạng âm thanh không được hỗ trợ bởi thiết bị âm thanh chụp! Hãy chọn thiết bị âm thanh khác hoặc giá trị không có trong cài đặt ghi lại màn hình.</translation>
+        <translation>오디오 장치에서 44.1Khz와 48Khz 포멧을 지원하지 않습니다! 다른 오디오 장치를 선택하시거나 화면 녹화 설정에서 &apos;none&apos;값으로 설정을 변경하십시오.</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Không thể tìm thấy các bộ mã hóa video &apos;%1&apos;。</translation>
+        <translation>%1 비디어 엔코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation>Không thể tạo tập tin tạm thời trong thư mục %1. Hãy cấu hình Main Truyền thông Folder năng thâu Screen.</translation>
+        <translation>&apos;%1&apos; 폴더에 임시 파일을 만들 수 없습니다. 화면 녹화설정에서 &apos;주 저장 폴더&apos;를 구성하십시오.</translation>
     </message>
     <message>
         <source>Could not allocate output stream for video codec.</source>
-        <translation>Không thể phân bổ dòng đầu ra cho video codec.</translation>
+        <translation>비디오 코덱의 출력 스트림을 할당할 수 없습니다.</translation>
     </message>
     <message>
         <source>Screen width must be a multiplier of 8.</source>
-        <translation>Chiều rộng màn hình phải có một số nhân của 8.</translation>
+        <translation>화면 너비는 반드시 8의 승수여야 합니다.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation>Không thể khởi tạo bộ mã hóa video.</translation>
+        <translation>비디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not allocate output audio stream.</source>
-        <translation>Không thể để phân bổ âm thanh dòng sản lượng.</translation>
+        <translation>오디오 코덱의 출력 스트림을 할당할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Không thể tìm thấy các coder audio &apos;%1&apos;。</translation>
+        <translation>%1 오디오 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+        <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Không thể khởi tạo thiết bị âm thanh &apos;%1&apos;。</translation>
+        <translation>&apos;%1&apos; 오디오 장비를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
-        <translation>Không thể khởi động các thiết bị âm thanh chính.</translation>
+        <translation>주 오디오 장치를 시작할 수 없습니다.</translation>
     </message>
 </context>
 <context>
     <name>QnEventLogDialog</name>
     <message>
         <source>Filter Similar Rows</source>
-        <translation>Lọc Rows tương tự</translation>
+        <translation>유사한 행 필터</translation>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Sao chép lựa chọn vào Clipboard</translation>
+        <translation>클립보드로 복사</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation>Lựa chọn Export to File...</translation>
+        <translation>선택된 파일로 내보내기...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>chọn tất cả</translation>
+        <translation>전체 선택</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation>rõ ràng Lọc</translation>
+        <translation>필터 초기화</translation>
     </message>
     <message numerus="yes">
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
-            <numerusform>Ghi sự kiện cho giai đoạn %1-%2 - %n sự kiện tìm thấy</numerusform>
+            <numerusform>%1에서 %2 - %n 기간 중 발견된 이벤트 로그</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Event log for %1 - %n event(s) found</source>
         <translation>
-            <numerusform>Ghi sự kiện cho %1 - %n sự kiện tìm thấy</numerusform>
+            <numerusform>%1 - %n 발견된 이벤트 로그</numerusform>
         </translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation>Xuất khẩu chọn lọc sự kiện để nộp</translation>
+        <translation>선택된 이벤트 파일로 내보내기</translation>
     </message>
     <message>
         <source>Any Action</source>
-        <translation>bất kỳ hành động</translation>
+        <translation type="unfinished">모든 동작</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
-        <translation>&lt;bất kỳ %1&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnEventLogModel</name>
     <message>
         <source>Motion video</source>
-        <translation>chuyển động video</translation>
+        <translation>움직임 영상</translation>
     </message>
     <message>
         <source>Date/Time</source>
-        <translation>ngày / thời gian</translation>
+        <translation>날짜/시간</translation>
     </message>
     <message>
         <source>Event</source>
-        <translation>biến cố</translation>
+        <translation>이벤트</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation>nguồn</translation>
+        <translation>소스</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation>hoạt động</translation>
+        <translation>동작</translation>
     </message>
     <message>
         <source>Target</source>
-        <translation>Mục đích</translation>
+        <translation>대상</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation>miêu tả</translation>
+        <translation>상세</translation>
     </message>
     <message>
         <source>Administrators Only</source>
-        <translation>chỉ có các nhà quản lý</translation>
+        <translation>관리자만</translation>
     </message>
     <message>
         <source>%1 times</source>
-        <translation>%1 thời gian</translation>
+        <translation>%1 회</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation>Tất cả người dùng</translation>
+        <translation type="unfinished">모든 사용자</translation>
     </message>
 </context>
 <context>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
         <source>Copy archive length settings</source>
-        <translation>Sao chép các thiết lập thời gian tự động lưu trữ</translation>
+        <translation>저장 범위 설정 복사</translation>
     </message>
     <message>
         <source>Schedule motion type is not supported by some %1.</source>
-        <translation>Loại lịch trình chuyển động không được hỗ trợ bởi một số %1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some %1.</source>
-        <translation>Ghi âm không thể được kích hoạt cho một số %1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some %1.</source>
-        <translation>Thiết lập lịch trình không tương thích với một số %1.</translation>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnFailoverPriorityDialog</name>
+    <message>
+        <source>Failover Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">하지 않음</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">일반화</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">높음</translation>
+    </message>
+</context>
+<context>
+    <name>QnFailoverPriorityDialogDelegate</name>
+    <message>
+        <source>Set Priority:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
         <source>Auto Calibration</source>
-        <translation>tự động điều chỉnh</translation>
+        <translation>자동 측정</translation>
     </message>
     <message>
         <source>Loading preview, please wait...</source>
-        <translation>Tải xem trước, vui lòng đợi ...</translation>
+        <translation>미리보기를 불러오고 있습니다, 잠시만 기다려 주세요...</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Auto calibration failed. Image is not round.</source>
-        <translation>Auto chuẩn bị thất bại. Hình ảnh không tròn.</translation>
+        <translation>자동 교정에 실패하였습니다. 이미지를 구성할 수 없습니다.</translation>
     </message>
     <message>
         <source>Auto calibration failed. The image might be too dim.</source>
-        <translation>Auto chuẩn bị thất bại. Các hình ảnh có thể là quá mờ.</translation>
+        <translation>자동 교정에 실패하였습니다. 이미지가 너무 어두울 수 있습니다.</translation>
     </message>
 </context>
 <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation>Chọn thư mục...</translation>
+        <translation>폴더 선택...</translation>
     </message>
     <message>
         <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation>thư mục &apos;%1&apos; không tồn tại.</translation>
+        <translation>&apos;%1&apos; 폴더가 존재하지 않습니다.</translation>
     </message>
     <message>
         <source>Disable only if the client takes too much CPU</source>
-        <translation>Chỉ vô hiệu hóa nếu khách hàng mất quá nhiều CPU</translation>
+        <translation>너무 많은 CPU를 사용하는 경우 비활성화</translation>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation>Thư mục đã được thêm vào.</translation>
+        <translation type="unfinished">이 폴더는 이미 추가 되었습니다</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation>Thư mục này đã được thêm vào.</translation>
+        <translation type="unfinished">이 폴더는 이미 추가 되었습니다.</translation>
     </message>
 </context>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management</source>
-        <translation>báo động mở / quy tắc quản lý sự kiện</translation>
-    </message>
-    <message>
-        <source>Open Event Log</source>
-        <translation>ghi sự kiện mở</translation>
-    </message>
-    <message>
-        <source>Open %1 List</source>
-        <translation>Mở Danh sách %1</translation>
-    </message>
-    <message>
         <source>%1 List</source>
-        <translation>%1 danh sách</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open %1 List...</source>
+        <extracomment>&quot;Open Cameras List...&quot; or &quot;Open Devices List...&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4181,264 +4224,265 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm exit</source>
-        <translation>Xác nhận Exit</translation>
+        <translation>종료 및 확인</translation>
     </message>
     <message>
         <source>Unsaved changes will be lost. Save the following pages?</source>
-        <translation>Những thay đổi chưa được lưu sẽ bị mất. Lưu các trang sau đây?</translation>
+        <translation>저장을 선택하지 않으면 변경 값이 손실됩니다. 아래 설정을 저장하시겠습니까?</translation>
     </message>
 </context>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation>Chúng tôi đã phát hiện ra rằng trình điều khiển card màn hình của bạn có thể không được cài đặt hoặc hết hạn.</translation>
+        <translation>비디오 카드 드라이버가 감지되지 않거나, 최신버젼이 감지 되었습니다.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation>Cài đặt và / hoặc cập nhật các trình điều khiển video của bạn có thể làm tăng đáng kể hiệu năng hệ thống của bạn khi xem và làm việc với video.</translation>
+        <translation>비디어 카드 드라이버의 업데이트 또는 설치하는 것은 영상 모니터링을 하거나 위치 조정 및 검색 동작 시의 성능을 향상 시킵니다.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation>Hiệu suất quan trọng Mẹo</translation>
+        <translation>중요한 성능 팁</translation>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation>Điều này có thể dẫn đến sự cố phần mềm máy khách bao gồm cả tai nạn.</translation>
+        <translation>소프트웨어 오동작 가능성 있음</translation>
     </message>
 </context>
 <context>
     <name>QnGridWidgetHelper</name>
     <message>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation>HTML văn khố (*.html);;Spread Bảng (CSV) văn khố(*.csv)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation>tiết kiệm như</translation>
+        <translation>다른이름으로 저장</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>văn khố &apos;%1&apos; đã tồn tại, Bạn muốn ghi đè lên nó?</translation>
+        <translation>&apos;%1&apos; 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation>Không thể ghi đè lên tập tin</translation>
+        <translation>파일을 덮어씌울 수 없습니다</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>văn khố &apos;%1&apos; Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
+        <translation>&apos;%1&apos; 파일은 다른 프로세서에 의해 사용 중입니다. 다른이름으로 시도 하십시오.</translation>
     </message>
 </context>
 <context>
     <name>QnHelpHandler</name>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
 </context>
 <context>
     <name>QnHistogramWidget</name>
     <message>
         <source>Gamma %1</source>
-        <translation>Gamma %1</translation>
+        <translation>감마 %1</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortItemDelegate</name>
     <message>
         <source>Disabled</source>
-        <translation>tàn tật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Input</source>
-        <translation>đầu vào</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Output</source>
-        <translation>Đầu ra</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Open circuit</source>
-        <translation>mở mạch</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Grounded circuit</source>
-        <translation>mạch nối đất</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation>hình thức</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnIOPortsViewModel</name>
     <message>
         <source>#</source>
-        <translation>#</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Type</source>
-        <translation>kiểu</translation>
+        <translation type="unfinished">방식</translation>
     </message>
     <message>
         <source>Default state</source>
-        <translation>trạng thái mặc định</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>tên</translation>
+        <translation type="unfinished">이름</translation>
     </message>
     <message>
         <source>Pulse time(ms)</source>
-        <translation>Thời gian xung (ms)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unknown</source>
         <comment>IO Port Type</comment>
-        <translation>không biết</translation>
+        <translation type="unfinished">알려지지 않음</translation>
     </message>
     <message>
         <source>Disabled</source>
         <comment>IO Port Type</comment>
-        <translation>tàn tật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Input</source>
         <comment>IO Port Type</comment>
-        <translation>đầu vào</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Output</source>
         <comment>IO Port Type</comment>
-        <translation>Đầu ra</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Invalid</source>
         <comment>IO Port Type</comment>
-        <translation>vô hiệu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Open Circuit</source>
         <comment>IO Port State</comment>
-        <translation>mở mạch</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Grounded circuit</source>
         <comment>IO Port State</comment>
-        <translation>mạch nối đất</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Invalid state</source>
         <comment>IO Port State</comment>
-        <translation>nhà nước không hợp lệ</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnImageControlWidget</name>
     <message>
         <source>4:3</source>
-        <translation>4:3</translation>
+        <translation type="unfinished">4:3</translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation>16:9</translation>
+        <translation type="unfinished">16:9</translation>
     </message>
     <message>
         <source>1:1</source>
-        <translation>1:1</translation>
+        <translation type="unfinished">1:1</translation>
     </message>
     <message>
         <source>%1 degrees</source>
-        <translation>%1 độ</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
         <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation>Không thể bật IO port &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation>Không để tắt cổng IO &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>IO port error</source>
-        <translation>Lỗi cổng IO</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>văn khố &apos;%1&apos; Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
+        <translation>&apos;%1&apos; 파일은 다른 프로세서에 의해 사용 중입니다. 다른이름으로 시도 하십시오.</translation>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation>xuất khẩu sang &quot;%1&quot;…</translation>
+        <translation>&quot;%1&quot;로 내보내기...</translation>
     </message>
     <message>
         <source>Could not create output file %1.</source>
-        <translation>Không thể tạo tập tin đầu ra %1.</translation>
+        <translation type="unfinished">%1.의 내보내기 파일을 만들 수 없습니다</translation>
     </message>
     <message>
         <source>Could not export %1 %2.</source>
-        <translation>Không thể xuất %1 %2.</translation>
+        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
         <source>Select file...</source>
-        <translation>Chọn File...</translation>
+        <translation>파일선택...</translation>
     </message>
     <message>
         <source>Pictures %1</source>
-        <translation>màn%1</translation>
+        <translation>사진 %1</translation>
     </message>
     <message>
         <source>&lt;No picture&gt;</source>
-        <translation>&lt;Không có hình ảnh&gt;</translation>
+        <translation>&lt;사진 없음&gt;</translation>
     </message>
     <message>
         <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;Lỗi trong khi tải các hình ảnh&gt;</translation>
+        <translation>&lt;사진 로딩 중 오류&gt;</translation>
     </message>
     <message>
         <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;Lỗi trong khi tải lên hình ảnh&gt;</translation>
+        <translation>&lt;사진 업데이트 중 오류&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;Hình ảnh không thể được đọc&gt;</translation>
+        <translation>&lt;사진파일을 읽을 수 없음&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;Hình ảnh quá lớn. Kích thước tối đa là %1 Mb&gt;</translation>
+        <translation>&lt;사진의 사이즈가 너무 큽니다. 최대 크기는 %1 Mb 입니다.&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;Hình ảnh không thể được nạp&gt;</translation>
+        <translation>&lt;사진을 읽어오지 못합니다.&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
         <source>Test</source>
-        <translation>thử</translation>
+        <translation type="unfinished">테스트</translation>
     </message>
     <message>
         <source>Test failed</source>
-        <translation>thử nghiệm thất bại</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>Test completed successfully: %n users found.</source>
-        <translation>
-            <numerusform>Kiểm tra đã hoàn thành công: %n người đã được tìm thấy.</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -4446,160 +4490,160 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation>Các thiết lập được cung cấp không hợp lệ.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation>Không thể thực hiện một thử nghiệm.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation>Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation>giờ nghĩ giảo lao</translation>
+        <translation type="unfinished">시간제한</translation>
     </message>
 </context>
 <context>
     <name>QnLdapUserListModel</name>
     <message>
         <source>Login</source>
-        <translation>đăng nhập</translation>
+        <translation type="unfinished">로그인</translation>
     </message>
     <message>
         <source>Full Name</source>
-        <translation>Họ và tên</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Email</source>
-        <translation>Emai</translation>
+        <translation type="unfinished">이메일</translation>
     </message>
     <message>
         <source>DN</source>
-        <translation>DN</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnLdapUsersDialog</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation>Các thiết lập được cung cấp không hợp lệ.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation>Không thể thực hiện một thử nghiệm.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation>Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not load users.</source>
-        <translation>Không thể tải người sử dụng.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Import users</source>
-        <translation>người sử dụng nhập khẩu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation>giờ nghĩ giảo lao</translation>
+        <translation type="unfinished">시간제한</translation>
     </message>
     <message>
         <source>Error while loading users.</source>
-        <translation>Lỗi trong khi tải người sử dụng.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No new users found.</source>
-        <translation>Không có người dùng mới được tìm thấy.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
         <source>Screens Allowed:</source>
-        <translation>Màn hình cho phép:</translation>
+        <translation>화면 허용:</translation>
     </message>
     <message>
         <source>Control Sessions Allowed:</source>
-        <translation>buổi kiểm soát cho phép:</translation>
+        <translation>제어 세션 허용:</translation>
     </message>
     <message>
         <source>Archive Streams Allowed:</source>
-        <translation>lưu trữ các dòng cho phép:</translation>
+        <translation>저장 스트림 허용:</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Sao chép vào Clipboard</translation>
+        <translation>상세보기 복사</translation>
     </message>
     <message>
         <source>Generic:</source>
-        <translation>chung:</translation>
+        <translation>일반:</translation>
     </message>
     <message>
         <source>License Type</source>
-        <translation>loại giấy phép</translation>
+        <translation>인증키 방식</translation>
     </message>
     <message>
         <source>License Key</source>
-        <translation>key bản quyền</translation>
+        <translation>인증키</translation>
     </message>
     <message>
         <source>Locked to Hardware ID</source>
-        <translation>khóa để ID phần cứng</translation>
+        <translation>하드웨어 ID 잠금</translation>
     </message>
     <message>
         <source>Features:</source>
-        <translation>Các tính năng:</translation>
+        <translation>기능:</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseListModel</name>
     <message>
         <source>Type</source>
-        <translation>kiểu</translation>
+        <translation>방식</translation>
     </message>
     <message>
         <source>License Key</source>
-        <translation>key bản quyền</translation>
+        <translation>인증키</translation>
     </message>
     <message>
         <source>Expiration Date</source>
-        <translation>ngày đáo hạn</translation>
+        <translation>만료일자</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>Số tiền</translation>
+        <translation>합계</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>trạng thái</translation>
+        <translation>상태</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation>máy chủ</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <source>Never</source>
-        <translation>thường xuyên</translation>
+        <translation>하지 않음</translation>
     </message>
     <message>
         <source>Expired</source>
-        <translation>hết hạn</translation>
+        <translation>만료됨</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation>ngày nay</translation>
+        <translation>오늘</translation>
     </message>
     <message>
         <source>Tomorrow</source>
-        <translation>ngày mai</translation>
+        <translation>내일</translation>
     </message>
     <message numerus="yes">
         <source>In %n days</source>
         <translation>
-            <numerusform>trong %n ngày</numerusform>
+            <numerusform>%n 일이내</numerusform>
         </translation>
     </message>
     <message>
@@ -4608,392 +4652,392 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Server not found&gt;</source>
-        <translation>&lt;Server không tìm thấy&gt;</translation>
+        <translation>&lt;서버를 찾을 수 없음&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
     <message>
         <source>The software is licensed to: </source>
-        <translation>Các phần mềm được cấp phép:</translation>
+        <translation>해당 프로그램의 인증키 :</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Sao chép vào Clipboard</translation>
+        <translation>상세보기 복사</translation>
     </message>
     <message>
         <source>License Activation</source>
-        <translation>Giấy phép Activation</translation>
+        <translation>인증키 활성화</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <translation>호환되지 않는 인증키를 사용하셨습니다. 관리자를 통해 유효한 인증키를 받으십시오.</translation>
     </message>
     <message>
         <source>License Activation </source>
-        <translation>kích hoạt giấy phép</translation>
+        <translation>인증키 활성화</translation>
     </message>
     <message>
         <source>Remove license</source>
-        <translation>loại bỏ giấy phép</translation>
+        <translation>인증키 삭제</translation>
     </message>
     <message>
         <source>License was successfully activated.</source>
-        <translation>Ủy quyền đã được kích hoạt thành công.</translation>
+        <translation>인증이 완료 되었습니다.</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>
         <translation>
-            <numerusform>Ít nhất %n %2 được yêu cầu</numerusform>
+            <numerusform>최소한 %n %2 이 필요함</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %2 are currently in use</source>
         <translation>
-            <numerusform>%n %2 hiện đang được sử dụng</numerusform>
+            <numerusform>%n %2 현재 사용 중</numerusform>
         </translation>
     </message>
     <message>
         <source>You do not have a valid license installed.</source>
-        <translation>Bạn không cần phải cài đặt một giấy phép hợp lệ.</translation>
+        <translation>유효한 인증키가 설치 되어있지 않습니다.</translation>
     </message>
     <message>
         <source>Please activate your commercial or trial license.</source>
-        <translation>Vui lòng kích hoạt giấy phép thương mại hoặc dùng thử của bạn.</translation>
+        <translation>정식판 또는 평가판의 인증키를 입력하여 주세요.</translation>
     </message>
     <message>
         <source>Please activate your commercial license.</source>
-        <translation>Vui lòng kích hoạt bản quyền thương mại của bạn.</translation>
+        <translation>정식판의 인증키를 입력하여 주십시오.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation.</source>
-        <translation>Lỗi mạng đã xảy ra trong quá trình kích hoạt giấy phép tự động.</translation>
+        <translation>자동 키 인증 중 네트워크의 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Try to activate your license manually.</source>
-        <translation>Hãy thử để kích hoạt bản quyền của bạn bằng tay.</translation>
+        <translation>수동으로 인증키를 활성화 합니다.</translation>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation>Lấy giấy phép từ Server ...</translation>
+        <translation type="unfinished">서버로부터 인증키를 얻어오는 중...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
-        <translation>Giấy phép đã arleady được kích hoạt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi mạng đã xảy ra.</translation>
+        <translation type="unfinished">네트워크 오류로 인해 인증키를 등록하는 과정에 문제가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation>Không thể kích hoạt giấy phép: %1</translation>
+        <translation type="unfinished">라이센스를 인증 받을 수 없음:  %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation>Không thể loại bỏ giấy phép từ máy chủ:%1</translation>
+        <translation type="unfinished">서버로부터 인증키를 지울 수 없음:  %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation>Key bản quyền này trước đó đã được kích hoạt để id phần cứng %1. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <translation type="unfinished">선택하신 인증 키는 %1 시스템에 이미 사용하였습니다. 관리자를 통해 유효한 인증키를 받으십시오.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation>Lỗi mạng đã xảy ra trong quá trình kích hoạt giấy phép tự động. Hãy liên hệ với nhóm hỗ trợ để kích hoạt key bản quyền của bạn bằng tay.</translation>
+        <translation type="unfinished">네트워크 오류로 인해 인증키를 자동 등록하는 과정에 문제가 발생하였습니다. 관리자를 통해 수동 등록을 통해 인증 받으세요.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation>Hướng dẫn khóa kích hoạt tập tin bạn đã chọn không hợp lệ. Chọn đúng nhãn key kích hoạt tập tin. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ.</translation>
+        <translation type="unfinished">유효하지 않은 인증 파일입니다. 올바른 인증 파일을 선택하여 주십시오.만약 문제가 지속 될 경우, 관리자에게 문의하십시오.</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseNotificationDialog</name>
     <message>
         <source>Some of your licenses are unavailable.</source>
-        <translation>Một số giấy phép của bạn là không có.</translation>
+        <translation>일부 인증키는 사용할 수 없습니다.</translation>
     </message>
     <message>
         <source>Some of your licenses will soon expire.</source>
-        <translation>Bạn ủy quyền một phần là sắp hết hạn.</translation>
+        <translation>일부 인증키는 곧 만료 됩니다.</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseWidget</name>
     <message>
         <source>Activate Trial License</source>
-        <translation>Bắt đầu cấp giấy phép thử nghiệm</translation>
+        <translation>임시 키 인증</translation>
     </message>
     <message>
         <source>Activate Free License</source>
-        <translation>Bắt đầu cấp giấy phép miễn phí</translation>
+        <translation>무료 키 인증</translation>
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>Xin vui lòng gửi email với các khóa tiếp và các ID phần cứng cung cấp cho %1  để có được một khóa tập tin kích hoạt.</translation>
+        <translation>인증 키를 얻기 위해 %1에 제공받은 Serial Key와 하드웨어 ID를 이메일로 보내주세요.</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>sự thành công</translation>
+        <translation>성공</translation>
     </message>
     <message>
         <source>Hardware ID copied to clipboard.</source>
-        <translation>ID phần cứng sao chép vào clipboard.</translation>
+        <translation>클립보드에 하드웨어 ID 복사.</translation>
     </message>
     <message>
         <source>Activate License</source>
-        <translation>Bắt đầu Authorization</translation>
+        <translation>정식 키 인증</translation>
     </message>
     <message>
         <source>Activating...</source>
-        <translation>Bắt đầu...</translation>
+        <translation>인증중...</translation>
     </message>
     <message>
         <source>Open License File</source>
-        <translation>Phép mở tài liệu lưu trữ</translation>
+        <translation>인증키 파일 열기</translation>
     </message>
     <message>
         <source>All files (*.*)</source>
-        <translation>tất cả các file(*.*)</translation>
+        <translation>모든 파일형식</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Could not open the file %1</source>
-        <translation>Không thể mở tập tin %1</translation>
+        <translation>%1 파일을 열수 없습니다</translation>
     </message>
 </context>
 <context>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
         <source>Use analog licenses to view these %n cameras</source>
-        <translation>
-            <numerusform>Sử dụng giấy phép tương tự để xem những %n máy ảnh</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Use licenses for selected %1</source>
-        <translation>Sử dụng giấy phép cho %1 chọn</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnLoginDialog</name>
     <message>
         <source>Invalid Login Information</source>
-        <translation>Đăng nhập không hợp lệ</translation>
+        <translation>잘못된 로그인 정보</translation>
     </message>
     <message>
         <source>Saved Sessions</source>
-        <translation>Thông tin được lưu trữ trong các kết nối</translation>
+        <translation>세션 저장</translation>
     </message>
     <message>
         <source>The login information you have entered is not valid.</source>
-        <translation>Các thông tin đăng nhập bạn đã nhập không hợp lệ.</translation>
+        <translation>입력한 로그인 정보는 유효하지 않습니다.</translation>
     </message>
     <message>
         <source>* Last used connection *</source>
-        <translation>*Kết nối sử dụng cuối cùng*</translation>
+        <translation>*마지막 사용 서버 연결*</translation>
     </message>
     <message>
         <source>&lt;none&gt;</source>
-        <translation>&lt;không&gt;</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation>Kết nối đến máy chủ...</translation>
+        <translation>서버 연결...</translation>
     </message>
     <message>
         <source>Version %1</source>
-        <translation>phiên bản %1</translation>
+        <translation>버전 %1</translation>
     </message>
     <message>
         <source>Auto-Discovered Servers</source>
-        <translation>tự động phát hiện các máy chủ</translation>
+        <translation>서버 자동 검색</translation>
     </message>
     <message>
         <source>The information you have entered is not valid.</source>
-        <translation>Các thông tin bạn đã nhập không hợp lệ.</translation>
+        <translation>입력 한 정보가 유효 하지 않습니다.</translation>
     </message>
     <message>
         <source>Entered hostname is not valid.</source>
-        <translation>Nhập URL không hợp lệ.</translation>
+        <translation>입력한 호스트 정보가 유효하지 않습니다.</translation>
     </message>
     <message>
         <source>Host field cannot be empty.</source>
-        <translation>Cột URL là không có sản phẩm nào.</translation>
+        <translation>호스트 정보는 반드시 필요합니다.</translation>
     </message>
     <message>
         <source>%1 at %2</source>
-        <translation>%1 đến %2</translation>
+        <translation>%2 에서 %1</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
-        <translation>Bạn có chắc chắn muốn xóa kết nối này: %1?</translation>
+        <translation>연결을 삭제하시겠습니까: %1?</translation>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation>Lập luận không hợp lệ</translation>
+        <translation type="unfinished">잘못된 변수</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation>Kết nối đã tồn tại.</translation>
+        <translation type="unfinished">연결정보가 이미 존재합니다</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation>Cùng tên đã tồn tại trong kết nối, bạn có muốn ghi đè lên nó?</translation>
+        <translation type="unfinished">같은 이름을 가진 연결정보가 이미 존재합니다. 덮어쓸까요?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation>xóa kết nối</translation>
+        <translation type="unfinished">연결 정보 삭제</translation>
     </message>
 </context>
 <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
         <source>Pictures %1</source>
-        <translation>màn%1</translation>
+        <translation>사진 %1</translation>
     </message>
     <message>
         <source>Preparing Image...</source>
-        <translation>Chuẩn bị hình ảnh ...</translation>
+        <translation>이미지 준비 중...</translation>
     </message>
     <message>
         <source>Please wait while image is being prepared...</source>
-        <translation>Xin vui lòng chờ trong khi hình ảnh đang được chuẩn bị ...</translation>
+        <translation>이미지를 준비하는 동안 잠시 기다려 주세요...</translation>
     </message>
     <message>
         <source>Dark</source>
-        <translation>tối</translation>
+        <translation>어두움</translation>
     </message>
     <message>
         <source>Light</source>
-        <translation>sáng</translation>
+        <translation>밝음</translation>
     </message>
     <message>
         <source>Server Time</source>
-        <translation>thời gian máy chủ</translation>
+        <translation>서버시간</translation>
     </message>
     <message>
         <source>Client Time</source>
-        <translation>gian của khách hàng</translation>
+        <translation>클라이언트 시간</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation>vỡ nợ</translation>
+        <translation>기본</translation>
     </message>
     <message>
         <source>Rainbow</source>
-        <translation>cầu vồng</translation>
+        <translation>무지개색</translation>
     </message>
     <message>
         <source>Custom...</source>
-        <translation>khách hàng...</translation>
+        <translation>사용자...</translation>
     </message>
     <message>
         <source>Stretch</source>
-        <translation>căng ra</translation>
+        <translation>펼처보기</translation>
     </message>
     <message>
         <source>Fit</source>
-        <translation>phù hợp</translation>
+        <translation>맞추기</translation>
     </message>
     <message>
         <source>Crop</source>
-        <translation>trồng trọt</translation>
+        <translation>잘라내기</translation>
     </message>
     <message>
         <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-        <translation>Tùy chọn này sẽ không ảnh hưởng đến Schedule Recording. Lịch trình ghi âm luôn luôn dựa trên Server Time.</translation>
+        <translation>이 옵션은 저장 일정에 영향을 주지 않습니다. 저장 일정은 항상 서버 시간을 기준으로 합니다.</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation>Chọn File...</translation>
+        <translation type="unfinished">파일선택...</translation>
     </message>
 </context>
 <context>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation>Cài đặt tập tin</translation>
+        <translation>파일설정</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation>Hình ảnh không được tải</translation>
+        <translation>사진없음</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation>Đây là một tập tin ống kính mắt cá</translation>
+        <translation>어안렌즈파일 입니다.</translation>
     </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
-        <translation>chụp màn hình</translation>
+        <translation>스크린 샷</translation>
     </message>
     <message>
         <source>Smart Search</source>
-        <translation>Wisdom Tìm kiếm</translation>
+        <translation>스마트 검색</translation>
     </message>
     <message>
         <source>PTZ</source>
-        <translation>PTZ</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Dewarping</source>
-        <translation>Correction Fish-Eye (Dewarping)</translation>
+        <translation>디와핑</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
-        <translation>Thiết lập cửa sổ zoom</translation>
+        <translation>줌 영역 생성</translation>
     </message>
     <message>
         <source>Image Enhancement</source>
-        <translation>nâng cao hình ảnh</translation>
+        <translation>이미지 향상</translation>
     </message>
     <message>
         <source>Hi-Res</source>
-        <translation>độ phân giải cao</translation>
+        <translation>고-해상도</translation>
     </message>
     <message>
         <source>LIVE</source>
-        <translation>trực tiếp</translation>
+        <translation>라이브</translation>
     </message>
     <message>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1 (Tour &quot;%2&quot; đang được thực thi)</translation>
+        <translation>%1 (Tour &quot;%2&quot;연결)</translation>
     </message>
     <message>
         <source>IO Module</source>
-        <translation>IO Module</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation>phóng to cửa sổ</translation>
+        <translation type="unfinished">줌 영역</translation>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation>Độ phân giải thấp</translation>
+        <translation type="unfinished">저-해상도</translation>
     </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
     <message>
         <source>Merge Systems...</source>
-        <translation>Kết hợp hệ thống ...</translation>
+        <translation>시스템 조정...</translation>
     </message>
     <message>
         <source>Server URL:</source>
-        <translation>URL máy chủ:</translation>
+        <translation>서버 URL:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>mật khẩu:</translation>
+        <translation>비밀번호:</translation>
     </message>
     <message>
         <source>The new system will have password and name from the system:</source>
-        <translation>Hệ thống mới sẽ có mật khẩu và tên từ hệ thống:</translation>
+        <translation>새 시스템은 시스템에서 암호와 이름을 갖게 됨:</translation>
     </message>
     <message>
         <source>http(s)://host:port</source>
@@ -5001,92 +5045,106 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You are about to merge the current system %1 with the system</source>
-        <translation>Bạn muốn hợp nhất các hệ thống hiện tại %1 với hệ thống</translation>
+        <translation>현재 %1 시스템과 이 시스템의 병합을 시행함</translation>
     </message>
     <message>
         <source>%1 (current)</source>
-        <translation>%1 (hiện tại)</translation>
+        <translation>%1 (현재)</translation>
     </message>
     <message>
         <source>The URL is invalid.</source>
-        <translation>Các URL không hợp lệ.</translation>
+        <translation>유효하지 않은 URL.</translation>
     </message>
     <message>
         <source>The password cannot be empty.</source>
-        <translation>Mật khẩu không thể để trống.</translation>
+        <translation>비밀번호를 입력하십시오.</translation>
     </message>
     <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
-        <translation>Sử dụng một tên máy hoặc địa chỉ IP cụ thể chứ không phải là %1.</translation>
+        <translation>%1 보다는 별도 호스트 네임 또는 아이피 주소를 사용하세요.</translation>
     </message>
     <message>
         <source>This is the current system URL.</source>
-        <translation>Đây là địa chỉ hệ thống hiện tại.</translation>
+        <translation>현재 시스템의 URL입니다.</translation>
     </message>
     <message>
         <source>Merge with %1</source>
-        <translation>Kết hợp với %1</translation>
+        <translation>%1로 병합</translation>
     </message>
     <message>
         <source>The password is invalid.</source>
-        <translation>Các mật khẩu là không hợp lệ.</translation>
+        <translation>비밀번호가 유효하지 않습니다.</translation>
     </message>
     <message>
         <source>The system was not found.</source>
-        <translation>Hệ thống này đã không được tìm thấy.</translation>
+        <translation>시스템을 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not create a backup of the server database.</source>
-        <translation>Không thể tạo ra một bản sao lưu cơ sở dữ liệu máy chủ.</translation>
+        <translation>시스템 데이터 베이스에 백업을 만들 수 없습니다.</translation>
     </message>
     <message>
         <source>System was not found.</source>
-        <translation>Hệ thống không tìm thấy.</translation>
+        <translation>시스템을 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Cannot merge systems.</source>
-        <translation>Không thể hợp nhất các hệ thống.</translation>
+        <translation>시스템 조정을 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Success!</source>
-        <translation>Thành công!</translation>
+        <translation>성공!</translation>
     </message>
     <message>
         <source>The system was configured successfully.</source>
-        <translation>Hệ thống được cấu hình thành công.</translation>
+        <translation>시스템의 설정을 완료함.</translation>
     </message>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
-        <translation>Các máy chủ từ xa hệ thống sẽ xuất hiện trong hệ thống của bạn sớm.</translation>
+        <translation>원격 시스템에서 서버는 곧 표시 됩니다.</translation>
     </message>
     <message>
         <source>Check</source>
-        <translation>kiểm tra</translation>
+        <translation>확인</translation>
     </message>
     <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation>Cảnh báo: Bạn muốn hợp nhất hệ thống với giấy phép START.
-Vì chỉ có 1 giấy phép START phép cho mỗi hệ thống sau khi hợp nhất của bạn, bạn sẽ chỉ có 1 giấy phép BẮT ĐẦU còn lại.
-Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng bấm Merge để tiếp tục.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation>thử nghiệm ...</translation>
+        <translation type="unfinished">시험...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation>sáp nhập hệ thống ...</translation>
+        <translation type="unfinished">시스템 병합 중...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation>Việc tìm thấy hệ thống %1 có một phiên bản không tương thích %2.</translation>
+        <translation type="unfinished">%1 시스템에서 호환되지 않는 %2 버젼이 발견되었습니다.</translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System has an incompatible version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operation is not permitted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System is in safe mode.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5094,55 +5152,55 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
-        <translation>&lt;nhiều lựa chọn&gt;</translation>
+        <translation>&lt;중복 결과&gt;</translation>
     </message>
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
-        <translation>&lt;nhiều lựa chọn&gt;</translation>
+        <translation>multiple values&gt;</translation>
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation>lịch trình không hợp lệ</translation>
+        <translation type="unfinished">유효하지 않은 스케줄</translation>
     </message>
     <message>
         <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Phần thứ hai được vô hiệu hóa trên các máy ảnh. Tùy chọn chuyển động + LQ không có hiệu lực. Nhấn &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnNavigationItem</name>
     <message>
         <source>Speed Down</source>
-        <translation>làm chậm lại</translation>
+        <translation>속도 감소</translation>
     </message>
     <message>
         <source>Previous Frame</source>
-        <translation>Khung trước</translation>
+        <translation>이전 프레임</translation>
     </message>
     <message>
         <source>Speed Up</source>
-        <translation>Tăng tốc</translation>
+        <translation>속도 증가</translation>
     </message>
     <message>
         <source>Next Frame</source>
-        <translation>Các khung hình tiếp theo</translation>
+        <translation>다음 프레임</translation>
     </message>
     <message>
         <source>Previuos Chunk</source>
-        <translation>Trước khi một khối</translation>
+        <translation>이전 블럭</translation>
     </message>
     <message>
         <source>To Start</source>
-        <translation>đến điểm khởi</translation>
+        <translation>시작으로</translation>
     </message>
     <message>
         <source>Next Chunk</source>
-        <translation>khối tiếp theo</translation>
+        <translation>다음 블럭</translation>
     </message>
     <message>
         <source>To End</source>
-        <translation>Để một điểm kết thúc</translation>
+        <translation>끝으로</translation>
     </message>
 </context>
 <context>
@@ -5165,7 +5223,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message numerus="yes">
         <source>%n more item(s)</source>
         <translation>
-            <numerusform>hơn %n dự án</numerusform>
+            <numerusform>%n 항목</numerusform>
         </translation>
     </message>
 </context>
@@ -5173,375 +5231,372 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnNotificationSoundManagerDialog</name>
     <message>
         <source>Notification Sounds</source>
-        <translation>âm báo</translation>
+        <translation>알림 음원</translation>
     </message>
     <message>
         <source>&amp;Play</source>
-        <translation>&amp;Broadcast</translation>
+        <translation>재생(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Add...</source>
-        <translation>&amp;thêm...</translation>
+        <translation>추가(&amp;A)...</translation>
     </message>
     <message>
         <source>&amp;Rename...</source>
-        <translation>&amp;đổi tên...</translation>
+        <translation>이름 변경(&amp;R)...</translation>
     </message>
     <message>
         <source>&amp;Delete...</source>
-        <translation>&amp;xóa bỏ...</translation>
+        <translation>삭제(&amp;D)...</translation>
     </message>
     <message>
         <source>Clip sound up to %1 seconds</source>
-        <translation>Lên đến %1 giây của đoạn âm thanh</translation>
+        <translation>%1초 까지 음원 클립</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>File cannot be added.</source>
-        <translation>Không thể thêm tập tin.</translation>
+        <translation>파일을 추가 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Rename sound</source>
-        <translation>Đổi tên âm thanh</translation>
+        <translation>음원 이름 변경</translation>
     </message>
     <message>
         <source>New title could not be set.</source>
-        <translation>Tiêu đề mới không được thiết lập.</translation>
+        <translation>새로운 타이틀을 설정할 수 없습니다.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation>Bạn có chắc là bạn muốn xóa &apos;%1&apos; ?</translation>
+        <translation>삭제 하시겠습니까 &apos;%1&apos;?</translation>
     </message>
     <message>
         <source>Custom title:</source>
-        <translation>Tiêu đề tùy chỉnh:</translation>
+        <translation>사용자 표제:</translation>
     </message>
     <message>
         <source>Sound Files</source>
-        <translation>Lưu trữ âm thanh</translation>
+        <translation type="unfinished">음원 파일</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation>Chọn File...</translation>
+        <translation type="unfinished">파일선택...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation>Nhập tiêu đề mới:</translation>
+        <translation type="unfinished">새 타이틀 입력:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation>Xác nhận tập tin Xóa</translation>
+        <translation type="unfinished">파일 삭제 확인</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
         <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;Tải về Âm thanh danh...&gt;</translation>
+        <translation>&lt;다운로드 음원 목록...&gt;</translation>
     </message>
     <message>
         <source>&lt;No Sound&gt;</source>
-        <translation>&lt;không có âm thanh&gt;</translation>
+        <translation>&lt;음원 없음&gt;</translation>
     </message>
     <message>
         <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;Tải về Âm thanh...&gt;</translation>
+        <translation>&lt;음원 다운로드...&gt;</translation>
     </message>
     <message>
         <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;tải lên tiếng&gt;</translation>
+        <translation>&lt;음원 업로드...&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
         <source>Close</source>
-        <translation>đóng cửa</translation>
+        <translation>닫기</translation>
     </message>
     <message>
         <source>Right Click</source>
-        <translation>click chuột phải</translation>
+        <translation>우측 클릭</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationsCollectionWidget</name>
     <message>
         <source>DEBUG</source>
-        <translation>debug</translation>
+        <translation>디버그</translation>
     </message>
     <message>
         <source>Browse Archive</source>
-        <translation>Xem video</translation>
-    </message>
-    <message>
-        <source>Server settings</source>
-        <translation>cài đặt máy chủ</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>thiết lập</translation>
-    </message>
-    <message>
-        <source>User Settings</source>
-        <translation>thiết lập người dùng</translation>
-    </message>
-    <message>
-        <source>Licenses</source>
-        <translation>ủy quyền</translation>
-    </message>
-    <message>
-        <source>SMTP Settin gs</source>
-        <translation>Cài đặt SMTP</translation>
-    </message>
-    <message>
-        <source>SMTP Settings</source>
-        <translation>SMTP thiết lập</translation>
-    </message>
-    <message>
-        <source>Connect to server</source>
-        <translation>Kết nối đến máy chủ</translation>
+        <translation>백업 검색</translation>
     </message>
     <message>
         <source>Open %1</source>
-        <translation>mở %1</translation>
-    </message>
-    <message>
-        <source>%1 Settings</source>
-        <translation>%1 Cài đặt</translation>
-    </message>
-    <message>
-        <source>Server Settings</source>
-        <translation>cài đặt máy chủ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Open %1 Web Page...</source>
-        <translation>Mở %1 trang Web ...</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <extracomment>&quot;Camera Settings...&quot; or &quot;Device Settings...&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings...</source>
+        <translation type="unfinished">서버 설정...</translation>
+    </message>
+    <message>
+        <source>Licenses...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Settings...</source>
+        <translation type="unfinished">사용자 설정...</translation>
+    </message>
+    <message>
+        <source>SMTP Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Synchronization...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnPerformanceTest</name>
     <message>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
-        <translation>Hiệu suất của máy tính này cho phép chạy được %1 trong chế độ cấu hình duy nhất.</translation>
+        <translation>시스템의 성능은 설정 모드의 %1 동작에서만 허용한다.</translation>
     </message>
     <message>
         <source>For full-featured mode please use another computer.</source>
-        <translation>Đối với chế độ đầy đủ tính năng xin vui lòng sử dụng một máy tính khác.</translation>
+        <translation>전체 기능 모드 사용을 위해 다른 시스템을 이용해 주세요.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
+        <translation>주의</translation>
     </message>
 </context>
 <context>
     <name>QnPreferencesDialog</name>
     <message>
         <source>Notifications</source>
-        <translation>thông báo</translation>
+        <translation>알림</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>chung</translation>
+        <translation>일반</translation>
     </message>
     <message>
         <source>Look and Feel</source>
-        <translation>điều chỉnh thị giác</translation>
+        <translation>화면 설정</translation>
     </message>
     <message>
         <source>Screen Recording</source>
-        <translation>màn hình video</translation>
+        <translation>화면 저장 중</translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation>Một số thay đổi sẽ chỉ có hiệu lực sau khi khởi động lại ứng dụng. Bạn có muốn khởi động lại ứng dụng bây giờ?</translation>
+        <translation>응용 프로그램을 다시 시작한 후에 변경 내용이 적용 됩니다.프로그램을 다시 시작하시겠습니까?</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <source>Settings file is read-only. Please contact your system administrator.</source>
-        <translation>Cài đặt tập tin là chỉ đọc. Hãy liên hệ với quản trị hệ thống của bạn.</translation>
+        <translation>설정파일은 읽기 전용입니다. 시스템 관리자에게 문의하세요.</translation>
     </message>
     <message>
         <source>All changes will be lost after program exit.</source>
-        <translation>Mọi thay đổi sẽ bị mất sau khi thoát chương trình.</translation>
+        <translation>모든 변경 항목은 프로그램 종료 후에 손실됩니다.</translation>
     </message>
     <message>
         <source>Settings cannot be saved. Please contact your system administrator.</source>
-        <translation>Cài đặt không thể lưu. Hãy liên hệ với quản trị hệ thống của bạn.</translation>
+        <translation>설정을 저장하지 못했습니다. 시스템 관리자에게 문의하세요.</translation>
     </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
     <message>
         <source>Cancel</source>
-        <translation>hủy bỏ</translation>
+        <translation>취소</translation>
     </message>
 </context>
 <context>
     <name>QnPtzManageDialog</name>
     <message>
         <source>Do not show again.</source>
-        <translation>Tương lai không còn hiển thị.</translation>
+        <translation>다시 보기를 사용할 수 없습니다.</translation>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
-        <translation>Cài sẵn này được sử dụng trong một số tour du lịch.</translation>
+        <translation>이 프리셋은 몇몇 투어설정에서 사용합니다.</translation>
     </message>
     <message>
         <source>These tours will become invalid if you remove it.</source>
-        <translation>Các tour du lịch sẽ trở thành không hợp lệ nếu bạn gỡ bỏ nó.</translation>
+        <translation>만약 삭제할 경우 이 투어는 잘못 동작할 수 있습니다.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Một lỗi đã xảy ra trong khi cố gắng để có được vị trí hiện tại từ camera %1.</translation>
+        <translation>%1 카메라의 현재 위치를 가져오는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
-        <translation>Xin vui lòng chờ máy ảnh để đi trực tuyến.</translation>
+        <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Một lỗi đã xảy ra trong khi đang cố gắng để thiết lập vị trí hiện tại cho máy ảnh %1.</translation>
+        <translation>%1 카메라의 현재 위치를 설정하는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation>Không thể có được từ vị trí camera.</translation>
+        <translation type="unfinished">카메라 위치를 가져올 수 없음</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation>Bạn không thể thiết lập vị trí camera.</translation>
+        <translation type="unfinished">카메라의 위치를 설정할 수 없음</translation>
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation>Hủy bỏ các điểm định sẵn</translation>
+        <translation type="unfinished">프리셋 삭제</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
-        <translation>quản lý PTZ %1.</translation>
+        <translation type="unfinished">%1.의 PTZ 조정</translation>
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation>PTZ Các giá trị cài đặt không được lưu trữ.</translation>
+        <translation type="unfinished">PTZ 설정이 저장되지 않음</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation>Những thay đổi chưa được lưu. Bạn có chắc chắn muốn lưu chúng?</translation>
+        <translation type="unfinished">변경사항이 저장되지 않았습니다. 저장하시겠습니까?</translation>
     </message>
 </context>
 <context>
     <name>QnPtzManageModel</name>
     <message>
         <source>#</source>
-        <translation>#</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>tên</translation>
+        <translation>이름</translation>
     </message>
     <message>
         <source>Hotkey</source>
-        <translation>Hotkeys</translation>
+        <translation>단축키</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation>nhà</translation>
+        <translation>홈</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>chi tiết</translation>
+        <translation>상세</translation>
     </message>
     <message>
         <source>Tours</source>
-        <translation>chuyến du lịch</translation>
+        <translation>투어</translation>
     </message>
     <message>
         <source>Positions</source>
-        <translation>vị trí</translation>
+        <translation>위치</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>không ai</translation>
+        <translation>None</translation>
     </message>
     <message numerus="yes">
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
-            <numerusform>Đây điểm thiết lập trong %n phút sau khi kích hoạt</numerusform>
+            <numerusform>프리셋은 비활성화된 %n분 후에 활성화 됩니다</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Tour has %n identical positions</source>
         <translation>
-            <numerusform>Cruise gồm %n cùng một vị trí</numerusform>
+            <numerusform>투어는 %n의 동일 위치임</numerusform>
         </translation>
     </message>
     <message>
         <source>less than a minute</source>
-        <translation>Chưa đầy một phút</translation>
+        <translation>1분 미만</translation>
     </message>
     <message numerus="yes">
         <source>about %n minute(s)</source>
         <translation>
-            <numerusform>về %n phút</numerusform>
+            <numerusform>%n분에 대한</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid tour</source>
-        <translation>Hành trình không hợp lệ</translation>
+        <translation>유효하지 않은 투어</translation>
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation>du lịch mới %1</translation>
+        <translation type="unfinished">%1 새 투어</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
-        <translation>lưu trữ Location %1</translation>
+        <translation type="unfinished">%1 위치 저장</translation>
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation>Cruise phải chứa ít nhất hai hoặc nhiều vị trí.</translation>
+        <translation type="unfinished">투어는 2개 이상의 위치를 포함합니다</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation>thời gian tour：%1.</translation>
+        <translation type="unfinished">투어 시간: %1</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetDialog</name>
     <message>
         <source>Saved Position %1</source>
-        <translation>lưu trữ Location %1</translation>
+        <translation>%1 위치 저장</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>không ai</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
         <source>None</source>
-        <translation>không ai</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Change hotkey</source>
-        <translation>Thay đổi phím nóng</translation>
+        <translation>단축키 변경</translation>
     </message>
     <message>
         <source>Reassign</source>
-        <translation>phân công lại</translation>
+        <translation>재할당</translation>
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation>Các phím nóng là thời điểm định sẵn &quot;%1&quot; dùng.</translation>
+        <translation type="unfinished">이 단축키는 &quot;%1&quot; 프리셋에서 사용합니다</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation>Hotkey này đã được bay đường &quot;%1&quot; dùng.</translation>
+        <translation type="unfinished">이 단축키는 &quot;%1&quot; 투어에서 사용합니다</translation>
     </message>
 </context>
 <context>
@@ -5549,272 +5604,276 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>%1 (active)</source>
         <comment>Template for active PTZ preset</comment>
-        <translation>%1 (sáng kiến)</translation>
+        <translation>%1 (활성화)</translation>
     </message>
     <message>
         <source>%1 (active)</source>
         <comment>Template for active PTZ tour</comment>
-        <translation>%1 (sáng kiến)</translation>
+        <translation>%1 (활성화)</translation>
     </message>
 </context>
 <context>
     <name>QnPtzTourSpotsModel</name>
     <message>
         <source>Lowest</source>
-        <translation>thấp nhất</translation>
+        <translation>최저</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation>thấp</translation>
+        <translation>낮음</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation>chung</translation>
+        <translation>중간</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>cao</translation>
+        <translation>높음</translation>
     </message>
     <message>
         <source>Highest</source>
-        <translation>cao nhất</translation>
+        <translation>최대</translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation>ngay</translation>
+        <translation>긴급</translation>
     </message>
     <message numerus="yes">
         <source>%n seconds</source>
         <translation>
-            <numerusform>%n thứ hai</numerusform>
+            <numerusform>%n초</numerusform>
         </translation>
     </message>
     <message>
         <source>&lt;Invalid&gt;</source>
-        <translation>&lt;vô hiệu&gt;</translation>
+        <translation>&lt;유효하지 않는&gt;</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation>vị trí</translation>
+        <translation>위치</translation>
     </message>
     <message>
         <source>Stay Time</source>
-        <translation>thời gian cư trú</translation>
+        <translation>대기 시간</translation>
     </message>
     <message>
         <source>Speed</source>
-        <translation>tốc độ</translation>
+        <translation>속도</translation>
     </message>
 </context>
 <context>
     <name>QnReconnectInfoDialog</name>
     <message>
         <source>Canceling...</source>
-        <translation>Huỷ ...</translation>
+        <translation>취소 중...</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingSettingsWidget</name>
     <message>
         <source>Screen %1 - %2x%3</source>
-        <translation>màn %1 - %2 x %3</translation>
+        <translation>스크린 %1 - %2x%3</translation>
     </message>
     <message>
         <source>%1 (Primary)</source>
-        <translation>%1 (chìa khóa)</translation>
+        <translation>%1 (메인)</translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation>thời gian máy chủ...</translation>
+        <translation>폴더 선택...</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatisticsWidget</name>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Sao chép vào clipboard lựa chọn</translation>
+        <translation type="unfinished">클립보드로 복사</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation>Lựa chọn Export to File...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>chọn tất cả</translation>
+        <translation type="unfinished">전체 선택</translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation>Xuất khẩu chọn lọc sự kiện để nộp</translation>
+        <translation type="unfinished">선택된 이벤트 파일로 내보내기</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatsModel</name>
     <message numerus="yes">
         <source>%n years</source>
-        <translation>
-            <numerusform>%n năm</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n months</source>
-        <translation>
-            <numerusform>%n tháng</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n days</source>
-        <translation>
-            <numerusform>%n ngày</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hours</source>
-        <translation>
-            <numerusform>%n giờ</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation>Thời gian lưu trữ trong những ngày lịch giữa các bản ghi đầu tiên và thời điểm hiện tại</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
-        <translation>Bitrate trung bình trong khoảng thời gian ghi</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Space</source>
-        <translation>Spacebar</translation>
+        <translation type="unfinished">여유공간</translation>
     </message>
     <message>
         <source>Calendar Days</source>
-        <translation>Lịch ngày</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>less than an hour</source>
-        <translation>ít hơn một giờ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Mbps</source>
-        <translation>%1 Mbps</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Tb</source>
-        <translation>%1 Tb</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Gb</source>
-        <translation>%1 Gb</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Total %1</source>
-        <translation>tổng số %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 with non-empty archive</source>
-        <translation>%1 với kho lưu trữ không có sản phẩm nào</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Storage space occupied by %1</source>
-        <translation>Không gian lưu trữ bị chiếm đóng bởi %1</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
     <message>
         <source>Not recording</source>
-        <translation>không có video</translation>
+        <translation>저장안함</translation>
     </message>
     <message>
         <source>Recording everything</source>
-        <translation>video liên tục</translation>
+        <translation>연속 저장</translation>
     </message>
     <message>
         <source>Recording motion only</source>
-        <translation>Ghi âm phát hiện Displacement chỉ</translation>
+        <translation>움직임 저장만</translation>
     </message>
     <message>
         <source>Recording motion and low quality</source>
-        <translation>Phát hiện chuyển động + chất lượng thấp video liên tục</translation>
+        <translation>움직임 저장과 저화질</translation>
     </message>
     <message>
         <source>Continuous</source>
-        <translation>video liên tục</translation>
+        <translation>연속저장</translation>
     </message>
     <message>
         <source>Motion only</source>
-        <translation>Chỉ phát hiện di dời</translation>
+        <translation>움직임 저장만</translation>
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation>Displacement + chất lượng thấp</translation>
+        <translation>움직임 + 저해상도</translation>
     </message>
 </context>
 <context>
     <name>QnResourceBrowserWidget</name>
     <message>
         <source>Any Type</source>
-        <translation>bất kỳ loại</translation>
+        <translation>모든 방식</translation>
     </message>
     <message>
         <source>Video Files</source>
-        <translation>tập tin hình ảnh</translation>
+        <translation>비디오 파일</translation>
     </message>
     <message>
         <source>Image Files</source>
-        <translation>hình ảnh Lưu trữ</translation>
+        <translation>이미지 파일</translation>
     </message>
     <message>
         <source>Live %1</source>
-        <translation>LIVE %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnResourcePoolModelNode</name>
     <message>
         <source>Root</source>
-        <translation>nguồn gốc</translation>
+        <translation>루트</translation>
     </message>
     <message>
         <source>Local</source>
-        <translation>địa phương</translation>
+        <translation>내부</translation>
     </message>
     <message>
         <source>System</source>
-        <translation>hệ thống</translation>
+        <translation>시스템</translation>
     </message>
     <message>
         <source>Other Systems</source>
-        <translation>Hệ thống khác</translation>
+        <translation>다른 시스템</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation>người sử dụng</translation>
+        <translation>사용자</translation>
     </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation>Chọn người dùng...</translation>
+        <translation type="unfinished">사용자 선택...</translation>
     </message>
     <message>
         <source>Select Resources...</source>
-        <translation>Chọn Tài...</translation>
+        <translation type="unfinished">리소스 선택...</translation>
     </message>
     <message>
         <source>Select %1...</source>
-        <translation>lựa chọn %1...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnResourceTreeWidget</name>
     <message>
         <source>Filter</source>
-        <translation>Lọc</translation>
+        <translation>필터</translation>
     </message>
     <message>
         <source>Reset Filter</source>
-        <translation>Đặt lại bộ lọc</translation>
+        <translation>필터 초기화</translation>
     </message>
     <message>
         <source>X</source>
@@ -5825,240 +5884,264 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnResourceWidget</name>
     <message>
         <source>Close</source>
-        <translation>đóng cửa</translation>
+        <translation>닫기</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <source>Rotate</source>
-        <translation>xoay</translation>
+        <translation>회전</translation>
     </message>
 </context>
 <context>
     <name>QnRoutingManagementWidget</name>
     <message>
         <source>Available Server Addresses</source>
-        <translation>Địa chỉ máy chủ có sẵn</translation>
+        <translation>사용 가능한 서버 주소</translation>
     </message>
     <message>
         <source>Add URL</source>
-        <translation>thêm vào URL</translation>
+        <translation>URL 추가</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>tẩy</translation>
+        <translation>제거</translation>
     </message>
     <message>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>Loại bỏ các tùy chọn kết nối này có thể dẫn đến hệ thống bị trục trặc.</translation>
+        <translation>이 연결 옵션을 삭제할 경우 시스템의 오류가 발생 할 수 있습니다.</translation>
     </message>
     <message>
         <source>Enter URL</source>
-        <translation>vào URL</translation>
+        <translation>URL 입력</translation>
     </message>
     <message>
         <source>URL</source>
-        <translation>nơi</translation>
+        <translation>URL</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>You have entered an invalid URL.</source>
-        <translation>Bạn đã nhập một URL không hợp lệ.</translation>
+        <translation>입력한 URL이 유효하지 않습니다.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
+        <translation>주의</translation>
     </message>
     <message>
         <source>This URL is already in the address list.</source>
-        <translation>URL này đã có trong danh sách địa chỉ.</translation>
+        <translation>이 URL은 목록에 이미 존재합니다.</translation>
     </message>
 </context>
 <context>
     <name>QnScreenRecorder</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation>Chụp màn hình hệ thống con đã không được khởi tạo. Vui lòng thử lại.</translation>
+        <translation>화면 캡쳐하는 서브 시스템이 초기화 되지 않았습니다. 나중에 다시 시도하세요.</translation>
     </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
     <message>
         <source>Search</source>
-        <translation>tìm kiếm</translation>
+        <translation>검색</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>trước</translation>
+        <translation>이전</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation>kế tiếp</translation>
+        <translation>다음</translation>
     </message>
 </context>
 <context>
     <name>QnServerAddressesModel</name>
     <message>
         <source>Address</source>
-        <translation>địa chỉ</translation>
+        <translation>주소</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation>dùng</translation>
+        <translation>사용자</translation>
     </message>
 </context>
 <context>
     <name>QnServerResourceWidget</name>
     <message>
         <source>Show Log</source>
-        <translation>chương trình log</translation>
+        <translation>로그보기</translation>
     </message>
     <message>
         <source>Check Issues</source>
-        <translation>Kiểm tra các vấn đề</translation>
+        <translation>이슈 확인</translation>
     </message>
     <message numerus="yes">
         <source>%1 (up %n days, %2)</source>
         <translation>
-            <numerusform>%1 (up %n days, %2)</numerusform>
+            <numerusform>%1 (%n일 이상, %2)</numerusform>
         </translation>
     </message>
     <message>
         <source>%1</source>
-        <translation>%1</translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
         <source>Open Web Page...</source>
-        <translation>Mở trang Web ...</translation>
+        <translation>웹페이지 열기...</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>chung</translation>
+        <translation type="unfinished">일반</translation>
     </message>
     <message>
         <source>Storage Analytics</source>
-        <translation>phân tích lưu trữ</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings - %1 (readonly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation type="unfinished">서버 설정</translation>
+    </message>
+    <message>
+        <source>Server not saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to the server %1?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
     <message>
         <source>Remove Storage</source>
-        <translation>Hủy bỏ các thiết bị lưu trữ</translation>
+        <translation type="unfinished">저장장치 삭제</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Đang tải...</translation>
+        <translation type="unfinished">읽는 중...</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation>không được phép</translation>
+        <translation type="unfinished">사용할 수 없음</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
+        <translation type="unfinished">주의</translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation>Bạn muốn khởi động các kho lưu trữ thường xuyên tái đồng bộ hóa.</translation>
+        <translation type="unfinished">저장기의 재동기화 절차가 시행 될 것입니다.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation>Chú ý! Sử dụng đĩa cứng của bạn sẽ được tăng lên trong quá trình tái đồng bộ! Tùy thuộc vào kích thước tổng thể của kho lưu trữ có thể mất vài giờ.</translation>
+        <translation type="unfinished">주의! 재 동기화가 진행되는 동안 하드 디스크 사용량이 증가 됩니다. 저장기 전체 크기에 따라 몇 시간이 소요될 수 있습니다.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation>Quá trình này chỉ cần thiết nếu các thư mục lưu trữ của bạn đã được di chuyển, đổi tên hoặc thay thế. Bạn có thể xây dựng lại hủy bỏ hoạt động bất cứ lúc nào mà không mất dữ liệu.</translation>
+        <translation type="unfinished">현 진행은 보관 폴더의 이동, 변경 및 교체를 할 경우 필요합니다. 데이터 손실 없이 작업의 재 구성을 위해 취소 할 수 있습니다.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation>Bạn có chắc muốn tiếp tục không?</translation>
+        <translation type="unfinished">계속 진행 하시겠습니까?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ để lưu trữ &apos;%1&apos; là trong tiến trình</translation>
+        <translation type="unfinished">검생데이터파일 재구성중 : %1</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation>Scan lưu trữ nhanh chóng cho việc lưu trữ &apos;%1&apos; là trong tiến trình</translation>
+        <translation type="unfinished">저장위치에서 고속 데이터 검색 중: %1</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation>đóng</translation>
+        <translation type="unfinished">완료</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
-        <translation>Thư mục hoàn chỉnh xây dựng lại.</translation>
+        <translation type="unfinished">인덱스 보관소 재정리 완료.</translation>
     </message>
     <message>
         <source>At least two servers are required for this feature.</source>
-        <translation>Ít nhất hai máy chủ được yêu cầu cho tính năng này.</translation>
+        <translation type="unfinished">이 기능은 두개 이상의 서버가 요구 됩니다.</translation>
     </message>
     <message>
         <source>Could not load storages from server.</source>
-        <translation>Không thể tải thiết bị lưu trữ từ máy chủ.</translation>
+        <translation type="unfinished">서버에서 저장장치를 읽을 수 없습니다.</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation>Thêm lưu trữ gắn ngoài ...</translation>
+        <translation type="unfinished">외부 저장 장치 추가...</translation>
     </message>
     <message>
         <source>Enable failover (server will take %1 automatically from offline servers)</source>
-        <translation>Kích hoạt tính năng chuyển đổi dự phòng (máy chủ sẽ tự động %1 từ server offline)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Max. %1 on this server:</source>
-        <translation>Max. %1 trên máy chủ này:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This server already has more than max %1</source>
-        <translation>Máy chủ này đã có hơn max %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
-        <translation>Để tránh sự cố điều chỉnh số lượng tối đa của %1</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is unavailable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnServerUpdatesModel</name>
     <message>
         <source>Server</source>
-        <translation>máy chủ</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>trạng thái</translation>
+        <translation>상태</translation>
     </message>
 </context>
 <context>
     <name>QnServerUpdatesWidget</name>
     <message>
         <source>Unknown</source>
-        <translation>không biết</translation>
+        <translation>알려지지 않음</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation>Cập nhật</translation>
+        <translation>업데이트</translation>
     </message>
     <message>
         <source>Update from file:</source>
-        <translation>Cập nhật từ tập tin:</translation>
+        <translation>업데이트 파일:</translation>
     </message>
     <message>
         <source>Archive url:</source>
-        <translation>Url lưu trữ:</translation>
+        <translation>저장기 URL:</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Sao chép vào Clipboard</translation>
+        <translation>상세보기 복사</translation>
     </message>
     <message>
         <source>...</source>
@@ -6066,360 +6149,365 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Cancel</source>
-        <translation>hủy bỏ</translation>
+        <translation>취소</translation>
     </message>
     <message>
         <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-        <translation>Nó trông giống như quá trình cập nhật được dành thời gian nhiều hơn bình thường. Xin hãy tiếp tục chờ đợi.</translation>
+        <translation>업데이트 진행에 다소 시간이 소요될 수 있습니다. 잠시만 기다려 주세요.</translation>
     </message>
     <message>
         <source>Select Update File...</source>
-        <translation>chọn tập tin cập nhật ...</translation>
+        <translation>업데이트 파일 선택...</translation>
     </message>
     <message>
         <source>Update Files (*.zip)</source>
-        <translation>cập nhật các tập tin (* .zip)</translation>
+        <translation>업데이트 파일 (*.zip)</translation>
     </message>
     <message>
         <source>Release notes</source>
-        <translation>ghi chú Phát hành</translation>
+        <translation>업데이트 내용</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation>Nhận một xây dựng cụ thể</translation>
+        <translation>특정 빌드 얻기</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation>Cập nhật phiên bản mới nhất</translation>
+        <translation>최종 버젼 얻기</translation>
     </message>
     <message>
         <source>Update from Internet...</source>
-        <translation>Cập nhật từ Internet ...</translation>
+        <translation>인터넷을 통한 업데이트...</translation>
     </message>
     <message>
         <source>Update from local source...</source>
-        <translation>Cập nhật từ nguồn địa phương ...</translation>
+        <translation>내부 파일을 통한 업데이트...</translation>
     </message>
     <message>
         <source>Update from Internet</source>
-        <translation>Cập nhật từ internet</translation>
+        <translation>인터넷을 통한 업데이트</translation>
     </message>
     <message>
         <source>Update from local source</source>
-        <translation>Cập nhật từ nguồn địa phương</translation>
+        <translation>내부 파일을 통한 업데이트</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>sự thành công</translation>
+        <translation>성공</translation>
     </message>
     <message>
         <source>URL copied to clipboard.</source>
-        <translation>URL sao chép vào clipboard.</translation>
+        <translation>클립보드에 URL 복사.</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <source>Update is in process now.</source>
-        <translation>Đang trong quá trình cập nhật ngay bây giờ.</translation>
+        <translation>업데이트 진행 중.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Update has been successfully finished.</source>
-        <translation>Cập nhật đã được hoàn tất thành công.</translation>
+        <translation>업데이트가 성공적으로 완료 되었습니다.</translation>
     </message>
     <message>
         <source>The client will be restarted to the updated version.</source>
-        <translation>Các khách hàng sẽ được khởi động lại với phiên bản cập nhật.</translation>
+        <translation>업데이트 된 버전의 클라이언트로 다시 시작됩니다.</translation>
     </message>
     <message>
         <source>Update has been cancelled.</source>
-        <translation>Cập nhật đã bị hủy bỏ.</translation>
+        <translation>업데이트가 취소 되었습니다.</translation>
     </message>
     <message>
         <source>Could not download updates.</source>
-        <translation>Không thể tải bản cập nhật.</translation>
+        <translation>업데이트를 다운 받을 수 없습니다.</translation>
     </message>
     <message>
         <source>No free space left on the disk.</source>
-        <translation>Không gian trống còn lại trên đĩa.</translation>
+        <translation>여유 공간이 디스크에 남아있지 않습니다.</translation>
     </message>
     <message>
         <source>Could not push updates to servers.</source>
-        <translation>Không thể đẩy bản cập nhật cho các máy chủ.</translation>
+        <translation>서버에 업데이트를 할 수 없습니다.</translation>
     </message>
     <message numerus="yes">
         <source>The problem is caused by %n servers:</source>
         <translation>
-            <numerusform>Vấn đề là do %n máy chủ:</numerusform>
+            <numerusform>%n 서버에 문제 발생:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>No free space left on %n servers:</source>
         <translation>
-            <numerusform>Không gian trống còn lại trên %n máy chủ:</numerusform>
+            <numerusform>%n 서버에 여유 공간이 없음:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers are not responding:</source>
         <translation>
-            <numerusform>%n máy chủ không được đáp ứng:</numerusform>
+            <numerusform>%n 서버가 응답이 없음:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers have gone offline:</source>
         <translation>
-            <numerusform>%n máy chủ đã đi offline:</numerusform>
+            <numerusform>%n 서버가 오프라인 상태:</numerusform>
         </translation>
     </message>
     <message>
         <source>Could not install an update to the client.</source>
-        <translation>Không thể cài đặt một bản cập nhật cho khách hàng.</translation>
+        <translation>클라이언트에 업데이트를 설치 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not install updates on one or more servers.</source>
-        <translation>Không thể cài đặt các bản cập nhật trên một hoặc nhiều máy chủ.</translation>
+        <translation>하나 이상의 서버에 업데이트를 설치 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Checking for updates...</source>
-        <translation>Kiểm tra các bản cập nhật ...</translation>
+        <translation>업데이트 확인 중...</translation>
     </message>
     <message>
         <source>Newer version found.</source>
-        <translation>Phiên bản mới hơn được tìm thấy.</translation>
+        <translation>새 버전이 있습니다.</translation>
     </message>
     <message>
         <source>You will have to update the client manually.</source>
-        <translation>Bạn sẽ phải cập nhật các khách hàng bằng tay.</translation>
+        <translation>클라이언트의 수동 업데이트가 필요합니다.</translation>
     </message>
     <message>
         <source>You will have to update the client manually using an installer.</source>
-        <translation>Bạn sẽ phải cập nhật các khách hàng sử dụng một trình cài đặt bằng tay.</translation>
+        <translation>설치 파일을 사용하여 클라이언트의 수동 업데이트가 필요합니다.</translation>
     </message>
     <message>
         <source>All components in your system are up to date.</source>
-        <translation>Tất cả các thành phần trong hệ thống của bạn luôn được cập nhật.</translation>
+        <translation>시스템의 모든 구성 요소는 최신 버전입니다.</translation>
     </message>
     <message>
         <source>Cannot update from this file.</source>
-        <translation>Không thể cập nhật từ tập tin này.</translation>
+        <translation>업데이트 할 수 없는 파일입니다.</translation>
     </message>
     <message>
         <source>Checking for updates... %1%</source>
-        <translation>Kiểm tra các bản cập nhật ... %1%</translation>
+        <translation>업데이트 확인 중... %1%</translation>
     </message>
     <message>
         <source>Downloading updates... %1%</source>
-        <translation>Tải bản cập nhật ... %1%</translation>
+        <translation>업데이트 다운로드 중... %1%</translation>
     </message>
     <message>
         <source>Installing client update... %1%</source>
-        <translation>Cài đặt cập nhật khách hàng ... %1%</translation>
+        <translation>클라이언트 설치 중... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers... %1%</source>
-        <translation>Cài đặt bản cập nhật cho các máy chủ không tương thích ... %1%</translation>
+        <translation>호환되지 않는 서버에 업데이트 버전 설치 중... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers... %1%</source>
-        <translation>Đẩy mạnh thông tin cập nhật đến các máy chủ ... %1%</translation>
+        <translation>서버에 업데이트 전송 중... %1%</translation>
     </message>
     <message>
         <source>Installing updates... %1%</source>
-        <translation>Cài đặt bản cập nhật ... %1%</translation>
+        <translation>업데이트 설치 중... %1%</translation>
     </message>
     <message>
         <source>Cannot cancel update at this state.</source>
-        <translation>Không thể hủy cập nhật tại tiểu bang này.</translation>
+        <translation>현 상태에서는 업데이트를 취소할 수 없습니다.</translation>
     </message>
     <message>
         <source>Please wait until update is finished</source>
-        <translation>Hãy đợi cho đến khi cập nhật hoàn tất</translation>
+        <translation>업데이트가 완료 될때까지 잠시 기다려주세요</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
-        <translation>Không thể khởi động lại client.</translation>
+        <translation>클라이언트를 재 시작할 수 없습니다.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>Xin hãy đóng ứng dụng và khởi động nó lại bằng cách sử dụng phím tắt trong menu start.</translation>
+        <translation>프로그램을 닫아주세요, 그리고 시작메뉴의 바로가기를 통해 다시 시작해 주세요.</translation>
     </message>
     <message>
         <source>Check for updates automatically</source>
-        <translation>Kiểm tra các bản cập nhật tự động</translation>
+        <translation>자동 업데이트 체크</translation>
     </message>
     <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
-        <translation>Chú ý: Áp dụng hệ thống cập nhật vào cuối tuần này không được khuyến khích.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation>Phiên bản mới nhất:</translation>
+        <translation type="unfinished">최종 버전:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation>Phiên bản mục tiêu:</translation>
+        <translation type="unfinished">대상 버전:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation>Cập nhật xong ... 100%</translation>
+        <translation type="unfinished">업데이트 완료... 100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
-        <translation>Vui lòng cập nhật cho khách hàng bằng tay.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Please update the client manually using an installation package.</source>
-        <translation>Vui lòng cập nhật cho khách hàng bằng tay dùng một gói cài đặt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Update Succeeded.</source>
-        <translation>Cập nhật Kế nhiệm.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Quá trình phóng không được tìm thấy.</translation>
+        <translation type="unfinished">시작 프로세서를 찾을 수 없음</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation>Cập nhật hủy</translation>
+        <translation type="unfinished">업데이트 취소</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation>Cập nhật thành công.</translation>
+        <translation type="unfinished">업데이트 완료</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation>Một người nào đó đã bắt đầu cập nhật.</translation>
+        <translation type="unfinished">업데이트가 이미 시작되었습니다.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation>Vấn đề kết nối Internet</translation>
+        <translation type="unfinished">인터넷 연결 오류</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
-        <translation>Không như xây dựng sẵn trên máy chủ cập nhật.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation>Không thể bắt đầu cập nhật. Bản cập nhật cho một hoặc nhiều máy chủ đã không được tìm thấy.</translation>
+        <translation type="unfinished">업데이트를 시작 할 수 없습니다. 하나 이상의 서버에 대한 업데이트를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation>Không thể bắt đầu cập nhật. Bản cập nhật cho khách hàng đã không được tìm thấy.</translation>
+        <translation type="unfinished">업데이트를 시작할 수 없습니다. 클라이언트에 대한 업데이트를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
-        <translation>Không thể giải nén tập tin cập nhật.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation>Không thể kiểm tra cập nhật thông qua internet.</translation>
+        <translation type="unfinished">인터넷을 통해 업데이트를 확인할 수 없습니다.</translation>
     </message>
     <message>
         <source>Available Update:</source>
-        <translation>Sẵn có:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation>Để cập nhật bằng tay, tải về một kho lưu trữ với các liên kết sau đây:</translation>
+        <translation type="unfinished">수동 업데이트를 할 경우, 아래 링크를 통해 다운로드 받기:</translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSignInfo</name>
     <message>
         <source>Analyzing: %1%</source>
-        <translation>nghiên cứu: %1</translation>
+        <translation>분석: %1%</translation>
     </message>
     <message>
         <source>Invalid watermark</source>
-        <translation>Watermark không hợp lệ</translation>
+        <translation>데이터 변조됨</translation>
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation>không thể tìm thấy một watermark</translation>
+        <translation type="unfinished">영상 변조를 찾을 수 없습니다</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation>watermark phù hợp</translation>
+        <translation type="unfinished">변조되지 않은 데이터</translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
         <source>FPS value is too high</source>
-        <translation>FPS trị là quá cao</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>Fps hiện trong lưới lịch là %1. Fps được giảm xuống tối đa %2 camera fps.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Đối với chuyển động phần mềm 2 fps được dành riêng cho các dòng thứ cấp. Fps hiện trong lưới lịch là %1. Fps đã giảm xuống %2.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Invalid schedule</source>
-        <translation>lịch trình không hợp lệ</translation>
+        <translation type="unfinished">유효하지 않은 스케줄</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Phần thứ hai được vô hiệu hóa trên máy ảnh này. Tùy chọn Chuyển động + LQ không có effect.Press &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
+        <translation type="unfinished">카메라의 보조 스트림을 사용할 수 없습니다. Motion + LQ 옵션이 동작하지 않습니다. 보조 스트림을 활성화 하신 후에 녹화 설정을 &quot;항상&quot; 또는 &quot;아니오&quot;로 변경하려면 &quot;예&quot;를 누르세요.</translation>
     </message>
     <message>
         <source>Confirm motion regions reset</source>
-        <translation>Xác nhận vùng chuyển động res</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation>Bạn có chắc chắn muốn thiết lập lại vùng chuyển động để mặc định?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation>Hành động này không thể khôi phục!</translation>
+        <translation type="unfinished">이 작업은 취소할 수 없음!</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation>Phần cứng (camera built-in)</translation>
+        <translation type="unfinished">하드웨어 (카메라 포함)</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation>Không sử dụng các video chuyển</translation>
+        <translation type="unfinished">움직임 저장하지 않음</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>%1 Cài đặt</translation>
+        <extracomment>&quot;Camera Settings&quot; or &quot;IO Module settings&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
     <message>
         <source>Auto</source>
-        <translation>tự động</translation>
+        <translation>자동</translation>
     </message>
     <message>
         <source>Invalid data</source>
-        <translation>dữ liệu không hợp lệ</translation>
+        <translation>잘못된 데이터</translation>
     </message>
     <message>
         <source>Network Error</source>
-        <translation>Lỗi mạng</translation>
+        <translation>네트워크 오류</translation>
     </message>
     <message>
         <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation>Không thể thực hiện một thử nghiệm. Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
+        <translation>테스트를 수행할 수 없습니다. 서버가 인터넷에 연결되어있지 않습니다.</translation>
     </message>
     <message>
         <source>Failed</source>
-        <translation>thất bại</translation>
+        <translation>실패</translation>
     </message>
     <message>
         <source>Canceled</source>
-        <translation>Hủy</translation>
+        <translation>취소됨</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -6431,101 +6519,97 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Unsecured</source>
-        <translation>nguy hiểm</translation>
+        <translation>보안 되지 않음</translation>
     </message>
     <message>
         <source>In Progress...</source>
-        <translation>điều trị...</translation>
+        <translation>진행 중...</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>sự thành công</translation>
+        <translation>성공</translation>
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation>Đối số không hợp lệ, kiểm tra không thể thực thi.</translation>
+        <translation type="unfinished">제공된 변수가 유효하지 않습니다.테스트를 시행할 수 없습니다.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation>giờ nghĩ giảo lao</translation>
+        <translation type="unfinished">시간제한</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation>E-Mail vô hiệu</translation>
+        <translation type="unfinished">이메일 정보가 유효하지 않습니다</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>Không cài đặt trước được tìm thấy. Sử dụng tùy chọn &apos;cao cấp&apos;.</translation>
-    </message>
-    <message>
-        <source>Support email is not valid.</source>
-        <translation>Hỗ trợ email không hợp lệ.</translation>
+        <translation type="unfinished">프리셋을 찾을 수 없습니다. &apos;고급&apos;설정을 사용하세요</translation>
     </message>
 </context>
 <context>
     <name>QnSpeedSlider</name>
     <message>
         <source>%1x</source>
-        <translation>%1x</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation>giờ nghĩ giảo lao</translation>
+        <translation>일시정지</translation>
     </message>
 </context>
 <context>
     <name>QnStatusOverlayWidget</name>
     <message>
         <source>NO DATA</source>
-        <translation>không có sẵn</translation>
+        <translation>데이터 없음</translation>
     </message>
     <message>
         <source>NO SIGNAL</source>
-        <translation>không có tín hiệu</translation>
+        <translation>영상없음</translation>
     </message>
     <message>
         <source>Unauthorized</source>
-        <translation>không được phép</translation>
+        <translation>권한 오류</translation>
     </message>
     <message>
         <source>Activate Video Wall license to remove this message</source>
-        <translation>kích hoạt giấy phép tường video để loại bỏ thông báo này</translation>
+        <translation>이 메세지를 지우시려면 비디오 월 인증 키를 활성화 하십시오</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Đang tải...</translation>
+        <translation>읽는 중...</translation>
     </message>
     <message>
         <source>Activate analog license to remove this message</source>
-        <translation>Xin vui lòng mua các loại suy ủy quyền</translation>
+        <translation>이 메세지를 지우시려면 아날로그 인증 키를 활성화 하십시오</translation>
     </message>
     <message>
         <source>No video stream</source>
-        <translation>Không có dòng video</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation>Chẩn đoán...</translation>
+        <translation type="unfinished">진단...</translation>
     </message>
     <message>
         <source>Enable</source>
-        <translation>cho phép</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Activate license...</source>
-        <translation>Kích hoạt giấy phép ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Module is disabled</source>
-        <translation>mô-đun bị vô hiệu hóa</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server Offline</source>
-        <translation>máy chủ đang ẩn</translation>
+        <translation type="unfinished">오프라인</translation>
     </message>
     <message>
         <source>Please check authentication information in %1 settings</source>
-        <translation>Vui lòng kiểm tra thông tin xác thực trong cài đặt %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6539,136 +6623,136 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnStorageUrlDialog</name>
     <message>
         <source>Invalid Storage</source>
-        <translation>Thiết bị lưu trữ không hợp lệ</translation>
+        <translation>유효하지 않은 저장장치</translation>
     </message>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\ &lt;Tên máy tính&gt; \ &lt;thư mục&gt;</translation>
+        <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation>Windows mạng chia sẻ tài nguyên</translation>
+        <translation type="unfinished">윈도우 네트워크 공유 리스소</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
-        <translation>Hệ thống có máy chủ khác sử dụng các đường dẫn lưu trữ cùng một mạng. Ghi dữ liệu bằng nhiều máy chủ để chính xác cùng một vị trí không được khuyến cáo.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
+        <translation type="unfinished">주의</translation>
     </message>
     <message>
         <source>Add storage</source>
-        <translation>Thêm lưu trữ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation>Cung cấp đường dẫn lưu trữ không định nghĩa một thiết bị lưu trữ bên ngoài hiệu quả.</translation>
+        <translation type="unfinished">외부 저장소 정보가 유효하지 않아 저장 경로를 사용할 수 없습니다.</translation>
     </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
         <source>System Administration</source>
-        <translation>quản trị hệ thống</translation>
+        <translation>관리자</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>chung</translation>
+        <translation>일반</translation>
     </message>
     <message>
         <source>Licenses</source>
-        <translation>ủy quyền</translation>
+        <translation>인증키</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation>Emai</translation>
+        <translation>이메일</translation>
     </message>
     <message>
         <source>Updates</source>
-        <translation>cập nhật</translation>
+        <translation>업데이트</translation>
     </message>
     <message>
         <source>Routing Management</source>
-        <translation>quản lý định tuyến</translation>
+        <translation>라우팅 관리</translation>
     </message>
     <message>
         <source>Time Synchronization</source>
-        <translation>thời gian đồng bộ hóa</translation>
+        <translation>시간 동기화</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Cannot cancel update at this state.</source>
-        <translation>Không thể hủy cập nhật tại tiểu bang này.</translation>
+        <translation>현 상태에서는 업데이트를 취소할 수 없습니다.</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <source>Update is in process now.</source>
-        <translation>Đang trong quá trình cập nhật ngay bây giờ.</translation>
+        <translation>업데이트 진행 중입니다.</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation>người sử dụng</translation>
+        <translation type="unfinished">사용자</translation>
     </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable %1 and servers auto discovery</source>
-        <translation>Kích hoạt tính năng %1 và máy chủ phát hiện tự động</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Allow system to optimize %1 settings</source>
-        <translation>Cho phép hệ thống để tối ưu hóa các thiết lập %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnTimeServerSelectionModel</name>
     <message>
         <source>Server</source>
-        <translation>máy chủ</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <source>Server Time</source>
-        <translation>thời gian máy chủ</translation>
+        <translation>서버시간</translation>
     </message>
     <message>
         <source>Offset</source>
-        <translation>bù lại</translation>
+        <translation>오프셋</translation>
     </message>
     <message>
         <source>Synchronizing...</source>
-        <translation>Đồng bộ hóa ...</translation>
+        <translation>동기화 중...</translation>
     </message>
 </context>
 <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
         <source>Time is taken from the Internet.</source>
-        <translation>Thời gian được lấy từ Internet.</translation>
+        <translation>인터넷을 통한 시간 업데이트.</translation>
     </message>
     <message>
         <source>Time is taken from %1.</source>
-        <translation>Thời gian được lấy từ %1.</translation>
+        <translation>%1 로 부터 시간 업데이트.</translation>
     </message>
 </context>
 <context>
     <name>QnTimeSlider</name>
     <message>
         <source>NO THUMBNAILS AVAILABLE</source>
-        <translation>Không có thumbnail SẴN</translation>
+        <translation>가능한 미리보기 없음</translation>
     </message>
     <message>
         <source>auto</source>
         <comment>AM/PM usage based on user&apos;s system locale.</comment>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>xe hơi</translation>
+        <translation>자동</translation>
     </message>
     <message>
         <source>ms</source>
@@ -6777,42 +6861,42 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnTwoStepFileDialog</name>
     <message>
         <source>Folder:</source>
-        <translation>thư mục:</translation>
+        <translation>폴더:</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>Duyệt…</translation>
+        <translation>찾기...</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation>tên tập tin:</translation>
+        <translation>파일이름:</translation>
     </message>
     <message>
         <source>Format:</source>
-        <translation>định dạng:</translation>
+        <translation>포맷:</translation>
     </message>
     <message>
         <source>Warning: file with same name already exists!</source>
-        <translation>Cảnh báo: file có cùng tên đã tồn tại!</translation>
+        <translation>주의: 동일이름의 파일이 이미 존재합니다!</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation>Tùy chọn</translation>
+        <translation>옵션</translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation>thời gian máy chủ...</translation>
+        <translation>폴더 선택...</translation>
     </message>
     <message>
         <source>Select file...</source>
-        <translation>Chọn File...</translation>
+        <translation>파일선택...</translation>
     </message>
 </context>
 <context>
     <name>QnUpdateDialog</name>
     <message>
         <source>Update Servers</source>
-        <translation>máy chủ cập nhật</translation>
+        <translation>업데이트 서버</translation>
     </message>
 </context>
 <context>
@@ -6826,42 +6910,42 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnUserEmailPolicy</name>
     <message>
         <source>Select at least one user</source>
-        <translation>Chọn ít nhất một người dùng</translation>
+        <translation>최소 하나의 사용자를 선택하세요</translation>
     </message>
     <message>
         <source>User %1 has invalid email address</source>
-        <translation>người sử dụng %1 E-Mail vô hiệu</translation>
+        <translation>&apos;%1&apos; 사용자는 잘못된 이메일 정보 가지고 있음</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid email address</source>
         <translation>
-            <numerusform>%n của %1 người có địa chỉ email không hợp lệ</numerusform>
+            <numerusform>%1 사용자의 %n 는 유효하지 않은 이메일 주소를 가지고 있습니다</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid email address %1</source>
-        <translation>Địa chỉ email không hợp lệ %1</translation>
+        <translation>%1 유효하지 않은 이메일 주소</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 additional email addresses are invalid</source>
         <translation>
-            <numerusform>%n of %1 địa chỉ email bổ sung không hợp lệ</numerusform>
+            <numerusform>%1의 %n 는 유효하지 않은 이메일 주소가 추가됨</numerusform>
         </translation>
     </message>
     <message>
         <source>Send email to %1</source>
-        <translation>Gửi email đến %1</translation>
+        <translation>%1 로 이메일 보내기</translation>
     </message>
     <message numerus="yes">
         <source>%n User(s)</source>
         <translation>
-            <numerusform>%n người sử dụng</numerusform>
+            <numerusform>%n 사용자</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1, %n additional</source>
         <translation>
-            <numerusform>%1，%n bổ sung</numerusform>
+            <numerusform>%1, %n 추가</numerusform>
         </translation>
     </message>
 </context>
@@ -6869,230 +6953,230 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnUserListModel</name>
     <message>
         <source>LDAP user</source>
-        <translation>người dùng LDAP</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Normal user</source>
-        <translation>người dùng bình thường</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation>Bật</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit user</source>
-        <translation>chỉnh sửa người dùng</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>tên</translation>
+        <translation type="unfinished">이름</translation>
     </message>
     <message>
         <source>Permissions</source>
-        <translation>Quyền</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>LDAP</source>
-        <translation>LDAP</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnUserListModelPrivate</name>
     <message>
         <source>Owner</source>
-        <translation>chủ nhân</translation>
+        <translation type="unfinished">소유자</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation>giám sát viên</translation>
+        <translation type="unfinished">관리자</translation>
     </message>
     <message>
         <source>View live video</source>
-        <translation>Xem video trực tiếp</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use PTZ controls</source>
-        <translation>Sử dụng điều khiển PTZ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>View video archives</source>
-        <translation>Lưu trữ Xem video</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Export video</source>
-        <translation>video và xuất ra</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit Video Walls</source>
-        <translation>chỉnh sửa Video Walls</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Adjust %1 settings</source>
-        <translation>Điều chỉnh cài đặt %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnUserManagementWidget</name>
     <message>
         <source>LDAP Settings...</source>
-        <translation>Cài đặt LDAP ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation>Lọc...</translation>
+        <translation type="unfinished">필터...</translation>
     </message>
     <message>
         <source>New User...</source>
-        <translation>Người dùng mới…</translation>
+        <translation type="unfinished">신규 사용자...</translation>
     </message>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation>Người dùng lấy từ LDAP ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable Selected</source>
-        <translation>Cho phép chọn</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Disable Selected</source>
-        <translation>Vô hiệu hoá chọn lọc</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Delete Selected</source>
-        <translation>xóa chọn</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation>rõ ràng Selection</translation>
+        <translation type="unfinished">선택항목 초기화</translation>
     </message>
 </context>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
         <source>New Password</source>
-        <translation>Mật khẩu mới</translation>
+        <translation>신규 사용자</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation>mật khẩu</translation>
+        <translation>비밀번호</translation>
     </message>
     <message>
         <source>Login cannot be empty.</source>
-        <translation>Đăng nhập không thể để trống.</translation>
+        <translation>로그인 정보는 비울 수 없습니다.</translation>
     </message>
     <message>
         <source>User with specified login already exists.</source>
-        <translation>Đăng nhập người dùng chỉ định đã tồn tại.</translation>
+        <translation>지정된 사용자가 이미 존재합니다.</translation>
     </message>
     <message>
         <source>Invalid current password.</source>
-        <translation>Mật khẩu hiện tại không hợp lệ.</translation>
+        <translation> 현재 비밀번호는 유효하지 않습니다.</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
-        <translation>Mật khẩu không khớp.</translation>
+        <translation>비밀번호가 일치하지 않습니다.</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
-        <translation>Password không có sản phẩm nào.</translation>
+        <translation>비밀번호는 비울 수 없습니다.</translation>
     </message>
     <message>
         <source>Choose access rights.</source>
-        <translation>Chọn Access.</translation>
+        <translation>액서스 권한 선택.</translation>
     </message>
     <message>
         <source>Invalid email address.</source>
-        <translation>vô hiệu MAIL.</translation>
+        <translation>유효하지 않은 이메일 주소.</translation>
     </message>
     <message>
         <source>Owner</source>
-        <translation>chủ nhân</translation>
+        <translation>소유자</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation>giám sát viên</translation>
+        <translation>관리자</translation>
     </message>
     <message>
         <source>Advanced Viewer</source>
-        <translation>người dùng cao cấp</translation>
+        <translation>고급 </translation>
     </message>
     <message>
         <source>Viewer</source>
-        <translation>người sử dụng</translation>
+        <translation>보기</translation>
     </message>
     <message>
         <source>Live Viewer</source>
-        <translation>Giám sát tức thì</translation>
+        <translation>라이브 보기</translation>
     </message>
     <message>
         <source>Custom...</source>
-        <translation>khách hàng...</translation>
+        <translation>사용자...</translation>
     </message>
     <message>
         <source>Can use PTZ controls</source>
-        <translation>Bạn có thể sử dụng điều khiển PTZ</translation>
+        <translation>PTZ 제어를 사용</translation>
     </message>
     <message>
         <source>Can view video archives</source>
-        <translation>Hình ảnh có thể truy cập dữ liệu lịch sử</translation>
+        <translation>비디어 백업을 볼 수 있습니다</translation>
     </message>
     <message>
         <source>Can export video</source>
-        <translation>Bạn có thể xuất hình ảnh</translation>
+        <translation>비디오백업</translation>
     </message>
     <message>
         <source>Can edit Video Walls</source>
-        <translation>Có thể chỉnh sửa bức tường video</translation>
+        <translation>비디오 월 조정</translation>
     </message>
     <message>
         <source>To modify your password, please enter existing one.</source>
-        <translation>Để thay đổi mật khẩu của bạn, xin vui lòng nhập vào một trong hiện tại.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation>Người dùng được đổi tên. Mật khẩu phải được cập nhật.</translation>
+        <translation type="unfinished">사용자 이름이 재 설정 되었습니다. 비밀번호를 반드시 업데이트 하셔야 합니다.</translation>
     </message>
     <message>
         <source>Can adjust %1 settings</source>
-        <translation>Có thể điều chỉnh cài đặt %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnVideowallItemWidget</name>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallManageWidgetPrivate</name>
     <message>
         <source>Desktop %1</source>
-        <translation>máy tính để bàn %1</translation>
+        <translation>바탕화면 %1</translation>
     </message>
     <message>
         <source>Screen</source>
-        <translation>màn</translation>
+        <translation>화면</translation>
     </message>
     <message>
         <source>Screen %1</source>
-        <translation>màn %1</translation>
+        <translation>%1 화면</translation>
     </message>
     <message>
         <source>New Item</source>
-        <translation>mục mới</translation>
+        <translation>신규 항목</translation>
     </message>
     <message>
         <source>Delete Screen</source>
-        <translation>xóa màn hình</translation>
+        <translation>화면 삭제</translation>
     </message>
     <message>
         <source>Are you sure you want to delete %1?</source>
-        <translation>Bạn có chắc chắn muốn xóa %1?</translation>
+        <translation>삭제 하시겠습니까 &apos;%1&apos;?</translation>
     </message>
 </context>
 <context>
@@ -7104,7 +7188,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message numerus="yes">
         <source>Pc %1 - Screens %2</source>
         <translation>
-            <numerusform>%nPc %1 - màn hình %2</numerusform>
+            <numerusform>%nPc %1 - Screens %2</numerusform>
         </translation>
     </message>
 </context>
@@ -7112,22 +7196,22 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnVideowallSettingsDialog</name>
     <message>
         <source>Video Wall Settings</source>
-        <translation>thiết lập bức tường video</translation>
+        <translation>비디오 월 설정</translation>
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation>start video wall when the Windows starts.</translation>
+        <translation type="unfinished">윈도우 시작 시 비디오 월 실행</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
-        <translation>Đặt shortcut trên desktop.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnVolumeSlider</name>
     <message>
         <source>Muted</source>
-        <translation>người câm</translation>
+        <translation>음소거</translation>
     </message>
     <message>
         <source>%1%</source>
@@ -7138,391 +7222,375 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnWorkbenchActionHandler</name>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Layout is locked and cannot be changed.</source>
-        <translation>Giao diện đã bị khóa và không thể thay đổi.</translation>
+        <translation>지정된 레이아웃은 잠겨있어 변경할 수 없습니다.</translation>
     </message>
     <message>
         <source>Cannot add item</source>
-        <translation>Không thể thêm mặt hàng</translation>
+        <translation>항목 추가 안됨</translation>
     </message>
     <message>
         <source>Cannot add a local file to Multi-Video</source>
-        <translation>Không thể thêm các tập tin địa phương cho nhiều hình ảnh</translation>
+        <translation>로컬 파일은 다중 채널 백업에 추가할 수 없음</translation>
     </message>
     <message>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation>Tất cả tập tin hỗ trợ (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+        <translation>지원 (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-        <translation>hình ảnh (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+        <translation>비디오 (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
         <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation>hình ảnh (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+        <translation>사진 (*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
         <source>All files (*.*)</source>
-        <translation>tất cả các file (*.*)</translation>
+        <translation>모든파일 (*.*)</translation>
     </message>
     <message>
         <source>All Supported (*.layout)</source>
-        <translation>Hỗ trợ đầy đủ (*.layout)</translation>
+        <translation>지원 (*.layout)</translation>
     </message>
     <message>
         <source>Layouts (*.layout)</source>
-        <translation>bố trí (*.layout)</translation>
+        <translation>레이아웃 (*.layout)</translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation>thời gian máy chủ...</translation>
+        <translation>폴더 선택...</translation>
     </message>
     <message>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
-        <translation>Chọn khoảng thời gian quá ngắn để tìm kiếm xem trước. Hãy chọn một khoảng thời gian dài hơn.</translation>
+        <translation>미리보기 검색을 수행하기 위해 설정된 시간이 짧습니다. 더 긴 기간을 선택하십시오.</translation>
     </message>
     <message>
         <source>Preview Search for %1</source>
-        <translation>Preview Tìm kiếm %1</translation>
+        <translation>%1에 대한 미리보기 검색</translation>
     </message>
     <message>
         <source>Delete Files</source>
-        <translation>xóa các tập tin</translation>
+        <translation>파일 삭제</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
-            <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các tập tin %n?</numerusform>
+            <numerusform>%n 파일을 영구적으로 삭제하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <source>Remove Items</source>
-        <translation>Xóa mục</translation>
+        <translation>항목 삭제</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
-            <numerusform>Bạn có chắc chắn muốn xóa dự án bố trí %n này?</numerusform>
+            <numerusform>현 레이아웃에서 %n 항목을 삭제하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <source>User already exists.</source>
-        <translation>Người dùng đã tồn tại.</translation>
+        <translation>이 사용자는 이미 존재합니다.</translation>
     </message>
     <message>
         <source>Video Wall already exists</source>
-        <translation>bức tường video đã tồn tại</translation>
+        <translation>비디오 월이 이미 존재합니다</translation>
     </message>
     <message>
         <source>User with the same name already exists</source>
-        <translation>Người sử dụng có cùng tên đã tồn tại</translation>
+        <translation>같은 이름의 사용자가 존재합니다</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation>đổi tên</translation>
+        <translation>이름변경</translation>
     </message>
     <message>
         <source>Enter new name for the selected item:</source>
-        <translation>Nhập tên mới cho các sản phẩm được chọn:</translation>
+        <translation>선택된 항목에 대한 새 이름 설정: </translation>
     </message>
     <message>
         <source>Delete Resources</source>
-        <translation>xóa tài nguyên</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items.</source>
-        <translation>
-            <numerusform>Không thể lưu các mục %n sau.</numerusform>
-        </translation>
+        <translation>리소스 삭제</translation>
     </message>
     <message>
         <source>Update...</source>
-        <translation>Cập nhật ...</translation>
+        <translation>업데이트...</translation>
     </message>
     <message>
         <source>Beta version %1</source>
-        <translation>Phiên bản Beta %1</translation>
+        <translation>베타 버젼 %1</translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
-            <numerusform>Bạn có chắc chắn muốn xóa các mục sau đây %n?</numerusform>
+            <numerusform>해당 %n 항목의 삭제를 진행하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <source>User Settings</source>
-        <translation>thiết lập người dùng</translation>
-    </message>
-    <message>
-        <source>Could not delete resource</source>
-        <translation>Không thể xóa các tài nguyên</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save changes made to the following %n resource(s).</source>
-        <translation>
-            <numerusform>Không thể lưu các thay đổi được thực hiện cho các tài nguyên sau %n.</numerusform>
-        </translation>
+        <translation>사용자 설정</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
-        <translation>Phiên bản không phù hợp</translation>
+        <translation>일치하지 않는 버젼</translation>
     </message>
     <message>
         <source>They may be auto-discovered again after removing.</source>
-        <translation>Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ.</translation>
+        <translation>목록 삭제 후 자동 검색을 통해 다시 검색될 수 있습니다.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete them?</source>
-        <translation>Bạn có chắc chắn muốn xóa chúng?</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. </source>
-        <translation>Một lỗi đã xảy ra trong khi cố gắng để xóa một tài nguyên từ Server.</translation>
-    </message>
-    <message>
-        <source>Error description: &apos;%1&apos;</source>
-        <translation>Mô tả lỗi: &apos;%1&apos;</translation>
+        <translation>삭제 하시겠습니까?</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
-        <translation>Không thể khởi động lại client.</translation>
+        <translation>클라이언트를 재 시작할 수 없습니다.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>Xin hãy đóng ứng dụng và khởi động nó lại bằng cách sử dụng phím tắt trong menu start.</translation>
+        <translation>프로그램을 닫아주세요, 그리고 시작메뉴의 바로가기를 통해 다시 시작해 주세요.</translation>
     </message>
     <message>
         <source>Picture is too big. Maximum size is %1 Mb</source>
-        <translation>Hình ảnh là quá lớn. Kích thước tối đa là %1 Mb</translation>
+        <translation>사진이 너무 큽니다. 최대 사이즈는 %1 Mb 입니다</translation>
     </message>
     <message>
         <source>Error while uploading picture.</source>
-        <translation>Lỗi trong khi tải lên hình ảnh.</translation>
+        <translation>사진을 업로드 하는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation>Một số thành phần của hệ thống không được cập nhật</translation>
+        <translation>시스템 구성요소중 업데이트 되지 않은 항목이 있습니다.</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation>khách hàng v%1</translation>
+        <translation>클라이언트 %1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation>Máy chủ v%1 tại %2</translation>
+        <translation>서버 %1 에서 %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation>máy chủr v%1</translation>
+        <translation>서버 %1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation>Vui lòng cập nhật tất cả các thành phần với phiên bản mới nhất %1.</translation>
+        <translation>모든 시스템 구성요소 업데이트 요망 %1.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation>Anonymous Cách sử dụng thống kê</translation>
+        <translation>공개된 사용 통계</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation>Hệ thống sẽ gửi sử dụng và crash thống kê ẩn danh cho nhóm phát triển phần mềm để giúp chúng tôi cải thiện trải nghiệm người dùng của bạn.
-Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như vậy trong hộp thoại System Settings.</translation>
+        <translation>제품 오동작및 통계정보를 개발자에서 전달 합니다. 기능을 해지하고 싶을경우 시스템 설정에서 해지 하십시오.</translation>
     </message>
     <message>
         <source>New Layout</source>
-        <translation>việc bố trí mới</translation>
+        <translation type="unfinished">새 레이아웃</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation>新佈局 %1</translation>
+        <translation type="unfinished">%1 새 레이아웃</translation>
     </message>
     <message>
         <source>Open File</source>
-        <translation>mở tập tin</translation>
+        <translation type="unfinished">파일 열기</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation>Tìm kiếm không thể thực thi Preview.</translation>
+        <translation type="unfinished">미리보기 검색을 수행할 수 없음</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation>Không thể tìm thấy khởi động...</translation>
+        <translation type="unfinished">과정의 진행</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation>bức tường video có cùng tên đã tồn tại.</translation>
+        <translation type="unfinished">같은 이름의 비디오 월이 존재합니다</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation>nền Đang cập nhật...</translation>
+        <translation type="unfinished">배경 업데이트</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation>Xử lý hình ảnh sẽ tiêu thụ một số thời gian, xin vui lòng chờ đợi.</translation>
+        <translation type="unfinished">이미지 처리 시간이 많이 걸릴 수 있습니다. 기다려 주십시오.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
-        <translation>Đây là một phiên bản beta của %1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Không thể tìm thấy khởi động.</translation>
-    </message>
-    <message>
-        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation>Không thể di chuyển đến máy chủ %1 %2. Máy chủ không phản hồi.</translation>
-    </message>
-    <message>
-        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation>Máy chủ %1 là không thể tìm và truy cập các %2. Bạn có chắc là bạn muốn di chuyển chúng?</translation>
+        <translation type="unfinished">시작프로세서를 찾을 수 없음</translation>
     </message>
     <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Ngoài ra thiết bị đã có trong progress.Are Bạn có chắc chắn bạn muốn hủy bỏ quá trình hiện tại?</translation>
-    </message>
-    <message>
-        <source>These %1 are auto-discovered.</source>
-        <translation>Những %1 được tự động phát hiện.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
-        <translation>
-            <numerusform>%n trong số này %1 được tự động phát hiện.</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Do you really want to delete the following %1?</source>
-        <translation>Bạn có thực sự muốn xóa %1 sau đây?</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n %1 to server %2. Server is unresponsive.</source>
+        <extracomment>&quot;Cannot move these 5 cameras to server &lt;server_name&gt;. Server is unresponsive.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n %2. Are you sure you would like to move them?</source>
+        <extracomment>&quot;Server &lt;server_name&gt; is unable to find and access these 5 cameras. Are you sure you would like to move them?&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n %1 are auto-discovered.</source>
+        <extracomment>&quot;These 5 cameras are auto-discovered.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Bookmark</source>
-        <translation>Bookmark</translation>
+        <translation>북마크</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation>Bạn có chắc chắn muốn xóa bookmark này %1?</translation>
+        <translation>%1 북마크를 삭제 하시겠습니까?</translation>
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation>Bookmark chỉ có thể được thêm vào một máy chủ trực tuyến.</translation>
+        <translation type="unfinished">북마크는 활성화된 서버에만 추가 됩니다.</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation>Bookmark chỉ có thể được chỉnh sửa trên một máy chủ trực tuyến.</translation>
+        <translation type="unfinished">북마크는 활성화된 서버에만 변경 됩니다.</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation>Bookmark chỉ có thể bị xóa khỏi máy chủ trực tuyến.</translation>
+        <translation type="unfinished">북마크는 활성화된 서버에서만 삭제됩니다.</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation>Xác nhận xóa</translation>
+        <translation type="unfinished">삭제 확인</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchConnectHandler</name>
     <message>
         <source>Connect to Another Server...</source>
-        <translation>Kết nối đến các máy chủ khác...</translation>
+        <translation>다른 서버 연결...</translation>
     </message>
     <message>
         <source>Could not connect to server. Closing in %1...</source>
-        <translation>Không thể kết nối với máy chủ. Đóng trong%1 ...</translation>
+        <translation>서버가 접속되지 않습니다. %1 닫는중...</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation>Kết nối ...</translation>
+        <translation>연결 중...</translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation>Kết nối đến máy chủ...</translation>
+        <translation>서버 연결...</translation>
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation>Không thể kết nối với máy chủ ...</translation>
+        <translation>서버에 접속할 수 없습니다.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
+        <translation>주의</translation>
     </message>
     <message>
         <source>Recording in...%1</source>
-        <translation>Ghi trong ... %1</translation>
+        <translation>저장 중...%1</translation>
     </message>
     <message>
         <source>Recorded Video</source>
-        <translation>video ghi lại</translation>
+        <translation>저장된 비디오</translation>
     </message>
     <message>
         <source>Save Recording As...</source>
-        <translation>Lưu video cho…</translation>
+        <translation>다른이름으로 저장...</translation>
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation>AVI (Tập tin hình ảnh âm thanh) (*.avi)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation>Video không thể được vì lỗi sau đây：%1</translation>
+        <translation type="unfinished">다음 오류로 인해 녹화를 시작할 수 없습니다: %1</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation>Không thể ghi đè lên tập tin &apos;%1&apos;, Hãy thử một tên khác.</translation>
+        <translation type="unfinished">&apos;%1&apos; 파일은 덮어쓸수 없습니다. 다른이름으로 다시 시도하십시오.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation>Nhấn phím bất kỳ để ngăn chặn bánh xe hop.</translation>
+        <translation type="unfinished">투어를 중단하려면 아무 키나 누르십시오</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchExportHandler</name>
     <message>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation>thực thi %1 Lưu trữ Truyền thông  (x64) (*.exe)</translation>
+        <translation>실행가능한 %1 Media File (x64) (*.exe)</translation>
     </message>
     <message>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation>thực thi %1 Lưu trữ Truyền thông  (x86) (*.exe)</translation>
+        <translation>실행가능한 %1 Media File (x86) (*.exe)</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation>văn khố &apos;%1&apos; Là sử dụng video. Hãy thử tên khác.</translation>
+        <translation>&apos;%1&apos; 파일은 녹화에 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation>Không thể ghi đè lên tập tin</translation>
+        <translation>파일을 덮어씌울 수 없음</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>văn khố &apos;%1&apos; Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
+        <translation>&apos;%1&apos; 파일은 다른 프로세서에 의해 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
-        <translation>Giao diện xuất khẩu</translation>
+        <translation>레이아웃 내보내기</translation>
     </message>
     <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
         <translation>
-            <numerusform>Cần phải chọn ít nhất một mục để xuất khẩu, nhưng đã chọn đến %n.</numerusform>
+            <numerusform>내보내기를 위한 하나의 정확한 항목을 선택하십시오, 현재 %n 항목이 선택되어있습니다.</numerusform>
         </translation>
     </message>
     <message>
         <source>AVI (*.avi)</source>
-        <translation>AVI (*.avi)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Matroska (*.mkv)</source>
@@ -7530,290 +7598,288 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Export Video As...</source>
-        <translation>Xuất hình ảnh cho...</translation>
+        <translation>다른이름으로 영상 내보내기...</translation>
     </message>
     <message>
         <source>Timestamps:</source>
-        <translation>Dấu thời gian:</translation>
+        <translation>타임스템프:</translation>
     </message>
     <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
-        <translation>Bố trí hiện tại chứa các tập tin địa phương. File địa phương không được phép xuất khẩu Multi-Video.</translation>
+        <translation>현재 레이아웃에는 내부 파일이 포함되어있습니다. 내부 파일은 다중 비디오 내보내기를 허용하지 않습니다.</translation>
     </message>
     <message>
         <source>AVI format is not recommended</source>
-        <translation>Định dạng AVI không được khuyến cáo</translation>
+        <translation>AVI 포맷은 권장하지 않음</translation>
     </message>
     <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
-        <translation>Bởi vì video và âm thanh cho hình thức không liên tục, không được khuyến cáo để xuất ra thành file AVI, bạn có chắc muốn tiếp tục không?</translation>
+        <translation>오디오 트랙이 있을 때 비 연속 녹화 데이터를 내보내기 위한 AVI 포맷은 권장하지 않습니다. 계속 하시겠습니까?</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation>tiết kiệm như</translation>
+        <translation>다른이름으로 저장</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>văn khố &apos;%1&apos; Đã tồn tại. Bạn có chắc chắn muốn ghi đè lên nó?</translation>
+        <translation>&apos;%1&apos; 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
     </message>
     <message>
         <source>Exporting Video</source>
-        <translation>hình ảnh xuất khẩu</translation>
+        <translation>비디오 내보내기</translation>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation>xuất khẩu sang &quot;%1&quot;…</translation>
+        <translation>&quot;%1&quot;로 내보내기...</translation>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation>Bố trí hiện tại của tập tin có chứa các hình ảnh, hình ảnh không thể được nộp cùng với nhiều hình ảnh.</translation>
+        <translation>현재 레이아웃에 이미지 파일이 존재합니다. 이미지 파일은 다중 백업을 허용하지 않습니다.</translation>
     </message>
     <message>
         <source>Export Layout As...</source>
-        <translation>Bố trí xuất khẩu…</translation>
+        <translation>레이아웃 다른이름으로 내보내기...</translation>
     </message>
     <message>
         <source>%1 Media File (*.nov)</source>
-        <translation>%1 Lưu trữ Truyền thông (*.nov)</translation>
+        <translation>&apos;%1&apos; Media File (*.nov)</translation>
     </message>
     <message>
         <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation>Bạn muốn xuất khẩu một chuỗi video dài hơn 30 phút.</translation>
+        <translation>추출하려는 비디오 시퀀스가 30분 이상이 소요되는 데이터입니다.</translation>
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
-        <translation>Nó có thể đòi hỏi hơn một gigabyte không gian ổ cứng, và, tùy thuộc vào tốc độ kết nối của bạn, cũng có thể mất vài phút để hoàn thành.</translation>
+        <translation>현 작업은 HDD의 공간이 기가바이트 이상이 필요 한 작업이며, 연결 속도에 따라 완료는데 다소 시간이 소요될 수 있습니다.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
-        <translation>Bạn có muốn tiếp tục không?</translation>
+        <translation>계속 진행 하시겠습니까?</translation>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation>Bạn muốn xuất khẩu một số trình tự video với tổng chiều dài quá 30 phút.</translation>
+        <translation>추출하려는 여러 비디오 시퀀스가 30분 이상이 소요되는 데이터입니다.</translation>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation>áp dụng các bộ lọc: xoay, dewarping, nâng cao hình ảnh, tỉ lệ tùy chỉnh (yêu cầu chuyển mã)</translation>
+        <translation>검색조건 적용:방향 변경, De-Warping,이미지 수정, 사용자 화면 비율지정(Transcoding 요구됨)</translation>
     </message>
     <message>
         <source>exported</source>
-        <translation>xuất khẩu</translation>
+        <translation>저장완료</translation>
     </message>
     <message>
         <source>File is in use.</source>
-        <translation>Các tập tin trong sử dụng.</translation>
+        <translation type="unfinished">사용 중</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
-        <translation>Không thể xuất file.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation>sự phản đối!</translation>
+        <translation type="unfinished">주의</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation>Không có thời gian đóng dấu</translation>
+        <translation type="unfinished">타임스템프 없음</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation>Góc trên bên trái (cần phải chuyển mã)</translation>
+        <translation type="unfinished">상단 좌측 모서리 (변환 필요)</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation>Góc trên bên phải (cần phải chuyển mã)</translation>
+        <translation type="unfinished">상단 우측 모서리 (변환 필요)</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation>Góc dưới bên trái (cần phải chuyển mã)</translation>
+        <translation type="unfinished">하단 좌측 모서리 (변환 필요)</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation>góc dưới bên phải (cần phải chuyển mã)</translation>
+        <translation type="unfinished">하단 우측 모서리 (변환 필요)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation>File video xuất ra mà bạn chọn cần chuyển mã, hành động chuyển mã sẽ mất một thời gian dài, bạn có chắc muốn tiếp tục không?</translation>
+        <translation type="unfinished">변환에 필요한 필터를 적용하여 비디오 백업을 받을 경우, 많은 시간이 소요될 수 있습니다. 계속 진행하시겠습니까?</translation>
     </message>
     <message>
         <source>Export Complete</source>
-        <translation>xuất khẩu hoàn chỉnh</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Export Successful</source>
-        <translation>xuất khẩu thành công</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unable to export layout.</source>
-        <translation>Không thể xuất khẩu bố trí.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unable to save layout.</source>
-        <translation>Không thể lưu bố trí.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation>Lưu bố trí địa phương…</translation>
+        <translation type="unfinished">로컬 레이아웃으로 저장...</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation>Việc tạo ra tập tin là chế độ một mình.</translation>
+        <translation type="unfinished">읽기 전용 파일 생성</translation>
     </message>
     <message>
         <source>Export Successful.</source>
-        <translation>Xuất khẩu thành công.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unable to export video.</source>
-        <translation>Không thể xuất video.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Enter Password...</source>
-        <translation>Nhập mật khẩu ...</translation>
+        <translation>비밀번호 입력...</translation>
     </message>
     <message>
         <source>Administrator Password</source>
-        <translation>Mật khẩu quản trị viên</translation>
+        <translation>관리자 비밀번호</translation>
     </message>
     <message>
         <source>Password cannot be empty!</source>
-        <translation>Mật khẩu không thể để trống!</translation>
+        <translation>암호는 빈칸을 허용하지 않음!</translation>
     </message>
     <message>
         <source>Connecting to the current system...</source>
-        <translation>Kết nối với các hệ thống hiện tại ...</translation>
+        <translation>현재 서버에 접속 중...</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>tin tức</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <source>Could not configure the selected servers.</source>
-        <translation>Không thể cấu hình các máy chủ đã chọn.</translation>
+        <translation>선택된 서버의 설정을 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Authentication failed.</source>
-        <translation>Xác thực không thành.</translation>
+        <translation>인증 실패.</translation>
     </message>
     <message>
         <source>Please, check the password you have entered.</source>
-        <translation>Xin vui lòng kiểm tra mật khẩu bạn đã nhập.</translation>
+        <translation>입력하신 비밀번호를 다시 확인하십시오.</translation>
     </message>
     <message>
         <source>Could not update the selected servers.</source>
-        <translation>Không thể cập nhật các máy chủ đã chọn.</translation>
+        <translation>선택된 서버를 업데이트 할 수 없습니다.</translation>
     </message>
     <message>
         <source>You can try to update the servers again in the System Administration.</source>
-        <translation>Bạn có thể cố gắng cập nhật các máy chủ một lần nữa trong Quản trị hệ thống.</translation>
+        <translation>시스템 관리 설정에서 서버의 업데이트를 다시 시도할 수 있습니다.</translation>
     </message>
     <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation>Cảnh báo: Bạn muốn hợp nhất hệ thống với giấy phép START.
-Vì chỉ có 1 giấy phép START phép cho mỗi hệ thống sau khi hợp nhất của bạn, bạn sẽ chỉ có 1 giấy phép BẮT ĐẦU còn lại.
-Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng bấm Merge để tiếp tục.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>sự phản đối</translation>
+        <translation type="unfinished">주의</translation>
     </message>
     <message>
         <source>Merge</source>
-        <translation>Hợp nhất</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation>Xin vui lòng chờ đợi trước khi các máy chủ yêu cầu trước đó sẽ được bổ sung vào hệ thống của bạn.</translation>
+        <translation type="unfinished">기다려 주세요, 이전 요청을 서버에 저장 중에 있습니다.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation>Các máy chủ đã chọn đã được kết nối thành công với hệ thống của bạn!</translation>
+        <translation type="unfinished">선택된 서버 시스템에 성공적으로 연결되었습니다!</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
     <message>
         <source>Save Layout As</source>
-        <translation>Lưu bố trí</translation>
+        <translation>레이아웃 다른이름으로 저장</translation>
     </message>
     <message>
         <source>Close Layouts</source>
-        <translation>Đóng bố trí</translation>
+        <translation>레이아웃 닫기</translation>
     </message>
     <message numerus="yes">
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
         <translation>
-            <numerusform>%n bố trí sau đây chưa được lưu, bạn muốn họ lưu nó?</numerusform>
+            <numerusform>현재의 %n 레이아웃은 저장되어있지 않습니다. 저장하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <source>Saving Layouts</source>
-        <translation>Cách bài trí cửa</translation>
+        <translation>레이아웃 저장</translation>
     </message>
     <message numerus="yes">
         <source>The following %n layout(s) are being saved.</source>
         <translation>
-            <numerusform>%n bố trí sau đây đã được lưu.</numerusform>
+            <numerusform>현재의 %n 레이아웃을 저장합니다.</numerusform>
         </translation>
     </message>
     <message>
         <source>Please wait.</source>
-        <translation>Xin lỗi đợi tôi một chút.</translation>
+        <translation>잠시만 기다려 주십시오.</translation>
     </message>
     <message>
         <source>New Layout</source>
-        <translation>việc bố trí mới</translation>
+        <translation>새 레이아웃</translation>
     </message>
     <message>
         <source>Enter the name of the layout to create:</source>
-        <translation>Nhập tên mà bạn muốn xây dựng bố cục:</translation>
+        <translation>레이아웃 이름 설정:</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Server.</source>
         <translation>
-            <numerusform>Không thể lưu các layout %n sau đây (s) để Server.</numerusform>
+            <numerusform>서버에 %n 레이아웃을 저장할 수 없습니다.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
         <translation>
-            <numerusform>Bạn có chắc chắn muốn khôi phục lại các bố trí %n nó?</numerusform>
+            <numerusform>%n 레이아웃을 복구 하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation>Giao diện đã tồn tại.</translation>
+        <translation type="unfinished">지정된 레이아웃은 이미 존재함</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation>Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó.</translation>
+        <translation type="unfinished">지정된 레이아웃의 이름이 이미 존재하며 덮어쓸수 있는 권한이 없습니다.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation>Nhập tên bố trí:</translation>
+        <translation type="unfinished">레이아웃 이름 설정:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation>Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó?</translation>
+        <translation type="unfinished">같은 이름을 가진 연결정보가 이미 존재합니다. 덮어쓸까요?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation>việc bố trí mới %1</translation>
+        <translation type="unfinished">%1 새 레이아웃</translation>
     </message>
 </context>
 <context>
@@ -7821,12 +7887,12 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>Giờ: phút: giây</translation>
+        <translation></translation>
     </message>
     <message>
         <source>mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>Min: sec</translation>
+        <translation></translation>
     </message>
     <message>
         <source>yyyy MMM dd</source>
@@ -7836,839 +7902,871 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>Live</source>
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
-        <translation>Live</translation>
+        <translation>라이브</translation>
     </message>
     <message>
         <source>All %1</source>
-        <translation>tất cả %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
+        <translation>PTZ_교정_%1.jpg</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Một lỗi đã xảy ra trong khi cố gắng để có được vị trí hiện tại từ camera %1.</translation>
+        <translation>%1 카메라에서 현재 위치를 가져오는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
-        <translation>Xin vui lòng chờ máy ảnh để đi trực tuyến.</translation>
+        <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Một lỗi đã xảy ra trong khi đang cố gắng để thiết lập vị trí hiện tại cho máy ảnh %1.</translation>
+        <translation>%1 카메라의 현재 위치를 설정하는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation>Không thể có được từ vị trí camera.</translation>
+        <translation type="unfinished">카메라 위치를 가져올 수 없음</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation>Unable to set position for camera.</translation>
+        <translation type="unfinished">카메라의 위치를 설정할 수 없음</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
-        <translation>Không thể thiết lập vị trí của camera.</translation>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchResourcesChangesWatcher</name>
+    <message>
+        <source>The system is in Safe Mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not allowed to make any changes except license activation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following %n items are not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not save the following %n items to Server.</source>
+        <translation type="unfinished">
+            <numerusform>서버에 %n 아이뎀이 저장되지 않습니다.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">오류</translation>
+    </message>
+    <message>
+        <source>The following %n items are not deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not delete the following %n items from Server.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchSafeModeWatcher</name>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
         <source>PNG Image (*.png)</source>
-        <translation>PNG hình ảnh (*.PNG)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save Screenshot As...</source>
-        <translation>lưu ảnh chụp màn hình như…</translation>
+        <translation>다른이름으로 스크린샷 저장...</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation>tiết kiệm như</translation>
+        <translation>다른이름으로 저장</translation>
     </message>
     <message>
         <source>JPEG Image (*.jpg)</source>
-        <translation>JPEG hình ảnh (*.jpg)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Timestamp:</source>
-        <translation>Dấu thời gian:</translation>
+        <translation>타임스템프:</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>văn khố &apos;%1&apos; Đã tồn tại. Bạn có chắc chắn muốn ghi đè lên nó?</translation>
+        <translation>&apos;%1&apos; 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>văn khố &apos;%1&apos; Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
-    </message>
-    <message>
-        <source>Saving Screenshot...</source>
-        <translation>Lưu ảnh chụp màn hình ...</translation>
+        <translation>&apos;%1&apos; 파일은 다른 프로세서에 의해 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
     </message>
     <message>
         <source>Saving %1</source>
-        <translation>Tiết kiệm %1</translation>
+        <translation>%1 저장 중</translation>
+    </message>
+    <message>
+        <source>Saving Screenshot...</source>
+        <translation>스크린 샷 저장 중...</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation>Không có thời gian đóng dấu</translation>
+        <translation type="unfinished">타임스템프 없음</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation>góc trên bên trái</translation>
+        <translation type="unfinished">상단 좌측 모서리</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation>góc trên bên phải</translation>
+        <translation type="unfinished">상단 우측 모서리</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation>góc dưới cùng bên trái</translation>
+        <translation type="unfinished">하단 좌측 모서리</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation>góc dưới bên phải</translation>
+        <translation type="unfinished">하단 우측 모서리</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation>Tập tin không thể được ghi đè.</translation>
+        <translation type="unfinished">덮어쓰기 실패</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation>Không thể lưu ảnh chụp màn hình.</translation>
+        <translation type="unfinished">스크린샷 저장 실패</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation>Khi một lỗi xảy ra khi lưu trữ Ảnh chụp màn hình &apos;%1&apos;。</translation>
+        <translation type="unfinished">&apos;%1&apos; 스크린 샷을 저장하는 동안 오류가 발생하였습니다.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
         <source>Would you like to update?</source>
-        <translation>Bạn có muốn cập nhật?</translation>
+        <translation>업데이트 하시겠습니까?</translation>
     </message>
     <message>
         <source>Major issues have been fixed.</source>
-        <translation>Các vấn đề chính đã được cố định.</translation>
+        <translation>중요한 문제가 해결되었습니다.</translation>
     </message>
     <message>
         <source>Update is strongly recommended.</source>
-        <translation>Cập nhật được khuyến khích mạnh mẽ.</translation>
+        <translation>업데이트 하시는 것이 좋습니다.</translation>
     </message>
     <message>
         <source>Release Notes</source>
-        <translation>ghi chú Phát hành</translation>
+        <translation>업데이트 내용</translation>
     </message>
     <message>
         <source>Please update %1 Client.</source>
-        <translation>Vui lòng cập nhật %1 khách hàng.</translation>
+        <translation>%1 클라이언트를 업데이트 하세요.</translation>
     </message>
     <message>
         <source>New version %1 is available.</source>
-        <translation>Phiên bản mới %1 là có sẵn.</translation>
+        <translation>새로운 %1 버전 사용 가능.</translation>
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation>Phiên bản mới hơn có sẵn.</translation>
+        <translation type="unfinished">최신 버젼 사용 가능</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation>Cập nhật được khuyến cáo.</translation>
+        <translation type="unfinished">업데이트 권장</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation>Không có thông báo về bản cập nhật này.</translation>
+        <translation type="unfinished">해당 업데이트에 대한 알람을 다시 열지 않습니다.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
         <source>Error</source>
-        <translation>lỗi</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <source>Switch to Video Wall Mode...</source>
-        <translation>Chuyển sang chế độ tường video ...</translation>
+        <translation>비디오 월 모드 전환...</translation>
     </message>
     <message>
         <source>Could not start Video Wall control session.</source>
-        <translation>Không thể bắt đầu video phiên điều khiển tường.</translation>
+        <translation>비디오 월 제어 세션을 시작할 수 없습니다.</translation>
     </message>
     <message>
         <source>Video Wall</source>
-        <translation>bức tường video</translation>
+        <translation>비디오 월</translation>
     </message>
     <message>
         <source>Video Wall %1</source>
-        <translation>bức tường video %1</translation>
+        <translation>%1 비디오 월</translation>
     </message>
     <message>
         <source>New Video Wall...</source>
-        <translation>tường video mới...</translation>
+        <translation>새 비디오 월...</translation>
     </message>
     <message>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation>Nhập tên của bức tường video để tạo ra:</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items to Server.</source>
-        <translation>
-            <numerusform>Không thể lưu các mục %n sau để Server.</numerusform>
-        </translation>
+        <translation>비디오 월 이름 입력:</translation>
     </message>
     <message>
         <source>Delete Items</source>
-        <translation>xóa mục</translation>
+        <translation>항목 삭제</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
-            <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các %n item (s)?</numerusform>
+            <numerusform>%n 항목을 영구 삭제 하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <source>Could not start Video Wall.</source>
-        <translation>Không thể bắt đầu tường video.</translation>
+        <translation>비디오 월을 시작할 수 없습니다.</translation>
     </message>
     <message>
         <source>Confirm Video Wall stop</source>
-        <translation>Xác nhận hình tường stop</translation>
+        <translation>비디오 월 중지</translation>
     </message>
     <message>
         <source>New Matrix %1</source>
-        <translation>mới ma trận %1</translation>
+        <translation>새 매트릭스 %1</translation>
     </message>
     <message>
         <source>Invalid matrix</source>
-        <translation>ma trận không hợp lệ</translation>
+        <translation>유효하지 않은 매트릭스</translation>
     </message>
     <message>
         <source>You have no layouts on the screens. Matrix cannot be saved.</source>
-        <translation>Bạn không có bố trí trên màn hình. Matrix không thể lưu.</translation>
+        <translation>현재 화면에 레이아웃이 없습니다. 매트릭스를 저장할 수 없습니다.</translation>
     </message>
     <message>
         <source>Delete Matrices</source>
-        <translation>xóa ma trận</translation>
+        <translation>매트릭스 삭제</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n matrices?</source>
         <translation>
-            <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các ma trận %n?</numerusform>
+            <numerusform>%n 매트릭스를 영구 삭제 하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <source>Could not start control session.</source>
-        <translation>Không thể bắt đầu phiên điều khiển.</translation>
+        <translation>제어 세션을 시작할 수 없습니다.</translation>
     </message>
     <message>
         <source>Another user is already controlling this screen.</source>
-        <translation>Một người dùng khác đã được kiểm soát màn hình này.</translation>
+        <translation>다른 사용자가 이 스크린을 제어하고 있습니다.</translation>
     </message>
     <message>
         <source>Are you sure you want to stop the Video Wall?</source>
-        <translation>Bạn có chắc chắn muốn dừng Wall Video?</translation>
+        <translation>비디어 월의 정지하시겠습니까?</translation>
     </message>
     <message>
         <source>You&apos;ll have to start it manually.</source>
-        <translation>Bạn sẽ phải bắt đầu nó bằng tay.</translation>
+        <translation>수동으로 시작해야 합니다.</translation>
     </message>
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation>Màn hình của %1</translation>
+        <translation>%1의 화면</translation>
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation>Phiên điều khiển đã chạy.</translation>
+        <translation type="unfinished">제어 세션이 이미 동작 중입니다</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation>Lỗi không mong muốn đã xảy ra. Thay đổi không thể được cứu.</translation>
+        <translation type="unfinished">예상치 못한 오류가 발생하였습니다. 변경된 사항이 저장되지 않았습니다.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation>Không có mục videowall ẩn gắn liền với máy tính này.</translation>
+        <translation type="unfinished">이 PC에 연결된 비디오 월이 없습니다.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation>tường video sẽ được bắt đầu ngay bây giờ. Bạn có muốn đóng %1 Khách hàng dụ này?</translation>
+        <translation type="unfinished">비디어 월이 시작됩니다. %1 클라이언트를 종료 하시겠습니까?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
-        <translation>Giấy phép bổ sung cần thiết.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation>Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép Video Wall.</translation>
+        <translation type="unfinished">기능 사용을 위해 최소 하나의 비디오 월 인증키가 필요합니다.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation>Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép Video Wall.</translation>
+        <translation type="unfinished">기능 사용을 위해 최소 하나의 비디오 월 인증키가 필요합니다.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation>bức tường video đã tồn tại.</translation>
+        <translation type="unfinished">비디오 월이 이미 존재합니다</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation>bức tường video có cùng tên đã tồn tại.</translation>
+        <translation type="unfinished">동일한 이름의 비디오 월이 존재합니다</translation>
     </message>
     <message>
         <source>%n items</source>
-        <translation>%n mặt hàng</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReconnectInfoDialog</name>
     <message>
         <source>Reconnecting...</source>
-        <translation>Kết nối lại ...</translation>
+        <translation>재 접속 중...</translation>
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation>Xin vui lòng chờ trong khi kết nối đang được phục hồi ...</translation>
+        <translation type="unfinished">연결을 복원하는 동안 잠시 기다려주세요...</translation>
     </message>
 </context>
 <context>
     <name>RecordingBusinessActionWidget</name>
     <message>
         <source>Quality:</source>
-        <translation>hình ảnh:</translation>
+        <translation>화질:</translation>
     </message>
     <message>
         <source>FPS</source>
-        <translation>FPS</translation>
+        <translation>프레임</translation>
     </message>
     <message>
         <source>s</source>
-        <translation>thứ hai</translation>
+        <translation></translation>
     </message>
     <message>
         <source>max</source>
-        <translation>tối đa</translation>
+        <translation>최대</translation>
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation>pre-recording:</translation>
+        <translation type="unfinished">사전녹화:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation>bài-ghi âm:</translation>
+        <translation type="unfinished">사후 녹화:</translation>
     </message>
 </context>
 <context>
     <name>RecordingSettings</name>
     <message>
         <source>Video Recording</source>
-        <translation>đầu ghi video</translation>
+        <translation>비디오 저장</translation>
     </message>
     <message>
         <source>Temporary Folder</source>
-        <translation>thư mục Scratch</translation>
+        <translation>임시 폴더</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
-        <translation>&amp;Duyệt…</translation>
+        <translation>찾기(&amp;B)...</translation>
     </message>
     <message>
         <source>Capture Mode</source>
-        <translation>chế độ chụp</translation>
+        <translation>캡쳐 모드</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation>toàn màn hình</translation>
+        <translation>전체화면</translation>
     </message>
     <message>
         <source>Application Window</source>
-        <translation>phần mềm Windows</translation>
+        <translation>응용프로그램 창</translation>
     </message>
     <message>
         <source>Additional Options</source>
-        <translation>Tùy chọn thêm</translation>
+        <translation>추가옵션</translation>
     </message>
     <message>
         <source>Disable Aero</source>
-        <translation>không được phép Aero</translation>
+        <translation>Aero 비활성화</translation>
     </message>
     <message>
         <source>Capture Cursor</source>
-        <translation>Chụp con trỏ chuột</translation>
+        <translation>캡쳐 커서</translation>
     </message>
     <message>
         <source>Quality</source>
-        <translation>hình ảnh</translation>
+        <translation>화질</translation>
     </message>
     <message>
         <source>Resolution:</source>
-        <translation>Nghị quyết:</translation>
+        <translation>해상도:</translation>
     </message>
     <message>
         <source>Native</source>
-        <translation>nguyên</translation>
+        <translation>네이티브</translation>
     </message>
     <message>
         <source>Quarter Native</source>
-        <translation>nguyên 1/4</translation>
+        <translation>쿼터 네이티브</translation>
     </message>
     <message>
         <source>1920x1080</source>
-        <translation>1920x1080</translation>
+        <translation></translation>
     </message>
     <message>
         <source>1280x720</source>
-        <translation>1280x720</translation>
+        <translation></translation>
     </message>
     <message>
         <source>640x480</source>
-        <translation>640x480</translation>
+        <translation></translation>
     </message>
     <message>
         <source>320x240</source>
-        <translation>320x240</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Recording Quality:</source>
-        <translation>chất lượng video:</translation>
+        <translation>저장 화질:</translation>
     </message>
     <message>
         <source>Best</source>
-        <translation>cao nhất</translation>
+        <translation>최상</translation>
     </message>
     <message>
         <source>Average</source>
-        <translation>Trung bình</translation>
+        <translation>평균</translation>
     </message>
     <message>
         <source>Performance</source>
-        <translation>hiệu quả</translation>
+        <translation>성능</translation>
     </message>
     <message>
         <source>Audio Grabber</source>
-        <translation>chụp Sound</translation>
+        <translation>오디오 포착</translation>
     </message>
     <message>
         <source>Primary Device:</source>
-        <translation>các đơn vị chính:</translation>
+        <translation>주 장치:</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>không ai</translation>
+        <translation></translation>
     </message>
     <message>
         <source>External Device:</source>
-        <translation>các thiết bị bên ngoài:</translation>
+        <translation>외부장치:</translation>
     </message>
     <message>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation>Một máy tính mạnh mẽ được khuyến khích cho &quot;Best&quot; chất lượng và độ phân giải.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>RecordingStatisticsWidget</name>
     <message>
         <source>Refresh</source>
-        <translation>Làm mới</translation>
+        <translation type="unfinished">새로고침</translation>
     </message>
     <message>
         <source>10 Tb</source>
-        <translation>10 Tb</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Forecast for full storage(s) usage</source>
-        <translation>Dự báo dung lượng sử dụng đầy đủ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>0 Tb</source>
-        <translation>0 Tb</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Additional storage:</source>
-        <translation>Lưu trữ bổ sung:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>1000 Tb</source>
-        <translation>1000 Tb</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>100 Tb</source>
-        <translation>100 Tb</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tb</source>
-        <translation>Tb</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>1 Tb</source>
-        <translation>1 Tb</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Current usage</source>
-        <translation>sử dụng hiện tại</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Forecast</source>
-        <translation>dự báo</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Servers is offline. Statistics is not available.</source>
-        <translation>Máy chủ đang ẩn. Thống kê là không có sẵn.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ResourceBrowserWidget</name>
     <message>
         <source>Resources</source>
-        <translation>tài nguyên</translation>
+        <translation>리소스</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation>tìm kiếm</translation>
+        <translation>검색</translation>
     </message>
     <message>
         <source>Reset Filter</source>
-        <translation>Đặt lại bộ lọc</translation>
+        <translation>필터 초기화</translation>
     </message>
     <message>
         <source>X</source>
-        <translation>X</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>ResourceListDialog</name>
     <message>
         <source>Never suggest saving layouts</source>
-        <translation>Không bao giờ đề nghị bố trí tiết kiệm</translation>
+        <translation>레이아웃을 저장하시기 바랍니다</translation>
     </message>
 </context>
 <context>
     <name>SayTextBusinessActionWidget</name>
     <message>
         <source>Speak the following:</source>
-        <translation>Cho biết sau:</translation>
+        <translation>출력할 문구:</translation>
     </message>
     <message>
         <source>Type any text here</source>
-        <translation>Nhập bất kỳ văn bản (bằng tiếng Anh)</translation>
+        <translation>여기에 텍스트 입력</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>thể tích:</translation>
+        <translation>음량:</translation>
     </message>
     <message>
         <source>Test...</source>
-        <translation>thử...</translation>
+        <translation>테스트...</translation>
     </message>
 </context>
 <context>
     <name>SendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
-        <translation>&amp;Nhận thêm:</translation>
+        <translation>함께 받는사람(&amp;A):</translation>
     </message>
     <message>
         <source>&amp;Global Email Settings...</source>
-        <translation>&amp;Cài đặt Email trên toàn cầu…</translation>
-    </message>
-</context>
-<context>
-    <name>ServerSettingsDialog</name>
-    <message>
-        <source>Server Settings</source>
-        <translation>cài đặt máy chủ</translation>
+        <translation>이메일 설정(&amp;G)...</translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
-        <translation>tên:</translation>
+        <translation type="unfinished">이름:</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation>IP :</translation>
+        <translation type="unfinished">IP 주소:</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation>Ping</translation>
+        <translation type="unfinished">핑</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation>port:</translation>
+        <translation type="unfinished">포트:</translation>
     </message>
     <message>
         <source>9000</source>
-        <translation>9000</translation>
+        <translation type="unfinished">9000</translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation>Sao lưu</translation>
+        <translation type="unfinished">장애 조치(이중화)</translation>
     </message>
     <message>
         <source>Storages</source>
-        <translation>cửa hàng</translation>
+        <translation type="unfinished">저장기</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation>dùng</translation>
+        <translation type="unfinished">사용자</translation>
     </message>
     <message>
         <source>Protocol</source>
-        <translation>Nghị định thư</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Path</source>
-        <translation>đường dẫn</translation>
+        <translation type="unfinished">패치</translation>
     </message>
     <message>
         <source>Capacity</source>
-        <translation>khả năng</translation>
+        <translation type="unfinished">용량</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation>đăng nhập</translation>
+        <translation type="unfinished">로그인</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation>mật khẩu</translation>
+        <translation type="unfinished">비밀번호</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation>Spacebar</translation>
+        <translation type="unfinished">여유공간</translation>
     </message>
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation>Bỏ chọn lưu trữ sẽ gây ra gì, nhưng văn bản dừng.
-Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rebuild archive index</source>
-        <translation>Danh mục hàng Tái thiết</translation>
+        <translation type="unfinished">인덱스 보관소 재정비</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation>bắt đầu</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>hủy bỏ</translation>
+        <translation type="unfinished">취소</translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation>watermark tra</translation>
+        <translation type="unfinished">변조 확인</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation>Kiểm tra các tài liệu lưu trữ:</translation>
+        <translation type="unfinished">확인 파일:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation>Kết quả thử nghiệm:</translation>
+        <translation type="unfinished">확인 결과:</translation>
     </message>
 </context>
 <context>
     <name>SingleCameraSettingsWidget</name>
     <message>
         <source>General</source>
-        <translation>chung</translation>
+        <translation>일반</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation>tên:</translation>
+        <translation>이름:</translation>
     </message>
     <message>
         <source>Model:</source>
-        <translation>kiểu mẫu:</translation>
+        <translation>모델:</translation>
     </message>
     <message>
         <source>Firmware:</source>
-        <translation>firmware:</translation>
+        <translation>펌웨어:</translation>
     </message>
     <message>
         <source>Vendor:</source>
-        <translation>Nhà cung cấp:</translation>
+        <translation>제조사:</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>địa chỉ</translation>
+        <translation>주소</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation>IP :</translation>
+        <translation>IP 주소:</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation>Ping</translation>
+        <translation>핑</translation>
     </message>
     <message>
         <source>Web Page:</source>
-        <translation>trang Web:</translation>
+        <translation>웹페이지:</translation>
     </message>
     <message>
         <source>MAC Address:</source>
-        <translation>MAC :</translation>
+        <translation>MAC 정보:</translation>
     </message>
     <message>
         <source>Authentication</source>
-        <translation>xác nhận</translation>
+        <translation>인증</translation>
     </message>
     <message>
         <source>Login:</source>
-        <translation>Đăng nhập:</translation>
+        <translation>로그인:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>mật khẩu:</translation>
+        <translation>비밀번호:</translation>
     </message>
     <message>
         <source>Recording</source>
-        <translation>ghi âm</translation>
+        <translation>저장</translation>
     </message>
     <message>
         <source>Motion</source>
-        <translation>vận động</translation>
+        <translation>움직임</translation>
     </message>
     <message>
         <source>Sensitivity:</source>
-        <translation>Độ nhạy:</translation>
+        <translation>민감도:</translation>
     </message>
     <message>
         <source>Maximum sensitivity (9)</source>
-        <translation>độ nhạy tối đa (9)</translation>
+        <translation>최대 민갑도 (9)</translation>
     </message>
     <message>
         <source>URL</source>
-        <translation>nơi</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation>nâng cao</translation>
+        <translation>고급</translation>
     </message>
     <message>
         <source>Expert</source>
-        <translation>Chế độ Expert</translation>
+        <translation>전문가</translation>
     </message>
     <message>
         <source>IO ports</source>
-        <translation>cổng IO</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation>cho phép âm thanh</translation>
+        <translation type="unfinished">오디오 사용</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation>Máy ảnh này không hỗ trợ phát hiện chuyển động.</translation>
+        <translation type="unfinished">이 카메라에서 움직임 감지를 사용할 수 없습니다</translation>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation>Displacement bộ</translation>
+        <translation type="unfinished">움직임 설정</translation>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation>phát hiện chuyển động</translation>
+        <translation type="unfinished">움직임 감지:</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation>Phần mềm - tối đa FPS có thể giảm nhẹ trên máy chủ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation>Không phát hiện di dời (0)</translation>
+        <translation type="unfinished">움직임 감지 마스크 (0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation>Máy ảnh trang phát hiện chuyển động:</translation>
+        <translation type="unfinished">카메라 모션 웹 페이지:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation>Thiết lập lại khu vực phát hiện chuyển động</translation>
+        <translation type="unfinished">움직임 감지 범위 초기화</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation>Phần cứng (camera built-in)</translation>
+        <translation type="unfinished">하드웨어 (카메라 포함)</translation>
     </message>
     <message>
         <source>Fisheye</source>
-        <translation>Fisheye</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SmtpSettingsWidget</name>
     <message>
         <source>Advanced settings...</source>
-        <translation>Cài đặt nâng cao...</translation>
+        <translation>고급 설정...</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation>thử</translation>
+        <translation>테스트</translation>
     </message>
     <message>
         <source>Outgoing Email Settings</source>
-        <translation>Cài đặt email gửi đi</translation>
+        <translation>발송 이메일 설정</translation>
     </message>
     <message>
         <source>&amp;Email:</source>
-        <translation>&amp;Email:</translation>
+        <translation>이메일(&amp;E):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
+        <translation>비밀번호(&amp;P):</translation>
     </message>
     <message>
         <source>&amp;System Signature:</source>
-        <translation>&amp;hệ thống Seal:</translation>
+        <translation>시스템 서명(&amp;S):</translation>
     </message>
     <message>
         <source>Support Signature:</source>
-        <translation>Chữ ký hỗ trợ:</translation>
+        <translation>서명 지원: </translation>
     </message>
     <message>
         <source>SMTP &amp;Server:</source>
-        <translation>SMTP&amp;máy chủ:</translation>
+        <translation>SMTP 서버(&amp;S):</translation>
     </message>
     <message>
         <source>&amp;User:</source>
-        <translation>&amp;người sử dụng:</translation>
+        <translation>사용자(&amp;U):</translation>
     </message>
     <message>
         <source>Email:</source>
-        <translation>Email:</translation>
+        <translation>이메일:</translation>
     </message>
     <message>
         <source>P&amp;ort:</source>
-        <translation>&amp;port:</translation>
+        <translation>포트(&amp;o):</translation>
     </message>
     <message>
         <source>Server:</source>
-        <translation>máy chủ:</translation>
+        <translation>서버:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation>port:</translation>
+        <translation>포트:</translation>
     </message>
     <message>
         <source>User:</source>
-        <translation>người sử dụng:</translation>
+        <translation>사용자:</translation>
     </message>
     <message>
         <source>Security:</source>
-        <translation>an ninh:</translation>
+        <translation>보안:</translation>
     </message>
     <message>
         <source>Progress:</source>
-        <translation>đối phó với:</translation>
+        <translation>진행:</translation>
     </message>
     <message>
         <source>Result:</source>
-        <translation>các kết quả:</translation>
+        <translation>결과:</translation>
     </message>
     <message>
         <source>OK</source>
@@ -8676,161 +8774,161 @@ Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa
     </message>
     <message>
         <source>Cancel</source>
-        <translation>hủy bỏ</translation>
+        <translation>취소</translation>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation>(đề nghị)</translation>
+        <translation>(추천)</translation>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation>Nhập một mô tả ngắn gọn của hệ thống.</translation>
+        <translation type="unfinished">간단한 설명이 필요할 경우 여기에 기입...</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation>Dây không an toàn</translation>
+        <translation type="unfinished">신뢰할 수 없는 연결</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation>dùng TLS kết nối an toàn.</translation>
+        <translation type="unfinished">TLS를 이용한 보안 연결</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation>dùng SSL kết nối an toàn.</translation>
+        <translation type="unfinished">SSL을 이용한 보안 연결</translation>
     </message>
 </context>
 <context>
     <name>StatisticsOverlayWidget</name>
     <message>
         <source>%1%</source>
-        <translation>%1%</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>StorageUrlDialog</name>
     <message>
         <source>Add External Storage...</source>
-        <translation>Lưu trữ bên ngoài mới...</translation>
+        <translation>외부 장치 추가...</translation>
     </message>
     <message>
         <source>Protocol:</source>
-        <translation>giao thức truyền thông:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation>nơi:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>...</source>
-        <translation>...</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Login:</source>
-        <translation>Đăng nhập:</translation>
+        <translation>로그인:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>mật khẩu:</translation>
+        <translation>비밀번호:</translation>
     </message>
 </context>
 <context>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
+        <translation type="unfinished">주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation>(đề nghị)</translation>
+        <translation type="unfinished">(추천)</translation>
     </message>
     <message>
         <source>Enable audit trail</source>
-        <translation>Kích hoạt tính năng dấu vết kiểm toán</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation>Gửi sử dụng và crash thống kê vô danh với các nhà phát triển phần mềm</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>TimeServerSelectionWidget</name>
     <message>
         <source>Synchronizing...</source>
-        <translation>Đồng bộ hóa ...</translation>
+        <translation>동기화 중...</translation>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation>Thời gian hiện tại:</translation>
+        <translation type="unfinished">현재 시스템 시간:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation>Chọn một máy chủ có sẵn tại địa phương để hoạt động như một máy chủ thời gian nếu hệ thống không có truy cập Internet:</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>UserSettingsDialog</name>
     <message>
         <source>Create New User</source>
-        <translation>Người dùng mới</translation>
+        <translation>신규 사용자 생성</translation>
     </message>
     <message>
         <source>Advanced...</source>
-        <translation>nâng cao…</translation>
+        <translation>고급...</translation>
     </message>
     <message>
         <source>C&amp;urrent Password:</source>
-        <translation>Đối với doanh nghiệp&amp;mật khẩu:</translation>
+        <translation>현&amp; 비밀번호:</translation>
     </message>
     <message>
         <source>&amp;Confirm Password:</source>
-        <translation>&amp;Xác nhận mật khẩu:</translation>
+        <translation>&amp;비밀번호 확인:</translation>
     </message>
     <message>
         <source>&amp;Access Rights:</source>
-        <translation>&amp;quyền:</translation>
+        <translation>&amp;액서스 권한:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>&amp;mật khẩu:</translation>
+        <translation>&amp;비밀번호:</translation>
     </message>
     <message>
         <source>Access rights</source>
-        <translation>quyền</translation>
+        <translation>엑서스 권한</translation>
     </message>
     <message>
         <source>&amp;Login:</source>
-        <translation>&amp;Đăng nhập:</translation>
+        <translation>&amp;로그인:</translation>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation>&amp;Email:</translation>
+        <translation type="unfinished">&amp;이메일:</translation>
     </message>
     <message>
         <source>Enabled:</source>
-        <translation>được kích hoạt:</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>WeekTimeScheduleDialog</name>
     <message>
         <source>Schedule Settings</source>
-        <translation>Lịch tập</translation>
+        <translation>일정 설정</translation>
     </message>
     <message>
         <source>On</source>
-        <translation>mở</translation>
+        <translation>켬</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>tắt</translation>
+        <translation>끔</translation>
     </message>
     <message>
         <source>Schedule</source>
-        <translation>lịch trình</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation>Lưu ý: Lịch trình thời gian cho thời gian máy chủ.</translation>
+        <translation type="unfinished">참고: 일정 설정은 서버시간을 기준으로 함</translation>
     </message>
 </context>
 </TS>

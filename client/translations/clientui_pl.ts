@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pl" sourcelanguage="en">
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -502,9 +502,7 @@
     </message>
     <message>
         <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;
-----------
-Short for &quot;seconds&quot;</extracomment>
+        <extracomment>Short for &quot;seconds&quot;</extracomment>
         <translation>s</translation>
     </message>
     <message>
@@ -595,6 +593,29 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Testing connection...</source>
         <translation>Testowanie połączenia...</translation>
+    </message>
+</context>
+<context>
+    <name>CustomBusinessEventWidget</name>
+    <message>
+        <source>Source contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords separated by space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1440,22 +1461,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>None</source>
         <translation>Nic</translation>
-    </message>
-    <message>
-        <source>Stops</source>
-        <translation>Stop</translation>
-    </message>
-    <message>
-        <source>Starts</source>
-        <translation>Start</translation>
-    </message>
-    <message>
-        <source>Starts/Stops</source>
-        <translation>Start/Stop</translation>
-    </message>
-    <message>
-        <source>Occurs</source>
-        <translation>Wystąpienie</translation>
     </message>
 </context>
 <context>
@@ -2622,10 +2627,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>%1 Ustawienia...</translation>
     </message>
     <message>
-        <source>Open in %1 Settings Dialog...</source>
-        <translation>Otwórz w %1 oknie ustawień...</translation>
-    </message>
-    <message>
         <source>Add Device(s)...</source>
         <translation>Dodaj urządzenie(nia)...</translation>
     </message>
@@ -2633,6 +2634,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%1 List by Server...</source>
         <translatorcomment>?????</translatorcomment>
         <translation>%1 Wylistuj po serwerach...</translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2721,6 +2730,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 actions</source>
+        <extracomment>&quot;Camera actions&quot; or &quot;Device actions&quot;</extracomment>
         <translation>%1 działania</translation>
     </message>
 </context>
@@ -3038,10 +3048,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Start</translation>
     </message>
     <message>
-        <source>Starts/Stops</source>
-        <translation>Start/Stop</translation>
-    </message>
-    <message>
         <source>Administrators Only</source>
         <translation>Tylko administratorzy</translation>
     </message>
@@ -3064,6 +3070,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Select at least one %1</source>
         <translation>Wybierz co najmniej jeden z %1</translation>
+    </message>
+    <message>
+        <source>Occures</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3229,13 +3239,9 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Scanning online hosts...</source>
         <translation>Skanowanie hostów online...</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Scanning hosts... (%1)</source>
-        <translation>
-            <numerusform>Skanowanie hostów...(%1)</numerusform>
-            <numerusform>Skanowanie hosta...(%1)</numerusform>
-            <numerusform>Skanowanie hostów...(%1)</numerusform>
-        </translation>
+        <translation type="unfinished">Skanowanie hostów...(%1)</translation>
     </message>
     <message>
         <source>Finished</source>
@@ -3328,6 +3334,11 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Add devices...</source>
         <translation>Dodaj urządzenia...</translation>
+    </message>
+    <message>
+        <source>Scanning host... (%1)</source>
+        <extracomment>Scanning host... (0 devices found)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3447,10 +3458,12 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
+        <extracomment>&quot;Confirming camera is accessible.&quot; or &quot;Confirming device is accessible.&quot;</extracomment>
         <translation>Potwierdzenie dostępności %1.</translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
+        <extracomment>&quot;Confirming target camera provides media stream.&quot; or &quot;Confirming target device provides media stream.&quot;</extracomment>
         <translatorcomment>&gt;??????</translatorcomment>
         <translation>Potwierdzenie stumieniowania przez %1.</translation>
     </message>
@@ -3609,10 +3622,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ostrzeżenie</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation>Ostrzeżenie! Wysoka wartość minimalna może zmniejszyć inny%1 &apos;czas  nagrywania.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
         <translation>Nagrywanie na ruch jest wyłączone lub nieobsługiwane przez zaznaczone %1. Proszę sprawdzić ustawienia detekcji ruchu.</translation>
     </message>
@@ -3628,16 +3637,20 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
         <translation>Detekcja ruchu jest wyłączona. Proszę przejść do ustawień detekcji by ustawić obszar i czułość detekcji dla %1.</translation>
     </message>
+    <message>
+        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
     <message>
         <source>Open in New Tab</source>
         <translation>Otwórz w nowej Karcie</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Błąd</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
@@ -3661,14 +3674,17 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 Settings</source>
+        <extracomment>&quot;Cameras settings&quot; or &quot;Devices settings&quot; or &quot;IO Module Settings&quot;, etc</extracomment>
         <translation>Ustawienia %1</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
+        <extracomment>&quot;Cameras Diagnostics&quot; or &quot;Devices Diagnostics&quot; or &quot;IO Module Diagnostics&quot;, etc</extracomment>
         <translation>Sprawdzanie %1</translation>
     </message>
     <message>
         <source>%1 Rules</source>
+        <extracomment>&quot;Cameras Rules&quot; or &quot;Devices Rules&quot; or &quot;IO Module Rules&quot;, etc</extracomment>
         <translation>Reguły %1</translation>
     </message>
     <message>
@@ -3676,12 +3692,9 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Nie zapisano %1.</translation>
     </message>
     <message>
-        <source>Save changes to the following %1?</source>
-        <translation>Zapisać zmiany w %1?</translation>
-    </message>
-    <message>
-        <source>Could not save the following %1 to Server.</source>
-        <translation>Nie można zapisać następujących %1 na serwerze.</translation>
+        <source>Apply changes to the following %1?</source>
+        <extracomment>&quot;Apply changes to the following 5 cameras?&quot; or &quot;Apply changes to the following IO module?&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4155,6 +4168,40 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnFailoverPriorityDialog</name>
+    <message>
+        <source>Failover Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">Nigdy</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">Niski</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">Średni</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">Wysoki</translation>
+    </message>
+</context>
+<context>
+    <name>QnFailoverPriorityDialogDelegate</name>
+    <message>
+        <source>Set Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
         <source>Auto Calibration</source>
@@ -4207,20 +4254,21 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management</source>
-        <translation>Otwórz zarządzanie Alarmami/Zdarzeniami i Regułami</translation>
-    </message>
-    <message>
-        <source>Open Event Log</source>
-        <translation>Otwórz logi zdarzeń</translation>
-    </message>
-    <message>
-        <source>Open %1 List</source>
-        <translation>Otwórz %1 listę</translation>
-    </message>
-    <message>
         <source>%1 List</source>
         <translation>Lista %1</translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open %1 List...</source>
+        <extracomment>&quot;Open Cameras List...&quot; or &quot;Open Devices List...&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4437,6 +4485,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not export %1 %2.</source>
+        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>Nie można wyeksportować %1 %2.</translation>
     </message>
 </context>
@@ -5148,6 +5197,22 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>The discovered system %1 has an incompatible version %2.</source>
         <translation>Znaleziony system %1 ma niezgodną wersję  %2.</translation>
     </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System has an incompatible version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operation is not permitted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -5339,48 +5404,45 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <translation>Przeglądaj archiwum</translation>
     </message>
     <message>
-        <source>Server settings</source>
-        <translation>Ustawienia serwera</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Ustawienia</translation>
-    </message>
-    <message>
-        <source>User Settings</source>
-        <translation>Ustawienia użytkownika</translation>
-    </message>
-    <message>
-        <source>Licenses</source>
-        <translation>Licencje</translation>
-    </message>
-    <message>
-        <source>SMTP Settin gs</source>
-        <translation>Ustawienia SMTP</translation>
-    </message>
-    <message>
-        <source>Connect to server</source>
-        <translation>Podłącz do serwera</translation>
-    </message>
-    <message>
-        <source>SMTP Settings</source>
-        <translation>Ustawienia SMTP</translation>
-    </message>
-    <message>
         <source>Open %1</source>
         <translation>Otwórz %1</translation>
     </message>
     <message>
-        <source>%1 Settings</source>
-        <translation>Ustawienia %1</translation>
-    </message>
-    <message>
-        <source>Server Settings</source>
-        <translation>Ustawienia serwera</translation>
-    </message>
-    <message>
         <source>Open %1 Web Page...</source>
         <translation>Otwórz stronę Web %1...</translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <extracomment>&quot;Camera Settings...&quot; or &quot;Device Settings...&quot;</extracomment>
+        <translation type="unfinished">%1 Ustawienia...</translation>
+    </message>
+    <message>
+        <source>Server Settings...</source>
+        <translation type="unfinished">Ustawienia serwera...</translation>
+    </message>
+    <message>
+        <source>Licenses...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Settings...</source>
+        <translation type="unfinished">Ustawienia użytkownika...</translation>
+    </message>
+    <message>
+        <source>SMTP Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Synchronization...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5795,6 +5857,10 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>Storage space occupied by %1</source>
         <translation>Przestrzeń do zapisu zajęta przez %1</translation>
     </message>
+    <message>
+        <source>empty</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -6027,6 +6093,26 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>Storage Analytics</source>
         <translation>Analiza przestrzeni dyskowaej</translation>
     </message>
+    <message>
+        <source>Server Settings - %1 (readonly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation type="unfinished">Ustawienia serwera</translation>
+    </message>
+    <message>
+        <source>Server not saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to the server %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
@@ -6105,6 +6191,10 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
         <translation>Aby uniknąć wadliwego działania ustaw maksymalną liczbę %1</translation>
+    </message>
+    <message>
+        <source>Server is unavailable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6272,6 +6362,8 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>%n servers are not responding:</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6414,6 +6506,10 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>W celu aktualziacji ręcznej pobierz plik z następującego linku:</translation>
     </message>
+    <message>
+        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -6478,6 +6574,7 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     </message>
     <message>
         <source>%1 Settings</source>
+        <extracomment>&quot;Camera Settings&quot; or &quot;IO Module settings&quot;, etc</extracomment>
         <translation>Ustawienia %1</translation>
     </message>
 </context>
@@ -6542,10 +6639,6 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
         <translation>Nie znaleziono presetu. Użyj opcji Zaawansowanych.</translation>
-    </message>
-    <message>
-        <source>Support email is not valid.</source>
-        <translation>Obsługa emaili jest niedostępna.</translation>
     </message>
 </context>
 <context>
@@ -7360,34 +7453,6 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>Error while uploading picture.</source>
         <translation>Błąd podczas ładowania obrazu.</translation>
     </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items.</source>
-        <translation>
-            <numerusform>Nie można zapisać następujących elementów%n.</numerusform>
-            <numerusform>Nie można zapisać następującego elementu %n.</numerusform>
-            <numerusform>Nie można zapisać następujących elementów%n.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Could not delete resource</source>
-        <translation>Nie można usunąć zasobu</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. </source>
-        <translation>Wystapił błąd podczas usuwania zasobu z serwera.</translation>
-    </message>
-    <message>
-        <source>Error description: &apos;%1&apos;</source>
-        <translation>Opis błędu: &apos;%1&apos;</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save changes made to the following %n resource(s).</source>
-        <translation>
-            <numerusform>Nie można zapisać zmian  dokonanych w następujących %n zasobach.</numerusform>
-            <numerusform>Nie można zapisać zmian  dokonanych w następującym %n zasobie.</numerusform>
-            <numerusform>Nie można zapisać zmian  dokonanych w następujących %n zasobach.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Version Mismatch</source>
         <translation>Niezgodność wersji</translation>
@@ -7479,20 +7544,8 @@ Jeśli chcesz wyłączyć tę funkcję zrób to w oknie Ustawienia systemowe.</t
         <translation>Launcher proces nie został znaleziony.</translation>
     </message>
     <message>
-        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation>Nie można przenieść%1 na serwer %2. Serwer nie odpowiada.</translation>
-    </message>
-    <message>
-        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation>Serwer%1 nie ma dostępu do%2. Czy na pewno chcesz przenieść?</translation>
-    </message>
-    <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
         <translation>Dodawanie urządzeń jest w toku. Czy na pewno chcesz anulować bieżący proces?</translation>
-    </message>
-    <message>
-        <source>These %1 are auto-discovered.</source>
-        <translation>Automatycznie wykryte %1.</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
@@ -7505,6 +7558,33 @@ Jeśli chcesz wyłączyć tę funkcję zrób to w oknie Ustawienia systemowe.</t
     <message>
         <source>Do you really want to delete the following %1?</source>
         <translation>Czy na pewno chcesz usunąć %1?</translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n %1 to server %2. Server is unresponsive.</source>
+        <extracomment>&quot;Cannot move these 5 cameras to server &lt;server_name&gt;. Server is unresponsive.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n %2. Are you sure you would like to move them?</source>
+        <extracomment>&quot;Server &lt;server_name&gt; is unable to find and access these 5 cameras. Are you sure you would like to move them?&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n %1 are auto-discovered.</source>
+        <extracomment>&quot;These 5 cameras are auto-discovered.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7993,6 +8073,52 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     </message>
 </context>
 <context>
+    <name>QnWorkbenchResourcesChangesWatcher</name>
+    <message>
+        <source>The system is in Safe Mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not allowed to make any changes except license activation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following %n items are not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not save the following %n items to Server.</source>
+        <translation type="unfinished">
+            <numerusform>Nie można zapisać następujących pozycji %n na serwerze.</numerusform>
+            <numerusform>Nie można zapisać następujących pozycji %n na serwerze.</numerusform>
+            <numerusform>Nie można zapisać następującej pozycji %n na serwerze.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Błąd</translation>
+    </message>
+    <message>
+        <source>The following %n items are not deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not delete the following %n items from Server.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchSafeModeWatcher</name>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
         <source>PNG Image (*.png)</source>
@@ -8139,14 +8265,6 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     <message>
         <source>Enter the name of the Video Wall to create:</source>
         <translation>Podaj nazwę Ściany Wideo:</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items to Server.</source>
-        <translation>
-            <numerusform>Nie można zapisać następujących pozycji %n na serwerze.</numerusform>
-            <numerusform>Nie można zapisać następujących pozycji %n na serwerze.</numerusform>
-            <numerusform>Nie można zapisać następującej pozycji %n na serwerze.</numerusform>
-        </translation>
     </message>
     <message>
         <source>Delete Items</source>
@@ -8499,13 +8617,6 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     </message>
 </context>
 <context>
-    <name>ServerSettingsDialog</name>
-    <message>
-        <source>Server Settings</source>
-        <translation>Ustawienia serwera</translation>
-    </message>
-</context>
-<context>
     <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
@@ -8580,6 +8691,10 @@ Nie spowoduje  odmowy podczas próby skasowania najstarszych nagrań z dysku.</t
     <message>
         <source>Cancel</source>
         <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

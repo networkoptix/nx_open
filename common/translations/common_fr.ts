@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr" sourcelanguage="en">
+<TS version="2.1" language="fr" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -27,10 +27,6 @@
 </context>
 <context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>User Defined (%1)</source>
-        <translation>Défini par l&apos;usager (%1)</translation>
-    </message>
     <message>
         <source>Motion on Camera</source>
         <translation>Mouvement sur caméra</translation>
@@ -190,10 +186,6 @@
         <translation>Perte de paquet RTP détectée.</translation>
     </message>
     <message>
-        <source>Server started after crash.</source>
-        <translation>Démarrage du serveur après un plantage.</translation>
-    </message>
-    <message>
         <source>I/O error has occurred at %1.</source>
         <translation>I/O erreur est survenue à %1.</translation>
     </message>
@@ -236,10 +228,6 @@
     <message>
         <source>An unknown event has occurred</source>
         <translation>Évènement inconnu s&apos;est produit</translation>
-    </message>
-    <message>
-        <source>Input Port: %1</source>
-        <translation>Port d&apos;entrée: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
@@ -291,25 +279,48 @@
     </message>
     <message>
         <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>%1 Conflit IP à %2</translation>
-    </message>
-    <message>
-        <source>%1 #%2 MAC: %3</source>
-        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation>%1 #%2 MAC: %3</translation>
-    </message>
-    <message>
-        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation>Connexion à la caméra %1 (flux primaire) a été fermée de manière inattendue.</translation>
-    </message>
-    <message>
-        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation>Connexion à la caméra %1 (flux secondaire) a été fermée de manière inattendue.</translation>
     </message>
     <message>
         <source>Recording on %1 is disabled: </source>
         <translation>Enregistrement sur %1 est désactivé: </translation>
+    </message>
+    <message>
+        <source>Generic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server restarted unexpectedly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -400,14 +411,10 @@
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Assurez-vous que le port %2 soit accessible. S.V.P. essayez de redémarrer %1, ensuite restaurez les paramètres défaut sur la page web.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Assurez-vous que %1 est branché dans le réseau. Essayez de redémarrer %1.</translation>
     </message>
     <message>
@@ -416,23 +423,14 @@
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>S.V.P. essayez de redémarrer %1, ensuite restaurez les paramètres défaut sur la page web.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>En premier, essayez d&apos;activer l&apos;enregistrement et diminuer l&apos;IPS dans %1.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Si cela n&apos;aide pas, restaurez les paramètres %1 par défaut depuis la page web. Si le problème persiste, S.v.P. contactez l&apos;assistance technique.</translation>
     </message>
     <message>
@@ -1047,6 +1045,18 @@
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation>Temps serveur n&apos;est pas synchronisé et un temps commun ne pouvait pas être détectés automatiquement.</translation>
+    </message>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The system is running in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any configuration changes except license activation are impossible.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

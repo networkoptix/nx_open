@@ -1,202 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr" sourcelanguage="en">
+<TS version="2.1" language="zh_CN" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
         <source>Information</source>
-        <translation>Informations</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>Credits</source>
-        <translation>Crédits</translation>
+        <translation>开发环境</translation>
     </message>
     <message>
         <source>GPU Information</source>
-        <translation>Informations GPU</translation>
+        <translation>GPU信息</translation>
     </message>
     <message>
         <source>Connected servers</source>
-        <translation>Serveurs connectés</translation>
+        <translation>服务器连接信息</translation>
     </message>
     <message>
         <source>Support</source>
-        <translation>Support</translation>
+        <translation>技术支持</translation>
     </message>
     <message>
         <source>About</source>
-        <translation>À Propos</translation>
+        <translation>关于</translation>
     </message>
 </context>
 <context>
     <name>AdjustVideoDialog</name>
     <message>
         <source>Gamma</source>
-        <translation>Gamma</translation>
+        <translation>伽玛</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>Auto</translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>Image Enhancement</source>
-        <translation>Amélioration de l&apos;image</translation>
+        <translation>图像增强</translation>
     </message>
     <message>
         <source>Black level</source>
-        <translation>Niveau de noir</translation>
+        <translation>黑电平</translation>
     </message>
     <message>
         <source>White level</source>
-        <translation>Niveau de blanc</translation>
+        <translation>白电平</translation>
     </message>
     <message>
         <source>Enable image enhancement</source>
-        <translation>Activer l&apos;amélioration de l&apos;image</translation>
+        <translation>启用图像增强</translation>
     </message>
 </context>
 <context>
     <name>AggregationWidget</name>
     <message>
         <source>Check to set aggregation period</source>
-        <translation>Définir période d&apos;agrégation</translation>
+        <translation>勾选以设置聚合期</translation>
     </message>
     <message>
         <source>Interval of action :</source>
-        <translation>Intervalle d&apos;action :</translation>
+        <translation>动作时间间隔:</translation>
     </message>
     <message>
         <source>No more than once per</source>
-        <translation>Pas plus d&apos;une fois par</translation>
+        <translation>不超过一次每</translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation>Immédiat</translation>
+        <translation>立即作用</translation>
     </message>
 </context>
 <context>
     <name>AuditLogDialog</name>
     <message>
         <source>From</source>
-        <translation>Depuis</translation>
+        <translation>从</translation>
     </message>
     <message>
         <source>till</source>
-        <translation>Jusqu&apos;à</translation>
+        <translation>到</translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation>Actualiser</translation>
+        <translation>刷新</translation>
     </message>
     <message>
         <source>User actions</source>
-        <translation>Actions Usager</translation>
+        <translation>用户操作</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation>Visionnement d&apos;archive</translation>
+        <translation>查看录像</translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation>Exportation vidéo</translation>
+        <translation>导出录像</translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation>Visionnement en direct</translation>
+        <translation>实时浏览</translation>
     </message>
     <message>
         <source>Login/logout</source>
-        <translation>Connexion/Déconnexion</translation>
+        <translation>登录/退出</translation>
     </message>
     <message>
         <source>Event rules</source>
-        <translation>Règles d&apos;événement</translation>
+        <translation>事件规则</translation>
     </message>
     <message>
         <source>Server actions</source>
-        <translation>Actions Serveur</translation>
+        <translation>服务端操作</translation>
     </message>
     <message>
         <source>E-mail settings</source>
-        <translation>Paramètres Courriel</translation>
+        <translation>邮件设置</translation>
     </message>
     <message>
         <source>System actions</source>
-        <translation>Actions Ssystème</translation>
+        <translation>系统设置</translation>
     </message>
     <message>
         <source>Select all</source>
-        <translation>Sélectionner tout</translation>
+        <translation>全选</translation>
     </message>
     <message>
         <source>Sessions</source>
-        <translation>Sessions</translation>
+        <translation>会话</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Détails</translation>
+        <translation>内容</translation>
     </message>
     <message>
         <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Tous les serveurs sont hors ligne. Vérification de donnée non disponibles.</translation>
+        <translation>所有服务器离线，数据研判不可用.</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation>Piste de vérification</translation>
+        <translation>研判</translation>
     </message>
 </context>
 <context>
     <name>BusinessRuleWidget</name>
     <message>
         <source>Event</source>
-        <translation>Événement</translation>
+        <translation>事件</translation>
     </message>
     <message>
         <source>at</source>
-        <translation>à</translation>
+        <translation>在</translation>
     </message>
     <message>
         <source>Schedule...</source>
-        <translation>Horaire...</translation>
+        <translation>日程...</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation>Action</translation>
+        <translation>动作</translation>
     </message>
     <message>
         <source>Comments:</source>
-        <translation>Commentaires:</translation>
+        <translation>备注:</translation>
     </message>
     <message>
         <source>When</source>
-        <translation>Quand</translation>
+        <translation>触发</translation>
     </message>
     <message>
         <source>Do</source>
-        <translation>Faire</translation>
+        <translation>关联</translation>
     </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
     <message>
         <source>Alarm/Event Rules</source>
-        <translation>Règles Alarme/Événement</translation>
+        <translation>报警/事件规则</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Ajouter</translation>
+        <translation>添加</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Supprimer</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>Advanced...</source>
-        <translation>Avancée ...</translation>
+        <translation>高级设置...</translation>
     </message>
     <message>
         <source>Event log</source>
-        <translation>Journal d&apos;événement</translation>
+        <translation>事件日志</translation>
     </message>
     <message>
         <source>X</source>
@@ -207,435 +207,455 @@
     <name>CameraAdditionDialog</name>
     <message>
         <source>S&amp;tart IP:</source>
-        <translation>IP de &amp;départ:</translation>
+        <translation>&amp;开始IP:</translation>
     </message>
     <message>
         <source>&amp;End IP:</source>
-        <translation>IP de &amp;fin:</translation>
+        <translation>&amp;结束IP:</translation>
     </message>
     <message>
         <source>&amp;Login:</source>
-        <translation>&amp;Identifiant:</translation>
+        <translation>&amp;登录:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>&amp;Mot de passe:</translation>
+        <translation>&amp;密码:</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>Auto</translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>&amp;Scan</source>
-        <translation>&amp;Balayer</translation>
+        <translation>&amp;搜索</translation>
     </message>
     <message>
         <source>Scanning...</source>
-        <translation>Balayage en cours...</translation>
+        <translation>搜索中...</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>Adresse</translation>
+        <translation>地址</translation>
     </message>
     <message>
         <source>&amp;Add selected</source>
-        <translation>A&amp;jouter - Sélectionnée</translation>
+        <translation>&amp;添加选中</translation>
     </message>
     <message>
         <source>&amp;Discovery Port:</source>
-        <translation>&amp;Port de Découverte:</translation>
+        <translation>&amp;发现端口:</translation>
     </message>
     <message>
         <source>Server is offline</source>
-        <translation>Le serveur est hors ligne</translation>
+        <translation>服务器离线</translation>
     </message>
     <message>
         <source>IP, hostname, RTSP link...</source>
-        <translation>IP, Hôte, Lien RTSP ...</translation>
+        <translation>IP，主机名，RTSP链接...</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation>Arrêt</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation>Serveur sélectionné:</translation>
+        <translation>选择服务器:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation>Balayage du &amp;sous réseau</translation>
+        <translation>&amp;子网搜索</translation>
     </message>
     <message>
         <source>Brand</source>
-        <translation>Marque</translation>
+        <translation>厂商</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation>Modèle</translation>
+        <translation>型号</translation>
     </message>
     <message>
         <source>New Scan...</source>
-        <translation>Nouveau balayage...</translation>
+        <translation>新搜索中...</translation>
     </message>
     <message>
         <source>Add device(s)...</source>
-        <translation>Ajouter Périphérique(s)...</translation>
+        <translation>添加设备...</translation>
     </message>
     <message>
         <source>Device Address:</source>
-        <translation>Adresse Périphérique:</translation>
+        <translation>设备地址:</translation>
     </message>
     <message>
         <source>Discovered Devices:</source>
-        <translation>Périphériques découverts:</translation>
+        <translation>搜索设备:</translation>
     </message>
 </context>
 <context>
     <name>CameraAdvancedSettingsWidget</name>
     <message>
         <source>Advanced settings for this camera cannot be loaded</source>
-        <translation>Paramètres avancées pour cette caméra ne peut pas être chargée</translation>
+        <translation>摄像机高级设置无法加载</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation>Catégorie</translation>
+        <translation>分类</translation>
     </message>
     <message>
         <source>about:blank</source>
-        <translation>about:blank</translation>
+        <translation>空白页</translation>
     </message>
     <message>
         <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
-        <translation>Paramètres avancés non disponibles pour cette caméra. Consultez la page Web de la caméra pour plus d&apos;options.</translation>
+        <translation>此摄像机的高级设置不可用,请进入摄像机web网页进行更多设置.</translation>
     </message>
     <message>
         <source>Note: Any changes made will be applied instantly!</source>
-        <translation>Note: Toutes modifications apportées seront appliquées instantanément!</translation>
+        <translation>注意:任何更改将立即生效!</translation>
     </message>
 </context>
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
         <source>No connection to Server %1.</source>
-        <translation>Aucune connexion sur Serveur %1.</translation>
+        <translation>未连接到服务器 %1.</translation>
     </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
         <source>I have read the manual and understand the risks</source>
-        <translation>J&apos;ai lu le manuel et comprends les risques</translation>
+        <translation>我已阅读使用手册，并了解风险</translation>
     </message>
     <message>
         <source>Camera Settings Control</source>
-        <translation>Contrôle des paramètres de caméra</translation>
+        <translation>摄像机设置控制</translation>
     </message>
     <message>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>Conserver le flux et les paramètres des profiles de la caméra</translation>
+        <translation>保留摄像机视频流及原始配置</translation>
     </message>
     <message>
         <source>Secondary Stream Control</source>
-        <translation>Contrôle du flux secondaire</translation>
+        <translation>次码流控制</translation>
     </message>
     <message>
         <source>Override secondary stream quality</source>
-        <translation>Outrepasser la qualité secondaire du flux</translation>
+        <translation>次码流画质</translation>
     </message>
     <message>
         <source>Low quality</source>
-        <translation>Basse qualité</translation>
+        <translation>低画质</translation>
     </message>
     <message>
         <source>Medium quality</source>
-        <translation>Moyenne qualité</translation>
+        <translation>中画质</translation>
     </message>
     <message>
         <source>High quality</source>
-        <translation>Haute qualité</translation>
+        <translation>高画质</translation>
     </message>
     <message>
         <source>Archive control</source>
-        <translation>Contrôle Archive</translation>
+        <translation>存储控制</translation>
     </message>
     <message>
         <source>Do not archive primary stream</source>
-        <translation>Ne pas archiver le flux primaire</translation>
+        <translation>不使用主码流存储</translation>
     </message>
     <message>
         <source>Do not archive secondary stream</source>
-        <translation>Ne pas archiver le flux secondaire</translation>
+        <translation>不使用次码流存储</translation>
     </message>
     <message>
         <source>Media streaming control</source>
-        <translation>Contrôle flux média</translation>
+        <translation>视频流控制</translation>
     </message>
     <message>
         <source>RTP transport:</source>
-        <translation>Transport RTP:</translation>
+        <translation>RTP传输:</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>Auto</translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>TCP</source>
-        <translation>TCP</translation>
+        <translation></translation>
     </message>
     <message>
         <source>UDP</source>
-        <translation>UDP</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation>Restaurer par défauts</translation>
+        <translation>还原为默认值</translation>
     </message>
     <message>
         <source>Warning! Low quality may result in low resolution image.</source>
-        <translation>Attention! Basse qualité peut entraîner une image de basse résolution.</translation>
+        <translation>注意！低码流将导致低分辨率图片生成。</translation>
     </message>
     <message>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;Autoriser le système à optimiser les paramètres caméra&quot; est désactivé dans l&apos;administration système.</translation>
+        <translation>系统管理中禁用“允许系统更改摄像机配置”.</translation>
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>Calculer le débit par GOP au lieu du débit par seconde (Augmente le débit de la caméra)</translation>
+        <translation>计算每个GPO比特率替代秒比特率（将增加摄像机比特率）</translation>
     </message>
     <message>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation>Attention! Cela rendra la qualité et l&apos;image par seconde (IPS) de la programmation d&apos;enregistrement non pertinent.</translation>
+        <translation>注意！当前视频质量和帧率将无法与录像计划中的录像设置同步.</translation>
     </message>
     <message>
         <source>Do not use</source>
-        <translation>Ne pas utiliser</translation>
+        <translation>不使用</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation>Attention! Sélectionner &apos;Haute qualité&apos; peut influer sur votre CPU et les performances du réseau, ce qui pourrait causer des problèmes supplémentaires.</translation>
+        <translation>注意！选择高画质将会影响CPU和网络性能，可能会导致系统稳定性.</translation>
     </message>
     <message>
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>Attention! Ne pas modifier ces paramètres, sauf si vous êtes absolument sûr de leur impact potentiel sur les performances de votre système.</translation>
+        <translation>注意！请不要改变以下参数，可能会影响系统稳定性.</translation>
     </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
         <source>Input ID:</source>
-        <translation>ID d&apos;entrée:</translation>
+        <translation>输入ID:</translation>
     </message>
 </context>
 <context>
     <name>CameraListDialog</name>
     <message>
         <source>Filter:</source>
-        <translation>Filtre:</translation>
+        <translation>过滤器:</translation>
     </message>
 </context>
 <context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <source>&amp;Output ID:</source>
-        <translation>ID de &amp;sortie:</translation>
+        <translation>&amp;输出ID:</translation>
     </message>
     <message>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation>&amp;Réinitialisation Auto dans (sec):</translation>
+        <translation>&amp;自动重置在(秒):</translation>
     </message>
 </context>
 <context>
     <name>CameraScheduleWidget</name>
     <message>
         <source>Get More Licenses...</source>
-        <translation>Obtenez plus de licences ...</translation>
+        <translation>取得更多软件许可...</translation>
     </message>
     <message>
         <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;
-----------
-Short for &quot;seconds&quot;</extracomment>
-        <translatorcomment>&quot;s&quot; Refering to what ?</translatorcomment>
-        <translation> s</translation>
+        <extracomment>Short for &quot;seconds&quot;</extracomment>
+        <translation>秒</translation>
     </message>
     <message>
         <source>Enable Recording</source>
-        <translation>Activer l&apos;enregistrement</translation>
+        <translation>启用录像</translation>
     </message>
     <message>
         <source>Panic Mode: </source>
-        <translation>Mode Panic: </translation>
+        <translation>危机模式:</translation>
     </message>
     <message>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation>Note: L&apos;horaire d&apos;enregistrement est basé sur l&apos;heure du serveur</translation>
+        <translation>注意：录像时间与存储服务器时间同步</translation>
     </message>
     <message>
         <source>Schedule Settings</source>
-        <translation>Configuration de l&apos;horaire</translation>
+        <translation>计划设定</translation>
     </message>
     <message>
         <source>FPS</source>
-        <translation>IPS</translation>
+        <translation>每秒帧数</translation>
     </message>
     <message>
         <source>Quality</source>
-        <translation>Qualité</translation>
+        <translation>画质</translation>
     </message>
     <message>
         <source>Record Always</source>
-        <translation>Toujours Enreg</translation>
+        <translation>连续录像</translation>
     </message>
     <message>
         <source>Motion Only</source>
-        <translation>Mouv. Seul</translation>
+        <translation>仅移动侦测录像</translation>
     </message>
     <message>
         <source>Fixed Archive Length</source>
-        <translation>Longeur d&apos;Archive Fixe</translation>
+        <translation>固定的录像范围</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>Auto</translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>Motion Recording</source>
-        <translation>Enregist. sur mouvement</translation>
+        <translation>移动侦测录像</translation>
     </message>
     <message>
         <source>Pre-Recording</source>
-        <translation>Pré-Enregistrement</translation>
+        <translation>预录</translation>
     </message>
     <message>
         <source>Post-Recording</source>
-        <translation>Post-Enregistrement</translation>
+        <translation>延录</translation>
     </message>
     <message>
         <source>Copy Schedule...</source>
-        <translation>Copier l&apos;horaire...</translation>
+        <translation>复制日程...</translation>
     </message>
     <message>
         <source>Apply changes before copying schedule</source>
-        <translation>Appliquer les modifications avant de copier l&apos;horaire</translation>
+        <translation>复制日程前执行修改</translation>
     </message>
     <message>
         <source>Recording Schedule</source>
-        <translation>Horaire d&apos;enregistrement</translation>
+        <translation>录像计划</translation>
     </message>
     <message>
         <source>Show Quality on Schedule</source>
-        <translation>Afficher la qualité sur horaire</translation>
+        <translation>录像计划显示视频质量</translation>
     </message>
     <message>
         <source>Show FPS on Schedule</source>
-        <translation>Afficher l&apos;IPS sur horaire</translation>
+        <translation>录像计划显示帧率</translation>
     </message>
     <message>
         <source>Motion + Low-Res </source>
-        <translation>Mouv. et Basse réso</translation>
+        <translation>移动侦测+低分辨率</translation>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation>Aucun Enreg</translation>
+        <translation>不录像</translation>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation>Jours min</translation>
+        <translation>最小天数</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation>Jours max</translation>
+        <translation>最大天数</translation>
     </message>
 </context>
 <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
         <source>Installing version %1</source>
-        <translation>Installation version %1</translation>
+        <translation>安装版本%1</translation>
     </message>
     <message>
         <source>Installation failed</source>
-        <translation>Échec de l&apos;installation</translation>
+        <translation>安装失败</translation>
     </message>
     <message>
         <source>Could not cancel installation</source>
-        <translation>L&apos;installation ne peut être annulée</translation>
+        <translation>无法取消安装</translation>
     </message>
     <message>
         <source>Installation completed</source>
-        <translation>Installation terminée</translation>
+        <translation>安装完成</translation>
     </message>
     <message>
         <source>Installation has been cancelled</source>
-        <translation>L&apos;installation a été annulée</translation>
+        <translation>安装已被取消</translation>
     </message>
 </context>
 <context>
     <name>ConnectionNameDialog</name>
     <message>
         <source>Save connection as...</source>
-        <translation>Sauvegarder la connexion sous...</translation>
+        <translation>保存连接到...</translation>
     </message>
     <message>
         <source>Enter name:</source>
-        <translation>Entrer le nom:</translation>
+        <translation>输入名称:</translation>
     </message>
     <message>
         <source>Save password</source>
-        <translation>Sauvergarder mot de passe</translation>
+        <translation>保存密码</translation>
     </message>
 </context>
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
         <source>Connection Test</source>
-        <translation>Test de connexion</translation>
+        <translation>连接测试</translation>
     </message>
     <message>
         <source>Testing connection...</source>
-        <translation>Test de connexion en cours...</translation>
+        <translation>测试连接中...</translation>
+    </message>
+</context>
+<context>
+    <name>CustomBusinessEventWidget</name>
+    <message>
+        <source>Source contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords separated by space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CustomHorizontalHeader</name>
     <message>
         <source>5 minutes</source>
-        <translation>5 minutes</translation>
+        <translation>5分钟</translation>
     </message>
     <message>
         <source>Hour</source>
-        <translation>Heure</translation>
+        <translation>时</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation>Jour</translation>
+        <translation>天</translation>
     </message>
     <message>
         <source>Week</source>
-        <translation>Semaine</translation>
+        <translation>周</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation>Mois</translation>
+        <translation>月</translation>
     </message>
     <message>
         <source>All data</source>
-        <translation>Toutes Données</translation>
+        <translation>所有数据</translation>
     </message>
     <message>
         <source>Bitrate for the last recorded:</source>
-        <translation>Débit pour le dernier enregistrement:</translation>
+        <translation>录像前的比特率:</translation>
     </message>
 </context>
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
         <source>Create Backup...</source>
-        <translation>Créer Sauvegarde...</translation>
+        <translation>创建备份...</translation>
     </message>
     <message>
         <source>Restore from Backup...</source>
-        <translation>Restaurer une sauvegarde...</translation>
+        <translation>从备份文件还原...</translation>
     </message>
 </context>
 <context>
@@ -645,121 +665,121 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>-</translation>
     </message>
     <message>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation>Tous les serveurs sont hors ligne, Journal non disponibles.</translation>
-    </message>
-    <message>
         <source>Refresh</source>
-        <translation>Actualiser</translation>
+        <translation>刷新</translation>
     </message>
     <message>
         <source>Alarm/Event Rules</source>
-        <translation>Règles Alarme/Événement</translation>
+        <translation>报警/事件规则</translation>
+    </message>
+    <message>
+        <source>All Servers are offline. Logs are not available.</source>
+        <translation>所有服务器离线，日志不可用。</translation>
     </message>
     <message>
         <source>Event Log</source>
-        <translation>Journal d&apos;événements</translation>
+        <translation>事件日志</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation>Effacer le filtre</translation>
+        <translation>清除过滤器</translation>
     </message>
 </context>
 <context>
     <name>FisheyeSettingsWidget</name>
     <message>
         <source>Calibration</source>
-        <translation>Calibration</translation>
+        <translation>校准</translation>
     </message>
     <message>
         <source>Ceiling Mount</source>
-        <translation>Fixation Plafond</translation>
+        <translation>吸顶安装</translation>
     </message>
     <message>
         <source>Wall Mount</source>
-        <translation>Fixation Mur</translation>
+        <translation>墙面安装</translation>
     </message>
     <message>
         <source>Floor/Table Mount</source>
-        <translation>Fixation sol/table</translation>
+        <translation>地面安装</translation>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation>Correction de l&apos;angle de vision de caméra</translation>
+        <translation>摄像机视角校正</translation>
     </message>
 </context>
 <context>
     <name>GeneralPreferencesWidget</name>
     <message>
         <source>Main Media Folder</source>
-        <translation>Dossier Média Principal</translation>
+        <translation>主要媒体文件夹</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
-        <translation>&amp;Parcourir...</translation>
+        <translation>&amp;浏览...</translation>
     </message>
     <message>
         <source>Extra Media Folders</source>
-        <translation>Dossiers média supplémentaires</translation>
+        <translation>其他媒体文件夹</translation>
     </message>
     <message>
         <source>&amp;Add...</source>
-        <translation>&amp;Ajouter...</translation>
+        <translation>&amp;添加...</translation>
     </message>
     <message>
         <source>&amp;Remove</source>
-        <translation>&amp;Supprimer</translation>
+        <translation>&amp;删除</translation>
     </message>
     <message>
         <source>Misc</source>
-        <translation>Divers</translation>
+        <translation>其他设置</translation>
     </message>
     <message>
         <source>after</source>
-        <translation>après</translation>
+        <translation>在</translation>
     </message>
     <message>
         <source>Restart required</source>
-        <translation>Redémarrage nécessaire</translation>
+        <translation>需重新启动</translation>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation>Diminuer le mixage audio de 5.1 à 2.1</translation>
+        <translation>从5.1到2.1的混合音频</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation>Pause vidéo auto</translation>
+        <translation>自动暂停视频</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation>Minutes d&apos;inactivité</translation>
+        <translation>分钟以后</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation>Ouvrir l&apos;application quand le PC démarre:</translation>
+        <translation>开机自动启动:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation>Double tampon:</translation>
+        <translation>双缓冲区:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation>Parcourir les journaux</translation>
+        <translation>浏览记录</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation>Effacer le cache local</translation>
+        <translation>清除本地缓存</translation>
     </message>
 </context>
 <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
         <source>Administration</source>
-        <translation>Administration</translation>
+        <translation>系统设置</translation>
     </message>
     <message>
         <source>&amp;Alarm/Event Rules</source>
-        <translation>Régles &amp;Alarme/Évén</translation>
+        <translation>&amp;报警/事件规则</translation>
     </message>
     <message>
         <source>Ctrl+E</source>
@@ -767,7 +787,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Event Log</source>
-        <translation>Journal &amp;Evénement</translation>
+        <translation>&amp;事件日志</translation>
     </message>
     <message>
         <source>Ctrl+L</source>
@@ -779,164 +799,163 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Health Monitoring</source>
-        <translatorcomment>Kept english, no word in french with &apos;H&apos;</translatorcomment>
-        <translation>&amp;Health Monitoring</translation>
+        <translation>&amp;系统监测</translation>
     </message>
     <message>
         <source>System Settings</source>
-        <translation>Paramètres Système</translation>
+        <translation>系统设置</translation>
     </message>
     <message>
         <source>Open audit trail log</source>
-        <translation>Ouvrir journal de piste de vérification</translation>
+        <translation>打开研判日志</translation>
     </message>
     <message>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation>Surveiller tous les serveurs sur mise en page simple</translation>
+        <translation>统一视图中监控所有服务器状态</translation>
     </message>
     <message>
         <source>System Backup and Restore</source>
-        <translation>Sauvegarde et restauration système</translation>
+        <translation>系统备份和还原</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation>Piste de vérification</translation>
+        <translation>研判</translation>
     </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
     <message>
         <source>Top</source>
-        <translation>Haut</translation>
+        <translation>上</translation>
     </message>
     <message>
         <source>Bottom</source>
-        <translation>Bas</translation>
+        <translation>下</translation>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation>Défilez ici</translation>
+        <translation>滚动</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation>Bordure Gauche</translation>
+        <translation>左边</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation>Bordure Droite</translation>
+        <translation>右边</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation>Page Gauche</translation>
+        <translation>左页</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation>Page Haut</translation>
+        <translation>上页</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation>Page Droite</translation>
+        <translation>右页</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation>Page Bas</translation>
+        <translation>下页</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation>Défilement Gauche</translation>
+        <translation>左滚动</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation>Défilement Haut</translation>
+        <translation>上滚动</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation>Défilement Droite</translation>
+        <translation>右滚动</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation>Défilement Bas</translation>
+        <translation>下滚动</translation>
     </message>
 </context>
 <context>
     <name>ImageControlWidget</name>
     <message>
         <source>Image Control</source>
-        <translation>Contrôle Image</translation>
+        <translation>图像控制</translation>
     </message>
     <message>
         <source>Force aspect ratio to:</source>
-        <translation>Forcer le format de l&apos;image à :</translation>
+        <translation>强制长宽比例:</translation>
     </message>
     <message>
         <source>Default rotation:</source>
-        <translation>Rotation par défaut:</translation>
+        <translation>默认角度:</translation>
     </message>
     <message>
         <source>This is a fish-eye lens camera</source>
-        <translation>Ceci est une lentille &apos;fisheye&apos;</translation>
+        <translation>全景鱼眼摄像机</translation>
     </message>
 </context>
 <context>
     <name>ImagePreviewDialog</name>
     <message>
         <source>Image View</source>
-        <translation>Afficher l&apos;image </translation>
+        <translation>图像浏览</translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
-        <translation>&lt;No image&gt;</translation>
+        <translation>&lt;无 图像&gt;</translation>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation>Chargement de l&apos;image... Patientez S.V.P.</translation>
+        <translation>加载图像...请稍候.</translation>
     </message>
 </context>
 <context>
     <name>LayoutSettingsDialog</name>
     <message>
         <source>Layout Settings</source>
-        <translation>Paramètres mise en page</translation>
+        <translation>Layout设定</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Paramètres Généraux</translation>
+        <translation>一般设定</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation>Arrière plan</translation>
+        <translation>电子地图</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>Parcourir...</translation>
+        <translation>浏览...</translation>
     </message>
     <message>
         <source>View...</source>
-        <translation>Vue...</translation>
+        <translation>查看...</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation>Effacer</translation>
+        <translation>清除</translation>
     </message>
     <message>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation>&amp;Couper aux proportions de l&apos;écran </translation>
+        <translation>&amp;裁切至显示器宽高比</translation>
     </message>
     <message>
         <source>&amp;Width:</source>
-        <translation>&amp;Largeur:</translation>
+        <translation>&amp;宽:</translation>
     </message>
     <message>
         <source> cells</source>
-        <translation>cellules</translation>
+        <translation>格</translation>
     </message>
     <message>
         <source>&amp;Height:</source>
-        <translation>&amp;Hauteur:</translation>
+        <translation>&amp;高:</translation>
     </message>
     <message>
         <source>&amp;Opacity:</source>
-        <translation>&amp;Opacité:</translation>
+        <translation>&amp;不透明度:</translation>
     </message>
     <message>
         <source>%</source>
@@ -944,26 +963,26 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation>La Mise en page est Verrouillée</translation>
+        <translation>Layout被锁定</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation>Image en traitement... Patientez S.V.P.</translation>
+        <translation>处理图像...请稍候.</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation>Garder les proportions</translation>
+        <translation>保存宽高比不变</translation>
     </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
     <message>
         <source>Server UR&amp;L:</source>
-        <translation>Serveur UR&amp;L:</translation>
+        <translation>服务器 UR&amp;L:</translation>
     </message>
     <message>
         <source>ldap(s)://host:port</source>
-        <translation>ldap(s)://hôte:port</translation>
+        <translation>ldap(s)://host:port</translation>
     </message>
     <message>
         <source>Ad&amp;min DN:</source>
@@ -971,268 +990,269 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>Mot de &amp;Passe:</translation>
+        <translation>&amp;密码:</translation>
     </message>
     <message>
         <source>Search Base:</source>
-        <translation>Base Recherche:</translation>
+        <translation>查找库:</translation>
     </message>
     <message>
         <source>Search Filter:</source>
-        <translation>Filtre Recherche:</translation>
+        <translation>查找过滤器:</translation>
     </message>
     <message>
         <source>Optional</source>
-        <translation>Facultatif</translation>
+        <translation>选项</translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation>En test...</translation>
+        <translation>测试中...</translation>
     </message>
     <message>
         <source>LDAP Settings</source>
-        <translation>Paramètres LDAP</translation>
+        <translation>LDAP设置</translation>
     </message>
 </context>
 <context>
     <name>LdapUsersDialog</name>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation>Cherche usagers depuis LDAP...</translation>
+        <translation>获取用户的LDAP...</translation>
     </message>
     <message>
         <source>Select users to import</source>
-        <translation>Sélectionner l&apos;usager à importer</translation>
+        <translation>选择需导入的用户</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation>Filtre...</translation>
+        <translation>过滤器...</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Chargement...</translation>
+        <translation>加载中...</translation>
     </message>
     <message>
         <source>Connection error</source>
-        <translation>Erreur de Connexion</translation>
+        <translation>连接错误</translation>
     </message>
 </context>
 <context>
     <name>LicenseDetailsDialog</name>
     <message>
         <source>License Details</source>
-        <translation>Détails licences</translation>
+        <translation>许可内容</translation>
     </message>
     <message>
         <source>Generic</source>
-        <translation>Générique</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>License Type:</source>
-        <translation>Type de Licence:</translation>
+        <translation>授权类型:</translation>
     </message>
     <message>
         <source>License Key:</source>
-        <translation>Clé de licence:</translation>
+        <translation>授权密钥:</translation>
     </message>
     <message>
         <source>Locked to Hardware ID:</source>
-        <translation>Vérouillé sur ID Matériel:</translation>
+        <translation>硬件ID绑定:</translation>
     </message>
     <message>
         <source>Features</source>
-        <translation>Fonctionnalités</translation>
+        <translation>功能</translation>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation>Ce type de licence requiert une version logiciel récente.</translation>
+        <translation>许可类型需要更高的软件版本.</translation>
     </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
     <message>
         <source>Remove</source>
-        <translation>Effacer</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>Selected License Details</source>
-        <translation>Détails sur licence sélectionnée</translation>
+        <translation>选择的许可细节</translation>
     </message>
     <message>
         <source>New License</source>
-        <translation>Nouvelle Licence</translation>
+        <translation>新许可</translation>
     </message>
     <message>
         <source>Active Licenses</source>
-        <translation>Licences Active</translation>
+        <translation>激活许可</translation>
     </message>
 </context>
 <context>
     <name>LicenseNotificationDialog</name>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
+        <translation>警告</translation>
     </message>
 </context>
 <context>
     <name>LicenseWidget</name>
     <message>
         <source>Hardware ID:</source>
-        <translation>ID Matériel:</translation>
-    </message>
-    <message>
-        <source>Paste from Clipboard</source>
-        <translation>Coller du Presse-Papier</translation>
-    </message>
-    <message>
-        <source>Copy to Clipboard</source>
-        <translation>Copier vers Presse-Papier</translation>
+        <translation>硬件ID:</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>Parcourir...</translation>
+        <translation>浏览...</translation>
+    </message>
+    <message>
+        <source>Paste from Clipboard</source>
+        <translation>剪贴板复制</translation>
+    </message>
+    <message>
+        <source>Copy to Clipboard</source>
+        <translation>复制到剪贴板</translation>
     </message>
     <message>
         <source>License will be bound to the current server</source>
-        <translation>La licence sera liée au serveur actuel</translation>
+        <translation>授权将绑定到当前服务器</translation>
     </message>
     <message>
         <source>Activate Free License</source>
-        <translation>Activer licence gratuite</translation>
+        <translation>激活免费许可密钥</translation>
     </message>
     <message>
         <source>Activate License</source>
-        <translation>Activer Licence</translation>
+        <translation>激活许可</translation>
     </message>
     <message>
         <source>Automatic Activation via Internet</source>
-        <translation>Activation automatique par Internet</translation>
+        <translation>通过网络激活</translation>
     </message>
     <message>
         <source>Manual Activation</source>
-        <translation>Activation Manuel</translation>
+        <translation>手动激活</translation>
     </message>
     <message>
         <source>Activation Key File:</source>
-        <translation>Fichier Clé d&apos;activation:</translation>
+        <translation>激活密钥文件:</translation>
     </message>
     <message>
         <source>License Key:</source>
-        <translation>Clé de licence:</translation>
+        <translation>许可密钥:</translation>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation>Clé de licence invalide</translation>
+        <translation>授权密钥无效</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation>Sélectionner un fichier licence...</translation>
+        <translation>选择授权文件...</translation>
     </message>
 </context>
 <context>
     <name>LicensesProposeWidget</name>
     <message>
         <source>Licensing</source>
-        <translation>Licences</translation>
+        <translation>授权</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation>Obtenez plus de licences...</translation>
+        <translation>取得更多软件许可...</translation>
     </message>
 </context>
 <context>
     <name>LoginDialog</name>
     <message>
         <source>&amp;Host:</source>
-        <translation>&amp;Hôte:</translation>
+        <translation>&amp;主机:</translation>
     </message>
     <message>
         <source>P&amp;ort:</source>
-        <translation>P&amp;ort:</translation>
+        <translation>&amp;端口:</translation>
     </message>
     <message>
         <source>&amp;Login:</source>
-        <translation>&amp;Identifiant:</translation>
-    </message>
-    <message>
-        <source>&amp;Password:</source>
-        <translation>Mot de &amp;passe:</translation>
-    </message>
-    <message>
-        <source>&amp;Test</source>
-        <translation>&amp;Test</translation>
+        <translation>&amp;登录:</translation>
     </message>
     <message>
         <source>Connect to Server</source>
         <comment>Groupbox Title</comment>
-        <translation>Connecter au serveur</translation>
+        <translatorcomment>标题</translatorcomment>
+        <translation>连接到服务器</translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation>&amp;密码:</translation>
+    </message>
+    <message>
+        <source>&amp;Test</source>
+        <translation>&amp;测试</translation>
     </message>
     <message>
         <source>Save...</source>
-        <translation>Sauvegarde...</translation>
+        <translation>保存...</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Supprimer</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>&amp;Auto-Login</source>
-        <translation>Connexion-&amp;Auto</translation>
+        <translation>&amp;自动登录</translation>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation>Options de &amp;Connexion:</translation>
+        <translation>&amp;连接选项:</translation>
     </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
         <source>Look and Feel</source>
-        <translation>Affichage</translation>
+        <translation>常规设置</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation>Langue:</translation>
+        <translation>语言:</translation>
     </message>
     <message>
         <source>Show IP in tree:</source>
-        <translation>Afficher l&apos;IP dans arborescence:</translation>
+        <translation>在左侧资源列表中显示IP:</translation>
     </message>
     <message>
         <source>Skin:</source>
-        <translation>Habillage:</translation>
+        <translation>界面风格:</translation>
     </message>
     <message>
         <source>Tour sequence cycle time:</source>
-        <translation>Durée de cycle du Tour de séquence:</translation>
+        <translation>轮巡周期:</translation>
     </message>
     <message>
         <source>Restart required.</source>
-        <translation>Redémarrage nécessaire.</translation>
+        <translation>需重新启动。</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation>Secondes</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>Background Animation</source>
-        <translation>Animation de Fond</translation>
+        <translation>背景设置</translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
-        <translation>Activer l&apos;Animation de fond</translation>
+        <translation>使用动画背景</translation>
     </message>
     <message>
         <source>Color:</source>
-        <translation>Couleur:</translation>
+        <translation>颜色:</translation>
     </message>
     <message>
         <source>Select color...</source>
-        <translation>Choisir la couleur...</translation>
+        <translation>选择颜色...</translation>
     </message>
     <message>
         <source>Intensity:</source>
-        <translation>Intensité:</translation>
+        <translation>对比度:</translation>
     </message>
     <message>
         <source>%</source>
@@ -1240,222 +1260,206 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Background Image</source>
-        <translation>Image de Fond</translation>
+        <translation>背景图片</translation>
     </message>
     <message>
         <source>Enable Background Image</source>
-        <translation>Activer l&apos;image de fond</translation>
+        <translation>使用背景图片</translation>
     </message>
     <message>
         <source>Image:</source>
-        <translation>Image:</translation>
+        <translation>图片:</translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
-        <translation>&lt;No image&gt;</translation>
+        <translation>&lt;沒有图像&gt;</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>Parcourir...</translation>
+        <translation>浏览...</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>Mode:</translation>
+        <translation>模式:</translation>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation>Mode de chronologie:</translation>
+        <translation>时间轴模式:</translation>
     </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
     <message>
         <source>General</source>
-        <translation>Général</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>Authentication</source>
-        <translation>Authentification</translation>
+        <translation>验证</translation>
     </message>
     <message>
         <source>Login:</source>
-        <translation>Identifiant:</translation>
+        <translation>登录:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe:</translation>
+        <translation>密码:</translation>
     </message>
     <message>
         <source>Recording</source>
-        <translation>Enregistrement</translation>
+        <translation>录像</translation>
     </message>
     <message>
         <source>Expert</source>
-        <translation>Expert</translation>
+        <translation>专家</translation>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation>Activer l&apos;audio</translation>
+        <translation>启用音频</translation>
     </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
         <source>Manage...</source>
-        <translation>Gérer...</translation>
+        <translation>管理...</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>Volume:</translation>
+        <translation>音量:</translation>
     </message>
     <message>
         <source>Test...</source>
-        <translation>Test...</translation>
+        <translation>测试...</translation>
     </message>
 </context>
 <context>
     <name>PopupBusinessActionWidget</name>
     <message>
         <source>Global Notification Settings...</source>
-        <translation>Paramètres de notification globale...</translation>
+        <translation>全局通知设定...</translation>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation>Afficher aux Administrateurs seulement</translation>
+        <translation>仅显示给管理员</translation>
     </message>
 </context>
 <context>
     <name>PopupSettingsWidget</name>
     <message>
         <source>Show all notifications</source>
-        <translation>Afficher toutes les notifications</translation>
+        <translation>显示所有通知</translation>
     </message>
     <message>
         <source>Alarms/Events</source>
-        <translation>Alarmes/Évènements</translation>
+        <translation>报警/事件</translation>
     </message>
     <message>
         <source>System Notifications</source>
-        <translation>Notifications système</translation>
+        <translation>系统提醒</translation>
     </message>
 </context>
 <context>
     <name>PreferencesDialog</name>
     <message>
         <source>Local Settings</source>
-        <translation>Paramètres Locaux</translation>
+        <translation>本地设置</translation>
     </message>
 </context>
 <context>
     <name>PtzManageDialog</name>
     <message>
         <source>Save Current Position</source>
-        <translation>Enregistrer la position actuelle</translation>
+        <translation>保存当前位置</translation>
     </message>
     <message>
         <source>Go To Position</source>
-        <translation>Aller à la position</translation>
+        <translation>去预置位</translation>
     </message>
     <message>
         <source>Create Tour</source>
-        <translation>Créer un Tour</translation>
+        <translation>创建新轮巡</translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation>Démarrer le tour</translation>
+        <translation>开始轮巡</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Supprimer</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Détails</translation>
+        <translation>配置信息</translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation>Aperçu</translation>
+        <translation>预览</translation>
     </message>
     <message>
         <source>No preview available</source>
-        <translation>Aucun aperçu disponible</translation>
+        <translation>没有预览</translation>
     </message>
     <message>
         <source>Get Preview</source>
-        <translation>Obtenir l&apos;aperçu</translation>
+        <translation>进行预览</translation>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation>Aucun tour sélectionné</translation>
+        <translation>无轮巡选择</translation>
     </message>
 </context>
 <context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
-        <translation>Zoom Avant</translation>
+        <translation>放大</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation>Zoom Arrière</translation>
+        <translation>缩小</translation>
     </message>
     <message>
         <source>Focus Far</source>
-        <translation>Focus Loin</translation>
+        <translation>远焦</translation>
     </message>
     <message>
         <source>Focus Near</source>
-        <translation>Focus Près</translation>
+        <translation>近焦</translation>
     </message>
     <message>
         <source>Auto Focus</source>
-        <translation>Auto Focus</translation>
+        <translation>自动聚焦</translation>
     </message>
     <message>
         <source>Change Dewarping Mode</source>
-        <translation>Changer Mode Dérouler</translation>
+        <translation>图像矫正模式</translation>
     </message>
 </context>
 <context>
     <name>PtzPresetDialog</name>
     <message>
         <source>Name:</source>
-        <translation>Nom:</translation>
+        <translation>名称:</translation>
     </message>
     <message>
         <source>Hotkey:</source>
-        <translation>Raccourci:</translation>
+        <translation>热键:</translation>
     </message>
     <message>
         <source>Save Position</source>
-        <translation>Enregistrer la position</translation>
+        <translation>保存预设位</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>None</source>
-        <translation>Aucun</translation>
-    </message>
-    <message>
-        <source>Stops</source>
-        <translation>Arrêts</translation>
-    </message>
-    <message>
-        <source>Starts</source>
-        <translation>Démarrages</translation>
-    </message>
-    <message>
-        <source>Starts/Stops</source>
-        <translation>Démarrages/Arrêts</translation>
-    </message>
-    <message>
-        <source>Occurs</source>
-        <translation>Survient</translation>
+        <translation>无</translation>
     </message>
     <message>
         <source>Parameter 1 is null.</source>
-        <translation>Paramètre 1 est nul.</translation>
+        <translation>参数 1 为空.</translation>
     </message>
 </context>
 <context>
@@ -1463,57 +1467,49 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%n millisecond(s)</source>
         <translation>
-            <numerusform>%n milliseconde</numerusform>
-            <numerusform>%n millisecondes</numerusform>
+            <numerusform>%n 毫秒</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n second(s)</source>
         <translation>
-            <numerusform>%n seconde</numerusform>
-            <numerusform>%n secondes</numerusform>
+            <numerusform>%n 秒</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n minute(s)</source>
         <translation>
-            <numerusform>%n minute</numerusform>
-            <numerusform>%n minutes</numerusform>
+            <numerusform>%n 分</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
         <translation>
-            <numerusform>%n heure</numerusform>
-            <numerusform>%n heures</numerusform>
+            <numerusform>%n 时</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
         <translation>
-            <numerusform>%n jour</numerusform>
-            <numerusform>%n jours</numerusform>
+            <numerusform>%n 天</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
         <translation>
-            <numerusform>%n semaine</numerusform>
-            <numerusform>%n semaines</numerusform>
+            <numerusform>%n 周</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n month(s)</source>
         <translation>
-            <numerusform>%n mois</numerusform>
-            <numerusform>%n mois</numerusform>
+            <numerusform>%n 月</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
         <translation>
-            <numerusform>%n an</numerusform>
-            <numerusform>%n ans</numerusform>
+            <numerusform>%n 年</numerusform>
         </translation>
     </message>
 </context>
@@ -1521,69 +1517,69 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnAboutDialog</name>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Copier vers Presse-Papier</translation>
+        <translation>复制到剪贴板</translation>
     </message>
     <message>
         <source>%1 uses the following external libraries:</source>
-        <translation>%1 utilise les librairies externes suivantes:</translation>
+        <translation>%1 使用以下外部库:</translation>
     </message>
     <message>
         <source>OpenGL version</source>
-        <translation>Version OpenGL</translation>
+        <translation>OpenGL 版本</translation>
     </message>
     <message>
         <source>OpenGL renderer</source>
-        <translation>Rendu OpenGL</translation>
+        <translation>OpenGL 构建</translation>
     </message>
     <message>
         <source>OpenGL vendor</source>
-        <translation>Vendeur OpenGL</translation>
+        <translation>OpenGL 提供商</translation>
     </message>
     <message>
         <source>OpenGL max texture size</source>
-        <translation>Taille Texture Max OpenGL</translation>
+        <translation>OpenGL 最大结构尺寸</translation>
     </message>
     <message>
         <source>Support</source>
-        <translation>Support</translation>
+        <translation>技术支持</translation>
     </message>
     <message>
         <source>Server at %2: v%1</source>
-        <translation>Serveur à %2: v%1</translation>
+        <translation>服务器在 %2: 和%1</translation>
     </message>
     <message>
         <source>%1 version %2 (%3).</source>
-        <translation>%1 version %2 (%3).</translation>
+        <translation>版本 %1  %2 (%3).</translation>
     </message>
     <message>
         <source>Built for %1-%2 with %3.</source>
-        <translation>Construit pour %1-%2 avec %3.</translation>
+        <translation>%1-%2为 %3创建.</translation>
     </message>
     <message>
         <source>Client is not connected to any server</source>
-        <translation>Le Client n&apos;est pas connecté à un serveur</translation>
+        <translation>客户端未连接到任何服务器</translation>
     </message>
 </context>
 <context>
     <name>QnAbstractPtzDialog</name>
     <message>
         <source>Loading...</source>
-        <translation>Chargement...</translation>
+        <translation>加载中...</translation>
     </message>
     <message>
         <source>Saving...</source>
-        <translation>Sauvegarde en cours...</translation>
+        <translation>保存中...</translation>
     </message>
 </context>
 <context>
     <name>QnActionManager</name>
     <message>
         <source>Show FPS</source>
-        <translation>Afficher IPS</translation>
+        <translation>显示每秒帧数</translation>
     </message>
     <message>
         <source>Hide FPS</source>
-        <translation>Cacher IPS</translation>
+        <translation>隐藏每秒帧数</translation>
     </message>
     <message>
         <source>Ctrl+Alt+F</source>
@@ -1591,15 +1587,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Drop Resources</source>
-        <translation>Déposer ressources</translation>
+        <translation>拖放资源</translation>
     </message>
     <message>
         <source>Delayed Drop Resources</source>
-        <translation>Délais de dépôt de ressources</translation>
+        <translation>延迟拖放资源</translation>
     </message>
     <message>
         <source>Next Layout</source>
-        <translation>Mise en page suivante</translation>
+        <translation>下个视窗</translation>
     </message>
     <message>
         <source>Ctrl+Tab</source>
@@ -1607,7 +1603,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Previous Layout</source>
-        <translation>Mise en page précédente</translation>
+        <translation>前一个视窗</translation>
     </message>
     <message>
         <source>Ctrl+Shift+Tab</source>
@@ -1615,7 +1611,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select All</source>
-        <translation>Sélectionner tout</translation>
+        <translation>选择所有</translation>
     </message>
     <message>
         <source>Ctrl+A</source>
@@ -1623,15 +1619,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Selection Changed</source>
-        <translation>Sélection modifiée</translation>
+        <translation>修改选择</translation>
     </message>
     <message>
         <source>Reconnect to Server</source>
-        <translation>Reconnecter au Serveur</translation>
+        <translation>重新连接到服务器</translation>
     </message>
     <message>
         <source>Go to Freespace Mode</source>
-        <translation>Passer en mode espace libre</translation>
+        <translation>进入自由空间模式</translation>
     </message>
     <message>
         <source>F11</source>
@@ -1639,55 +1635,55 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Event Log...</source>
-        <translation>Journal d&apos;événement...</translation>
+        <translation>事件日志...</translation>
     </message>
     <message>
         <source>Control Video Wall</source>
-        <translation>Contrôle Mur Vidéo</translation>
+        <translation>电视墙控制</translation>
     </message>
     <message>
         <source>Push my screen</source>
-        <translation>Poussez mon écran</translation>
+        <translation>推送当前显示</translation>
     </message>
     <message>
         <source>Fit in View</source>
-        <translation>Ajustement de vue</translation>
+        <translation>视窗自动调整</translation>
     </message>
     <message>
         <source>Main Menu</source>
-        <translation>Menu principal</translation>
+        <translation>主菜单</translation>
     </message>
     <message>
         <source>Alt+Space</source>
-        <translation>Alt+Espace</translation>
+        <translation>Alt+Space</translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation>Connexion au serveur...</translation>
+        <translation>连接到服务器...</translation>
     </message>
     <message>
         <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Maj+C</translation>
+        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>New...</source>
-        <translation>Nouveau...</translation>
+        <translation>新的...</translation>
     </message>
     <message>
         <source>Layout...</source>
-        <translation>Mise en page...</translation>
+        <translation>视窗...</translation>
     </message>
     <message>
         <source>New Layout...</source>
-        <translation>Nouvelle mise en page...</translation>
+        <translation>新视窗...</translation>
     </message>
     <message>
         <source>Tab</source>
-        <translation>Onglet</translation>
+        <translation>标签</translation>
     </message>
     <message>
         <source>New Tab</source>
-        <translation>Nouvel Onglet</translation>
+        <translation>新标签</translation>
     </message>
     <message>
         <source>Ctrl+T</source>
@@ -1695,11 +1691,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Window</source>
-        <translation>Fenêtre</translation>
+        <translation>窗口</translation>
     </message>
     <message>
         <source>New Window</source>
-        <translation>Nouvelle Fenêtre</translation>
+        <translation>新窗口</translation>
     </message>
     <message>
         <source>Ctrl+N</source>
@@ -1707,27 +1703,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>User...</source>
-        <translation>Usager...</translation>
+        <translation>用户...</translation>
     </message>
     <message>
         <source>New User...</source>
-        <translation>Nouveau Usager...</translation>
+        <translation>新用户...</translation>
     </message>
     <message>
         <source>Video Wall...</source>
-        <translation>Mur Vidéo...</translation>
+        <translation>电视墙...</translation>
     </message>
     <message>
         <source>New Video Wall...</source>
-        <translation>Nouveau Mur Vidéo...</translation>
+        <translation>新建电视墙...</translation>
     </message>
     <message>
         <source>Open...</source>
-        <translation>Ouvrir...</translation>
+        <translation>打开...</translation>
     </message>
     <message>
         <source>File(s)...</source>
-        <translation>Fichier(s)...</translation>
+        <translation>文件...</translation>
     </message>
     <message>
         <source>Ctrl+O</source>
@@ -1735,15 +1731,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout(s)...</source>
-        <translation>Mise(s) en page...</translation>
+        <translation>视窗...</translation>
     </message>
     <message>
         <source>Folder...</source>
-        <translation>Dossier...</translation>
+        <translation>文件夹...</translation>
     </message>
     <message>
         <source>Save Current Layout</source>
-        <translation>Sauvegarder la mise en page actuelle</translation>
+        <translation>保存当前视窗</translation>
     </message>
     <message>
         <source>Ctrl+S</source>
@@ -1751,11 +1747,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Current Layout As...</source>
-        <translation>Sauvegarder la mise en page sous...</translation>
+        <translation>当前视窗另存为...</translation>
     </message>
     <message>
         <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Maj+S</translation>
+        <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
         <source>Ctrl+Alt+S</source>
@@ -1763,15 +1759,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Video Wall View</source>
-        <translation>Sauv. Vue Mur Vidéo</translation>
+        <translation>保存电视墙视图</translation>
     </message>
     <message>
         <source>Start Screen Recording</source>
-        <translation>Démarrer l&apos;enregistrement d&apos;écran</translation>
+        <translation>开始屏幕录像</translation>
     </message>
     <message>
         <source>Stop Screen Recording</source>
-        <translation>Arrêter l&apos;enregistrement d&apos;écran</translation>
+        <translation>结束屏幕录像</translation>
     </message>
     <message>
         <source>Alt+R</source>
@@ -1779,11 +1775,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Go to Fullscreen</source>
-        <translation>Aller en plein écran</translation>
+        <translation>全屏</translation>
     </message>
     <message>
         <source>Exit Fullscreen</source>
-        <translation>Quitter plein écran</translation>
+        <translation>退出全屏</translation>
     </message>
     <message>
         <source>Ctrl+F</source>
@@ -1791,43 +1787,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Alt+Enter</source>
-        <translation>Alt+Entrer</translation>
+        <translation>Alt+Enter</translation>
     </message>
     <message>
         <source>Alt+Return</source>
-        <translation>Alt+Retour</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
-    </message>
-    <message>
-        <source>Disable Background Animation</source>
-        <translation>Désactiver l&apos;Animation de Fond</translation>
-    </message>
-    <message>
-        <source>Enable Background Animation</source>
-        <translation>Activer l&apos;Animation de Fond</translation>
-    </message>
-    <message>
-        <source>Show Search Panel</source>
-        <translation>Afficher le Panneau Rech</translation>
-    </message>
-    <message>
-        <source>Hide Search Panel</source>
-        <translation>Cacher le Panneau Rech</translation>
+        <translation>Alt+Return</translation>
     </message>
     <message>
         <source>Esc</source>
-        <translation>Échap</translation>
+        <translation>退出</translation>
     </message>
     <message>
         <source>Minimize</source>
-        <translation>Minimiser</translation>
+        <translation>最小化</translation>
     </message>
     <message>
         <source>Maximize</source>
-        <translation>Maximiser</translation>
+        <translation>最大化</translation>
     </message>
     <message>
         <source>Ctrl+P</source>
@@ -1835,11 +1811,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>About...</source>
-        <translation>À propos...</translation>
+        <translation>关于...</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>Quitter</translation>
+        <translation>退出</translation>
     </message>
     <message>
         <source>Alt+F4</source>
@@ -1847,7 +1823,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Close</source>
-        <translation>Fermer</translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <source>Ctrl+W</source>
@@ -1855,19 +1831,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Close All But This</source>
-        <translation>Fermer tout sauf ceci</translation>
+        <translation>除此外，关闭所有</translation>
     </message>
     <message>
         <source>Open in Layout</source>
-        <translation>Ouvrir dans la mise en page</translation>
+        <translation>在视窗中打开</translation>
     </message>
     <message>
         <source>Open</source>
-        <translation>Ouvrir</translation>
+        <translation>打开</translation>
     </message>
     <message>
         <source>Open Containing Folder</source>
-        <translation>Ouvrir le dossier contenant</translation>
+        <translation>打开包含的文件夹</translation>
     </message>
     <message>
         <source>Ctrl+Enter</source>
@@ -1879,123 +1855,123 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Open Layouts</source>
-        <translation>Ouvrir les mises en page</translation>
+        <translation>打开视窗</translation>
     </message>
     <message>
         <source>Show Debug</source>
-        <translation>Afficher Debug</translation>
+        <translation>显示Debug</translation>
     </message>
     <message>
         <source>Hide Debug</source>
-        <translation>Cacher Debug</translation>
+        <translation>隐藏Debug</translation>
     </message>
     <message>
         <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
-        <translation>Delayer l&apos;ouverture Mur Vidéo</translation>
+        <translation>延迟打开电视墙</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation>Filtre...</translation>
+        <translation>过滤器...</translation>
     </message>
     <message>
         <source>System Administration...</source>
-        <translation>Administration Système...</translation>
+        <translation>系统管理...</translation>
     </message>
     <message>
         <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
+        <translation></translation>
     </message>
     <message>
         <source>System Update...</source>
-        <translation>MàJ Système...</translation>
+        <translation>系统升级...</translation>
     </message>
     <message>
         <source>Local Settings...</source>
-        <translation>Paramètres locaux...</translation>
+        <translation>本地设置...</translation>
     </message>
     <message>
         <source>Merge Systems...</source>
-        <translation>Unifier Systèmes...</translation>
+        <translation>联网设置...</translation>
     </message>
     <message>
         <source>Server...</source>
-        <translation>Serveur...</translation>
+        <translation>服务器...</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
-        <translation>Ouvrir Mise(s) en page</translation>
+        <translation>打开视窗</translation>
     </message>
     <message>
         <source>Open Video Wall(s)</source>
-        <translation>Ouvrir Mur Vidéo(s)</translation>
+        <translation>开启电视墙</translation>
     </message>
     <message>
         <source>Identify</source>
-        <translation>Identifier</translation>
+        <translation>识别</translation>
     </message>
     <message>
         <source>Attach to Video Wall...</source>
-        <translation>Joindre au Mur Vidéo...</translation>
+        <translation>连接到电视墙...</translation>
     </message>
     <message>
         <source>Switch to Video Wall mode...</source>
-        <translation>Changer sur mode Mur Vidéo...</translation>
+        <translation>切换电视墙模式...</translation>
     </message>
     <message>
         <source>Save Current Matrix</source>
-        <translation>Sauv. Matrice actuelle</translation>
+        <translation>保存当前矩阵</translation>
     </message>
     <message>
         <source>Load Matrix</source>
-        <translation>Charger Matrice</translation>
+        <translation>加载矩阵</translation>
     </message>
     <message>
         <source>Update Layout</source>
-        <translation>MàJ Mise en page</translation>
+        <translation>更新视图</translation>
     </message>
     <message>
         <source>Stop Video Wall</source>
-        <translation>Arrêter Mur Vidéo</translation>
+        <translation>停止电视墙</translation>
     </message>
     <message>
         <source>Detach Layout</source>
-        <translation>Détacher Mise en page</translation>
+        <translation>分离视窗</translation>
     </message>
     <message>
         <source>Save Layout</source>
-        <translation>Sauvegarder la mise en page</translation>
+        <translation>保存视窗</translation>
     </message>
     <message>
         <source>Save Layout As...</source>
-        <translation>Sauvegarder la mise en page sous...</translation>
+        <translation>视窗另存为...</translation>
     </message>
     <message>
         <source>Maximize Item</source>
-        <translation>Maximiser l&apos;objet</translation>
+        <translation>项目最大化</translation>
     </message>
     <message>
         <source>Enter</source>
-        <translation>Entrer</translation>
+        <translation>进入</translation>
     </message>
     <message>
         <source>Return</source>
-        <translation>Retour</translation>
+        <translation>返回</translation>
     </message>
     <message>
         <source>Restore Item</source>
-        <translation>Restaurer l&apos;objet</translation>
+        <translation>还原项目</translation>
     </message>
     <message>
         <source>Manage...</source>
-        <translation>Gérer...</translation>
+        <translation>管理...</translation>
     </message>
     <message>
         <source>Show Motion/Smart Search</source>
-        <translation>Afficher la recherche Mouvement/Intelligente</translation>
+        <translation>显示移动/智能搜索</translation>
     </message>
     <message>
         <source>Alt+G</source>
@@ -2003,19 +1979,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Hide Motion/Smart Search</source>
-        <translation>Cacher la recherche Mouvement/Intelligente</translation>
+        <translation>隐藏移动/智能搜索</translation>
     </message>
     <message>
         <source>Clear Motion Selection</source>
-        <translation>Effacer la sélection Mouvement</translation>
+        <translation>清除移动选择</translation>
     </message>
     <message>
         <source>Toggle Smart Search</source>
-        <translation>Basculer recherche intelligente</translation>
+        <translation>切换智能搜索</translation>
     </message>
     <message>
         <source>Check File Watermark</source>
-        <translation>Vérifiez le filigrane du fichier</translation>
+        <translation>检查文件水印</translation>
     </message>
     <message>
         <source>Alt+C</source>
@@ -2023,7 +1999,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Take Screenshot</source>
-        <translation>Prendre une capture d&apos;écran</translation>
+        <translation>截屏</translation>
     </message>
     <message>
         <source>Alt+S</source>
@@ -2031,39 +2007,63 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Rotate to...</source>
-        <translation>Rotation à...</translation>
+        <translation>旋转到...</translation>
     </message>
     <message>
         <source>0 degrees</source>
-        <translation>0 degrés</translation>
+        <translation>0度</translation>
     </message>
     <message>
         <source>90 degrees</source>
-        <translation>90 degrés</translation>
+        <translation>90度</translation>
     </message>
     <message>
         <source>180 degrees</source>
-        <translation>180 degrés</translation>
+        <translation>180度</translation>
     </message>
     <message>
         <source>270 degrees</source>
-        <translation>270 degrés</translation>
+        <translation>270度</translation>
     </message>
     <message>
         <source>Remove from Layout</source>
-        <translation>Retirer de la mise en page</translation>
+        <translation>从视图中移除</translation>
+    </message>
+    <message>
+        <source>Merge to Currently Connected System...</source>
+        <translation>联网到当前系统...</translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+T</source>
+        <translation>Ctrl+Alt+T</translation>
+    </message>
+    <message>
+        <source>Disable Background Animation</source>
+        <translation>不使用动画背景</translation>
+    </message>
+    <message>
+        <source>Enable Background Animation</source>
+        <translation>使用动画背景</translation>
+    </message>
+    <message>
+        <source>Show Search Panel</source>
+        <translation>显示搜索面板</translation>
+    </message>
+    <message>
+        <source>Hide Search Panel</source>
+        <translation>隐藏搜索面板</translation>
     </message>
     <message>
         <source>Del</source>
-        <translation>Supp</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Supprimer</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation>Renommer</translation>
+        <translation>重命名</translation>
     </message>
     <message>
         <source>F2</source>
@@ -2075,39 +2075,35 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Delete from Disk</source>
-        <translation>Supprimer du disque</translation>
+        <translation>从磁盘中删除</translation>
     </message>
     <message>
         <source>User Settings...</source>
-        <translation>Paramètres Usager...</translation>
-    </message>
-    <message>
-        <source>Video Wall Settings...</source>
-        <translation>Paramètres Mur Vidéo...</translation>
+        <translation>用户设置...</translation>
     </message>
     <message>
         <source>Server Settings...</source>
-        <translation>Paramètres Serveur...</translation>
+        <translation>服务器设定...</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Aucun</translation>
+        <translation>无</translation>
     </message>
     <message>
         <source>Small</source>
-        <translation>Petit</translation>
+        <translation>小</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation>Moyen</translation>
+        <translation>中</translation>
     </message>
     <message>
         <source>Large</source>
-        <translation>Grand</translation>
+        <translation>大</translation>
     </message>
     <message>
         <source>Mark Selection Start</source>
-        <translation>Marquer la sélection de début</translation>
+        <translation>标记开始</translation>
     </message>
     <message>
         <source>[</source>
@@ -2115,7 +2111,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Mark Selection End</source>
-        <translation>Marquer la sélection de fin</translation>
+        <translation>标记结束</translation>
     </message>
     <message>
         <source>]</source>
@@ -2123,27 +2119,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation>Effacer la sélection</translation>
-    </message>
-    <message>
-        <source>Bookmark Selection...</source>
-        <translation>Sélectionner Signet...</translation>
-    </message>
-    <message>
-        <source>Edit Bookmark...</source>
-        <translation>Éditer Signet...</translation>
-    </message>
-    <message>
-        <source>Remove Bookmark...</source>
-        <translation>Enlever Signet...</translation>
+        <translation>清除选择</translation>
     </message>
     <message>
         <source>Show Thumbnails</source>
-        <translation>Afficher les miniatures</translation>
+        <translation>显示缩略图</translation>
     </message>
     <message>
         <source>Hide Thumbnails</source>
-        <translation>Cacher les miniatures</translation>
+        <translation>隐藏缩略图</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift++</source>
@@ -2151,7 +2135,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Increment Debug Counter</source>
-        <translation>Incrémenter compteur de débogage</translation>
+        <translation>增加调试计数器</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift+-</source>
@@ -2159,63 +2143,63 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Decrement Debug Counter</source>
-        <translation>Décrémenter compteur de débogage</translation>
+        <translation>减少调试计数器</translation>
     </message>
     <message>
         <source>Monitor</source>
-        <translation>Surveiller</translation>
+        <translation>监控</translation>
     </message>
     <message>
         <source>Monitor in a New Tab</source>
-        <translation>Surveiller dans une nouvelle mise en page</translation>
+        <translation>在新标签中监控</translation>
     </message>
     <message>
         <source>Monitor in a New Window</source>
-        <translation>Surveiller dans une nouvelle fenêtre</translation>
+        <translation>在新窗口中监控</translation>
     </message>
     <message>
         <source>Start Panic Recording</source>
-        <translation>Démarrer l&apos;enregistrement panique</translation>
+        <translation>开始危机录像</translation>
     </message>
     <message>
         <source>Stop Panic Recording</source>
-        <translation>Arrêter l&apos;enregistrement panique</translation>
-    </message>
-    <message>
-        <source>Show Calendar</source>
-        <translation>Afficher le Calendrier</translation>
-    </message>
-    <message>
-        <source>Hide Calendar</source>
-        <translation>Cacher le Calendrier</translation>
+        <translation>结束危机录像</translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation>Démarrer le tour</translation>
+        <translation>开始轮巡</translation>
     </message>
     <message>
         <source>Stop Tour</source>
-        <translation>Arrêter le tour</translation>
+        <translation>停止轮巡</translation>
+    </message>
+    <message>
+        <source>Show Calendar</source>
+        <translation>显示日历</translation>
+    </message>
+    <message>
+        <source>Hide Calendar</source>
+        <translation>隐藏日历</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation>Éspace</translation>
+        <translation>空格</translation>
     </message>
     <message>
         <source>Ctrl+Left</source>
-        <translation>Ctrl+Gauche</translation>
+        <translation>Ctrl+Left</translation>
     </message>
     <message>
         <source>Previous Frame</source>
-        <translation>Image précédente</translation>
+        <translation>前一帧</translation>
     </message>
     <message>
         <source>Ctrl+Right</source>
-        <translation>Ctrl+Droite</translation>
+        <translation>Ctrl+Right</translation>
     </message>
     <message>
         <source>Next Frame</source>
-        <translation>Image suivante</translation>
+        <translation>下一帧</translation>
     </message>
     <message>
         <source>Z</source>
@@ -2223,7 +2207,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>To Start</source>
-        <translation>Pour Démarrer</translation>
+        <translation>到开始</translation>
     </message>
     <message>
         <source>X</source>
@@ -2231,23 +2215,39 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>To End</source>
-        <translation>Pour Terminer</translation>
+        <translation>到结束</translation>
     </message>
     <message>
         <source>Ctrl+Down</source>
-        <translation>Ctrl+Bas</translation>
+        <translation>Ctrl+Down</translation>
     </message>
     <message>
         <source>Volume Down</source>
-        <translation>Baisser le volume</translation>
+        <translation>降低音量</translation>
+    </message>
+    <message>
+        <source>Video Wall Settings...</source>
+        <translation>电视墙设置...</translation>
+    </message>
+    <message>
+        <source>Bookmark Selection...</source>
+        <translation>标签选择...</translation>
+    </message>
+    <message>
+        <source>Edit Bookmark...</source>
+        <translation>编辑标签...</translation>
+    </message>
+    <message>
+        <source>Remove Bookmark...</source>
+        <translation>删除标签...</translation>
     </message>
     <message>
         <source>Ctrl+Up</source>
-        <translation>Ctrl+Haut</translation>
+        <translation>Ctrl+Up</translation>
     </message>
     <message>
         <source>Volume Up</source>
-        <translation>Monter le volume</translation>
+        <translation>提高音量</translation>
     </message>
     <message>
         <source>M</source>
@@ -2255,7 +2255,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Toggle Mute</source>
-        <translation>Basculer Sourdine</translation>
+        <translation>切换静音</translation>
     </message>
     <message>
         <source>L</source>
@@ -2263,7 +2263,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Jump to Live</source>
-        <translation>Aller en direct</translation>
+        <translation>跳转到实时视频</translation>
     </message>
     <message>
         <source>S</source>
@@ -2275,51 +2275,51 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Play</source>
-        <translation>Lecture</translation>
+        <translation>播放</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation>Pause</translation>
+        <translation>暂停</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
-        <translation>Synchroniser les flux</translation>
+        <translation>同步回放</translation>
     </message>
     <message>
         <source>Disable Stream Synchronization</source>
-        <translation>Désactiver la synchronisation de flux</translation>
+        <translation>禁用码流同步</translation>
     </message>
     <message>
         <source>Instant Drop Resources</source>
-        <translation>Dépôt de ressources instantané</translation>
+        <translation>快速拖放资源</translation>
     </message>
     <message>
         <source>Help</source>
-        <translation>Aide</translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <source>Logout</source>
-        <translation>Déconnexion</translation>
+        <translation>登出</translation>
     </message>
     <message>
         <source>Open Layout...</source>
-        <translation>Ouvrir la mise en page...</translation>
+        <translation>打开视窗...</translation>
     </message>
     <message>
         <source>Restore Down</source>
-        <translation>Rétablir le bas</translation>
+        <translation>向下还原</translation>
     </message>
     <message>
         <source>Open Layout in a New Tab</source>
-        <translation>Ouvrir la mise en page dans un nouvel onglet</translation>
+        <translation>在新标签中打开视窗</translation>
     </message>
     <message>
         <source>Open Layout(s) in a New Window</source>
-        <translation>Ouvrir Mise(s) en page dans une nouvelle fenêtre</translation>
+        <translation>在新窗口中打开视窗</translation>
     </message>
     <message>
         <source>Show Info</source>
-        <translation>Afficher les infos</translation>
+        <translation>显示信息</translation>
     </message>
     <message>
         <source>Alt+I</source>
@@ -2327,31 +2327,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Hide Info</source>
-        <translation>Cacher les infos</translation>
+        <translation>隐藏信息</translation>
     </message>
     <message>
         <source>Toggle Info</source>
-        <translation>Basculer Infos</translation>
+        <translation>切换信息</translation>
     </message>
     <message>
         <source>Show Motion</source>
-        <translation>Afficher les mouvements</translation>
+        <translation>显示移动</translation>
     </message>
     <message>
         <source>Hide Motion</source>
-        <translation>Cacher les mouvements</translation>
-    </message>
-    <message>
-        <source>Merge to Currently Connected System...</source>
-        <translation>Unifier au Système Actuellement Connecté...</translation>
+        <translation>隐藏移动</translation>
     </message>
     <message>
         <source>Export Selected Area...</source>
-        <translation>Exporter la zone sélectionnée...</translation>
+        <translation>导出所选录像区域...</translation>
     </message>
     <message>
         <source>Export Multi-Video...</source>
-        <translation>Exporter Multi-Vidéo...</translation>
+        <translation>导出多个录像...</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift+R</source>
@@ -2359,55 +2355,55 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Show Resource Pool</source>
-        <translation>Afficher le pool Ressource</translation>
+        <translation>显示资源库</translation>
     </message>
     <message>
         <source>Get PTZ Position</source>
-        <translation>Obtenir la position PTZ</translation>
+        <translation>获取云台位置</translation>
     </message>
     <message>
         <source>Show Title Bar</source>
-        <translation>Afficher la barre de titre</translation>
+        <translation>显示标题栏</translation>
     </message>
     <message>
         <source>Hide Title Bar</source>
-        <translation>Cacher la barre de titre</translation>
+        <translation>隐藏标题栏</translation>
     </message>
     <message>
         <source>Pin Tree</source>
-        <translation>Attacher l&apos;arborescence</translation>
+        <translation>钉选树状表</translation>
     </message>
     <message>
         <source>Unpin Tree</source>
-        <translation>Détacher l&apos;arborescence</translation>
+        <translation>取消钉选树状表</translation>
     </message>
     <message>
         <source>Show Tree</source>
-        <translation>Afficher l&apos;arborescence</translation>
+        <translation>显示树状表</translation>
     </message>
     <message>
         <source>Hide Tree</source>
-        <translation>Cacher l&apos;arborescence</translation>
+        <translation>隐藏树状表</translation>
     </message>
     <message>
         <source>Show Timeline</source>
-        <translation>Afficher la chronologie</translation>
+        <translation>显示时间轴</translation>
     </message>
     <message>
         <source>Hide Timeline</source>
-        <translation>Cacher la chronologie</translation>
+        <translation>隐藏时间轴</translation>
     </message>
     <message>
         <source>Preview Search...</source>
-        <translation>Recherche d&apos;aperçu...</translation>
+        <translation>预览搜索...</translation>
     </message>
     <message>
         <source>Stop current action</source>
-        <translation>Arrêter l&apos;action en cours</translation>
+        <translation>停止当前动作</translation>
     </message>
     <message>
         <source>Alarm/Event Rules...</source>
-        <translation>Règles Alarme/Événement...</translation>
+        <translation>报警/事件规则...</translation>
     </message>
     <message>
         <source>Ctrl+E</source>
@@ -2415,19 +2411,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Change Resolution...</source>
-        <translation>Modifier la résolution...</translation>
+        <translation>修改分辨率...</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation>Auto</translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation>Bas</translation>
+        <translation>低</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>Haut</translation>
+        <translation>高</translation>
     </message>
     <message>
         <source>PTZ...</source>
@@ -2435,27 +2431,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Current Position...</source>
-        <translation>Enregistrer la position actuelle...</translation>
+        <translation>保存当前位置...</translation>
     </message>
     <message>
         <source>Go To Saved Position</source>
-        <translation>Aller à la position sauvegardée</translation>
+        <translation>调用预置位</translation>
     </message>
     <message>
         <source>Toggle Resolution Mode</source>
-        <translation>Basculer Mode Résolution</translation>
+        <translation>切换分辨率模式</translation>
     </message>
     <message>
         <source>Change Cell Aspect Ratio...</source>
-        <translation>Modifier le format de la cellule...</translation>
+        <translation>改变宽高比...</translation>
     </message>
     <message>
         <source>Change Cell Spacing...</source>
-        <translation>Modifier l&apos;espacement des cellules...</translation>
+        <translation>改变间距...</translation>
     </message>
     <message>
         <source>Layout Settings...</source>
-        <translation>Paramètres de la mise en page...</translation>
+        <translation>视窗设定...</translation>
     </message>
     <message>
         <source>Ctrl+L</source>
@@ -2471,11 +2467,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Create Zoom Window</source>
-        <translation>Créer une fenêtre zoom</translation>
+        <translation>创建缩放窗口</translation>
     </message>
     <message>
         <source>Set as Layout Background</source>
-        <translation>Définir comme mise en page d&apos;arrière plan</translation>
+        <translation>设置为视窗背景</translation>
     </message>
     <message>
         <source>Ping...</source>
@@ -2483,327 +2479,331 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server Diagnostics...</source>
-        <translation>Diagnostics Serveur...</translation>
+        <translation>服务器诊断...</translation>
     </message>
     <message>
         <source>Calibrate PTZ</source>
-        <translation>Calibration PTZ</translation>
+        <translation>校准PTZ</translation>
     </message>
     <message>
         <source>Pin Notifications</source>
-        <translation>Attacher les notifications</translation>
+        <translation>钉选通知</translation>
     </message>
     <message>
         <source>Unpin Notifications</source>
-        <translation>Détacher les notifications</translation>
+        <translation>取消钉选通知</translation>
     </message>
     <message>
         <source>Open in Browser...</source>
-        <translation>Ouvrir dans le navigateur...</translation>
+        <translation>在浏览器中打开...</translation>
     </message>
     <message>
         <source>Open in New Tab</source>
-        <translation>Ouvrir dans un nouvel onglet</translation>
+        <translation>在新标签页中打开</translation>
     </message>
     <message>
         <source>Open in New Window</source>
-        <translation>Ouvrir dans une nouvelle fenêtre</translation>
+        <translation>在新窗口打开</translation>
     </message>
     <message>
         <source>Show Message</source>
-        <translation>Afficher Message</translation>
+        <translation>显示信息</translation>
     </message>
     <message>
         <source>Show Version Mismatch Message</source>
-        <translation>Afficher les messages d&apos;incompatibilité de version</translation>
+        <translation>显示版本不匹配信息</translation>
     </message>
     <message>
         <source>Open Web Client...</source>
-        <translation>Ouvrir le client web...</translation>
+        <translation>打开Web客户端...</translation>
     </message>
     <message>
         <source>Image Enhancement...</source>
-        <translation>Amélioration de l&apos;image...</translation>
+        <translation>图像增强...</translation>
     </message>
     <message>
         <source>Server Logs...</source>
-        <translation>Journals Serveur...</translation>
+        <translation>服务器日志...</translation>
     </message>
     <message>
         <source>Open Current Layout in a New Window</source>
-        <translation>Ouvrir la mise en page actuelle dans une nouvelle fenêtre</translation>
+        <translation>在新窗口打开当前视窗</translation>
     </message>
     <message>
         <source>How-to Videos and FAQ...</source>
-        <translatorcomment>Added a note saying to french speaking that these video/faq are in english</translatorcomment>
-        <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
+        <translation>视频教程及常见问题解答...</translation>
     </message>
     <message>
         <source>Show Beta Version Warning Message</source>
-        <translation>Afficher le message d&apos;avertissement de Version Beta</translation>
+        <translation>显示测试版本警告信息</translation>
     </message>
     <message>
         <source>Restart application</source>
-        <translation>Redémarrer l&apos;application</translation>
+        <translation>重新启动程序</translation>
     </message>
     <message>
         <source>Activate PTZ Tour</source>
-        <translation>Activer le tour PTZ</translation>
+        <translation>激活PTZ轮巡</translation>
     </message>
     <message>
         <source>Calibrate Fisheye</source>
-        <translation>Calibrer le &apos;fisheye&apos;</translation>
+        <translation>校准鱼眼图像</translation>
     </message>
     <message>
         <source>Zoom to Selection</source>
-        <translation>Zoom sur la sélection</translation>
+        <translation>放大选择</translation>
     </message>
     <message>
         <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Maj+D</translation>
+        <translation>Ctrl+Alt+Shift+D</translation>
     </message>
     <message>
         <source>Debug Control Panel</source>
-        <translation>Panneau de configuration &apos;Debug&apos;</translation>
+        <translation>调试控制板面</translation>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation>Paramètres Fichier...</translation>
+        <translation>文件设置...</translation>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation>Demander à propos de rapport de statstiques</translation>
+        <translation>获取数据统计报告</translation>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation>Déposer ressources dans une nouvelle mise en page</translation>
+        <translation>将资源拖放到一个新视图</translation>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation>Sélectionner l&apos;heure serveur</translation>
+        <translation>选择时间服务器</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation>Activer l&apos;objet PTZ</translation>
+        <translation>激活PTZ</translation>
     </message>
     <message>
         <source>User Management...</source>
-        <translation>Gestion Utilisateur...</translation>
+        <translation>用户管理...</translation>
     </message>
     <message>
         <source>Audit Trail...</source>
-        <translation>Piste de vérification...</translation>
+        <translation>研判...</translation>
     </message>
     <message>
         <source>Move %1</source>
-        <translation>Déplacer %1</translation>
+        <translation>移动 %1</translation>
     </message>
     <message>
         <source>Check %1 Issues...</source>
-        <translation>Vérifier problèmes %1...</translation>
+        <translation>选择 %1 问题...</translation>
     </message>
     <message>
         <source>%1 List...</source>
-        <translation>%1 Liste...</translation>
+        <translation>%1 列表...</translation>
     </message>
     <message>
         <source>%1 Rules...</source>
-        <translation>%1 Règles...</translation>
+        <translation>%1 规则...</translation>
     </message>
     <message>
         <source>%1 Settings...</source>
-        <translation>%1 Paramètres...</translation>
-    </message>
-    <message>
-        <source>Open in %1 Settings Dialog...</source>
-        <translation>Ouvrir paramètres dialogue dans %1...</translation>
+        <translation>%1 设置...</translation>
     </message>
     <message>
         <source>Add Device(s)...</source>
-        <translation>Ajouter Périphérique(s)...</translation>
+        <translation>添加设备...</translation>
     </message>
     <message>
         <source>%1 List by Server...</source>
-        <translation>%1 Liste par Serveur...</translation>
+        <translation>%1 服务器列表...</translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
     <message>
         <source>Image Enhancement - %1</source>
-        <translation>Amélioration de l&apos;image - %1</translation>
+        <translation>图像增强 - %1</translation>
     </message>
     <message>
         <source>Image Enhancement</source>
-        <translation>Amélioration de l&apos;image</translation>
+        <translation>图像增强</translation>
     </message>
 </context>
 <context>
     <name>QnAggregationWidget</name>
     <message>
         <source>sec</source>
-        <translation>sec</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>min</source>
-        <translation>min</translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation>hrs</translation>
+        <translation>时</translation>
     </message>
     <message>
         <source>days</source>
-        <translation>jours</translation>
+        <translation>天</translation>
     </message>
 </context>
 <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
         <source>Attach to Video Wall...</source>
-        <translation>Joindre au Mur Vidéo...</translation>
+        <translation>关联电视墙...</translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation>Aperçu</translation>
+        <translation>预览</translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogDialog</name>
     <message>
         <source>Play this</source>
-        <translation>Jouer ceci</translation>
+        <translation>播放</translation>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Copier la sélection dans le presse-papier</translation>
+        <translation>复制选择到剪贴板</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation>Exporter la sélection vers un fichier...</translation>
+        <translation>导出选择到文件...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>Sélectionner tout</translation>
+        <translation>选择所有</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation>Recherche</translation>
+        <translation>搜索</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Information</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>No archive data for that position left</source>
-        <translation>Aucune donnée d&apos;archive restante pour cette position</translation>
+        <translation>没有录像数据位置</translation>
     </message>
     <message>
         <source>This resources already removed from the system</source>
-        <translation>Cette ressource est déjà retiré du système</translation>
+        <translation>资源已从系统中删除</translation>
     </message>
     <message>
         <source>Export selected records to a file</source>
-        <translation>Exporter les enregistrements sélectionnés vers un fichier</translation>
+        <translation>导出所选择录像至文件</translation>
     </message>
     <message>
         <source>Audit log replay</source>
-        <translation>Relecture du journal de vérification</translation>
+        <translation>研判日志回放</translation>
     </message>
     <message>
         <source>%1 actions</source>
-        <translation>Actions %1</translation>
+        <extracomment>&quot;Camera actions&quot; or &quot;Device actions&quot;</extracomment>
+        <translation>%1 使用</translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
     <message>
         <source>%1d </source>
-        <translation>%1j</translation>
+        <translation>%1 天</translation>
     </message>
     <message>
         <source>%1h </source>
-        <translation>%1h</translation>
+        <translation>%1 时</translation>
     </message>
     <message>
         <source>%1m </source>
-        <translation>%1m</translation>
+        <translation>%1 分</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Inconnue</translation>
+        <translation>未知错误</translation>
     </message>
     <message>
         <source>Unsuccessful login</source>
-        <translation>Échec de connexion</translation>
+        <translation>登录不成功</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation>Identifiant</translation>
+        <translation>登录</translation>
     </message>
     <message>
         <source>User updated</source>
-        <translation>Usager mis à jour</translation>
+        <translation>用户更新</translation>
     </message>
     <message>
         <source>Watching live</source>
-        <translation>Visionnement en direct</translation>
+        <translation>实时预览</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation>Visionnement d&apos;archive</translation>
+        <translation>录像预览</translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation>Exportation vidéo</translation>
+        <translation>导出录像</translation>
     </message>
     <message>
         <source>System name changed</source>
-        <translation>Nom Système changé</translation>
+        <translation>更改系统名称</translation>
     </message>
     <message>
         <source>System merge</source>
-        <translation>Système Unifié</translation>
+        <translation>系统联网</translation>
     </message>
     <message>
         <source>General settings updated</source>
-        <translation>Paramètres Généraux mis à jour</translation>
+        <translation>更新常用设置</translation>
     </message>
     <message>
         <source>Server updated</source>
-        <translation>Serveur mis à jour</translation>
+        <translation>更新服务器</translation>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation>Règle d&apos;affaires mis à jour</translation>
+        <translation>更新事件规则</translation>
     </message>
     <message>
         <source>Server removed</source>
-        <translation>Serveur retiré</translation>
+        <translation>移除服务器</translation>
     </message>
     <message>
         <source>Business rule removed</source>
-        <translation>Règle d&apos;affaires retiré</translation>
+        <translation>移除事件规则</translation>
     </message>
     <message>
         <source>User removed</source>
-        <translation>Usager retiré</translation>
+        <translation>移除用户</translation>
     </message>
     <message>
         <source>Business rule reseted</source>
-        <translation>Règle d&apos;affaires réinitialisé</translation>
+        <translation>事件规则重置</translation>
     </message>
     <message>
         <source>Database restored</source>
-        <translation>Base de données restaurée</translation>
+        <translation>数据库还原</translation>
     </message>
     <message>
         <source>Play this</source>
-        <translation>Jouer ceci</translation>
+        <translation>播放</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation>Paramètres</translation>
+        <translation>设置</translation>
     </message>
     <message>
         <source>%1 - %2, </source>
@@ -2812,25 +2812,24 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%n action(s)</source>
         <translation>
-            <numerusform>%n action</numerusform>
-            <numerusform>%n actions</numerusform>
+            <numerusform>%n 使用</numerusform>
         </translation>
     </message>
     <message>
         <source>Session begins</source>
-        <translation>Début de session</translation>
+        <translation>任务开始</translation>
     </message>
     <message>
         <source>Session ends</source>
-        <translation>Fin de session</translation>
+        <translation>任务结束</translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation>Duration</translation>
+        <translation>持续</translation>
     </message>
     <message>
         <source>User</source>
-        <translation>Usager</translation>
+        <translation>用户</translation>
     </message>
     <message>
         <source>IP</source>
@@ -2838,51 +2837,51 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Activity</source>
-        <translation>Activité</translation>
+        <translation>活动</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>Date</translation>
+        <translation>日期</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation>Temps</translation>
+        <translation>时间</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation>Description</translation>
+        <translation>描述</translation>
     </message>
     <message>
         <source>View it</source>
-        <translation>Voir</translation>
+        <translation>查看</translation>
     </message>
     <message>
         <source>Click to expand</source>
-        <translation>Cliquez pour développer</translation>
+        <translation>点击展开</translation>
     </message>
     <message>
         <source>Red mark means that an archive is still available</source>
-        <translation>Une marque rouge signifie qu&apos;un archive est toujours disponible</translation>
+        <translation>红色标志表示录像仍可用</translation>
     </message>
     <message>
         <source>E-mail settings changed</source>
-        <translation>Paramètres courriel changé</translation>
+        <translation>更改邮箱设置</translation>
     </message>
     <message>
         <source>%1 updated</source>
-        <translation>%1 mis à jour</translation>
+        <translation>%1 更新</translation>
     </message>
     <message>
         <source>%1 added</source>
-        <translation>%1 ajouté</translation>
+        <translation>%1 添加</translation>
     </message>
     <message>
         <source>%1 removed</source>
-        <translation>%1 enlevé</translation>
+        <translation>%1 移除</translation>
     </message>
     <message>
         <source>%1 name</source>
-        <translation>%1 nom</translation>
+        <translation>%1 名称</translation>
     </message>
 </context>
 <context>
@@ -2890,13 +2889,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>You have %n notifications</source>
         <translation>
-            <numerusform>Vous avez %n notification</numerusform>
-            <numerusform>Vous avez %n notifications</numerusform>
+            <numerusform>当前有 %n 通知</numerusform>
         </translation>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation>Vous avez de nouvelles notifications.</translation>
+        <translation>当前沒有新的通知.</translation>
     </message>
 </context>
 <context>
@@ -2907,23 +2905,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe:</translation>
+        <translation>密码:</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation>Installer une vers. précise.</translation>
+        <translation>安装指定版本.</translation>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation>Numéro Vers.:</translation>
+        <translation>版本号:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation>Le mot de passe que vous avez entré est invalide.</translation>
+        <translation>输入的密码无效.</translation>
     </message>
 </context>
 <context>
@@ -2931,8 +2929,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>%n of %1</source>
         <translation>
-            <numerusform>%n de %1</numerusform>
-            <numerusform>%n de %1</numerusform>
+            <numerusform>%n 的 %1</numerusform>
         </translation>
     </message>
     <message>
@@ -2941,105 +2938,95 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select at least one %1.</source>
-        <translation>Sélectionnez au moins une %1.</translation>
+        <translation>选择最新版本 %1.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
         <source>For All Users</source>
-        <translation>Pour tous les Usagers</translation>
+        <translation>所有用户</translation>
     </message>
     <message>
         <source>For Administrators Only</source>
-        <translation>Pour Adminstrateurs Seulement</translation>
+        <translation>仅管理员</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
         <source>&lt;System&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;System&gt;</translation>
+        <translation>&lt;系统&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Server&gt;</source>
-        <translation>&lt;Tout Serveur&gt;</translation>
+        <translation>&lt;任何服务器&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
         <translation>
-            <numerusform>%n Serveur</numerusform>
-            <numerusform>%n Serveurs</numerusform>
+            <numerusform>%n 台服务器</numerusform>
         </translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation>immédiat</translation>
+        <translation>立即作用</translation>
     </message>
     <message>
         <source>Not Applied</source>
-        <translation>Non appliqué</translation>
+        <translation>不可用</translation>
     </message>
     <message numerus="yes">
         <source>Every %n days</source>
         <translation>
-            <numerusform>Tous les %n jour</numerusform>
-            <numerusform>Tous les %n jours</numerusform>
+            <numerusform>每 %n 天</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n hours</source>
         <translation>
-            <numerusform>Toutes les %n heure</numerusform>
-            <numerusform>Toutes les %n heures</numerusform>
+            <numerusform>每 %n 小时</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n minutes</source>
         <translation>
-            <numerusform>Toutes les %n minute</numerusform>
-            <numerusform>Toutes les %n minutes</numerusform>
+            <numerusform>每 %n 分钟</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Every %n seconds</source>
         <translation>
-            <numerusform>Toutes les %n seconde</numerusform>
-            <numerusform>Toutes les %n secondes</numerusform>
+            <numerusform>每 %n </numerusform>
         </translation>
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>Erreur: %1</translation>
+        <translation>错误：%1</translation>
     </message>
     <message>
         <source>Stops</source>
-        <translation>Arrêts</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <source>Starts</source>
-        <translation>Démarrages</translation>
-    </message>
-    <message>
-        <source>Starts/Stops</source>
-        <translation>Démarrages/Arrêts</translation>
+        <translation>开始</translation>
     </message>
     <message>
         <source>Administrators Only</source>
-        <translation>Administrateurs Seulement</translation>
+        <translation>仅管理员</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation>Tous les usagers</translation>
+        <translation>所有用户</translation>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation>Sélectionner un son</translation>
+        <translation>选择一个音效</translation>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation>Entrer texte</translation>
+        <translation>输入文字</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
@@ -3047,20 +3034,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select at least one %1</source>
-        <translation>Sélectionnez au moins une %1</translation>
+        <translation>请选择至少一个 %1</translation>
+    </message>
+    <message>
+        <source>Occures</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
-        <translatorcomment>? au- de - en - dans ?</translatorcomment>
-        <translation>à</translation>
+        <translation>在</translation>
     </message>
     <message>
         <source>to</source>
-        <translatorcomment>? au- de - en - dans ?</translatorcomment>
-        <translation>à</translation>
+        <translation>到</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
@@ -3068,82 +3057,82 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Select at least one %1&gt;</source>
-        <translation>&lt;Sélectionnez au moins une %1&gt;</translation>
+        <translation>&lt;Select 至少一个 %1&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRulesDialog</name>
     <message>
         <source>Unsaved changes will be lost. Save?</source>
-        <translation>Les modifications non sauvegardées seront perdues. Sauvegarder?</translation>
+        <translation>参数已发生修改，是否需要保存?</translation>
     </message>
     <message>
         <source>Hide Advanced</source>
-        <translation>Cacher le mode avancé</translation>
+        <translation>隐藏高级设置</translation>
     </message>
     <message>
         <source>Show Advanced</source>
-        <translation>Afficher le mode avancé</translation>
+        <translation>显示高级设置</translation>
     </message>
     <message>
         <source>&amp;New...</source>
-        <translation>&amp;Nouveau...</translation>
+        <translation>&amp;新建...</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation>&amp;Supprimer</translation>
+        <translation>&amp;删除</translation>
     </message>
     <message>
         <source>&amp;Schedule...</source>
-        <translation>&amp;Horaire...</translation>
+        <translation>&amp;日程...</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Error while saving rule.</source>
-        <translation>Erreur lors de la sauvegarde de la règle.</translation>
+        <translation>保存规则时发生错误。</translation>
     </message>
     <message>
         <source>Reset Default Rules</source>
-        <translation>Réinitialiser les règles par défaut</translation>
+        <translation>重置默认规则</translation>
     </message>
     <message>
         <source>Error while receiving rules.</source>
-        <translation>Erreur lors de la réception des règles.</translation>
+        <translation>接收规则时发生错误.</translation>
     </message>
     <message>
         <source>Some rules are not valid. Should they be disabled?</source>
-        <translation>Certaines règles ne sont pas valides. Devraient-elles être désactivées?</translation>
+        <translation>部分规则无效，是否要禁用?</translation>
     </message>
     <message>
         <source>Are you sure you want to reset rules to the defaults?</source>
-        <translation>Êtes-vous sûr de vouloir réinitialiser les règles par défaut?</translation>
+        <translation>确定是否重新恢复为默认规则?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation>Cette action NE PEUT PAS être annulée!</translation>
+        <translation>事件动作无法执行!</translation>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation>Confirmez la réinitialisation des règles</translation>
+        <translation>确认规则重置</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation>Erreur lors de la suppression de la règle.</translation>
+        <translation>删除规则时发生错误.</translation>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation>Confirmer la sauvegarde</translation>
+        <translation>确认保存</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation>Confirmer pour quitter</translation>
+        <translation>确认退出</translation>
     </message>
     <message>
         <source>filter by %1...</source>
-        <translation>Filtre par %1...</translation>
+        <translation>过滤 %1...</translation>
     </message>
 </context>
 <context>
@@ -3154,16 +3143,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>On</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>Sur</translation>
+        <translation>启用</translation>
     </message>
     <message>
         <source>Event</source>
-        <translation>Événement</translation>
+        <translation>事件</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation>Source</translation>
+        <translation>源</translation>
     </message>
     <message>
         <source>-&gt;</source>
@@ -3171,290 +3159,286 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Action</source>
-        <translation>Action</translation>
+        <translation>动作</translation>
     </message>
     <message>
         <source>Target</source>
-        <translation>Cible</translation>
+        <translation>目标</translation>
     </message>
     <message>
         <source>Interval of Action</source>
-        <translation>Intervalle d&apos;actions</translation>
+        <translation>动作时间间隔</translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdditionDialog</name>
     <message>
         <source>Finished</source>
-        <translation>Terminer</translation>
+        <translation>完成</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>Succès</translation>
+        <translation>成功</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Initializing scan...</source>
-        <translation>Initialisation de balayage ...</translation>
+        <translation>初始搜索...</translation>
     </message>
     <message>
         <source>Scanning online hosts...</source>
-        <translation>Balayage des hôtes en ligne...</translation>
+        <translation>搜索在线设备中...</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Scanning hosts... (%1)</source>
-        <translatorcomment>False Warning ? or should be (%n) instead.</translatorcomment>
-        <translation>
-            <numerusform>Balayage de l&apos;hôte... (%1)</numerusform>
-            <numerusform>Balayage des hôtes... (%1)</numerusform>
-        </translation>
+        <translation type="unfinished">搜索目标中... (%1)</translation>
     </message>
     <message>
         <source>Select target server...</source>
-        <translation>Sélectionner serveur cible...</translation>
+        <translation>选择目标服务器...</translation>
     </message>
     <message>
         <source>First address in range is greater than the last one.</source>
-        <translation>La première adresse de la plage est plus grande que la dernière.</translation>
+        <translation>区间内的起始地址大于结束地址.</translation>
     </message>
     <message>
         <source>Examples:</source>
-        <translation>Exemples:</translation>
+        <translation>例如:</translation>
     </message>
     <message>
         <source>Server is offline.</source>
-        <translation>Le serveur est hors ligne.</translation>
+        <translation>服务器已离线.</translation>
     </message>
     <message>
         <source>It might take a few moments to populate them in the tree.</source>
-        <translation>Cela peut prendre quelques instants pour apparaitre dans l&apos;arbre.</translation>
+        <translation>请等待系统加载资源树.</translation>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation>La plage d&apos;adresse spécifiée contient plus de 255 dans les adresses.</translation>
+        <translation>超出IP地址区间，最大允许255个地址.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation>La recherche se termine...</translation>
+        <translation>搜索结束...</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation>Serveur mis hors ligne, recherche annulée.</translation>
+        <translation>服务器离线, 搜索中止.</translation>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation>Le serveur a été retiré, recherche annulée.</translation>
+        <translation>服务器已删除, 搜索中止.</translation>
     </message>
     <message>
         <source>Device addition is possible for online servers only.</source>
-        <translation>L&apos;ajout de périphériques est seulement possible pour les serveurs en ligne.</translation>
+        <translation>仅服务器在线时，可进行设备添加.</translation>
     </message>
     <message>
         <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation>Le champ d&apos;adresse doit contenir un URL, Adresse IP ou lien RTSP valide.</translation>
+        <translation>设备地址字段必须包含一个有效的URL,IP地址,或RTSP链接.</translation>
     </message>
     <message>
         <source>No devices selected.</source>
-        <translation>Aucun périphérique sélectionné.</translation>
+        <translation>未选择设备.</translation>
     </message>
     <message>
         <source>Please select at least one device</source>
-        <translation>S.V.P. sélectionner au moins un périphérique</translation>
+        <translation>请选择至少一个设备</translation>
     </message>
     <message numerus="yes">
         <source>%n devices added successfully.</source>
         <translation>
-            <numerusform>%n périphérique ajouté avec succès.</numerusform>
-            <numerusform>%n périphériques ajoutés avec succès.</numerusform>
+            <numerusform>%n 设备添加成功.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
         <translation>
-            <numerusform>Erreur lors de l&apos;ajout de %n périphérique.</numerusform>
-            <numerusform>Erreur lors de l&apos;ajout de %n périphériques.</numerusform>
+            <numerusform>添加 %n 设备时发生错误.</numerusform>
         </translation>
     </message>
     <message>
         <source>Server is offline, devices can only be added to an online server.</source>
-        <translation>Serveur hors ligne, des périphériques peuvent seulement être ajoutées à un serveur en ligne.</translation>
+        <translation>服务器离线,设备只能被添加到一个在线服务器.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add devices.</source>
-        <translation>Le serveur a été retiré, ne peut pas ajouter de périphériques.</translation>
+        <translation>服务器已删除，无法添加设备.</translation>
     </message>
     <message>
         <source>Error while searching for device(s).</source>
-        <translation>Erreur lors de la recherche de périphérique(s).</translation>
+        <translation>搜索设备时发生错误.</translation>
     </message>
     <message numerus="yes">
         <source>%n devices found</source>
         <translation>
-            <numerusform>%n périphérique trouvé</numerusform>
-            <numerusform>%n périphériques trouvés</numerusform>
+            <numerusform>%n 设备被发现</numerusform>
         </translation>
     </message>
     <message>
         <source>All devices are already in the resource tree.</source>
-        <translation>Tous les périphériques sont déjà dans l&apos;arborescence des ressources.</translation>
+        <translation>所有设备已在资源树中.</translation>
     </message>
     <message>
         <source>No devices found.</source>
-        <translation>Aucun périphérique trouvé.</translation>
+        <translation>未发现设备.</translation>
     </message>
     <message>
         <source>Add devices to %1</source>
-        <translation>Ajouter Périphériques au %1</translation>
+        <translation>添加设备到 %1</translation>
     </message>
     <message>
         <source>Add devices...</source>
-        <translation>Ajouter Périphériques...</translation>
+        <translation>添加设备...</translation>
+    </message>
+    <message>
+        <source>Scanning host... (%1)</source>
+        <extracomment>Scanning host... (0 devices found)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
         <source>Server returned the following error code : </source>
-        <translation>Le Serveur a retourné l&apos;erreur suivante :</translation>
+        <translation>服务器返回一下错误:</translation>
     </message>
     <message>
         <source>Failed to save the following parameters (%1):
 %2</source>
-        <translation>Échec de la sauvegarde de ce paramètre (%1):
-%2</translation>
+        <translation>以下参数(%1):%2保存失败</translation>
     </message>
     <message>
         <source>Please wait while settings are being loaded.</source>
-        <translation>S.V.P. patientez pendant que la configuration se charge.</translation>
+        <translation>请等待加载设置信息.</translation>
     </message>
     <message>
         <source>This can take a lot of time.</source>
-        <translation>Ceci peut prendre beaucoup de temps.</translation>
+        <translation>请等待.</translation>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation>Application des paramètres...</translation>
+        <translation>启用设置...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
-        <translation>Le service de la caméra cible est indisponible. Essayez à nouveau.</translation>
+        <translation>目标摄像机服务不可用，请重试.</translation>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation>Impossible de sauvegarder les paramètres.</translation>
+        <translation>无法保存参数.</translation>
     </message>
 </context>
 <context>
     <name>QnCameraBookmarkDialog</name>
     <message>
         <source>Bookmark</source>
-        <translation>Signet</translation>
+        <translation>标签</translation>
     </message>
     <message>
         <source>&amp;Name</source>
-        <translation>&amp;Nom</translation>
+        <translation>&amp;名称</translation>
     </message>
     <message>
         <source>&amp;Description</source>
-        <translation>&amp;Description</translation>
+        <translation>&amp;描述</translation>
     </message>
     <message>
         <source>&amp;Timeout</source>
-        <translation>&amp;Temporisation</translation>
+        <translation>&amp;超时</translation>
     </message>
     <message>
         <source>T&amp;ags</source>
-        <translation>B&amp;alises</translation>
+        <translation>标&amp;签</translation>
     </message>
     <message>
         <source>1 month</source>
-        <translation>1 mois</translation>
+        <translation>1个月</translation>
     </message>
     <message>
         <source>3 month</source>
-        <translation>3 mois</translation>
+        <translation>3个月</translation>
     </message>
     <message>
         <source>6 month</source>
-        <translation>6 mois</translation>
+        <translation>6个月</translation>
     </message>
     <message>
         <source>year</source>
-        <translation>année</translation>
+        <translation>年</translation>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation>Ne pas verrouiller l&apos;archive.</translation>
+        <translation>不锁定保存.</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation>Liste de balises, divisée par virgules ou espaces.</translation>
+        <translation>标签内容不能使用逗号或者空格.</translation>
     </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Copier vers Presse-Papier</translation>
+        <translation>复制到剪贴板</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation>好</translation>
     </message>
     <message>
         <source>FAILED: %1</source>
-        <translation>ÉCHEC: %1</translation>
+        <translation>失败: %1</translation>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation>Confirmation disponibilité serveur.</translation>
+        <translation>检查服务器是否可用.</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation>Évaluation d&apos;erreurs du flux média.</translation>
+        <translation>检查媒体流的错误.</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
-        <translation>Diagnostics complèté!</translation>
+        <translation>诊断完成!</translation>
     </message>
     <message>
         <source>Diagnostics for %1 %2.</source>
         <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
-        <translation>Diagnostics pour %1 %2.</translation>
+        <translation>从 %1 %2.诊断.</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
         <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
-        <translation>Diagnostics %1</translation>
+        <translation>%1 诊断</translation>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
-        <translation>Confirmation si %1 est accessible.</translation>
+        <extracomment>&quot;Confirming camera is accessible.&quot; or &quot;Confirming device is accessible.&quot;</extracomment>
+        <translation>确认 %1已访问.</translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
-        <translation>Confirmation que la cible %1 fournis un flux média.</translation>
+        <extracomment>&quot;Confirming target camera provides media stream.&quot; or &quot;Confirming target device provides media stream.&quot;</extracomment>
+        <translation>确认目标 %1 提供视频流.</translation>
     </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
         <source>&lt;automatic&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;automatic&gt;</translation>
+        <translation>&lt;自动&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
         <source>%1 have no input ports</source>
-        <translatorcomment>Wrong warning ? should be %n ?</translatorcomment>
         <translation>
-            <numerusform>%1 n&apos;a auncun port d&apos;entrée</numerusform>
-            <numerusform>%1 n&apos;a aucun ports d&apos;entrées</numerusform>
+            <numerusform>%1 无报警输入</numerusform>
         </translation>
     </message>
 </context>
@@ -3462,91 +3446,89 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraListDialog</name>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Copier la sélection dans le presse-papier</translation>
+        <translation>复制选择到剪贴板</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>Sélectionner tout</translation>
+        <translation>选择所有</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation>Exporter la sélection vers un fichier...</translation>
+        <translation>导出选择到文件...</translation>
     </message>
     <message>
         <source>%1 List for &apos;%2&apos; - %3 found</source>
-        <translation>Liste %1 pour %2 - %3 trouvé</translation>
+        <translation>%1 l列表中发现 &apos;%2&apos; - %3 </translation>
     </message>
     <message>
         <source>%1 List - %2 found</source>
-        <translation>Liste %1 - %2 trouvé</translation>
+        <translation>%1 列表中搜索到 - %2 </translation>
     </message>
     <message>
         <source>Export selected %1 to a file.</source>
-        <translation>Exporter %1 sélectionné vers un fichier.</translation>
+        <translation>导出所选 %1 到文件.</translation>
     </message>
 </context>
 <context>
     <name>QnCameraListModel</name>
     <message>
         <source>Recording</source>
-        <translation>Enregistrement</translation>
+        <translation>录像</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Nom</translation>
-    </message>
-    <message>
-        <source>Model</source>
-        <translation>Modèle</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <source>Vendor</source>
-        <translation>Vendeur</translation>
+        <translation>厂商</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>型号</translation>
     </message>
     <message>
         <source>Firmware</source>
-        <translation>Micrologiciel</translation>
+        <translation>版本</translation>
     </message>
     <message>
         <source>IP/Name</source>
-        <translation>IP/Nom</translation>
+        <translation>IP/名称</translation>
     </message>
     <message>
         <source>MAC address</source>
-        <translation>Adresse MAC</translation>
+        <translation>MAC地址</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation>Serveur</translation>
+        <translation>服务器</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMotionMaskWidget</name>
     <message>
         <source>Too many motion windows</source>
-        <translation>Trop de fenêtres de mouvement</translation>
+        <translation>过多的移动侦测窗口</translation>
     </message>
     <message>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
-        <translation>Le nombre maximum de fenêtres de mouvement pour la caméra en cours est de %1, mais %2 fenêtres de mouvement sont présentement sélectionnées.</translation>
+        <translation>当前摄像机支持最多的移动侦测窗口数是%1，当前所设置移动侦测窗口是%2。</translation>
     </message>
     <message>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
-        <translation>Le nombre maximum de sensibilités de mouvement pour la caméra en cours est de %1, mais %2 sensibilités de mouvement sont présentement sélectionnées.</translation>
+        <translation>当前摄像机支持的最大移动敏感度是%1，当前所设置灵敏度是%2。</translation>
     </message>
     <message>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
-        <translation>Le nombre maximum de fenêtres de masque/ mouvement pour la caméra en cours est de %1, mais %2 fenêtres de masque/mouvement sont présentement sélectionnées.</translation>
+        <translation>当前摄像机支持的最多移动遮罩窗口数是%1，当前所设置的窗口数是%2。</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
-        <translatorcomment>?? %n ??</translatorcomment>
         <translation>
-            <numerusform>L&apos;enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
-            <numerusform>L&apos;enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
+            <numerusform> %1 录像或移动侦测功能已禁用</numerusform>
         </translation>
     </message>
 </context>
@@ -3554,18 +3536,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
         <source>&lt;automatic&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;automatic&gt;</translation>
+        <translation>&lt;自动&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
         <source>%1 have no output relays</source>
-        <translatorcomment>False warning ? should be %n ?</translatorcomment>
         <translation>
-            <numerusform>%1 n&apos;a auncun relais de sortie</numerusform>
-            <numerusform>%1 n&apos;a auncun relais de sortie</numerusform>
+            <numerusform>%1 无报警输出</numerusform>
         </translation>
     </message>
 </context>
@@ -3573,10 +3552,8 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
-        <translatorcomment>Warning ? Should be %n ?</translatorcomment>
         <translation>
-            <numerusform>L&apos;enreg.est désactivé pour %1</numerusform>
-            <numerusform>L&apos;enreg. est désactivé pour %1</numerusform>
+            <numerusform>%1 的录像功能关闭</numerusform>
         </translation>
     </message>
 </context>
@@ -3584,492 +3561,490 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnCameraScheduleWidget</name>
     <message>
         <source>Off</source>
-        <translation>Désactivé</translation>
+        <translation>关</translation>
     </message>
     <message>
         <source>On</source>
-        <translation>Activé</translation>
+        <translation>开</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
-    </message>
-    <message>
-        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation>Attention! Une valeur minimum élevée peut réduire la durée d&apos;enregistrement des autres %1.</translation>
+        <translation>注意</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>Enregistrement sur mouvement désactivé ou non supporté par certains des %1 sélectionné. S.V.P. allez à la page de configuration de mouvement pour s&apos;assurer que c&apos;est supporté et activé.</translation>
+        <translation>移动侦测录像被禁用或不支持以下选定的%1 .请到移动侦测设置页面,以确保设备是支持和启用。</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this %1.</source>
-        <translation>Flux double non supporté par %1.</translation>
+        <translation> %1不支持双码流</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this %1.</source>
-        <translation>Flux double et détection de mouvement ne sont pas disponible pour %1.</translation>
+        <translation>双码流和移动侦测在 %1 上不可用.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
-        <translation>Enregistrement sur mouvement désactivé. S.V.P.  allez à la page de configuration de mouvement de %1 pour configurer la sensibilité et zone de mouvement.</translation>
+        <translation>移动侦测录像已禁用，请到移动侦测设置页面设置 %1 的侦测区域和灵敏度.</translation>
+    </message>
+    <message>
+        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
     <message>
         <source>Open in New Tab</source>
-        <translation>Ouvrir dans un nouvel onglet</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>在新标签页中打开</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation>Les paramètre d&apos;enregistrement n&apos;ont pas été sauvegardés. S.V.P. Choisir le la méthode d&apos;enregistrement désiré, ISP, qualité et marquez ceux-ci dans l&apos;horaire.</translation>
+        <translation>录像修改未能保存,请将需要修改的录像类型，码流，画质同步到录像计划上.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation>Les changements ne sont pas appliqués.</translation>
+        <translation>修改未生效.</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation>La sensibilité de mouvement  n&apos;a pas changée. Pour la changer, dessinez des rectangles sur l&apos;image.</translation>
+        <translation>移动侦测敏感度未修改成功,请修改敏感度后，重新在图像中设置侦测区域。</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation>Limite de licences dépassée. Les changements seront enregistrées, mais ne seront pas appliqués.</translation>
+        <translation>超过许可限制,当前修改将会保存，但不会生效。</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation>Impossible d&apos;appliquer les changements.</translation>
+        <translation>无法进行修改.</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>Paramètres %1</translation>
+        <extracomment>&quot;Cameras settings&quot; or &quot;Devices settings&quot; or &quot;IO Module Settings&quot;, etc</extracomment>
+        <translation>%1 设置</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
-        <translation>Diagnostics %1</translation>
+        <extracomment>&quot;Cameras Diagnostics&quot; or &quot;Devices Diagnostics&quot; or &quot;IO Module Diagnostics&quot;, etc</extracomment>
+        <translation>%1 诊断</translation>
     </message>
     <message>
         <source>%1 Rules</source>
-        <translation>Règles %1</translation>
+        <extracomment>&quot;Cameras Rules&quot; or &quot;Devices Rules&quot; or &quot;IO Module Rules&quot;, etc</extracomment>
+        <translation>%1 规则</translation>
     </message>
     <message>
         <source>%1 not saved.</source>
-        <translation>%1 non enregistré.</translation>
+        <translation>%1 未保存.</translation>
     </message>
     <message>
-        <source>Save changes to the following %1?</source>
-        <translation>Sauvegarder les changements sur %1?</translation>
-    </message>
-    <message>
-        <source>Could not save the following %1 to Server.</source>
-        <translation>Impossible d&apos;enregistrer %1 au Serveur.</translation>
+        <source>Apply changes to the following %1?</source>
+        <extracomment>&quot;Apply changes to the following 5 cameras?&quot; or &quot;Apply changes to the following IO module?&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCameraSettingsWidget</name>
     <message>
         <source>Cannot edit properties for items of different types.</source>
-        <translation>Ne peut pas éditer les propriétés pour des objets de differents types.</translation>
+        <translation>无法编辑不同类型项的属性。</translation>
     </message>
     <message>
         <source>No %1 selected.</source>
-        <translation>%1 non sélectionné.</translation>
+        <translation>无 %1 选择.</translation>
     </message>
 </context>
 <context>
     <name>QnCheckableMessageBox</name>
     <message>
         <source>Do not ask again</source>
-        <translation>Ne plus demander</translation>
+        <translation>不再询问</translation>
     </message>
 </context>
 <context>
     <name>QnClientVideoCamera</name>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation>Type de ressource invalide pour l&apos;exportation des données.</translation>
+        <translation>数据导出非法资源类型.</translation>
     </message>
 </context>
 <context>
     <name>QnClockLabel</name>
     <message>
         <source>Server Time</source>
-        <translation>Heure Serveur</translation>
+        <translation>服务器时间</translation>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation>Heure Système local</translation>
+        <translation>本地系统时间</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation>Configuration Serveur(s)</translation>
+        <translation>配置服务器</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation>Mise à jour Serveur(s)</translation>
+        <translation>更新服务器</translation>
     </message>
 </context>
 <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation>Vous essayez de vous connecter sur un serveur incompatible.</translation>
+        <translation>您正在尝试连接到不兼容的服务器。</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation>Serveur</translation>
+        <translation>服务器</translation>
     </message>
     <message>
         <source>Client</source>
-        <translation>Client</translation>
+        <translation>客户端</translation>
     </message>
     <message>
         <source>Failure</source>
-        <translation>Échec</translation>
+        <translation>失败</translation>
     </message>
     <message>
         <source>Connection to the Server could not be established.</source>
-        <translation>La connexion au serveur ne peut pas être établie.</translation>
+        <translation>无法与服务器建立连接.</translation>
     </message>
     <message>
         <source>Connection details that you have entered are incorrect, please try again.</source>
-        <translation>Les détails de connexion entrés sont incorrects, S.V.P. essayez à nouveau.</translation>
+        <translation>输入的连接信息错误,请重新输入.</translation>
     </message>
     <message>
         <source>If this error persists, please contact your VMS administrator.</source>
-        <translation>Si l&apos;erreur persiste, S.V.P. contactez votre administrateur VMS.</translation>
+        <translation>若错误仍存在，请联系VMS系统管理员.</translation>
     </message>
     <message>
         <source> - Client version: %1.</source>
-        <translation> - Version Client: %1.</translation>
+        <translation> - 客户端版本: %1.</translation>
     </message>
     <message>
         <source> - Server version: %1.</source>
-        <translation> - Version Serveur: %1.</translation>
+        <translation> - 服务器版本: %1.</translation>
     </message>
     <message>
         <source>You are about to connect to Server which has a different version:</source>
-        <translation>Vous êtes sur le point de vous connecter sur un serveur d&apos;une version différente:</translation>
+        <translation>正在连接到不同版本的服务器:</translation>
     </message>
     <message>
         <source>These versions are not compatible. Please update your %1.</source>
-        <translation>Ces versions ne sont pas compatibles. S.V.P. mettre à jour votre %1.</translation>
+        <translation>版本不兼容，请升级系统 %1.</translation>
     </message>
     <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
-        <translation>Mode compatible pour les versions inférieures à %1 ne sont pas supportés.</translation>
+        <translation>兼容模式下版本不低于 %1.</translation>
     </message>
     <message>
         <source>Selected Server has a different version:</source>
-        <translation>Serveur sélectionné à une version différente:</translation>
+        <translation>所选的服务器版本不同:</translation>
     </message>
     <message>
         <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation>L&apos;autre version du Client est nécessaire pour établir une connexion à ce Serveur.</translation>
+        <translation>其它版本的客户端正在请求与当前服务器建立连接.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to restart in compatibility mode.</source>
-        <translation>Une erreur est survenue en essayant de redémarrer en mode compatible.</translation>
+        <translation>重启兼容模式时,发生错误.</translation>
     </message>
     <message>
         <source>Client version %1 is required to connect to this Server.</source>
-        <translation>Version Client %1 est nécessaire pour connexion à ce Serveur.</translation>
+        <translation>客户端版本 %1正请求连接到服务器.</translation>
     </message>
     <message>
         <source>Download version %1?</source>
-        <translation>Télécharger version %1?</translation>
+        <translation>是否下载版本 %1?</translation>
     </message>
     <message>
         <source>Would you like to restart the Client in compatibility mode?</source>
-        <translation>Voulez-vous redémarrer le Client en mode compatible?</translation>
+        <translation>是否需要载兼容模式下重启客户端?</translation>
     </message>
     <message>
         <source>Cannot restart the Client in compatibility mode.</source>
-        <translation>Ne peut pas redémarrer le Client en mode compatible.</translation>
+        <translation>无法在兼容模式下重启客户端.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
+        <translation>请关闭当前应用并尝试使用开始菜单的快捷方式.</translation>
     </message>
     <message>
         <source>Failed to launch compatibility version %1</source>
-        <translation>Échec du lancement de compatibilité version %1</translation>
+        <translation>未更新至兼容版本 %1</translation>
     </message>
     <message>
         <source>Try to restore version %1?</source>
-        <translation>Essayer de restaurer version %1?</translation>
+        <translation>是否尝试恢复版本 %1?</translation>
     </message>
     <message>
         <source>Server has a different version:</source>
-        <translation>Serveur a une version différente:</translation>
+        <translation>服务器版本不同:</translation>
     </message>
     <message>
         <source>You will be asked to restart the client in compatibility mode.</source>
-        <translation>Vous serez invité à redémarrer le client en mode compatibilité.</translation>
+        <translation>将在兼容模式下重新启动客户端.</translation>
     </message>
     <message>
         <source>You will be asked to update your %1</source>
-        <translation>Vous serez invité à mettre à jour votre %1</translation>
+        <translation>将更新版本 %1</translation>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation>L&apos;ID ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez .</translation>
+        <translation>当前输入的登陆信息不正确, 请再试一次。</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
-        <translation>Ne peut pas se connecter au serveur</translation>
+        <translation>无法连接到服务器.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Le processus du lanceur n&apos;a pas été trouvé.</translation>
+        <translation>未发现启动过程</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
-        <translation>Connexion au serveur LDAP a expiré.</translation>
+        <translation>LDAP服务器连接超时.</translation>
     </message>
 </context>
 <context>
     <name>QnConnectionTestingDialog</name>
     <message>
         <source>Success</source>
-        <translation>Succès</translation>
+        <translation>成功</translation>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation>Demande dépassée</translation>
+        <translation>请求超时。</translation>
     </message>
     <message>
         <source>Test Failed</source>
-        <translation>Échec du Test</translation>
+        <translation>测试失败</translation>
     </message>
 </context>
 <context>
     <name>QnCredentialsDialog</name>
     <message>
         <source>User:</source>
-        <translation>Usager:</translation>
+        <translation>用户:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe:</translation>
+        <translation>密码:</translation>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation>Entrer nom d&apos;usager et mot de passe valide...</translation>
+        <translation>请输入用户名和密码...</translation>
     </message>
 </context>
 <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation>Vous pouvez créer une sauvegarde des paramètres système, que vous pourrez restaurer en cas de défaillance.</translation>
+        <translation>请创建系统配置备份，以便在系统出错时可还原。</translation>
     </message>
     <message>
         <source>Save Database Backup...</source>
-        <translation>Enregistrer la sauvegarde de la base de données...</translation>
+        <translation>保存数据库备份...</translation>
     </message>
     <message>
         <source>Database Backup Files (*.db)</source>
-        <translation>Format de fichiers de la base de données (*.db)</translation>
+        <translation>数据库备份文件(*.db)</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Could not open file &apos;%1&apos; for writing.</source>
-        <translation>Ne peut pas ouvrir le fichier &apos;%1&apos; pour l&apos;écriture.</translation>
+        <translation>无法打开文件 &apos;%1&apos; 写入。</translation>
     </message>
     <message>
         <source>Downloading Database Backup</source>
-        <translation>Téléchargement de la sauvegarde de la  base de données</translation>
+        <translation>正在下载数据库备份</translation>
     </message>
     <message>
         <source>Database backup is being downloaded from the server. Please wait.</source>
-        <translation>La sauvegarde de la base de données est en téléchargements depuis le serveur. Patientez s’il vous plait.</translation>
+        <translation>数据库备份正从服务器中下载.请稍候.</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Informations</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>Database was successfully backed up into file &apos;%1&apos;.</source>
-        <translation>La base de données à été sauvegardé avec succès dans le fichier &apos;%1&apos;.</translation>
+        <translation>数据库成功备份到文件 &apos;%1&apos;。</translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
-        <translation>Ouvrir la sauvegarde de la base de données...</translation>
+        <translation>开启数据库备份...</translation>
     </message>
     <message>
         <source>Could not open file &apos;%1&apos; for reading.</source>
-        <translation>Ne peut pas ouvrir le fichier &apos;%1&apos; pour la lecture.</translation>
+        <translation>无法开启文件 &apos;%1&apos; 读取。</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <source>Restoring Database Backup</source>
-        <translation>Restaurer la sauvegarde de la base de données</translation>
+        <translation>正在还原数据库备份</translation>
     </message>
     <message>
         <source>Database backup is being uploaded to the server. Please wait.</source>
-        <translation>La sauvegarde de la base de données est en cours d&apos;envoi sur le serveur. Patientez s’il vous plait.</translation>
+        <translation>数据库备份正上传到服务器。请稍候。</translation>
     </message>
     <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation>Base de données restaurée avec succès depuis le fichier &apos;%1&apos;. Serveur Média va être redémarré.</translation>
+        <translation>数据库已成功从文件&apos;%1&apos;恢复，媒体服务器将重启。</translation>
     </message>
     <message>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation>Échec de restauration de la base de données à partir du fichier &apos;%1&apos;.</translation>
+        <translation>当从文件 &apos;%1&apos;恢复数据库时，发生错误。</translation>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation>Échec du vidage de la base de données Serveur sur %1.</translation>
+        <translation>转存服务器数据库到 &apos;%1&apos;失败</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
-        <translation>Êtes-vous sûr de vouloir restaurer la base de données? Toutes les données existantes seront perdues.</translation>
+        <translation>请确定是否需要还原数据库?若是，所有的数据将被丢失.</translation>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation>Vous devez être connecté sur une serveur avant la sauvegarde.</translation>
+        <translation>在进行备份前,请连接到服务器</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>Les formats audios 44.1Khz et 48Khz ne sont pas supportés par le périphérique de capture audio! S.V.P, sélectionnez un autre périphérique audio ou &apos;Aucun&apos; comme valeur dans les paramètres d&apos;enregistrement</translation>
+        <translation>音频采集设备不支持44.1Khz和48Khz音频格式,请在屏幕录像设置中选择其他的音频设备或空白</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur vidéo %1.</translation>
+        <translation>无法找到视频编码器%1.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur vidéo.</translation>
+        <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur audio %1.</translation>
+        <translation>无法找到音频编码器%1.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur audio.</translation>
+        <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
         <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Ne peut pas initialiser le périphérique audio %1.</translation>
+        <translation>无法找使用视频编码器%1.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
-        <translation>Ne peut pas démarrer le périphérique audio principal.</translation>
+        <translation>无法启动主音频设备.</translation>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation>La largeur de l&apos;écran doit être un multiplicateur de 8.</translation>
+        <translation>屏幕宽度必须是一个8的倍数.</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation>Les formats audios 44.1Khz et 48Khz ne sont pas supportés par le périphérique de capture audio! S.V.P, sélectionnez un autre périphérique audio ou &apos;Aucun&apos; comme valeur dans les paramètres d&apos;enregistrement.</translation>
+        <translation>音频采集设备不支持44.1Khz和48Khz音频格式，请在屏幕录像设置中选择其他的音频设备或空白.</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur vidéo %1.</translation>
+        <translation>无法找到视频编码器%1.</translation>
     </message>
     <message>
         <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation>Ne peut pas créer un fichier temporaire dans le dossier &apos;%1&apos;. S.V.P, configurez le &apos;Dossier Média Principal&apos; dans les paramètres d&apos;enregistrement.</translation>
+        <translation>无法在文件夹&apos;%1&apos;中创建临时文件。请在屏幕录像设置中配置&apos;主媒体文件夹&apos;。</translation>
     </message>
     <message>
         <source>Could not allocate output stream for video codec.</source>
-        <translation>Ne peut pas allouer une sortie du flux pour le codec vidéo.</translation>
+        <translation>无法分配用于视频编解码器输出码流。</translation>
     </message>
     <message>
         <source>Screen width must be a multiplier of 8.</source>
-        <translation>La largeur de l&apos;écran doit être un multiplicateur de 8.</translation>
+        <translation>屏幕宽度必须是一个8的倍数.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur vidéo.</translation>
+        <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
         <source>Could not allocate output audio stream.</source>
-        <translation>Ne peut pas allouer une sortie du flux audio.</translation>
+        <translation>无法分配输出音频流.</translation>
     </message>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur audio %1.</translation>
+        <translation>无法找到音频编码器%1.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur audio.</translation>
+        <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
         <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Ne peut pas initialiser le périphérique audio %1.</translation>
+        <translation>无法找使用视频编码器%1.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
-        <translation>Ne peut pas démarrer le périphérique audio principal.</translation>
+        <translation>无法启动主音频设备.</translation>
     </message>
 </context>
 <context>
     <name>QnEventLogDialog</name>
     <message>
         <source>Filter Similar Rows</source>
-        <translation>Filtrer les rangées similaires</translation>
+        <translation>过滤相似行</translation>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Copier la sélection dans le presse-papier</translation>
+        <translation>复制选择到剪贴板</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>Sélectionner tout</translation>
+        <translation>选择所有</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation>Effacer le filtre</translation>
+        <translation>清除过滤器</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation>Exporter la sélection vers un fichier...</translation>
+        <translation>导出选择到文件...</translation>
     </message>
     <message numerus="yes">
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
-            <numerusform>Le journal d&apos;événement pour la période de %1 à %2 - %n événement trouvé</numerusform>
-            <numerusform>Le journal d&apos;événement pour la période de %1 à %2 - %n événements trouvés</numerusform>
+            <numerusform>搜索到 %1 从 %2时间段的事件日志 - %n </numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Event log for %1 - %n event(s) found</source>
         <translation>
-            <numerusform>Journal d&apos;événement pour %1  - %n événement trouvé</numerusform>
-            <numerusform>Journal d&apos;événement pour %1  - %n événements trouvés</numerusform>
+            <numerusform>%1 事件日志 - 发现 %n 个事件</numerusform>
         </translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation>Exporter les événements sélectionnés vers un fichier</translation>
+        <translation>导出选取的事件至文件</translation>
     </message>
     <message>
         <source>Any Action</source>
-        <translation>N&apos;importe quel action</translation>
+        <translation>任何动作</translation>
     </message>
     <message>
         <source>&lt;Any %1&gt;</source>
@@ -4080,131 +4055,166 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnEventLogModel</name>
     <message>
         <source>Motion video</source>
-        <translation>Mouvement Vidéo</translation>
+        <translation>移动侦测视频</translation>
     </message>
     <message>
         <source>Date/Time</source>
-        <translation>Date/Heure</translation>
+        <translation>日期/时间</translation>
     </message>
     <message>
         <source>Event</source>
-        <translation>Événement</translation>
+        <translation>事件</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation>Source</translation>
+        <translation>源</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation>Action</translation>
+        <translation>动作</translation>
     </message>
     <message>
         <source>Target</source>
-        <translation>Cible</translation>
+        <translation>目标</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation>Description</translation>
+        <translation>描述</translation>
     </message>
     <message>
         <source>Administrators Only</source>
-        <translation>Administrateurs Seulement</translation>
+        <translation>仅管理员</translation>
     </message>
     <message>
         <source>%1 times</source>
-        <translation>%1 fois</translation>
+        <translation>%1 次</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation>Tous les usagers</translation>
+        <translation>所有用户</translation>
     </message>
 </context>
 <context>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
         <source>Copy archive length settings</source>
-        <translation>Copier paramètres longeur d&apos;archive</translation>
+        <translation>复制存储大小设置</translation>
     </message>
     <message>
         <source>Schedule motion type is not supported by some %1.</source>
-        <translation>Type d&apos;horaire de mouvement non supporté par certaine %1.</translation>
+        <translation>部分设备%1不支持时间表的移动侦测类型.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some %1.</source>
-        <translation>Enregistrement ne peut pas être activé pour certaine %1.</translation>
+        <translation>在部分设备 %1上录像服务无法开启.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some %1.</source>
-        <translation>Paramètres d&apos;horaire non compatible pour certaine %1.</translation>
+        <translation>时间表的设置与%1 不兼容.</translation>
+    </message>
+</context>
+<context>
+    <name>QnFailoverPriorityDialog</name>
+    <message>
+        <source>Failover Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">从不</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">低</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">中</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">高</translation>
+    </message>
+</context>
+<context>
+    <name>QnFailoverPriorityDialogDelegate</name>
+    <message>
+        <source>Set Priority:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
         <source>Auto Calibration</source>
-        <translation>Calibration Auto</translation>
+        <translation>自动校准</translation>
     </message>
     <message>
         <source>Loading preview, please wait...</source>
-        <translation>Charge l&apos;apercu, S.V.P. patientez...</translation>
+        <translation>加载预览中...</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Auto calibration failed. Image is not round.</source>
-        <translation>Échec calibration auto. L&apos;image n&apos;est pas ronde.</translation>
+        <translation>未能进行自动校准，图像不能矫正。</translation>
     </message>
     <message>
         <source>Auto calibration failed. The image might be too dim.</source>
-        <translation>Échec calibration auto. L&apos;image pourrait être trop terne.</translation>
+        <translation>未能进行自定校准，图像可能出现模糊。</translation>
     </message>
 </context>
 <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
         <source>Information</source>
-        <translation>Informations</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation>Dossier %1 n&apos;existe pas.</translation>
+        <translation>文件夹 %1不存在.</translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation>Sélectionner Dossier...</translation>
+        <translation>选择文件夹...</translation>
     </message>
     <message>
         <source>Disable only if the client takes too much CPU</source>
-        <translation>Désactiver seulement si le client prend trop de CPU</translation>
+        <translation>禁用客户端占用过多CPU</translation>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation>Dossier déjà ajouté.</translation>
+        <translation>文件夹已添加</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation>Ce dossier est déjà ajouté.</translation>
+        <translation>此文件夹已添加。</translation>
     </message>
 </context>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management</source>
-        <translation>Ouvrir Gestionnaire de règles Alarme/Éven</translation>
-    </message>
-    <message>
-        <source>Open Event Log</source>
-        <translation>Ouvrir Journal d&apos;évén</translation>
-    </message>
-    <message>
-        <source>Open %1 List</source>
-        <translation>Ouvrir liste %1</translation>
-    </message>
-    <message>
         <source>%1 List</source>
-        <translation>Liste %1</translation>
+        <translation>%1 列表</translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open %1 List...</source>
+        <extracomment>&quot;Open Cameras List...&quot; or &quot;Open Devices List...&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4215,97 +4225,97 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm exit</source>
-        <translation>Confirmer quitter</translation>
+        <translation>确认退出</translation>
     </message>
     <message>
         <source>Unsaved changes will be lost. Save the following pages?</source>
-        <translation>Modifications non sauvegardées seront perdues. Sauvegarder?</translation>
+        <translation>当前修改未被保存.是否保存?</translation>
     </message>
 </context>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation>Nous avons détecté que votre pilote de carte vidéo n&apos;est peut-être pas installé ou à jour.</translation>
+        <translation>检测到显卡驱动未安装或者驱动未更新，请检查显卡驱动并更新。</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation>Installer ou une MàJ de votre pilote vidéo peut considérablement améliorer les performances lors de la visualisation vidéo.</translation>
+        <translation>安装或更新显卡驱动程序，可提高系统完成视频预览和使用视频的性能。</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation> Conseil Important - Performance</translation>
+        <translation>重要性能提示</translation>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation>Ceci pourrait entrainer une malfonction et fermeture du client.</translation>
+        <translation>可能导致客户端异常崩溃.</translation>
     </message>
 </context>
 <context>
     <name>QnGridWidgetHelper</name>
     <message>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation>Fichier HTML (*.html);;Fichier Tableur(*.csv)</translation>
+        <translation>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation>Enregistrer sous</translation>
+        <translation>另存为</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>Le fichier %1 existe déjà. Remplacer?</translation>
+        <translation>文件&apos;%1&apos;已经存在，是否覆盖?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation>Ne peut pas remplacer le fichier</translation>
+        <translation>无法覆盖文件</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus.S.V.P, essayez un autre nom.</translation>
+        <translation>文件&apos;%1&apos;正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
 </context>
 <context>
     <name>QnHelpHandler</name>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
 </context>
 <context>
     <name>QnHistogramWidget</name>
     <message>
         <source>Gamma %1</source>
-        <translation>Gamma %1</translation>
+        <translation>伽马 %1</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortItemDelegate</name>
     <message>
         <source>Disabled</source>
-        <translation>Désactivé</translation>
+        <translation>禁用</translation>
     </message>
     <message>
         <source>Input</source>
-        <translation>Entrée</translation>
+        <translation>输入</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation>Sortie</translation>
+        <translation>输出</translation>
     </message>
     <message>
         <source>Open circuit</source>
-        <translation>Circuit ouvert</translation>
+        <translation>开路</translation>
     </message>
     <message>
         <source>Grounded circuit</source>
-        <translation>Circuit à la terre</translation>
+        <translation>闭路</translation>
     </message>
 </context>
 <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation>Formulaire</translation>
+        <translation>从</translation>
     </message>
 </context>
 <context>
@@ -4316,59 +4326,59 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation>类型</translation>
     </message>
     <message>
         <source>Default state</source>
-        <translation>État par défaut</translation>
+        <translation>默认</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Nom</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <source>Pulse time(ms)</source>
-        <translation>Temps d&apos;impulsion(ms)</translation>
+        <translation>脉冲时间(ms)</translation>
     </message>
     <message>
         <source>Unknown</source>
         <comment>IO Port Type</comment>
-        <translation>Inconnue</translation>
+        <translation>未知错误</translation>
     </message>
     <message>
         <source>Disabled</source>
         <comment>IO Port Type</comment>
-        <translation>Désactivé</translation>
+        <translation>禁用</translation>
     </message>
     <message>
         <source>Input</source>
         <comment>IO Port Type</comment>
-        <translation>Entrée</translation>
+        <translation>输入</translation>
     </message>
     <message>
         <source>Output</source>
         <comment>IO Port Type</comment>
-        <translation>Sortie</translation>
+        <translation>输出</translation>
     </message>
     <message>
         <source>Invalid</source>
         <comment>IO Port Type</comment>
-        <translation>Invalide</translation>
+        <translation>无效</translation>
     </message>
     <message>
         <source>Open Circuit</source>
         <comment>IO Port State</comment>
-        <translation>Circuit Ouvert</translation>
+        <translation>开路</translation>
     </message>
     <message>
         <source>Grounded circuit</source>
         <comment>IO Port State</comment>
-        <translation>Circuit à la terre</translation>
+        <translation>闭路</translation>
     </message>
     <message>
         <source>Invalid state</source>
         <comment>IO Port State</comment>
-        <translation>État invalide</translation>
+        <translation>无效状态</translation>
     </message>
 </context>
 <context>
@@ -4387,93 +4397,93 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 degrees</source>
-        <translation>%1 degrés</translation>
+        <translation>%1 度</translation>
     </message>
 </context>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
         <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation>Échec d&apos;ouverture du port IO &apos;%1&apos;</translation>
+        <translation>打开IO端口 &apos;%1&apos;失败</translation>
     </message>
     <message>
         <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation>Échec de fermeture du port IO &apos;%1&apos;</translation>
+        <translation>关闭IO端口 &apos;%1&apos;失败</translation>
     </message>
     <message>
         <source>IO port error</source>
-        <translation>Erreur port IO</translation>
+        <translation>IO端口错误</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus. S.V.P, essayez un autre nom.</translation>
+        <translation>文件&apos;%1&apos;正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation>Exportation vers &quot;%1&quot;...</translation>
+        <translation>导出至 &quot;%1&quot;...</translation>
     </message>
     <message>
         <source>Could not create output file %1.</source>
-        <translation>Impossible de céer le fichier de sortie %1.</translation>
+        <translation>无法创建导出文件%1.</translation>
     </message>
     <message>
         <source>Could not export %1 %2.</source>
-        <translation>Ne peut pas exporter %1 %2.</translation>
+        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+        <translation>无法导出 %1 %2</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
         <source>Select file...</source>
-        <translation>Sélectionner fichier...</translation>
+        <translation>选择文件...</translation>
     </message>
     <message>
         <source>Pictures %1</source>
-        <translation>Images %1</translation>
+        <translation>图片 %1</translation>
     </message>
     <message>
         <source>&lt;No picture&gt;</source>
-        <translation>&lt;No picture&gt;</translation>
+        <translation>&lt;无 图片&gt;</translation>
     </message>
     <message>
         <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;Error while loading picture&gt;</translation>
+        <translation>&lt;错误 加载图片&gt;</translation>
     </message>
     <message>
         <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;Error while uploading picture&gt;</translation>
+        <translation>&lt;错误 图片更新&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;Picture cannot be read&gt;</translation>
+        <translation>&lt;图片 无法读取&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;Picture is too big. Maximum size is %1 Mb&gt;</translation>
+        <translation>&lt;图片 过大，最大尺寸为 %1 Mb&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;Picture cannot be loaded&gt;</translation>
+        <translation>&lt;图片 无法加载&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
         <source>Test</source>
-        <translation>Test</translation>
+        <translation>测试</translation>
     </message>
     <message>
         <source>Test failed</source>
-        <translation>Échec du Test</translation>
+        <translation>测试失败</translation>
     </message>
     <message numerus="yes">
         <source>Test completed successfully: %n users found.</source>
         <translation>
-            <numerusform>Test complété avec succes: %n usager trouvé.</numerusform>
-            <numerusform>Test complété avec succes: %n usagers trouvés.</numerusform>
+            <numerusform>测试成功， 发现 %n 用户.</numerusform>
         </translation>
     </message>
 </context>
@@ -4481,34 +4491,34 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation>Les paramètres fournis ne sont pas valides.</translation>
+        <translation>所提供的设置无效.</translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation>Ne peut pas effectuer un test.</translation>
+        <translation>无法完成测试.</translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation>Aucun des serveurs est connecté à l&apos;Internet.</translation>
+        <translation>当前无服务器连接到公网.</translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation></translation>
+        <translation>超时</translation>
     </message>
 </context>
 <context>
     <name>QnLdapUserListModel</name>
     <message>
         <source>Login</source>
-        <translation>Identifiant</translation>
+        <translation>登录</translation>
     </message>
     <message>
         <source>Full Name</source>
-        <translation>Nom complet</translation>
+        <translation>全名</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation>Courriel</translation>
+        <translation>邮箱</translation>
     </message>
     <message>
         <source>DN</source>
@@ -4519,287 +4529,284 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnLdapUsersDialog</name>
     <message>
         <source>The provided settings are not valid.</source>
-        <translation>Les paramètres fournis ne sont pas valides.</translation>
+        <translation>所提供的设置无效.</translation>
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation>Ne peut pas effectuer un test.</translation>
+        <translation>无法完成测试.</translation>
     </message>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation>Aucun des serveurs est connecté à l&apos;Internet.</translation>
+        <translation>当前服务器已连接到公网.</translation>
     </message>
     <message>
         <source>Could not load users.</source>
-        <translation>Ne peut pas charger les usagers.</translation>
+        <translation>无法加载用户.</translation>
     </message>
     <message>
         <source>Import users</source>
-        <translation>Importer usagers</translation>
+        <translation>导入用户</translation>
     </message>
     <message>
         <source>Timed out</source>
-        <translation>Délai expiré</translation>
+        <translation>超时</translation>
     </message>
     <message>
         <source>Error while loading users.</source>
-        <translation>Erreur lors du chargement d&apos;usagers.</translation>
+        <translation>加载用户时出错.</translation>
     </message>
     <message>
         <source>No new users found.</source>
-        <translation>Aucun nouveau usager trouvé.</translation>
+        <translation>未发现新用户.</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
         <source>Screens Allowed:</source>
-        <translation>Écrans Autorisés:</translation>
+        <translation>电视墙已授权:</translation>
     </message>
     <message>
         <source>Control Sessions Allowed:</source>
-        <translation>Contrôle Sessions Autorisés:</translation>
+        <translation>控制已授权:</translation>
     </message>
     <message>
         <source>Archive Streams Allowed:</source>
-        <translation>Flux Archive Autorisés:</translation>
+        <translation>存储已授权:</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Copier vers Presse-Papier</translation>
+        <translation>复制到剪贴板</translation>
     </message>
     <message>
         <source>Generic:</source>
-        <translation>Générique:</translation>
+        <translation>一般:</translation>
     </message>
     <message>
         <source>License Type</source>
-        <translation>Type Licence</translation>
+        <translation>授权类型</translation>
     </message>
     <message>
         <source>License Key</source>
-        <translation>Clé Licence</translation>
+        <translation>授权密钥</translation>
     </message>
     <message>
         <source>Locked to Hardware ID</source>
-        <translation>Verrouillé sur ID Matériel</translation>
+        <translation>已关联硬件ID</translation>
     </message>
     <message>
         <source>Features:</source>
-        <translation>Fonctionnalités:</translation>
+        <translation>功能:</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseListModel</name>
     <message>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation>类型</translation>
     </message>
     <message>
         <source>License Key</source>
-        <translation>Clé de licence</translation>
+        <translation>授权密钥</translation>
     </message>
     <message>
         <source>Expiration Date</source>
-        <translation>Date d&apos;expiration</translation>
+        <translation>到期日</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>Quantité</translation>
+        <translation>数量</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>État</translation>
+        <translation>授权状态</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation>Serveur</translation>
+        <translation>服务器</translation>
     </message>
     <message>
         <source>Never</source>
-        <translation>Jamais</translation>
+        <translation>从不</translation>
     </message>
     <message>
         <source>Expired</source>
-        <translation>Expiré</translation>
+        <translation>已经到期</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation>Aujourd&apos;hui</translation>
+        <translation>今天</translation>
     </message>
     <message>
         <source>Tomorrow</source>
-        <translation>Demain</translation>
+        <translation>明天</translation>
     </message>
     <message numerus="yes">
         <source>In %n days</source>
         <translation>
-            <numerusform>Dans %n jour</numerusform>
-            <numerusform>Dans %n jours</numerusform>
+            <numerusform>在%n天后</numerusform>
         </translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation>确认</translation>
     </message>
     <message>
         <source>&lt;Server not found&gt;</source>
-        <translation>&lt;Server non disponible&gt;</translation>
+        <translation>&lt;Server 未找到&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
     <message>
         <source>The software is licensed to: </source>
-        <translation>Le logiciel est sous licence à: </translation>
+        <translation>软件的授权为:</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Copier vers Presse-Papier</translation>
+        <translation>复制到剪贴板</translation>
     </message>
     <message>
         <source>License Activation</source>
-        <translation>Activation de licence</translation>
+        <translation>激活许可</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Vous essayez d&apos;activer une licence incompatible avec votre logiciel. S.V.P. contactez le support pour obtenir une licence valide.</translation>
+        <translation>激活的授权不兼容，请联系技术支持获取有效授权。</translation>
     </message>
     <message>
         <source>License Activation </source>
-        <translation>Activation de licence</translation>
+        <translation>激活许可</translation>
     </message>
     <message>
         <source>Remove license</source>
-        <translation>Enlever Licence</translation>
+        <translation>移除授权许可</translation>
     </message>
     <message>
         <source>License was successfully activated.</source>
-        <translation>La licence a été activé avec succès.</translation>
+        <translation>授权许可激活成功。</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>
         <translation>
-            <numerusform>Au moins %n %2 est requis</numerusform>
-            <numerusform>Au moins %n %2 sont requis</numerusform>
+            <numerusform>至少需要 %n %2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %2 are currently in use</source>
         <translation>
-            <numerusform>%n %2 est en utilisation</numerusform>
-            <numerusform>%n %2 sont en utilisations</numerusform>
+            <numerusform>当前已用%n %2 </numerusform>
         </translation>
     </message>
     <message>
         <source>You do not have a valid license installed.</source>
-        <translation>Vous n&apos;avez pas de licence valide installée.</translation>
+        <translation>未获得有效的授权许可进行安装.</translation>
     </message>
     <message>
         <source>Please activate your commercial or trial license.</source>
-        <translation>S.V.P. activez votre licence commerciale ou d&apos;essai.</translation>
+        <translation>请激活商用许可或者试用许可.</translation>
     </message>
     <message>
         <source>Please activate your commercial license.</source>
-        <translation>S.V.P. activez votre licence commerciale.</translation>
+        <translation>请激活商用许可.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation.</source>
-        <translation>Une erreur est survenue durant l&apos;activation automatique de licence.</translation>
+        <translation>自动激活授权时发生网络错误.</translation>
     </message>
     <message>
         <source>Try to activate your license manually.</source>
-        <translation>Essayez d&apos;activer votre licence manuellement.</translation>
+        <translation>请尝试手动激活授权.</translation>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation>Obtention de licences du Serveur...</translation>
+        <translation>从服务器获取许可...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
-        <translation>Licence a déjà été activée.</translation>
+        <translation>授权许可已激活.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation>Il y a eu un problème à l&apos;activation de votre licence. Erreur réseau survenue.</translation>
+        <translation>在激活授权过程中发生了网络错误。</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation>Impossible d&apos;activer licence: %1</translation>
+        <translation>无法激活授权许可:  %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation>Impossible d&apos;enlever la licence du serveur: %1</translation>
+        <translation>无法从服务器上移除授权许可： %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation>La clé de licence a déjà été activé sur l’ID matériel %1. S.V.P. contactez le support pour obtenir une clé de licence valide.</translation>
+        <translation>授权已被激活，关联硬件ID %1. 请联系技术支持团队获取有效授权。</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation>Une erreur réseau s&apos;est produite durant l&apos;activation automatique de la licence. S.V.P. contactez le support pour activer votre licence manuellement.</translation>
+        <translation>自动激活授权时发生网络错误，请联系技术图团队进行手动激活授权.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation>Fichier de la clé activation manuelle invalide. Sélectionner un fichier d&apos;activation de clé manuelle valide. Si le problème persiste, S.V.P. contacter le support.</translation>
+        <translation>所选的手动激活授权文件无效，请选择正确的激活文件。如果问题依然存在，请联系技术支持团队.</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseNotificationDialog</name>
     <message>
         <source>Some of your licenses are unavailable.</source>
-        <translation>Certaines de vos licences sont indisponibles.</translation>
+        <translation>部分授权许可无效.</translation>
     </message>
     <message>
         <source>Some of your licenses will soon expire.</source>
-        <translation>Certaines de vos licences expire sous peu.</translation>
+        <translation>一些许可即将到期。</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseWidget</name>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>S.V.P. envoyez un courriel avec le numéro de série et l&apos;ID matériel fournis à %1 pour obtenir une clé d&apos;activation.</translation>
+        <translation>请通过发送电子邮件将硬件ID信息来获取激活授权密钥 %1。</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>Succès</translation>
+        <translation>成功</translation>
     </message>
     <message>
         <source>Hardware ID copied to clipboard.</source>
-        <translation>Matériel ID copier vers presse-papier.</translation>
+        <translation>复制硬件ID到剪贴板。</translation>
     </message>
     <message>
         <source>Activate License</source>
-        <translation>Activer Licence</translation>
+        <translation>激活许可</translation>
     </message>
     <message>
         <source>Activating...</source>
-        <translation>Activation...</translation>
+        <translation>正在激活...</translation>
     </message>
     <message>
         <source>Open License File</source>
-        <translation>Ouvrir Fichier de licence</translation>
+        <translation>打开授权许可文件</translation>
     </message>
     <message>
         <source>All files (*.*)</source>
-        <translation>Tous les fichiers (*.*)</translation>
+        <translation>所有文件(*.*)</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Could not open the file %1</source>
-        <translation>Impossible d&apos;ouvrir le fichier %1</translation>
+        <translation>无法打开文件%1</translation>
     </message>
     <message>
         <source>Activate Trial License</source>
-        <translation>Activer une licence d&apos;essai</translation>
+        <translation>激活测试许可</translation>
     </message>
     <message>
         <source>Activate Free License</source>
-        <translation>Activer une licence gratuite</translation>
+        <translation>激活免费许可</translation>
     </message>
 </context>
 <context>
@@ -4807,327 +4814,339 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>Use analog licenses to view these %n cameras</source>
         <translation>
-            <numerusform>Utiliser une licence pour voir %n camera</numerusform>
-            <numerusform>Utiliser une licence pour voir %n cameras</numerusform>
+            <numerusform>使用模拟授权预览 %n 摄像机</numerusform>
         </translation>
     </message>
     <message>
         <source>Use licenses for selected %1</source>
-        <translation>Utiliser une licence pour %1 sélectionné</translation>
+        <translation>对选定的 %1使用授权</translation>
     </message>
 </context>
 <context>
     <name>QnLoginDialog</name>
     <message>
         <source>Invalid Login Information</source>
-        <translation>Informations de connexion invalide</translation>
+        <translation>无效登录信息</translation>
     </message>
     <message>
         <source>Saved Sessions</source>
-        <translation>Sessions sauvegardées</translation>
+        <translation>保存的会话</translation>
     </message>
     <message>
         <source>&lt;none&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;none&gt;</translation>
+        <translation>&lt;无&gt;</translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation>Connexion au serveur...</translation>
+        <translation>连接到服务器...</translation>
     </message>
     <message>
         <source>Version %1</source>
-        <translation>Version %1</translation>
+        <translation>版本 %1</translation>
     </message>
     <message>
         <source>Auto-Discovered Servers</source>
-        <translation>Auto-Découverte Serveurs</translation>
+        <translation>自动发现服务器</translation>
     </message>
     <message>
         <source>The information you have entered is not valid.</source>
-        <translation>L&apos;information que vous avez entrée est invalide.</translation>
+        <translation>输入的登录信息无效。</translation>
     </message>
     <message>
         <source>Entered hostname is not valid.</source>
-        <translation>Le nom d&apos;hôte entré est invalide.</translation>
+        <translation>输入的主机名无效。</translation>
     </message>
     <message>
         <source>Host field cannot be empty.</source>
-        <translation>Le champ hôte ne peut pas être vide.</translation>
+        <translation>主机名不能为空。</translation>
     </message>
     <message>
         <source>%1 at %2</source>
-        <translation>%1 à %2</translation>
+        <translation>%1 在 %2</translation>
     </message>
     <message>
         <source>* Last used connection *</source>
-        <translation>* Dernière connexion utilisée *</translation>
+        <translation>*最后使用的连接*</translation>
     </message>
     <message>
         <source>The login information you have entered is not valid.</source>
-        <translation>Les informations de connexion que vous avez entrées sont invalides.</translation>
+        <translation>输入的登录信息无效。</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
-        <translation>Êtes-vous sûr de vouloir effacer cette connexion %1?</translation>
+        <translation>请确认是否删除以下连接: %1?</translation>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation>Paramètres invalides</translation>
+        <translation>无效参数</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation>La connexion existe déjà.</translation>
+        <translation>连接已存在</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation>Une connexion avec le même nom existe déjà. Voulez-vous la remplacer?</translation>
+        <translation>连接名称已存在,是否覆盖?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation>Effacer Connexions</translation>
+        <translation>删除连接</translation>
     </message>
 </context>
 <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
         <source>Pictures %1</source>
-        <translation>Images %1</translation>
+        <translation>图片 %1</translation>
     </message>
     <message>
         <source>Preparing Image...</source>
-        <translation>Préparation de l&apos;image...</translation>
+        <translation>正在准备图片...</translation>
     </message>
     <message>
         <source>Please wait while image is being prepared...</source>
-        <translation>S.V.P. patientez pendant que l&apos;image est préparée...</translation>
+        <translation>图片正在准备中...请稍后...</translation>
     </message>
     <message>
         <source>Dark</source>
-        <translation>Sombre</translation>
+        <translation>深色</translation>
     </message>
     <message>
         <source>Light</source>
-        <translation>Clair</translation>
+        <translation>浅色</translation>
     </message>
     <message>
         <source>Server Time</source>
-        <translation>Heure Serveur</translation>
+        <translation>服务器时间</translation>
     </message>
     <message>
         <source>Client Time</source>
-        <translation>Heure Client</translation>
+        <translation>客户端时间</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation>Défaut</translation>
+        <translation>默认</translation>
     </message>
     <message>
         <source>Rainbow</source>
-        <translation>arc-en-ciel</translation>
+        <translation>彩色</translation>
     </message>
     <message>
         <source>Custom...</source>
-        <translation>Personnalisé...</translation>
+        <translation>自定义...</translation>
     </message>
     <message>
         <source>Stretch</source>
-        <translation>Étirer</translation>
+        <translation>拉伸</translation>
     </message>
     <message>
         <source>Fit</source>
-        <translation>Ajuster</translation>
+        <translation>平铺</translation>
     </message>
     <message>
         <source>Crop</source>
-        <translation>Rogner</translation>
+        <translation>裁剪</translation>
     </message>
     <message>
         <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-        <translation>Cette option n&apos;affecte pas l&apos;horaire d&apos;enregistrement. L&apos;horaire est toujours basé sur l&apos;heure du Serveur.</translation>
+        <translation>此选项不影响录像计划.录像计划时间与服务器时间一致.</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation>Sélectionner fichier...</translation>
+        <translation>选择文件...</translation>
     </message>
 </context>
 <context>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation>Paramètres Fichier</translation>
+        <translation>文件设置</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation>L&apos;image n&apos;est pas chargée</translation>
+        <translation>图片未加载</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation>Ceci est un fichier lentille &apos;fisheye&apos;</translation>
+        <translation>鱼眼录像文件</translation>
     </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Smart Search</source>
-        <translation>Recherche intelligente</translation>
+        <translation>智能搜索</translation>
     </message>
     <message>
         <source>PTZ</source>
         <translation>PTZ</translation>
     </message>
     <message>
-        <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1 (Tour &quot;%2&quot; est actif)</translation>
+        <source>LIVE</source>
+        <translation>实时</translation>
     </message>
     <message>
-        <source>LIVE</source>
-        <translation>DIRECT</translation>
+        <source>%1 (Tour &quot;%2&quot; is active)</source>
+        <translation>%1 (轮巡 &quot;%2&quot; 已生效)</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
-        <translation>Créer une fenêtre de zoom</translation>
+        <translation>创建缩放窗口</translation>
     </message>
     <message>
         <source>Image Enhancement</source>
-        <translation>Amélioration de l&apos;image</translation>
+        <translation>图像增强</translation>
     </message>
     <message>
         <source>Hi-Res</source>
-        <translation>Haute-Res</translation>
+        <translation>高分辨率</translation>
     </message>
     <message>
         <source>Dewarping</source>
-        <translation>Dérouler</translation>
+        <translation>全景鱼眼矫正</translation>
     </message>
     <message>
         <source>Screenshot</source>
-        <translation>Prendre une capture d&apos;écran</translation>
+        <translation>截屏</translation>
     </message>
     <message>
         <source>IO Module</source>
-        <translation>Module IO</translation>
+        <translation>IO模块@</translation>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation>Fenêtre de zoom</translation>
+        <translation>缩放窗口</translation>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation>Basse-Rés</translation>
+        <translation>低分辨率</translation>
     </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
     <message>
         <source>Merge Systems...</source>
-        <translation>Unifier Systèmes...</translation>
+        <translation>联网设置...</translation>
     </message>
     <message>
         <source>Server URL:</source>
-        <translation>Serveur URL:</translation>
+        <translation>服务器URL:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe:</translation>
+        <translation>密码:</translation>
     </message>
     <message>
         <source>The new system will have password and name from the system:</source>
-        <translation>Le nouveau système aura le mot de passe et nom du système:</translation>
+        <translation>新系统需要新的用户名和密码:</translation>
     </message>
     <message>
         <source>http(s)://host:port</source>
-        <translation>http(s)://hôte:port</translation>
+        <translation>http(s)://主机:端口</translation>
     </message>
     <message>
         <source>You are about to merge the current system %1 with the system</source>
-        <translation>Vous êtes sur le point d&apos;unir le système actuel %1 avec le système</translation>
+        <translation>正在将服务器%1连接到服务器</translation>
     </message>
     <message>
         <source>%1 (current)</source>
-        <translation>%1 (actuel)</translation>
+        <translation>%1 (当前)</translation>
     </message>
     <message>
         <source>The URL is invalid.</source>
-        <translation>Le URL est invalide.</translation>
+        <translation>URL不可用.</translation>
     </message>
     <message>
         <source>The password cannot be empty.</source>
-        <translation>Le mot de passe ne peut pas être vide.</translation>
+        <translation>密码不能为空.</translation>
     </message>
     <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
-        <translation>Utiliser un nom d&apos;hôte précis ou l&apos;adresse IP plutôt que %1.</translation>
+        <translation>使用特定的主机名和IP地址而不是 %1.</translation>
     </message>
     <message>
         <source>This is the current system URL.</source>
-        <translation>Ceci est l&apos;URL actuelle du système.</translation>
+        <translation>当前系统URL.</translation>
     </message>
     <message>
         <source>Merge with %1</source>
-        <translation>Unifier avec %1</translation>
+        <translation>联网到 %1</translation>
     </message>
     <message>
         <source>The password is invalid.</source>
-        <translation>Le mot de passe est invalide.</translation>
+        <translation>密码输入错误.</translation>
     </message>
     <message>
         <source>The system was not found.</source>
-        <translation>Le système n&apos;a pas été trouvé.</translation>
+        <translation>系统无法搜索到.</translation>
     </message>
     <message>
         <source>Could not create a backup of the server database.</source>
-        <translation>Impossible de créer une sauvegarde de la base de données du serveur.</translation>
+        <translation>无法为服务器创建数据库.</translation>
     </message>
     <message>
         <source>System was not found.</source>
-        <translation>Système n&apos;a pas été trouvé.</translation>
+        <translation>没有搜索到系统.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Cannot merge systems.</source>
-        <translation>Impossible d&apos;unir les Systèmes.</translation>
+        <translation>无法进行系统联网.</translation>
     </message>
     <message>
         <source>Success!</source>
-        <translation>Succès!</translation>
+        <translation>成功!</translation>
     </message>
     <message>
         <source>The system was configured successfully.</source>
-        <translation>Le système a été configuré avec succès.</translation>
+        <translation>系统已配置成功.</translation>
     </message>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
-        <translation>Les serveurs des systèmes distants devraient apparaitre dans votre système sous peu.</translation>
+        <translation>远程系统的服务器将出现在当前系统中.</translation>
     </message>
     <message>
         <source>Check</source>
-        <translation>Vérifier</translation>
+        <translation>检查</translation>
     </message>
     <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation>Attention: Vous êtes sur le point de fusionner avec les systèmes de licences&apos;DÉMARRAGE&apos;
-Comme seulement une licence de &apos;DÉMARRAGE&apos; par système est autorisé après fusion, vous aurez seulement une licence de &apos;DÉMARRAGE restante.
-Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusionner pour continuer.
-</translation>
+        <translation>注意:将合并授权到联网系统中.
+若您已知晓，请继续联网.</translation>
     </message>
     <message>
         <source>Testing...</source>
-        <translation>En test...</translation>
+        <translation>测试中...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation>Union systèmes...</translation>
+        <translation>系统联网...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation>Le système trouvé %1 à une version incompatible %2.</translation>
+        <translation>搜索到的系统 %1存在不兼容的版本 %2.</translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System has an incompatible version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operation is not permitted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System is in safe mode.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5135,57 +5154,55 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
-        <translatorcomment>?</translatorcomment>
         <translation>&lt;multiple values&gt;</translation>
     </message>
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
-        <translatorcomment>?</translatorcomment>
         <translation>&lt;multiple values&gt;</translation>
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation>Horaire Invalide</translation>
+        <translation>无效计划</translation>
     </message>
     <message>
         <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Flux secondaire désactivé sur ces caméras. L&apos;option Mouv.+Basse Qualité n&apos;a aucun effet. Appuyez sur &quot;Oui&quot; pour changer le type d&apos;enreg. à &quot;Toujours&quot; ou sur &quot;Non&quot; pour réactiver le flux secondaire.</translation>
+        <translation>子码流已禁用.移动侦测+LQ选项没有影响.请点击“是”设置录像类型改为“总是”，或“不”，重新启动子码流.</translation>
     </message>
 </context>
 <context>
     <name>QnNavigationItem</name>
     <message>
         <source>Speed Down</source>
-        <translation>Décélération</translation>
-    </message>
-    <message>
-        <source>Previous Frame</source>
-        <translation>Image précédente</translation>
+        <translation>慢放</translation>
     </message>
     <message>
         <source>Speed Up</source>
-        <translation>Accélérer</translation>
+        <translation>快进</translation>
+    </message>
+    <message>
+        <source>Previous Frame</source>
+        <translation>前一帧</translation>
     </message>
     <message>
         <source>Next Frame</source>
-        <translation>Image suivante</translation>
-    </message>
-    <message>
-        <source>Previuos Chunk</source>
-        <translation>Morceau précédent</translation>
+        <translation>后一帧</translation>
     </message>
     <message>
         <source>To Start</source>
-        <translation>Pour Démarrer</translation>
-    </message>
-    <message>
-        <source>Next Chunk</source>
-        <translation>Morceau suivante</translation>
+        <translation>开始</translation>
     </message>
     <message>
         <source>To End</source>
-        <translation>Pour Terminer</translation>
+        <translation>到结束</translation>
+    </message>
+    <message>
+        <source>Previuos Chunk</source>
+        <translation>上一个</translation>
+    </message>
+    <message>
+        <source>Next Chunk</source>
+        <translation>下一个</translation>
     </message>
 </context>
 <context>
@@ -5208,8 +5225,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message numerus="yes">
         <source>%n more item(s)</source>
         <translation>
-            <numerusform>%n objet de plus</numerusform>
-            <numerusform>%n objets de plus</numerusform>
+            <numerusform>%n更多项</numerusform>
         </translation>
     </message>
 </context>
@@ -5217,269 +5233,261 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnNotificationSoundManagerDialog</name>
     <message>
         <source>Notification Sounds</source>
-        <translation>Sons de notifications</translation>
+        <translation>通知音效</translation>
     </message>
     <message>
         <source>&amp;Play</source>
-        <translation>&amp;Lecture</translation>
+        <translation>&amp;播放</translation>
     </message>
     <message>
         <source>&amp;Add...</source>
-        <translation>&amp;Ajouter...</translation>
+        <translation>&amp;添加...</translation>
     </message>
     <message>
         <source>&amp;Rename...</source>
-        <translation>&amp;Renommer...</translation>
+        <translation>&amp;重命名...</translation>
     </message>
     <message>
         <source>&amp;Delete...</source>
-        <translation>&amp;Supprimer...</translation>
+        <translation>&amp;删除...</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>File cannot be added.</source>
-        <translation>Le fichier ne peut pas être ajouté.</translation>
+        <translation>无法添加文件。</translation>
     </message>
     <message>
         <source>Rename sound</source>
-        <translation>Renommer le son</translation>
+        <translation>重命名音效</translation>
     </message>
     <message>
         <source>Clip sound up to %1 seconds</source>
-        <translation>Le Clip de son jusqu&apos;à %1 secondes</translation>
+        <translation>影片音效至%1 秒</translation>
     </message>
     <message>
         <source>New title could not be set.</source>
-        <translation>Le nouveau titre ne peut pas être défini.</translation>
+        <translation>新标题无法设定.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation>Êtes-vous sûr que vous voulez supprimer %1?</translation>
+        <translation>确认要删除%1?</translation>
     </message>
     <message>
         <source>Custom title:</source>
-        <translation>Titre Personnalisé:</translation>
+        <translation>自定义标题:</translation>
     </message>
     <message>
         <source>Sound Files</source>
-        <translation>Fichiers de son</translation>
+        <translation>音效文件</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation>Sélectionner fichier...</translation>
+        <translation>选择文件...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation>Entrer nouveau titre:</translation>
+        <translation>输入新标题:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation>Confirmer suppression fichier</translation>
+        <translation>确认刪除文件</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
         <source>&lt;Downloading sound list...&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;Downloading sound list...&gt;</translation>
+        <translation>&lt;正在下载音效列表...&gt;</translation>
     </message>
     <message>
         <source>&lt;No Sound&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;No Sound&gt;</translation>
+        <translation>&lt;沒有音效&gt;</translation>
     </message>
     <message>
         <source>&lt;Downloading sound...&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;Downloading sound...&gt;</translation>
+        <translation>&lt;正在下载音效...&gt;</translation>
     </message>
     <message>
         <source>&lt;Uploading sound...&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;Uploading sound...&gt;</translation>
+        <translation>&lt;正在上传音效...&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
         <source>Close</source>
-        <translation>Fermer</translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <source>Right Click</source>
-        <translation>Clic Droit</translation>
+        <translation>右击</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationsCollectionWidget</name>
     <message>
         <source>DEBUG</source>
-        <translation>DEBUG</translation>
+        <translation>调试</translation>
     </message>
     <message>
         <source>Browse Archive</source>
-        <translation>Parcourir les archives</translation>
-    </message>
-    <message>
-        <source>Server settings</source>
-        <translation>Paramètres Serveur</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Paramètres</translation>
-    </message>
-    <message>
-        <source>User Settings</source>
-        <translation>Paramètres Usager</translation>
-    </message>
-    <message>
-        <source>Licenses</source>
-        <translation>Licences</translation>
-    </message>
-    <message>
-        <source>SMTP Settin gs</source>
-        <translatorcomment>Must be an error, this strings shouldn&apos;t exist ? Wrote it with the same kind of space just in case.</translatorcomment>
-        <translation>Paramètr es SMTP</translation>
-    </message>
-    <message>
-        <source>SMTP Settings</source>
-        <translation>Paramètres SMTP</translation>
-    </message>
-    <message>
-        <source>Connect to server</source>
-        <translation>Se connecter au serveur</translation>
+        <translation>浏览文档</translation>
     </message>
     <message>
         <source>Open %1</source>
-        <translation>Ouvrir %1</translation>
-    </message>
-    <message>
-        <source>%1 Settings</source>
-        <translation>%1 Paramètres</translation>
-    </message>
-    <message>
-        <source>Server Settings</source>
-        <translation>Paramètres Serveur</translation>
+        <translation>打开 %1</translation>
     </message>
     <message>
         <source>Open %1 Web Page...</source>
-        <translation>Ouvrir Page Web %1...</translation>
+        <translation>打开 %1 网页...</translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <extracomment>&quot;Camera Settings...&quot; or &quot;Device Settings...&quot;</extracomment>
+        <translation type="unfinished">%1 设置...</translation>
+    </message>
+    <message>
+        <source>Server Settings...</source>
+        <translation type="unfinished">服务器设定...</translation>
+    </message>
+    <message>
+        <source>Licenses...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Settings...</source>
+        <translation type="unfinished">用户设置...</translation>
+    </message>
+    <message>
+        <source>SMTP Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Synchronization...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnPerformanceTest</name>
     <message>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
-        <translation>La performance de cet ordinateur autorise %1 en mode configuration seulement.</translation>
+        <translation>当前服务器性能在配置模式下仅允许运行 %1.</translation>
     </message>
     <message>
         <source>For full-featured mode please use another computer.</source>
-        <translation>Pour le mode &apos;Toutes fonctions&apos;, S.V.P. utilisez un autre ordinateur.</translation>
+        <translation>若需启用全功能模式,请使用另外的服务器.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
+        <translation>警告</translation>
     </message>
 </context>
 <context>
     <name>QnPreferencesDialog</name>
     <message>
         <source>Information</source>
-        <translation>Information</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>Notifications</source>
-        <translation>Notifications</translation>
+        <translation>通知</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>Général</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>Look and Feel</source>
-        <translation>Affichage</translation>
+        <translation>常规设置</translation>
     </message>
     <message>
         <source>Screen Recording</source>
-        <translation>Enregistrement d&apos;écran</translation>
+        <translation>屏幕录像</translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation>Certains changements ne prendront effet qu&apos;après le redémarrage de l&apos;application. Voulez-vous redémarrer l&apos;application maintenant ?</translation>
+        <translation>部分更改需重新启动用程序后生效. 是否需要现在重新启动?</translation>
     </message>
     <message>
         <source>Settings file is read-only. Please contact your system administrator.</source>
-        <translation>Fichier de config. est en lecture seul. S.V.P. contactez votre administrateur de système.</translation>
+        <translation>当前设置文件为只读，请联系系统管理员.</translation>
     </message>
     <message>
         <source>All changes will be lost after program exit.</source>
-        <translation>Tous les changements seront perdus à la fermeture du programme.</translation>
+        <translation>程序退出后，所有更改都将丢失，请保存.</translation>
     </message>
     <message>
         <source>Settings cannot be saved. Please contact your system administrator.</source>
-        <translation>Config. ne peut pas être sauvé. S.V.P. contactez votre administrateur système.</translation>
+        <translation>设置无法保存,请联系系统管理员.</translation>
     </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
     <name>QnPtzManageDialog</name>
     <message>
         <source>Do not show again.</source>
-        <translation>Ne plus afficher.</translation>
+        <translation>不再显示.</translation>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
-        <translation>Ce préréglage est utilisé dans certains tours.</translation>
+        <translation>当前预置位已被其它巡视使用.</translation>
     </message>
     <message>
         <source>These tours will become invalid if you remove it.</source>
-        <translation>Ces tours seront invalides si vous l&apos;enlevez.</translation>
+        <translation>若删除当前预置位，将会导致巡视无法使用.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Une erreur est survenue en essayant d&apos;obtenir la position depuis la caméra %1.</translation>
+        <translation>摄像机 %1获取当前位置时,发生错误.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
-        <translation>S.V.P. attendez que la caméra soit en ligne.</translation>
+        <translation>摄像机上线中,请等待.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Une erreur est survenue en essayant de régler la position de la caméra %1.</translation>
+        <translation>摄像机 %1在设置当前位置时,发生错误.</translation>
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation>Ne peut pas obtenir la position depuis la caméra.</translation>
+        <translation>无法从摄像机取得位置.</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation>Ne peut pas définir la position de la caméra.</translation>
+        <translation>无法给摄像机设定位置.</translation>
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation>Retirer le préréglage</translation>
+        <translation>删除预置位</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
-        <translation>Gestion de PTZ pour %1.</translation>
+        <translation>摄像机云台管理%1.</translation>
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation>La configuration de PTZ n&apos;est pas sauvegardée.</translation>
+        <translation>云台设置为保存.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation>Les changements ne sont pas sauvegardés. Voulez-vous les sauvegarder?</translation>
+        <translation>改动未保存 是否保存?</translation>
     </message>
 </context>
 <context>
@@ -5490,110 +5498,107 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Name</source>
-        <translation>Nom</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <source>Hotkey</source>
-        <translation>Raccourci</translation>
+        <translation>热键</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation>Accueil</translation>
+        <translation>初始位置</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Détails</translation>
+        <translation>详细内容</translation>
     </message>
     <message>
         <source>Tours</source>
-        <translation>Tours</translation>
+        <translation>轮巡</translation>
     </message>
     <message>
         <source>Positions</source>
-        <translation>Positions</translation>
+        <translation>位置</translation>
     </message>
     <message numerus="yes">
         <source>Tour has %n identical positions</source>
         <translation>
-            <numerusform>Le Tour a %n position identique</numerusform>
-            <numerusform>Le Tour a %n positions identiques</numerusform>
+            <numerusform>轮巡包含%n 相同的位置</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>about %n minute(s)</source>
         <translation>
-            <numerusform>Environ %n minute</numerusform>
-            <numerusform>Environ %n minutes</numerusform>
+            <numerusform>关于 %n 分钟</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid tour</source>
-        <translation>Tour invalide</translation>
+        <translation>无效轮巡</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Aucun</translation>
+        <translation>无</translation>
     </message>
     <message numerus="yes">
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
-            <numerusform>Le préréglage sera activé après %n minute d&apos;inactivité</numerusform>
-            <numerusform>Le préréglage sera activé après %n minutes d&apos;inactivités</numerusform>
+            <numerusform>预置位将在 %n分钟后激活</numerusform>
         </translation>
     </message>
     <message>
         <source>less than a minute</source>
-        <translation>Moins d&apos;une minute</translation>
+        <translation>小于一分钟</translation>
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation>Nouveau tour %1</translation>
+        <translation>新轮巡 %1</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
-        <translation>Enregistrer Position %1</translation>
+        <translation>保存预置位%1</translation>
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation>Le Tour devrait contenir au moins 2 positions.</translation>
+        <translation>轮巡应包含至少2个位置</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation>Temps du Tour: %1.</translation>
+        <translation>轮巡间隔%1</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetDialog</name>
     <message>
         <source>None</source>
-        <translation>Aucun</translation>
+        <translation>无</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
-        <translation>Enregistrer la position %1</translation>
+        <translation>保存预置位%1</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
         <source>None</source>
-        <translation>Aucun</translation>
+        <translation>无</translation>
     </message>
     <message>
         <source>Change hotkey</source>
-        <translation>Changer le raccourci</translation>
+        <translation>修改热键</translation>
     </message>
     <message>
         <source>Reassign</source>
-        <translation>Réassigner</translation>
+        <translation>重新分配</translation>
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation>Ce raccourci est utilisé par le préréglage &quot;%1&quot;.</translation>
+        <translation>此热键用于预置 %1</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation>Ce raccourci est utilisé par le tour &quot;%1&quot;.</translation>
+        <translation>此热键用于轮巡 %1</translation>
     </message>
 </context>
 <context>
@@ -5601,103 +5606,102 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message>
         <source>%1 (active)</source>
         <comment>Template for active PTZ preset</comment>
-        <translation>%1 (actif)</translation>
+        <translation>%1激活 预置位模板</translation>
     </message>
     <message>
         <source>%1 (active)</source>
         <comment>Template for active PTZ tour</comment>
-        <translation>%1 (actif)</translation>
+        <translation>%1激活 轮巡模板</translation>
     </message>
 </context>
 <context>
     <name>QnPtzTourSpotsModel</name>
     <message>
         <source>Lowest</source>
-        <translation>Plus Bas</translation>
+        <translation>最低</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation>Bas</translation>
+        <translation>低</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation>Normal</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>Haut</translation>
+        <translation>高</translation>
     </message>
     <message>
         <source>Highest</source>
-        <translation>Trés Haut</translation>
+        <translation>最高</translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation>Immédiat</translation>
+        <translation>立即作用</translation>
     </message>
     <message numerus="yes">
         <source>%n seconds</source>
         <translation>
-            <numerusform>%n seconde</numerusform>
-            <numerusform>%n secondes</numerusform>
+            <numerusform>%n 秒</numerusform>
         </translation>
     </message>
     <message>
         <source>&lt;Invalid&gt;</source>
-        <translation>&lt;Invalide&gt;</translation>
+        <translation>无效</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation>Position</translation>
+        <translation>位置</translation>
     </message>
     <message>
         <source>Stay Time</source>
-        <translation>Temps en attente</translation>
+        <translation>停留时间</translation>
     </message>
     <message>
         <source>Speed</source>
-        <translation>Vitesse</translation>
+        <translation>速度</translation>
     </message>
 </context>
 <context>
     <name>QnReconnectInfoDialog</name>
     <message>
         <source>Canceling...</source>
-        <translation>Annulation...</translation>
+        <translation>取消中...</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingSettingsWidget</name>
     <message>
         <source>Screen %1 - %2x%3</source>
-        <translation>Écran %1 - %2x%3</translation>
+        <translation>屏幕%1 - %2x%3</translation>
     </message>
     <message>
         <source>%1 (Primary)</source>
-        <translation>%1(Primaire)</translation>
+        <translation>%1 (主要)</translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation>Sélectionner Dossier...</translation>
+        <translation>选择文件夹...</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatisticsWidget</name>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Copier la sélection dans le presse-papier</translation>
+        <translation>复制选择到剪贴板</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation>Exporter la sélection vers un fichier...</translation>
+        <translation>导出选择到文件...</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>Sélectionner tout</translation>
+        <translation>选择所有</translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation>Exporter les événements sélectionnés vers un fichier</translation>
+        <translation>导出选取的事件至文件</translation>
     </message>
 </context>
 <context>
@@ -5705,50 +5709,46 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message numerus="yes">
         <source>%n years</source>
         <translation>
-            <numerusform>%n an</numerusform>
-            <numerusform>%n ans</numerusform>
+            <numerusform>%n 年</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n months</source>
         <translation>
-            <numerusform>%n mois</numerusform>
-            <numerusform>%n mois</numerusform>
+            <numerusform>%n 月</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n days</source>
         <translation>
-            <numerusform>%n jour</numerusform>
-            <numerusform>%n jours</numerusform>
+            <numerusform>%n 天</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hours</source>
         <translation>
-            <numerusform>%n heure</numerusform>
-            <numerusform>%n heures</numerusform>
+            <numerusform>%n 时</numerusform>
         </translation>
     </message>
     <message>
         <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation>La durée d&apos;archive dans le calendrier jours entre la première enregistrement et ce moment</translation>
+        <translation>录像时间在日历天第一个记录和当前的时刻</translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
-        <translation>Débit moyen pour la période enregistrée</translation>
+        <translation>记录的平均比特率</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation>Éspace</translation>
+        <translation>空格</translation>
     </message>
     <message>
         <source>Calendar Days</source>
-        <translation>Jours Calendrier</translation>
+        <translation>日历</translation>
     </message>
     <message>
         <source>less than an hour</source>
-        <translation>Moins d&apos;une heure</translation>
+        <translation>不到一小时</translation>
     </message>
     <message>
         <source>%1 Mbps</source>
@@ -5764,114 +5764,118 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Total %1</source>
-        <translation>Total %1</translation>
+        <translation>全部 %1</translation>
     </message>
     <message>
         <source>%1 with non-empty archive</source>
-        <translation>%1 avec des archives non-vide</translation>
+        <translation>%1 非空档案</translation>
     </message>
     <message>
         <source>Storage space occupied by %1</source>
-        <translation>Espace de stockage occupé par %1</translation>
+        <translation>存储空间占用%1 </translation>
+    </message>
+    <message>
+        <source>empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
     <message>
         <source>Not recording</source>
-        <translation>N&apos;enregistre pas</translation>
+        <translation>不录像</translation>
     </message>
     <message>
         <source>Recording everything</source>
-        <translation>Enregistre tout</translation>
+        <translation>全部录像</translation>
     </message>
     <message>
         <source>Recording motion only</source>
-        <translation>Enregistrement sur mouvement seulement</translation>
+        <translation>仅移动侦测录像</translation>
     </message>
     <message>
         <source>Recording motion and low quality</source>
-        <translation>Enregistrement sur mouvement et basse qualité</translation>
+        <translation>移动侦测和低分辨率录像</translation>
     </message>
     <message>
         <source>Continuous</source>
-        <translation>Continu</translation>
+        <translation>连续</translation>
     </message>
     <message>
         <source>Motion only</source>
-        <translation>Mouvement seulement</translation>
+        <translation>仅移动侦测</translation>
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation>Mouvement et Basse réso</translation>
+        <translation>移动+低分辨率</translation>
     </message>
 </context>
 <context>
     <name>QnResourceBrowserWidget</name>
     <message>
         <source>Any Type</source>
-        <translation>Tous Types</translation>
+        <translation>任何类型</translation>
     </message>
     <message>
         <source>Video Files</source>
-        <translation>Fichiers Vidéo</translation>
+        <translation>视频文件</translation>
     </message>
     <message>
         <source>Image Files</source>
-        <translation>Fichiers Image</translation>
+        <translation>图像文件</translation>
     </message>
     <message>
         <source>Live %1</source>
-        <translation>Direct %1</translation>
+        <translation>实时 %1</translation>
     </message>
 </context>
 <context>
     <name>QnResourcePoolModelNode</name>
     <message>
         <source>Root</source>
-        <translation>Racine</translation>
+        <translation>根</translation>
     </message>
     <message>
         <source>Local</source>
-        <translation>Locale</translation>
+        <translation>本地</translation>
     </message>
     <message>
         <source>System</source>
-        <translation>Système</translation>
+        <translation>系统</translation>
     </message>
     <message>
         <source>Other Systems</source>
-        <translation>Autre Systèmes</translation>
+        <translation>其它系统</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation>Usagers</translation>
+        <translation>用户</translation>
     </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation>Sélectionner lUtlisateurs...</translation>
+        <translation>选择用户...</translation>
     </message>
     <message>
         <source>Select Resources...</source>
-        <translation>Sélectionner Ressources...</translation>
+        <translation>选择资源...</translation>
     </message>
     <message>
         <source>Select %1...</source>
-        <translation>Sélectionner %1...</translation>
+        <translation>选择 %1...</translation>
     </message>
 </context>
 <context>
     <name>QnResourceTreeWidget</name>
     <message>
         <source>Filter</source>
-        <translation>Filtre</translation>
+        <translation>过滤器</translation>
     </message>
     <message>
         <source>Reset Filter</source>
-        <translation>Réinitialisé le filtre</translation>
+        <translation>重置过滤器</translation>
     </message>
     <message>
         <source>X</source>
@@ -5882,38 +5886,38 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnResourceWidget</name>
     <message>
         <source>Close</source>
-        <translation>Fermer</translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Informations</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>Rotate</source>
-        <translation>Rotation</translation>
+        <translation>旋转</translation>
     </message>
 </context>
 <context>
     <name>QnRoutingManagementWidget</name>
     <message>
         <source>Available Server Addresses</source>
-        <translation>Adresses Serveur Disponible</translation>
+        <translation>可用的服务器地址</translation>
     </message>
     <message>
         <source>Add URL</source>
-        <translation>Ajouter URL</translation>
+        <translation>添加URL</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Enlever</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>Enlever cette option de connexion peut entrainer une défaillance système.</translation>
+        <translation>删除此连接项可能导致系统故障。</translation>
     </message>
     <message>
         <source>Enter URL</source>
-        <translation>Entrer URL</translation>
+        <translation>输入URL</translation>
     </message>
     <message>
         <source>URL</source>
@@ -5921,202 +5925,225 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>You have entered an invalid URL.</source>
-        <translation>Vous avez entré une URL invalide.</translation>
+        <translation>请输入有效URL.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
+        <translation>注意</translation>
     </message>
     <message>
         <source>This URL is already in the address list.</source>
-        <translation>L&apos;URL déjà dans la liste d&apos;adresse.</translation>
+        <translation>当前URL已存在地址列表中.</translation>
     </message>
 </context>
 <context>
     <name>QnScreenRecorder</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation>Le sous-système de capture d&apos;écran n&apos;est pas encore initialisé. S.V.P, essayez plus tard.</translation>
+        <translation>屏幕配置子系统未初始化完成，请稍后再试。</translation>
     </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
     <message>
         <source>Search</source>
-        <translation>Recherche</translation>
+        <translation>搜索</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Précédent</translation>
+        <translation>上一个</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation>Suivant</translation>
+        <translation>下一个</translation>
     </message>
 </context>
 <context>
     <name>QnServerAddressesModel</name>
     <message>
         <source>Address</source>
-        <translation>Adresse</translation>
+        <translation>地址</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation>En utilisation</translation>
+        <translation>使用中</translation>
     </message>
 </context>
 <context>
     <name>QnServerResourceWidget</name>
     <message>
         <source>Show Log</source>
-        <translation>Afficher le journal</translation>
+        <translation>显示日志</translation>
     </message>
     <message>
         <source>Check Issues</source>
-        <translation>Vérifier les problèmes</translation>
+        <translation>检查问题</translation>
     </message>
     <message numerus="yes">
         <source>%1 (up %n days, %2)</source>
         <translation>
-            <numerusform>%1 (en marche %n jour, %2)</numerusform>
-            <numerusform>%1 (en marche %n jours, %2)</numerusform>
+            <numerusform>%1 (上 %n 天, %2)</numerusform>
         </translation>
     </message>
     <message>
         <source>%1</source>
-        <translation>%1</translation>
+        <translation>%1% {1?}</translation>
     </message>
 </context>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
         <source>Open Web Page...</source>
-        <translation>Ouvrir Page Web...</translation>
+        <translation>打开web页面...</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>Général</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>Storage Analytics</source>
-        <translation>Stockage Analytics</translation>
+        <translation>录像分析</translation>
+    </message>
+    <message>
+        <source>Server Settings - %1 (readonly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation type="unfinished">服务器设置</translation>
+    </message>
+    <message>
+        <source>Server not saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to the server %1?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
     <message>
         <source>Remove Storage</source>
-        <translation>Retirer stockage</translation>
+        <translation>移除存储</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Chargement...</translation>
+        <translation>加载中...</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation>Non disponible</translation>
+        <translation>不可用</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
+        <translation>注意</translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation>Vous êtes sur le point de lancer la routine de resynchronisation d&apos;archive.</translation>
+        <translation>即将启动日常录像再同步.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation>ATTENTION! L&apos;usage de disque dur va augmenter durant le processus de resynchronisation! Selon la taille totale d&apos;archive, cela pourrait prendre plusieurs heures.</translation>
+        <translation>注意:在进行录像再同步时将会增加硬盘使用!根据录像文件大小可能需要几个小时.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation>Ce processus est nécessaire seulement si le dossier d&apos;archive a été déplacé, renommé ou remplacé. Vous pouvez annuler la reconstruction à n&apos;importe quel moment sans perte de données.</translation>
+        <translation>当前操作只需要在录像文件夹被移动,重命名或者覆盖时使用.您可以在重建的过程中取消操作,而不丢失数据.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation>Êtes-vous sûr que vous voulez continuer?</translation>
+        <translation>请确定是否继续?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation>Reconstruction de l&apos;index de stockage &apos;%1&apos; en progression</translation>
+        <translation>正在重建录像索引&apos;%1&apos;</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation>Balayage rapide d&apos;archive pour le stockage &apos;%1&apos; en progression</translation>
+        <translation>正在快速扫描录像&apos;%1&apos;</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation>Terminer</translation>
+        <translation>完成</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
-        <translation>Reconstruction de l&apos;index d&apos;archive terminée.</translation>
+        <translation>重建录像索引完成.</translation>
     </message>
     <message>
         <source>At least two servers are required for this feature.</source>
-        <translation>Au moins deux serveurs sont nécessaires pour cette fonction.</translation>
+        <translation>此功能需要两个服务器才开启.</translation>
     </message>
     <message>
         <source>Could not load storages from server.</source>
-        <translation>N&apos;a pas pu charger le stockages depuis le serveur.</translation>
+        <translation>无法从服务器加载存储资源。</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation>Ajouter stockage externe...</translation>
+        <translation>添加外部存储...</translation>
     </message>
     <message>
         <source>Enable failover (server will take %1 automatically from offline servers)</source>
-        <translation>Activer basculement (Le serveur prendera automatiquement %1  à partir des serveurs hors ligne)</translation>
+        <translation>支持故障转移(服务器将自动接管离线服务器%1)</translation>
     </message>
     <message>
         <source>Max. %1 on this server:</source>
-        <translation>Max. %1 sur ce serveur:</translation>
+        <translation>在此服务器上最大 %1</translation>
     </message>
     <message>
         <source>This server already has more than max %1</source>
-        <translation>Ce serveur à déjà plus que le max %1</translation>
+        <translation>服务器已超过最大 %1</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
-        <translation>Pour éviter toute malfonction, régler le nombre maximum de %1</translation>
+        <translation>为了避免故障调整最大数量 %1 </translation>
+    </message>
+    <message>
+        <source>Server is unavailable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnServerUpdatesModel</name>
     <message>
         <source>Server</source>
-        <translation>Serveur</translation>
+        <translation>服务器</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>État</translation>
+        <translation>状态</translation>
     </message>
 </context>
 <context>
     <name>QnServerUpdatesWidget</name>
     <message>
         <source>Unknown</source>
-        <translation>Inconnue</translation>
+        <translation>未知错误</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation>Mise à Jour</translation>
+        <translation>升级</translation>
     </message>
     <message>
         <source>Update from file:</source>
-        <translation>Mise à jour depuis fichier:</translation>
+        <translation>从文件升级:</translation>
     </message>
     <message>
         <source>Archive url:</source>
-        <translation>URL Archive:</translation>
+        <translation>可用RUL:</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>Copier vers Presse-Papier</translation>
+        <translation>复制到剪贴板</translation>
     </message>
     <message>
         <source>...</source>
@@ -6124,348 +6151,350 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-        <translation>Il semble que le processus de mise à jour soit plus long qu&apos;à l&apos;habitude. S.V.P. patientez.</translation>
+        <translation>升级进度需要花费一些时间，请等候.</translation>
     </message>
     <message>
         <source>Select Update File...</source>
-        <translation>Choisir Fichier MàJ...</translation>
+        <translation>请选择升级文件...</translation>
     </message>
     <message>
         <source>Update Files (*.zip)</source>
-        <translation>Fichiers MàJ (*.zip)</translation>
+        <translation>升级文件（*.zip）</translation>
     </message>
     <message>
         <source>Release notes</source>
-        <translation>Notes de Version</translation>
+        <translation>版本说明</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation>Obtenir une vers. spécifique</translation>
+        <translation>获取特殊版本</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation>Obtenir la dernière Version</translation>
+        <translation>获取最新版本</translation>
     </message>
     <message>
         <source>Update from Internet...</source>
-        <translation>Mise à jour depuis Internet...</translation>
+        <translation>从网络升级...</translation>
     </message>
     <message>
         <source>Update from local source...</source>
-        <translation>Mise à jour depuis une source locale...</translation>
+        <translation>从本地升级...</translation>
     </message>
     <message>
         <source>Update from Internet</source>
-        <translation>Mise à jour depuis Internet</translation>
+        <translation>从网络升级</translation>
     </message>
     <message>
         <source>Update from local source</source>
-        <translation>Mise à jour depuis une source locale</translation>
+        <translation>从本地升级</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>Succès</translation>
+        <translation>成功</translation>
     </message>
     <message>
         <source>URL copied to clipboard.</source>
-        <translation>URL copiée vers presse-papier.</translation>
+        <translation>将URL复制到剪贴板。</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Informations</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>Update is in process now.</source>
-        <translation>Mise à jour en cours.</translation>
+        <translation>升级正在进行.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Update has been successfully finished.</source>
-        <translation>Mise à jour  terminée avec succès.</translation>
+        <translation>已升级成功.</translation>
     </message>
     <message>
         <source>The client will be restarted to the updated version.</source>
-        <translation>Le client va être redémarré à la version à jour.</translation>
+        <translation>升级完成后，客户端需要重新启动。</translation>
     </message>
     <message>
         <source>Update has been cancelled.</source>
-        <translation>Mise en jour annulée.</translation>
+        <translation>升级被取消。</translation>
     </message>
     <message>
         <source>Could not download updates.</source>
-        <translation>Impossible de télécharger les MàJ.</translation>
+        <translation>无法下载更新。</translation>
     </message>
     <message>
         <source>No free space left on the disk.</source>
-        <translation>Aucun espace libre sur le disque.</translation>
+        <translation>硬盘上无更多空间。</translation>
     </message>
     <message>
         <source>Could not push updates to servers.</source>
-        <translation>Impossible d&apos;envoyer les MàJ aux serveurs.</translation>
+        <translation>无法在此服务器上推送更新.</translation>
     </message>
     <message numerus="yes">
         <source>The problem is caused by %n servers:</source>
         <translation>
-            <numerusform>Le problème est causé par%n serveur:</numerusform>
-            <numerusform>Le problème est causé par%n serveurs:</numerusform>
+            <numerusform>问题发生 %n 服务器:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>No free space left on %n servers:</source>
         <translation>
-            <numerusform>Aucun espace libre sur %n serveur:</numerusform>
-            <numerusform>Aucun espace libre sur %n serveurs:</numerusform>
+            <numerusform>服务器 %n上没有更多空间:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers are not responding:</source>
         <translation>
-            <numerusform>%n serveur ne répond pas:</numerusform>
-            <numerusform>%n serveurs ne répondent pas:</numerusform>
+            <numerusform>%n 服务器无响应:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers have gone offline:</source>
         <translation>
-            <numerusform>%n serveur est hors-ligne:</numerusform>
-            <numerusform>%n serveurs sont hors-ligne:</numerusform>
+            <numerusform>%n服务器已离线:</numerusform>
         </translation>
     </message>
     <message>
         <source>Could not install an update to the client.</source>
-        <translation>Impossible d&apos;installer les mises à jour client.</translation>
+        <translation>无法给客户端安装更新。</translation>
     </message>
     <message>
         <source>Could not install updates on one or more servers.</source>
-        <translation>Impossible d&apos;installer les MàJ sur un ou plusieurs serveurs.</translation>
+        <translation>无法在多个服务器上安装更新。</translation>
     </message>
     <message>
         <source>Checking for updates...</source>
-        <translation>Vérification des MàJ...</translation>
+        <translation>检查更新中...</translation>
     </message>
     <message>
         <source>Newer version found.</source>
-        <translation>Nouvelle version trouvée.</translation>
+        <translation>发现更新的版本.</translation>
     </message>
     <message>
         <source>You will have to update the client manually.</source>
-        <translation>Vous devrez mettre à jour le client manuellement.</translation>
+        <translation>需要手动升级客户端。</translation>
     </message>
     <message>
         <source>You will have to update the client manually using an installer.</source>
-        <translation>Vous devrez mettre à jour le client manuellement avec un installeur.</translation>
+        <translation>需要使用安装包手动升级客户端。</translation>
     </message>
     <message>
         <source>All components in your system are up to date.</source>
-        <translation>Toutes les composantes du système sont à jour.</translation>
+        <translation>系统里的组件已升级至最新。</translation>
     </message>
     <message>
         <source>Cannot update from this file.</source>
-        <translation>MàJ impossible depuis ce fichier.</translation>
+        <translation>无法从此文件更新。</translation>
     </message>
     <message>
         <source>Checking for updates... %1%</source>
-        <translation>Vérification des MàJ... %1%</translation>
+        <translation>检查更新中... %1%</translation>
     </message>
     <message>
         <source>Downloading updates... %1%</source>
-        <translation>Téléchargement des MàJ... %1%</translation>
+        <translation>正在下载更新... %1%</translation>
     </message>
     <message>
         <source>Installing client update... %1%</source>
-        <translation>Installation MàJ client... %1%</translation>
+        <translation>安装客户端更新... %1%</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers... %1%</source>
-        <translation>Installation MàJ sur les serveurs incompatibles... %1%</translation>
+        <translation>在不兼容的服务器安装更新... %1%</translation>
     </message>
     <message>
         <source>Pushing updates to servers... %1%</source>
-        <translation>Envoi de MàJ aux serveurs... %1%</translation>
+        <translation>连接更新到服务器... %1%</translation>
     </message>
     <message>
         <source>Installing updates... %1%</source>
-        <translation>Installation de MàJ... %1%</translation>
+        <translation>安装升级中... %1%</translation>
     </message>
     <message>
         <source>Cannot cancel update at this state.</source>
-        <translation>Impossible d&apos;annuler la MàJ dans cet état.</translation>
+        <translation>无法取消更新.</translation>
     </message>
     <message>
         <source>Please wait until update is finished</source>
-        <translation>S.V.P. attendez que la MàJ se termine</translation>
+        <translation>正在更新中,请稍后...</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
-        <translation>Ne peut pas redémarrer le client.</translation>
+        <translation>无法重启客户端.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
+        <translation>请关闭当前程序并重新启动.</translation>
     </message>
     <message>
         <source>Check for updates automatically</source>
-        <translation>Vérifier les MàJ automatiquement</translation>
+        <translation>自动检查更新</translation>
     </message>
     <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
-        <translation>Attention: Appliquer les mises à jour du système à la fin de la semaine n&apos;est pas recommandé.</translation>
+        <translation>注意:不推荐更新最后一周的应用系统</translation>
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation>Dernière Version:</translation>
+        <translation>最新版本:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation>Version Cible:</translation>
+        <translation>目标版本:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation>Mise à jour Terminée... 100%</translation>
+        <translation>升级结束... 100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
-        <translation>S.V.P. mettre à jour le client manuellement.</translation>
+        <translation>请手动更新客户端.</translation>
     </message>
     <message>
         <source>Please update the client manually using an installation package.</source>
-        <translation>S.V.P. mettre à jour le client manuellement en utilisant un paquet d&apos;installation.</translation>
+        <translation>请使用安装包手动更新客户端.</translation>
     </message>
     <message>
         <source>Update Succeeded.</source>
-        <translation>Mise à jour réussi.</translation>
+        <translation>升级成功</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Processus du lanceur n&apos;a pas été trouvé.</translation>
+        <translation>未发现启动过程.</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation>Mise à jour annulée</translation>
+        <translation>升级取消</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation>Échec mise à jour.</translation>
+        <translation>升级成功.</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation>Quelqu&apos;un a déjà commencé une MàJ.</translation>
+        <translation>已经开始更新。</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation>Problème de connexion Internet</translation>
+        <translation>网络连接问题</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
-        <translation>Aucune version disponible sur le serveur de mise à jour.</translation>
+        <translation>无可用版本在更新服务器上.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation>Impossible de démarrer la MàJ. Une MàJ pour un ou plusieurs serveurs n&apos;a pas été trouvée.</translation>
+        <translation>无法开始更新，未发现一个或多个服务器。</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation>Impossible de démarrer la MàJ. Une MàJ pour le client n&apos;a pas été trouvée.</translation>
+        <translation>无法开始更新，未发现客户端。</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
-        <translation>Ne peut pas extraire le fichier de mise à jour.</translation>
+        <translation>无法提取更新文件.</translation>
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation>Impossible de vérifier les MàJ depuis Internet.</translation>
+        <translation>不能通过互联网检查更新.</translation>
     </message>
     <message>
         <source>Available Update:</source>
-        <translation>Mise à jour disponible:</translation>
+        <translation>可用更新:</translation>
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation>Pour faire une MàJ manuelle, télécharger et utiliser le fichierdu lien suivant:</translation>
+        <translation>执行手动升级,从以下链接下载:</translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSignInfo</name>
     <message>
         <source>Analyzing: %1%</source>
-        <translation>Analyse: %1%</translation>
+        <translation>分析中: %1%</translation>
     </message>
     <message>
         <source>Invalid watermark</source>
-        <translation>Filigrane invalide</translation>
+        <translation>无效水印</translation>
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation>Filigrane introuvable</translation>
+        <translation>没有发现水印</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation>Le filigrane correspond</translation>
+        <translation>水印相配</translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
         <source>FPS value is too high</source>
-        <translation>Valeur IPS trop élevée</translation>
+        <translation>帧率太高</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>L&apos;IPS actuel dans la grille horaire est %1. L&apos;IPS à été diminuée au maximum de IPS caméra %2.</translation>
+        <translation>当前帧调度网格是%1。Fps已下降到最大的相机Fps的 %2。
+</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Pour le mouvement logiciel 2 IPS sont réservées pour le flux secondaire. L&apos;IPS actuel dans la grille horaire est %1. L&apos;IPS à été diminuée à %2.</translation>
+        <translation>软件移动侦测的2 fps是预留给次码流。当前帧调度网格是 %1 。Fps下降 %2 。</translation>
     </message>
     <message>
         <source>Invalid schedule</source>
-        <translation>Horaire Invalide</translation>
+        <translation>无效计划</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Flux secondaire désactivé sur cette caméra. L&apos;option Mouv.+Basse Qualité n&apos;a aucun effet. Appuyez sur &quot;Oui&quot; pour changer le type d&apos;enreg. à &quot;Toujours&quot; ou sur &quot;Non&quot; pour réactiver le flux secondaire.</translation>
+        <translation>次码流已禁用。运动+ LQ选项没有影响。按“是”更改录像类型为“总是”，或“不”重新启用次码流。</translation>
     </message>
     <message>
         <source>Confirm motion regions reset</source>
-        <translation>Confimer la réinitialisation des zones de mouvement</translation>
+        <translation>确认移动侦测区域重置</translation>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation>Êtes-vous sûr de vouloir réinitialiser les zones de mouvement par défaut?</translation>
+        <translation>请确认是否需要将移动侦测区域重置?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation>Cette action NE PEUT PAS être annulée!</translation>
+        <translation>事件动作无法执行.</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation>Matériel ( intégrée caméra)</translation>
+        <translation>硬件（摄像机内建）</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation>N&apos;enregistre pas sur mouvement</translation>
+        <translation>选择在摄像机上启用移动侦测</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>Paramètres %1</translation>
+        <extracomment>&quot;Camera Settings&quot; or &quot;IO Module settings&quot;, etc</extracomment>
+        <translation>%1 设置</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
     <message>
         <source>Auto</source>
-        <translation>Auto</translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>Invalid data</source>
-        <translation>Données invalides</translation>
+        <translation>无效数据</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -6477,51 +6506,47 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Unsecured</source>
-        <translation>Non sécurisé</translation>
+        <translation>不安全的</translation>
     </message>
     <message>
         <source>In Progress...</source>
-        <translation>En cours...</translation>
+        <translation>处理中...</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation>Succès</translation>
+        <translation>成功</translation>
     </message>
     <message>
         <source>Network Error</source>
-        <translation>Erreur Réseau</translation>
+        <translation>网络错误</translation>
     </message>
     <message>
         <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation>Impossible de faire le test. Aucun de vos serveurs n’est connecté à Internet.</translation>
+        <translation>不能执行此测试，服务器未连接到网络上。</translation>
     </message>
     <message>
         <source>Failed</source>
-        <translation>Échec</translation>
+        <translation>失败</translation>
     </message>
     <message>
         <source>Canceled</source>
-        <translation>Annulé</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation>Paramètres fournis invalides. Ne peut pas effectuer un test.</translation>
+        <translation>提供的参数是无效的. 无法执行测试.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation></translation>
+        <translation>超时</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation>Courriel invalide</translation>
+        <translation>邮箱无效</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>Aucun préréglage trouvé. Utiliser l&apos;option &apos;Avancée&apos;.</translation>
-    </message>
-    <message>
-        <source>Support email is not valid.</source>
-        <translation>Courriel support invalide.</translation>
+        <translation>无预置位信息,请使用“高级”选项</translation>
     </message>
 </context>
 <context>
@@ -6532,62 +6557,62 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Paused</source>
-        <translation>Pause</translation>
+        <translation>暂停</translation>
     </message>
 </context>
 <context>
     <name>QnStatusOverlayWidget</name>
     <message>
         <source>NO DATA</source>
-        <translation>AUCUNE DONNÉE</translation>
+        <translation>没有数据</translation>
     </message>
     <message>
         <source>NO SIGNAL</source>
-        <translation>AUCUN SIGNAL</translation>
+        <translation>没有信号</translation>
     </message>
     <message>
         <source>Unauthorized</source>
-        <translation>Non autorisé</translation>
+        <translation>未授权</translation>
     </message>
     <message>
         <source>Activate Video Wall license to remove this message</source>
-        <translation>Activer une licence Mur Vidéo pour enlever ce message</translation>
+        <translation>激活电视墙授权许可来删除此信息</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Chargement...</translation>
+        <translation>加载中...</translation>
     </message>
     <message>
         <source>Activate analog license to remove this message</source>
-        <translation>Activer une licence analogue pour enlever ce message</translation>
+        <translation>激活模拟许可来删除此信息</translation>
     </message>
     <message>
         <source>No video stream</source>
-        <translation>Aucun flux vidéo</translation>
+        <translation>无视频流</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation>Diagnostics...</translation>
+        <translation>诊断...</translation>
     </message>
     <message>
         <source>Enable</source>
-        <translation>Activer</translation>
+        <translation>启用</translation>
     </message>
     <message>
         <source>Activate license...</source>
-        <translation>Activer Licence...</translation>
+        <translation>激活授权...</translation>
     </message>
     <message>
         <source>Module is disabled</source>
-        <translation>Module désactivé</translation>
+        <translation>模块不可用</translation>
     </message>
     <message>
         <source>Server Offline</source>
-        <translation>Serveur hors ligne</translation>
+        <translation>服务器离线</translation>
     </message>
     <message>
         <source>Please check authentication information in %1 settings</source>
-        <translation>S.V.P. vérifier les informations d&apos;authentification dans les paramètres %1</translation>
+        <translation>请在 %1 设置中检查身份验证信息</translation>
     </message>
 </context>
 <context>
@@ -6601,280 +6626,280 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnStorageUrlDialog</name>
     <message>
         <source>Invalid Storage</source>
-        <translation>Stockage invalide</translation>
+        <translation>无效存储</translation>
     </message>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+        <translation>\\&lt;Computer 名称&gt;\&lt;文件夹&gt;</translation>
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation>Réseau de partage ressouce</translation>
+        <translation>Windows网络共享资源</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
-        <translation>Le système a un autre serveur(s) utilisant le même chemin de stockage en réseau. L&apos;enregistrement des données par plusieurs serveurs sur exactement le même endroit est pas recommandé.</translation>
+        <translation>系统已有其它服务器使用相同的网络存储路径，不建议录像数据被多存储服务器同时使用。</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
+        <translation>注意</translation>
     </message>
     <message>
         <source>Add storage</source>
-        <translation>Ajouter Stockage</translation>
+        <translation>添加存储设备</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation>Le chemin de stockage fourni ne définit pas un stockage externe valide.</translation>
+        <translation>提供的存储路径无法定义可用的外部存储空间。</translation>
     </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
         <source>System Administration</source>
-        <translation>Administration Système</translation>
+        <translation>系统管理</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>Général</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>Licenses</source>
-        <translation>Licences</translation>
+        <translation>授权许可</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation>Courriel</translation>
+        <translation>邮箱</translation>
     </message>
     <message>
         <source>Updates</source>
-        <translation>Mises à jour</translation>
+        <translation>升级</translation>
     </message>
     <message>
         <source>Routing Management</source>
-        <translation>Gestion Routage</translation>
+        <translation>路由管理</translation>
     </message>
     <message>
         <source>Time Synchronization</source>
-        <translation>Synchronisation de l&apos;Heure</translation>
+        <translation>时间同步</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Cannot cancel update at this state.</source>
-        <translation>Impossible d&apos;annuler la MàJ dans cet état.</translation>
+        <translation>不能取消升级.</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Informations</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>Update is in process now.</source>
-        <translation>MàJ présentement en cours.</translation>
+        <translation>升级正在进行.</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation>Usagers</translation>
+        <translation>用户</translation>
     </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable %1 and servers auto discovery</source>
-        <translation>Activer %1 et auto-découverte serveurs</translation>
+        <translation>允许%1 和服务器自动发现</translation>
     </message>
     <message>
         <source>Allow system to optimize %1 settings</source>
-        <translation>Autoriser le système à optimiser les paramètres %1</translation>
+        <translation>允许系统同步 %1 设置</translation>
     </message>
 </context>
 <context>
     <name>QnTimeServerSelectionModel</name>
     <message>
         <source>Server</source>
-        <translation>Serveur</translation>
+        <translation>服务器</translation>
     </message>
     <message>
         <source>Server Time</source>
-        <translation>Temps Serveur</translation>
+        <translation>服务器时间</translation>
     </message>
     <message>
         <source>Offset</source>
-        <translation></translation>
+        <translation>偏移</translation>
     </message>
     <message>
         <source>Synchronizing...</source>
-        <translation>Synchronisation...</translation>
+        <translation>同步中...</translation>
     </message>
 </context>
 <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
         <source>Time is taken from the Internet.</source>
-        <translation>L&apos;Heure est pris depuis Internet.</translation>
+        <translation>时间来自于网络.</translation>
     </message>
     <message>
         <source>Time is taken from %1.</source>
-        <translation>L&apos;Heure est pris depuis %1.</translation>
+        <translation>时间来自于 %1.</translation>
     </message>
 </context>
 <context>
     <name>QnTimeSlider</name>
     <message>
         <source>NO THUMBNAILS AVAILABLE</source>
-        <translation>AUCUNE VIGNETTE DISPONIBLE</translation>
+        <translation>无可用缩略图</translation>
     </message>
     <message>
         <source>auto</source>
         <comment>AM/PM usage based on user&apos;s system locale.</comment>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>auto</translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>毫秒</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>时</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>日</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>月</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>年</translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
         <comment>Format for displaying day caption in timeline&apos;s header.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
         <comment>Format for displaying month caption in timeline&apos;s header.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>yyyy</translation>
     </message>
 </context>
 <context>
     <name>QnTwoStepFileDialog</name>
     <message>
         <source>Folder:</source>
-        <translation>Dossier:</translation>
+        <translation>文件夹:</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>Parcourir...</translation>
+        <translation>浏览...</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation>Nom de fichier:</translation>
+        <translation>文件名称:</translation>
     </message>
     <message>
         <source>Format:</source>
-        <translation>Format:</translation>
+        <translation>格式:</translation>
     </message>
     <message>
         <source>Warning: file with same name already exists!</source>
-        <translation>Attention: Un fichier du même nom existe déjà!</translation>
+        <translation>注意: 已有相同名称已经存在!</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation>Options</translation>
+        <translation>选项</translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation>Sélectionner un dossier...</translation>
+        <translation>选择文件夹...</translation>
     </message>
     <message>
         <source>Select file...</source>
-        <translation>Sélectionner un fichier...</translation>
+        <translation>选择文件...</translation>
     </message>
 </context>
 <context>
     <name>QnUpdateDialog</name>
     <message>
         <source>Update Servers</source>
-        <translation>MàJ Serveurs</translation>
+        <translation>升级服务器</translation>
     </message>
 </context>
 <context>
@@ -6888,78 +6913,74 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnUserEmailPolicy</name>
     <message>
         <source>Select at least one user</source>
-        <translation>Sélectionner au moins un usager</translation>
+        <translation>选择至少一个用户</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid email address</source>
         <translation>
-            <numerusform>%n de %1 usager a un adresse courriel invalide</numerusform>
-            <numerusform>%n de %1 usagesr ont un adresse courriel invalide</numerusform>
+            <numerusform>%n 的 %1 用户无有效的邮箱地址users have invalid email address</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid email address %1</source>
-        <translation>Adresse courriel %1 invalide</translation>
+        <translation>无效的邮箱地址 %1</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 additional email addresses are invalid</source>
         <translation>
-            <numerusform>%n de %1 courriel additionnel est invalide</numerusform>
-            <numerusform>%n de %1 courriels additionnels sont invalides</numerusform>
+            <numerusform>%n 的 %1 其它邮箱地址无效</numerusform>
         </translation>
     </message>
     <message>
         <source>Send email to %1</source>
-        <translation>Envoyer courriel à %1</translation>
+        <translation>发送邮件至 %1</translation>
     </message>
     <message numerus="yes">
         <source>%n User(s)</source>
         <translation>
-            <numerusform>%n Usager</numerusform>
-            <numerusform>%n Usagers</numerusform>
+            <numerusform>%n 用户</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1, %n additional</source>
         <translation>
-            <numerusform>%1, %n additionnel</numerusform>
-            <numerusform>%1, %n additionnels</numerusform>
+            <numerusform>%1 用户, %n 其他</numerusform>
         </translation>
     </message>
     <message>
         <source>User %1 has invalid email address</source>
-        <translation>L&apos;usager %1 a une adresse courriel invalide</translation>
+        <translation>用户 %1 拥有无效的邮件地址</translation>
     </message>
 </context>
 <context>
     <name>QnUserListModel</name>
     <message>
         <source>LDAP user</source>
-        <translation>Usager LDAP</translation>
+        <translation>LDAP用户</translation>
     </message>
     <message>
         <source>Normal user</source>
-        <translation>Usager Normal</translation>
+        <translation>常规用户</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation>Activé</translation>
+        <translation>启用</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation>Désactivé</translation>
+        <translation>禁用</translation>
     </message>
     <message>
         <source>Edit user</source>
-        <translation>Modifier Usager</translation>
+        <translation>添加用户</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Nom</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <source>Permissions</source>
-        <translation>Autorisations</translation>
+        <translation>许可</translation>
     </message>
     <message>
         <source>LDAP</source>
@@ -6970,209 +6991,207 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnUserListModelPrivate</name>
     <message>
         <source>Owner</source>
-        <translation>Propriétaire</translation>
+        <translation>拥有者</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation>Administrateur</translation>
+        <translation>管理员</translation>
     </message>
     <message>
         <source>View live video</source>
-        <translation>Visualisation vidéo en direct</translation>
+        <translation>预览实时视频</translation>
     </message>
     <message>
         <source>Use PTZ controls</source>
-        <translation>Utiliser les contrôles PTZ</translation>
+        <translation>使用PTZ控制</translation>
     </message>
     <message>
         <source>View video archives</source>
-        <translation>Visualisation vidéo en archives</translation>
+        <translation>预览录像视频</translation>
     </message>
     <message>
         <source>Export video</source>
-        <translation>Exporter vidéo</translation>
+        <translation>导出视频</translation>
     </message>
     <message>
         <source>Edit Video Walls</source>
-        <translation>Modifier Mur Vidéo</translation>
+        <translation>编辑电视墙</translation>
     </message>
     <message>
         <source>Adjust %1 settings</source>
-        <translation>Ajuster paramètres %1</translation>
+        <translation>调整 %1 设置</translation>
     </message>
 </context>
 <context>
     <name>QnUserManagementWidget</name>
     <message>
         <source>LDAP Settings...</source>
-        <translation>Paramètres LDAP...</translation>
+        <translation>LDAP设置...</translation>
     </message>
     <message>
         <source>Filter...</source>
-        <translation>Filtre...</translation>
+        <translation>过滤器...</translation>
     </message>
     <message>
         <source>New User...</source>
-        <translation>Nouveau Usager...</translation>
+        <translation>新用户...</translation>
     </message>
     <message>
         <source>Fetch Users from LDAP...</source>
-        <translation>Cherche usagers depuis LDAP...</translation>
+        <translation>从LDAP获取用户...</translation>
     </message>
     <message>
         <source>Enable Selected</source>
-        <translation>Activer sélectionné</translation>
+        <translation>允许选择</translation>
     </message>
     <message>
         <source>Disable Selected</source>
-        <translation>Désactiver sélectionné</translation>
+        <translation>删除选择</translation>
     </message>
     <message>
         <source>Delete Selected</source>
-        <translation>Supprimer sélectionné</translation>
+        <translation>删除选择</translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation>Effacer la sélection</translation>
+        <translation>清除选择</translation>
     </message>
 </context>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
         <source>Viewer</source>
-        <translation>Visualisateur</translation>
+        <translation>操作员</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation>Administrateur</translation>
+        <translation>管理员</translation>
     </message>
     <message>
         <source>New Password</source>
-        <translation>Nouveau mot de passe</translation>
+        <translation>新密码</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation>Mot de passe</translation>
+        <translation>密码</translation>
     </message>
     <message>
         <source>Login cannot be empty.</source>
-        <translation>L’identifiant ne peut pas être vide.</translation>
+        <translation>登录名不能为空。</translation>
     </message>
     <message>
         <source>User with specified login already exists.</source>
-        <translation>Un usager avec l&apos;identifiant spécifié existe déjà.</translation>
+        <translation>指定登录的用户已经存在。</translation>
     </message>
     <message>
         <source>Invalid current password.</source>
-        <translation>Mot de passe actuel invalide.</translation>
+        <translation>当前密码无效。</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
-        <translation>Le mot de passe ne peut pas être vide.</translation>
-    </message>
-    <message>
-        <source>Passwords do not match.</source>
-        <translation>Le mot de passe ne correspond pas.</translation>
-    </message>
-    <message>
-        <source>Choose access rights.</source>
-        <translation>Choisissez les droits d&apos;accès.</translation>
-    </message>
-    <message>
-        <source>Owner</source>
-        <translation>Propriétaire</translation>
-    </message>
-    <message>
-        <source>Advanced Viewer</source>
-        <translation>Visualisateur avancé</translation>
-    </message>
-    <message>
-        <source>Live Viewer</source>
-        <translation>Visualisateur en direct</translation>
-    </message>
-    <message>
-        <source>Custom...</source>
-        <translation>Personnalisé...</translation>
-    </message>
-    <message>
-        <source>Can view video archives</source>
-        <translation>Peut visionner les archives vidéo</translation>
+        <translation>密码不能为空。</translation>
     </message>
     <message>
         <source>Can edit Video Walls</source>
-        <translation>Peut éditer Murs Vidéo</translation>
+        <translation>可编辑电视墙</translation>
+    </message>
+    <message>
+        <source>Passwords do not match.</source>
+        <translation>密码不匹配。</translation>
+    </message>
+    <message>
+        <source>Choose access rights.</source>
+        <translation>选择登录权限。</translation>
+    </message>
+    <message>
+        <source>Owner</source>
+        <translation>拥有者</translation>
+    </message>
+    <message>
+        <source>Advanced Viewer</source>
+        <translation>高级操作员</translation>
+    </message>
+    <message>
+        <source>Live Viewer</source>
+        <translation>实时操作员</translation>
+    </message>
+    <message>
+        <source>Custom...</source>
+        <translation>自定义...</translation>
+    </message>
+    <message>
+        <source>Can view video archives</source>
+        <translation>可以浏览存储视频</translation>
     </message>
     <message>
         <source>Can use PTZ controls</source>
-        <translation>Peut utiliser les contrôles PTZ</translation>
+        <translation>可以使用PTZ控制</translation>
     </message>
     <message>
         <source>Can export video</source>
-        <translation>Peut exporter le vidéo</translation>
+        <translation>可以输出视频</translation>
     </message>
     <message>
         <source>Invalid email address.</source>
-        <translation>Adresse courriel invalide.</translation>
+        <translation>无效邮箱地址。</translation>
     </message>
     <message>
         <source>To modify your password, please enter existing one.</source>
-        <translation>Pour modifier vôtre mot de passe, S.V.P. entrer celui existant.</translation>
+        <translation>修改密码，请输入密码.</translation>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation>Usager renommé. Mot de passe doit être MàJ.</translation>
+        <translation>用户重命名，密码需要更换。</translation>
     </message>
     <message>
         <source>Can adjust %1 settings</source>
-        <translation>Peut ajuster paramètres %1</translation>
+        <translation>调整%1 设置</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallItemWidget</name>
     <message>
         <source>Information</source>
-        <translation>Informations</translation>
+        <translation>信息</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallManageWidgetPrivate</name>
     <message>
         <source>Desktop %1</source>
-        <translation>Bureau %1</translation>
+        <translation>桌面 %1</translation>
     </message>
     <message>
         <source>Screen</source>
-        <translation>Écran</translation>
+        <translation>屏幕</translation>
     </message>
     <message>
         <source>Screen %1</source>
-        <translation>Écran %1</translation>
+        <translation>屏幕%1</translation>
     </message>
     <message>
         <source>New Item</source>
-        <translation></translation>
+        <translation>新选项</translation>
     </message>
     <message>
         <source>Delete Screen</source>
-        <translation>Supprimer Écran</translation>
+        <translation>删除屏幕</translation>
     </message>
     <message>
         <source>Are you sure you want to delete %1?</source>
-        <translation>Êtes-vous sûr que vous voulez supprimer %1?</translation>
+        <translation>是否确认删除 %1?</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>Pc %1</source>
-        <translation>PC %1</translation>
+        <translation>解码器 %1</translation>
     </message>
     <message numerus="yes">
         <source>Pc %1 - Screens %2</source>
-        <translatorcomment>Ask for %n ?</translatorcomment>
         <translation>
-            <numerusform>PC %1 - Écran %2</numerusform>
-            <numerusform>PC %1 - Écrans %2</numerusform>
+            <numerusform>解码器 %1 - 屏幕 %2</numerusform>
         </translation>
     </message>
 </context>
@@ -7180,22 +7199,22 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnVideowallSettingsDialog</name>
     <message>
         <source>Video Wall Settings</source>
-        <translation>Paramètres Mur Vidéo</translation>
+        <translation>电视墙设置</translation>
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation>Activer Mur Vidéo au démarrage Windows.</translation>
+        <translation>系统启动时开启电视墙.</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
-        <translation>Placer raccourci sur le bureau.</translation>
+        <translation>桌面显示快捷方式.</translation>
     </message>
 </context>
 <context>
     <name>QnVolumeSlider</name>
     <message>
         <source>Muted</source>
-        <translation>En sourdine</translation>
+        <translation>静音</translation>
     </message>
     <message>
         <source>%1%</source>
@@ -7206,386 +7225,363 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnWorkbenchActionHandler</name>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation>Images (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+        <translation>图片(*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
         <source>All files (*.*)</source>
-        <translation>Tous les fichiers (*.*)</translation>
+        <translation>所有文件(*.*)</translation>
     </message>
     <message>
         <source>All Supported (*.layout)</source>
-        <translation>Toutes supportées (*.mise en page)</translation>
+        <translation>所有支持的(*.视窗)</translation>
     </message>
     <message>
         <source>Layouts (*.layout)</source>
-        <translation>Mises en page (*.mise en page)</translation>
+        <translation>视窗(*.视窗)</translation>
     </message>
     <message>
         <source>Delete Files</source>
-        <translation>Supprimer les fichiers</translation>
+        <translation>删除文件</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
-            <numerusform>Etes-vous sûr de vouloir supprimer définitivement %n fichier?</numerusform>
-            <numerusform>Etes-vous sûr de vouloir supprimer définitivement %n fichiers?</numerusform>
+            <numerusform>确认要永久删除这%n个文件?</numerusform>
         </translation>
     </message>
     <message>
         <source>Remove Items</source>
-        <translation>Supprimer les objets</translation>
+        <translation>删除项目</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
-            <numerusform>Êtes-vous sûr de vouloir effacer %n objet de la mise en page?</numerusform>
-            <numerusform>Êtes-vous sûr de vouloir effacer %n objets de la mise en page?</numerusform>
+            <numerusform>确认要从视窗中删除这%n个项目?</numerusform>
         </translation>
     </message>
     <message>
         <source>User already exists.</source>
-        <translation>Usager existe déjà.</translation>
+        <translation>用户已存在.</translation>
     </message>
     <message>
         <source>Video Wall already exists</source>
-        <translation>Mur vidéo existe déjà</translation>
+        <translation>电视墙已存在</translation>
     </message>
     <message>
         <source>User with the same name already exists</source>
-        <translation>Usager avec le même nom existe déjà</translation>
+        <translation>用户已存在相同名称</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation>Renommer</translation>
+        <translation>重命名</translation>
     </message>
     <message>
         <source>Enter new name for the selected item:</source>
-        <translation>Entrer un nouveau nom pour les objets sélectionnés:</translation>
+        <translation>为选择的项目输入新名称:</translation>
     </message>
     <message>
         <source>Delete Resources</source>
-        <translation>Effacer les ressources</translation>
+        <translation>删除资源</translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
-            <numerusform>Êtes-vous sûr de vouloir effacer %n objet?</numerusform>
-            <numerusform>Êtes-vous sûr de vouloir effacer %n objets?</numerusform>
+            <numerusform>确认要删除这%n个项目?</numerusform>
         </translation>
     </message>
     <message>
         <source>User Settings</source>
-        <translation>Paramètres Usagers</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save changes made to the following %n resource(s).</source>
-        <translation>
-            <numerusform>Impossible d&apos;enregistrer les modifications apportées à %n ressource.</numerusform>
-            <numerusform>Impossible d&apos;enregistrer les modifications apportées à %n ressources.</numerusform>
-        </translation>
+        <translation>用户设置</translation>
     </message>
     <message>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation>Tous supportés (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+        <translation>所有支持的(*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-        <translation>Vidéo (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+        <translation>视频(*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
-        <translation>La période de temps sélectionnée est trop courte pour effectuer une recherche d&apos;aperçu. S&apos;il vous plait, sélectionner une période plus longue.</translation>
+        <translation>选择的时间范围太短，无法执行预览搜索，请选择一个较长的时间范围。</translation>
     </message>
     <message>
         <source>Preview Search for %1</source>
-        <translation>Recherche d&apos;aperçu pour %1</translation>
-    </message>
-    <message>
-        <source>Could not delete resource</source>
-        <translation>Impossible d&apos;effacer la ressource</translation>
+        <translation>预览搜索 %1</translation>
     </message>
     <message>
         <source>Layout is locked and cannot be changed.</source>
-        <translation>La mise en page est verrouillée et ne peut être changée.</translation>
+        <translation>视窗已被锁定无法修改。</translation>
     </message>
     <message>
         <source>Cannot add item</source>
-        <translation>Impossible d&apos;ajouter l&apos;objet</translation>
+        <translation>无法添加项目</translation>
     </message>
     <message>
         <source>Cannot add a local file to Multi-Video</source>
-        <translation>Impossible d&apos;ajouter le fichier locale au Multi-Viédo</translation>
+        <translation>无法添加本地文件成多视频</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
-        <translation>Incompatibilité de version</translation>
+        <translation>版本不匹配</translation>
     </message>
     <message>
         <source>Select folder...</source>
-        <translation>Sélectionner le dossier...</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items.</source>
-        <translation>
-            <numerusform>Impossible de sauvegarder %n objet suivant.</numerusform>
-            <numerusform>Impossible de sauvegarder les %n objets suivant.</numerusform>
-        </translation>
+        <translation>选择文件夹...</translation>
     </message>
     <message>
         <source>Update...</source>
-        <translation>Mise à jour...</translation>
+        <translation>更新...</translation>
     </message>
     <message>
         <source>Beta version %1</source>
-        <translation>Version Beta %1</translation>
+        <translation>测试版%1</translation>
     </message>
     <message>
         <source>They may be auto-discovered again after removing.</source>
-        <translation>Elles peuvent être &apos;auto-découvertes&apos; à nouveau après les avoirs enlevées.</translation>
+        <translation>摄像机移除后将被重新自动发现.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete them?</source>
-        <translation>Êtes-vous sûr que vous voulez les supprimer?</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. </source>
-        <translation>Une erreur est survenue en essayant de supprimer une ressource du Serveur. </translation>
-    </message>
-    <message>
-        <source>Error description: &apos;%1&apos;</source>
-        <translation>Description de l&apos;erreur:&apos;%1&apos;</translation>
+        <translation>请确定是否删除?</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
-        <translation>Ne peut pas redémarrer le client.</translation>
+        <translation>无法重启客户端.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
+        <translation>请关闭应用程序并重新打开.</translation>
     </message>
     <message>
         <source>Picture is too big. Maximum size is %1 Mb</source>
-        <translation>Picture is too big. Maximum size is %1 Mb</translation>
+        <translation>图片过大.最大尺寸为 %1 Mb</translation>
     </message>
     <message>
         <source>Error while uploading picture.</source>
-        <translation>Erreur lors de l&apos;envoi de l&apos;image.</translation>
+        <translation>更新图片时发生错误.</translation>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation>Quelques composantes du système ne sont pas à jour</translation>
+        <translation>部分系统组件未更新</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation>Client v%1</translation>
+        <translation>客户端 v%1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation>Server v%1 à %2</translation>
+        <translation>服务器 v%1 at %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation>Server v%1</translation>
+        <translation>服务器 v%1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation>S.V.P. faire les MàJ de toutes les composantes à la dernière version %1.</translation>
+        <translation>请升级到最新程序组件  %1.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation> Statstiques anonyme d&apos;usage</translation>
+        <translation>匿名使用的数据统计</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation>Le système envoie des statistiques d&apos;usage et &apos;crash&apos;aux développeurs du logiciel pour nous aider à améliorer l&apos;expérience utilisateur.
-Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le menu&apos;Paramètres Système&apos;.</translation>
+        <translation>系统向开发者发送匿名使用和异常统计来提升用户体验.
+此功能可在系统设置中开启和关闭.</translation>
     </message>
     <message>
         <source>New Layout</source>
-        <translation>Nouvelle mise en page</translation>
+        <translation>新视窗</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation>Nouvelle mise en page %1</translation>
+        <translation>新视窗%1</translation>
     </message>
     <message>
         <source>Open File</source>
-        <translation>Ouvrir un fichier</translation>
+        <translation>打开文件</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation>Ne peut pas effectuer une recherche d&apos;aperçu.</translation>
+        <translation>无法执行预览搜索.</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation>Processus en progression...</translation>
+        <translation>处理中...</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation>Mur Vidéo avec le même nom existe déjà.</translation>
+        <translation>电视墙名称已存在.</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation>Mise à jour du fond d&apos;écran...</translation>
+        <translation>更新背景...</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation>Le traitement de l&apos;image peut prendre beaucoup de temps. S.V.P, être patient.</translation>
+        <translation>图像处理需要很多时间。请耐心等待.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
-        <translation>Ceci est une version beta de %1.</translation>
+        <translation>测试版本 %1.</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Le processus du lanceur n&apos;a pas été trouvé.</translation>
-    </message>
-    <message>
-        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation>Ne peut pas déplacer %1 sur le serveur %2. Le Serveur ne répond pas.</translation>
-    </message>
-    <message>
-        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation>Serveur %1 est incapable de trouver and accèder ces %2. Etes-vous sûr que vous voulez les déplacer?</translation>
+        <translation>未发现启动过程.</translation>
     </message>
     <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Ajout de périphérique déjà en progression. Etes-vous sûr que vous voulez annuler le processus actuel?</translation>
-    </message>
-    <message>
-        <source>These %1 are auto-discovered.</source>
-        <translation>Ces %1 sont &apos;auto-découvert&apos;.</translation>
+        <translation>设备添加正在进行。确定要取消当前进程吗?</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
         <translation>
-            <numerusform>%n %1 est &apos;auto-découvert&apos;.</numerusform>
-            <numerusform>%n %1 sont &apos;auto-découvert&apos;.</numerusform>
+            <numerusform> %1 中 %n 是自动发现.</numerusform>
         </translation>
     </message>
     <message>
         <source>Do you really want to delete the following %1?</source>
-        <translation>Voulez-vous vraiment supprimer la %1 suivant ?</translation>
+        <translation>是否需要删除设备 %1?</translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n %1 to server %2. Server is unresponsive.</source>
+        <extracomment>&quot;Cannot move these 5 cameras to server &lt;server_name&gt;. Server is unresponsive.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n %2. Are you sure you would like to move them?</source>
+        <extracomment>&quot;Server &lt;server_name&gt; is unable to find and access these 5 cameras. Are you sure you would like to move them?&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n %1 are auto-discovered.</source>
+        <extracomment>&quot;These 5 cameras are auto-discovered.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Bookmark</source>
-        <translation>Signet</translation>
+        <translation>书签</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation>Êtes-vous sûr de vouloir effacer ce signet %1?</translation>
+        <translation>请确认是否需要删除书签 %1?</translation>
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation>Les signets peuvent seulement être ajoutés sur un serveur en ligne.</translation>
+        <translation>书签只能在线服务器上添加。</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation>Les signets peuvent seulement être édités sur un serveur en ligne.</translation>
+        <translation>书签只能在线服务器上编辑。</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation>Les signets peuvent seulement être supprimés sur un serveur en ligne.</translation>
+        <translation>书签只能在线服务器上删除。</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation>Confirmez la suppression</translation>
+        <translation>确认删除</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchConnectHandler</name>
     <message>
         <source>Connect to Another Server...</source>
-        <translation>Connecter à un autre Serveur...</translation>
+        <translation>连接到另一台服务器...</translation>
     </message>
     <message>
         <source>Could not connect to server. Closing in %1...</source>
-        <translation>Impossible de se connecter au Serveur. Fermeture dans %1...</translation>
+        <translation>无法连接到服务器，正在关闭%1...</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation>Connexion...</translation>
+        <translation>连接中...</translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation>Connexion au serveur...</translation>
+        <translation>连接到服务器...</translation>
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation>Ne peut pas se connecter ausServeur...</translation>
+        <translation>无法连接至服务器...</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
-    </message>
-    <message>
-        <source>Save Recording As...</source>
-        <translation>Sauvegarder la l&apos;enregistrement sous...</translation>
-    </message>
-    <message>
-        <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
+        <translation>注意</translation>
     </message>
     <message>
         <source>Recording in...%1</source>
-        <translation>Enregistrement dans... %1</translation>
+        <translation>录像在...%1</translation>
+    </message>
+    <message>
+        <source>Save Recording As...</source>
+        <translation>录像保存为...</translation>
+    </message>
+    <message>
+        <source>AVI (Audio/Video Interleaved) (*.avi)</source>
+        <translation>AVI (音频/视频交错) (*.avi)</translation>
     </message>
     <message>
         <source>Recorded Video</source>
-        <translation>Vidéo enregistrée</translation>
+        <translation>录像视频</translation>
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation>Impossible de démarrer l&apos;enregistrement en raison de l&apos;erreur suivante: %1</translation>
+        <translation>由于以下错误无法开始录像:%1</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation>Ne peut pas remplacer le fichier &apos;%1&apos;. S.V.P, essayez un autre nom.</translation>
+        <translation>无法覆盖文件&apos;%1&apos;,请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation>Appuyez sur n&apos;importe quelle touche pour arrêter le tour.</translation>
+        <translation>按任意键停止轮巡.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchExportHandler</name>
     <message>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation>Fichier Média %1 exécutable (x64) (*.exe)</translation>
+        <translation>可执行 %1 媒体文件 (x64) (*.exe)</translation>
     </message>
     <message>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation>Fichier Média %1 exécutable (x86) (*.exe)</translation>
+        <translation>可执行 %1 媒体文件 (x86) (*.exe)</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation>Ne peut pas remplacer le fichier</translation>
+        <translation>无法覆盖文件</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
-        <translation>Exportation de la mise en page</translation>
+        <translation>导出视窗</translation>
     </message>
     <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translatorcomment>There&apos;s no need for a Singular if you need one items</translatorcomment>
         <translation>
-            <numerusform>Exactement un objet doit être sélectionné pour l&apos;exportation, mais %n objets sont actuellement sélectionnés.</numerusform>
-            <numerusform>Exactement un objet doit être sélectionné pour l&apos;exportation, mais %n objets sont actuellement sélectionnés.</numerusform>
+            <numerusform>仅能选择一个项目导出，但目前已选择了%n个项目。</numerusform>
         </translation>
     </message>
     <message>
@@ -7598,303 +7594,298 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Export Video As...</source>
-        <translation>Exporter la vidéo sous...</translation>
+        <translation>导出视频为...</translation>
     </message>
     <message>
         <source>Timestamps:</source>
-        <translation>Horodatage:</translation>
+        <translation>时间戳:</translation>
     </message>
     <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
-        <translation>Mise en page actuelle contient des fichiers locaux. Fichiers locaux ne sont pas autorisés pour l&apos;exportation Multi-Vidéo.</translation>
+        <translation>当前视图包含本地文件，本地文件不允许多个视频导出。</translation>
     </message>
     <message>
         <source>AVI format is not recommended</source>
-        <translation>Le format AVI n&apos;est pas recommandé</translation>
+        <translation>不建议AVI格式</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation>Enregistrer sous</translation>
+        <translation>另存为</translation>
     </message>
     <message>
         <source>Exporting Video</source>
-        <translation>Exportation vidéo</translation>
+        <translation>导出视频</translation>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation>Exportation vers &quot;%1&quot;...</translation>
+        <translation>导出至 &quot;%1&quot;...</translation>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation>La mise en page actuelle contient des fichiers d&apos;image. Les images ne sont pas autorisées pour une exportation Multi-Vidéo.</translation>
+        <translation>当前的视窗包含图像文件，图像不能作为多视频导出。</translation>
     </message>
     <message>
         <source>Export Layout As...</source>
-        <translation>Exporter la mise en page sous...</translation>
+        <translation>导出视窗为...</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation>Fichier &apos;%1 &apos;est déjà utilisé par l&apos;enregistrement. S.V.P, essayez un autre nom.</translation>
+        <translation>文件&apos;%1&apos;正在被录像使用，请尝试另一个名称。</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus.S.V.P, essayez un autre nom.</translation>
+        <translation>文件&apos;%1&apos;正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
     <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
-        <translation>Le format AVI n&apos;est pas recommandé pour l&apos;exportation d&apos;enregistrement &apos;non continu&apos; quand la piste audio est présente. Voulez-vous continuer?</translation>
+        <translation>不推荐带音频的摄像机使用AVI格式，将存在不连续记录?点击&apos;是&apos;导出或&apos;否&apos;选择其他格式.是否继续?</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>Le fichier %1 existe déjà. Voulez-vous le remplacer?</translation>
+        <translation>文件&apos;%1&apos;已经存在，是否需要覆盖?</translation>
     </message>
     <message>
         <source>%1 Media File (*.nov)</source>
-        <translation>%1 Fichier Média (*.nov)</translation>
+        <translation>%1 媒体文件(*.nov)</translation>
     </message>
     <message>
         <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation>Vous êtes sur le point d&apos;exporter une séquence vidéo plus longue que 30 minutes.</translation>
+        <translation>将导出超过30分钟的录像.</translation>
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
-        <translation>Plus de 1Go d&apos;espace disque peut être requis et selon la vitesse de votre connexion, cela peut prendre plusieurs minutes à compléter.</translation>
+        <translation>当前操作需要GB的硬盘空间,根据连接速度，有可能需要更多的时间完成.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
-        <translation>Voulez-vous continuer?</translation>
+        <translation>是否需要继续?</translation>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation>Vous êtes sur le point d&apos;exporter plusieurs séquences vidéos avec un total plus long que 30 minutes.</translation>
+        <translation>将导出的录像片长超过30分钟.</translation>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation>Appliquer Filtres: Rotation, Dérouler, Amélioration d&apos;image, Aspect Personnalisé (requiers transcodes)</translation>
+        <translation>应用过滤器:旋转、图像矫正、图像增强、自定义宽高比(需转码)</translation>
     </message>
     <message>
         <source>exported</source>
-        <translation>Exporté</translation>
+        <translation>导出</translation>
     </message>
     <message>
         <source>File is in use.</source>
-        <translation>Fichier en utilisation.</translation>
+        <translation>文件使用中.</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
-        <translation>Ne peut pas exporter le fichier.</translation>
+        <translation>无法导出文件.</translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation>Attention!</translation>
+        <translation>注意!</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation>Aucun Horodatage</translation>
+        <translation>无时间戳</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation>Coin supérieur gauche (Transcodage nécessaire)</translation>
+        <translation>左上角((需转码)</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation>Coin supérieur droit (Transcodage nécessaire)</translation>
+        <translation>右上角((需转码)</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation>Coin inférieur gauche (Transcodage nécessaire)</translation>
+        <translation>左下角((需转码)</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation>Coin inférieur droit (Transcodage nécessaire)</translation>
+        <translation>右下角((需转码)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation>Vous êtes sur le point d&apos;exporter une vidéo avec filtres qui requière un transcodage. Le transcodage peut prendre beaucoup de temps. Voulez-vous continuer ?</translation>
+        <translation>导出的视频需转码，转码可能需要一点时间,是否继续?</translation>
     </message>
     <message>
         <source>Export Complete</source>
-        <translation>Exportation Terminé</translation>
+        <translation>导出完成</translation>
     </message>
     <message>
         <source>Export Successful</source>
-        <translation>Exporter avec Succès</translation>
+        <translation>导出成功</translation>
     </message>
     <message>
         <source>Unable to export layout.</source>
-        <translation>Ne peut pas exporter la mise en page.</translation>
+        <translation>无法导出视图.</translation>
     </message>
     <message>
         <source>Unable to save layout.</source>
-        <translation>Ne peut pas sauvegader la mise en page.</translation>
+        <translation>无法保存视图.</translation>
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation>Sauvegarder la mise en page locale sous...</translation>
+        <translation>保存本地视窗为...</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation>Faire un fichier en lecture seulement.</translation>
+        <translation>设置文件为只读.</translation>
     </message>
     <message>
         <source>Export Successful.</source>
-        <translation>Exporter avec Succès.</translation>
+        <translation>导出成功.</translation>
     </message>
     <message>
         <source>Unable to export video.</source>
-        <translation>Ne peut pas exporter la vidéo.</translation>
+        <translation>无法导出视频.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Enter Password...</source>
-        <translation>Entrer mot de passe...</translation>
+        <translation>输入密码...</translation>
     </message>
     <message>
         <source>Administrator Password</source>
-        <translation>Mot de passe Administrateur</translation>
+        <translation>管理员密码</translation>
     </message>
     <message>
         <source>Password cannot be empty!</source>
-        <translation>Mot de passe ne peut pas être vide!</translation>
+        <translation>密码不能为空!</translation>
     </message>
     <message>
         <source>Connecting to the current system...</source>
-        <translation>Connexion sur le système actuel...</translation>
+        <translation>正在连接到当前系统...</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Informations</translation>
+        <translation>信息</translation>
     </message>
     <message>
         <source>Could not configure the selected servers.</source>
-        <translation>Impossible de configurer les serveurs sélectionnés.</translation>
+        <translation>无法配置所需服务器。</translation>
     </message>
     <message>
         <source>Authentication failed.</source>
-        <translation>Échec d&apos;Authentification.</translation>
+        <translation>身份验证失败.</translation>
     </message>
     <message>
         <source>Please, check the password you have entered.</source>
-        <translation>S.V.P., vérifier le mot de passe que vous avez entré.</translation>
+        <translation>请确定输入的密码是否正确.</translation>
     </message>
     <message>
         <source>Could not update the selected servers.</source>
-        <translation>Ne peut pas faire la MàJ des serveurs sélectionnées.</translation>
+        <translation>无法更新所选服务器.</translation>
     </message>
     <message>
         <source>You can try to update the servers again in the System Administration.</source>
-        <translation>Vous pouvez essayer de faire la MàJ serveur à nouveau dans l&apos;Administration Système.</translation>
+        <translation>正在更新服务器系统管理.</translation>
     </message>
     <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation>Attention: Vous êtes sur le point de fusionner avec les systèmes de licences&apos;DÉMARRAGE&apos;
-Comme seulement une licence de &apos;DÉMARRAGE&apos; par système est autorisé après fusion, vous aurez seulement une licence de &apos;DÉMARRAGE restante.
-Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusionner pour continuer.
+        <translation>注意:合并系统许可将开始.
+若您已知晓并希望进行联网合并，请继续.
 </translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Attention</translation>
+        <translation>注意</translation>
     </message>
     <message>
         <source>Merge</source>
-        <translation>Fusionner</translation>
+        <translation>联网</translation>
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation>S.V.P. pattienter. Les serveurs demandés seront ajoutés à votre système.</translation>
+        <translation>请等待先前请求的服务器被添加到系统中.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation>Réjouissez-vous! Les serveurs sélectionnés ont été connectés à votre système avec succès!</translation>
+        <translation>选定的服务器已成功连接到您的系统!</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
     <message>
         <source>Save Layout As</source>
-        <translation>Sauvegarder la mise en page sous</translation>
+        <translation>另存视窗为</translation>
     </message>
     <message>
         <source>Close Layouts</source>
-        <translation>Fermer les mises en page</translation>
+        <translation>关闭视窗</translation>
     </message>
     <message numerus="yes">
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
         <translation>
-            <numerusform>%n mise en page n&apos;a pas été sauvegardée. Voulez-vous la sauvegarder?</numerusform>
-            <numerusform>%n mises en page n&apos;ont pas été sauvegardées. Voulez-vous les sauvegarder?</numerusform>
+            <numerusform>以下%n个视窗没有保存，需保存吗?</numerusform>
         </translation>
     </message>
     <message>
         <source>Saving Layouts</source>
-        <translation>Sauvegarde de la mise en page</translation>
+        <translation>保存视窗</translation>
     </message>
     <message numerus="yes">
         <source>The following %n layout(s) are being saved.</source>
         <translation>
-            <numerusform>%n mise en page est enregistrée.</numerusform>
-            <numerusform>%n mises en page ont enregistrées.</numerusform>
+            <numerusform>以下%n个正在保存。</numerusform>
         </translation>
     </message>
     <message>
         <source>Please wait.</source>
-        <translation>Patientez s’il vous plait.</translation>
+        <translation>请稍候。</translation>
     </message>
     <message>
         <source>New Layout</source>
-        <translation>Nouvelle mise en page</translation>
+        <translation>新视窗</translation>
     </message>
     <message>
         <source>Enter the name of the layout to create:</source>
-        <translation>Entrer le nom de la mise en page à créer:</translation>
+        <translation>输入创建的视窗名称:</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Server.</source>
         <translation>
-            <numerusform>Impossible de sauvegarder %n mise en page sur Serveur.</numerusform>
-            <numerusform>Impossible de sauvegarder %n mises en page sur Serveur.</numerusform>
+            <numerusform>无法保存以下 %n 视窗。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
         <translation>
-            <numerusform>Voulez-vous restaurer %n mise en page?</numerusform>
-            <numerusform>Voulez-vous restaurer %n mises en page?</numerusform>
+            <numerusform>要还原这%n个视窗吗?</numerusform>
         </translation>
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation>Mise en page existe déjà.</translation>
+        <translation>视窗已经存在.</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation>Mise en page avec le même nom existe déjà et vous n&apos;avez pas les droits pour la remplacer.</translation>
+        <translation>相同名称的视窗已经存在，无法进行覆盖。</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation>Entrez le nom de la mise en page:</translation>
+        <translation>输入视窗名称:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation>Mise en page avec le même nom existe déjà. Voulez-vous la remplacer?</translation>
+        <translation>相同名称的视窗已经存在。要覆盖吗?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation>Nouvelle mise en page %1</translation>
+        <translation>新视窗%1</translation>
     </message>
 </context>
 <context>
@@ -7902,381 +7893,414 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>mm:ss</translation>
     </message>
     <message>
         <source>yyyy MMM dd</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <translation>yyyy MMM dd</translation>
     </message>
     <message>
         <source>Live</source>
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
-        <translation>Direct</translation>
+        <translation>实时</translation>
     </message>
     <message>
         <source>All %1</source>
-        <translation>Toutes %1</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
+        <translation>PTZ_校准_%1.jpg</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Une erreur est survenue en essayant d&apos;obtenir la position depuis la caméra %1.</translation>
+        <translation>获取摄像机 %1当前位置时发生错误.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
-        <translation>S.V.P. attendez que la caméra soit en ligne.</translation>
+        <translation>请等待摄像机上线.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Une erreur est survenue en essayant de régler la position de la caméra %1.</translation>
+        <translation>设置摄像机 %1 当前位置时发生错误.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation>Ne peut pas obtenir la position depuis la caméra.</translation>
+        <translation>无法从摄像机获取预置位.</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation>Ne peut pas définir la position pour caméra.</translation>
+        <translation>无法给摄像机设置位置.</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
-        <translation>Ne peut pas définir la position de caméra.</translation>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchResourcesChangesWatcher</name>
+    <message>
+        <source>The system is in Safe Mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not allowed to make any changes except license activation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following %n items are not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not save the following %n items to Server.</source>
+        <translation type="unfinished">
+            <numerusform>不能将 %n 项保存到服务器。</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">错误</translation>
+    </message>
+    <message>
+        <source>The following %n items are not deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not delete the following %n items from Server.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchSafeModeWatcher</name>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
         <source>PNG Image (*.png)</source>
-        <translation>Image PNG (*.png)</translation>
+        <translation>PNG图片(*.png)</translation>
     </message>
     <message>
         <source>Save Screenshot As...</source>
-        <translation>Sauvegarder la capture d&apos;écran sous...</translation>
+        <translation>保存屏幕截屏为...</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation>Enregistrer sous</translation>
+        <translation>另存为</translation>
     </message>
     <message>
         <source>JPEG Image (*.jpg)</source>
-        <translation>Image JPEG (*.jpg)</translation>
+        <translation>JPEG图片(*.jpg)</translation>
     </message>
     <message>
         <source>Timestamp:</source>
-        <translation>Horodatage:</translation>
+        <translation>时间戳:</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>Le fichier %1 existe déjà. Voulez-vous le remplacer?</translation>
+        <translation>文件&apos;%1&apos;已经存在，要覆盖吗?</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus.S.V.P, entrer un autre nom.</translation>
+        <translation>文件&apos;%1&apos;正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Saving %1</source>
-        <translation>Sauvegarde %1</translation>
+        <translation>保存 %1</translation>
     </message>
     <message>
         <source>Saving Screenshot...</source>
-        <translation>Sauvegarde capture d&apos;écran...</translation>
+        <translation>保存截图...</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation>Aucun Horodatage</translation>
+        <translation>无时间戳</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation>Coin supérieur gauche</translation>
+        <translation>左上方</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation>Coin supérieur droit</translation>
+        <translation>右上方</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation>Coin inférieur gauche</translation>
+        <translation>左下方</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation>Coin inférieur droit</translation>
+        <translation>右下方</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation>Impossible de remplacer le fichier.</translation>
+        <translation>无法覆盖文件.</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation>Impossible de sauvegarder la caputre d&apos;écran.</translation>
+        <translation>无法保存截屏.</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation>Erreur lors de la sauvegarde de la capture d&apos;écran &apos;%1&apos;.</translation>
+        <translation>保存截图&apos;%1&apos;时发生错误.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
         <source>Would you like to update?</source>
-        <translation>Voulez-vous mettre a jour ?</translation>
+        <translation>是否需要升级?</translation>
     </message>
     <message>
         <source>Major issues have been fixed.</source>
-        <translation>Principaux problèmes ont été corrigés.</translation>
+        <translation>问题已解决。</translation>
     </message>
     <message>
         <source>Update is strongly recommended.</source>
-        <translation>Mise à jour fortement recommandée.</translation>
+        <translation>强烈推荐更新。</translation>
     </message>
     <message>
         <source>Release Notes</source>
-        <translation>Notes de Version</translation>
+        <translation>更新日志</translation>
     </message>
     <message>
         <source>Please update %1 Client.</source>
-        <translation>S.V.P. faites la MàJ Client %1.</translation>
+        <translation>请更新客户端 %1.</translation>
     </message>
     <message>
         <source>New version %1 is available.</source>
-        <translation>Nouvelle version %1 disponible.</translation>
+        <translation>可用新版本%1.</translation>
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation>Nouvelle version disponible.</translation>
+        <translation>有可用的更新版本.</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation>MàJ recommandé.</translation>
+        <translation>建议更新.</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation>Ne pas notifier à nouveau sur cette mise à jour.</translation>
+        <translation>不再提醒此更新.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Switch to Video Wall Mode...</source>
-        <translation>Changer sur mode Mur Vidéo...</translation>
+        <translation>切换至电视墙模式...</translation>
     </message>
     <message>
         <source>Could not start Video Wall control session.</source>
-        <translation>Impossible de démarrer la session contrôle Mur Vidéo.</translation>
+        <translation>无法启动电视墙控制任务.</translation>
     </message>
     <message>
         <source>Video Wall</source>
-        <translation>Mur Vidéo</translation>
+        <translation>电视墙</translation>
     </message>
     <message>
         <source>Video Wall %1</source>
-        <translation>Mur Vidéo %1</translation>
+        <translation>电视墙 %1</translation>
     </message>
     <message>
         <source>New Video Wall...</source>
-        <translation>Nouveau Mur Vidéo...</translation>
+        <translation>新电视墙...</translation>
     </message>
     <message>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation>Entrer le nom du Mur Vidéo à créer:</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items to Server.</source>
-        <translation>
-            <numerusform>Impossible d&apos;enregistrer %n objet  au serveur.</numerusform>
-            <numerusform>Impossible d&apos;enregistrer les %n objets au serveur.</numerusform>
-        </translation>
+        <translation>输入创建的电视墙名称:</translation>
     </message>
     <message>
         <source>Delete Items</source>
-        <translation>Supprimer Objet</translation>
+        <translation>删除项</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
-            <numerusform>Etes-vous sûr de vouloir supprimer définitivement %n objet?</numerusform>
-            <numerusform>Etes-vous sûr de vouloir supprimer définitivement %n objets?</numerusform>
+            <numerusform>是否需要永久删除 %n 项?</numerusform>
         </translation>
     </message>
     <message>
         <source>Could not start Video Wall.</source>
-        <translation>Impossible de démarrer le Mur Vidéo.</translation>
+        <translation>开始电视墙失败.</translation>
     </message>
     <message>
         <source>Confirm Video Wall stop</source>
-        <translation>Confirmer l&apos;arrêt du Mur Vidéo</translation>
+        <translation>确认停止电视墙</translation>
     </message>
     <message>
         <source>New Matrix %1</source>
-        <translation>Nouvelle Matrice %1</translation>
+        <translation>新矩阵%1</translation>
     </message>
     <message>
         <source>Invalid matrix</source>
-        <translation>Matrice invalide</translation>
+        <translation>无效矩阵</translation>
     </message>
     <message>
         <source>You have no layouts on the screens. Matrix cannot be saved.</source>
-        <translation>Vous n&apos;avez aucune mise en pages sur vos écrans. Matrice ne peux pas être sauvegardée.</translation>
+        <translation>屏幕上没有视窗，矩阵无法保存。</translation>
     </message>
     <message>
         <source>Delete Matrices</source>
-        <translation>Supprimer Matrices</translation>
+        <translation>删除矩阵</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n matrices?</source>
         <translation>
-            <numerusform>Ëtes-vous sûr de vouloir supprimer définitivement %n matrice ?</numerusform>
-            <numerusform>Ëtes-vous sûr de vouloir supprimer définitivement ces %n matrices ?</numerusform>
+            <numerusform>是否需要永久删除 %n 矩阵?</numerusform>
         </translation>
     </message>
     <message>
         <source>Could not start control session.</source>
-        <translation>Ne peut pas démarrer la session contrôle.</translation>
+        <translation>无法启动控制会话.</translation>
     </message>
     <message>
         <source>Another user is already controlling this screen.</source>
-        <translation>Un autre usager contrôle déjà cet écran.</translation>
+        <translation>当前屏幕正被其它用户控制.</translation>
     </message>
     <message>
         <source>Are you sure you want to stop the Video Wall?</source>
-        <translation>Êtes-vous sûr que vous voulez arrêter le mur vidéo?</translation>
+        <translation>是否需要关闭电视墙?</translation>
     </message>
     <message>
         <source>You&apos;ll have to start it manually.</source>
-        <translation>Vous devrez le démarrer manuellement.</translation>
+        <translation>将需要手动重启.</translation>
     </message>
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation>Écran %1</translation>
+        <translation>%1&apos;屏幕</translation>
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation>Session de contrôle déjà en fonction.</translation>
+        <translation>控制任务正在进行.</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation>Erreur inattendue s&apos;est produite. Impossible d&apos;appliquer les changements.</translation>
+        <translation>未知错误发生，无法保存修改内容.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation>Il n&apos;y a aucun objet mur vidéo hors ligne lié à ce PC.</translation>
+        <translation>无离线电视墙添加到此计算机。</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation>Mur vidéo va être démarré. Voulez-vous fermer cette %1 instance client?</translation>
+        <translation>电视墙将重启，是否需要关闭%1 客户端?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
-        <translation>Licences additionnelles requises.</translation>
+        <translation>需要额外的授权许可.</translation>
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation>Pour utiliser cette fonction, S.V.P. activer au moins une licence Mur Vidéo.</translation>
+        <translation>需要使用此功能，请激活至少一个电视墙授权.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation>Pour utiliser ce mur vidéo, S.V.P. activer au moins une licence Mur Vidéo.</translation>
+        <translation>需要使用此功能，请激活至少一个电视墙授权.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation>Mur vidéo existe déjà.</translation>
+        <translation>电视墙已存在.</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation>Mur Vidéo avec le même nom existe déjà.</translation>
+        <translation>相同名称的电视墙已存在.</translation>
     </message>
     <message>
         <source>%n items</source>
-        <translation>%n Objets</translation>
+        <translation>%n 项</translation>
     </message>
 </context>
 <context>
     <name>ReconnectInfoDialog</name>
     <message>
         <source>Reconnecting...</source>
-        <translation>Reconnexion...</translation>
+        <translation>重连中...</translation>
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation>S.V.P. attendre que la connexion soit restaurée...</translation>
+        <translation>正在恢复连接，请稍候...</translation>
     </message>
 </context>
 <context>
     <name>RecordingBusinessActionWidget</name>
     <message>
         <source>Quality:</source>
-        <translation>Qualité:</translation>
+        <translation>质量:</translation>
     </message>
     <message>
         <source>FPS</source>
-        <translation>IPS</translation>
+        <translation>每秒帧数</translation>
     </message>
     <message>
         <source>s</source>
-        <translation>s</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>max</source>
-        <translation>max</translation>
+        <translation>最大</translation>
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation>Pré-Enregistrement:</translation>
+        <translation>事前录像:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation>Post-Enregistrement:</translation>
+        <translation>事后录像:</translation>
     </message>
 </context>
 <context>
     <name>RecordingSettings</name>
     <message>
         <source>Video Recording</source>
-        <translation>Enregistrement Vidéo</translation>
+        <translation>视频录像</translation>
     </message>
     <message>
         <source>Capture Mode</source>
-        <translation>Mode de capture</translation>
+        <translation>截取模式</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation>Plein Écran</translation>
+        <translation>全屏</translation>
     </message>
     <message>
         <source>Application Window</source>
-        <translation>Fenêtre d&apos;application</translation>
+        <translation>应用程序窗口</translation>
     </message>
     <message>
         <source>Disable Aero</source>
-        <translation>Désactiver Aero</translation>
+        <translation>禁用Aero</translation>
     </message>
     <message>
         <source>Quality</source>
-        <translation>Qualité</translation>
+        <translation>质量</translation>
     </message>
     <message>
         <source>Resolution:</source>
-        <translation>Résolution:</translation>
+        <translation>分辨率:</translation>
     </message>
     <message>
         <source>Native</source>
-        <translation>Native</translation>
+        <translation>原始的</translation>
     </message>
     <message>
         <source>1920x1080</source>
@@ -8296,68 +8320,66 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Best</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>Meilleur</translation>
+        <translation>最佳</translation>
     </message>
     <message>
         <source>Performance</source>
-        <translation>Performance</translation>
+        <translation>性能</translation>
     </message>
     <message>
         <source>None</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>Aucun</translation>
+        <translation>无</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
-        <translation>&amp;Parcourir...</translation>
+        <translation>&amp;浏览...</translation>
     </message>
     <message>
         <source>Capture Cursor</source>
-        <translation>Curseur de capture</translation>
+        <translation>获取鼠标</translation>
     </message>
     <message>
         <source>Recording Quality:</source>
-        <translation>Qualité d&apos;enregistrement:</translation>
+        <translation>录像质量:</translation>
     </message>
     <message>
         <source>Average</source>
-        <translation>Moyenne</translation>
+        <translation>平均</translation>
     </message>
     <message>
         <source>Primary Device:</source>
-        <translation>Périphérique primaire:</translation>
+        <translation>主设备:</translation>
     </message>
     <message>
         <source>External Device:</source>
-        <translation>Périphérique externe:</translation>
+        <translation>外部设备:</translation>
     </message>
     <message>
         <source>Temporary Folder</source>
-        <translation>Dossier Temporaire</translation>
+        <translation>临时文件夹</translation>
     </message>
     <message>
         <source>Additional Options</source>
-        <translation>Options additionnelles</translation>
+        <translation>其他选项</translation>
     </message>
     <message>
         <source>Quarter Native</source>
-        <translation>Quart natif</translation>
+        <translation>四分之一原始画面</translation>
     </message>
     <message>
         <source>Audio Grabber</source>
-        <translation>Capture Audio</translation>
+        <translation>音频采集</translation>
     </message>
     <message>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation>Un ordinateur puissant est recommandé pour la meilleur qualité et résolution.</translation>
+        <translation>高配置计算机建议使用最好画质和分辨率.</translation>
     </message>
 </context>
 <context>
     <name>RecordingStatisticsWidget</name>
     <message>
         <source>Refresh</source>
-        <translation>Actualiser</translation>
+        <translation>刷新</translation>
     </message>
     <message>
         <source>10 Tb</source>
@@ -8365,7 +8387,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Forecast for full storage(s) usage</source>
-        <translation>Prévision pour l&apos;utilisation complète du stockage</translation>
+        <translation>预测完全存储使用率</translation>
     </message>
     <message>
         <source>0 Tb</source>
@@ -8373,7 +8395,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Additional storage:</source>
-        <translation>Stockage additionnelle:</translation>
+        <translation>附加存储设备:</translation>
     </message>
     <message>
         <source>1000 Tb</source>
@@ -8393,30 +8415,30 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Current usage</source>
-        <translation>Utilisation actuel</translation>
+        <translation>当前使用</translation>
     </message>
     <message>
         <source>Forecast</source>
-        <translation>Prévision</translation>
+        <translation>预测</translation>
     </message>
     <message>
         <source>Servers is offline. Statistics is not available.</source>
-        <translation>Serveurs Hors Ligne. Statistiques non disponible.</translation>
+        <translation>服务器离线，数据统计不可用.</translation>
     </message>
 </context>
 <context>
     <name>ResourceBrowserWidget</name>
     <message>
         <source>Resources</source>
-        <translation>Ressources</translation>
+        <translation>资源</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation>Recherche</translation>
+        <translation>搜索</translation>
     </message>
     <message>
         <source>Reset Filter</source>
-        <translation>Réinitialiser le filtre</translation>
+        <translation>重置过滤器</translation>
     </message>
     <message>
         <source>X</source>
@@ -8427,55 +8449,48 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>ResourceListDialog</name>
     <message>
         <source>Never suggest saving layouts</source>
-        <translation>Ne pas suggérer la sauvegarde de mise en page</translation>
+        <translation>不再提示保存视窗</translation>
     </message>
 </context>
 <context>
     <name>SayTextBusinessActionWidget</name>
     <message>
         <source>Speak the following:</source>
-        <translation>Dire ce qui suit:</translation>
+        <translation>广播以下内容:</translation>
     </message>
     <message>
         <source>Type any text here</source>
-        <translation>Entrez n’importe quel texte ici</translation>
+        <translation>键入任何文字在这里</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>Volume:</translation>
+        <translation>音量:</translation>
     </message>
     <message>
         <source>Test...</source>
-        <translation>Test...</translation>
+        <translation>测试...</translation>
     </message>
 </context>
 <context>
     <name>SendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
-        <translation>&amp;Destinataires supplémentaires:</translation>
+        <translation>&amp;其它收件人:</translation>
     </message>
     <message>
         <source>&amp;Global Email Settings...</source>
-        <translation>&amp;Paramètres de courriel globaux...</translation>
-    </message>
-</context>
-<context>
-    <name>ServerSettingsDialog</name>
-    <message>
-        <source>Server Settings</source>
-        <translation>Paramètres Serveur</translation>
+        <translation>&amp;全局邮件设定...</translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
-        <translation>Nom:</translation>
+        <translation>名称:</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation>L&apos;adresse IP:</translation>
+        <translation>IP地址:</translation>
     </message>
     <message>
         <source>Ping</source>
@@ -8483,7 +8498,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Port:</source>
-        <translation>Port:</translation>
+        <translation>端口:</translation>
     </message>
     <message>
         <source>9000</source>
@@ -8491,127 +8506,131 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Failover</source>
-        <translation>Basculement de secours</translation>
+        <translation>服务器冗余</translation>
     </message>
     <message>
         <source>Storages</source>
-        <translation>Stockages</translation>
+        <translation>存储空间</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation>En utilisation</translation>
+        <translation>使用中</translation>
     </message>
     <message>
         <source>Protocol</source>
-        <translation>Protocole</translation>
+        <translation>协议</translation>
     </message>
     <message>
         <source>Path</source>
-        <translation>Chemin</translation>
+        <translation>路径</translation>
     </message>
     <message>
         <source>Capacity</source>
-        <translation>Capacité</translation>
+        <translation>容量</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation>Identifiant</translation>
+        <translation>登录</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation>Mot de passe</translation>
+        <translation>密码</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation>Espace</translation>
+        <translation>空格</translation>
     </message>
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation>Décocher le stockage fera rien d&apos;autre que l&apos;arrêt de l&apos;écriture.
-Il ne sera pas refuser de supprimer les séquences du disque.</translation>
+        <translation>若存储设备未检测将导致停止录像.
+同时将允许从驱动器上移除最早录像.</translation>
     </message>
     <message>
         <source>Rebuild archive index</source>
-        <translation>Reconstruire l&apos;index d&apos;archive</translation>
+        <translation>重建录像索引</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation>Démarrer</translation>
+        <translation>开始</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation>Vérification filigrane</translation>
+        <translation>水印检查</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation>Fichier vérifié:</translation>
+        <translation>检查文件:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation>Résultat de vérification:</translation>
+        <translation>检查结果:</translation>
     </message>
 </context>
 <context>
     <name>SingleCameraSettingsWidget</name>
     <message>
         <source>General</source>
-        <translation>Général</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation>Nom:</translation>
+        <translation>名称:</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>Adresse</translation>
+        <translation>地址</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation>L&apos;adresse IP:</translation>
+        <translation>IP地址:</translation>
     </message>
     <message>
         <source>MAC Address:</source>
-        <translation>L&apos;adresse MAC:</translation>
+        <translation>MAC地址:</translation>
     </message>
     <message>
         <source>Web Page:</source>
-        <translation>Page Web:</translation>
+        <translation>网页:</translation>
     </message>
     <message>
         <source>Authentication</source>
-        <translation>Authentification</translation>
+        <translation>验证</translation>
     </message>
     <message>
         <source>Login:</source>
-        <translation>Identifiant:</translation>
+        <translation>登录:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe:</translation>
+        <translation>密码:</translation>
     </message>
     <message>
         <source>Recording</source>
-        <translation>Enregistrement</translation>
+        <translation>录像</translation>
     </message>
     <message>
         <source>Motion</source>
-        <translation>Mouvement</translation>
+        <translation>移动侦测</translation>
     </message>
     <message>
         <source>Sensitivity:</source>
-        <translation>Sensibilité:</translation>
+        <translation>敏感度:</translation>
     </message>
     <message>
         <source>Maximum sensitivity (9)</source>
-        <translation>Sensibilité maximale (9)</translation>
+        <translation>最大敏感度(9)</translation>
     </message>
     <message>
         <source>URL</source>
@@ -8619,11 +8638,11 @@ Il ne sera pas refuser de supprimer les séquences du disque.</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation>Avancée</translation>
+        <translation>高级设置</translation>
     </message>
     <message>
         <source>Model:</source>
-        <translation>Modèle:</translation>
+        <translation>型号:</translation>
     </message>
     <message>
         <source>Ping</source>
@@ -8631,158 +8650,158 @@ Il ne sera pas refuser de supprimer les séquences du disque.</translation>
     </message>
     <message>
         <source>Firmware:</source>
-        <translation>Micrologiciel:</translation>
+        <translation>版本:</translation>
     </message>
     <message>
         <source>Expert</source>
-        <translation>Expert</translation>
+        <translation>专家</translation>
     </message>
     <message>
         <source>Vendor:</source>
-        <translation>Vendeur:</translation>
+        <translation>厂商:</translation>
     </message>
     <message>
         <source>IO ports</source>
-        <translation>Ports IO</translation>
+        <translation>IO端口</translation>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation>Activer Audio</translation>
+        <translation>启用音频</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation>Mouvement non disponible pour cette caméra.</translation>
+        <translation>此摄像机不支持移动侦测.</translation>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation>Paramètres mouvement</translation>
+        <translation>移动侦测设定</translation>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation>Détection de mouvement</translation>
+        <translation>移动侦测</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation>Logiciel - IPS maximum pourrait diminuer légèrement sur le serveur</translation>
+        <translation>软件-最大帧率将减少服务端稳定</translation>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation>Masque Mouvement (0)</translation>
+        <translation>移动侦测遮挡区域(0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation>Page web caméra:</translation>
+        <translation>摄像机移动侦测网页:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation>Réinitialiser les zones de mouvement</translation>
+        <translation>重置移动侦测区域</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation>Matériel ( intégrée caméra)</translation>
+        <translation>硬件（摄像机内建）</translation>
     </message>
     <message>
         <source>Fisheye</source>
-        <translation>Fisheye</translation>
+        <translation>鱼眼</translation>
     </message>
 </context>
 <context>
     <name>SmtpSettingsWidget</name>
     <message>
         <source>Advanced settings...</source>
-        <translation>Paramètres avancées...</translation>
+        <translation>高级设置...</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation>Test</translation>
+        <translation>测试</translation>
     </message>
     <message>
         <source>Outgoing Email Settings</source>
-        <translation>Paramètres de courriel sortant</translation>
+        <translation>邮件设置</translation>
     </message>
     <message>
         <source>&amp;Email:</source>
-        <translation>Courri&amp;el:</translation>
+        <translation>&amp;邮箱:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>Mot de &amp;passe:</translation>
+        <translation>&amp;密码:</translation>
     </message>
     <message>
         <source>&amp;System Signature:</source>
-        <translation>S&amp;ignature Système:</translation>
+        <translation>&amp;系统签名:</translation>
     </message>
     <message>
         <source>Support Signature:</source>
-        <translation>Signature-Support:</translation>
+        <translation>技术支持方式:</translation>
     </message>
     <message>
         <source>SMTP &amp;Server:</source>
-        <translation>&amp;Serveur SMTP:</translation>
+        <translation>SMTP &amp;服务器:</translation>
     </message>
     <message>
         <source>&amp;User:</source>
-        <translation>&amp;Usager:</translation>
+        <translation>&amp;用户:</translation>
     </message>
     <message>
         <source>Email:</source>
-        <translation>Courriel:</translation>
+        <translation>邮箱:</translation>
     </message>
     <message>
         <source>P&amp;ort:</source>
-        <translation>P&amp;ort:</translation>
+        <translation>&amp;端口:</translation>
     </message>
     <message>
         <source>Server:</source>
-        <translation>Serveur:</translation>
+        <translation>服务器:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation>Port:</translation>
+        <translation>端口:</translation>
     </message>
     <message>
         <source>User:</source>
-        <translation>Usager:</translation>
+        <translation>用户:</translation>
     </message>
     <message>
         <source>Security:</source>
-        <translation>Sécurité:</translation>
+        <translation>安全性:</translation>
     </message>
     <message>
         <source>Progress:</source>
-        <translation>Progrès:</translation>
+        <translation>进程:</translation>
     </message>
     <message>
         <source>Result:</source>
-        <translation>Résultat:</translation>
+        <translation>结果:</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation>确认</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation>(recommandé)</translation>
+        <translation>(推荐)</translation>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation>Entrez une courte description ici.</translation>
+        <translation>在这里输入系统描述.</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation>Connexion non sécurisée</translation>
+        <translation>不安全的连接</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation>Connexion sécurisée utilisant TLS.</translation>
+        <translation>使用TLS安全连接.</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation>Connexion sécurisée utilisant SSL.</translation>
+        <translation>使用SSL安全连接.</translation>
     </message>
 </context>
 <context>
@@ -8796,11 +8815,11 @@ Il ne sera pas refuser de supprimer les séquences du disque.</translation>
     <name>StorageUrlDialog</name>
     <message>
         <source>Add External Storage...</source>
-        <translation>Ajouter stockage externe...</translation>
+        <translation>增加外部存储...</translation>
     </message>
     <message>
         <source>Protocol:</source>
-        <translation>Protocole:</translation>
+        <translation>协议:</translation>
     </message>
     <message>
         <source>URL:</source>
@@ -8812,111 +8831,111 @@ Il ne sera pas refuser de supprimer les séquences du disque.</translation>
     </message>
     <message>
         <source>Login:</source>
-        <translation>Identifiant:</translation>
+        <translation>登录:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe:</translation>
+        <translation>密码:</translation>
     </message>
 </context>
 <context>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Attention! Les paramètres de qualité et d&apos;IPS dans l&apos;horaire d&apos;enregistrement ne fonctionnera pas!</translation>
+        <translation>注意!录像计划中对每秒帧数/画质设置将无法正常运作!</translation>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation>(recommandé)</translation>
+        <translation>(推荐)</translation>
     </message>
     <message>
         <source>Enable audit trail</source>
-        <translation>Activer piste de vérification</translation>
+        <translation>允许研判启用</translation>
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation>Envoyer des statistiques anonymes de l&apos;utilisation et plantage aux développeurs du logiciels</translation>
+        <translation>发送匿名使用情况和事故统计至软件开发人员</translation>
     </message>
 </context>
 <context>
     <name>TimeServerSelectionWidget</name>
     <message>
         <source>Synchronizing...</source>
-        <translation>Synchronisation...</translation>
+        <translation>同步中...</translation>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation>Heure système actuelle:</translation>
+        <translation>当前系统时间:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation>Choisissez un serveur disponible sur place pour agir en tant que serveur de temps si le système n&apos;a pas d&apos;accès à Internet:</translation>
+        <translation>选择一个本地可用的服务器作为时间服务器:</translation>
     </message>
 </context>
 <context>
     <name>UserSettingsDialog</name>
     <message>
         <source>Create New User</source>
-        <translation>Créer un nouveau usager</translation>
+        <translation>创建新用户</translation>
     </message>
     <message>
         <source>Access rights</source>
-        <translation>Droits d&apos;accès</translation>
+        <translation>登录权限</translation>
     </message>
     <message>
         <source>Advanced...</source>
-        <translation>Avancée ...</translation>
+        <translation>高级配置...</translation>
     </message>
     <message>
         <source>C&amp;urrent Password:</source>
-        <translation>Mot de passe &amp;actuel:</translation>
+        <translation>&amp;当前密码:</translation>
     </message>
     <message>
         <source>&amp;Confirm Password:</source>
-        <translation>Confirmer mot de&amp;passe:</translation>
+        <translation>&amp;确认密码:</translation>
     </message>
     <message>
         <source>&amp;Access Rights:</source>
-        <translation>&amp;Droits d&apos;accès:</translation>
+        <translation>&amp;登录权限:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>&amp;Mot de passe:</translation>
+        <translation>&amp;密码:</translation>
     </message>
     <message>
         <source>&amp;Login:</source>
-        <translation>&amp;Identifiant:</translation>
+        <translation>&amp;登录:</translation>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation>&amp;Courriel:</translation>
+        <translation>&amp;邮箱:</translation>
     </message>
     <message>
         <source>Enabled:</source>
-        <translation>Activé:</translation>
+        <translation>可用:</translation>
     </message>
 </context>
 <context>
     <name>WeekTimeScheduleDialog</name>
     <message>
         <source>Schedule Settings</source>
-        <translation>Configuration de l&apos;horaire</translation>
+        <translation>录像计划设置</translation>
     </message>
     <message>
         <source>On</source>
-        <translation>Activé</translation>
+        <translation>开</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>Désactivé</translation>
+        <translation>关</translation>
     </message>
     <message>
         <source>Schedule</source>
-        <translation>Horaire</translation>
+        <translation>录像计划</translation>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation>Note: L&apos;horaire est basé sur l&apos;heure du serveur.</translation>
+        <translation>注意：录像计划根据服务器时间.</translation>
     </message>
 </context>
 </TS>

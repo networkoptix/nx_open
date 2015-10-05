@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="th" sourcelanguage="en">
+<TS version="2.1" language="th" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -500,9 +500,7 @@
     </message>
     <message>
         <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;
-----------
-Short for &quot;seconds&quot;</extracomment>
+        <extracomment>Short for &quot;seconds&quot;</extracomment>
         <translation>วินาที</translation>
     </message>
     <message>
@@ -593,6 +591,29 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Testing connection...</source>
         <translation>ทดสอบการเชื่อมต่อ...</translation>
+    </message>
+</context>
+<context>
+    <name>CustomBusinessEventWidget</name>
+    <message>
+        <source>Source contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords separated by space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1439,22 +1460,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>None</source>
         <translation>None</translation>
-    </message>
-    <message>
-        <source>Stops</source>
-        <translation>หยุด</translation>
-    </message>
-    <message>
-        <source>Starts</source>
-        <translation>เริ่ม</translation>
-    </message>
-    <message>
-        <source>Starts/Stops</source>
-        <translation>เริ่ม/หยุด</translation>
-    </message>
-    <message>
-        <source>Occurs</source>
-        <translation>เกิดขึ้น</translation>
     </message>
 </context>
 <context>
@@ -2605,16 +2610,20 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>การตั้งค่า %1...</translation>
     </message>
     <message>
-        <source>Open in %1 Settings Dialog...</source>
-        <translation>เปิดใน%1 การตั้งค่าโต้ตอบ ...</translation>
-    </message>
-    <message>
         <source>Add Device(s)...</source>
         <translation>เพิ่มอุปกรณ์ (s) ...</translation>
     </message>
     <message>
         <source>%1 List by Server...</source>
         <translation>รายชื่อโดยเซิร์ฟเวอร์ %1...</translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2702,6 +2711,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 actions</source>
+        <extracomment>&quot;Camera actions&quot; or &quot;Device actions&quot;</extracomment>
         <translation>%1 การกระทำ</translation>
     </message>
 </context>
@@ -3003,10 +3013,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>เริ่ม</translation>
     </message>
     <message>
-        <source>Starts/Stops</source>
-        <translation>เริ่ม/หยุด</translation>
-    </message>
-    <message>
         <source>Administrators Only</source>
         <translation>ผู้ดูแลระบบเท่านั้น</translation>
     </message>
@@ -3029,6 +3035,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Select at least one %1</source>
         <translation>เลือกอย่างน้อยหนึ่ง %1</translation>
+    </message>
+    <message>
+        <source>Occures</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3182,11 +3192,9 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Scanning online hosts...</source>
         <translation>สแกนโฮสต์ออนไลน์ ...</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Scanning hosts... (%1)</source>
-        <translation>
-            <numerusform>กำลังสแกนโฮสต์ ... (%1)%n</numerusform>
-        </translation>
+        <translation type="unfinished">กำลังสแกนโฮสต์ ... (%1)%n</translation>
     </message>
     <message>
         <source>Finished</source>
@@ -3285,6 +3293,11 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Add devices...</source>
         <translation>เพิ่มอุปกรณ์ ...</translation>
+    </message>
+    <message>
+        <source>Scanning host... (%1)</source>
+        <extracomment>Scanning host... (0 devices found)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3405,10 +3418,12 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
+        <extracomment>&quot;Confirming camera is accessible.&quot; or &quot;Confirming device is accessible.&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
+        <extracomment>&quot;Confirming target camera provides media stream.&quot; or &quot;Confirming target device provides media stream.&quot;</extracomment>
         <translation>ยืนยันเป้าหมาย %1  ให้สื่อกระแส.</translation>
     </message>
 </context>
@@ -3558,10 +3573,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>การเตือน</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation>คำเตือน! ค่าต่ำสุดสูงสามารถลดอื่น ๆ %1 &apos;ระยะเวลาการบันทึก.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
         <translation>การบันทึกการเคลื่อนไหว มีการยกเลิกหรือไม่ รับการสนับสนุนโดยบางส่วนของ %1 ที่เลือก โปรดไปที่หน้าการตั้งค่าการเคลื่อนไหวเพื่อให้แน่ใจว่าได้รับการสนับสนุนและเปิดใช้งาน.</translation>
     </message>
@@ -3577,16 +3588,20 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
         <translation>การบันทึกการเคลื่อนไหวถูกปิดใช้งาน โปรดไปที่หน้าการตั้งค่าการเคลื่อนไหวการติดตั้ง%1 พื้นที่การเคลื่อนไหวและความไว.</translation>
     </message>
+    <message>
+        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
     <message>
         <source>Open in New Tab</source>
         <translation>เปิดแท็บใหม่</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>ความผิดพลาด</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
@@ -3610,14 +3625,17 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 Settings</source>
+        <extracomment>&quot;Cameras settings&quot; or &quot;Devices settings&quot; or &quot;IO Module Settings&quot;, etc</extracomment>
         <translation>%1 การตั้งค่า</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
+        <extracomment>&quot;Cameras Diagnostics&quot; or &quot;Devices Diagnostics&quot; or &quot;IO Module Diagnostics&quot;, etc</extracomment>
         <translation>%1 Diagnostics</translation>
     </message>
     <message>
         <source>%1 Rules</source>
+        <extracomment>&quot;Cameras Rules&quot; or &quot;Devices Rules&quot; or &quot;IO Module Rules&quot;, etc</extracomment>
         <translation>%1 กฎ</translation>
     </message>
     <message>
@@ -3625,12 +3643,9 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>%1 ไม่ได้บันทึก.</translation>
     </message>
     <message>
-        <source>Save changes to the following %1?</source>
-        <translation>บันทึกการเปลี่ยนแปลงไปดังต่อไปนี้ %1?</translation>
-    </message>
-    <message>
-        <source>Could not save the following %1 to Server.</source>
-        <translation>ไม่สามารถบันทึกต่อไปนี้ %1 ไปยังเซิร์ฟเวอร์.</translation>
+        <source>Apply changes to the following %1?</source>
+        <extracomment>&quot;Apply changes to the following 5 cameras?&quot; or &quot;Apply changes to the following IO module?&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4100,6 +4115,40 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnFailoverPriorityDialog</name>
+    <message>
+        <source>Failover Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">ตลอด</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">ต่ำ</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">ปานกลาง</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">สูง</translation>
+    </message>
+</context>
+<context>
+    <name>QnFailoverPriorityDialogDelegate</name>
+    <message>
+        <source>Set Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
         <source>Auto Calibration</source>
@@ -4152,20 +4201,21 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management</source>
-        <translation>เปิด การเตือน / การจัดการเหตุการณ์</translation>
-    </message>
-    <message>
-        <source>Open Event Log</source>
-        <translation>เปิดบันทึกเหตุการณ์</translation>
-    </message>
-    <message>
-        <source>Open %1 List</source>
-        <translation>เปิด %1 รายชื่อ</translation>
-    </message>
-    <message>
         <source>%1 List</source>
         <translation>%1 รายชื่อ</translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open %1 List...</source>
+        <extracomment>&quot;Open Cameras List...&quot; or &quot;Open Devices List...&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4382,6 +4432,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not export %1 %2.</source>
+        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>ไม่สามารถส่งออก %1 %2.</translation>
     </message>
 </context>
@@ -5083,6 +5134,22 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>The discovered system %1 has an incompatible version %2.</source>
         <translation>ระบบพบ %1 มีรุ่น %2 เข้ากันไม่ได้.</translation>
     </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System has an incompatible version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operation is not permitted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -5272,48 +5339,45 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>เรียกดูคลังข้อมูล</translation>
     </message>
     <message>
-        <source>Server settings</source>
-        <translation>การตั้งค่าเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>การตั้งค่า</translation>
-    </message>
-    <message>
-        <source>User Settings</source>
-        <translation>การตั้งค่าผู้ใช้งาน</translation>
-    </message>
-    <message>
-        <source>Licenses</source>
-        <translation>ไลเซนส์</translation>
-    </message>
-    <message>
-        <source>SMTP Settin gs</source>
-        <translation>การตั้งค่า SMTP</translation>
-    </message>
-    <message>
-        <source>Connect to server</source>
-        <translation>เชื่อมต่อกับเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-        <source>SMTP Settings</source>
-        <translation>การตั้งค่า SMTP</translation>
-    </message>
-    <message>
         <source>Open %1</source>
         <translation>เปิด %1</translation>
     </message>
     <message>
-        <source>%1 Settings</source>
-        <translation>การตั้งค่า %1</translation>
-    </message>
-    <message>
-        <source>Server Settings</source>
-        <translation>การตั้งค่าเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
         <source>Open %1 Web Page...</source>
         <translation>เปิดหน้าเว็บ %1 ...</translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <extracomment>&quot;Camera Settings...&quot; or &quot;Device Settings...&quot;</extracomment>
+        <translation type="unfinished">การตั้งค่า %1...</translation>
+    </message>
+    <message>
+        <source>Server Settings...</source>
+        <translation type="unfinished">การตั้งค่าเซิร์ฟเวอร์ ...</translation>
+    </message>
+    <message>
+        <source>Licenses...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Settings...</source>
+        <translation type="unfinished">การตั้งค่าผู้ใช้งาน...</translation>
+    </message>
+    <message>
+        <source>SMTP Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Synchronization...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5712,6 +5776,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Storage space occupied by %1</source>
         <translation>พื้นที่จัดเก็บที่ถูกครอบครองโดย %1</translation>
     </message>
+    <message>
+        <source>empty</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -5942,6 +6010,26 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Storage Analytics</source>
         <translation>การวิเคราะห์การจัดเก็บข้อมูล</translation>
     </message>
+    <message>
+        <source>Server Settings - %1 (readonly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation type="unfinished">การตั้งค่าเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+        <source>Server not saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to the server %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
@@ -6020,6 +6108,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
         <translation>เพื่อหลีกเลี่ยงความผิดปกติของการปรับจำนวนสูงสุด %1</translation>
+    </message>
+    <message>
+        <source>Server is unavailable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6323,6 +6415,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>การอัปเดตด้วยตนเองดาวน์โหลดเก็บมีการเชื่อมโยงต่อไปนี้:</translation>
     </message>
+    <message>
+        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -6387,6 +6483,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>%1 Settings</source>
+        <extracomment>&quot;Camera Settings&quot; or &quot;IO Module settings&quot;, etc</extracomment>
         <translation>%1 การตั้งค่า</translation>
     </message>
 </context>
@@ -6451,10 +6548,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
         <translation>ไม่พบที่ตั้งไว้ ใช้ตัวเลือก &apos;ขั้นสูง.</translation>
-    </message>
-    <message>
-        <source>Support email is not valid.</source>
-        <translation>การสนับสนุนทางอีเมลไม่ถูกต้อง.</translation>
     </message>
 </context>
 <context>
@@ -7237,22 +7330,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>User Settings</source>
         <translation>ตั้งค่าผู้ใช้งาน</translation>
     </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items.</source>
-        <translation>
-            <numerusform>ไม่สามารถบันทึกรายการต่อไปนี้ %n.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Could not delete resource</source>
-        <translation>ไม่สามารถลบทรัพยากร</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save changes made to the following %n resource(s).</source>
-        <translation>
-            <numerusform>ไม่สามารถบันทึกการเปลี่ยนแปลงที่เกิดขึ้นกับทรัพยากรต่อไปนี้ %n (s).</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Version Mismatch</source>
         <translation>รุ่นไม่ตรงกัน</translation>
@@ -7272,14 +7349,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Are you sure you want to delete them?</source>
         <translation>คุณแน่ใจว่าคุณต้องการที่จะลบพวกเขา?</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. </source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามจะลบทรัพยากรจากเซิร์ฟเวอร์.</translation>
-    </message>
-    <message>
-        <source>Error description: &apos;%1&apos;</source>
-        <translation>คำอธิบายข้อผิดพลาด: &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
@@ -7368,20 +7437,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>กระบวนการเปิดไม่พบ.</translation>
     </message>
     <message>
-        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation>ไม่สามารถย้าย%1 ไปยังเซิร์ฟเวอร์ %2 เซิร์ฟเวอร์ไม่ตอบสนอง.</translation>
-    </message>
-    <message>
-        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation>เซิร์ฟเวอร์ %1 ไม่สามารถค้นหาและเข้าถึง %2 คุณแน่ใจหรือว่าต้องการที่จะย้ายพวกเขา?</translation>
-    </message>
-    <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
         <translation>อุปกรณ์ที่มีอยู่แล้วอยู่ระหว่างดำเนินการ คุณแน่ใจหรือว่าต้องการยกเลิกการดำเนินการปัจจุบันหรือไม่?</translation>
-    </message>
-    <message>
-        <source>These %1 are auto-discovered.</source>
-        <translation>%1 เหล่านี้ถูกค้นพบโดยอัตโนมัติ.</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
@@ -7392,6 +7449,27 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Do you really want to delete the following %1?</source>
         <translation>คุณแน่ใจที่ต้องการจะลบ ต่อไปนี้ %1?</translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n %1 to server %2. Server is unresponsive.</source>
+        <extracomment>&quot;Cannot move these 5 cameras to server &lt;server_name&gt;. Server is unresponsive.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n %2. Are you sure you would like to move them?</source>
+        <extracomment>&quot;Server &lt;server_name&gt; is unable to find and access these 5 cameras. Are you sure you would like to move them?&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n %1 are auto-discovered.</source>
+        <extracomment>&quot;These 5 cameras are auto-discovered.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7870,6 +7948,48 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
+    <name>QnWorkbenchResourcesChangesWatcher</name>
+    <message>
+        <source>The system is in Safe Mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not allowed to make any changes except license activation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following %n items are not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not save the following %n items to Server.</source>
+        <translation type="unfinished">
+            <numerusform>ไม่สามารถบันทึกรายการต่อไปนี้ %n ไปยังเซิร์ฟเวอร์.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following %n items are not deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not delete the following %n items from Server.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchSafeModeWatcher</name>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
         <source>PNG Image (*.png)</source>
@@ -8008,12 +8128,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Enter the name of the Video Wall to create:</source>
         <translation>ใส่ชื่อของจอแสดงผล ของการสร้าง:</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items to Server.</source>
-        <translation>
-            <numerusform>ไม่สามารถบันทึกรายการต่อไปนี้ %n ไปยังเซิร์ฟเวอร์.</numerusform>
-        </translation>
     </message>
     <message>
         <source>Delete Items</source>
@@ -8370,13 +8484,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
-    <name>ServerSettingsDialog</name>
-    <message>
-        <source>Server Settings</source>
-        <translation>การตั้งค่าเซิร์ฟเวอร์</translation>
-    </message>
-</context>
-<context>
     <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
@@ -8451,6 +8558,10 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>Cancel</source>
         <translation>ยกเลิก</translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

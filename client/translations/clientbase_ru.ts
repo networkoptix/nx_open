@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -513,9 +513,7 @@
     </message>
     <message>
         <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;
-----------
-Short for &quot;seconds&quot;</extracomment>
+        <extracomment>Short for &quot;seconds&quot;</extracomment>
         <translation>с</translation>
     </message>
     <message>
@@ -594,6 +592,29 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Testing connection...</source>
         <translation>Проверка подключения...</translation>
+    </message>
+</context>
+<context>
+    <name>CustomBusinessEventWidget</name>
+    <message>
+        <source>Source contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords separated by space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description contains:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1435,22 +1456,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>None</source>
         <translation>Нет</translation>
-    </message>
-    <message>
-        <source>Stops</source>
-        <translation>Кончается</translation>
-    </message>
-    <message>
-        <source>Starts</source>
-        <translation>Начинается</translation>
-    </message>
-    <message>
-        <source>Starts/Stops</source>
-        <translation>Начинается/Кончается</translation>
-    </message>
-    <message>
-        <source>Occurs</source>
-        <translation>Происходит</translation>
     </message>
     <message>
         <source>Parameter 1 is null.</source>
@@ -2622,16 +2627,20 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Настройки...</translation>
     </message>
     <message>
-        <source>Open in %1 Settings Dialog...</source>
-        <translation>Открыть в окне настроек...</translation>
-    </message>
-    <message>
         <source>Add Device(s)...</source>
         <translation>Добавить устройства...</translation>
     </message>
     <message>
         <source>%1 List by Server...</source>
         <translation>Список по серверам...</translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2719,6 +2728,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 actions</source>
+        <extracomment>&quot;Camera actions&quot; or &quot;Device actions&quot;</extracomment>
         <translation>Действия: %1</translation>
     </message>
 </context>
@@ -3032,10 +3042,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Начинается</translation>
     </message>
     <message>
-        <source>Starts/Stops</source>
-        <translation>Начинается/Кончается</translation>
-    </message>
-    <message>
         <source>Instant</source>
         <translation>Мгновенно</translation>
     </message>
@@ -3062,6 +3068,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Select at least one %1</source>
         <translation>Выберите хотя бы одно устойство.</translation>
+    </message>
+    <message>
+        <source>Occures</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3219,13 +3229,9 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Scanning online hosts...</source>
         <translation>Сканирование узлов в сети...</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Scanning hosts... (%1)</source>
-        <translation>
-            <numerusform>Сканирование узла... (%1)</numerusform>
-            <numerusform>Сканирование узлов... (%1)</numerusform>
-            <numerusform>Сканирование узлов... (%1)</numerusform>
-        </translation>
+        <translation type="unfinished">Сканирование узла... (%1)</translation>
     </message>
     <message>
         <source>Select target server...</source>
@@ -3326,6 +3332,11 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Add devices...</source>
         <translation>Добавить устройства...</translation>
+    </message>
+    <message>
+        <source>Scanning host... (%1)</source>
+        <extracomment>Scanning host... (0 devices found)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3446,10 +3457,12 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming %1 is accessible.</source>
+        <extracomment>&quot;Confirming camera is accessible.&quot; or &quot;Confirming device is accessible.&quot;</extracomment>
         <translation>Доступность устройства подтверждена.</translation>
     </message>
     <message>
         <source>Confirming target %1 provides media stream.</source>
+        <extracomment>&quot;Confirming target camera provides media stream.&quot; or &quot;Confirming target device provides media stream.&quot;</extracomment>
         <translation>Подтверждение: %1 передаёт медиа поток.</translation>
     </message>
 </context>
@@ -3607,10 +3620,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Внимание</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other %1&apos; recording durations.</source>
-        <translation>Внимание! Высокое минимальное значение может уменьшить длительность записи прочих устройств.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.</source>
         <translation>Запись по движению отключена или не поддерживается некоторыми из выбранных устройств. Перейдите на страницу настроек детектора движения, чтобы убедиться, что он поддерживается и включён.</translation>
     </message>
@@ -3626,16 +3635,20 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the %1&apos;s motion area and sensitivity.</source>
         <translation>Запись по движению отключена. Перейдите на страницу настройки движения на устройстве, чтобы задать зону и чувствительность движения.</translation>
     </message>
+    <message>
+        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
     <message>
         <source>Open in New Tab</source>
         <translation>Открыть в новой вкладке</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Ошибка</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
@@ -3659,14 +3672,17 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 Settings</source>
+        <extracomment>&quot;Cameras settings&quot; or &quot;Devices settings&quot; or &quot;IO Module Settings&quot;, etc</extracomment>
         <translation>Настройки</translation>
     </message>
     <message>
         <source>%1 Diagnostics</source>
+        <extracomment>&quot;Cameras Diagnostics&quot; or &quot;Devices Diagnostics&quot; or &quot;IO Module Diagnostics&quot;, etc</extracomment>
         <translation>Диагностика</translation>
     </message>
     <message>
         <source>%1 Rules</source>
+        <extracomment>&quot;Cameras Rules&quot; or &quot;Devices Rules&quot; or &quot;IO Module Rules&quot;, etc</extracomment>
         <translation>Правила</translation>
     </message>
     <message>
@@ -3674,12 +3690,9 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Не сохранено.</translation>
     </message>
     <message>
-        <source>Save changes to the following %1?</source>
-        <translation>Сохранить изменения для следующих устройств?</translation>
-    </message>
-    <message>
-        <source>Could not save the following %1 to Server.</source>
-        <translation>Невозможно сохранить следующие устройства на сервере.</translation>
+        <source>Apply changes to the following %1?</source>
+        <extracomment>&quot;Apply changes to the following 5 cameras?&quot; or &quot;Apply changes to the following IO module?&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4153,6 +4166,40 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnFailoverPriorityDialog</name>
+    <message>
+        <source>Failover Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">Никогда</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished">Среднее</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <comment>Failover priority</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnFailoverPriorityDialogDelegate</name>
+    <message>
+        <source>Set Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
         <source>Auto Calibration</source>
@@ -4205,20 +4252,21 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management</source>
-        <translation>Открыть Связь с событием</translation>
-    </message>
-    <message>
-        <source>Open Event Log</source>
-        <translation>Открыть Журнал событий</translation>
-    </message>
-    <message>
-        <source>Open %1 List</source>
-        <translation>Открыть %1</translation>
-    </message>
-    <message>
         <source>%1 List</source>
         <translation>%1</translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open %1 List...</source>
+        <extracomment>&quot;Open Cameras List...&quot; or &quot;Open Devices List...&quot;, etc</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4435,6 +4483,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not export %1 %2.</source>
+        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>Невозможно экспортировать %1 %2.</translation>
     </message>
 </context>
@@ -5147,6 +5196,22 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>The discovered system %1 has an incompatible version %2.</source>
         <translation>Найденная система %1 несовместима с версией %2.</translation>
     </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System has an incompatible version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operation is not permitted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System is in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -5338,49 +5403,45 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Просмотр архива</translation>
     </message>
     <message>
-        <source>Server settings</source>
-        <translation>Настройки сервера</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Настройки</translation>
-    </message>
-    <message>
-        <source>User Settings</source>
-        <translation>Настройки пользователя</translation>
-    </message>
-    <message>
-        <source>Licenses</source>
-        <translation>Лицензии</translation>
-    </message>
-    <message>
-        <source>SMTP Settin gs</source>
-        <translatorcomment>Опечатка??</translatorcomment>
-        <translation>Настройки SMTP</translation>
-    </message>
-    <message>
-        <source>SMTP Settings</source>
-        <translation>Настройки  SMTP</translation>
-    </message>
-    <message>
-        <source>Connect to server</source>
-        <translation>Соединение с сервером</translation>
-    </message>
-    <message>
         <source>Open %1</source>
         <translation>Открыть</translation>
     </message>
     <message>
-        <source>%1 Settings</source>
-        <translation>Настройки</translation>
-    </message>
-    <message>
-        <source>Server Settings</source>
-        <translation>Настройки сервера</translation>
-    </message>
-    <message>
         <source>Open %1 Web Page...</source>
         <translation>Открыть веб страницу...</translation>
+    </message>
+    <message>
+        <source>%1 Settings...</source>
+        <extracomment>&quot;Camera Settings...&quot; or &quot;Device Settings...&quot;</extracomment>
+        <translation type="unfinished">Настройки...</translation>
+    </message>
+    <message>
+        <source>Server Settings...</source>
+        <translation type="unfinished">Настройки сервера...</translation>
+    </message>
+    <message>
+        <source>Licenses...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Settings...</source>
+        <translation type="unfinished">Настройки пользователя...</translation>
+    </message>
+    <message>
+        <source>SMTP Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Synchronization...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5795,6 +5856,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Storage space occupied by %1</source>
         <translation>Занятое пространство</translation>
     </message>
+    <message>
+        <source>empty</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -6027,6 +6092,26 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Storage Analytics</source>
         <translation>Анализ хранилища</translation>
     </message>
+    <message>
+        <source>Server Settings - %1 (readonly)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings</source>
+        <translation type="unfinished">Настройки сервера</translation>
+    </message>
+    <message>
+        <source>Server not saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to the server %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
@@ -6105,6 +6190,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>To avoid malfunction adjust max number of %1</source>
         <translation>Воизбежание неполадок настройте максимальное количество устройств (%1)</translation>
+    </message>
+    <message>
+        <source>Server is unavailable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6416,6 +6505,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>Для того чтобы обновиться вручную, скачайте архив по следующей ссылке:</translation>
     </message>
+    <message>
+        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -6480,6 +6573,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>%1 Settings</source>
+        <extracomment>&quot;Camera Settings&quot; or &quot;IO Module settings&quot;, etc</extracomment>
         <translation>Настройки</translation>
     </message>
 </context>
@@ -6544,10 +6638,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
         <translation>Шаблон не найден. Воспользуйтесь дополнительными настройками.</translation>
-    </message>
-    <message>
-        <source>Support email is not valid.</source>
-        <translation>Некорректный адрес техподдержки.</translation>
     </message>
 </context>
 <context>
@@ -7326,14 +7416,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Delete Resources</source>
         <translation>Удалить ресурсы</translation>
     </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items.</source>
-        <translation>
-            <numerusform>Не получается сохранить этот элемент.</numerusform>
-            <numerusform>Не получается сохранить эти %n элементa.</numerusform>
-            <numerusform>Не получается сохранить эти %n элементов.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Update...</source>
         <translation>Обновление...</translation>
@@ -7351,10 +7433,6 @@ If you understand this and would like to proceed please click Merge to continue.
         </translation>
     </message>
     <message>
-        <source>Could not delete resource</source>
-        <translation>Невозможно удалить ресурс</translation>
-    </message>
-    <message>
         <source>User Settings</source>
         <translation>Настройки пользователя</translation>
     </message>
@@ -7365,14 +7443,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Preview Search for %1</source>
         <translation>Поиск по фрагментам для %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save changes made to the following %n resource(s).</source>
-        <translation>
-            <numerusform>Невозможно сохранить изменения для ресурса.</numerusform>
-            <numerusform>Невозможно сохранить изменения для %n следующих ресурсов.</numerusform>
-            <numerusform>Невозможно сохранить изменения для %n следующих ресурсов.</numerusform>
-        </translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -7385,14 +7455,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Are you sure you want to delete them?</source>
         <translation>Вы уверены, что хотите удалить их?</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. </source>
-        <translation>Ошибка при удалении ресурса с сервера.</translation>
-    </message>
-    <message>
-        <source>Error description: &apos;%1&apos;</source>
-        <translation>Описание ошибки: &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
@@ -7480,20 +7542,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Процесс Launcher не найден.</translation>
     </message>
     <message>
-        <source>Cannot move %1 to server %2. Server is unresponsive.</source>
-        <translation>Невозможно переместить устройство (%1) на сервер %2. Сервер не отвечает.</translation>
-    </message>
-    <message>
-        <source>Server %1 is unable to find and access these %2. Are you sure you would like to move them?</source>
-        <translation>Сервер %1 не может найти данные %2. Вы уверены, что хотите преместить их?</translation>
-    </message>
-    <message>
         <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
         <translation>Добавление устройств уже происходит. Вы уверены, что хотите прервать данный процесс?</translation>
-    </message>
-    <message>
-        <source>These %1 are auto-discovered.</source>
-        <translation>Данные %1 обнаружены автоматически.</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 are auto-discovered.</source>
@@ -7506,6 +7556,33 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Do you really want to delete the following %1?</source>
         <translation>Вы действительно хотите удалить следующие устройства?</translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n %1 to server %2. Server is unresponsive.</source>
+        <extracomment>&quot;Cannot move these 5 cameras to server &lt;server_name&gt;. Server is unresponsive.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n %2. Are you sure you would like to move them?</source>
+        <extracomment>&quot;Server &lt;server_name&gt; is unable to find and access these 5 cameras. Are you sure you would like to move them?&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n %1 are auto-discovered.</source>
+        <extracomment>&quot;These 5 cameras are auto-discovered.&quot;</extracomment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7995,6 +8072,52 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
+    <name>QnWorkbenchResourcesChangesWatcher</name>
+    <message>
+        <source>The system is in Safe Mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not allowed to make any changes except license activation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following %n items are not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not save the following %n items to Server.</source>
+        <translation type="unfinished">
+            <numerusform>Невозможно сохранить следующий элемент на сервере.</numerusform>
+            <numerusform>Невозможно сохранить %n следующиx элемента на сервере.</numerusform>
+            <numerusform>Невозможно сохранить %n следующиx элементов на сервере.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Ошибка</translation>
+    </message>
+    <message>
+        <source>The following %n items are not deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not delete the following %n items from Server.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchSafeModeWatcher</name>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
         <source>PNG Image (*.png)</source>
@@ -8133,14 +8256,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Enter the name of the Video Wall to create:</source>
         <translation>Введите название видеостены:</translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items to Server.</source>
-        <translation>
-            <numerusform>Невозможно сохранить следующий элемент на сервере.</numerusform>
-            <numerusform>Невозможно сохранить %n следующиx элемента на сервере.</numerusform>
-            <numerusform>Невозможно сохранить %n следующиx элементов на сервере.</numerusform>
-        </translation>
     </message>
     <message>
         <source>Delete Items</source>
@@ -8501,13 +8616,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
-    <name>ServerSettingsDialog</name>
-    <message>
-        <source>Server Settings</source>
-        <translation>Настройки сервера</translation>
-    </message>
-</context>
-<context>
     <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
@@ -8582,6 +8690,10 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>Cancel</source>
         <translation>Отмена</translation>
+    </message>
+    <message>
+        <source>Failover Priority...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
