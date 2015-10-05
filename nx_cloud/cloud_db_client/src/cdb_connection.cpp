@@ -5,6 +5,7 @@
 
 #include "cdb_connection.h"
 
+#include "cdb_request_path.h"
 #include "data/module_info.h"
 
 
@@ -54,7 +55,7 @@ void Connection::ping(
     std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler)
 {
     executeRequest(
-        "/ping",
+        PING_PATH,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::ModuleInfo()));
 }

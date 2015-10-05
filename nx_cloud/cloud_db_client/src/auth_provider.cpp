@@ -5,6 +5,7 @@
 
 #include "auth_provider.h"
 
+#include "cdb_request_path.h"
 #include "data/auth_data.h"
 
 
@@ -22,7 +23,7 @@ void AuthProvider::getCdbNonce(
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
     executeRequest(
-        "/auth/get_nonce",
+        AUTH_GET_NONCE_PATH,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::NonceData()));
 }
@@ -32,7 +33,7 @@ void AuthProvider::getAuthenticationResponse(
     std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
 {
     executeRequest(
-        "/auth/get_authentication",
+        AUTH_GET_AUTHENTICATION_PATH,
         authRequest,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::AuthResponse()));

@@ -5,6 +5,7 @@
 
 #include "system_manager.h"
 
+#include "cdb_request_path.h"
 #include "data/system_data.h"
 
 
@@ -23,7 +24,7 @@ void SystemManager::bindSystem(
     std::function<void(api::ResultCode, api::SystemData)> completionHandler)
 {
     executeRequest(
-        "/system/bind",
+        SYSTEM_BIND_PATH,
         registrationData,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemData()));
@@ -34,7 +35,7 @@ void SystemManager::unbindSystem(
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
-        "/system/unbind",
+        SYSTEM_UNBIND_PATH,
         api::SystemID(systemID),
         completionHandler,
         completionHandler);
@@ -44,7 +45,7 @@ void SystemManager::getSystems(
     std::function<void(api::ResultCode, api::SystemDataList)> completionHandler)
 {
     executeRequest(
-        "/system/get",
+        SYSTEM_GET_PATH,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemDataList()));
 }
@@ -54,7 +55,7 @@ void SystemManager::shareSystem(
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
-        "/system/share",
+        SYSTEM_SHARE_PATH,
         sharingData,
         completionHandler,
         completionHandler);

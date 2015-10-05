@@ -5,6 +5,8 @@
 
 #include "account_manager.h"
 
+#include "cdb_request_path.h"
+
 
 namespace nx {
 namespace cdb {
@@ -21,7 +23,7 @@ void AccountManager::registerNewAccount(
     std::function<void(api::ResultCode, api::AccountActivationCode)> completionHandler)
 {
     executeRequest(
-        "/account/register",
+        ACCOUNT_REGISTER_PATH,
         accountData,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::AccountActivationCode()));
@@ -32,7 +34,7 @@ void AccountManager::activateAccount(
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
-        "/account/activate",
+        ACCOUNT_ACTIVATE_PATH,
         activationCode,
         completionHandler,
         completionHandler);
@@ -42,7 +44,7 @@ void AccountManager::getAccount(
     std::function<void(api::ResultCode, api::AccountData)> completionHandler)
 {
     executeRequest(
-        "/account/get",
+        ACCOUNT_GET_PATH,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::AccountData()));
 }
