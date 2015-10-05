@@ -1,11 +1,16 @@
 #ifndef QN_LOG_H
 #define QN_LOG_H
 
-#include <utils/thread/mutex.h>
+#include <mutex>
+
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
-#include <mutex>
+
+#include <utils/thread/mutex.h>
+
+#include "log_message.h"
+
 
 // TODO: #Elric #enum
 enum QnLogLevel {
