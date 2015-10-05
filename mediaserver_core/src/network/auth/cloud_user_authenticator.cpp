@@ -112,7 +112,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
                 m_monotonicClock.elapsed() +
                 std::chrono::duration_cast<std::chrono::milliseconds>(authResponse.validPeriod).count();
             cachedIter = m_authorizationCache.emplace(
-                std::make_pair(authorizationHeader.userid(), nonce),
+                std::make_pair(authorizationHeader.userid(), cloudNonce),
                 std::move(authData)).first;
         }
         else

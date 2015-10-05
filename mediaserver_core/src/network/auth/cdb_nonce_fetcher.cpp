@@ -108,8 +108,10 @@ bool CdbNonceFetcher::parseCloudNonce(
         (memcmp(
             nonce.constData() + nonce.size() - NONCE_TRAILER_LEN,
             MAGIC_BYTES,
-            sizeof(MAGIC_BYTES)) == 0))
+            sizeof(MAGIC_BYTES)) != 0))
+    {
         return false;
+    }
 
     *cloudNonce = nonce.mid(0, nonce.size() - NONCE_TRAILER_LEN);
     *nonceTrailer = nonce.mid(nonce.size() - NONCE_TRAILER_LEN);
