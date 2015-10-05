@@ -2,9 +2,9 @@
 
 #include <api/model/test_email_settings_reply.h>
 
+#include <nxemail/email_manager_impl.h>
 #include <utils/network/tcp_connection_priv.h>
 #include <utils/email/email.h>
-#include <utils/email/email_manager_impl.h>
 
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_email_data.h"
