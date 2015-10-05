@@ -46,8 +46,6 @@ QString Nx1::getSerial()
 bool Nx1::isBootedFromSD()
 {
 #ifdef __linux__
-    if (QnAppInfo::armBox() == lit("bpi") || QnAppInfo::armBox() == lit("nx1"))
-    {
         std::list<PartitionInfo> partitionInfoList;
         if (!readPartitions(&partitionInfoList))
             return true;
@@ -90,7 +88,6 @@ bool Nx1::isBootedFromSD()
                 }
             }
         }
-    }
 
     return false;
 #else
