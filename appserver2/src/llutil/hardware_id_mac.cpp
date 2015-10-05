@@ -62,5 +62,7 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
     CFRelease(uuidCf);
 
     hardwareIds[0] = hardwareIds[1] = hardwareIds[2] = hardwareIds[3] = hardwareIds[4] = hardwareIds[5] = QLatin1String(buf);
+
+#endif
 }
 }
