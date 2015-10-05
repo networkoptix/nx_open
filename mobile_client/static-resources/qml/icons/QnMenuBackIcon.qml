@@ -9,10 +9,6 @@ Item {
 
     property real animationProgress: 0.0
 
-    function dps(dpix) {
-        return dp(dpix) / iconScale()
-    }
-
     width: dps(24)
     height: dps(24)
     scale: iconScale()

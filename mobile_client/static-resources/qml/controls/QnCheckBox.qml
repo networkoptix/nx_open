@@ -58,8 +58,8 @@ Item {
             opacity: checked ? 1.0 : 0.0
 
             anchors.centerIn: parent
-            width: parent.width
-            height: parent.height
+            width: dps(18)
+            height: dps(18)
 
             renderStrategy: Canvas.Cooperative
             scale: iconScale()
@@ -73,7 +73,7 @@ Item {
 
                 ctx.moveTo(dps(2.5), dps(8.5))
                 ctx.lineTo(dps(7), dps(12.5))
-                ctx.lineTo(dps(15.5), dps(4))
+                ctx.lineTo(dps(15), dps(4.5))
                 ctx.stroke()
             }
         }
