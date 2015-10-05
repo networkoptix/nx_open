@@ -841,6 +841,16 @@ void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &peri
 
 bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs)
 {
+    return qnNormalStorageMan->isArchiveTimeExists(cameraUniqueId, timeMs) || qnBackupStorageMan->isArchiveTimeExists(cameraUniqueId, timeMs);
+}
+
+bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period)
+{
+    return qnNormalStorageMan->isArchiveTimeExists(cameraUniqueId, period) || qnBackupStorageMan->isArchiveTimeExists(cameraUniqueId, period);
+}
+
+bool QnStorageManager::isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs)
+{
     DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
     if (catalog && catalog->containTime(timeMs))
         return true;
@@ -849,7 +859,7 @@ bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, qint64
     return catalog && catalog->containTime(timeMs);
 }
 
-bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period)
+bool QnStorageManager::isArchiveTimeExistsInternal(const QString& cameraUniqueId, const QnTimePeriod period)
 {
     DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
     if (catalog && catalog->containTime(period))

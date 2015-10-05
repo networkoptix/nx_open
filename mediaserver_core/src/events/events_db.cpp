@@ -718,8 +718,8 @@ void QnEventsDB::getAndSerializeActions(
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes = qnResPool->getResourceById<QnNetworkResource>(eventResId);
             if (camRes) {
-                if (qnNormalStorageMan->isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll) || 
-                    qnBackupStorageMan->isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
+                if (QnStorageManager::isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll) || 
+                    QnStorageManager::isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
                 {
                     flags |= QnBusinessActionData::MotionExists;
                 }

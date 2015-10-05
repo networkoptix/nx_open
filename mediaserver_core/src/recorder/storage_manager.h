@@ -100,8 +100,8 @@ public:
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
-    bool isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs);
-    bool isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period);
+    static bool isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs);
+    static bool isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period);
     void stopAsyncTasks();
 
     QnStorageScanData rebuildCatalogAsync();
@@ -141,6 +141,8 @@ public slots:
 private:
     friend class TestStorageThread;
 
+    bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs);
+    bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, const QnTimePeriod period);
     int detectStorageIndex(const QString& path);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
