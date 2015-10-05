@@ -12,6 +12,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/read_only.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench.h>
@@ -95,4 +96,11 @@ void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.box != lit("isd");
+}
+
+void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly) {
+    using ::setReadOnly;
+
+    setReadOnly(ui->systemSettingsWidget, readOnly);
+    setReadOnly(ui->backupWidget, readOnly);
 }

@@ -1,57 +1,23 @@
 #include "authutil.h"
 
-//!Splits \a data by \a delimiter not closed within quotes
-/*!
-    E.g.: 
-    \code
-    one, two, "three, four"
-    \endcode
-
-    will be splitted to 
-    \code
-    one
-    two
-    "three, four"
-    \endcode
-*/
-QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
+template <class T, class T2>
+QList<T> smartSplitInternal(const T& data, const T2 delimiter, const T2 quoteChar, bool keepEmptyParts)
 {
     bool quoted = false;
-    QList<QByteArray> rez;
+    QList<T> rez;
     if (data.isEmpty())
         return rez;
 
     int lastPos = 0;
     for (int i = 0; i < data.size(); ++i)
     {
-        if (data[i] == '\"')
+        if (data[i] == quoteChar)
             quoted = !quoted;
         else if (data[i] == delimiter && !quoted)
         {
-            rez << QByteArray(data.constData() + lastPos, i - lastPos);
-            lastPos = i + 1;
-        }
-    }
-    rez << QByteArray(data.constData() + lastPos, data.size() - lastPos);
-
-    return rez;
-}
-
-QStringList smartSplit(const QString& data, const QChar delimiter)
-{
-    bool quoted = false;
-    QStringList rez;
-    if (data.isEmpty())
-        return rez;
-
-    int lastPos = 0;
-    for (int i = 0; i < data.size(); ++i)
-    {
-        if (data[i] == L'\"')
-            quoted = !quoted;
-        else if (data[i] == delimiter && !quoted)
-        {
-            rez << data.mid(lastPos, i - lastPos);
+            T value = data.mid(lastPos, i - lastPos);
+            if (!value.isEmpty() || keepEmptyParts)
+                rez << value;
             lastPos = i + 1;
         }
     }
@@ -60,12 +26,33 @@ QStringList smartSplit(const QString& data, const QChar delimiter)
     return rez;
 }
 
+QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
+{
+    return smartSplitInternal(data, delimiter, '\"', true);
+}
+
+QStringList smartSplit(const QString& data, const QChar delimiter, QString::SplitBehavior splitBehavior )
+{
+    return smartSplitInternal(data, delimiter, QChar(L'\"'), splitBehavior == QString::KeepEmptyParts);
+}
+
+template <class T, class T2>
+T unquoteStrInternal(const T& v, T2 quoteChar)
+{
+    T value = v.trimmed();
+    int pos1 = value.startsWith(quoteChar) ? 1 : 0;
+    int pos2 = value.endsWith(quoteChar) ? 1 : 0;
+    return value.mid(pos1, value.length()-pos1-pos2);
+}
+
 QByteArray unquoteStr(const QByteArray& v)
 {
-    QByteArray value = v.trimmed();
-    int pos1 = value.startsWith('\"') ? 1 : 0;
-    int pos2 = value.endsWith('\"') ? 1 : 0;
-    return value.mid(pos1, value.length()-pos1-pos2);
+    return unquoteStrInternal(v, '\"');
+}
+
+QString unquoteStr(const QString& v)
+{
+    return unquoteStrInternal(v, L'\"');
 }
 
 QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter) {

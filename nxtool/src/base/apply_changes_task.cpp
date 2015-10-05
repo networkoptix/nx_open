@@ -1,6 +1,8 @@
 
 #include "apply_changes_task.h"
 
+#include <set>
+
 #include <QTimer>
 #include <QHostAddress>
 
@@ -23,8 +25,8 @@ namespace
     {
         kIfListRequestsPeriod = 2 * 1000
 
-        /// Accepted wait time is 300 seconds due to restart on network interface parameters change
-        , kRestartTimeout = 300 * 1000
+        /// Accepted wait time is 360 seconds due to restart on network interface parameters change
+        , kRestartTimeout = 360 * 1000
 
         /// Long 30-minutes timeout for reset to factory defautls operation
         , kFactoryDefaultsTimeout = 30 * 60 * 1000
@@ -197,8 +199,42 @@ namespace
     typedef std::shared_ptr<ItfChangeRequest> ItfChangeRequestPtr;
     typedef std::function<void (rtu::RequestError error
         , rtu::Constants::AffectedEntities affected)> BeforeDeleteAction;
-    typedef QPair<rtu::AwaitingOp::Holder, BeforeDeleteAction> AwaitingOpData;
-    typedef QHash<QUuid, AwaitingOpData> AwaitingOps;
+    
+    typedef std::pair<rtu::AwaitingOp::Holder
+        , BeforeDeleteAction> AwaitingOpData;
+    typedef std::multimap<QUuid, AwaitingOpData> AwaitingOps;
+    typedef std::function<void (const rtu::AwaitingOp::Holder op)> OpHandler;
+
+    
+    struct ItfChangeAwaitngOpData
+    {
+        QUuid initRuntimeId;
+        ServerInfoCacheItem *item;
+        rtu::AwaitingOp::WeakPtr weakOp;
+        rtu::ItfUpdateInfoContainer initialChanges;
+        bool needRestartProperty;
+
+        ItfChangeAwaitngOpData(const rtu::AwaitingOp::WeakPtr &initWeakOp
+            , ServerInfoCacheItem *initItem
+            , const rtu::ItfUpdateInfoContainer &initInitialChanges
+            , bool initNeedRestartProperty
+            , const QUuid &runtimeId);
+    };
+
+    typedef std::shared_ptr<ItfChangeAwaitngOpData> ItfChangeAwaitngOpDataPtr;
+
+    ItfChangeAwaitngOpData::ItfChangeAwaitngOpData(const rtu::AwaitingOp::WeakPtr &initWeakOp
+        , ServerInfoCacheItem *initItem
+        , const rtu::ItfUpdateInfoContainer &initInitialChanges
+        , bool initNeedRestartProperty
+        , const QUuid &runtimeId)
+        : initRuntimeId(runtimeId)
+        , item(initItem)
+        , weakOp(initWeakOp)
+        , initialChanges(initInitialChanges)
+        , needRestartProperty(initNeedRestartProperty)
+    {
+    }
 }
 
 class rtu::ApplyChangesTask::Impl : public std::enable_shared_from_this<rtu::ApplyChangesTask::Impl>
@@ -228,6 +264,9 @@ public:
         
     int appliedChangesCount() const;
 
+    void applyOp(const QUuid &serverId
+        , const OpHandler &handler);
+
     void serverDiscovered(const rtu::BaseServerInfo &baseInfo);
 
     void serversDisappeared(const rtu::IDsVector &ids);
@@ -242,18 +281,19 @@ private:
 
     void sendRequests();
 
-    rtu::OperationCallback makeAwaitingRequestCallback(const QUuid &id);
+    rtu::OperationCallback makeAwaitingRequestCallback(const AwaitingOp::WeakPtr &weakOp);
 
-    void removeAwatingOp(const QUuid &id
+    void removeAwatingOp(const AwaitingOp::WeakPtr &op
         , RequestError error
         , Constants::AffectedEntities affected);
+
+    bool addRestartAuthAwaitingOp(const ServerInfoCacheItem &item
+        , const QUuid &initRuntimeId
+        , int changesCount);
 
     rtu::AwaitingOp::Holder addAwaitingOp(const QUuid &id
         , int changesCount
         , qint64 timeout
-        , const AwaitingOp::ServerDiscoveredAction &discovered
-        , const Callback &disappeared
-        , const AwaitingOp::UnknownAddedHandler &unknownAdded
         , const BeforeDeleteAction &beforeDeleteAction
         , const Constants::AffectedEntities affected);
 
@@ -273,17 +313,14 @@ private:
     void addPortChangeRequests();
     
     AwaitingOp::ServerDiscoveredAction makeItfChangeDiscoveredHandler(
-        ServerInfoCacheItem &item
+        const ItfChangeAwaitngOpDataPtr data
         , const ItfChangeRequestPtr &itfChangeRequest
-        , const ItfUpdateInfoContainer &initialChanges
         , Constants::AffectedEntities affected);
 
-    Callback makeItfChangeDisappearedHandler(const ServerInfoCacheItem &item
-        , const rtu::ItfUpdateInfoContainer &initialChanges);
+    Callback makeItfChangeDisappearedHandler(const ItfChangeAwaitngOpDataPtr &data);
     
     AwaitingOp::UnknownAddedHandler makeItfChangeUnknownAddedHandler(
-        const ServerInfoCacheItem &item
-        , const ItfUpdateInfoContainer &initialChanges);
+        const ItfChangeAwaitngOpDataPtr &data);
 
     void addItfsChangeRequest(ServerInfoCacheItem &item
         , const ItfUpdateInfoContainer &changes);
@@ -306,13 +343,17 @@ private:
 
     typedef QHash<QUuid, ItfChangeRequest> ItfChangesContainer;
     
-    void itfRequestSuccessfullyApplied(const rtu::ItfUpdateInfoContainer &initialChanges
+    void itfRequestSuccessfullyApplied(const ItfChangeAwaitngOpDataPtr &data);
+
+    typedef std::weak_ptr<Impl> ThisWeakPtr;
+    void checkReachability(const ThisWeakPtr &weak
+        , const AwaitingOp::WeakPtr &weakOp
         , const ServerInfoCacheItem &item);
 
 private:
     typedef QPair<bool, Request> RequestData;
     typedef QVector<RequestData>  RequestContainer;
-    typedef std::weak_ptr<Impl> ThisWeakPtr;
+    typedef std::set<QUuid> UuidsSet;
 
     const QUuid m_id;
     const ChangesetPointer m_changeset;
@@ -327,6 +368,7 @@ private:
     
     RequestContainer m_requests;
     AwaitingOps m_awaiting;
+    UuidsSet m_restartAuthAwaitingIds;
 
     int m_appliedChangesIndex;
     int m_lastChangesetIndex;
@@ -353,6 +395,7 @@ rtu::ApplyChangesTask::Impl::Impl(const ChangesetPointer &changeset
     
     , m_requests()
     , m_awaiting()
+    , m_restartAuthAwaitingIds()
     
     , m_appliedChangesIndex(0)
     , m_lastChangesetIndex(0)
@@ -421,27 +464,41 @@ int rtu::ApplyChangesTask::Impl::appliedChangesCount() const
     return m_appliedChangesCount;
 }
 
+void rtu::ApplyChangesTask::Impl::applyOp(const QUuid &serverId
+    , const OpHandler &handler)
+{
+    if (!handler)
+        return;
+
+    const auto range = (!serverId.isNull() ? m_awaiting.equal_range(serverId)
+        : std::make_pair(m_awaiting.begin(), m_awaiting.end()));
+
+    typedef std::vector<AwaitingOpData> TargetData;
+    TargetData data;
+
+    for (auto it = range.first; it != range.second; ++it)
+        data.push_back(it->second);
+
+    for (auto &opData: data)
+        handler(opData.first);
+}
+
 void rtu::ApplyChangesTask::Impl::serverDiscovered(const rtu::BaseServerInfo &info)
 {
-    /// Awating operations processor
-    const auto it = m_awaiting.find(info.id);
-    if (it != m_awaiting.end())
+    applyOp(info.id, [info](const AwaitingOp::Holder &op)
     {
-        const auto awatingOp = it.value().first;
-        awatingOp->processServerDiscovered(info);
-    }
+        op->processServerDiscovered(info);
+    });
 }
 
 void rtu::ApplyChangesTask::Impl::serversDisappeared(const rtu::IDsVector &ids)
 {
     for (const QUuid &id: ids)
     {
-        const auto it = m_awaiting.find(id);
-        if (it == m_awaiting.end())
-            continue;
-
-        const auto awaitingOp = it.value().first;
-        awaitingOp->processServerDisappeared();
+        applyOp(id, [](const AwaitingOp::Holder &op)
+        {
+            op->processServerDisappeared();
+        });
     }
 }
 
@@ -449,23 +506,31 @@ bool rtu::ApplyChangesTask::Impl::unknownAdded(const QString &ip)
 {
     for(const auto &awaiting: m_awaiting)
     {
-        if (awaiting.first->processUnknownAdded(ip))
+        if (awaiting.second.first->processUnknownAdded(ip))
             return true;
     }
     return false;
 }
 
-void rtu::ApplyChangesTask::Impl::itfRequestSuccessfullyApplied(
-    const rtu::ItfUpdateInfoContainer &initialChanges
-    , const ServerInfoCacheItem &item)
+void rtu::ApplyChangesTask::Impl::itfRequestSuccessfullyApplied(const ItfChangeAwaitngOpDataPtr &data)
 {
-    for(const auto &change: initialChanges)
+    if (data->weakOp.expired())
+        return;
+
+    for(const auto &change: data->initialChanges)
     {
-        addUpdateInfoSummaryItem(item, RequestError::kSuccess
+        addUpdateInfoSummaryItem(*data->item, RequestError::kSuccess
             , change, Constants::kAllEntitiesAffected);
     }
 
-    removeAwatingOp(item.first->id, RequestError::kSuccess, Constants::kAllEntitiesAffected);
+    if (data->needRestartProperty)
+    {
+        const auto sharedOp = data->weakOp.lock();
+        const int changesCount = sharedOp->changesCount();
+        if (addRestartAuthAwaitingOp(*data->item, data->initRuntimeId, changesCount))
+            sharedOp->resetChangesCount();
+    }
+    removeAwatingOp(data->weakOp, RequestError::kSuccess, Constants::kAllEntitiesAffected);
 }
 
 void rtu::ApplyChangesTask::Impl::onChangesetApplied(int changesCount)
@@ -501,10 +566,10 @@ void rtu::ApplyChangesTask::Impl::sendRequests()
     }
 }
 
-rtu::OperationCallback rtu::ApplyChangesTask::Impl::makeAwaitingRequestCallback(const QUuid &id)
+rtu::OperationCallback rtu::ApplyChangesTask::Impl::makeAwaitingRequestCallback(const AwaitingOp::WeakPtr &weakOp)
 {
     const ThisWeakPtr weak = shared_from_this();
-    const auto callback = [id, weak]
+    const auto callback = [weakOp, weak]
         (RequestError error, Constants::AffectedEntities affected)
     {
         if (weak.expired())
@@ -513,51 +578,138 @@ rtu::OperationCallback rtu::ApplyChangesTask::Impl::makeAwaitingRequestCallback(
         if (error != RequestError::kSuccess)
         {
             const auto shared = weak.lock();
-            shared->removeAwatingOp(id, error, affected);
+            shared->removeAwatingOp(weakOp, error, affected);
         }
     };
 
     return callback;
 }
 
-void rtu::ApplyChangesTask::Impl::removeAwatingOp(const QUuid &id
+void rtu::ApplyChangesTask::Impl::removeAwatingOp(const AwaitingOp::WeakPtr &op
     , RequestError error
     , Constants::AffectedEntities affected)
 {
-    const auto itOp = m_awaiting.find(id);
-    if (itOp == m_awaiting.end())
+    if (op.expired())
         return;
 
-    const auto &data = (*itOp);
-    if (data.second)
-        data.second(error, affected);
+    const auto sharedOp = op.lock();
+    const auto id = sharedOp->serverId();
 
-    onChangesetApplied(data.first->changesCount());
-    m_awaiting.erase(itOp);
+    const auto range = m_awaiting.equal_range(id);
+    for (auto it = range.first; it != range.second; ++it)
+    {
+        const auto &data = (it->second);
+        const auto &operation = data.first;
+        if (operation != sharedOp)
+            continue;
+
+        if (data.second)
+            data.second(error, affected);
+
+        onChangesetApplied(data.first->changesCount());
+        m_awaiting.erase(it);
+        break;
+    }
 }
 
-rtu::AwaitingOp::Holder rtu::ApplyChangesTask::Impl::addAwaitingOp(const QUuid &id
-    , int changesCount
-    , qint64 timeout
-    , const AwaitingOp::ServerDiscoveredAction &discovered
-    , const Callback &disappeared
-    , const AwaitingOp::UnknownAddedHandler &unknownAdded
-    , const BeforeDeleteAction &beforeDeleteAction
-    , Constants::AffectedEntities affected)
+void rtu::ApplyChangesTask::Impl::checkReachability(const ThisWeakPtr &weak
+    , const AwaitingOp::WeakPtr &weakOp
+    , const ServerInfoCacheItem &item)
 {
-    const ThisWeakPtr weak = shared_from_this(); 
-    const auto removeByTimeout = [weak, affected](const QUuid &id)
+    /// Send after delay to give a chance to discover server in ServersFinder
+    enum { kDiscoveryDelay = 15 * 1000 };
+    QTimer::singleShot(kDiscoveryDelay, [weak, weakOp, &item]()
+    {
+        const auto success = [weak, weakOp, &item](const QUuid &id, const ExtraServerInfo &extraInfo) 
+        {
+            if (weak.expired())
+                return;
+
+            const auto shared = weak.lock();
+            emit shared->m_owner->extraInfoUpdated(id, extraInfo, item.first->hostAddress);
+
+            shared->removeAwatingOp(weakOp, RequestError::kSuccess, Constants::kNoEntitiesAffected);
+        };
+
+        const auto failed = [weak, weakOp](const RequestError /* errorCode */
+            , Constants::AffectedEntities affectedEntities)
+        {
+            if (weak.expired())
+                return;
+
+            const auto shared = weak.lock();
+            shared->removeAwatingOp(weakOp, RequestError::kSuccess, affectedEntities);
+        };
+
+        getServerExtraInfo(item.first, item.second.password, success, failed);
+    });
+}
+
+bool rtu::ApplyChangesTask::Impl::addRestartAuthAwaitingOp(const ServerInfoCacheItem &item
+    , const QUuid &initRuntimeId
+    , int changesCount)
+{
+    const auto &serverId = item.first->id;
+    const auto it = m_restartAuthAwaitingIds.find(serverId);
+    if (it != m_restartAuthAwaitingIds.end())
+    {
+        /// Awaiting operation has been added already
+        return false;
+    }
+
+    const ThisWeakPtr weak = shared_from_this();
+    const auto request = [weak, serverId, initRuntimeId, changesCount, &item]()
     {
         if (weak.expired())
             return;
 
         const auto shared = weak.lock();
-        shared->removeAwatingOp(id, RequestError::kRequestTimeout, affected);
+        const auto op = shared->addAwaitingOp(serverId, changesCount, kRestartTimeout
+            , BeforeDeleteAction(), Constants::kNoEntitiesAffected); 
+
+        const AwaitingOp::WeakPtr weakOp = op;
+        const BoolPointer firstRequestProperty(new bool(true));
+        const auto discovered = [weak, weakOp, initRuntimeId, firstRequestProperty, &item]
+            (const BaseServerInfo &info)
+        {
+            if (weak.expired() || (info.runtimeId == initRuntimeId) || (!*firstRequestProperty))
+                return;
+
+            *firstRequestProperty = false;
+
+            /// Server has restarted
+            /// Sending authorization request
+
+            const auto shared = weak.lock();
+            shared->checkReachability(weak, weakOp, item);
+        };
+
+        op->setServerDiscoveredHandler(discovered);
     };
 
-    const auto op = AwaitingOp::create(id, changesCount, timeout
-        , discovered, disappeared, unknownAdded, removeByTimeout);
-    m_awaiting.insert(id, AwaitingOpData(op, beforeDeleteAction));
+    m_requests.push_back(RequestData(kNonBlockingRequest, request));
+    return true;
+}
+
+
+rtu::AwaitingOp::Holder rtu::ApplyChangesTask::Impl::addAwaitingOp(const QUuid &id
+    , int changesCount
+    , qint64 timeout
+    , const BeforeDeleteAction &beforeDeleteAction
+    , Constants::AffectedEntities affected)
+{
+    const ThisWeakPtr weak = shared_from_this(); 
+    const auto removeByTimeout = [weak, affected](const AwaitingOp::WeakPtr op)
+    {
+        if (weak.expired())
+            return;
+
+        const auto shared = weak.lock();
+        shared->removeAwatingOp(op, RequestError::kRequestTimeout, affected);
+    };
+
+    const auto op = AwaitingOp::create(id, changesCount, timeout, removeByTimeout);
+    m_awaiting.insert(std::make_pair(id, AwaitingOpData(op, beforeDeleteAction)));
     return op;
 }
 
@@ -568,7 +720,7 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
     , const QString &description
     , int timeout)
 {
-    static const auto kOpAffected = Constants::kAllEntitiesAffected;
+    static const auto kOpAffected = Constants::kNoEntitiesAffected;
     static const auto kOpValue = QString();
 
     const ThisWeakPtr weak = shared_from_this();
@@ -581,21 +733,6 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
 
         const auto id = item.first->id;
         const auto initialRuntimeId = item.first->runtimeId;
-
-        const auto discoveredHandler = [weak, id, initialRuntimeId, pred] (const BaseServerInfo &info)
-        {
-            if (weak.expired())
-                return;
-
-            /// Server has restarted, thus we are waiting until it gets in normal (not safe) mode
-            if ((info.runtimeId != initialRuntimeId) && (!pred || pred(info))) 
-                                                        
-            {
-                const auto shared = weak.lock();
-                shared->removeAwatingOp(id, RequestError::kSuccess, kOpAffected);
-            }
-        };
-
 
         const auto beforeRemoveHandler = [weak, &item, cmd, description]
             (RequestError error, Constants::AffectedEntities /* affected */)
@@ -611,12 +748,33 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
         
         const auto shared = weak.lock();
         
-        shared->addAwaitingOp(id, changesCount, timeout, discoveredHandler
-            , Callback(), AwaitingOp::UnknownAddedHandler(), beforeRemoveHandler, kOpAffected);
+        const auto op = shared->addAwaitingOp(id, changesCount
+            , timeout, beforeRemoveHandler, kOpAffected);
+
+
+        const AwaitingOp::WeakPtr weakOp = op;
+        const BoolPointer firstRequestProperty(new bool(true));
+        const auto discoveredHandler = [weak, weakOp, initialRuntimeId, pred, firstRequestProperty, &item] 
+            (const BaseServerInfo &info)
+        {
+            if (weak.expired())
+                return;
+
+            /// Server has restarted, thus we are waiting until it gets in normal (not safe) mode
+            if ((info.runtimeId != initialRuntimeId) && (!pred || pred(info)) && *firstRequestProperty) 
+                                                        
+            {
+                *firstRequestProperty = false;
+                const auto shared = weak.lock();
+                shared->checkReachability(weak, weakOp, item);
+            }
+        };
+
+        op->setServerDiscoveredHandler(discoveredHandler);
 
         const auto &baseServerInfo = item.first;
         const auto &password = item.second.password;
-        const auto &callback = shared->makeAwaitingRequestCallback(id);
+        const auto &callback = shared->makeAwaitingRequestCallback(op);
 
         sendSystemCommand(baseServerInfo, password, cmd, callback);
     };
@@ -675,16 +833,18 @@ void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
     const DateTime &change = *m_changeset->dateTime();
     const ThisWeakPtr weak = shared_from_this();
 
-    for (auto &info: m_serversCache)
+    for (auto &item: m_serversCache)
     {
         enum { kDateTimeChangesetSize = 1};
-        const auto request = [weak, &info, change, timestampMs]()
+
+        const auto initRuntimeId = item.first->runtimeId;
+        const auto request = [weak, &item, change, timestampMs, initRuntimeId]()
         {
             if (weak.expired())
                 return;
 
-            const auto &callback = [weak, &info, change, timestampMs]
-                (const RequestError errorCode, Constants::AffectedEntities affected)
+            const auto &callback = [weak, &item, change, timestampMs, initRuntimeId]
+                (const RequestError errorCode, Constants::AffectedEntities affected, bool needRestart)
             {
                 static const QString kTimeDescription = "server time";
                 static const QString kTimeTemplate("%1\n%2");
@@ -700,25 +860,30 @@ void rtu::ApplyChangesTask::Impl::addDateTimeChangeRequests()
 
                 const auto val = kTimeTemplate.arg(timeStr, timeZoneName);
                 const auto flags = (Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
-                const bool successful = shared->addSummaryItem(info, kTimeDescription
+                const bool successful = shared->addSummaryItem(item, kTimeDescription
                     , val, errorCode, flags, affected);
 
-                if (successful)
+                bool waitForRestart = false;
+                if(successful)
                 {
-                    emit shared->m_owner->dateTimeUpdated(info.first->id
+                    emit shared->m_owner->dateTimeUpdated(item.first->id
                         , change.utcDateTimeMs, change.timeZoneId, timestampMs);
                     
-                    ExtraServerInfo &extraInfo = info.second;
+                    ExtraServerInfo &extraInfo = item.second;
                     extraInfo.timestampMs = timestampMs;
                     extraInfo.timeZoneId = change.timeZoneId;
                     extraInfo.utcDateTimeMs = change.utcDateTimeMs;
+                    
+                    if (needRestart)
+                        waitForRestart = shared->addRestartAuthAwaitingOp(item, initRuntimeId, kDateTimeChangesetSize);
                 }
-                
-                shared->onChangesetApplied(kDateTimeChangesetSize);
+
+
+                shared->onChangesetApplied(waitForRestart ? 0 : kDateTimeChangesetSize);
             };
 
             const auto shared = weak.lock();
-            sendSetTimeRequest(info.first, info.second.password
+            sendSetTimeRequest(item.first, item.second.password
                 , change.utcDateTimeMs, change.timeZoneId, callback);
         };
 
@@ -734,16 +899,18 @@ void rtu::ApplyChangesTask::Impl::addSystemNameChangeRequests()
 
     const QString &systemName = *m_changeset->systemName();
     const ThisWeakPtr weak = shared_from_this();
-    for (auto &info: m_serversCache)
+    for (auto &item: m_serversCache)
     {
         enum { kSystemNameChangesetSize = 1 };
-        const auto request = [weak, &info, systemName]()
+
+        const auto initRuntimeId = item.first->runtimeId;
+        const auto request = [weak, initRuntimeId, &item, systemName]()
         {
             if (weak.expired())
                 return;
 
-            const auto &callback = [weak, &info, systemName]
-                (const RequestError errorCode, Constants::AffectedEntities affected)
+            const auto &callback = [weak, initRuntimeId, &item, systemName]
+                (const RequestError errorCode, Constants::AffectedEntities affected, bool needRestart)
             {
                 static const QString &kSystemNameDescription = "system name";
 
@@ -751,18 +918,22 @@ void rtu::ApplyChangesTask::Impl::addSystemNameChangeRequests()
                     return;
 
                 const auto shared = weak.lock();
-                if(shared->addSummaryItem(info, kSystemNameDescription, systemName
+                bool waitForRestart = false;
+                if(shared->addSummaryItem(item, kSystemNameDescription, systemName
                     , errorCode, Constants::kSystemNameAffected, affected))
                 {
-                    emit shared->m_owner->systemNameUpdated(info.first->id, systemName);
-                    info.first->systemName = systemName;
+                    emit shared->m_owner->systemNameUpdated(item.first->id, systemName);
+                    item.first->systemName = systemName;
+
+                    if (needRestart)
+                        waitForRestart = shared->addRestartAuthAwaitingOp(item, initRuntimeId, kSystemNameChangesetSize);
                 }
                 
-                shared->onChangesetApplied(kSystemNameChangesetSize);
+                shared->onChangesetApplied(waitForRestart ? 0 : kSystemNameChangesetSize);
             };
 
             const auto shared = weak.lock();
-            sendSetSystemNameRequest(info.first, info.second.password, systemName, callback);
+            sendSetSystemNameRequest(item.first, item.second.password, systemName, callback);
         };
 
         m_totalChangesCount += kSystemNameChangesetSize;
@@ -778,17 +949,17 @@ void rtu::ApplyChangesTask::Impl::addPortChangeRequests()
     const int port = *m_changeset->port();
     const ThisWeakPtr weak = shared_from_this();
 
-    for (auto &info: m_serversCache)
+    for (auto &item: m_serversCache)
     {
         enum { kPortChangesetCapacity = 1 };
-        const auto request = [weak, &info, port]()
+        const auto initRuntimeId = item.first->runtimeId;
+        const auto request = [weak, initRuntimeId, &item, port]()
         {
             if (weak.expired())
                 return;
 
-
-            const auto &callback = [weak, &info, port]
-                (const RequestError errorCode, Constants::AffectedEntities affected)
+            const auto &callback = [weak, initRuntimeId, &item, port]
+                (const RequestError errorCode, Constants::AffectedEntities affected, bool needRestart)
             {
                 static const QString kPortDescription = "port";
 
@@ -796,19 +967,23 @@ void rtu::ApplyChangesTask::Impl::addPortChangeRequests()
                     return;
 
                 const auto shared = weak.lock();
-                if (shared->addSummaryItem(info, kPortDescription, QString::number(port)
+                bool waitForRestart = false;
+                if (shared->addSummaryItem(item, kPortDescription, QString::number(port)
                     , errorCode, Constants::kPortAffected, affected))
                 {
-                    emit shared->m_owner->portUpdated(info.first->id, port);
-                    info.first->port = port;
+                    emit shared->m_owner->portUpdated(item.first->id, port);
+                    item.first->port = port;
+
+                    if (needRestart)
+                        waitForRestart = shared->addRestartAuthAwaitingOp(item, initRuntimeId, kPortChangesetCapacity);
                 }
 
-                shared->onChangesetApplied(kPortChangesetCapacity);
+                shared->onChangesetApplied(waitForRestart ? 0 : kPortChangesetCapacity);
             };
 
 
             const auto shared = weak.lock();
-            sendSetPortRequest(info.first, info.second.password, port, callback);
+            sendSetPortRequest(item.first, item.second.password, port, callback);
         };
 
         m_totalChangesCount += kPortChangesetCapacity;
@@ -817,14 +992,12 @@ void rtu::ApplyChangesTask::Impl::addPortChangeRequests()
 }
 
 rtu::AwaitingOp::ServerDiscoveredAction rtu::ApplyChangesTask::Impl::makeItfChangeDiscoveredHandler(
-    ServerInfoCacheItem &item
+    const ItfChangeAwaitngOpDataPtr data
     , const ItfChangeRequestPtr &itfChangeRequest
-    , const rtu::ItfUpdateInfoContainer &initialChanges
     , Constants::AffectedEntities affected)
 {
     const ThisWeakPtr weak = shared_from_this();
-
-    const auto handler = [weak, &item, itfChangeRequest, initialChanges, affected]
+    const auto handler = [weak, data, itfChangeRequest, affected]
         (const BaseServerInfo &info)
     {
         if (weak.expired())
@@ -841,10 +1014,10 @@ rtu::AwaitingOp::ServerDiscoveredAction rtu::ApplyChangesTask::Impl::makeItfChan
         if ((current - itfChangeRequest->timestamp) < kIfListRequestsPeriod)
             return;
 
-        const auto processCallback = [weak, &item, itfChangeRequest, initialChanges, affected]
+        const auto processCallback = [weak, data, itfChangeRequest, affected]
             (bool successful, const QUuid &id, const ExtraServerInfo &extraInfo)
         {
-            if (weak.expired())
+            if (weak.expired() || data->weakOp.expired())
                 return;
 
             const auto shared = weak.lock();
@@ -852,18 +1025,18 @@ rtu::AwaitingOp::ServerDiscoveredAction rtu::ApplyChangesTask::Impl::makeItfChan
             itfChangeRequest->inProgress = false;
             itfChangeRequest->timestamp = QDateTime::currentMSecsSinceEpoch();
         
-            const bool totalApplied = changesWasApplied(extraInfo.interfaces, initialChanges);
+            const bool totalApplied = changesWasApplied(extraInfo.interfaces, data->initialChanges);
         
             if (!successful || !totalApplied)
                 return;
 
-            for (const ItfUpdateInfo &change: initialChanges)
+            for (const ItfUpdateInfo &change: data->initialChanges)
             {
                 const auto &it = changeAppliedPos(extraInfo.interfaces, change);
                 const bool applied = (it != extraInfo.interfaces.end());
                 const auto affected = (applied ? Constants::kAllEntitiesAffected : Constants::kNoEntitiesAffected);
                 const auto code = (applied ? RequestError::kSuccess : RequestError::kUnspecified);
-                shared->addUpdateInfoSummaryItem(item, code, change, affected);
+                shared->addUpdateInfoSummaryItem(*data->item, code, change, affected);
             }
 
             RequestError finalError = RequestError::kUnspecified;
@@ -871,10 +1044,19 @@ rtu::AwaitingOp::ServerDiscoveredAction rtu::ApplyChangesTask::Impl::makeItfChan
             {
                 finalError = RequestError::kSuccess;
                 emit shared->m_owner->extraInfoUpdated(
-                    id, extraInfo, item.first->hostAddress);
+                    id, extraInfo, data->item->first->hostAddress);
+            }
+        
+            
+            const auto sharedOp = data->weakOp.lock();
+            const int changesCount = sharedOp->changesCount();
+            if (data->needRestartProperty && (finalError == RequestError::kSuccess) 
+                && shared->addRestartAuthAwaitingOp(*data->item, data->initRuntimeId, changesCount))
+            {
+                sharedOp->resetChangesCount();
             }
 
-            shared->removeAwatingOp(id, finalError, affected);
+            shared->removeAwatingOp(data->weakOp, finalError, affected);
         };
     
         const auto &successful =
@@ -889,14 +1071,14 @@ rtu::AwaitingOp::ServerDiscoveredAction rtu::ApplyChangesTask::Impl::makeItfChan
             processCallback(false, info.id, ExtraServerInfo());
         };
     
-        BaseServerInfo &currentBase = *item.first;
+        BaseServerInfo &currentBase = *data->item->first;
 
         const bool currentDiscoverByHttp = currentBase.accessibleByHttp;
         currentBase = info;
         currentBase.accessibleByHttp = currentDiscoverByHttp;
         itfChangeRequest->inProgress = true;
     
-        getServerExtraInfo(item.first, item.second.password
+        getServerExtraInfo(data->item->first, data->item->second.password
             , successful, failed, kIfListRequestsPeriod);
     };
 
@@ -904,20 +1086,19 @@ rtu::AwaitingOp::ServerDiscoveredAction rtu::ApplyChangesTask::Impl::makeItfChan
 }
 
 rtu::Callback rtu::ApplyChangesTask::Impl::makeItfChangeDisappearedHandler(
-    const ServerInfoCacheItem &item
-    , const rtu::ItfUpdateInfoContainer &initialChanges)
+    const ItfChangeAwaitngOpDataPtr &data)
 {
     const ThisWeakPtr weak = shared_from_this();
 
-    const auto handler = [weak, &item, initialChanges]()
+    const auto handler = [weak, data]()
     {
         /// TODO: extend logic for several interface changes
         if (weak.expired() 
-            || (initialChanges.size() != kSingleInterfaceChangeCount))
+            || (data->initialChanges.size() != kSingleInterfaceChangeCount))
             return;
 
         bool isDHCPTurnOnChange = true;
-        for (const auto &change: initialChanges)
+        for (const auto &change: data->initialChanges)
         {
             isDHCPTurnOnChange &= (change.useDHCP && *change.useDHCP);
         }
@@ -927,31 +1108,31 @@ rtu::Callback rtu::ApplyChangesTask::Impl::makeItfChangeDisappearedHandler(
 
         //// If server is disappeared and all changes are dhcp "on"
         const auto shared = weak.lock();
-        shared->itfRequestSuccessfullyApplied(initialChanges, item);
+        shared->itfRequestSuccessfullyApplied(data);
     };
 
     return handler;
 }
 
 rtu::AwaitingOp::UnknownAddedHandler rtu::ApplyChangesTask::Impl::makeItfChangeUnknownAddedHandler(
-    const ServerInfoCacheItem &item
-    , const ItfUpdateInfoContainer &initialChanges)
+    const ItfChangeAwaitngOpDataPtr &data)
 {
     const ThisWeakPtr weak = shared_from_this();
 
-    const auto handler = [weak, &item, initialChanges](const QString &ip) -> bool
+    const auto handler = [weak, data]
+        (const QString &ip) -> bool
     {
         if (weak.expired())
             return false;
 
         /// Searches for the change request
-        const auto &it = std::find_if(initialChanges.begin(), initialChanges.end()
+        const auto &it = std::find_if(data->initialChanges.begin(), data->initialChanges.end()
             , [ip](const ItfUpdateInfo &updateInfo) 
         {
             return ((!updateInfo.useDHCP || !*updateInfo.useDHCP) && updateInfo.ip && *updateInfo.ip == ip);
         });
 
-        if (it == initialChanges.end())
+        if (it == data->initialChanges.end())
         {
             return false;
         }
@@ -961,7 +1142,7 @@ rtu::AwaitingOp::UnknownAddedHandler rtu::ApplyChangesTask::Impl::makeItfChangeU
         /// So, we suppose that request to change ip is successfully applied
 
         const auto shared = weak.lock();
-        shared->itfRequestSuccessfullyApplied(initialChanges, item);
+        shared->itfRequestSuccessfullyApplied(data);
         return true;
     };
 
@@ -969,37 +1150,20 @@ rtu::AwaitingOp::UnknownAddedHandler rtu::ApplyChangesTask::Impl::makeItfChangeU
 }
 
 void rtu::ApplyChangesTask::Impl::addItfsChangeRequest(ServerInfoCacheItem &item
-                                                       , const ItfUpdateInfoContainer &initialChanges)
+    , const ItfUpdateInfoContainer &initialChanges)
 {
     const ThisWeakPtr weak = shared_from_this();
 
-    const QUuid id = item.first->id;
+    const QUuid initRuntimeId = item.first->runtimeId;
 
     const auto affected = calcAffected(initialChanges);
     const auto changesCount = changesFromUpdateInfos(initialChanges);
 
     const auto &request = 
-        [weak, id, &item, initialChanges, changesCount, affected]()
+        [weak, initRuntimeId, &item, initialChanges, changesCount, affected]()
     {
         if (weak.expired())
             return;
-
-        const auto failedCallback = [weak, id, &item, initialChanges]
-            (const RequestError errorCode, Constants::AffectedEntities affected)
-        {
-            if (weak.expired())
-                return;
-
-            const auto shared = weak.lock();
-            shared->removeAwatingOp(id, errorCode, affected);
-        };
-
-        const auto callback = [failedCallback, weak, initialChanges, item]
-            (const RequestError errorCode, Constants::AffectedEntities affected)
-        {
-            if (errorCode != RequestError::kSuccess)
-                failedCallback(errorCode , affected);
-        };
 
         auto augmentedChanges = initialChanges;
         const auto itfChangeRequest = ItfChangeRequestPtr(new ItfChangeRequest(&item, augmentedChanges));
@@ -1019,16 +1183,37 @@ void rtu::ApplyChangesTask::Impl::addItfsChangeRequest(ServerInfoCacheItem &item
         };
 
         const auto shared = weak.lock();
-        const auto discoveredHandler = shared->makeItfChangeDiscoveredHandler(
-            item, itfChangeRequest, initialChanges, affected);
 
-        const auto disappearedHandler = shared->makeItfChangeDisappearedHandler(
-            item, initialChanges);
-        const auto unknownAdded = shared->makeItfChangeUnknownAddedHandler(
-            item, initialChanges);
+        const auto op = shared->addAwaitingOp(item.first->id, changesCount
+            , kRestartTimeout, beforeDeleteCallback, affected);
 
-        shared->addAwaitingOp(id, changesCount, kRestartTimeout, discoveredHandler
-            , disappearedHandler, unknownAdded, beforeDeleteCallback, affected);
+        const BoolPointer needRestartProperty(new bool(false));
+        const ItfChangeAwaitngOpDataPtr data(new ItfChangeAwaitngOpData(
+            op, &item, initialChanges, needRestartProperty, initRuntimeId));
+
+        op->setServerDiscoveredHandler(shared->makeItfChangeDiscoveredHandler(
+            data, itfChangeRequest, affected));
+        op->setServerDisappearedHandler(shared->makeItfChangeDisappearedHandler(data));
+        op->setUnknownAddedHandler(shared->makeItfChangeUnknownAddedHandler(data));
+
+        const auto failedCallback = [weak, data]
+            (const RequestError errorCode, Constants::AffectedEntities affected)
+        {
+            if (weak.expired())
+                return;
+
+            const auto shared = weak.lock();
+            shared->removeAwatingOp(data->weakOp, errorCode, affected);
+        };
+
+        const auto callback = [failedCallback, data]
+            (const RequestError errorCode, Constants::AffectedEntities affected, bool needRestart)
+        {
+            if (errorCode != RequestError::kSuccess)
+                failedCallback(errorCode , affected);
+            else
+                data->needRestartProperty = needRestart;
+        };
 
         const auto baseInfo = item.first;
         const auto password = item.second.password;
@@ -1101,16 +1286,17 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
     const QString &newPassword = *m_changeset->password();
     const ThisWeakPtr weak = shared_from_this();
 
-    for (auto &info: m_serversCache)
+    for (auto &item: m_serversCache)
     {
         enum { kPasswordChangesetSize = 1 };
-        const auto request = [weak, &info, newPassword ]()
+        const auto initRuntimeId = item.first->runtimeId;
+        const auto request = [weak, initRuntimeId, &item, newPassword]()
         {
             if (weak.expired())
                 return;
 
-            const auto finalCallback =
-                [weak, &info, newPassword ](const RequestError errorCode, Constants::AffectedEntities affected)
+            const auto finalCallback = [weak, initRuntimeId, &item, newPassword ](const RequestError errorCode
+                , Constants::AffectedEntities affected, bool needRestart)
             {
                 static const QString kPasswordDescription = "password";
 
@@ -1118,35 +1304,39 @@ void rtu::ApplyChangesTask::Impl::addPasswordChangeRequests()
                     return;
 
                 const auto shared = weak.lock();
-                if (shared->addSummaryItem(info, kPasswordDescription, newPassword 
+                bool waitForRestart = false;
+                if (shared->addSummaryItem(item, kPasswordDescription, newPassword 
                     , errorCode, Constants::kPasswordAffected, affected))
                 {
-                    info.second.password = newPassword;
-                    emit shared->m_owner->passwordUpdated(info.first->id, newPassword);
+                    item.second.password = newPassword;
+                    emit shared->m_owner->passwordUpdated(item.first->id, newPassword);
+
+                    if (needRestart)
+                        waitForRestart = shared->addRestartAuthAwaitingOp(item, initRuntimeId, kPasswordChangesetSize);
                 }
                 
-                shared->onChangesetApplied(kPasswordChangesetSize);
+                shared->onChangesetApplied(waitForRestart ? 0 : kPasswordChangesetSize);
             };
             
-            const auto &callback = 
-                [weak, &info, newPassword, finalCallback](const RequestError errorCode, Constants::AffectedEntities affected)
+            const auto &callback = [weak, &item, newPassword, finalCallback]
+                (const RequestError errorCode, Constants::AffectedEntities affected, bool needRestart)
             {
                 if (weak.expired())
                     return;
 
                 if ((errorCode != RequestError::kSuccess) && (errorCode != RequestError::kUnauthorized))
                 {
-                    finalCallback(errorCode, affected);
+                    finalCallback(errorCode, affected, needRestart);
                 }
                 else
                 {
                     const auto shared = weak.lock();
-                    sendSetPasswordRequest(info.first, info.second.password, newPassword, true, finalCallback);
+                    sendSetPasswordRequest(item.first, item.second.password, newPassword, true, finalCallback);
                 }
             };
 
             const auto shared = weak.lock();
-            sendSetPasswordRequest(info.first, info.second.password, newPassword, false, callback);
+            sendSetPasswordRequest(item.first, item.second.password, newPassword, false, callback);
         };
 
         m_totalChangesCount += kPasswordChangesetSize;

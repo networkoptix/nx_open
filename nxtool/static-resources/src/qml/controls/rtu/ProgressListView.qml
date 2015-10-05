@@ -260,7 +260,7 @@ Item
                                 }
 
                                 text: (model.errorsCount ? qsTr("%1 error(s)").arg(model.errorsCount)
-                                    : qsTr("Sucessful!"));
+                                    : qsTr("Changes applied"));
                                 color: (model.errorsCount ? "red" : "green");
                             }
 

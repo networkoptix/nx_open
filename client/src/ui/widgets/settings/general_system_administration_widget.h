@@ -25,6 +25,7 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
+    void setReadOnlyInternal(bool readOnly) override;
 private:
     bool isDatabaseBackupAvailable() const;
 

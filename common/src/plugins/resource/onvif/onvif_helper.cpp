@@ -356,6 +356,10 @@ NameHelper::NameHelper()
         QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());
         QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, QString());
 
+        // todo: refactor it. it should be a pair with vendor + camera model here
+        if (normalizedName.toLower() == lit("panoramic"))
+            continue; // skip av abstract resource type
+
         if (normalizedName == normalizedManufacturer + QString(lit("camera")))
             continue;
 

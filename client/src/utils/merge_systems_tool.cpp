@@ -33,6 +33,8 @@ namespace {
             return QnMergeSystemsTool::BackupError;
         else if (str == lit("STARTER_LICENSE_ERROR"))
             return QnMergeSystemsTool::StarterLicenseError;
+        else if (str == lit("SAFE_MODE"))
+            return QnMergeSystemsTool::SafeModeError;
         else
             return QnMergeSystemsTool::InternalError;
     }
@@ -87,7 +89,12 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 
     ErrorCode errorCode = (status == 0) ? errorStringToErrorCode(errorString) : InternalError;
 
-    if (errorCode == NoError || errorCode == StarterLicenseError) {
+    auto isOk = [](ErrorCode errorCode) { return errorCode == NoError || errorCode == StarterLicenseError; };
+
+    if (isOk(errorCode) && moduleInformation.ecDbReadOnly)
+        errorCode = ErrorCode::SafeModeError;
+
+    if (isOk(errorCode)) {
         m_serverByRequestHandle.clear();
         emit systemFound(moduleInformation, server, errorCode);
         return;

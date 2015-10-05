@@ -185,11 +185,9 @@ Expandable.MaskedSettingsPanel
                             if (!timeZonePicker.model.isValidValue(from)
                                 || !timeZonePicker.model.isValidValue(to))
                             {
-                                console.log("Can't change timezone form " + prevZoneId + " to " + curZoneId);
                                 return;
                             }
 
-                            console.log("Chaning timezone from " + prevZoneId + " to " + curZoneId);
                             var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, prevZoneId, curZoneId);
                             datePicker.setDate(dateTime);
                             timePicker.setTime(dateTime, true);

@@ -531,13 +531,19 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Control Video Wall")).
-        condition(new QnStartVideoWallControlActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+            new QnStartVideoWallControlActionCondition(this),
+            new QnForbiddenInSafeModeCondition(this),
+            this));
 
     factory(Qn::PushMyScreenToVideowallAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Push my screen")).
-        condition(new QnDesktopCameraActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+            new QnDesktopCameraActionCondition(this),
+            new QnForbiddenInSafeModeCondition(this),
+            this));
 
     factory(Qn::QueueAppRestartAction).
         flags(Qn::NoTarget).
@@ -729,11 +735,15 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Video Wall View")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false).
-        condition(new QnSaveVideowallReviewActionCondition(true, this));
+        condition(new QnConjunctionActionCondition(
+            new QnForbiddenInSafeModeCondition(this),      
+            new QnSaveVideowallReviewActionCondition(true, this),
+            this));
 
     factory(Qn::DropOnVideoWallItemAction).
         flags(Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::VideoWallItemTarget | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Drop Resources"));
+        text(tr("Drop Resources")).
+        condition(new QnForbiddenInSafeModeCondition(this));
 
     factory().
         flags(Qn::Main).
@@ -1034,7 +1044,10 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Attach to Video Wall...")).
         autoRepeat(false).
-        condition(hasFlags(Qn::videowall));
+        condition(new QnConjunctionActionCondition(
+            new QnForbiddenInSafeModeCondition(this),
+            new QnResourceActionCondition(hasFlags(Qn::videowall), Qn::Any, this),
+            this));
 
     factory(Qn::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -1049,18 +1062,25 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+S")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         autoRepeat(false).
-        condition(new QnSaveVideowallReviewActionCondition(false, this));
+        condition(new QnConjunctionActionCondition(
+            new QnSaveVideowallReviewActionCondition(false, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this));
 
     factory(Qn::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Save Current Matrix")).
         autoRepeat(false).
-        condition(new QnNonEmptyVideowallActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+            new QnNonEmptyVideowallActionCondition(this),
+            new QnForbiddenInSafeModeCondition(this),
+            this));
 
     factory(Qn::LoadVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::VideoWallMatrixTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        condition(new QnForbiddenInSafeModeCondition(this)).
         text(tr("Load Matrix"));
 
     factory(Qn::DeleteVideowallMatrixAction).
@@ -1069,13 +1089,17 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Delete")).
         shortcut(tr("Del")).
         shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
+        condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
 
     factory(Qn::ResetVideoWallLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         text(tr("Update Layout")).
         autoRepeat(false).
-        condition(new QnResetVideoWallLayoutActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+            new QnResetVideoWallLayoutActionCondition(this),
+            new QnForbiddenInSafeModeCondition(this),
+            this));
 
     factory().
         flags(Qn::Scene | Qn::Tree).
@@ -1121,6 +1145,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Delete")).
+        condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
 
     factory(Qn::MaximizeItemAction).
@@ -1336,6 +1361,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
+        condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
 
     factory().
@@ -1356,6 +1382,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnSetAsBackgroundActionCondition(this),
             new QnLightModeCondition(Qn::LightModeNoLayoutBackground, this),
+            new QnForbiddenInSafeModeCondition(this),
             this));
 
     factory(Qn::UserSettingsAction).
@@ -1415,6 +1442,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::videowall), Qn::ExactlyOne, this),
             new QnAutoStartAllowedActionCodition(this),
+            new QnForbiddenInSafeModeCondition(this),
             this));
 
     factory(Qn::ServerAddCameraManuallyAction).
@@ -1424,6 +1452,7 @@ QnActionManager::QnActionManager(QObject *parent):
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
+                      new QnForbiddenInSafeModeCondition(this),
                       this));
 
     factory(Qn::CameraListByServerAction).
@@ -1469,10 +1498,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
-            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::All, this),
-            new QnFakeServerActionCondition(true, this),
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
             new QnForbiddenInSafeModeCondition(this),
+            new QnMergeToCurrentSystemActionCondition(this),
             this));
 
     factory().
@@ -1593,17 +1621,26 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::AddCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Bookmark Selection...")).
-        condition(new QnAddBookmarkActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+            new QnForbiddenInSafeModeCondition(this),
+            new QnAddBookmarkActionCondition(this),
+            this));
 
     factory(Qn::EditCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Edit Bookmark...")).
-        condition(new QnModifyBookmarkActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+            new QnForbiddenInSafeModeCondition(this),
+            new QnModifyBookmarkActionCondition(this),
+            this));
 
     factory(Qn::RemoveCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Remove Bookmark...")).
-        condition(new QnModifyBookmarkActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+            new QnForbiddenInSafeModeCondition(this),
+            new QnModifyBookmarkActionCondition(this),
+            this));
 
     factory().
         flags(Qn::Slider | Qn::SingleTarget).
