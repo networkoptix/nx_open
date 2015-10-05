@@ -112,8 +112,8 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: (rtuContext.selection.SystemCommands
-                    && NxRtu.Constants.FactoryDefaultsCmd);
+                enabled: ((rtuContext.selection.SystemCommands & NxRtu.Constants.FactoryDefaultsCmd)
+                    && (rtuContext.selection.flags & NxRtu.Constants.HasHdd));
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
@@ -133,8 +133,8 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: (rtuContext.selection.SystemCommands
-                    && NxRtu.Constants.FactoryDefaultsButNetworkCmd);
+                enabled: ((rtuContext.selection.SystemCommands & NxRtu.Constants.FactoryDefaultsButNetworkCmd)
+                    && (rtuContext.selection.flags & NxRtu.Constants.HasHdd));
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
