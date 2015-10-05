@@ -1,4 +1,5 @@
-#include "mustache/mustache_helper.h"
+
+#include "mustache_helper.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QIODevice>
