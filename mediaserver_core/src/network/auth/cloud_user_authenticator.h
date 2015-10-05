@@ -13,6 +13,7 @@
 
 #include <cdb/auth_provider.h>
 #include <cdb/connection.h>
+#include <core/resource/resource_fwd.h>
 #include <utils/thread/mutex.h>
 
 #include "abstract_user_data_provider.h"
@@ -68,6 +69,9 @@ private:
 
     bool isValidCloudUserName(const nx_http::StringType& userName) const;
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
+    QnUserResourcePtr getMappedLocalUserForCloudCredentials(
+        const nx_http::StringType& userName,
+        nx::cdb::api::SystemAccessRole cloudAccessRole) const;
 };
 
 #endif  //NX_MS_CLOUD_USER_AUTHENTICATOR_H
