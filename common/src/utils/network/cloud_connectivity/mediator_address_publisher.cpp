@@ -4,32 +4,24 @@
 
 #include "common/common_globals.h"
 #include "utils/common/log.h"
+#include "utils/network/socket_global.h"
 
 namespace nx {
 namespace cc {
 
-MediatorAddressPublisher::MediatorAddressPublisher(
-        CloudModuleEndPointFetcher* addressFetcher, String serverId )
+MediatorAddressPublisher::MediatorAddressPublisher( String serverId )
     : m_serverId( std::move( serverId ) )
 {
-    addressFetcher->get( [ this ]( nx_http::StatusCode::Value status,
-                                   SocketAddress address )
+    SocketGlobals::cloudInfo().enableMediator();
+}
+
+MediatorAddressPublisher::~MediatorAddressPublisher()
+{
+    std::unique_ptr< stun::AsyncClient > stunClient;
     {
-        if( status != nx_http::StatusCode::ok )
-        {
-            NX_LOG( lit( "%1 could not fetch mediator address: %2" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                    .arg( status ), cl_logERROR );
-
-            // TODO: retry later? when?
-            return;
-        }
-
         QnMutexLocker lk( &m_mutex );
-        m_address = std::move( address );
-        m_stunClient = std::make_unique< stun::AsyncClient >( *m_address );
-        updateExternalAddresses();
-    } );
+        std::swap( m_stunClient, stunClient );
+    }
 }
 
 bool MediatorAddressPublisher::Authorization::operator == ( const Authorization& rhs ) const
@@ -87,12 +79,29 @@ void MediatorAddressPublisher::updateAddresses( std::list< SocketAddress > addre
     checkAddresses( std::move( addresses ) );
 }
 
+bool MediatorAddressPublisher::isCloudReady()
+{
+    // TODO #mu should we update address in some point in time?
+    if( !m_stunClient && !m_address )
+    {
+        if( const auto address = SocketGlobals::cloudInfo().mediatorAddress() )
+        {
+            m_address = std::move( address );
+            m_stunClient = std::make_unique< stun::AsyncClient >( *m_address );
+        }
+        else
+        {
+            NX_LOG( lit( "%1 Mediator address is not resolved yet" )
+                    .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logDEBUG1 );
+        }
+    }
+
+    return m_stunClient && m_authorization;
+}
+
 void MediatorAddressPublisher::updateExternalAddresses()
 {
-    if( !m_stunClient || !m_authorization )
-        return;
-
-    if( !m_isExternalChanged || m_isExternalUpdateInProgress )
+    if( !isCloudReady() || !m_isExternalChanged || m_isExternalUpdateInProgress )
         return;
 
     stun::Message request( stun::Header( stun::MessageClass::request,
@@ -134,7 +143,7 @@ void MediatorAddressPublisher::updateExternalAddresses()
 
 void MediatorAddressPublisher::checkAddresses( const std::list< SocketAddress >& addresses )
 {
-    if( !m_stunClient || !m_authorization )
+    if( !isCloudReady() )
         return;
 
     stun::Message request( stun::Header( stun::MessageClass::request,

@@ -2,7 +2,6 @@
 
 #include <api/model/ping_reply.h>
 #include <rest/server/json_rest_result.h>
-#include <utils/network/http/httpclient.h>
 #include <utils/common/log.h>
 
 #include <QJsonDocument>
@@ -23,6 +22,20 @@ MediaserverApiIf::MediaserverApiIf( stun::MessageDispatcher* dispatcher )
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
 }
 
+struct PingCollector
+{
+    QnMutex mutex;
+    size_t expected;
+    std::list< SocketAddress > endpoints;
+    std::weak_ptr< stun::ServerConnection > connection;
+
+    PingCollector( size_t expected_,
+                   const std::weak_ptr< stun::ServerConnection >& connection_ )
+        : expected( expected_ )
+        , connection( connection_ )
+    {}
+};
+
 void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
                              stun::Message message )
 {
@@ -37,23 +50,40 @@ void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
             return;
         }
 
-        std::list< SocketAddress > endpoints = endpointsAttr->get();
-        endpoints.remove_if( [ & ]( const SocketAddress& addr )
-            { return !pingServer( addr, mediaserver->serverId ); } );
+        const auto endpoints = endpointsAttr->get();
+        const auto collector = std::make_shared< PingCollector >( endpoints.size(), connection );
+        const auto& method = message.header.method;
+        const auto& transactionId = message.header.transactionId;
+        const auto onPinged = [ = ]( SocketAddress address, bool result )
+        {
+            QnMutexLocker lk( &collector->mutex );
+            if( result )
+                collector->endpoints.push_back( std::move( address ) );
 
-        NX_LOG( lit("%1 Peer %2/%3 succesfully pinged %4 of %5")
-                .arg( Q_FUNC_INFO )
-                .arg( QString::fromUtf8( mediaserver->systemId ) )
-                .arg( QString::fromUtf8( mediaserver->serverId ) )
-                .arg( containerString( endpoints ) )
-                .arg( containerString( endpointsAttr->get() ) ), cl_logDEBUG1 );
+            if( --collector->expected )
+                return; // wait for others...
 
-        stun::Message response( stun::Header(
-            stun::MessageClass::successResponse, message.header.method,
-            std::move( message.header.transactionId ) ) );
+            if( auto connection = collector->connection.lock() )
+            {
+                NX_LOG( lit("%1 Peer %2/%3 succesfully pinged %4")
+                        .arg( Q_FUNC_INFO )
+                        .arg( QString::fromUtf8( mediaserver->systemId ) )
+                        .arg( QString::fromUtf8( mediaserver->serverId ) )
+                        .arg( containerString( collector->endpoints ) ), cl_logDEBUG1 );
 
-        response.newAttribute< stun::cc::attrs::PublicEndpointList >( endpoints );
-        connection->sendMessage( std::move( response ) );
+                stun::Message response( stun::Header(
+                    stun::MessageClass::successResponse, method,
+                    std::move( transactionId ) ) );
+
+                response.newAttribute< stun::cc::attrs::PublicEndpointList >(
+                            collector->endpoints );
+
+                connection->sendMessage( std::move( response ) );
+            }
+        };
+
+        for( auto& ep : endpoints )
+            pingServer( ep, mediaserver->serverId, onPinged );
     }
 }
 
@@ -64,47 +94,63 @@ MediaserverApi::MediaserverApi( stun::MessageDispatcher* dispatcher )
 {
 }
 
-bool MediaserverApi::pingServer( const SocketAddress& address, const String& expectedId )
+static QString scanResponseForErrors( const nx::Buffer& buffer, const String& expectedId )
 {
-    // TODO: Async implementation
-    const auto url = lit( "http://%1/api/ping" ).arg( address.toString() );
-    nx_http::HttpClient client;
-    if( !client.doGet( url ) )
-    {
-        NX_LOG( lit("%1 Url %2 is unaccesible")
-                .arg( Q_FUNC_INFO ).arg( url ), cl_logDEBUG1 )
-        return false;
-    }
-
-    const auto buffer = client.fetchMessageBodyBuffer();
-
     QnJsonRestResult result;
     if( !QJson::deserialize( buffer, &result ) )
-    {
-        NX_LOG( lit("%1 Url %2 response is a bad REST result: %3")
-                .arg( Q_FUNC_INFO ).arg( url )
-                .arg( QString::fromUtf8( buffer ) ), cl_logDEBUG1 );
-        return false;
-    }
+        return lit("bad REST result: %3").arg( QString::fromUtf8( buffer ) );
 
     QnPingReply reply;
     if( !QJson::deserialize( result.reply, &reply ) )
-    {
-        NX_LOG( lit("%1 Url %2 response is a bad REST result: %3")
-                .arg( Q_FUNC_INFO ).arg( url )
-                .arg( result.reply.toString() ), cl_logDEBUG1 );
-        return false;
-    }
+        return lit("bad REST reply: %3").arg( result.reply.toString() );
 
-    if( reply.moduleGuid.toSimpleString().toUtf8() != expectedId ) {
-        NX_LOG( lit("%1 Url %2 moduleGuid '%3' doesnt match expectedId '%4'")
-                .arg( Q_FUNC_INFO ).arg( url )
+    if( reply.moduleGuid.toSimpleString().toUtf8() != expectedId )
+        return lit("moduleGuid '%3' doesnt match expectedId '%4'")
                 .arg( reply.moduleGuid.toString() )
-                .arg( QString::fromUtf8( expectedId ) ), cl_logDEBUG1 );
-        return false;
+                .arg( QString::fromUtf8( expectedId ) );
+
+    return QString();
+}
+
+void MediaserverApi::pingServer( const SocketAddress& address, const String& expectedId,
+                                 std::function< void( SocketAddress, bool ) > onPinged )
+{
+    auto httpClient = nx_http::AsyncHttpClient::create();
+    QObject::connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
+                      [ = ]( nx_http::AsyncHttpClientPtr httpClient )
+        {
+            {
+                QnMutexLocker lk( &m_mutex );
+                m_httpClients.erase( httpClient );
+            }
+
+            if( !httpClient->hasRequestSuccesed() )
+            {
+                NX_LOG( lit("%1 Response from %2 failed").arg( Q_FUNC_INFO )
+                        .arg( address.toString() ), cl_logDEBUG1 );
+                return onPinged( std::move( address ), false );
+            }
+
+            const auto buffer = httpClient->fetchMessageBodyBuffer();
+            const auto error = scanResponseForErrors( buffer, expectedId );
+            if( !error.isEmpty() )
+            {
+                NX_LOG( lit("%1 Response from %2 %3").arg( Q_FUNC_INFO )
+                        .arg( address.toString() ).arg( error ), cl_logDEBUG1 );
+                return onPinged( std::move( address ), false );
+            }
+            onPinged( std::move( address ), true );
+        } );
+
+    if( !httpClient->doGet( lit( "http://%1/api/ping" ).arg( address.toString() ) ) )
+    {
+        NX_LOG( lit("%1 Mediaserver %2 is unaccesible")
+                .arg( Q_FUNC_INFO ).arg( address.toString() ), cl_logDEBUG1 )
+        return onPinged( address, false );
     }
 
-    return true;
+    QnMutexLocker lk( &m_mutex );
+    m_httpClients.insert( std::move( httpClient ) );
 }
 
 } // namespace hpm

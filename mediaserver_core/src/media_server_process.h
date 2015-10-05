@@ -107,9 +107,6 @@ private:
     bool m_stopping;
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
-
-    // TODO: Create cloud providers factory to reuse CloudModuleEndPointFetcher
-    std::unique_ptr<nx::cc::CloudModuleEndPointFetcher> m_mediatorAddressFetcher;
     std::unique_ptr<nx::cc::MediatorAddressPublisher> m_mediatorAddressPublisher;
 };
 

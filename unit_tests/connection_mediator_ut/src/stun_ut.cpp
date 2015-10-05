@@ -25,7 +25,8 @@ public:
     MediaserverApiMock( stun::MessageDispatcher* dispatcher )
         : MediaserverApiIf( dispatcher ) {}
 
-    MOCK_METHOD2( pingServer, bool( const SocketAddress&, const String& ) );
+    MOCK_METHOD3( pingServer, void( const SocketAddress&, const String&,
+                                    std::function< void( SocketAddress, bool ) > ) );
 };
 
 class StunCustomTest : public testing::Test
@@ -68,11 +69,19 @@ TEST_F( StunCustomTest, Ping )
     allEndpoints.push_back( BAD_ADDRESS );
     request.newAttribute< cc::attrs::PublicEndpointList >( allEndpoints );
 
-    // Suppose only one address is pingable
-    EXPECT_CALL( mediaserverApi, pingServer( GOOD_ADDRESS, SERVER_ID ) )
-        .Times( 1 ).WillOnce( ::testing::Return( true ) );
-    EXPECT_CALL( mediaserverApi, pingServer( BAD_ADDRESS, SERVER_ID ) )
-        .Times( 1 ).WillOnce( ::testing::Return( false ) );
+    // GOOD_ADDRESS shell be successfuly pinged
+    EXPECT_CALL( mediaserverApi, pingServer( GOOD_ADDRESS, SERVER_ID, ::testing::_ ) )
+        .Times( 1 ).WillOnce( ::testing::Invoke(
+            []( const SocketAddress&, const String&,
+                std::function< void( SocketAddress, bool ) > onPinged )
+            { onPinged( GOOD_ADDRESS, true ); } ) );
+
+    // while BAD_ADDRESS shell not pass
+    EXPECT_CALL( mediaserverApi, pingServer( BAD_ADDRESS, SERVER_ID, ::testing::_  ) )
+        .Times( 1 ).WillOnce( ::testing::Invoke(
+            []( const SocketAddress&, const String&,
+                std::function< void( SocketAddress, bool ) > onPinged )
+            { onPinged( BAD_ADDRESS, false ); } ) );
 
     SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
     ASSERT_TRUE( client.sendRequest( std::move( request ), waiter.pusher() ) );
@@ -87,7 +96,7 @@ TEST_F( StunCustomTest, Ping )
     const auto eps = response.getAttribute< cc::attrs::PublicEndpointList >();
     ASSERT_NE( eps, nullptr );
 
-    // Only good address is expected to be returned
+    // only good address is expected to be returned
     ASSERT_EQ( eps->get(), std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
 }
 

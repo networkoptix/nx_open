@@ -166,7 +166,6 @@ private:
     std::multimap< void*, RequestInfo > m_requests;
 
     DnsResolver m_dnsResolver;
-    CloudModuleEndPointFetcher m_mediatorAddressFetcher;
     std::unique_ptr< stun::AsyncClient > m_stunClient;
 };
 

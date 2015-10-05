@@ -2141,9 +2141,8 @@ void MediaServerProcess::run()
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
-    m_mediatorAddressFetcher.reset(new nx::cc::CloudModuleEndPointFetcher(lit("hpm")));
-    m_mediatorAddressPublisher.reset(new nx::cc::MediatorAddressPublisher(
-        m_mediatorAddressFetcher.get(), qnCommon->moduleGUID().toSimpleString().toUtf8()));
+   m_mediatorAddressPublisher.reset(new nx::cc::MediatorAddressPublisher(
+        qnCommon->moduleGUID().toSimpleString().toUtf8()));
 
     auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
     {
@@ -2302,7 +2301,6 @@ void MediaServerProcess::run()
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
     m_crashReporter.reset();
-    m_mediatorAddressFetcher.reset();
     m_mediatorAddressPublisher.reset();
 
     //cancelling dumping system usage
