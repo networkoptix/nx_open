@@ -117,7 +117,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
-
 #include <utils/app_server_image_cache.h>
 
 #include <utils/applauncher_utils.h>

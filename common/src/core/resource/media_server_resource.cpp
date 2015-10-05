@@ -461,6 +461,11 @@ void QnMediaServerResource::setModuleInformation(const QnModuleInformationWithAd
     setSystemName(moduleInformation.systemName);
     setProperty(protoVersionPropertyName, QString::number(moduleInformation.protoVersion));
     setProperty(safeModePropertyName, QnLexical::serialized(moduleInformation.ecDbReadOnly));
+
+    if (moduleInformation.ecDbReadOnly)
+        addFlags(Qn::read_only);
+    else
+        removeFlags(Qn::read_only);
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {

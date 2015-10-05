@@ -49,6 +49,13 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(IOModule | Offline,      qnSkin->icon("tree/io_offline.png"));
     m_cache.insert(IOModule | Unauthorized, qnSkin->icon("tree/io_unauthorized.png"));
 
+    /* Read-only server that is auto-discovered. */
+    m_cache.insert(Server | Incompatible | ReadOnly,    qnSkin->icon("tree/server_incompatible_readonly.png"));
+
+    /* Read-only server we are connected to. */
+    m_cache.insert(Server | Control | ReadOnly,         qnSkin->icon("tree/server_readonly.png"));
+
+    /* Overlays. Should not be used. */
     m_cache.insert(Offline,                 qnSkin->icon("tree/offline.png"));
     m_cache.insert(Unauthorized,            qnSkin->icon("tree/unauthorized.png"));
 }
@@ -70,10 +77,12 @@ QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
 
     if(m_cache.contains(key))
         return m_cache.value(key);
-
+    
     QIcon icon = m_cache.value(key & TypeMask);
     QIcon overlay = m_cache.value(key & StatusMask);
     if(!icon.isNull() && !overlay.isNull()) {
+        Q_ASSERT_X(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+
         QPixmap pixmap = icon.pixmap(icon.actualSize(QSize(1024, 1024)));
         {
             QPainter painter(&pixmap);
@@ -133,6 +142,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
     } 
 
     Key status = Unknown;
+    
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             key = VideoWall;
@@ -160,6 +170,9 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
             break;
         }
     }
+
+    if (flags.testFlag(Qn::read_only))
+        status |= ReadOnly;
 
     return Key(key | status);
 }
