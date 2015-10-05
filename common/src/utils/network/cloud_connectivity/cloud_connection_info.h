@@ -4,22 +4,27 @@
 #include "cdb_endpoint_fetcher.h"
 
 namespace nx {
+    class SocketGlobals;
+}   //nx
+
+namespace nx {
 namespace cc {
 
 // TODO: generalize to keep all cloud related information
 class CloudConnectionInfo
 {
-public:
     CloudConnectionInfo();
+    friend class ::nx::SocketGlobals;
 
+public:
     /** Shell be called to enable cloud functionality for application */
     void enableMediator();
 
     /** Returns mediator address if fetched, boost::none otherwise */
-    boost::optional< SocketAddress > mediatorAddress();
+    boost::optional< SocketAddress > mediatorAddress() const;
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     CloudModuleEndPointFetcher m_mediatorEndpointFetcher;
     boost::optional< SocketAddress > m_mediatorAddress;
 };

@@ -10,8 +10,8 @@ namespace cc {
 class MediatorAddressPublisher
 {
 public:
-    MediatorAddressPublisher( CloudModuleEndPointFetcher* addressFetcher,
-                              String serverId );
+    MediatorAddressPublisher( String serverId );
+    ~MediatorAddressPublisher();
 
     struct Authorization
     {
@@ -25,6 +25,7 @@ public:
     void updateAddresses( std::list< SocketAddress > addresses );
 
 private:
+    bool isCloudReady();
     void updateExternalAddresses();
     void checkAddresses( const std::list< SocketAddress >& addresses );
 

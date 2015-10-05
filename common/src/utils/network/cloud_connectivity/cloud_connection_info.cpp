@@ -13,6 +13,7 @@ CloudConnectionInfo::CloudConnectionInfo()
 
 void CloudConnectionInfo::enableMediator()
 {
+    // TODO #mu: update values over time and deliver changes
     m_mediatorEndpointFetcher.get( [ = ]( nx_http::StatusCode::Value status,
                                           SocketAddress address )
     {
@@ -33,7 +34,7 @@ void CloudConnectionInfo::enableMediator()
     });
 }
 
-boost::optional< SocketAddress > CloudConnectionInfo::mediatorAddress()
+boost::optional< SocketAddress > CloudConnectionInfo::mediatorAddress() const
 {
     QnMutexLocker lk( &m_mutex );
     return m_mediatorAddress;

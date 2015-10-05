@@ -12,6 +12,7 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
 #include <utils/common/app_info.h>
+#include <utils/network/socket_global.h>
 #include "version.h"
 
 #include "applauncher_process.h"
@@ -133,7 +134,6 @@ int main( int argc, char* argv[] )
 
     if (mirrorListUrl.isEmpty())
         NX_LOG( "MirrorListUrl is empty", cl_logWARNING );
-
     if( displayHelp )
     {
         printHelp();
@@ -146,6 +146,9 @@ int main( int argc, char* argv[] )
         cl_log.create( logFilePath, 1024*1024*10, 5, cl_logWARNING );
         QnLog::initLog( logLevel );
     }
+
+    // TODO: #mu ON/OFF switch in settings?
+    nx::SocketGlobals::cloudInfo().enableMediator();
 
     NX_LOG( appName + " started", cl_logALWAYS );
     NX_LOG( "Software version: " + QnAppInfo::applicationVersion(), cl_logALWAYS );

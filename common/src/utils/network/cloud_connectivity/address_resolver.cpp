@@ -71,7 +71,6 @@ QString AddressEntry::toString() const
 }
 
 AddressResolver::AddressResolver()
-    : m_mediatorAddressFetcher( lit( "hpm" ) )
 {
 }
 
@@ -313,8 +312,7 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
     }
 
     NX_LOG( lit( "%1 Mediator address is not resolved yet" )
-            .arg( QString::fromUtf8( Q_FUNC_INFO ) ),
-            cl_logERROR );
+            .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logDEBUG1 );
 
     info->second.setMediatorEntries();
     const auto guards = grabHandlers( SystemError::dnsServerFailure, info );

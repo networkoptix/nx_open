@@ -3,25 +3,44 @@
 #include <mediaserver_api.h>
 
 #include <common/common_globals.h>
+#include <utils/thread/sync_queue.h>
 
 namespace nx {
 namespace hpm {
 namespace test {
 
-TEST( MediaserverApi, DISABLED_Hardcode )
+TEST( MediaserverApi, Hardcode )
 {
     stun::MessageDispatcher dispatcher;
     MediaserverApi api( &dispatcher );
+    SyncMultiQueue< SocketAddress, bool > results;
 
-    EXPECT_TRUE( api.pingServer(
-        lit("localhost:7001"), "0000000F-8aeb-7d56-2bc7-67afae00335c" ) );
+    // 1. success
+    api.pingServer( lit("localhost:7001"),
+                    "0000000F-8aeb-7d56-2bc7-67afae00335c",
+                    results.pusher() );
 
-    EXPECT_FALSE( api.pingServer( // wrong port
-        lit("localhost:7002"), "0000000F-8aeb-7d56-2bc7-67afae00335c" ) );
+    const auto r1 = results.pop();
+    EXPECT_EQ( r1.first, SocketAddress( lit("localhost:7001") ) );
+    EXPECT_EQ( r1.second, true );
 
-    EXPECT_FALSE( api.pingServer( // wrong uuid
-        lit("localhost:7001"), "1000000F-8aeb-7d56-2bc7-67afae00335c" ) );
+    // 2. wrong port
+    api.pingServer( lit("localhost:7002"),
+                    "0000000F-8aeb-7d56-2bc7-67afae00335c",
+                    results.pusher() );
 
+    const auto r2 = results.pop();
+    EXPECT_EQ( r2.first, SocketAddress( lit("localhost:7002") ) );
+    EXPECT_EQ( r2.second, false );
+
+    // 3. wrong uuid
+    api.pingServer( lit("localhost:7001"),
+                    "1000000F-8aeb-7d56-2bc7-67afae00335c",
+                    results.pusher() );
+
+    const auto r3 = results.pop();
+    EXPECT_EQ( r3.first, SocketAddress( lit("localhost:7001") ) );
+    EXPECT_EQ( r3.second, false );
 }
 
 } // namespace text
