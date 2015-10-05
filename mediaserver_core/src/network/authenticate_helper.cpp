@@ -260,7 +260,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 *usedAuthMethod = AuthMethod::httpDigest;
 
             authResult = doDigestAuth(
-                request.requestLine.method, authorizationHeader, response, isProxy, authUserId, ',');
+                request.requestLine.method, authorizationHeader, response, isProxy, authUserId);
         }
         else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic) {
             if (usedAuthMethod)
@@ -283,7 +283,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             //saving new user's digest
             applyClientCalculatedPasswordHashToResource( userResource, userDigestData );
         }
-        else if(  userResource && userResource->isLdap() )
+        else if( userResource && userResource->isLdap() )
         {
             //password has been changed in active directory? Requesting new digest...
             nx_http::insertOrReplaceHeader(
@@ -338,7 +338,6 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     nx_http::Response& responseHeaders,
     bool isProxy,
     QnUuid* authUserId,
-    char delimiter,
     QnUserResourcePtr* const outUserResource)
 {
     const QByteArray userName = authorization.digest->userid;
@@ -365,9 +364,9 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
 #ifdef USE_USER_RESOURCE_PROVIDER
         errCode = Qn::Auth_WrongLogin;
 
-        auto res = m_userDataProvider->findResByName(userName);
-        if (res)
-            errCode = Qn::Auth_WrongPassword;
+        QnResourcePtr res;
+        std::tie(errCode, res) = m_userDataProvider->authorize(method, authorization);
+        bool tryOnceAgain = false;
         if (userResource = res.dynamicCast<QnUserResource>())
         {
             if (outUserResource)
@@ -378,12 +377,15 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
                 errCode = doPasswordProlongation(userResource);
                 if (errCode != Qn::Auth_OK)
                     return errCode;
+                //have to call m_userDataProvider->authorize once again with password prolonged
+                tryOnceAgain = true;
             }
             if (authUserId)
                 *authUserId = userResource->getId();
         }
 
-        errCode = m_userDataProvider->authorize(res, method, authorization);
+        if (tryOnceAgain)
+            errCode = m_userDataProvider->authorize(res, method, authorization);
         if (errCode == Qn::Auth_OK)
             return Qn::Auth_OK;
 #else
@@ -475,9 +477,9 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
     Qn::AuthResult errCode = Qn::Auth_WrongLogin;     
 
 #ifdef USE_USER_RESOURCE_PROVIDER
-    auto res = m_userDataProvider->findResByName(authorization.basic->userid);
-    if (res)
-        errCode = Qn::Auth_WrongPassword;
+    QnResourcePtr res;
+    std::tie(errCode, res) = m_userDataProvider->authorize(method, authorization);
+    bool tryOnceAgain = false;
     if (auto user = res.dynamicCast<QnUserResource>())
     {
         if (authUserId)
@@ -488,10 +490,12 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
             errCode = doPasswordProlongation(user);
             if (errCode != Qn::Auth_OK)
                 return errCode;
+            tryOnceAgain = true;
         }
     }
 
-    errCode = m_userDataProvider->authorize(res, method, authorization);
+    if (tryOnceAgain)
+        errCode = m_userDataProvider->authorize(res, method, authorization);
     if (errCode == Qn::Auth_OK)
     {
         if (auto user = res.dynamicCast<QnUserResource>())
@@ -569,10 +573,9 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     else
     {
         nx_http::header::Authorization authorization(nx_http::header::AuthScheme::digest);
-        authorization.digest->parse(authData);
+        authorization.digest->parse(authData, ';');
         authResult = doDigestAuth(
-            method, authorization, tmpHeaders, false, authUserId, ';',
-            &outUserResource);
+            method, authorization, tmpHeaders, false, authUserId, &outUserResource);
     }
     if( authResult != Qn::Auth_OK)
     {
@@ -665,7 +668,9 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
         return Qn::Auth_WrongDigest;
     
 #ifdef USE_USER_RESOURCE_PROVIDER
-    auto res = m_userDataProvider->findResByName(authorization.digest->userid);
+    QnResourcePtr res;
+    Qn::AuthResult errCode = Qn::Auth_WrongLogin;
+    std::tie(errCode, res) = m_userDataProvider->authorize(method, authorization);
     if (!res)
         return Qn::Auth_WrongLogin;
 
@@ -675,7 +680,6 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
             *authUserId = user->getId();
     }
 
-    const auto errCode = m_userDataProvider->authorize(res, method, authorization);
     if (errCode == Qn::Auth_OK)
     {
         if (auto user = res.dynamicCast<QnUserResource>())

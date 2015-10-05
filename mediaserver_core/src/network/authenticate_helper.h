@@ -119,7 +119,6 @@ private:
         nx_http::Response& responseHeaders,
         bool isProxy,
         QnUuid* authUserId,
-        char delimiter,
         QnUserResourcePtr* const outUserResource = nullptr);
     Qn::AuthResult doBasicAuth(
         const QByteArray& method,
