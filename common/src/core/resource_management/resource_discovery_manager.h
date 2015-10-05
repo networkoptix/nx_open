@@ -103,7 +103,7 @@ public:
     ResourceSearcherList plugins() const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
-    void doResourceDiscoverIteration();
+    virtual void doResourceDiscoverIteration();
 
     State state() const;
     

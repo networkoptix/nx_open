@@ -18,8 +18,6 @@
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <mustache/mustache.h>
-
 #include <client/client_translation_manager.h>
 
 #include <ui/help/help_topic_accessor.h>
