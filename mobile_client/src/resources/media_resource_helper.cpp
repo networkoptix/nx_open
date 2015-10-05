@@ -258,11 +258,14 @@ void QnMediaResourceHelper::setScreenSize(const QSize &size) {
     if (m_screenSize == size)
         return;
 
+    bool updateRequired = m_screenSize != size.transposed();
+
     m_screenSize = size;
 
     emit screenSizeChanged();
 
-    updateUrl();
+    if (updateRequired)
+        updateUrl();
 }
 
 QString QnMediaResourceHelper::optimalResolution() const {
