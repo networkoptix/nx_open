@@ -29,7 +29,6 @@ function isMobile() {
 }
 
 function openDiscoveredSession(_host, _port, _systemName) {
-    mainWindow.currentSessionId = ""
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
@@ -40,13 +39,13 @@ function openDiscoveredSession(_host, _port, _systemName) {
             title: _systemName,
             host: _host,
             port: _port,
+            sessionId: "",
             state: "Discovered"
         }
     })
 }
 
 function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName) {
-    mainWindow.currentSessionId = _sessionId
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
@@ -59,13 +58,13 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
             port: _port,
             login: _login,
             password: _password,
+            sessionId: _sessionId,
             state: "Saved"
         }
     })
 }
 
 function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, statusMessage) {
-    mainWindow.currentSessionId = _sessionId
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
@@ -78,6 +77,7 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
             port: _port,
             login: _login,
             password: _password,
+            sessionId: _sessionId,
             state: "FailedSaved"
         }
     })

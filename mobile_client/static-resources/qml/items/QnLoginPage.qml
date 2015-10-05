@@ -16,7 +16,7 @@ QnPage {
     property alias port: portField.text
     property alias login: loginField.text
     property alias password: passwordField.text
-    property string sessionId: mainWindow.currentSessionId
+    property string sessionId: ""
 
     property string newConnectionLabel: qsTr("New Connection")
 

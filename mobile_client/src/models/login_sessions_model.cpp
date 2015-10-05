@@ -95,7 +95,7 @@ void QnLoginSessionsModel::setDisplayMode(DisplayModeFlags displayMode) {
     endResetModel();
 }
 
-QString QnLoginSessionsModel::updateSession(const QString &sessionId, const QString &address, const int port, const QString &user, const QString &password, const QString &systemName) {
+QString QnLoginSessionsModel::updateSession(const QString &sessionId, const QString &address, const int port, const QString &user, const QString &password, const QString &systemName, bool moveTop) {
     auto predicate = [&sessionId](const QnLoginSession &session) -> bool {
         return session.id == sessionId;
     };
@@ -109,13 +109,13 @@ QString QnLoginSessionsModel::updateSession(const QString &sessionId, const QStr
         it->systemName = systemName;
 
         int row = savedSessionRow(it - m_savedSessions.begin());
-        if (row == 0) {
-            QModelIndex index = this->index(0);
+        if (row == 0 || !moveTop) {
+            QModelIndex index = this->index(row);
             emit dataChanged(index, index);
         } else if (row > 0) {
             beginMoveRows(QModelIndex(), row, row, QModelIndex(), 0);
             m_savedSessions.move(row, 0);
-            endInsertRows();
+            endMoveRows();
         }
     } else {
         QnLoginSession session;
