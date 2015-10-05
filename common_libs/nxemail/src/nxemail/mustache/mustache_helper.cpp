@@ -7,6 +7,7 @@
 
 #include <common/common_globals.h>
 
+
 QString renderTemplateFromFile(const QString& filename, const QVariantHash& contextMap) {
     QFile templateFile(filename);
     templateFile.open(QIODevice::ReadOnly);
