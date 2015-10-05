@@ -25,6 +25,12 @@ public:
     std::string nonce;
     //!period, nonce usage should be limited to
     std::chrono::seconds validPeriod;
+
+    NonceData()
+    :
+        validPeriod(0)
+    {
+    }
 };
 
 class AuthRequest
@@ -54,7 +60,8 @@ public:
 
     AuthResponse()
     :
-        accessRole(SystemAccessRole::none)
+        accessRole(SystemAccessRole::none),
+        validPeriod(0)
     {
     }
 };

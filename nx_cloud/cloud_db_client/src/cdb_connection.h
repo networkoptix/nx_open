@@ -17,7 +17,8 @@
 namespace nx {
 namespace cc {
     class CloudModuleEndPointFetcher;
-} } // nx::cc
+}   //cc
+}   //nx
 
 namespace nx {
 namespace cdb {
