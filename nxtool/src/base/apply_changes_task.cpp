@@ -620,6 +620,9 @@ void rtu::ApplyChangesTask::Impl::checkReachability(const ThisWeakPtr &weak
     enum { kDiscoveryDelay = 15 * 1000 };
     QTimer::singleShot(kDiscoveryDelay, [weak, weakOp, &item]()
     {
+        if (weak.expired())
+            return;
+
         const auto success = [weak, weakOp, &item](const QUuid &id, const ExtraServerInfo &extraInfo) 
         {
             if (weak.expired())
@@ -811,7 +814,6 @@ void rtu::ApplyChangesTask::Impl::addActions()
     const int timeout = ((cmd == Constants::RestartServerCmd) || (cmd == Constants::RebootCmd) ? 
         kRestartTimeout : kFactoryDefaultsTimeout);
 
-    const ThisWeakPtr weak = shared_from_this();
     for (ServerInfoCacheItem &item: m_serversCache)
     {
         enum { kOpChangesCount = 1};

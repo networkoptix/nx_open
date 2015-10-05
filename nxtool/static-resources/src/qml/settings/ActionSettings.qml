@@ -78,7 +78,7 @@ Expandable.GenericSettingsPanel
             Base.Button
             {
                 enabled: (rtuContext.selection.SystemCommands
-                    && NxRtu.Constants.RebootCmd);
+                    & NxRtu.Constants.RebootCmd);
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
