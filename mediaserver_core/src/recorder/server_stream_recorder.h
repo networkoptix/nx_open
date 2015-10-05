@@ -50,9 +50,6 @@ public:
     int getFRAfterThreshold() const;
     bool needConfigureProvider() const;
 
-    void setRecordRedundant(bool v) { m_recordRedundant = v; }
-    bool recordRedundant() const { return m_recordRedundant; }
-
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
@@ -84,6 +81,7 @@ private:
     void writeRecentlyMotion(qint64 writeAfterTime);
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
     bool isPanicMode() const;
+    bool isRedundantSyncOn() const;
 private slots:
     void at_recordingFinished(int status, const QString &filename);
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
@@ -116,7 +114,6 @@ private:
     bool m_rebuildBlocked;
     bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
-    bool m_recordRedundant;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__
