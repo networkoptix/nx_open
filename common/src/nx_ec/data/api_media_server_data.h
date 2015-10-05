@@ -92,15 +92,17 @@ namespace ec2
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
 
         // redundant storage settings
-        int             backupDaysOfTheWeek; // Days of the week mask. -1 if not set
-        int             backupStart;         // seconds from 00:00:00. Error if rDOW set and this is not set
-        int             backupDuration;      // duration of synchronization period in seconds. -1 if not set.
-        int             backupBitrate;       // bitrate cap in bytes per second. -1 if not capped.
+        Qn::BackupTypes     backupType;
+        int                 backupDaysOfTheWeek; // Days of the week mask. See backup::DayOfWeek enum 
+        int                 backupStart;         // seconds from 00:00:00. Error if rDOW set and this is not set
+        int                 backupDuration;      // duration of synchronization period in seconds. -1 if not set.
+        int                 backupBitrate;       // bitrate cap in bytes per second. -1 if not capped.
     };
 
 #define ApiMediaServerUserAttributesData_Fields_Short   \
     (maxCameras)                                        \
     (allowAutoRedundancy)                               \
+    (backupType)                                        \
     (backupDaysOfTheWeek)                               \
     (backupStart)                                       \
     (backupDuration)                                    \
@@ -111,6 +113,8 @@ namespace ec2
     (serverName)                                    \
     ApiMediaServerUserAttributesData_Fields_Short
 
+
+    QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerUserAttributesData, (eq))
 
     struct ApiMediaServerDataEx
     :

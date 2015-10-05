@@ -21,6 +21,7 @@ public:
     QString name;
 
     // backup storage settings
+    Qn::BackupTypes backupType;
     int     backupDaysOfTheWeek; // Days of the week mask. -1 if not set
     int     backupStart;         // seconds from 00:00:00. Error if rDOW set and this is not set
     int     backupDuration;      // duration of synchronization period in seconds. -1 if not set.
@@ -37,6 +38,7 @@ public:
     (maxCameras)                            \
     (isRedundancyEnabled)                   \
     (name)                                  \
+    (backupType)                     \
     (backupDaysOfTheWeek)            \
     (backupStart)                    \
     (backupDuration)                 \

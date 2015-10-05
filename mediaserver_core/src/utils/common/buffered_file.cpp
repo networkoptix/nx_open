@@ -138,9 +138,7 @@ QnWriterPool::WritersMap QnWriterPool::getAllWriters()
 QueueFileWriter* QnWriterPool::getWriter(const QString& fileName)
 {
     QString drive = fileName.left(fileName.indexOf('/'));
-    QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrl(fileName);
-    if (!storage)
-        storage = qnBackupStorageMan->getStorageByUrl(fileName);
+    QnStorageResourcePtr storage = QnStorageManager::getStorageByUrl(fileName);
 
     if (storage)
         drive = storage->getPath();

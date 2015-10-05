@@ -124,7 +124,7 @@ void QnScreenRecorder::stopRecording() {
     if(!m_recording)
         return; /* Stopping when nothing is being recorded is OK. */
 
-    QString recordedFileName = m_recorder->getFileName();
+    QString recordedFileName = m_recorder->fixedFileName();
     
     m_dataProvider->removeDataProcessor(m_recorder);
 
