@@ -630,6 +630,7 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.serverName = src->name;
     dst.maxCameras = src->maxCameras;
     dst.allowAutoRedundancy = src->isRedundancyEnabled;
+    dst.backupType = src->backupType;
     dst.backupDaysOfTheWeek = src->backupDaysOfTheWeek;
     dst.backupStart = src->backupStart;
     dst.backupDuration = src->backupDuration;
@@ -641,6 +642,7 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->name = src.serverName;
     dst->maxCameras = src.maxCameras;
     dst->isRedundancyEnabled = src.allowAutoRedundancy;
+    dst->backupType = src.backupType;
     dst->backupDaysOfTheWeek = src.backupDaysOfTheWeek;
     dst->backupStart = src.backupStart;
     dst->backupDuration = src.backupDuration;

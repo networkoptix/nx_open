@@ -96,7 +96,8 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
     m_recordingFinished(false),
-    m_role(Role_ServerRecording)
+    m_role(Role_ServerRecording),
+    m_fixedFileName(false)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -823,11 +824,6 @@ bool QnStreamRecorder::addRecordingContext(const QString &fileName)
         return true;
     }
     return false;
-}
-
-QString QnStreamRecorder::getFileName() const
-{
-    return m_fixedFileName;
 }
 
 void QnStreamRecorder::setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS])

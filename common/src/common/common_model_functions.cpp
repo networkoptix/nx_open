@@ -47,6 +47,18 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTraits,
     (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupType,
+    (Qn::Backup_Disabled,          "BackupDisabled")
+    (Qn::Backup_RealTime,          "BackupRealTime")
+    (Qn::Backup_Schedule,          "BackupSchedule")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupTypes,
+    (Qn::Backup_Disabled,          "BackupDisabled")
+    (Qn::Backup_RealTime,          "BackupRealTime")
+    (Qn::Backup_Schedule,          "BackupSchedule")
+)
+
 // TODO: #Elric #2.3 code duplication ^v
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTrait,
     (Qn::FourWayPtzTrait,          "FourWayPtz")

@@ -40,7 +40,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_diskErrorWarned(false),
     m_rebuildBlocked(false),
-    m_recordRedundant(true)
+    m_recordRedundant(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -534,13 +534,13 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();
-        std::vector<QnStorageResourcePtr> storages;
+        QnStorageResourcePtr storages[2] = {QnStorageResourcePtr(), QnStorageResourcePtr()};
         
-        storages.push_back(qnNormalStorageMan->getOptimalStorageRoot(provider));
+        storages[0] = qnNormalStorageMan->getOptimalStorageRoot(provider);
         if (m_recordRedundant)
-            storages.push_back(qnBackupStorageMan->getOptimalStorageRoot(provider));
+            storages[1] = qnBackupStorageMan->getOptimalStorageRoot(provider);
 
-        if (!storages.empty())
+        if (storages[0] || storages[1])
             setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
 
         if (storages[QnServer::ArchiveKind::Normal])

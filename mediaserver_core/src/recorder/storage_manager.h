@@ -67,8 +67,8 @@ public:
     * timeZone server time zone offset in munutes. If value==-1 - current(system) time zone is used
     */
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
+    static QnStorageResourcePtr getStorageByUrl(const QString &storageUrl);
 
-    QnStorageResourcePtr getStorageByUrl(const QString& fileName);
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);
     QnStorageResourcePtr storageRoot(int storage_index) const { QnMutexLocker lock( &m_mutexStorages ); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const; 
@@ -153,6 +153,7 @@ private:
     void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
     bool existsStorageWithID(const QnStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
+    QnStorageResourcePtr getStorageByUrlInternal(const QString& fileName);
 
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;

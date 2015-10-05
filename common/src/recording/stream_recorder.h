@@ -86,8 +86,6 @@ public:
     // storage.
     bool addRecordingContext(const QString &fileName);
 
-    QString getFileName() const;
-    
     /*
     * Export motion stream to separate file
     */

@@ -2102,6 +2102,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
             server_name,                                            \
             max_cameras,                                            \
             redundancy,                                             \
+            backup_type,                                         \
             backup_days_of_the_week,                             \
             backup_start,                                        \
             backup_duration,                                     \
@@ -2112,6 +2113,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
             :serverName,                                            \
             :maxCameras,                                            \
             :allowAutoRedundancy,                                   \
+            :backupType,                                         \
             :backupDaysOfTheWeek,                                \
             :backupStart,                                        \
             :backupDuration,                                     \
@@ -3329,6 +3331,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
             server_name as serverName,                              \
             max_cameras as maxCameras,                              \
             redundancy as allowAutoRedundancy,                      \
+            backup_type as backupType,                              \
             backup_days_of_the_week as backupDaysOfTheWeek,         \
             backup_start as backupStart,                            \
             backup_duration as backupDuration,                      \

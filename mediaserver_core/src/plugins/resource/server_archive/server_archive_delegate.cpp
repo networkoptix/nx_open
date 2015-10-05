@@ -456,9 +456,9 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newCh
     m_aviDelegate->close();
     
     if (newCatalog->getKind() == QnServer::ArchiveKind::Normal)
-        m_aviDelegate->setStorage(qnNormalStorageMan->getStorageByUrl(url));
+        m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url));
     else if (newCatalog->getKind() == QnServer::ArchiveKind::Backup)
-        m_aviDelegate->setStorage(qnBackupStorageMan->getStorageByUrl(url));
+        m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url));
     else
         assert(0);
 
@@ -520,14 +520,14 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
 
             if (i == QnServer::ArchiveKind::Normal)
                 m_newQualityAviDelegate->setStorage(
-                    qnNormalStorageMan->getStorageByUrl(
+                    QnStorageManager::getStorageByUrl(
                         m_newQualityFileRes->getUrl()
                     )
                 );
 
             else if (i == QnServer::ArchiveKind::Backup)
                 m_newQualityAviDelegate->setStorage(
-                    qnBackupStorageMan->getStorageByUrl(
+                    QnStorageManager::getStorageByUrl(
                         m_newQualityFileRes->getUrl()
                     )
                 );

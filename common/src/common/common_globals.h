@@ -34,14 +34,14 @@ namespace Qn
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
-            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            ServerFlag BackupType CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
             FailoverPriority)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
             PtzDataFields PtzCapabilities PtzTraits 
             MotionTypes TimePeriodTypes 
-            ServerFlags CameraStatusFlags IOPortTypes)
+            ServerFlags BackupTypes CameraStatusFlags IOPortTypes)
 public:
 #else
     Q_NAMESPACE
@@ -730,6 +730,18 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
     static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
 
+    /** 
+     * backup settings 
+     */
+    enum BackupType
+    {
+        Backup_Disabled,
+        Backup_RealTime,
+        Backup_Schedule
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
+    Q_DECLARE_FLAGS(BackupTypes, BackupType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(BackupTypes)
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -776,7 +788,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::BackupType)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
         (Qn::BookmarkSearchStrategy)
@@ -787,7 +799,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::BackupTypes)(Qn::CameraStatusFlags),
     (metatype)(numeric)(lexical)
 )
 
