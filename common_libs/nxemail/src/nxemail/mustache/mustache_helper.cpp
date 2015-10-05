@@ -1,4 +1,5 @@
-#include "mustache/mustache_helper.h"
+
+#include "mustache_helper.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QIODevice>
@@ -16,4 +17,3 @@ QString renderTemplateFromFile(const QString& filename, const QVariantHash& cont
     Mustache::QtVariantContext context(contextMap, &partialLoader);
     return renderer.render(_template, &context);
 }
-
