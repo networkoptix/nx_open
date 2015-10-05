@@ -19,7 +19,7 @@
 
 static const size_t MAX_LINE_LENGTH = 512;
 
-SystemError::ErrorCode readPartitionsAndSizes(
+SystemError::ErrorCode readPartitions(
     std::list<PartitionInfo>* const partitionInfoList)
 {
 #ifdef __linux__
