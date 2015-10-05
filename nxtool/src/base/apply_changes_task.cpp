@@ -4,6 +4,7 @@
 #include <set>
 
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QHostAddress>
 
 #include <base/types.h>
@@ -19,6 +20,8 @@
 
 namespace
 {
+    QElapsedTimer msecsCounter;
+
     enum { kSingleInterfaceChangeCount = 1 };
 
     enum 
@@ -302,7 +305,8 @@ private:
         , int changesCount
         , const ExtraPred &pred
         , const QString &description
-        , int timeout);
+        , int timeout
+        , int falseTimeout);
 
     void addActions();
 
@@ -721,22 +725,21 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
     , int changesCount
     , const ExtraPred &pred
     , const QString &description
-    , int timeout)
+    , int timeout
+    , int falseTimeout)
 {
     static const auto kOpAffected = Constants::kNoEntitiesAffected;
     static const auto kOpValue = QString();
 
     const ThisWeakPtr weak = shared_from_this();
 
-    const auto request = [&item, weak, cmd, pred, description, changesCount, timeout]()
+    const auto request = [&item, weak, cmd, pred, description, changesCount, falseTimeout, timeout]()
     {
-
         if (weak.expired())
             return;
 
         const auto id = item.first->id;
         const auto initialRuntimeId = item.first->runtimeId;
-
         const auto beforeRemoveHandler = [weak, &item, cmd, description]
             (RequestError error, Constants::AffectedEntities /* affected */)
         {
@@ -757,16 +760,30 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
 
         const AwaitingOp::WeakPtr weakOp = op;
         const BoolPointer firstRequestProperty(new bool(true));
-        const auto discoveredHandler = [weak, weakOp, initialRuntimeId, pred, firstRequestProperty, &item] 
+        const auto initialTime = msecsCounter.elapsed();
+        const auto discoveredHandler = [weak, weakOp, initialTime, initialRuntimeId
+            , pred, firstRequestProperty, falseTimeout, &item] 
             (const BaseServerInfo &info)
         {
             if (weak.expired())
                 return;
 
-            /// Server has restarted, thus we are waiting until it gets in normal (not safe) mode
-            if ((info.runtimeId != initialRuntimeId) && (!pred || pred(info)) && *firstRequestProperty) 
-                                                        
+            if (!*firstRequestProperty)
+                return;
+
+            if (info.runtimeId == initialRuntimeId)
             {
+                if ((msecsCounter.elapsed() - initialTime) > falseTimeout)
+                {
+                    *firstRequestProperty = false;
+
+                    const auto shared = weak.lock();
+                    shared->removeAwatingOp(weakOp, RequestError::kRequestTimeout, Constants::kNoEntitiesAffected);
+                }
+            }
+            else if (!pred || pred(info))                     
+            {
+                /// Server has restarted, thus we are waiting until it gets in normal (not safe) mode
                 *firstRequestProperty = false;
                 const auto shared = weak.lock();
                 shared->checkReachability(weak, weakOp, item);
@@ -814,12 +831,20 @@ void rtu::ApplyChangesTask::Impl::addActions()
     const int timeout = ((cmd == Constants::RestartServerCmd) || (cmd == Constants::RebootCmd) ? 
         kRestartTimeout : kFactoryDefaultsTimeout);
 
+    enum 
+    { 
+        kFalseRestartTimeout = 60 * 1000
+        , kFalseRestoreTimeout = kFactoryDefaultsTimeout / 2 
+    };
+    const int falseTimeout = ((cmd == Constants::RestartServerCmd) || (cmd == Constants::RebootCmd) ? 
+        kFalseRestartTimeout:  kFalseRestoreTimeout);
+
     for (ServerInfoCacheItem &item: m_serversCache)
     {
         enum { kOpChangesCount = 1};
 
         const auto request = makeActionRequest(item, cmd
-            , kOpChangesCount, extraPred, description, timeout);
+            , kOpChangesCount, extraPred, description, timeout, falseTimeout);
 
         m_totalChangesCount += kOpChangesCount;
         m_requests.push_back(RequestData(kNonBlockingRequest, request));
