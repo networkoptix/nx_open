@@ -49,10 +49,11 @@ QByteArray CdbNonceFetcher::generateNonce()
     {
         QnMutexLocker lk(&m_mutex);
 
-        removeExpiredNonce(&lk);
+        const qint64 curClock = m_monotonicClock.elapsed();
+        removeExpiredNonce(&m_cdbNonceQueue, curClock);
 
         if (!m_cdbNonceQueue.empty() &&
-            m_cdbNonceQueue.back().validityTime > m_monotonicClock.elapsed())
+            m_cdbNonceQueue.back().validityTime > curClock)
         {
             //we have valid cloud nonce
             QByteArray nonceTrailer;
@@ -72,24 +73,47 @@ QByteArray CdbNonceFetcher::generateNonce()
 
 bool CdbNonceFetcher::isNonceValid(const QByteArray& nonce) const
 {
+    if (isValidCloudNonce(nonce))
+        return true;
+    return m_defaultGenerator->isNonceValid(nonce);
+}
+
+bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
+{
     if ((nonce.size() > NONCE_TRAILER_LEN) &&
         (memcmp(
-            nonce.constData()+nonce.size()-NONCE_TRAILER_LEN,
+            nonce.constData() + nonce.size() - NONCE_TRAILER_LEN,
             MAGIC_BYTES,
             sizeof(MAGIC_BYTES)) == 0))
     {
         QnMutexLocker lk(&m_mutex);
-        removeExpiredNonce(&lk);
+        removeExpiredNonce(&m_cdbNonceQueue, m_monotonicClock.elapsed());
         if (!m_cdbNonceQueue.empty())
         {
             const auto cdbNonce = nonce.mid(0, nonce.size() - NONCE_TRAILER_LEN);
-            for (const auto& nonceCtx: m_cdbNonceQueue)
+            for (const auto& nonceCtx : m_cdbNonceQueue)
                 if (nonceCtx.nonce == cdbNonce)
                     return true;
         }
     }
+    return false;
+}
 
-    return m_defaultGenerator->isNonceValid(nonce);
+bool CdbNonceFetcher::parseCloudNonce(
+    const nx_http::BufferType& nonce,
+    nx_http::BufferType* const cloudNonce,
+    nx_http::BufferType* const nonceTrailer)
+{
+    if ((nonce.size() <= NONCE_TRAILER_LEN) ||
+        (memcmp(
+            nonce.constData() + nonce.size() - NONCE_TRAILER_LEN,
+            MAGIC_BYTES,
+            sizeof(MAGIC_BYTES)) == 0))
+        return false;
+
+    *cloudNonce = nonce.mid(0, nonce.size() - NONCE_TRAILER_LEN);
+    *nonceTrailer = nonce.mid(nonce.size() - NONCE_TRAILER_LEN);
+    return true;
 }
 
 void CdbNonceFetcher::fetchCdbNonceAsync()
@@ -144,12 +168,14 @@ void CdbNonceFetcher::gotNonce(
         nonce.validPeriod/2);
 }
 
-void CdbNonceFetcher::removeExpiredNonce(QnMutexLockerBase* const /*lk*/)
+void CdbNonceFetcher::removeExpiredNonce(
+    std::deque<NonceCtx>* const cdbNonceQueue,
+    qint64 curClock)
 {
-    while (!m_cdbNonceQueue.empty() &&
-           m_cdbNonceQueue.front().expirationTime < m_monotonicClock.elapsed())
+    while (!cdbNonceQueue->empty() &&
+           cdbNonceQueue->front().expirationTime < curClock)
     {
-        m_cdbNonceQueue.pop_front();
+        cdbNonceQueue->pop_front();
     }
 }
 

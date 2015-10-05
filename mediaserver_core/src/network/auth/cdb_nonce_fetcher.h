@@ -18,6 +18,7 @@
 
 #include <cdb/connection.h>
 #include <utils/common/timermanager.h>
+#include <utils/network/http/httptypes.h>
 #include <utils/thread/mutex.h>
 
 #include "abstract_nonce_provider.h"
@@ -42,6 +43,13 @@ public:
     virtual QByteArray generateNonce() override;
     virtual bool isNonceValid(const QByteArray& nonce) const override;
 
+    bool isValidCloudNonce(const QByteArray& nonce) const;
+
+    static bool parseCloudNonce(
+        const nx_http::BufferType& nonce,
+        nx_http::BufferType* const cloudNonce,
+        nx_http::BufferType* const nonceTrailer);
+
 private:
     struct NonceCtx
     {
@@ -57,14 +65,17 @@ private:
     std::unique_ptr<AbstractNonceProvider> m_defaultGenerator;
     std::atomic<bool> m_bindedToCloud;
     //map<cdb_nonce, valid_time>
-    std::deque<NonceCtx> m_cdbNonceQueue;
+    mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
     std::unique_ptr<nx::cdb::api::Connection> m_connection;
     TimerManager::TimerGuard m_timerID;
 
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);
-    void removeExpiredNonce(QnMutexLockerBase* const lk);
+
+    static void removeExpiredNonce(
+        std::deque<NonceCtx>* const cdbNonceQueue,
+        qint64 curClock);
 
 private slots:
     void cloudBindingStatusChanged(bool bindedToCloud);
