@@ -115,7 +115,6 @@ void QnCloudManagementWidget::doBindSystem()
         ui->cloudUserLineEdit->text().toStdString(),
         ui->cloudPasswordLineEdit->text().toStdString());
 
-    using namespace std::placeholders;
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnCommon->localSystemName().toStdString();
     m_cloudConnection->systemManager()->bindSystem(
@@ -143,7 +142,6 @@ void QnCloudManagementWidget::doUnbindSystem()
     ui->toggleBindSystemButton->setEnabled(false);
     //TODO #ak displaying progress
 
-    using namespace std::placeholders;
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     m_cloudConnection->systemManager()->unbindSystem(
         qnResPool->getAdministrator()->getProperty(Qn::CLOUD_SYSTEM_ID).toStdString(),

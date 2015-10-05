@@ -29,7 +29,12 @@ public:
     nx::cdb::api::SystemData systemData;
     QnMediaServerConnectionPtr serverConnection;
 
-    QnBindToCloudResponse() {}
+    QnBindToCloudResponse()
+    :
+        resultCode(nx::cdb::api::ResultCode::ok)
+    {
+    }
+
     QnBindToCloudResponse(
         nx::cdb::api::ResultCode _resultCode,
         nx::cdb::api::SystemData _systemData,

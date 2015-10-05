@@ -22,7 +22,6 @@ std::tuple<ResultType> makeSyncCall(
     std::promise<ResultType> promise;
     auto future = promise.get_future();
     function([&promise](ResultType resCode) { promise.set_value(resCode); });
-    future.wait();
     return std::make_tuple(future.get());
 }
 
