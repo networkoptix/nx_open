@@ -42,7 +42,10 @@ public:
         Locked          = 4 << 8,
         Incompatible    = 5 << 8,
         Control         = 6 << 8,
-        StatusMask      = 0xFF00
+        StatusMask      = 0xFF00,
+
+        /* Additional flags */
+        ReadOnly        = 0x10000
     };
     Q_DECLARE_FLAGS(Key, KeyPart)
 

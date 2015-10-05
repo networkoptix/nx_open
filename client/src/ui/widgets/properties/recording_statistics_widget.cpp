@@ -36,10 +36,8 @@
 
 namespace {
 
-    const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
     const qint64 SECS_PER_HOUR = 3600;
     const qint64 SECS_PER_DAY = SECS_PER_HOUR * 24;
-    const qint64 SECS_PER_WEEK = SECS_PER_DAY * 7;
     const qint64 BYTES_IN_GB = 1000000000ll;
     const qint64 BYTES_IN_TB = 1000ll * BYTES_IN_GB;
     const qint64 FINAL_STEP_SECONDS = 1000000000ll * 10;
@@ -182,6 +180,7 @@ namespace {
         }
     };
 
+    const int minimumSectionSize = 200;
 }
 
 QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*/):
@@ -194,9 +193,9 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     m_requests(),
     m_updateDisabled(false),
     m_dirty(false),
-    m_selectAllAction(NULL),
-    m_exportAction(NULL),
-    m_clipboardAction(NULL),
+    m_selectAllAction(new QAction(tr("Select All"), this)),
+    m_exportAction(new QAction(tr("Export Selection to File..."), this)),
+    m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this)),
     m_lastMouseButton(Qt::NoButton),
     m_allData(),
     m_hiddenCameras(),
@@ -211,24 +210,19 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     ui->gridEvents->setModel(sortModel);
     ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
-
     CustomHorizontalHeader* headers = new CustomHorizontalHeader(this);
     ui->gridEvents->setHorizontalHeader(headers);
-    connect(headers->comboBox(), QnComboboxCurrentIndexChanged, this, &QnRecordingStatisticsWidget::updateData);
 
     headers->setSectionsClickable(true);
     headers->setStretchLastSection(true);
     headers->setSectionResizeMode(QHeaderView::Interactive);
     headers->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::ResizeToContents);
-    headers->setMinimumSectionSize(120);
+    headers->setMinimumSectionSize(minimumSectionSize);
     headers->setSortIndicatorShown(true);
-
+    
     for (int i = QnRecordingStatsModel::BytesColumn; i < QnRecordingStatsModel::ColumnCount; ++i)
-        ui->gridEvents->setColumnWidth(i, headers->minimumSectionSize());
+        ui->gridEvents->setColumnWidth(i, minimumSectionSize);
 
-    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
-    m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
 
@@ -242,24 +236,20 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
 
     ui->loadingProgressBar->hide();
 
-    connect(m_clipboardAction,      &QAction::triggered,                this,   &QnRecordingStatisticsWidget::at_clipboardAction_triggered);
-    connect(m_exportAction,         &QAction::triggered,                this,   &QnRecordingStatisticsWidget::at_exportAction_triggered);
-    connect(m_selectAllAction,      &QAction::triggered,                ui->gridEvents, &QTableView::selectAll);
+    connect(m_clipboardAction,      &QAction::triggered,                    this,   &QnRecordingStatisticsWidget::at_clipboardAction_triggered);
+    connect(m_exportAction,         &QAction::triggered,                    this,   &QnRecordingStatisticsWidget::at_exportAction_triggered);
+    connect(headers->comboBox(),    QnComboboxCurrentIndexChanged,          this,   &QnRecordingStatisticsWidget::updateData);
+    connect(ui->refreshButton,      &QAbstractButton::clicked,              this,   &QnRecordingStatisticsWidget::updateData);
+    connect(ui->checkBoxForecast,   &QCheckBox::stateChanged,               this,   &QnRecordingStatisticsWidget::at_forecastParamsChanged);
+    connect(ui->extraSpaceSlider,   &QSlider::valueChanged,                 this,   &QnRecordingStatisticsWidget::at_forecastParamsChanged);
+    connect(ui->extraSizeSpinBox,   QnDoubleSpinBoxValueChanged,            this,   &QnRecordingStatisticsWidget::at_forecastParamsChanged);
+    connect(m_model,                &QnRecordingStatsModel::colorsChanged,  this,   &QnRecordingStatisticsWidget::updateColors);
+    connect(ui->gridEvents,         &QTableView::customContextMenuRequested,this,   &QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested);
+    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE),
+                                    &QnPropertyNotifier::valueChanged,      ui->gridEvents, &QAbstractItemView::reset);
+    connect(m_selectAllAction,      &QAction::triggered,                    ui->gridEvents, &QTableView::selectAll);
 
-    connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnRecordingStatisticsWidget::updateData);
-
-    connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnRecordingStatisticsWidget::at_eventsGrid_clicked);
-    connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested);
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
-
-    connect(ui->checkBoxForecast,   &QCheckBox::stateChanged, this, &QnRecordingStatisticsWidget::at_forecastParamsChanged);
-    connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatisticsWidget::at_forecastParamsChanged);
-    connect(ui->extraSizeSpinBox,   SIGNAL(valueChanged(double)),   this, SLOT(at_forecastParamsChanged()));
-
-    connect(m_model, &QnRecordingStatsModel::colorsChanged, this, &QnRecordingStatisticsWidget::at_updateColors);
-    at_updateColors();
-
-    ui->mainGridLayout->activate();
+    updateColors();
 
     setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
 }
@@ -307,8 +297,7 @@ void QnRecordingStatisticsWidget::updateData() {
 }
 
 
-void QnRecordingStatisticsWidget::at_updateColors()
-{
+void QnRecordingStatisticsWidget::updateColors() {
     auto colors = m_model->colors();
 
     QPalette palette = ui->labelUsageColor->palette();
@@ -392,10 +381,6 @@ void QnRecordingStatisticsWidget::requestFinished()
     ui->loadingProgressBar->hide();
 }
 
-void QnRecordingStatisticsWidget::at_eventsGrid_clicked(const QModelIndex& /*idx*/)
-{
-}
-
 void QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
     QMenu* menu = 0;
@@ -445,7 +430,7 @@ void QnRecordingStatisticsWidget::at_clipboardAction_triggered()
 void QnRecordingStatisticsWidget::at_mouseButtonRelease(QObject* sender, QEvent* event)
 {
     Q_UNUSED(sender)
-        QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
+    QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
     m_lastMouseButton = me->button();
 }
 

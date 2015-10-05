@@ -72,6 +72,45 @@ namespace
             , info.extraInfo().password, command);
     }
     
+    QString convertCapsToReadable(const QString &caps)
+    {
+        static const auto kWindowsTag = QStringLiteral("windows");
+        static const auto kLinuxTag = QStringLiteral("linux");
+        static const auto kX64Tag = QStringLiteral("x64");
+        static const auto kX86Tag = QStringLiteral("x86");
+        static const auto kArmTag = QStringLiteral("arm");
+
+        const bool isX86 = caps.contains(kX86Tag);
+        const bool isX64 = caps.contains(kX64Tag);
+        const bool isArm = caps.contains(kArmTag);
+
+        const QString arch = (isX86 ? kX86Tag : (isX64 ? kX64Tag : QString()));
+        if (caps.contains(kWindowsTag))
+        {
+            return QStringLiteral("%1 %2").arg(kWindowsTag).arg(arch);
+        }
+        else if (caps.contains(kLinuxTag))
+        {
+            if (!isArm)
+                return QStringLiteral("%1 %2").arg(kLinuxTag).arg(arch);
+            else
+            {
+                if (caps.contains("bpi"))
+                    return QStringLiteral("nx1");
+                else if (caps.contains("rpi"))
+                    return QStringLiteral("Raspberry Pi");
+                else if (caps.contains("isd"))
+                    return QStringLiteral("isd jaguar");
+                else if (caps.contains("isd_s2"))
+                    return QStringLiteral("isd s2");
+                else
+                    return QStringLiteral("%1 %2").arg(kLinuxTag).arg("unknown");
+            }
+        }
+
+        return QStringLiteral("unknown os");
+    }
+
     typedef QHash<QString, std::function<void (const QJsonObject &object
         , rtu::BaseServerInfo &info)> > KeyParserContainer;
     const KeyParserContainer parser = []() -> KeyParserContainer
@@ -98,9 +137,10 @@ namespace
         {
             const auto val = object.value(kSysInfoTag);
             const auto sysInfo = val.toObject();
+            QString systemCaps;
             if (sysInfo.isEmpty())
             {
-                info.os = val.toString();
+                systemCaps = val.toString();
             }
             else
             {
@@ -115,8 +155,10 @@ namespace
                 const QString arch = (sysInfo.keys().contains(kArchKey) 
                     ? sysInfo.value(kArchKey).toString() : QString());
 
-                info.os = QStringLiteral("%1 %2 %3").arg(platform, arch, modification);
+                systemCaps = QStringLiteral("%1 %2 %3").arg(platform, arch, modification);
             }
+
+            info.os = convertCapsToReadable(systemCaps);
         });
 
         const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info, const QString &tagName)
