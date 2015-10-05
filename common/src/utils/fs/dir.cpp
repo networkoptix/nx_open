@@ -5,6 +5,9 @@
 
 #include "dir.h"
 
+#include <map>
+#include <memory>
+
 #ifdef __linux__
 #include <time.h>
 #include <signal.h>
@@ -13,6 +16,8 @@
 #include <sys/statvfs.h>
 #endif
 
+
+static const size_t MAX_LINE_LENGTH = 512;
 
 SystemError::ErrorCode readPartitionsAndSizes(
     std::list<PartitionInfo>* const partitionInfoList)

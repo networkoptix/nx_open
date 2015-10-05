@@ -1,10 +1,16 @@
 #include "info.h"
 
+#ifdef __linux__
+#include <unistd.h>
+#include <sys/stat.h>
+#endif
+
 #include <array>
 
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
+#include "utils/common/app_info.h"
 #include "utils/fs/dir.h"
 #include "utils/network/nettools.h"
 
@@ -40,7 +46,7 @@ QString Nx1::getSerial()
 bool Nx1::isBootedFromSD()
 {
 #ifdef __linux__
-    if (QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1")
+    if (QnAppInfo::armBox() == lit("bpi") || QnAppInfo::armBox() == lit("nx1"))
     {
         std::list<PartitionInfo> partitionInfoList;
         if (!readPartitions(&partitionInfoList))
@@ -48,7 +54,7 @@ bool Nx1::isBootedFromSD()
 
         for (const auto& partitionInfo: partitionInfoList)
         {
-            if (partitionInfo.path == "/")
+            if (partitionInfo.path == lit("/"))
             {
                 if (partitionInfo.devName.indexOf(lit("rootfs")) != -1 ||
                     partitionInfo.devName == lit("/dev/root"))

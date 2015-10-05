@@ -6,6 +6,7 @@
 #include "settings.h"
 
 #include <nx1/info.h>
+#include <utils/common/app_info.h>
 
 
 namespace ec2 {
