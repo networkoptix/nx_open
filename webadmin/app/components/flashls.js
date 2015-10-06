@@ -89,6 +89,8 @@ var JSLoaderPlaylist = {
 
 
 
+var collectedPosition = 0;
+var oldPosition = 0;
 var flashlsAPI = new (function(){
 
     //We use swfobject to embed player. see https://code.google.com/p/swfobject/wiki/documentation
@@ -177,6 +179,8 @@ var flashlsAPI = new (function(){
         this.errorHandler = errorHandler;
         this.positionHandler = positionHandler;
 
+
+
         /*swfobject.embedSWF(
             flashParameters.player,
             element,
@@ -198,6 +202,9 @@ var flashlsAPI = new (function(){
         if(!url){
             return;
         }
+        collectedPosition = 0;
+        oldPosition = 0;
+
         //console.log('load video',url);
         try {
             this.flashObject.playerLoad(url);
@@ -443,29 +450,14 @@ flashlsAPI.flashlsEvents = {
         //console.log('fragmentPlaying',event);
     },
     position: function(timemetrics) {
+        var currentPosition = Math.max(0,timemetrics.position);
 
-
-        var backbuffer = timemetrics.backbuffer;
-        // TODO: what if video stopped? (buffer goes 0);
-        flashlsAPI.positionHandler(Math.round(backbuffer * 1000))
-
-        if(!timer){
-            timer = (new Date()).getTime();
+        if(currentPosition < oldPosition){
+            collectedPosition += oldPosition;
         }
-        /*var position = timemetrics.position;
-        var duration = timemetrics.duration;
-        var sliding = timemetrics.live_sliding_main;
-        var buffer = timemetrics.buffer;
+        oldPosition = currentPosition;
 
-        console.log('position changed',
-            (((new Date()).getTime() - timer) / 1000 ).toFixed(2),
-            backbuffer.toFixed(2),
-            position.toFixed(2),
-            'bb:',backbuffer.toFixed(2),
-            (backbuffer - position).toFixed(2),
-            (backbuffer + position).toFixed(2),
-            (buffer + backbuffer).toFixed(2)
-        );*/
+        flashlsAPI.positionHandler(Math.round((collectedPosition + currentPosition) * 1000));
     },
     state: function(newState) {
         var event = {time : new Date() - jsLoadDate, type : newState.toLowerCase(), name : ''};

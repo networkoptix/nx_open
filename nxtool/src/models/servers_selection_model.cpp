@@ -241,7 +241,10 @@ namespace
         , kDefaultPassword
         , kBusyStateRoleId
         , kSafeModeRoleId
-        , kHasHdd
+        , kHasHddRoleId
+        , kVersionRoleId
+        , kOsRoleId
+        , kOperationRoleId
 
         , kLastCustomRoleId
     };
@@ -267,8 +270,11 @@ namespace
         result.insert(kDefaultPassword, "defaultPassword");
         result.insert(kBusyStateRoleId, "isBusy");
         result.insert(kSafeModeRoleId, "safeMode");
-        result.insert(kHasHdd, "hasHdd");
-
+        result.insert(kHasHddRoleId, "hasHdd");
+        result.insert(kVersionRoleId, "version");
+        result.insert(kOsRoleId, "os");
+        result.insert(kOperationRoleId, "operation");
+        
         return result;
     }();
     
@@ -526,24 +532,29 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kSystemNameRoleId:
             return systemInfo.name;
         case kNameRoleId:
-            if (info.baseInfo().displayAddress.isEmpty())
-                return QString("%1 (%2) %3").arg(info.baseInfo().name)
-                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST")
-                    .arg(info.baseInfo().version.toString());  /// TODO: remove after inner testing
-            else 
-                return QString("%1 (%2) (%3) %4").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress)
-                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST")
-                    .arg(info.baseInfo().version.toString());  /// TODO: remove after inner testing
+            return info.baseInfo().name;
+        case kIpAddressRoleId:
+            return info.baseInfo().displayAddress;
+        case kVersionRoleId:
+            return info.baseInfo().version.toString();
+        case kOsRoleId:
+            return info.baseInfo().os;
         case kIdRoleId:
             return info.baseInfo().id;
-        case kMacAddressRoleId:
+        case kOperationRoleId:
         {
             if (searchInfo.serverInfoIterator->locked)
                 return searchInfo.serverInfoIterator->lockReason;
+            else if (searchInfo.serverInfoIterator->loginState == kDifferentNetwork)
+                return tr("Server is unavailable");
 
+            return QString();
+        }
+
+        case kMacAddressRoleId:
+        {
             const bool hasMacAddress = info.hasExtraInfo() && !info.extraInfo().interfaces.empty();
-            return (hasMacAddress ? info.extraInfo().interfaces.front().macAddress :
-                (searchInfo.serverInfoIterator->loginState == kDifferentNetwork ? "Server is unavailable" : ""));
+            return (hasMacAddress ? info.extraInfo().interfaces.front().macAddress : QString());
         }
         case kLoggedIn:
             return info.hasExtraInfo();
@@ -551,8 +562,8 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
             return searchInfo.serverInfoIterator->locked;
         case kSafeModeRoleId:
             return searchInfo.serverInfoIterator->serverInfo.baseInfo().safeMode;
-        case kHasHdd:
-            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags && Constants::HasHdd);
+        case kHasHddRoleId:
+            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags & Constants::HasHdd);
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:

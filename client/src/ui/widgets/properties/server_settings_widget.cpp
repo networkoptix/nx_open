@@ -232,16 +232,26 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server) {
     updateReadOnly();
 }
 
-void QnServerSettingsWidget::updateReadOnly() {
-    bool readOnly = isReadOnly();
+void QnServerSettingsWidget::setReadOnlyInternal(bool readOnly) {
+    using ::setReadOnly;
     setReadOnly(ui->failoverCheckBox, readOnly);
     setReadOnly(ui->maxCamerasSpinBox, readOnly);
     setReadOnly(ui->storagesTable, readOnly);
 
+    ui->rebuildGroupBox->setVisible(!readOnly);
+}
+
+void QnServerSettingsWidget::updateReadOnly() {
+    bool readOnly = [&](){
+        if (!m_server)
+            return true;
+        return !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
+    }();
+
+    setReadOnly(readOnly);
+
     /* Edge servers cannot be renamed. */
     ui->nameLineEdit->setReadOnly(readOnly || QnMediaServerResource::isEdgeServer(m_server));
-
-    ui->rebuildGroupBox->setVisible(!readOnly);
 }
 
 bool QnServerSettingsWidget::hasChanges() const {
@@ -534,13 +544,6 @@ int QnServerSettingsWidget::dataRowCount() const {
 
     return rowCount;
 }
-
-bool QnServerSettingsWidget::isReadOnly() const {
-    if (!m_server)
-        return true;
-    return !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
-}
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

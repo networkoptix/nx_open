@@ -45,7 +45,8 @@ namespace {
     const QString tpProductLogo(lit("productLogo.png"));
     const QString tpCompanyName(lit("companyName"));
     const QString tpCompanyUrl(lit("companyUrl"));
-    const QString tpSupportEmail(lit("supportEmail"));
+    const QString tpSupportLink(lit("supportLink"));
+    const QString tpSupportLinkText(lit("supportLinkText"));
     const QString tpSystemName(lit("systemName"));
     const QString tpImageMimeType(lit("image/png"));
     const QString tpScreenshotFilename(lit("screenshot"));
@@ -369,7 +370,10 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
-    contextMap[tpSupportEmail] = emailSettings.supportEmail;
+    contextMap[tpSupportLink] = QnEmailAddress::isValid(emailSettings.supportEmail)
+        ? lit("mailto:%1").arg(emailSettings.supportEmail)
+        : emailSettings.supportEmail;
+    contextMap[tpSupportLinkText] = emailSettings.supportEmail;
     contextMap[tpSystemName] = emailSettings.signature;
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;

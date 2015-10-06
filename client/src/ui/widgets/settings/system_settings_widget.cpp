@@ -8,9 +8,11 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/media_server_resource.h>
+
 #include <ec2_statictics_reporter.h>
 
 #include <ui/common/checkbox_utils.h>
+#include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
@@ -89,6 +91,9 @@ void QnSystemSettingsWidget::submitToSettings() {
 }
 
 bool QnSystemSettingsWidget::hasChanges() const  {
+    if (isReadOnly())
+        return false;
+
     QnGlobalSettings *settings = QnGlobalSettings::instance();
 
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked
@@ -111,4 +116,13 @@ bool QnSystemSettingsWidget::hasChanges() const  {
         return true;
 
     return false;
+}
+
+void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly) {
+    using ::setReadOnly;
+
+    setReadOnly(ui->autoDiscoveryCheckBox, readOnly);
+    setReadOnly(ui->auditTrailCheckBox, readOnly);
+    setReadOnly(ui->autoSettingsCheckBox, readOnly);
+    setReadOnly(ui->statisticsReportCheckBox, readOnly);
 }

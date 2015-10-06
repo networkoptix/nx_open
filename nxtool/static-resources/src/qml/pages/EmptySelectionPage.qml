@@ -27,7 +27,7 @@ Item
             
             width: image.width * 1.6;   /// It is a magic! Don't change it!
             color: "#666666";
-            text: qsTr("Welcome to the\n%1").arg(rtuContext.toolDisplayName);
+            text: qsTr("Welcome to\n%1").arg(rtuContext.toolDisplayName);
             font.pixelSize: Common.SizeManager.fontSizes.medium;
             wrapMode: Text.Wrap;
             horizontalAlignment: Text.AlignHCenter;
@@ -50,7 +50,7 @@ Item
             anchors.horizontalCenter: parent.horizontalCenter;
     
             color: "#666666";
-            text: qsTr("Select server(s) from the menu on the left to get started");
+            text: qsTr("Select server(s) in the left menu to get started");
             font.pixelSize: Common.SizeManager.fontSizes.medium;
             horizontalAlignment: Text.AlignHCenter;
             wrapMode: Text.Wrap;
@@ -87,7 +87,7 @@ Item
             selectByMouse: true;
             color: "#666666";
             font.pixelSize: Common.SizeManager.fontSizes.small;
-            text: qsTr("     Software version %1").arg(version);
+            text: qsTr("     Software Version: %1").arg(version);
 
         }
 

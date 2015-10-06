@@ -156,6 +156,7 @@ chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts
 mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
 
 #additional platform specific files
+cp -R ./var $BUILD_DIR
 cp -R ./root $BUILD_DIR
 mkdir -p $BUILD_DIR/root/tools/nx
 cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx

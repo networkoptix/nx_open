@@ -59,10 +59,6 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged,          this,   &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
-
-
-
-    
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {

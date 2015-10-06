@@ -368,7 +368,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased);
         setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo);
         setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
-        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
+        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly());
         setTabEnabledSafe(Qn::IOPortsSettingsTab, camera()->isIOModule());
 
         if (!dtsBased) {
@@ -509,6 +509,10 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     setReadOnly(ui->imageControlWidget, readOnly);
     setReadOnly(ui->advancedSettingsWidget, readOnly);
     setReadOnly(ui->ioPortSettingsWidget, readOnly);
+
+    if (readOnly)
+        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, false);
+
     m_readOnly = readOnly;
 }
 
