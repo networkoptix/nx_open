@@ -60,6 +60,10 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 {
     assert(qnResPool);
     
+    QString defaultSupportLink = QnAppInfo::supportLink();
+    if (defaultSupportLink.isEmpty())
+        defaultSupportLink = QnAppInfo::supportEmailAddress();
+
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
@@ -70,7 +74,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
     m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(namePassword, QString(), this);
     m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSignature, QString(), this);
-    m_supportLinkAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportLink(), this);
+    m_supportLinkAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, defaultSupportLink, this);
     m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(nameConnectionType, QnEmail::Unsecure, this);
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
@@ -235,6 +239,15 @@ QnEmailSettings QnGlobalSettings::emailSettings() const {
     result.supportEmail = m_supportLinkAdaptor->value();
     result.simple = m_simpleAdaptor->value();
     result.timeout = m_timeoutAdaptor->value();
+
+    /*
+     * VMS-1055 - default email changed to link.
+     * We are checking if the value is not overridden and replacing it by the updated one. 
+     */
+    if (result.supportEmail == QnAppInfo::supportEmailAddress() && !QnAppInfo::supportLink().isEmpty()) {
+        result.supportEmail = QnAppInfo::supportLink();
+    }
+
     return result;
 }
 

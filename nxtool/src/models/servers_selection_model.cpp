@@ -563,7 +563,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kSafeModeRoleId:
             return searchInfo.serverInfoIterator->serverInfo.baseInfo().safeMode;
         case kHasHddRoleId:
-            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags && Constants::HasHdd);
+            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags & Constants::HasHdd);
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:

@@ -287,6 +287,7 @@ system_restore () {
         rm /var/tmp/keep_ip         
         rm $MNTBOOTHDDPART/restore
         touch $MNTBOOTHDDPART/restored
+        if [ ! -f $MNTBOOTHDDPART/var/tmp/mac ]; then echo $MAC > $MNTBOOTHDDPART/var/tmp/mac; fi
         hddboot_indicator_flush
         umount $BOOTHDDPART
         /etc/init.d/nx1led stop
@@ -350,6 +351,8 @@ upgrade() {
         rm -Rf $MNTBOOTHDDPART         
     fi    
     get_serial_number
+    chown root:root /etc/crontab
+    chmod 600 /etc/crontab
 }
 
 default_sequence () {
