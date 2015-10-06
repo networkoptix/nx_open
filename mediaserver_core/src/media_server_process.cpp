@@ -7,6 +7,9 @@
 #include <signal.h>
 #ifdef __linux__
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 
 #include <qtsinglecoreapplication.h>
@@ -1583,16 +1586,15 @@ void MediaServerProcess::run()
 #ifdef __arm__
     serverFlags |= Qn::SF_ArmServer;
 
-    auto partitions = qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-        QnPlatformMonitor::LocalDiskPartition);
-    for (const auto& partition: partitions)
-    {
-        if (partition.devName.startsWith(lit("/dev/sd")))
-        {
-            serverFlags |= Qn::SF_Has_HDD;
-            break;
-        }
-    }
+    struct stat st;
+    memset(&st, 0, sizeof(st));
+    const bool hddPresent = 
+        ::stat("/dev/sda", &st) == 0 ||
+        ::stat("/dev/sdb", &st) == 0 ||
+        ::stat("/dev/sdc", &st) == 0 ||
+        ::stat("/dev/sdd", &st) == 0;
+    if (hddPresent)
+        serverFlags |= Qn::SF_Has_HDD;
 #else
     serverFlags |= Qn::SF_Has_HDD;
 #endif
