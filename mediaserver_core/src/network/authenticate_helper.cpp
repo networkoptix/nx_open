@@ -139,6 +139,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                     ? "PLAY"    //for rtsp always using PLAY since client software does not know 
                                 //which request underlying player will issue first
                     : request.requestLine.method,
+                response,
                 authUserId);
             if(authResult == Qn::Auth_OK)
             {
@@ -372,7 +373,10 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
         errCode = Qn::Auth_WrongLogin;
 
         QnResourcePtr res;
-        std::tie(errCode, res) = m_userDataProvider->authorize(method, authorization);
+        std::tie(errCode, res) = m_userDataProvider->authorize(
+            method,
+            authorization,
+            &responseHeaders.headers);
         bool tryOnceAgain = false;
         if (userResource = res.dynamicCast<QnUserResource>())
         {
@@ -392,7 +396,11 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
         }
 
         if (tryOnceAgain)
-            errCode = m_userDataProvider->authorize(res, method, authorization);
+            errCode = m_userDataProvider->authorize(
+                res,
+                method,
+                authorization,
+                &responseHeaders.headers);
         if (errCode == Qn::Auth_OK)
             return Qn::Auth_OK;
 #else
@@ -476,7 +484,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
 Qn::AuthResult QnAuthHelper::doBasicAuth(
     const QByteArray& method,
     const nx_http::header::Authorization& authorization,
-    nx_http::Response& /*response*/,
+    nx_http::Response& response,
     QnUuid* authUserId)
 {
     assert(authorization.authScheme == nx_http::header::AuthScheme::basic);
@@ -485,7 +493,10 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
 
 #ifdef USE_USER_RESOURCE_PROVIDER
     QnResourcePtr res;
-    std::tie(errCode, res) = m_userDataProvider->authorize(method, authorization);
+    std::tie(errCode, res) = m_userDataProvider->authorize(
+        method,
+        authorization,
+        &response.headers);
     bool tryOnceAgain = false;
     if (auto user = res.dynamicCast<QnUserResource>())
     {
@@ -502,7 +513,11 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
     }
 
     if (tryOnceAgain)
-        errCode = m_userDataProvider->authorize(res, method, authorization);
+        errCode = m_userDataProvider->authorize(
+            res,
+            method,
+            authorization,
+            &response.headers);
     if (errCode == Qn::Auth_OK)
     {
         if (auto user = res.dynamicCast<QnUserResource>())
@@ -572,6 +587,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
         authResult = authenticateByUrl(
             QUrl::fromPercentEncoding(params.value(URL_QUERY_AUTH_KEY_NAME)).toUtf8(),
             method,
+            responseHeaders,
             &userID,
             &outUserResource);
         if( authUserId )
@@ -656,6 +672,7 @@ QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
 Qn::AuthResult QnAuthHelper::authenticateByUrl(
     const QByteArray& authRecordBase64,
     const QByteArray& method,
+    nx_http::Response& response,
     QnUuid* authUserId,
     QnUserResourcePtr* const outUserResource) const
 {
@@ -677,7 +694,10 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
 #ifdef USE_USER_RESOURCE_PROVIDER
     QnResourcePtr res;
     Qn::AuthResult errCode = Qn::Auth_WrongLogin;
-    std::tie(errCode, res) = m_userDataProvider->authorize(method, authorization);
+    std::tie(errCode, res) = m_userDataProvider->authorize(
+        method,
+        authorization,
+        &response.headers);
     if (!res)
         return Qn::Auth_WrongLogin;
 

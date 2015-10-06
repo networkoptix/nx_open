@@ -25,14 +25,16 @@ public:
     virtual Qn::AuthResult authorize(
         const QnResourcePtr& res,
         const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader) = 0;
+        const nx_http::header::Authorization& authorizationHeader,
+        nx_http::HttpHeaders* const responseHeaders) = 0;
     //!Authorizes \a authorizationHeader with any resource (user or server)
     /*!
         \return Resource is returned regardless of authentication result
     */
     virtual std::tuple<Qn::AuthResult, QnResourcePtr> authorize(
         const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader) = 0;
+        const nx_http::header::Authorization& authorizationHeader,
+        nx_http::HttpHeaders* const responseHeaders) = 0;
 };
 
 #endif  //NX_AUTH_ABSTRACT_USER_DATA_PROVIDER_H
