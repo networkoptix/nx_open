@@ -12,6 +12,7 @@ Item {
 
     property alias text: textLabel.text
     property alias icon: icon.source
+    property alias font: textLabel.font
 
     readonly property alias pressed: materialSurface.pressed
 
