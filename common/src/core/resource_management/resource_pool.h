@@ -144,6 +144,17 @@ public:
     QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
 
+    template<class Cond>
+    QnResourcePtr getResourceByCond(Cond cond) const
+    {
+        QnMutexLocker locker(&m_resourcesMtx);
+        for (const QnResourcePtr& resource : m_resources)
+            if (cond(resource))
+                return resource;
+
+        return QnResourcePtr();
+    }
+
     QnUserResourcePtr getAdministrator() const;
 
     /**
