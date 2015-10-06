@@ -18,7 +18,7 @@ public:
     QnCameraDeviceStringSet(
           const QString &mixedString
         , const QString &cameraString
-        , const QString &ioModuleString
+        , const QString &ioModuleString = QString()
         );
 
     QString getString(QnCameraDeviceType deviceType) const;
@@ -72,4 +72,9 @@ public:
     * @brief Select string from the given set based on the target devices list.
     */
     static QString getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourceList &devices);
+
+    /**
+    * @brief Select default string from the given set based on all devices in the system.
+    */
+    static QString getDefaultNameFromSet(const QnCameraDeviceStringSet &set);
 };

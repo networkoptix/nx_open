@@ -70,6 +70,12 @@ namespace {
         return QnCameraDeviceType::Mixed;
     }
 
+    QnCameraDeviceType calculateDefaultDeviceType() {
+        if (!qnResPool || !qnResPool->containsIoModules())
+            return QnCameraDeviceType::Camera;
+        return QnCameraDeviceType::Mixed;
+    }
+
 }
 
 QnCameraDeviceStringSet::QnCameraDeviceStringSet() {
@@ -78,7 +84,9 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet() {
 QnCameraDeviceStringSet::QnCameraDeviceStringSet(const QString &mixedString, const QString &cameraString, const QString &ioModuleString) {
     setString(Mixed, mixedString);
     setString(Camera, cameraString);
-    setString(IOModule, ioModuleString);
+
+    /* IO Module string can be absent in cases where we are selecting default names. */
+    setString(IOModule, ioModuleString.isEmpty() ? lit("<invalid>") : ioModuleString);
 
     Q_ASSERT_X(isValid(), Q_FUNC_INFO, "Invalid string set");
 }
@@ -106,7 +114,7 @@ bool QnCameraDeviceStringSet::isValid() const {
 /************************************************************************/
 
 QString QnDeviceDependentStrings::getDefaultName(bool plural /*= true*/, bool capitalize /*= true*/) {
-    QnCameraDeviceType deviceType = calculateDeviceType(QnVirtualCameraResourceList());
+    QnCameraDeviceType deviceType = calculateDefaultDeviceType();
     if (deviceType == Camera)
         return QnResourceNameStrings::defaultCameras(plural, capitalize);
     return QnResourceNameStrings::defaultDevices(plural, capitalize);
@@ -156,4 +164,8 @@ QString QnDeviceDependentStrings::getNumericName(const QnVirtualCameraResourceLi
 
 QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourceList &devices) {
     return set.getString(calculateDeviceType(devices));
+}
+
+QString QnDeviceDependentStrings::getDefaultNameFromSet(const QnCameraDeviceStringSet &set) {
+    return set.getString(calculateDefaultDeviceType());
 }
