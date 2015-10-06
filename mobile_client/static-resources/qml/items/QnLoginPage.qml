@@ -39,7 +39,6 @@ QnPage {
     QnFlickable {
         id: flickable
         anchors.fill: parent
-        topMargin: dp(16)
         leftMargin: dp(16)
         rightMargin: dp(16)
         bottomMargin: dp(16)
@@ -54,10 +53,10 @@ QnPage {
 
             Rectangle {
                 id: warningRect
-                height: _showWarning ? dp(40) : 0
+                height: _showWarning ? dp(40) : 1
                 width: loginPage.width
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: QnTheme.attentionBackground
+                color: _showWarning ? QnTheme.attentionBackground : "transparent"
                 clip: true
 
                 Behavior on height { NumberAnimation { duration: _warningAnimationDuration; easing.type: Easing.OutCubic } }
