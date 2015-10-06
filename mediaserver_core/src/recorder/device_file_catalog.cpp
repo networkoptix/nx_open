@@ -334,6 +334,9 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
         //chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
         chunk = Chunk(startTimeMs, qnStorageMan->getStorageIndex(storage), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
     }
+    else {
+        qWarning() << "Can't open media file" << fileName << "storage=" << storage->getUrl();
+    }
     delete avi;
     return chunk;
 }
