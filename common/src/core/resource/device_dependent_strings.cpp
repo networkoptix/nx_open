@@ -161,7 +161,11 @@ QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &
 }
 
 QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourcePtr &device) {
-    return set.getString(calculateDeviceType(QnVirtualCameraResourceList() << device), false);
+    return set.getString(
+        device 
+        ? calculateDeviceType(QnVirtualCameraResourceList() << device)
+        : calculateDefaultDeviceType()
+    , false);
 }
 
 QString QnDeviceDependentStrings::getDefaultNameFromSet(const QnCameraDeviceStringSet &set) {
