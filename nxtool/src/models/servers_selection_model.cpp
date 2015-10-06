@@ -563,7 +563,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kSafeModeRoleId:
             return searchInfo.serverInfoIterator->serverInfo.baseInfo().safeMode;
         case kHasHddRoleId:
-            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags & Constants::HasHdd);
+            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags & Constants::HasHdd ? true : false);
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
@@ -1228,12 +1228,16 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     const bool selectionOutdated = (searchInfo.serverInfoIterator->selectedState == Qt::Checked)
         && outdate && (foundServer.baseInfo() != baseInfo);
 
-    if (foundServer.baseInfo().systemName != baseInfo.systemName)
+    const bool newIsFactory = (baseInfo.flags & Constants::IsFactoryFlag);
+    const bool currentIsFactory = (foundServer.baseInfo().flags & Constants::IsFactoryFlag);
+    const bool diffSystemName = ((foundServer.baseInfo().systemName != baseInfo.systemName)
+        || (newIsFactory != currentIsFactory));
+
+    if (diffSystemName)
     {
         const Qt::CheckState selected = searchInfo.serverInfoIterator->selectedState;
 
-        const QString newSystemName = (baseInfo.flags & Constants::IsFactoryFlag
-            ? QString() : baseInfo.systemName);
+        const QString newSystemName = (newIsFactory ? QString() : baseInfo.systemName);
 
         int targetSystemRow = 0;
         const bool targetSystemExists = 
@@ -1243,15 +1247,18 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
         const bool inplaceRename = !targetSystemExists && (system.servers.size() == 1);
         if (inplaceRename)
         {
-            system.name = baseInfo.systemName;
+            system.name = newSystemName;
             m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
         }
 
         const auto locked = searchInfo.serverInfoIterator->locked;
         const auto lockReason = searchInfo.serverInfoIterator->lockReason;
-        const auto counter = searchInfo.serverInfoIterator->removeRequestsCounter;
 
-        removeServerImpl(baseInfo.id, targetSystemExists, true);
+        /// Remove operation with "force" flag never increases counter, thus 
+        /// increase it manualy
+        const auto counter = searchInfo.serverInfoIterator->removeRequestsCounter + 1;
+
+        removeServerImpl(baseInfo.id, targetSystemExists, true);    
         foundServer.setBaseInfo(baseInfo);
         addServer(foundServer, selected, locked, lockReason, counter);
     }
