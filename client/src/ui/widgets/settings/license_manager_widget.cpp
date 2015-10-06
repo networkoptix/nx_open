@@ -250,6 +250,14 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     params.addQueryItem(QLatin1String("version"), qnCommon->engineVersion().toString());
     params.addQueryItem(QLatin1String("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
+    if (!runtimeData.nx1mac.isEmpty()) {
+        params.addQueryItem(QLatin1String("mac"), runtimeData.nx1mac);
+    }
+
+    if (!runtimeData.nx1serial.isEmpty()) {
+        params.addQueryItem(QLatin1String("serial"), runtimeData.nx1serial);
+    }
+
     QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
