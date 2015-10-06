@@ -91,11 +91,13 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
         NX_LOG(lm("CloudUserAuthenticator. Auth data for username %1, nonce %2 not found in cache. Quering cloud...").
             arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
 
+        const auto userid =  authorizationHeader.userid();
         m_connection = CloudConnectionManager::instance()->getCloudConnection();
+
         nx::cdb::api::AuthRequest authRequest;
         authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());
         authRequest.realm = QnAppInfo::realm().toStdString();
-        authRequest.username = authorizationHeader.userid();
+        authRequest.username = std::string(userid.data(), userid.size());
 
         //TODO #ak MUST NOT invoke blocking call with mutex locked
         nx::cdb::api::ResultCode resultCode;

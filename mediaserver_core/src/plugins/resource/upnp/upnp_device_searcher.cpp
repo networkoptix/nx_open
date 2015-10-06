@@ -73,7 +73,7 @@ public:
         return true;
     }
 
-    UpnpDeviceInfo deviceInfo() const { return m_deviceInfo; }
+    const UpnpDeviceInfo& deviceInfo() const { return m_deviceInfo; }
 };
 
 

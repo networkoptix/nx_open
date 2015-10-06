@@ -11,6 +11,8 @@ namespace cc {
 
 MediatorAddressPublisher::MediatorAddressPublisher( String serverId )
     : m_serverId( std::move( serverId ) )
+    , m_isExternalChanged( false )
+    , m_isExternalUpdateInProgress( false )
 {
     SocketGlobals::cloudInfo().enableMediator();
 }
@@ -125,6 +127,12 @@ void MediatorAddressPublisher::updateExternalAddresses()
                                   .arg( *error ), cl_logERROR );
             m_isExternalChanged = true;
         }
+        else
+        {
+            NX_LOG( lit( "%1 Updated external addresses: %2" )
+                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+                    .arg( containerString( m_external ) ), cl_logDEBUG1 );
+        }
 
         // just in case if smthing already changed
         updateExternalAddresses();
@@ -175,9 +183,15 @@ void MediatorAddressPublisher::checkAddresses( const std::list< SocketAddress >&
         QnMutexLocker lk( &m_mutex );
         const auto size = m_external.size();
         const auto addresses = eps->get();
-        m_external.insert( addresses.begin(), addresses.end() );
 
-        m_isExternalChanged = (size != m_external.size());
+        m_external.insert( addresses.begin(), addresses.end() );
+        m_isExternalChanged = (size < m_external.size());
+
+        NX_LOG( lit( "%1 Pinged external addresses: %2, was %3, need update: %4" )
+                .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+                .arg( containerString( m_external ) )
+                .arg( size ).arg( m_isExternalChanged ), cl_logDEBUG1 );
+
         updateExternalAddresses();
     } );
 
