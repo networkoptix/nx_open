@@ -47,7 +47,7 @@ bool Nx1::isBootedFromSD()
 {
 #ifdef __linux__
         std::list<PartitionInfo> partitionInfoList;
-        if (!readPartitions(&partitionInfoList))
+        if (readPartitions(&partitionInfoList) != SystemError::noError)
             return true;
 
         for (const auto& partitionInfo: partitionInfoList)
