@@ -46,4 +46,7 @@ ios {
 
     ios_icon.files = $$files(${basedir}/${arch}/ios/images/icon*.png)
     QMAKE_BUNDLE_DATA += ios_icon
+
+    launch_image.files = $$files(${basedir}/${arch}/ios/Launch.xib)
+    QMAKE_BUNDLE_DATA += launch_image
 }

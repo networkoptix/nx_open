@@ -33,9 +33,11 @@ int runUi(QGuiApplication *application) {
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
     thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
 
+#ifndef Q_OS_IOS
     QFont font;
     font.setFamily(lit("Roboto"));
     QGuiApplication::setFont(font);
+#endif
 
     QnContext context;
 
