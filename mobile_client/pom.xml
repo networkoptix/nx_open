@@ -32,6 +32,9 @@
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>
+        <codesign_identity>iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)</codesign_identity>
+        <provisioning_profile_beta>TODO</provisioning_profile_beta>
+        <provisioning_profile_release>TODO</provisioning_profile_release>
     </properties>
 
 
