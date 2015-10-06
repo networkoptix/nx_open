@@ -1734,7 +1734,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :maxArchiveDays,                \
             :preferedServerId,              \
             :licenseUsed,                   \
-            :failoverPriority               \
+            :failoverPriority,              \
             :backup,                        \
             :backupType                     \
             )                               \

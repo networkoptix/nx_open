@@ -87,7 +87,9 @@ namespace ec2
     (minArchiveDays)        \
     (maxArchiveDays)        \
     (preferedServerId)      \
-    (failoverPriority)
+    (failoverPriority)      \
+    (backup)                \
+    (backupType)
 
 #define ApiCameraAttributesData_Fields (cameraID) (cameraName) ApiCameraAttributesData_Fields_Short
 
