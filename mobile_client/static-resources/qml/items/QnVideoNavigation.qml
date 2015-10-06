@@ -1,5 +1,6 @@
 import QtQuick 2.4
 import QtGraphicalEffects 1.0
+import QtQuick.Window 2.2
 
 import com.networkoptix.qml 1.0
 
@@ -15,20 +16,33 @@ Item {
     height: navigator.height + navigationPanel.height
     anchors.bottom: parent.bottom
 
-    readonly property var _locale: Qt.locale()
+    QtObject {
+        id: d
+
+        function updateNavigatorPosition() {
+            if (Screen.primaryOrientation == Qt.PortraitOrientation) {
+                navigator.y = 0
+                navigatorMouseArea.drag.target = undefined
+            } else {
+                navigatorMouseArea.drag.target = navigator
+            }
+        }
+        Screen.onPrimaryOrientationChanged: updateNavigatorPosition()
+
+        readonly property var locale: Qt.locale()
+    }
+
 
     Item {
         id: navigator
         width: parent.width
         height: timeline.height + playbackController.height
-        y: navigationPanel.height
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
         MouseArea {
             id: navigatorMouseArea
 
             anchors.fill: navigator
-            drag.target: navigator
             drag.axis: Drag.YAxis
             drag.minimumY: 0
             drag.maximumY: navigationPanel.height
@@ -237,7 +251,7 @@ Item {
                     font.weight: Font.Normal
                     verticalAlignment: Text.AlignVCenter
 
-                    text: timeline.positionDate.toLocaleDateString(_locale, qsTr("d MMMM yyyy"))
+                    text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy"))
                     color: "white"
 
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
@@ -299,7 +313,7 @@ Item {
 
     Rectangle {
         // This rectangle guarantees the same color under android navigation buttons as under the navigation panel
-        width: navigationPanel.width
+        width: parent.width
         anchors.top: parent.bottom
         color: navigationPanel.color
         height: navigationPanel.height
@@ -314,4 +328,6 @@ Item {
             mediaPlayer.seek(date.getTime())
         }
     }
+
+    Component.onCompleted: d.updateNavigatorPosition()
 }
