@@ -269,48 +269,48 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
     enum ResourceFlag {
-        network = 0x01,         /**< Has ip and mac. */
-        url = 0x02,             /**< Has url, e.g. file name. */
-        streamprovider = 0x04,
-        media = 0x08,
+        network                     = 0x1,          /**< Has ip and mac. */
+        url                         = 0x2,          /**< Has url, e.g. file name. */
+        streamprovider              = 0x4,
+        media                       = 0x8,
 
-        playback = 0x10,        /**< Something playable (not real time and not a single shot). */
-        video = 0x20,
-        audio = 0x40,
-        live = 0x80,
+        playback                    = 0x10,         /**< Something playable (not real time and not a single shot). */
+        video                       = 0x20,
+        audio                       = 0x40,
+        live                        = 0x80,
 
-        still_image = 0x100,    /**< Still image device. */
+        still_image                 = 0x100,        /**< Still image device. */
+        local                       = 0x200,        /**< Local client resource. */
+        server                      = 0x400,        /**< Server resource. */
+        remote                      = 0x800,        /**< Remote (on-server) resource. */
 
-        local = 0x200,          /**< Local client resource. */
-        server = 0x400,         /**< Server resource. */
-        remote = 0x800,         /**< Remote (on-server) resource. */
+        layout                      = 0x1000,       /**< Layout resource. */
+        user                        = 0x2000,       /**< User resource. */
+        utc                         = 0x4000,       /**< Resource uses UTC-based timing. */
+        periods                     = 0x8000,       /**< Resource has recorded periods. */
 
-        layout = 0x1000,        /**< Layout resource. */
-        user = 0x2000,          /**< User resource. */
+        motion                      = 0x10000,      /**< Resource has motion */
+        sync                        = 0x20000,      /**< Resource can be used in sync playback mode. */
+        foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
+        no_last_gop                 = 0x80000,      /**< Do not use last GOP for this when stream is opened */
 
-        utc = 0x4000,           /**< Resource uses UTC-based timing. */
-        periods = 0x8000,       /**< Resource has recorded periods. */
+        deprecated                  = 0x100000,     /**< Resource absent in Server but still used in memory for some reason */
+        videowall                   = 0x200000,     /**< Videowall resource */
+        desktop_camera              = 0x400000,     /**< Desktop Camera resource */
+        parent_change               = 0x800000,     /**< Camera discovery internal purpose */
 
-        motion = 0x10000,       /**< Resource has motion */
-        sync = 0x20000,         /**< Resource can be used in sync playback mode. */
-
-        foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
-        no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
-        deprecated = 0x100000,  /**< Resource absent in Server but still used in memory for some reason */
-
-        videowall = 0x200000,           /**< Videowall resource */
-        desktop_camera = 0x400000,      /**< Desktop Camera resource */
-
-        parent_change = 0x800000,       /**< Camera discovery internal purpose */
-        depend_on_parent_status = 0x1000000,   /**< Resource status depend on parent resource status */
-        search_upd_only = 0x2000000,   /**< Disable to insert new resource during discovery process, allow update only */
-        io_module       = 0x4000000,   /**< It's IO module camera (camera subtype) */
+        depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status */
+        search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
+        io_module                   = 0x4000000,    /**< It's IO module camera (camera subtype) */
+        read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */ 
 
         local_media = local | media,
         local_layout = local | layout,
 
         local_server = local | server,
         remote_server = remote | server,
+        safemode_server = read_only | server,
+
         live_cam = utc | sync | live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,

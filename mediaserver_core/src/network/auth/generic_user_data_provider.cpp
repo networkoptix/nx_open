@@ -52,7 +52,8 @@ QnResourcePtr GenericUserDataProvider::findResByName(const QByteArray& nxUserNam
 Qn::AuthResult GenericUserDataProvider::authorize(
     const QnResourcePtr& res,
     const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader)
+    const nx_http::header::Authorization& authorizationHeader,
+    nx_http::HttpHeaders* const /*responseHeaders*/)
 {
     if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
     {
@@ -105,13 +106,14 @@ Qn::AuthResult GenericUserDataProvider::authorize(
 
 std::tuple<Qn::AuthResult, QnResourcePtr> GenericUserDataProvider::authorize(
     const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader)
+    const nx_http::header::Authorization& authorizationHeader,
+    nx_http::HttpHeaders* const responseHeaders)
 {
     auto res = findResByName(authorizationHeader.userid());
     if (!res)
         return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
     return std::make_tuple(
-        authorize(res, method, authorizationHeader),
+        authorize(res, method, authorizationHeader, responseHeaders),
         res);
 }
 

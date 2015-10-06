@@ -144,6 +144,7 @@ private:
     Qn::AuthResult authenticateByUrl(
         const QByteArray& authRecord,
         const QByteArray& method,
+        nx_http::Response& response,
         QnUuid* authUserId,
         QnUserResourcePtr* const outUserResource = nullptr) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;

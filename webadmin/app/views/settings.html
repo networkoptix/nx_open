@@ -3,7 +3,7 @@
 
     <alert type="warning" ng-if="settings.ecDbReadOnly">The system is running in safe mode. Changes are impossible.</alert>
 
-    <div ng-if="!settings.ecDbReadOnly">
+    <div ng-hide="settings.ecDbReadOnly">
         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
             <h2>Server Settings</h2>
             <p>

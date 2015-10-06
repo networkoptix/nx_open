@@ -12,7 +12,10 @@
 
 #include <api/app_server_connection.h>
 
-#include <utils/common/event_processors.h>
+#include <client/client_settings.h>
+#include <client/client_message_processor.h>
+
+#include <common/common_module.h>
 
 #include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
@@ -20,6 +23,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx_ec/dummy_handler.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
@@ -27,10 +31,9 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
-#include <client/client_settings.h>
-#include <client/client_message_processor.h>
-
+#include <utils/common/event_processors.h>
 
 class QnSortedBusinessRulesModel: public QSortFilterProxyModel {
 public:
@@ -128,6 +131,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     updateFilter();  
     updateControlButtons();
+
+    auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
+    safeModeWatcher->addWarningLabel(ui->buttonBox);
+    safeModeWatcher->addAutoHiddenWidget(m_resetDefaultsButton);
+    safeModeWatcher->addAutoHiddenWidget(ui->buttonBox->button(QDialogButtonBox::Ok));
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog() {
@@ -360,7 +368,7 @@ void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
 }
 
 void QnBusinessRulesDialog::updateControlButtons() {
-    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission && !qnCommon->isReadOnly();
     bool hasChanges = hasRights && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
@@ -474,7 +482,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
         return true;
     }
     
-    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission && !qnCommon->isReadOnly();
     bool hasChanges = hasRights && (
         !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
         || !m_pendingDeleteRules.isEmpty()

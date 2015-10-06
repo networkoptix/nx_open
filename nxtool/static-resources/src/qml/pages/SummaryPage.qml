@@ -55,7 +55,7 @@ Item
                     id: summary;
                     
                     visible: model.changesCount;
-                    caption: (qsTr("%1 of %2 successful completed")
+                    caption: (qsTr("%1 of %2 change(s) applied successfully")
                             .arg(model.changesCount).arg(failedSummary.model.changesCount + model.changesCount));
                     anchors
                     {

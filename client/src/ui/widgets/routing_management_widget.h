@@ -32,6 +32,9 @@ public:
     virtual void updateFromSettings() override;
     virtual void submitToSettings() override;
 
+protected:
+    virtual void setReadOnlyInternal(bool readOnly) override;
+
 private:
     void updateModel();
     void updateFromModel();

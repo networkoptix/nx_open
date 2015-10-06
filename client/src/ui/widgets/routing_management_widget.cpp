@@ -5,16 +5,22 @@
 #include <QtWidgets/QMessageBox>
 
 #include "api/app_server_connection.h"
-#include "nx_ec/ec_api.h"
-#include "nx_ec/dummy_handler.h"
+
+#include "common/common_module.h"
+
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
+
+#include "nx_ec/ec_api.h"
+#include "nx_ec/dummy_handler.h"
+
+#include "ui/help/help_topics.h"
+#include "ui/help/help_topic_accessor.h"
+#include <ui/common/read_only.h>
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
 #include "ui/style/warning_style.h"
-#include "ui/help/help_topics.h"
-#include "ui/help/help_topic_accessor.h"
-#include "common/common_module.h"
+
 #include "utils/common/string.h"
 #include "utils/common/util.h"
 
@@ -205,6 +211,8 @@ void QnRoutingManagementWidget::updateFromSettings() {
 
 void QnRoutingManagementWidget::submitToSettings() {
     ui->warningLabel->hide();
+    if (isReadOnly())
+        return;
 
     updateFromModel();
 
@@ -252,6 +260,15 @@ void QnRoutingManagementWidget::submitToSettings() {
     }
 
     m_changes->changes.clear();
+}
+
+void QnRoutingManagementWidget::setReadOnlyInternal(bool readOnly) {
+    using ::setReadOnly;
+
+    setReadOnly(ui->addButton, readOnly);
+    setReadOnly(ui->removeButton, readOnly);
+    m_serverAddressesModel->setReadOnly(readOnly);
+    updateUi();
 }
 
 void QnRoutingManagementWidget::updateModel() {
@@ -306,8 +323,8 @@ void QnRoutingManagementWidget::updateFromModel() {
 void QnRoutingManagementWidget::updateUi() {
     QModelIndex sourceIndex = m_sortedServerAddressesModel->mapToSource(ui->addressesView->currentIndex());
 
-    ui->addButton->setEnabled(ui->serversView->currentIndex().isValid());
-    ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex));
+    ui->addButton->setEnabled(ui->serversView->currentIndex().isValid()&& !isReadOnly());
+    ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
 }
 
 void QnRoutingManagementWidget::at_addButton_clicked() {

@@ -44,6 +44,7 @@ namespace
     const QString kServerFlagsTag = "serverFlags";
     const QString kLocalTimeFlagTag = "local";
     const QString kSafeModeTag = "ecDbReadOnly";
+    const QString kSysInfoTag = "systemInformation";
 
     QUrl makeUrl(const QString &host
         , const int port
@@ -71,6 +72,45 @@ namespace
             , info.extraInfo().password, command);
     }
     
+    QString convertCapsToReadable(const QString &caps)
+    {
+        static const auto kWindowsTag = QStringLiteral("windows");
+        static const auto kLinuxTag = QStringLiteral("linux");
+        static const auto kX64Tag = QStringLiteral("x64");
+        static const auto kX86Tag = QStringLiteral("x86");
+        static const auto kArmTag = QStringLiteral("arm");
+
+        const bool isX86 = caps.contains(kX86Tag);
+        const bool isX64 = caps.contains(kX64Tag);
+        const bool isArm = caps.contains(kArmTag);
+
+        const QString arch = (isX86 ? kX86Tag : (isX64 ? kX64Tag : QString()));
+        if (caps.contains(kWindowsTag))
+        {
+            return QStringLiteral("%1 %2").arg(kWindowsTag).arg(arch);
+        }
+        else if (caps.contains(kLinuxTag))
+        {
+            if (!isArm)
+                return QStringLiteral("%1 %2").arg(kLinuxTag).arg(arch);
+            else
+            {
+                if (caps.contains("bpi"))
+                    return QStringLiteral("nx1");
+                else if (caps.contains("rpi"))
+                    return QStringLiteral("Raspberry Pi");
+                else if (caps.contains("isd"))
+                    return QStringLiteral("isd jaguar");
+                else if (caps.contains("isd_s2"))
+                    return QStringLiteral("isd s2");
+                else
+                    return QStringLiteral("%1 %2").arg(kLinuxTag).arg("unknown");
+            }
+        }
+
+        return QStringLiteral("unknown os");
+    }
+
     typedef QHash<QString, std::function<void (const QJsonObject &object
         , rtu::BaseServerInfo &info)> > KeyParserContainer;
     const KeyParserContainer parser = []() -> KeyParserContainer
@@ -93,7 +133,35 @@ namespace
         result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.safeMode = object.value(kSafeModeTag).toBool(); });
 
-        const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info)
+        result.insert(kSysInfoTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+        {
+            const auto val = object.value(kSysInfoTag);
+            const auto sysInfo = val.toObject();
+            QString systemCaps;
+            if (sysInfo.isEmpty())
+            {
+                systemCaps = val.toString();
+            }
+            else
+            {
+                static const auto kPlatformKey = QStringLiteral("platform");
+                static const auto kModKey = QStringLiteral("modification");
+                static const auto kArchKey = QStringLiteral("arch");
+
+                const QString platform = (sysInfo.keys().contains(kPlatformKey) 
+                    ? sysInfo.value(kPlatformKey).toString() : QString());
+                const QString modification = (sysInfo.keys().contains(kModKey) 
+                    ? sysInfo.value(kModKey).toString() : QString());
+                const QString arch = (sysInfo.keys().contains(kArchKey) 
+                    ? sysInfo.value(kArchKey).toString() : QString());
+
+                systemCaps = QStringLiteral("%1 %2 %3").arg(platform, arch, modification);
+            }
+
+            info.os = convertCapsToReadable(systemCaps);
+        });
+
+        const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info, const QString &tagName)
         {
                 typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
                 static const TextFlagsInfo kKnownFlags[] =
@@ -105,7 +173,7 @@ namespace
                 };
 
                 info.flags = rtu::Constants::ServerFlag::NoFlags;
-                const QString textFlags = object.value(kFlagsTag).toString();
+                const QString textFlags = object.value(tagName).toString();
                 for (const TextFlagsInfo &flagInfo: kKnownFlags)
                 {
                     if (textFlags.contains(flagInfo.first))
@@ -114,11 +182,11 @@ namespace
         };
 
         result.insert(kServerFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { parseFlags(object, info); });
+            { parseFlags(object, info, kServerFlagsTag); });
 
         /// Supports old versions of server where serverFlags field was "flags"
         result.insert(kFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { parseFlags(object, info); });
+            { parseFlags(object, info, kFlagsTag); });
         return result;
     }();
 }
@@ -174,6 +242,16 @@ namespace /// Parsers stuff
         static const QString &kReplyTag = "reply";
         return (object.contains(kReplyTag) ? object.value(kReplyTag) : QJsonValue());
     }
+
+    bool needRestart(const QJsonObject &object)
+    {
+        static const auto kNeedRestartTag = "rebootNeeded";
+
+        const auto body = extractReplyBody(object).toObject();
+        return (body.contains(kNeedRestartTag) 
+            ? body.value(kNeedRestartTag).toBool() : false);
+    }
+
     ///
 
     bool parseIfListCmd(const QJsonObject &object
@@ -257,6 +335,23 @@ namespace /// Parsers stuff
 
     ///
 
+    rtu::RestClient::SuccessCallback makeSuccessCallbackEx(const rtu::OperationCallbackEx &callback
+        , rtu::Constants::AffectedEntities affected)
+    {
+        return [callback, affected](const QByteArray &data)
+        {
+            if (!callback)
+                return;
+
+            const QJsonObject object = QJsonDocument::fromJson(data.data()).object();
+            const auto code = (isErrorReply(object) 
+                ? rtu::RequestError::kInternalAppError : rtu::RequestError::kSuccess);
+            const bool restart = needRestart(object);
+            callback(code, affected, restart);
+        };
+    }
+
+
     rtu::RestClient::SuccessCallback makeSuccessCallback(const rtu::OperationCallback &callback
         , rtu::Constants::AffectedEntities affected)
     {
@@ -270,6 +365,16 @@ namespace /// Parsers stuff
                 ? rtu::RequestError::kInternalAppError : rtu::RequestError::kSuccess);
 
             callback(code, affected);
+        };
+    }
+
+    rtu::RestClient::ErrorCallback makeErrorCallbackEx(const rtu::OperationCallbackEx &callback
+        , rtu::Constants::AffectedEntities affected)
+    {
+        return [callback, affected](rtu::RequestError error)
+        {
+            if (callback)
+                callback(error, affected, false);
         };
     }
 
@@ -662,13 +767,13 @@ void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , qint64 utcDateTimeMs
     , const QByteArray &timeZoneId
-    , const OperationCallback &callback)
+    , const OperationCallbackEx &callback)
 {
     static const Constants::AffectedEntities affected = (Constants::kDateTimeAffected | Constants::kTimeZoneAffected);
     if (utcDateTimeMs <= 0 || !QTimeZone(timeZoneId).isValid())
     {
         if (callback)
-            callback(RequestError::kUnspecified, affected);
+            callback(RequestError::kUnspecified, affected, false);
         return;
     }
     
@@ -682,7 +787,8 @@ void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
     enum { kSpecialTimeout = 30 * 1000 }; /// Due to server could apply time changes too long in some cases (Nx1 for example)
     const RestClient::Request request(baseInfo
         , password, kSetTimeCommand, query, kSpecialTimeout
-        , makeSuccessCallback(callback, affected), makeErrorCallback(callback, affected)); 
+        , makeSuccessCallbackEx(callback, affected)
+        , makeErrorCallbackEx(callback, affected)); 
     RestClient::sendGet(request);
 }
 
@@ -690,12 +796,12 @@ void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
 void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const QString &systemName
-    , const OperationCallback &callback)
+    , const OperationCallbackEx &callback)
 {
     if (systemName.isEmpty())
     {
         if (callback)
-            callback(RequestError::kUnspecified, Constants::kSystemNameAffected);
+            callback(RequestError::kUnspecified, Constants::kSystemNameAffected, false);
         return;
     }
 
@@ -708,8 +814,8 @@ void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
 
     const RestClient::Request request(baseInfo
         , password, kConfigureCommand, query, RestClient::kUseStandardTimeout
-        , makeSuccessCallback(callback, Constants::kSystemNameAffected)
-        , makeErrorCallback(callback, Constants::kSystemNameAffected)); 
+        , makeSuccessCallbackEx(callback, Constants::kSystemNameAffected)
+        , makeErrorCallbackEx(callback, Constants::kSystemNameAffected)); 
     RestClient::sendGet(request);
 }
 
@@ -719,12 +825,12 @@ void rtu::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
     , const QString &currentPassword
     , const QString &password
     , bool useNewPassword
-    , const OperationCallback &callback)
+    , const OperationCallbackEx &callback)
 {
     if (password.isEmpty())
     {
         if (callback)
-            callback(RequestError::kUnspecified, Constants::kPasswordAffected);
+            callback(RequestError::kUnspecified, Constants::kPasswordAffected, false);
 
         return;
     }
@@ -739,8 +845,8 @@ void rtu::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
     
     const RestClient::Request request(baseInfo
         , authPass, kConfigureCommand, query, RestClient::kUseStandardTimeout
-        , makeSuccessCallback(callback, Constants::kPasswordAffected)
-        , makeErrorCallback(callback, Constants::kPasswordAffected)); 
+        , makeSuccessCallbackEx(callback, Constants::kPasswordAffected)
+        , makeErrorCallbackEx(callback, Constants::kPasswordAffected)); 
     RestClient::sendGet(request);
 }
 
@@ -749,12 +855,12 @@ void rtu::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
 void rtu::sendSetPortRequest(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , int port
-    , const OperationCallback &callback)
+    , const OperationCallbackEx &callback)
 {
     if (!port)
     {
         if (callback)
-            callback(RequestError::kUnspecified, Constants::kPortAffected);
+            callback(RequestError::kUnspecified, Constants::kPortAffected, false);
        return;
     }
 
@@ -766,15 +872,15 @@ void rtu::sendSetPortRequest(const BaseServerInfoPtr &baseInfo
 
     const RestClient::Request request(baseInfo
         , password, kConfigureCommand, query, RestClient::kUseStandardTimeout
-        , makeSuccessCallback(callback, Constants::kPortAffected)
-        , makeErrorCallback(callback, Constants::kPortAffected)); 
+        , makeSuccessCallbackEx(callback, Constants::kPortAffected)
+        , makeErrorCallbackEx(callback, Constants::kPortAffected)); 
     RestClient::sendGet(request);
 }
 
 void rtu::sendChangeItfRequest(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const ItfUpdateInfoContainer &updateInfos
-    , const OperationCallback &callback)
+    , const OperationCallbackEx &callback)
 {
     QJsonArray jsonInfoChanges;
     Constants::AffectedEntities affected = 0;
@@ -825,8 +931,8 @@ void rtu::sendChangeItfRequest(const BaseServerInfoPtr &baseInfo
     }
 
     const RestClient::Request request(baseInfo, password, kIfConfigCommand, QUrlQuery()
-        , RestClient::kUseStandardTimeout, makeSuccessCallback(callback, affected)
-        , makeErrorCallback(callback, affected));
+        , RestClient::kUseStandardTimeout, makeSuccessCallbackEx(callback, affected)
+        , makeErrorCallbackEx(callback, affected));
     RestClient::sendPost(request, QJsonDocument(jsonInfoChanges).toJson());
 }
 
