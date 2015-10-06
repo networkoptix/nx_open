@@ -9,13 +9,11 @@ Item {
 
     property bool paused: false
 
-    property color color: "black"
-    property color markersBackground: "grey"
-    property color highlightColor: "#60000000"
-    property real tickSize: 10
-    property real lineWidth: 2
-    property bool speedEnabled: true
+    property bool speedEnabled: false
     readonly property alias dragging: d.dragging
+
+    width: parent.width
+    height: grip.height + tick.height
 
     QtObject {
         id: d
@@ -63,13 +61,13 @@ Item {
         Rectangle {
             width: (parent.width - grip.width - speedMarkers.padding) / 2
             height: parent.height
-            color: markersBackground
+            color: QnTheme.playPauseBackground
             radius: height / 2
             x: 0
 
             Text {
                 text: "-16x"
-                color: rootItem.color
+                color: QnTheme.playPause
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: speedMarkers.padding * 2
@@ -77,14 +75,14 @@ Item {
 
             Text {
                 text: "-4x"
-                color: rootItem.color
+                color: QnTheme.playPause
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
             Text {
                 text: "-1x"
-                color: rootItem.color
+                color: QnTheme.playPause
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: speedMarkers.padding * 2
@@ -94,13 +92,13 @@ Item {
         Rectangle {
             width: (parent.width - grip.width - speedMarkers.padding) / 2
             height: parent.height
-            color: markersBackground
+            color: QnTheme.playPauseBackground
             radius: height / 2
             x: (parent.width + grip.width + speedMarkers.padding) / 2
 
             Text {
                 text: "2x"
-                color: rootItem.color
+                color: QnTheme.playPause
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: speedMarkers.padding * 2
@@ -108,14 +106,14 @@ Item {
 
             Text {
                 text: "8x"
-                color: rootItem.color
+                color: QnTheme.playPause
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
             Text {
                 text: "16x"
-                color: rootItem.color
+                color: QnTheme.playPause
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: speedMarkers.padding * 2
@@ -127,7 +125,6 @@ Item {
         id: grip
 
         property real defaultX: (parent.width - width) / 2
-        property color idleColor: QnTheme.transparent(rootItem.color, 0)
 
         x: defaultX
         Binding {
@@ -137,14 +134,16 @@ Item {
             when: !gripMouseArea.pressed && !returnAnimation.running
         }
 
-        height: parent.height - tickSize
-        width: height
+        height: dp(60)
+        width: dp(60)
 
         Rectangle {
+            id: circleBackground
+
             anchors.centerIn: circle
-            width: circle.height + 2 * tickSize
-            height: width
-            color: "#48000000"
+            width: dp(76)
+            height: dp(76)
+            color: QnTheme.playPauseBackground
             radius: width / 2
         }
 
@@ -157,9 +156,9 @@ Item {
 
             height: width
             radius: width / 2
-            border.width: lineWidth
-            border.color: rootItem.color
-            color: gripMouseArea.drag.active ? highlightColor : grip.idleColor
+            border.width: dp(2)
+            border.color: QnTheme.playPause
+            color: "transparent"
         }
 
         Rectangle {
@@ -167,18 +166,26 @@ Item {
 
             anchors.horizontalCenter: grip.horizontalCenter
             anchors.top: circle.bottom
-            width: lineWidth
-            height: tickSize
-            color: rootItem.color
+            width: dp(2)
+            height: dp(8)
+            color: QnTheme.playPause
         }
 
         QnPlayPauseIcon {
             anchors.centerIn: circle
-            width: circle.width * 0.4 / iconScale()
-            height: circle.height * 0.4 / iconScale()
+            width: dps(18)
+            height: dps(18)
             scale: iconScale()
             pauseState: rootItem.paused
-            color: rootItem.color
+            color: QnTheme.playPause
+        }
+
+        Rectangle {
+            anchors.fill: circleBackground
+            color: "black"
+            radius: width / 2
+            opacity: gripMouseArea.pressed ? 0.25 : 0.0
+            Behavior on opacity { NumberAnimation { duration: 100 } }
         }
 
         MouseArea {

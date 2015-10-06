@@ -78,6 +78,9 @@ QtObject {
     property color preloaderDot
     property color preloaderCircle
     property color scrollIndicator
+    property color playPause
+    property color playPauseBackground
+    property color navigationPanelBackground
 
     function loadColors() {
         windowBackground        = colorTheme.color("window.background")
@@ -140,6 +143,9 @@ QtObject {
         preloaderDot            = colorTheme.color("other.preloaderDot")
         preloaderCircle         = colorTheme.color("other.preloaderCircle")
         scrollIndicator         = colorTheme.color("other.scrollIndicator")
+        playPause               = colorTheme.color("other.playPause")
+        playPauseBackground     = colorTheme.color("other.playPauseBackground")
+        navigationPanelBackground = colorTheme.color("other.navigationPanelBackground")
     }
 
     function transparent(color, opacity) {

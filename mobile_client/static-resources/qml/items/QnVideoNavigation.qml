@@ -17,9 +17,8 @@ Item {
 
     clip: true
 
-    property real cursorTickMargin: dp(10)
+    property real cursorTickMargin: dp(8)
     property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
-    property real cursorWidth: dp(2)
 
     property real videoBottomMargin: timeline.chunkBarHeight + navigationPanel.height - navigator.y
 
@@ -76,15 +75,15 @@ Item {
 
                 anchors.bottom: parent.bottom
                 width: parent.width
-                height: dp(140)
+                height: dp(150)
 
                 windowEnd: (new Date(Date.now() + 5 * 60 * 1000)).getTime()
                 windowStart: (new Date(Date.now() - 5 * 60 * 1000)).getTime()
 
                 stickToEnd: mediaPlayer.atLive && !playbackController.paused
 
-                chunkBarHeight: dp(36)
-                textY: (height - chunkBarHeight) / 2
+                chunkBarHeight: dp(32)
+                textY: height - chunkBarHeight - dp(16) - dp(24)
 
                 chunkProvider: mediaPlayer.chunkProvider
                 startBound: mediaPlayer.chunkProvider.bottomBound
@@ -166,9 +165,9 @@ Item {
             Rectangle {
                 id: navigationPanel
                 width: parent.width
-                height: dp(56)
+                height: dp(64)
                 anchors.top: timeline.bottom
-                color: "#0d0d0d"
+                color: QnTheme.navigationPanelBackground
                 clip: true
 
                 QnButton {
@@ -227,68 +226,73 @@ Item {
                 }
             }
 
-            Text {
-                id: dateLabel
-
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    verticalCenter: timeline.verticalCenter
-                    verticalCenterOffset: -timeline.chunkBarHeight / 2 - timeLiveLabel.height / 2
-                }
-
-                font.pixelSize: dp(20)
-                font.weight: Font.Normal
-
-                text: timeline.positionDate.toLocaleDateString(_locale, qsTr("d MMMM yyyy"))
-                color: "white"
-
-                opacity: timeline.stickToEnd ? 0.0 : 1.0
-                Behavior on opacity { NumberAnimation { duration: 200 } }
+            Rectangle {
+                // This rectangle guarantees the same color under android navigation buttons as under the navigation panel
+                width: navigationPanel.width
+                anchors.top: navigationPanel.bottom
+                color: navigationPanel.color
+                height: navigationPanel.height
             }
 
             Item {
-                id: timeLiveLabel
+                id: dateTimeLabel
 
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    verticalCenter: timeline.verticalCenter
-                    verticalCenterOffset: -timeline.chunkBarHeight / 2 + (timeline.stickToEnd ? 0 : dateLabel.height / 2)
-                }
-                Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 200 } }
-
-                width: timeLabel.visible ? timeLabel.width : liveLabel.width
-                height: timeLabel.height
-
-                QnTimeLabel {
-                    id: timeLabel
-                    dateTime: timeline.positionDate
-                    visible: !timeline.stickToEnd
-                }
+                height: dp(56)
+                width: parent.width
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: timeline.chunkBarHeight + dp(16)
 
                 Text {
-                    id: liveLabel
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: sp(36)
+                    id: dateLabel
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    height: dp(24)
+                    font.pixelSize: sp(14)
                     font.weight: Font.Normal
-                    color: QnTheme.windowText
-                    text: qsTr("LIVE")
-                    visible: timeline.stickToEnd
+                    verticalAlignment: Text.AlignVCenter
+
+                    text: timeline.positionDate.toLocaleDateString(_locale, qsTr("d MMMM yyyy"))
+                    color: "white"
+
+                    opacity: timeline.stickToEnd ? 0.0 : 1.0
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                }
+
+                Item {
+                    id: timeLiveLabel
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    y: timeline.stickToEnd ? (parent.height - height) / 2 : parent.height - height
+                    Behavior on y { NumberAnimation { duration: 200 } }
+
+                    width: timeLabel.visible ? timeLabel.width : liveLabel.width
+                    height: timeLabel.height
+
+                    QnTimeLabel {
+                        id: timeLabel
+                        dateTime: timeline.positionDate
+                        visible: !timeline.stickToEnd
+                    }
+
+                    Text {
+                        id: liveLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pixelSize: sp(32)
+                        font.weight: Font.Normal
+                        color: QnTheme.windowText
+                        text: qsTr("LIVE")
+                        visible: timeline.stickToEnd
+                    }
                 }
             }
 
             QnPlaybackController {
                 id: playbackController
 
-                width: parent.width - height / 3
-                height: dp(80)
-                anchors.bottom: timeline.top
+                anchors.verticalCenter: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                tickSize: cursorTickMargin
-                lineWidth: dp(2)
-                color: QnTheme.windowText
-                markersBackground: Qt.darker(color, 100)
-                highlightColor: "#2fffffff"
-                speedEnabled: false
 
                 onPausedChanged: {
                     if (paused)
@@ -299,11 +303,11 @@ Item {
             }
 
             Rectangle {
-                color: "white"
+                color: QnTheme.playPause
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                width: cursorWidth
-                height: timeline.chunkBarHeight + cursorTickMargin
+                width: dp(2)
+                height: timeline.chunkBarHeight + dp(8)
             }
         }
     }

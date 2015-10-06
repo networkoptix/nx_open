@@ -6,13 +6,11 @@ Item {
     property bool pauseState: true
     property color color: "black"
 
-    property real padding: 4
-
     Canvas {
         id: canvas
 
         anchors.centerIn: parent
-        width: Math.min(parent.width, parent.height) - padding * 2
+        width: Math.min(parent.width, parent.height)
         height: width
 
         property real animationPosition: pauseState ? 1.0 : 0.0
