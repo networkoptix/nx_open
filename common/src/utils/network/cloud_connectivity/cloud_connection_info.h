@@ -25,8 +25,8 @@ public:
 
 private:
     mutable QnMutex m_mutex;
-    CloudModuleEndPointFetcher m_mediatorEndpointFetcher;
     boost::optional< SocketAddress > m_mediatorAddress;
+    CloudModuleEndPointFetcher m_mediatorEndpointFetcher;
 };
 
 }   //cc

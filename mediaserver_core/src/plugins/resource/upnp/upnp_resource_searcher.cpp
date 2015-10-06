@@ -20,7 +20,7 @@ static const int GROUP_PORT = 1900;
 
 // TODO: #mu try to replace with UpnpDeviceDescriptionHandler when upnp camera is avaliable
 //!Partial parser for SSDP description xml (UPnP(TM) Device Architecture 1.1, 2.3)
-class UpnpDeviceDescriptionSaxHandler
+class UpnpResourceDescriptionSaxHandler
 :
     public QXmlDefaultHandler
 {
@@ -65,14 +65,7 @@ public:
         return true;
     }
 
-    /*
-    QString friendlyName() const { return m_friendlyName; }
-    QString manufacturer() const { return m_manufacturer; }
-    QString modelName() const { return m_modelName; }
-    QString serialNumber() const { return m_serialNumber; }
-    QString presentationUrl() const { return m_presentationUrl; }
-    */
-    nx_upnp::DeviceInfo deviceInfo() const { return m_deviceInfo; }
+    const nx_upnp::DeviceInfo& deviceInfo() const { return m_deviceInfo; }
 };
 
 
@@ -197,7 +190,7 @@ void QnUpnpResourceSearcher::processDeviceXml(
     //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
 
     //parsing description xml
-    UpnpDeviceDescriptionSaxHandler xmlHandler;
+    UpnpResourceDescriptionSaxHandler xmlHandler;
     QXmlSimpleReader xmlReader;
     xmlReader.setContentHandler( &xmlHandler );
     xmlReader.setErrorHandler( &xmlHandler );
