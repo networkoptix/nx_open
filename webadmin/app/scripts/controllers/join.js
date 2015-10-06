@@ -59,7 +59,7 @@ angular.module('webadminApp')
                 case 'url':
                     errorToShow = 'Wrong url.';
                     break;
-                case 'SAVE_MODE':
+                case 'SAFE_MODE':
                     errorToShow = 'Can\'t merge systems. Remote system is in safe mode.';
                     break;
                 case 'CONFIGURATION_ERROR':
