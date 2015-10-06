@@ -8,6 +8,7 @@
 
 #include <map>
 #include <memory>
+#include <set>
 
 #include <QtCore/QElapsedTimer>
 
@@ -15,6 +16,7 @@
 #include <cdb/connection.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include "abstract_user_data_provider.h"
 
@@ -64,18 +66,31 @@ private:
     std::unique_ptr<AbstractUserDataProvider> m_defaultAuthenticator;
     const CdbNonceFetcher& m_cdbNonceFetcher;
     mutable QnMutex m_mutex;
-    //!map<pair<username, nonce>, authd_ata>
+    mutable QnWaitCondition m_cond;
+    //!map<pair<username, nonce>, auth_data>
     std::map<
         std::pair<nx_http::StringType, nx_http::BufferType>,
         CloudAuthenticationData> m_authorizationCache;
     QElapsedTimer m_monotonicClock;
-    std::unique_ptr<nx::cdb::api::Connection> m_connection;
+    //!set<pair<username, nonce>, auth_data>
+    std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
 
     bool isValidCloudUserName(const nx_http::StringType& userName) const;
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
     QnUserResourcePtr getMappedLocalUserForCloudCredentials(
         const nx_http::StringType& userName,
         nx::cdb::api::SystemAccessRole cloudAccessRole) const;
+    void fetchAuthorizationFromCloud(
+        QnMutexLockerBase* const lk,
+        const nx_http::StringType& userid,
+        const nx_http::StringType& cloudNonce);
+    std::tuple<Qn::AuthResult, QnResourcePtr> authorizeWithCacheItem(
+        const CloudAuthenticationData& cacheItem,
+        const nx_http::StringType& cloudNonce,
+        const nx_http::StringType& nonceTrailer,
+        nx_http::HttpHeaders* const responseHeaders,
+        const nx_http::Method::ValueType& method,
+        const nx_http::header::Authorization& authorizationHeader) const;
 };
 
 #endif  //NX_MS_CLOUD_USER_AUTHENTICATOR_H

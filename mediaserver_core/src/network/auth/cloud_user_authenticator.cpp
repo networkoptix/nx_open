@@ -80,7 +80,6 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     }
 
     const auto nonce = authorizationHeader.digest->params["nonce"];
-    const auto ha2 = nx_http::calcHa2(method, authorizationHeader.digest->params["uri"]);
 
     NX_LOG(lm("Cloud authentication requested. username %1, nonce %2").
         arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
@@ -98,112 +97,42 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     }
 
     //checking authorization cache
+    const auto cacheKey = std::make_pair(authorizationHeader.userid(), cloudNonce);
+
     QnMutexLocker lk(&m_mutex);
     removeExpiredRecordsFromCache(&lk);
-    auto cachedIter = m_authorizationCache.find(
-        std::make_pair(authorizationHeader.userid(), cloudNonce));
+    auto cachedIter = m_authorizationCache.find(cacheKey);
     if (cachedIter == m_authorizationCache.end())
     {
-        NX_LOG(lm("CloudUserAuthenticator. Auth data for username %1, nonce %2 not found in cache. Quering cloud...").
-            arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
-
-        const auto userid =  authorizationHeader.userid();
-        m_connection = CloudConnectionManager::instance()->getCloudConnection();
-
-        nx::cdb::api::AuthRequest authRequest;
-        authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());
-        authRequest.realm = QnAppInfo::realm().toStdString();
-        authRequest.username = std::string(userid.data(), userid.size());
-
-        //TODO #ak MUST NOT invoke blocking call with mutex locked
-        nx::cdb::api::ResultCode resultCode;
-        nx::cdb::api::AuthResponse authResponse;
-        std::tie(resultCode, authResponse) =
-            makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::AuthResponse>(
-                std::bind(
-                    &nx::cdb::api::AuthProvider::getAuthenticationResponse,
-                    m_connection->authProvider(),
-                    std::move(authRequest),
-                    std::placeholders::_1));
-        if (resultCode == nx::cdb::api::ResultCode::ok)
+        if (m_requestInProgress.find(cacheKey) != m_requestInProgress.end())
         {
-            CloudAuthenticationData authData;
-            authData.authorized = true;
-            authData.data = std::move(authResponse);
-            authData.expirationTime =
-                m_monotonicClock.elapsed() +
-                std::chrono::duration_cast<std::chrono::milliseconds>(authResponse.validPeriod).count();
-            cachedIter = m_authorizationCache.emplace(
-                std::make_pair(authorizationHeader.userid(), cloudNonce),
-                std::move(authData)).first;
+            //if request for required cacheKey is in progress, waiting for its completion
+            while (m_requestInProgress.find(cacheKey) != m_requestInProgress.end())
+                m_cond.wait(lk.mutex());
         }
         else
         {
-            NX_LOG(lm("CloudUserAuthenticator. Failed to authenticate username %1, nonce %2 in cloud: %3").
-                arg(authorizationHeader.userid()).arg(nonce).
-                arg(CloudConnectionManager::instance()->connectionFactory().toString(resultCode)),
-                cl_logDEBUG2);
-
-            if (resultCode != nx::cdb::api::ResultCode::networkError &&
-                resultCode != nx::cdb::api::ResultCode::unknownError)
-            {
-                //caching invalid authorization result
-                CloudAuthenticationData authData;
-                authData.authorized = false;
-                authData.expirationTime =
-                    m_monotonicClock.elapsed() +
-                    std::chrono::duration_cast<std::chrono::milliseconds>(
-                        UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD).count();
-                cachedIter = m_authorizationCache.emplace(
-                    std::make_pair(authorizationHeader.userid(), cloudNonce),
-                    std::move(authData)).first;
-            }
+            fetchAuthorizationFromCloud(&lk, authorizationHeader.userid(), cloudNonce);
         }
     }
 
-    if (cachedIter != m_authorizationCache.end())
+    cachedIter = m_authorizationCache.find(cacheKey);
+    if (cachedIter == m_authorizationCache.end())
     {
-        if (!cachedIter->second.authorized)
-            return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
-        
-        //translating cloud account to local user
-        auto localUser = getMappedLocalUserForCloudCredentials(
-            authorizationHeader.userid(),
-            cachedIter->second.data.accessRole);
-        if (!localUser)
-        {
-            NX_LOG(lm("CloudUserAuthenticator. Failed to translate cloud user %1 to local user").
-                arg(authorizationHeader.userid()), cl_logWARNING);
-            return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
-        }
-
-        const auto calculatedResponse = nx_http::calcResponseFromIntermediate(
-            cachedIter->second.data.intermediateResponse.c_str(),
-            cloudNonce.size(),
-            nonceTrailer,
-            ha2);
-        if (authorizationHeader.digest->params["response"] == calculatedResponse)
-        {
-            //returning resolved user to HTTP client
-            responseHeaders->emplace(
-                Qn::EFFECTIVE_USER_NAME_HEADER_NAME,
-                localUser->getName().toUtf8());
-
-            NX_LOG(lm("CloudUserAuthenticator. Successful cloud authentication. username %1, nonce %2").
-                arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
-            return std::make_tuple(Qn::Auth_OK, std::move(localUser));
-        }
-        else
-        {
-            return std::make_tuple(Qn::Auth_WrongPassword, std::move(localUser));
-        }
+        lk.unlock();
+        return m_defaultAuthenticator->authorize(
+            method,
+            authorizationHeader,
+            responseHeaders);
     }
-    lk.unlock();
 
-    return m_defaultAuthenticator->authorize(
+    return authorizeWithCacheItem(
+        cachedIter->second,
+        cloudNonce,
+        nonceTrailer,
+        responseHeaders,
         method,
-        authorizationHeader,
-        responseHeaders);
+        authorizationHeader);
 }
 
 bool CloudUserAuthenticator::isValidCloudUserName(const nx_http::StringType& userName) const
@@ -251,5 +180,123 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
 
         default:
             return QnUserResourcePtr();
+    }
+}
+
+void CloudUserAuthenticator::fetchAuthorizationFromCloud(
+    QnMutexLockerBase* const lk,
+    const nx_http::StringType& userid,
+    const nx_http::StringType& cloudNonce)
+{
+    NX_LOG(lm("CloudUserAuthenticator. Auth data for username %1, "
+        "cloudNonce %2 not found in cache. Quering cloud...").
+        arg(cloudNonce).arg(cloudNonce), cl_logDEBUG2);
+
+    nx::cdb::api::AuthRequest authRequest;
+    authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());
+    authRequest.realm = QnAppInfo::realm().toStdString();
+    authRequest.username = std::string(userid.data(), userid.size());
+
+    //marking that request is in progress
+    const auto requestIter = m_requestInProgress.emplace(userid, cloudNonce).first;
+
+    lk->unlock();
+
+    nx::cdb::api::ResultCode resultCode;
+    nx::cdb::api::AuthResponse authResponse;
+    const auto connection = CloudConnectionManager::instance()->getCloudConnection();
+    std::tie(resultCode, authResponse) =
+        makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::AuthResponse>(
+            std::bind(
+                &nx::cdb::api::AuthProvider::getAuthenticationResponse,
+                connection->authProvider(),
+                std::move(authRequest),
+                std::placeholders::_1));
+
+    lk->relock();
+
+    m_requestInProgress.erase(requestIter);
+
+    if (resultCode == nx::cdb::api::ResultCode::ok)
+    {
+        CloudAuthenticationData authData;
+        authData.authorized = true;
+        authData.data = std::move(authResponse);
+        authData.expirationTime =
+            m_monotonicClock.elapsed() +
+            std::chrono::duration_cast<std::chrono::milliseconds>(authResponse.validPeriod).count();
+        m_authorizationCache.emplace(
+            std::make_pair(userid, cloudNonce),
+            std::move(authData)).first;
+    }
+    else
+    {
+        NX_LOG(lm("CloudUserAuthenticator. Failed to authenticate username %1, cloudNonce %2 in cloud: %3").
+            arg(userid).arg(cloudNonce).
+            arg(CloudConnectionManager::instance()->connectionFactory().toString(resultCode)),
+            cl_logDEBUG2);
+
+        if (resultCode != nx::cdb::api::ResultCode::networkError &&
+            resultCode != nx::cdb::api::ResultCode::unknownError)
+        {
+            //caching invalid authorization result
+            CloudAuthenticationData authData;
+            authData.authorized = false;
+            authData.expirationTime =
+                m_monotonicClock.elapsed() +
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD).count();
+            m_authorizationCache.emplace(
+                std::make_pair(userid, cloudNonce),
+                std::move(authData)).first;
+        }
+    }
+
+    m_cond.wakeAll();
+}
+
+std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithCacheItem(
+    const CloudAuthenticationData& cacheItem,
+    const nx_http::StringType& cloudNonce,
+    const nx_http::StringType& nonceTrailer,
+    nx_http::HttpHeaders* const responseHeaders,
+    const nx_http::Method::ValueType& method,
+    const nx_http::header::Authorization& authorizationHeader) const
+{
+    const auto ha2 = nx_http::calcHa2(method, authorizationHeader.digest->params["uri"]);
+
+    if (!cacheItem.authorized)
+        return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
+
+    //translating cloud account to local user
+    auto localUser = getMappedLocalUserForCloudCredentials(
+        authorizationHeader.userid(),
+        cacheItem.data.accessRole);
+    if (!localUser)
+    {
+        NX_LOG(lm("CloudUserAuthenticator. Failed to translate cloud user %1 to local user").
+            arg(authorizationHeader.userid()), cl_logWARNING);
+        return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
+    }
+
+    const auto calculatedResponse = nx_http::calcResponseFromIntermediate(
+        cacheItem.data.intermediateResponse.c_str(),
+        cloudNonce.size(),
+        nonceTrailer,
+        ha2);
+    if (authorizationHeader.digest->params["response"] == calculatedResponse)
+    {
+        //returning resolved user to HTTP client
+        responseHeaders->emplace(
+            Qn::EFFECTIVE_USER_NAME_HEADER_NAME,
+            localUser->getName().toUtf8());
+
+        NX_LOG(lm("CloudUserAuthenticator. Successful cloud authentication. username %1, cloudNonce %2").
+            arg(authorizationHeader.userid()).arg(cloudNonce), cl_logDEBUG2);
+        return std::make_tuple(Qn::Auth_OK, std::move(localUser));
+    }
+    else
+    {
+        return std::make_tuple(Qn::Auth_WrongPassword, std::move(localUser));
     }
 }
