@@ -41,7 +41,7 @@ QnNavigationDrawer {
 
                 Text {
                     id: sectionLabel
-                    height: dp(48)
+                    height: dp(56)
                     x: dp(16)
                     verticalAlignment: Text.AlignVCenter
                     text: qsTr("Saved connections")
@@ -53,7 +53,7 @@ QnNavigationDrawer {
                         width: content.width - 2 * sectionLabel.x
                         height: dp(1)
                         anchors.bottom: sectionLabel.bottom
-                        anchors.bottomMargin: dp(8)
+                        anchors.bottomMargin: dp(12)
                         color: QnTheme.sideNavigationSection
                     }
                 }
@@ -128,7 +128,7 @@ QnNavigationDrawer {
                     height: dp(48)
                     verticalAlignment: Text.AlignVCenter
                     text: qsTr("© 2015 Network Optix")
-                    font.pixelSize: sp(12)
+                    font.pixelSize: sp(13)
                     color: QnTheme.sideNavigationCopyright
                 }
 

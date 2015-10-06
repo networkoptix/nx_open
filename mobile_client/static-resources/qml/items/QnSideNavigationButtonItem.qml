@@ -23,7 +23,7 @@ QnSideNavigationItem {
         x: dp(56)
 
         color: QnTheme.listText
-        font.pixelSize: sp(14)
+        font.pixelSize: sp(16)
         font.weight: Font.DemiBold
     }
 }

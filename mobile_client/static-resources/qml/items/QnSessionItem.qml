@@ -17,22 +17,23 @@ QnSideNavigationItem {
     property string password
 
     width: parent.width
-    height: dp(120)
+    height: dp(104)
 
     Column {
         anchors.verticalCenter: parent.verticalCenter
-        spacing: dp(8)
         x: dp(16)
         width: parent.width - 2 * x
 
         Text {
             id: systemNameLabel
             text: systemName
-            font.pixelSize: dp(20)
+            font.pixelSize: dp(18)
             font.weight: Font.DemiBold
             color: QnTheme.listText
             elide: Text.ElideRight
             width: parent.width - editButton.width
+            height: dp(32)
+            verticalAlignment: Text.AlignVCenter
 
             QnIconButton {
                 id: editButton
@@ -50,16 +51,24 @@ QnSideNavigationItem {
 
         Text {
             text: address
-            font.pixelSize: dp(16)
+            font.pixelSize: dp(15)
             font.weight: Font.DemiBold
             color: QnTheme.listSubText
+            width: parent.width
+            height: dp(24)
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
         }
 
         Text {
             text: user
-            font.pixelSize: dp(16)
+            font.pixelSize: dp(15)
             font.weight: Font.DemiBold
             color: QnTheme.listSubText
+            elide: Text.ElideRight
+            width: parent.width
+            height: dp(24)
+            verticalAlignment: Text.AlignVCenter
         }
     }
 

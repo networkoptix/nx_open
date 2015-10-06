@@ -50,11 +50,11 @@ QnPage {
         Column {
             id: content
             width: parent.width - flickable.leftMargin - flickable.rightMargin
-            spacing: dp(16)
+            spacing: dp(24)
 
             Rectangle {
                 id: warningRect
-                height: _showWarning ? dp(48) : 0
+                height: _showWarning ? dp(40) : 0
                 width: loginPage.width
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: QnTheme.attentionBackground
@@ -65,17 +65,17 @@ QnPage {
                 Text {
                     id: warningText
                     anchors.horizontalCenter: parent.horizontalCenter
+                    // Two lines below are the hack to prevent text from moving when the header changes its size
                     anchors.verticalCenter: parent.top
-                    anchors.verticalCenterOffset: dp(24)
+                    anchors.verticalCenterOffset: dp(20)
                     font.pixelSize: sp(16)
-                    font.weight: Font.Bold
+                    font.weight: Font.DemiBold
                     color: QnTheme.windowText
                 }
             }
 
             Row {
                 width: parent.width
-                spacing: dp(16)
 
                 QnTextField {
                     id: hostField
@@ -96,29 +96,33 @@ QnPage {
                 }
             }
 
-            QnTextField {
-                id: loginField
+            Column {
                 width: parent.width
-                placeholderText: qsTr("Login")
-                showError: _authError
-                onTextChanged: loginPage.removeWarnings()
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
-            }
 
-            QnTextField {
-                id: passwordField
-                width: parent.width
-                placeholderText: qsTr("Password")
-                echoMode: TextInput.Password
-                showError: _authError
-                onTextChanged: loginPage.removeWarnings()
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+                QnTextField {
+                    id: loginField
+                    width: parent.width
+                    placeholderText: qsTr("Login")
+                    showError: _authError
+                    onTextChanged: loginPage.removeWarnings()
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
+                }
+
+                QnTextField {
+                    id: passwordField
+                    width: parent.width
+                    placeholderText: qsTr("Password")
+                    echoMode: TextInput.Password
+                    showError: _authError
+                    onTextChanged: loginPage.removeWarnings()
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+                }
             }
 
             Row {
                 id: editButtons
                 width: parent.width
-                spacing: dp(16)
+                spacing: dp(8)
                 visible: false
 
                 QnButton {
@@ -171,12 +175,11 @@ QnPage {
             spacing: dp(1)
 
             Text {
-                height: dp(48)
+                height: dp(40)
                 verticalAlignment: Text.AlignVCenter
                 text: qsTr("Auto-discovered systems")
                 color: QnTheme.listSectionText
-                font.pixelSize: sp(14)
-                font.weight: Font.DemiBold
+                font.pixelSize: sp(16)
             }
 
             Repeater {
