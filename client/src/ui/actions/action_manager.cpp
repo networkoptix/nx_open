@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
@@ -440,8 +441,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MoveCameraAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
         requiredPermissions(Qn::RemovePermission).
-        //: "Move Cameras" or "Move Devices"
-        text(tr("Move %1").arg(getDefaultDevicesName())).
+        text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Move Devices"),
+            tr("Move Cameras")
+        )).
         condition(hasFlags(Qn::network));
 
     factory(Qn::NextLayoutAction).
@@ -504,8 +507,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraDiagnosticsAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::ResourceTarget | Qn::SingleTarget).
-        //: "Cameras Diagnostics" or "Devices Diagnostics..."
-        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 Diagnostics..."), this)).
+        dynamicText(new QnDevicesNameActionTextFactory(
+            QnCameraDeviceStringSet(
+                tr("Device Diagnostics..."),
+                tr("Camera Diagnostics..."),
+                tr("IO Module Diagnostics...")
+            ), this)).
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
     factory(Qn::OpenBusinessLogAction).
@@ -893,9 +900,11 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraListAction).
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        //: "Cameras List" or "Devices List"
-        text(tr("%1 List...").arg(getDefaultDevicesName())).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).        
+        text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Devices List"),
+            tr("Cameras List")
+        )).
         shortcut(tr("Ctrl+M")).
         autoRepeat(false);
 
@@ -1393,8 +1402,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraIssuesAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        //: "Check Cameras Issues..." or "Check Devices Issues..."
-        dynamicText(new QnDevicesNameActionTextFactory(tr("Check %1 Issues..."), this)).
+        dynamicText(new QnDevicesNameActionTextFactory(
+            QnCameraDeviceStringSet(
+                tr("Check Device Issues..."),       tr("Check Devices Issues..."),
+                tr("Check Camera Issues..."),       tr("Check Cameras Issues..."),
+                tr("Check IO Module Issues..."),    tr("Check IO Modules Issues...")
+            ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
@@ -1404,8 +1417,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraBusinessRulesAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        //: "Cameras Rules..." or "Devices Rules..."
-        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 Rules..."), this)).
+        dynamicText(new QnDevicesNameActionTextFactory(
+            QnCameraDeviceStringSet(
+                tr("Device Rules..."),          tr("Devices Rules..."),
+                tr("Camera Rules..."),          tr("Cameras Rules..."),
+                tr("IO Module Rules..."),       tr("IO Modules Rules...")
+            ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::ExactlyOne, this),
@@ -1415,8 +1432,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraSettingsAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        //: "Cameras Settings..." or "Devices Settings..."
-        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 Settings..."), this)).
+        dynamicText(new QnDevicesNameActionTextFactory(
+            QnCameraDeviceStringSet(
+                tr("Device Settings..."),       tr("Devices Settings..."),
+                tr("Camera Settings..."),       tr("Cameras Settings..."),
+                tr("IO Module Settings..."),    tr("IO Modules Settings...")
+            ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
              new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
@@ -1457,8 +1478,10 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CameraListByServerAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        //: "Cameras List by Server..." or "Devices List by Server..."
-        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 List by Server..."), this)).
+        text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Devices List by Server..."),
+            tr("Cameras List by Server...")
+        )).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),

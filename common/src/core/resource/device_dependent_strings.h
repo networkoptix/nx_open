@@ -20,13 +20,22 @@ public:
         , const QString &cameraString
         , const QString &ioModuleString = QString()
         );
+    QnCameraDeviceStringSet(
+          const QString &mixedSigularString
+        , const QString &mixedPluralString
+        , const QString &cameraSigularString
+        , const QString &cameraPluralString
+        , const QString &ioModuleSigularString
+        , const QString &ioModulePluralString
+        );
 
-    QString getString(QnCameraDeviceType deviceType) const;
-    void setString(QnCameraDeviceType deviceType, const QString &value);
+    QString getString(QnCameraDeviceType deviceType, bool plural) const;
+    void setString(QnCameraDeviceType deviceType, bool plural, const QString &value);
 
     bool isValid() const;
 private:
-    std::array<QString, QnCameraDeviceType::Count> m_strings;
+    std::array<QString, QnCameraDeviceType::Count> m_singularStrings;
+    std::array<QString, QnCameraDeviceType::Count> m_pluralStrings;
 };
 
 
@@ -77,4 +86,9 @@ public:
     * @brief Select default string from the given set based on all devices in the system.
     */
     static QString getDefaultNameFromSet(const QnCameraDeviceStringSet &set);
+
+    /**
+    * @brief Select default string from the given set based on all devices in the system.
+    */
+    static QString getDefaultNameFromSet(const QString &mixedString, const QString &cameraString);
 };

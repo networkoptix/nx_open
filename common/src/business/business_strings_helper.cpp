@@ -38,22 +38,16 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     switch(value) {
     case UndefinedAction:           return QString();
     case CameraOutputAction:        return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                        QnCameraDeviceStringSet(
-                                            tr("Device output"),
-                                            tr("Camera output")
-                                        )
+                                        tr("Device output"),
+                                        tr("Camera output")
                                     );
     case CameraOutputOnceAction:    return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                        QnCameraDeviceStringSet(
-                                            tr("Device output for 30 sec"),
-                                            tr("Camera output for 30 sec")
-                                        )
+                                        tr("Device output for 30 sec"),
+                                        tr("Camera output for 30 sec")
                                     );
     case CameraRecordingAction:     return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                        QnCameraDeviceStringSet(
-                                            tr("Device recording"),
-                                            tr("Camera recording")
-                                        )
+                                        tr("Device recording"),
+                                        tr("Camera recording")
                                     );
     case BookmarkAction:            return tr("Bookmark");
     case PanicRecordingAction:      return tr("Panic recording");
@@ -81,28 +75,20 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     {
     case CameraMotionEvent:     return tr("Motion on Camera");
     case CameraInputEvent:      return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    QnCameraDeviceStringSet(
-                                        tr("Input Signal on Device"),
-                                        tr("Input Signal on Camera")
-                                    )
+                                    tr("Input Signal on Device"),
+                                    tr("Input Signal on Camera")
                                 );
     case CameraDisconnectEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    QnCameraDeviceStringSet(
-                                        tr("Device Disconnected"),
-                                        tr("Camera Disconnected")
-                                    )
+                                    tr("Device Disconnected"),
+                                    tr("Camera Disconnected")
                                 );
     case CameraIpConflictEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    QnCameraDeviceStringSet(
-                                        tr("Device IP Conflict"),
-                                        tr("Camera IP Conflict")
-                                    )
+                                    tr("Device IP Conflict"),
+                                    tr("Camera IP Conflict")
                                 );
     case AnyCameraEvent:        return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    QnCameraDeviceStringSet(
-                                        tr("Any Device Issue"),
-                                        tr("Any Camera Issue")
-                                    )
+                                    tr("Any Device Issue"),
+                                    tr("Any Camera Issue")
                                 );
     case StorageFailureEvent:   return tr("Storage Failure");
     case NetworkIssueEvent:     return tr("Network Issue");
@@ -151,13 +137,11 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     case CameraIpConflictEvent:       
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-            QnCameraDeviceStringSet(
-                //: Device IP Conflict at <server_name>
-                tr("Device IP Conflict at %1"),
+            //: Device IP Conflict at <server_name>
+            tr("Device IP Conflict at %1"),
 
-                //: Camera IP Conflict at <server_name>
-                tr("Camera IP Conflict at %1")
-            )
+            //: Camera IP Conflict at <server_name>
+            tr("Camera IP Conflict at %1")
         ).arg(resourceName);
 
     case ServerConflictEvent:
