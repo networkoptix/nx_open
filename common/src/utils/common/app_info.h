@@ -37,7 +37,10 @@ struct QnAppInfo {
     
     static QString licensingEmailAddress();
     static QString companyUrl();
-    static QString supportAddress();
+
+    static QString supportEmailAddress();
+    static QString supportLink();
+
     static QString showcaseUrl();
     static QString settingsUrl();
     static QString mirrorListUrl();

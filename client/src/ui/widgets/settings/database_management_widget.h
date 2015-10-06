@@ -22,6 +22,9 @@ public:
     QnDatabaseManagementWidget(QWidget *parent = NULL);
     virtual ~QnDatabaseManagementWidget();
 
+protected:
+    void setReadOnlyInternal(bool readOnly) override;
+
 private slots:
     void at_backupButton_clicked();
     void at_restoreButton_clicked();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="vi_VN" sourcelanguage="en">
+<TS version="2.1" language="vi_VN" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -27,10 +27,6 @@
 </context>
 <context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>User Defined (%1)</source>
-        <translation>người dùng định nghĩa (%1)</translation>
-    </message>
     <message>
         <source>Motion on Camera</source>
         <translation>Máy ảnh chuyển</translation>
@@ -188,10 +184,6 @@
         <translation>RTP Phát hiện mất gói tin.</translation>
     </message>
     <message>
-        <source>Server started after crash.</source>
-        <translation>Bắt đầu sau khi tai nạn máy chủ.</translation>
-    </message>
-    <message>
         <source>I/O error has occurred at %1.</source>
         <translation>I/O lỗi trong %1。</translation>
     </message>
@@ -234,10 +226,6 @@
     <message>
         <source>An unknown event has occurred</source>
         <translation>Một sự kiện chưa biết</translation>
-    </message>
-    <message>
-        <source>Input Port: %1</source>
-        <translation>Nhập các cổng giao tiếp：%1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
@@ -288,25 +276,48 @@
     </message>
     <message>
         <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>%1 IP xung đột tại %2</translation>
-    </message>
-    <message>
-        <source>%1 #%2 MAC: %3</source>
-        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation>%1 #%2 MAC: %3</translation>
-    </message>
-    <message>
-        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation>Kết nối với %1 (luồng chính) đã bất ngờ đóng cửa.</translation>
-    </message>
-    <message>
-        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation>Kết nối với %1 (dòng thứ cấp) đã bất ngờ đóng cửa.</translation>
     </message>
     <message>
         <source>Recording on %1 is disabled: </source>
         <translation>Ghi trên %1 là người khuyết tật:</translation>
+    </message>
+    <message>
+        <source>Generic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server restarted unexpectedly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -397,14 +408,10 @@
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp). Hãy cố gắng để khởi động lại máy %1, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Hãy chắc chắn rằng %1 được cắm vào mạng. Cố gắng khởi động lại máy %1.</translation>
     </message>
     <message>
@@ -413,23 +420,14 @@
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Hãy cố gắng để khởi động lại máy %1, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt %1.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên %1 trang web. Nếu vấn đề vẫn còn, xin vui lòng liên hệ với hỗ trợ.</translation>
     </message>
     <message>
@@ -1034,6 +1032,18 @@
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation>Lần máy chủ không đồng bộ và một thời gian chung không thể được phát hiện tự động.</translation>
+    </message>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The system is running in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any configuration changes except license activation are impossible.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

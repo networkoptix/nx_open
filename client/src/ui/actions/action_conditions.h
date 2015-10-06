@@ -683,6 +683,14 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
+class QnMergeToCurrentSystemActionCondition: public QnActionCondition {
+public:
+    QnMergeToCurrentSystemActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+
 class QnFakeServerActionCondition: public QnActionCondition {
 public:
     QnFakeServerActionCondition(bool allResources = false, QObject *parent = NULL):
