@@ -449,6 +449,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             }
             else {
                 //qnFileDeletor->deleteFile(fi.absoluteFilePath());
+                qDebug() << "remove file" << fi.absoluteFilePath() << "because of empty chunk. duration=" << chunk.durationMs << "startTime=" << chunk.startTimeMs;
                 emptyFileList 
                     << EmptyFileInfo(/*fi.created().toMSecsSinceEpoch()*/
                            chunk.startTimeMs, 
