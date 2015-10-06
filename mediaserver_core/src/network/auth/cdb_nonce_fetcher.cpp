@@ -141,8 +141,6 @@ void CdbNonceFetcher::gotNonce(
 {
     QnMutexLocker lk(&m_mutex);
 
-    using namespace std::placeholders;
-
     if (resCode != nx::cdb::api::ResultCode::ok)
     {
         NX_LOG(lit("CdbNonceFetcher. Failed to fetch nonce from cdb: %1").
