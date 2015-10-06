@@ -442,6 +442,8 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
 {
     Q_D(const QnTCPConnectionProcessor);
     other.d_ptr->clientRequest = d->clientRequest;
+    other.d_ptr->request = d->request;
+    other.d_ptr->response = d->response;
     other.d_ptr->protocol = d->protocol;
     other.d_ptr->authUserId = d->authUserId;
 }

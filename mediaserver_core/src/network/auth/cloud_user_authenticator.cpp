@@ -9,6 +9,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+#include <http/custom_headers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/log.h>
 #include <utils/common/sync_call.h>
@@ -40,11 +41,15 @@ QnResourcePtr CloudUserAuthenticator::findResByName(const QByteArray& nxUserName
 Qn::AuthResult CloudUserAuthenticator::authorize(
     const QnResourcePtr& res,
     const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader)
+    const nx_http::header::Authorization& authorizationHeader,
+    nx_http::HttpHeaders* const responseHeaders)
 {
     QnResourcePtr authResource;
     Qn::AuthResult authResult = Qn::Auth_OK;
-    std::tie(authResult, authResource) = authorize(method, authorizationHeader);
+    std::tie(authResult, authResource) = authorize(
+        method,
+        authorizationHeader,
+        responseHeaders);
     if (authResult == Qn::Auth_OK)
     {
         return authResource == res
@@ -52,18 +57,26 @@ Qn::AuthResult CloudUserAuthenticator::authorize(
             : Qn::Auth_Forbidden;
     }
 
-    return m_defaultAuthenticator->authorize(res, method, authorizationHeader);
+    return m_defaultAuthenticator->authorize(
+        res,
+        method,
+        authorizationHeader,
+        responseHeaders);
 }
 
 std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     const nx_http::Method::ValueType& method,
-    const nx_http::header::Authorization& authorizationHeader)
+    const nx_http::header::Authorization& authorizationHeader,
+    nx_http::HttpHeaders* const responseHeaders)
 {
     if (!isValidCloudUserName(authorizationHeader.userid()) ||
         (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest) ||      //supporting only digest authentication for cloud-based authentication
         (!m_cdbNonceFetcher.isValidCloudNonce(authorizationHeader.digest->params["nonce"])))    //nonce must be valid cloud nonce
     {
-        return m_defaultAuthenticator->authorize(method, authorizationHeader);
+        return m_defaultAuthenticator->authorize(
+            method,
+            authorizationHeader,
+            responseHeaders);
     }
 
     const auto nonce = authorizationHeader.digest->params["nonce"];
@@ -78,7 +91,10 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     {
         NX_LOG(lm("CloudUserAuthenticator. Bad nonce. username %1, nonce %2").
             arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG1);
-        return m_defaultAuthenticator->authorize(method, authorizationHeader);
+        return m_defaultAuthenticator->authorize(
+            method,
+            authorizationHeader,
+            responseHeaders);
     }
 
     //checking authorization cache
@@ -168,7 +184,10 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
             ha2);
         if (authorizationHeader.digest->params["response"] == calculatedResponse)
         {
-            //TODO #ak returning resolved user to HTTP client
+            //returning resolved user to HTTP client
+            responseHeaders->emplace(
+                Qn::EFFECTIVE_USER_NAME_HEADER_NAME,
+                localUser->getName().toUtf8());
 
             NX_LOG(lm("CloudUserAuthenticator. Successful cloud authentication. username %1, nonce %2").
                 arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
@@ -181,7 +200,10 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     }
     lk.unlock();
 
-    return m_defaultAuthenticator->authorize(method, authorizationHeader);
+    return m_defaultAuthenticator->authorize(
+        method,
+        authorizationHeader,
+        responseHeaders);
 }
 
 bool CloudUserAuthenticator::isValidCloudUserName(const nx_http::StringType& userName) const

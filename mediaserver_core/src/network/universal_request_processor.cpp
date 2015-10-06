@@ -160,8 +160,6 @@ void QnUniversalRequestProcessor::run()
             if (handler && !authenticate(&d->authUserId))
                 return;
 
-            d->response.headers.clear();
-
             isKeepAlive = isConnectionCanBePersistent();
 
 

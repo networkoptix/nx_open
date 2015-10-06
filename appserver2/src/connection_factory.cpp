@@ -282,10 +282,10 @@ namespace ec2
         registerGetFuncHandler<ApiStoredFilePath, qint64>( restProcessorPool, ApiCommand::dumpDatabaseToFile );
 
         //AbstractECConnectionFactory
-        registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
-            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
-        registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
-            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
+        registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3 ) );
+        registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3) );
 
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
             std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
@@ -531,7 +531,8 @@ namespace ec2
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         const ApiLoginData& loginInfo,
-        QnConnectionInfo* const connectionInfo )
+        QnConnectionInfo* const connectionInfo,
+        nx_http::Response* response)
     {
         connectionInfo->version = qnCommon->engineVersion();
         connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
@@ -543,6 +544,9 @@ namespace ec2
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
         connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
+        if (response)
+            connectionInfo->effectiveUserName =
+                nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
         
 		if (!loginInfo.clientInfo.id.isNull())
         {
@@ -640,14 +644,30 @@ namespace ec2
             new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor) );
     }
 
-    template<class InputType, class OutputType, class HandlerType>
+    template<class InputType, class OutputType>
     void Ec2DirectConnectionFactory::registerFunctorHandler(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        HandlerType handler )
+        std::function<ErrorCode(InputType, OutputType*)> handler )
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new FlexibleQueryHttpHandler<InputType, OutputType, HandlerType>(cmd, handler) );
+            new FlexibleQueryHttpHandler<InputType, OutputType>(
+                cmd,
+                std::move(handler)));
+    }
+
+    //!Registers handler which is able to modify HTTP response
+    template<class InputType, class OutputType>
+    void Ec2DirectConnectionFactory::registerFunctorWithResponseHandler(
+        QnRestProcessorPool* const restProcessorPool,
+        ApiCommand::Value cmd,
+        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler)
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new FlexibleQueryHttpHandler<InputType, OutputType>(
+                cmd,
+                std::move(handler)));
     }
 }

@@ -38,10 +38,12 @@ public:
     virtual Qn::AuthResult authorize(
         const QnResourcePtr& res,
         const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader) override;
+        const nx_http::header::Authorization& authorizationHeader,
+        nx_http::HttpHeaders* const responseHeaders) override;
     virtual std::tuple<Qn::AuthResult, QnResourcePtr> authorize(
         const nx_http::Method::ValueType& method,
-        const nx_http::header::Authorization& authorizationHeader) override;
+        const nx_http::header::Authorization& authorizationHeader,
+        nx_http::HttpHeaders* const responseHeaders) override;
 
 private:
     struct CloudAuthenticationData
