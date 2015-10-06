@@ -1716,7 +1716,6 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             prefered_server_id,             \
             license_used,                   \
             failover_priority,              \
-            backup,                         \
             backup_type                     \
             )                               \
          VALUES (                           \
@@ -1735,7 +1734,6 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :preferedServerId,              \
             :licenseUsed,                   \
             :failoverPriority,              \
-            :backup,                        \
             :backupType                     \
             )                               \
         ");
@@ -3116,7 +3114,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
             prefered_server_id as preferedServerId,      \
             license_used as licenseUsed,                 \
             failover_priority as failoverPriority,       \
-            backup as backup,                            \
             backup_type as backupType                    \
          FROM vms_camera_user_attributes                 \
          LEFT JOIN vms_resource r on r.guid = camera_guid     \

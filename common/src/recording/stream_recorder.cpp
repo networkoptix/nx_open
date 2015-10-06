@@ -11,6 +11,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/storage_plugin_factory.h>
+#include <core/resource/security_cam_resource.h>
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/datapacket/media_data_packet.h>
@@ -502,8 +503,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
     m_currentTimeZone = currentTimeZone()/60;
     QString fileExt = QString(QLatin1String(outputCtx->extensions)).split(QLatin1Char(','))[0];
-    
-    // get storages list along with relevant file names list
+
+    // get recording context list
     getStoragesAndFileNames(m_mediaProvider);
     if (m_recordingContextVector.empty() || 
         m_recordingContextVector[0].fileName.isEmpty())

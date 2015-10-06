@@ -18,7 +18,6 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     minDays(0),
     maxDays(0),
     failoverPriority(Qn::FP_Medium),
-    backup(true),
     backupType(Qn::CameraBackup_Disabled)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -43,8 +42,8 @@ void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<Q
         *modifiedFields << "licenseUsedChanged";
     if (failoverPriority != right.failoverPriority)
         *modifiedFields << "failoverPriorityChanged";
-    if (backup != right.backup)
-        *modifiedFields << "backupChanged";
+    if (backupType != right.backupType)
+        *modifiedFields << "backupTypeChanged";
 
     *this = right;
 }
