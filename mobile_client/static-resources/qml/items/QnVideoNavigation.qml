@@ -12,15 +12,8 @@ Item {
     property var mediaPlayer
 
     width: parent.width
-    height: navigator.height + navigationPanel.height + cursorTickMargin
+    height: navigator.height + navigationPanel.height
     anchors.bottom: parent.bottom
-
-    clip: true
-
-    property real cursorTickMargin: dp(8)
-    property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
-
-    property real videoBottomMargin: timeline.chunkBarHeight + navigationPanel.height - navigator.y
 
     readonly property var _locale: Qt.locale()
 
@@ -28,7 +21,7 @@ Item {
         id: navigator
         width: parent.width
         height: timeline.height + playbackController.height
-        y: navigationPanel.height + cursorTickMargin
+        y: navigationPanel.height
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
         MouseArea {
@@ -37,8 +30,8 @@ Item {
             anchors.fill: navigator
             drag.target: navigator
             drag.axis: Drag.YAxis
-            drag.minimumY: cursorTickMargin
-            drag.maximumY: navigationPanel.height + cursorTickMargin
+            drag.minimumY: 0
+            drag.maximumY: navigationPanel.height
             drag.filterChildren: true
 
             property real prevY
@@ -226,14 +219,6 @@ Item {
                 }
             }
 
-            Rectangle {
-                // This rectangle guarantees the same color under android navigation buttons as under the navigation panel
-                width: navigationPanel.width
-                anchors.top: navigationPanel.bottom
-                color: navigationPanel.color
-                height: navigationPanel.height
-            }
-
             Item {
                 id: dateTimeLabel
 
@@ -310,6 +295,14 @@ Item {
                 height: timeline.chunkBarHeight + dp(8)
             }
         }
+    }
+
+    Rectangle {
+        // This rectangle guarantees the same color under android navigation buttons as under the navigation panel
+        width: navigationPanel.width
+        anchors.top: parent.bottom
+        color: navigationPanel.color
+        height: navigationPanel.height
     }
 
     QnCalendarPanel {

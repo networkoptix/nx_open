@@ -13,7 +13,7 @@ Item {
     readonly property alias dragging: d.dragging
 
     width: parent.width
-    height: grip.height + tick.height
+    height: grip.height
 
     QtObject {
         id: d
