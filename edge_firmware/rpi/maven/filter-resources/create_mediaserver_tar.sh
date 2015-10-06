@@ -163,7 +163,7 @@ mv -f $BUILD_DIR/opt/networkoptix $BUILD_DIR/opt/$CUSTOMIZATION
 
 #building package
 pushd $BUILD_DIR
-  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root
+  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root ./var
   cp $PACKAGE_NAME ${project.build.directory}
 popd
 
