@@ -6,6 +6,7 @@ namespace Nx1 {
 
 QString getMac();
 QString getSerial();
+bool isBootedFromSD();
 
 }
 
