@@ -49,4 +49,6 @@ ios {
 
     launch_image.files = $$files(${basedir}/${arch}/ios/Launch.xib)
     QMAKE_BUNDLE_DATA += launch_image
+
+    QMAKE_IOS_DEPLOYMENT_TARGET = 8.0
 }
