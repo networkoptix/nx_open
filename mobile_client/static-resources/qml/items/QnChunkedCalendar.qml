@@ -20,7 +20,7 @@ Item {
     signal datePicked(date date)
 
     height: d.ui.height
-    width: horizontal ? d.ui.width : parent.width
+    width: horizontal ? d.ui.width : mainWindow.width
 
     QtObject {
         id: d
@@ -92,7 +92,7 @@ Item {
         QnHorizontalCalendarLayout {
             monthsList.model: monthsModel
             monthsList.delegate: monthDelegate
-            monthLabel.text: d.locale.monthName(month - 1)
+            monthLabel.text: d.locale.standaloneMonthName(month - 1, Locale.LongFormat)
             yearLabel.text: year
             dayNamesRow.mondayIsFirstDay: mondayIsFirstDay
 
@@ -118,7 +118,7 @@ Item {
             width: calendar.width
             monthsList.model: monthsModel
             monthsList.delegate: monthDelegate
-            monthLabel.text: d.locale.monthName(month - 1)
+            monthLabel.text: d.locale.standaloneMonthName(month - 1, Locale.LongFormat)
             yearLabel.text: year
             dayNamesRow.mondayIsFirstDay: mondayIsFirstDay
 
