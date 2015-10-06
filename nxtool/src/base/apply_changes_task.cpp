@@ -160,7 +160,7 @@ namespace
             , timestamp(QDateTime::currentMSecsSinceEpoch())
         {
             /// Forces send dhcp on every call
-            /// Forces send old ip if new one hasn't been assigned
+            /// Forces send old ip (or mask) if new one hasn't been assigned
             const auto &extraInfo = item->second;
             const auto &interfaces = extraInfo.interfaces;
             for (auto &item: itfUpdateInfo)
@@ -168,7 +168,7 @@ namespace
                 const bool hasMaskChange = (!!item.mask);
                 const bool hasIpChange = (!!item.ip);
                 const bool fixMaskIp = (hasMaskChange != hasIpChange);
-                if (!item.useDHCP || fixMaskIp)
+                if (!item.useDHCP || !(*item.useDHCP) || fixMaskIp)
                 {
                     ///searching the specified in current existing
                     const auto it = std::find_if(interfaces.begin(), interfaces.end()
@@ -179,15 +179,30 @@ namespace
 
                     if (it != interfaces.end())
                     {
-                        if (!item.useDHCP)  /// Force dhcp old value
+                        /// If we turned off dhcp force old values (if new were not presented)
+                        if (item.useDHCP && !(*item.useDHCP))
+                        {
+                            if (!item.ip)
+                               item.ip.reset(new QString(it->ip));
+                            if (!item.mask)
+                                item.mask.reset(new QString(it->mask));
+                        }
+
+                        if (!item.useDHCP)  /// Force dhcp old value anyway
                             item.useDHCP.reset(new bool(it->useDHCP == Qt::Checked));
 
+                        /// We should force old value to ip (or mask) if only mask (or only ip) has changed 
                         if (fixMaskIp)
                         {
-                            if (hasMaskChange)              /// Force old ip usage if mask was changed
-                               item.ip.reset(new QString(it->ip));
-                            else                            /// Force old mask usage if ip was changed
+                            if (hasMaskChange)
+                            {
+                                if (!item.ip)           /// Force old ip usage if mask was changed
+                                    item.ip.reset(new QString(it->ip));
+                            }
+                            else if (!item.mask)        /// Force old mask usage if ip was changed
+                            {
                                 item.mask.reset(new QString(it->mask));
+                            }
                         }
                     }
                     else
