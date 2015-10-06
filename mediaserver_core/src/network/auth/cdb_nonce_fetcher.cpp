@@ -50,10 +50,10 @@ QByteArray CdbNonceFetcher::generateNonce()
         QnMutexLocker lk(&m_mutex);
 
         const qint64 curClock = m_monotonicClock.elapsed();
-        removeExpiredNonce(&m_cdbNonceQueue, curClock);
+        removeInvalidNonce(&m_cdbNonceQueue, curClock);
 
         if (!m_cdbNonceQueue.empty() &&
-            m_cdbNonceQueue.back().validityTime > curClock)
+            m_cdbNonceQueue.back().expirationTime > curClock)
         {
             //we have valid cloud nonce
             QByteArray nonceTrailer;
@@ -87,7 +87,7 @@ bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
             sizeof(MAGIC_BYTES)) == 0))
     {
         QnMutexLocker lk(&m_mutex);
-        removeExpiredNonce(&m_cdbNonceQueue, m_monotonicClock.elapsed());
+        removeInvalidNonce(&m_cdbNonceQueue, m_monotonicClock.elapsed());
         if (!m_cdbNonceQueue.empty())
         {
             const auto cdbNonce = nonce.mid(0, nonce.size() - NONCE_TRAILER_LEN);
@@ -154,10 +154,10 @@ void CdbNonceFetcher::gotNonce(
     const auto curTime = m_monotonicClock.elapsed();
     NonceCtx nonceCtx;
     nonceCtx.nonce = nonce.nonce.c_str();
-    nonceCtx.expirationTime =
+    nonceCtx.validityTime =
         curTime +
         std::chrono::duration_cast<std::chrono::milliseconds>(nonce.validPeriod).count();
-    nonceCtx.validityTime =
+    nonceCtx.expirationTime =
         curTime +
         std::chrono::duration_cast<std::chrono::milliseconds>(nonce.validPeriod).count() / 2;
         
@@ -168,12 +168,12 @@ void CdbNonceFetcher::gotNonce(
         nonce.validPeriod/2);
 }
 
-void CdbNonceFetcher::removeExpiredNonce(
+void CdbNonceFetcher::removeInvalidNonce(
     std::deque<NonceCtx>* const cdbNonceQueue,
     qint64 curClock)
 {
     while (!cdbNonceQueue->empty() &&
-           cdbNonceQueue->front().expirationTime < curClock)
+           cdbNonceQueue->front().validityTime < curClock)
     {
         cdbNonceQueue->pop_front();
     }

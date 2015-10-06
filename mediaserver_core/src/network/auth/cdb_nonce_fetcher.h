@@ -56,9 +56,9 @@ private:
         QByteArray nonce;
         //!time we remove nonce from queue
         //TODO #ak #msvc2015 replace with std::chrono::time_point<std::chrono::steady_clock>
-        qint64 expirationTime;
-        //!time, we stop report this nonce to caller
         qint64 validityTime;
+        //!time, we stop report this nonce to caller
+        qint64 expirationTime;
     };
 
     mutable QnMutex m_mutex;
@@ -73,7 +73,7 @@ private:
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);
 
-    static void removeExpiredNonce(
+    static void removeInvalidNonce(
         std::deque<NonceCtx>* const cdbNonceQueue,
         qint64 curClock);
 
