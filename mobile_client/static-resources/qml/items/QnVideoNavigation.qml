@@ -47,6 +47,7 @@ Item {
             drag.minimumY: 0
             drag.maximumY: navigationPanel.height
             drag.filterChildren: true
+            drag.threshold: dp(10)
 
             property real prevY
 

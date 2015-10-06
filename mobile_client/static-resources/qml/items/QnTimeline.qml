@@ -85,6 +85,7 @@ Item {
 
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
+            drag.threshold: dp(10)
 
             onPressed: {
                 pressX = mouseX
