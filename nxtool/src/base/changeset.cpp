@@ -1,6 +1,8 @@
 
 #include "changeset.h"
 
+#include <QHostAddress>
+
 #include <base/requests.h>
 
 #include <helpers/qml_helpers.h>
@@ -136,28 +138,28 @@ void rtu::Changeset::addAddressChange(const QString &name
     , const QString &address)
 {
     preparePropChangesData();
-    getItfUpdateInfo(name).ip.reset(new QString(address));
+    getItfUpdateInfo(name).ip.reset(new QString(QHostAddress(address).toString()));
 }
         
 void rtu::Changeset::addMaskChange(const QString &name
     , const QString &mask)
 {
     preparePropChangesData();
-    getItfUpdateInfo(name).mask.reset(new QString(mask));
+    getItfUpdateInfo(name).mask.reset(new QString(QHostAddress(mask).toString()));
 }
         
 void rtu::Changeset::addDNSChange(const QString &name
     , const QString &dns)
 {
     preparePropChangesData();
-    getItfUpdateInfo(name).dns.reset(new QString(dns));
+    getItfUpdateInfo(name).dns.reset(new QString(QHostAddress(dns).toString()));
 }
         
 void rtu::Changeset::addGatewayChange(const QString &name
     , const QString &gateway)
 {
     preparePropChangesData();
-    getItfUpdateInfo(name).gateway.reset(new QString(gateway));
+    getItfUpdateInfo(name).gateway.reset(new QString(QHostAddress(gateway).toString()));
 }
         
 void rtu::Changeset::addDateTimeChange(const QDate &date

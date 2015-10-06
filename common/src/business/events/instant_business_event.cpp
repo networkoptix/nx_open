@@ -9,8 +9,9 @@ QnInstantBusinessEvent::QnInstantBusinessEvent(QnBusiness::EventType eventType,
     Q_ASSERT(!QnBusiness::hasToggleState(eventType));
 }
 
-bool QnInstantBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const {
+bool QnInstantBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params, QnBusiness::ActionType actionType) const {
     // Rule MUST contain 'Not Defined' event state filter
     Q_UNUSED(params)
+    Q_UNUSED(actionType)
     return (state == QnBusiness::UndefinedState);
 }

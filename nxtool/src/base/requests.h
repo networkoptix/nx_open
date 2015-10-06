@@ -44,6 +44,10 @@ namespace rtu
     
     typedef std::function<void (const RequestError errorCode
         , Constants::AffectedEntities affectedEntities)> OperationCallback; 
+
+    typedef std::function<void (const RequestError errorCode
+        , Constants::AffectedEntities affectedEntities
+        , bool needRestart)> OperationCallbackEx; 
     
     typedef std::function<void (const QUuid &serverId
         , const QDateTime &utcServerTime
@@ -101,26 +105,26 @@ namespace rtu
         , const QString &password
         , qint64 utcDateTimeMs
         , const QByteArray &timeZoneId
-        , const OperationCallback &callback);
+        , const OperationCallbackEx &callback);
 
     void sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const QString &systemName
-        , const OperationCallback &callback);
+        , const OperationCallbackEx &callback);
     
     void sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
         , const QString &currentPassword
         , const QString &password
         , bool useNewPassword
-        , const OperationCallback &callback);
+        , const OperationCallbackEx &callback);
 
     void sendSetPortRequest(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , int port
-        , const OperationCallback &callback);
+        , const OperationCallbackEx &callback);
 
     void sendChangeItfRequest(const rtu::BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ItfUpdateInfoContainer &updateInfo
-        , const OperationCallback &callback);
+        , const OperationCallbackEx &callback);
 }

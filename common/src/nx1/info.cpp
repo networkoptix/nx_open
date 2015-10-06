@@ -1,9 +1,19 @@
 #include "info.h"
 
+#ifdef __linux__
+#include <unistd.h>
+#include <sys/stat.h>
+#endif
+
+#include <array>
+
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
+#include "utils/common/app_info.h"
+#include "utils/fs/dir.h"
 #include "utils/network/nettools.h"
+
 
 namespace
 {
@@ -31,4 +41,56 @@ QString Nx1::getMac()
 QString Nx1::getSerial()
 {
     return readFile(lit("/tmp/serial"));
+}
+
+bool Nx1::isBootedFromSD()
+{
+#ifdef __linux__
+        std::list<PartitionInfo> partitionInfoList;
+        if (!readPartitions(&partitionInfoList))
+            return true;
+
+        for (const auto& partitionInfo: partitionInfoList)
+        {
+            if (partitionInfo.path == lit("/"))
+            {
+                if (partitionInfo.devName.indexOf(lit("rootfs")) != -1 ||
+                    partitionInfo.devName == lit("/dev/root"))
+                {
+                    struct stat st;
+                    memset(&st, 0, sizeof(st));
+                    if (stat("/dev/root", &st) == -1)
+                    {
+                        // if /dev/root is unavailable, considering 
+                        return false;
+                    }
+
+                    if (!(st.st_mode & S_IFLNK))
+                        return true; //OS is on SD card or some internal memory
+
+                    //checking that root is really on SD card
+                    std::array<char, PATH_MAX> realPath;
+                    const auto realPathLen = readlink("/dev/root", realPath.data(), realPath.size());
+                    if (realPathLen == -1)
+                    {
+                        //failure
+                        return false;
+                    }
+
+                    if (QString::fromLocal8Bit(realPath.data(), realPathLen).indexOf(lit("sd")) != -1)
+                        return false;  //OS is on regular drive. Can change root password
+
+                    return true; //OS is on SD card or some internal memory
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+    return false;
+#else
+    return false;
+#endif
 }

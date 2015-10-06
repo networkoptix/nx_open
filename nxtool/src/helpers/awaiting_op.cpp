@@ -9,40 +9,36 @@ namespace
     QElapsedTimer timeoutCounter;
 }
 
-rtu::AwaitingOp::Holder rtu::AwaitingOp::create(const QUuid &id
+rtu::AwaitingOp::Holder rtu::AwaitingOp::create(const QUuid &serverId
     , int changesCount
     , qint64 timeout
-    , const ServerDiscoveredAction &discovered
-    , const Callback &disappeared
-    , const UnknownAddedHandler &unknownAdded
     , const TimeoutHandler &timeoutHandler)
 {
     const auto result = Holder(new AwaitingOp(
-        id, changesCount, timeout, discovered, unknownAdded, disappeared));
+        serverId, changesCount, timeout));
 
     if (timeoutHandler)
     {
-        QTimer::singleShot(timeout, [timeoutHandler, id]() 
-            { timeoutHandler(id); });
+        const WeakPtr weak = result;   
+        QTimer::singleShot(timeout, [timeoutHandler, weak]() 
+            { timeoutHandler(weak); });
     }
 
     return result;
 }
 
-rtu::AwaitingOp::AwaitingOp(const QUuid &id
+rtu::AwaitingOp::AwaitingOp(const QUuid &serverId
     , int changesCount
-    , qint64 timeout
-    , const ServerDiscoveredAction &discovered
-    , const UnknownAddedHandler &unknownAdded
-    , const Callback &disappeared)
+    , qint64 timeout)
     
-    : m_id(id)
-    , m_discovered(discovered)
-    , m_disappeared(disappeared)
-    , m_unknownAdded(unknownAdded)
-    , m_changesCount(changesCount)
+    : m_serverId(serverId)
     , m_timeout(timeout)
     , m_creationTimestamp(timeoutCounter.elapsed())
+
+    , m_changesCount(changesCount)
+    , m_discovered()
+    , m_disappeared()
+    , m_unknownAdded()
 {
 }
 
@@ -53,6 +49,21 @@ rtu::AwaitingOp::~AwaitingOp()
 bool rtu::AwaitingOp::isTimedOut() const
 {
     return ((timeoutCounter.elapsed()- m_creationTimestamp) > m_timeout);
+}
+
+void rtu::AwaitingOp::setServerDiscoveredHandler(const ServerDiscoveredAction &handler)
+{
+    m_discovered = handler;
+}
+        
+void rtu::AwaitingOp::setServerDisappearedHandler(const Callback &handler)
+{
+    m_disappeared = handler;
+}
+
+void rtu::AwaitingOp::setUnknownAddedHandler(const UnknownAddedHandler &handler)
+{
+    m_unknownAdded = handler;
 }
 
 void rtu::AwaitingOp::processServerDiscovered(const BaseServerInfo &info)
@@ -79,14 +90,19 @@ bool rtu::AwaitingOp::processUnknownAdded(const QString &ip)
     return m_unknownAdded(ip);
 }
 
-const QUuid &rtu::AwaitingOp::id() const
+const QUuid &rtu::AwaitingOp::serverId() const
 {
-    return m_id;
+    return m_serverId;
 }
 
 int rtu::AwaitingOp::changesCount() const
 {
     return m_changesCount;
+}
+
+void rtu::AwaitingOp::resetChangesCount()
+{
+    m_changesCount = 0;
 }
 
 

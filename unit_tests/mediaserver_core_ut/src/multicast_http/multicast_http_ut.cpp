@@ -213,7 +213,7 @@ public:
                 ASSERT_TRUE(!response.messageBody.isEmpty());
                 QJsonDocument d = QJsonDocument::fromJson(response.messageBody);
                 ASSERT_TRUE(!d.isEmpty());
-                if (response.messageBody.contains("\"flags\""))
+                if (response.messageBody.contains("\"serverFlags\""))
                     ++m_firstRequest;
                 qDebug() << "doParallelTest(). completed: " << m_requests << "of" << MT_REQUESTS * 2;
                 if (++m_requests == MT_REQUESTS * 2) 

@@ -117,7 +117,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
-
 #include <utils/app_server_image_cache.h>
 
 #include <utils/applauncher_utils.h>
@@ -2230,6 +2229,9 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
+    if (qnCommon->isReadOnly())
+        return;
+
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if(!watcher->hasMismatches())
         return;
@@ -2311,6 +2313,10 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
 
     /* Check if user already made a decision. */
     if (ec2::Ec2StaticticsReporter::isDefined(servers))
+        return;
+
+    /* User cannot disable statistics collecting, so don't make him sorrow. */
+    if (qnCommon->isReadOnly())
         return;
 
     /* Suppress notification if no server has internet access. */

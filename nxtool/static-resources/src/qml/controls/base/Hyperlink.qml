@@ -9,6 +9,9 @@ Base.Text
 
     property string hyperlink;
     property string caption: hyperlink;
+
+//    linkColor: "#1DA6DC";
+
     font
     {
         pixelSize: Common.SizeManager.fontSizes.small;

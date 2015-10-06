@@ -75,7 +75,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_userAdaptor;
     QnResourcePropertyAdaptor<QString> *m_passwordAdaptor;
     QnResourcePropertyAdaptor<QString> *m_signatureAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_supportEmailAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_supportLinkAdaptor;
     QnResourcePropertyAdaptor<QnEmail::ConnectionType> *m_connectionTypeAdaptor;
     QnResourcePropertyAdaptor<int> *m_portAdaptor;
     QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
