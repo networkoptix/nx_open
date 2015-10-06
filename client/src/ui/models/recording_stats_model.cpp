@@ -2,6 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 
 #include <ui/common/ui_resource_name.h>
@@ -187,9 +188,15 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
     switch (column)
     {
         case CameraNameColumn:
-            return tr("%1 with non-empty archive").arg(getDefaultDevicesName());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Devices with non-empty archive"),
+                tr("Cameras with non-empty archive")
+                );
         case BytesColumn:
-            return tr("Storage space occupied by %1").arg(getDefaultDevicesName());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Storage space occupied by devices"),
+                tr("Storage space occupied by cameras")
+                );
         case DurationColumn:
             return tr("Archived duration in calendar days between the first record and the current moment");
         case BitrateColumn:

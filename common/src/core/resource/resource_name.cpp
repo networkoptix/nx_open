@@ -34,14 +34,6 @@ QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {
     return baseName;
 }
 
-QString getDefaultDevicesName(bool plural /* = true*/, bool capitalize /* = true*/) {
-    return QnDeviceDependentStrings::getDefaultName(plural, capitalize);
-}
-
-QString getDefaultDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /* = true*/) {
-    return QnDeviceDependentStrings::getDefaultName(devices, capitalize);
-}
-
 QString getNumericDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /* = true*/) {
     return QnDeviceDependentStrings::getNumericName(devices, capitalize);
 }

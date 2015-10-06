@@ -5,6 +5,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx_ec/data/api_runtime_data.h>
@@ -66,10 +67,16 @@ void QnGeneralSystemAdministrationWidget::retranslateUi() {
     ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management...")));
     ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log...")));
 
-    //: "Open Cameras List..." or "Open Devices List...", etc
-    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open %1 List...").arg(getDefaultDevicesName())));
+    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Open Devices List..."),
+        tr("Open Cameras List...")
+        )));
+        
 
-    ui->cameraListButton->setText(tr("%1 List").arg(getDefaultDevicesName()));
+    ui->cameraListButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Devices List"),
+        tr("Cameras List")
+        ));
 
     ui->systemSettingsWidget->retranslateUi();
 }

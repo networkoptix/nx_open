@@ -17,6 +17,7 @@
 #include <api/app_server_connection.h>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/client_storage_resource.h>
@@ -274,8 +275,16 @@ bool QnServerSettingsWidget::hasChanges() const {
 }
 
 void QnServerSettingsWidget::retranslateUi() {
-    ui->failoverCheckBox->setText(tr("Enable failover (server will take %1 automatically from offline servers)").arg(getDefaultDevicesName(true, false)));
-    ui->maxCamerasLabel->setText(tr("Max. %1 on this server:").arg(getDefaultDevicesName(true, false)));
+    ui->failoverCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Enable failover (server will take devices automatically from offline servers)"),
+        tr("Enable failover (server will take cameras automatically from offline servers)")
+        ));
+        
+    ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Max devices on this server:"),
+        tr("Max cameras on this server:")
+        ));
+        
     updateFailoverLabel();
 }
 
