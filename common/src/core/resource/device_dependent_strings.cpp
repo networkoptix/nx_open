@@ -103,12 +103,14 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(
     , const QString &ioModuleSigularString 
     , const QString &ioModulePluralString)
 {
-    setString(Mixed, false, mixedSigularString);
-    setString(Mixed, true,  mixedSigularString);
-    setString(Camera, false, cameraSigularString);
-    setString(Camera, true,  cameraPluralString);
-    setString(IOModule, false, ioModuleSigularString);
-    setString(IOModule, true,  ioModulePluralString);
+    setString(Mixed,    false,  mixedSigularString);
+    setString(Mixed,    true,   mixedPluralString);
+    setString(Camera,   false,  cameraSigularString);
+    setString(Camera,   true,   cameraPluralString);
+    setString(IOModule, false,  ioModuleSigularString);
+    setString(IOModule, true,   ioModulePluralString);
+
+    Q_ASSERT_X(isValid(), Q_FUNC_INFO, "Invalid string set");
 }
 
 QString QnCameraDeviceStringSet::getString(QnCameraDeviceType deviceType, bool plural) const {
@@ -192,6 +194,10 @@ QString QnDeviceDependentStrings::getNumericName(const QnVirtualCameraResourceLi
 
 QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourceList &devices) {
     return set.getString(calculateDeviceType(devices), devices.size() != 1);
+}
+
+QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourcePtr &device) {
+    return set.getString(calculateDeviceType(QnVirtualCameraResourceList() << device), false);
 }
 
 QString QnDeviceDependentStrings::getDefaultNameFromSet(const QnCameraDeviceStringSet &set) {
