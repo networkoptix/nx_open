@@ -50,9 +50,18 @@ Item {
 
             property real prevY
 
-            onPressed: prevY = drag.target.y
-            onMouseYChanged: prevY = drag.target.y
+            onPressed: {
+                if (drag.target)
+                    prevY = drag.target.y
+            }
+            onMouseYChanged: {
+                if (drag.target)
+                    prevY = drag.target.y
+            }
             onReleased: {
+                if (!drag.target)
+                    return
+
                 var dir = drag.target.y - prevY
 
                 if (dir > dp(1)) {
