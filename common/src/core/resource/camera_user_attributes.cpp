@@ -18,7 +18,8 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     minDays(0),
     maxDays(0),
     failoverPriority(Qn::FP_Medium),
-    redundantSyncOn(true)
+    backup(true),
+    backupType(Qn::CameraBackup_Disabled)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         motionRegions << QnMotionRegion();
@@ -42,8 +43,8 @@ void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<Q
         *modifiedFields << "licenseUsedChanged";
     if (failoverPriority != right.failoverPriority)
         *modifiedFields << "failoverPriorityChanged";
-    if (redundantSyncOn != right.redundantSyncOn)
-        *modifiedFields << "redundantSyncOnChanged";
+    if (backup != right.backup)
+        *modifiedFields << "backupChanged";
 
     *this = right;
 }

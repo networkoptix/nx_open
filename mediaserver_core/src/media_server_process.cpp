@@ -93,6 +93,7 @@
 #include <recorder/file_deletor.h>
 #include <recorder/recording_manager.h>
 #include <recorder/storage_manager.h>
+#include <recorder/schedule_sync.h>
 
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/business_event_log_rest_handler.h>
@@ -1551,6 +1552,10 @@ void MediaServerProcess::run()
         new QnStorageManager(
             QnServer::ArchiveKind::Backup
         ) 
+    );
+
+    std::unique_ptr<QnScheduleSync> scheduleSync(
+        new QnScheduleSync
     );
 
     std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
