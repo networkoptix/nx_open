@@ -87,28 +87,28 @@ namespace
         const QString arch = (isX86 ? kX86Tag : (isX64 ? kX64Tag : QString()));
         if (caps.contains(kWindowsTag))
         {
-            return QStringLiteral("%1 %2").arg(kWindowsTag).arg(arch);
+            return QStringLiteral("%1 %2").arg(QStringLiteral("Windows")).arg(arch);
         }
         else if (caps.contains(kLinuxTag))
         {
             if (!isArm)
-                return QStringLiteral("%1 %2").arg(kLinuxTag).arg(arch);
+                return QStringLiteral("%1 %2").arg(QStringLiteral("Linux")).arg(arch);
             else
             {
                 if (caps.contains("bpi"))
-                    return QStringLiteral("nx1");
+                    return QStringLiteral("Nx1");
                 else if (caps.contains("rpi"))
                     return QStringLiteral("Raspberry Pi");
                 else if (caps.contains("isd"))
-                    return QStringLiteral("isd jaguar");
+                    return QStringLiteral("ISD Jaguar");
                 else if (caps.contains("isd_s2"))
-                    return QStringLiteral("isd s2");
+                    return QStringLiteral("ISD S2");
                 else
                     return QStringLiteral("%1 %2").arg(kLinuxTag).arg("unknown");
             }
         }
 
-        return QStringLiteral("unknown os");
+        return QStringLiteral("Unknown Os");
     }
 
     typedef QHash<QString, std::function<void (const QJsonObject &object

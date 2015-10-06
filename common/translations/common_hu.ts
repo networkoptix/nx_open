@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="hu" sourcelanguage="en">
+<TS version="2.1" language="hu" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -62,10 +62,6 @@
     <message>
         <source>Unknown (%1)</source>
         <translation>Ismeretlen (%1)</translation>
-    </message>
-    <message>
-        <source>User Defined (%1)</source>
-        <translation>Felhasználó által definiált (%1)</translation>
     </message>
     <message>
         <source>Motion on Camera</source>
@@ -192,10 +188,6 @@
         <translation>RTP csomag vesztés észlelve.</translation>
     </message>
     <message>
-        <source>Server started after crash.</source>
-        <translation>A szerver a hiba után elindult.</translation>
-    </message>
-    <message>
         <source>I/O error has occurred at %1.</source>
         <translation>I/O hiba történt: %1.</translation>
     </message>
@@ -214,10 +206,6 @@
     <message>
         <source>An unknown event has occurred</source>
         <translation>Ismeretlen esemény történt</translation>
-    </message>
-    <message>
-        <source>Input Port: %1</source>
-        <translation>Bemeneti port: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
@@ -288,25 +276,48 @@
     </message>
     <message>
         <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>%1 IP ütközés itt: %2</translation>
-    </message>
-    <message>
-        <source>%1 #%2 MAC: %3</source>
-        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation>Kapcsolat a %1-hez (elsődleges adatfolyam) váratlanul bezárult.</translation>
-    </message>
-    <message>
-        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation>Kapcsolat a %1-hez (másodlagos adatfolyam) váratlanul bezárult.</translation>
     </message>
     <message>
         <source>Recording on %1 is disabled: </source>
         <translation>Felvétel a %1-n kikapcsolva: </translation>
+    </message>
+    <message>
+        <source>Generic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server restarted unexpectedly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -397,14 +408,10 @@
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Győződjön meg, hogy a %2 port elérhető (pl. át van irányítva). Próbálja meg újraindítani a %1-t és és állítsa vissza a gyári alapértelmezett beállításokra a weboldalon.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Győződjön meg, hogy a %1 csatlakoztatva van a hálózatra. Próbálja meg a(z) %1-t újraindítani.</translation>
     </message>
     <message>
@@ -413,23 +420,14 @@
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Próbálja meg újraindítani a %1-t és és állítsa vissza a gyári alapértelmezett beállításokra a weboldalon.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Először próbálja meg bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az FPS-t a %1 beállításokban.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Ha ez nem segít, állítsa vissza gyári alapértelmezett beállításokra a %1 weboldalon. Ha a probléma fennáll, kérem keresse fel a forgalmazót.</translation>
     </message>
     <message>
@@ -1034,6 +1032,18 @@
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation>A szerver idő nincs szinkronizálva és a közös időt nem lehet auromatikusan detektálni.</translation>
+    </message>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The system is running in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any configuration changes except license activation are impossible.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

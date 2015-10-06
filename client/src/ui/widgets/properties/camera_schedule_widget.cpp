@@ -82,9 +82,9 @@ namespace {
                 return label;
             };
 
-            m_motionLabel = addWarningLabel(tr("Schedule motion type is not supported by some %1.").arg(getDefaultDevicesName(true, false)));
-            m_dtsLabel = addWarningLabel(tr("Recording cannot be enabled for some %1.").arg(getDefaultDevicesName(true, false)));
-            m_noVideoLabel = addWarningLabel(tr("Schedule settings are not compatible with some %1.").arg(getDefaultDevicesName(true, false)));
+            m_motionLabel = addWarningLabel(tr("Schedule motion type is not supported by some cameras."));
+            m_dtsLabel = addWarningLabel(tr("Recording cannot be enabled for some cameras."));
+            m_noVideoLabel = addWarningLabel(tr("Schedule settings are not compatible with some devices."));
         }
 
         virtual bool validate(const QnResourceList &selected) override {
