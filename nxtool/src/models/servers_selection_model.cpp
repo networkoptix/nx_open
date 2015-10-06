@@ -563,7 +563,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kSafeModeRoleId:
             return searchInfo.serverInfoIterator->serverInfo.baseInfo().safeMode;
         case kHasHddRoleId:
-            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags & Constants::HasHdd ? true : false);
+            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags.testFlag(Constants::HasHdd));
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
@@ -1160,7 +1160,7 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     , const QString &lockReason
     , int removeRequestsCounter)
 {
-    const QString systemName = (info.baseInfo().flags & Constants::IsFactoryFlag
+    const QString systemName = (info.baseInfo().flags.testFlag(Constants::IsFactoryFlag)
         ? QString() : info.baseInfo().systemName);
 
     int row = 0;
@@ -1228,8 +1228,8 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     const bool selectionOutdated = (searchInfo.serverInfoIterator->selectedState == Qt::Checked)
         && outdate && (foundServer.baseInfo() != baseInfo);
 
-    const bool newIsFactory = (baseInfo.flags & Constants::IsFactoryFlag);
-    const bool currentIsFactory = (foundServer.baseInfo().flags & Constants::IsFactoryFlag);
+    const bool newIsFactory = (baseInfo.flags.testFlag(Constants::IsFactoryFlag));
+    const bool currentIsFactory = (foundServer.baseInfo().flags.testFlag(Constants::IsFactoryFlag));
     const bool diffSystemName = ((foundServer.baseInfo().systemName != baseInfo.systemName)
         || (newIsFactory != currentIsFactory));
 
