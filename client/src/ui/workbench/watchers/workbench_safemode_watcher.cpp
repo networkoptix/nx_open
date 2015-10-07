@@ -35,16 +35,24 @@ void QnWorkbenchSafeModeWatcher::updateReadOnlyMode() {
 }
         
 
-void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox) {
+void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox, QWidget *beforeWidget) {
     QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(buttonBox->layout());
+    Q_ASSERT_X(layout, Q_FUNC_INFO, "Layout must already exist here.");
     if (!layout)
         return;
+
+    if (!beforeWidget)
+        beforeWidget = buttonBox->button(QDialogButtonBox::Ok);
+    Q_ASSERT_X(beforeWidget, Q_FUNC_INFO, "Select correct widget to place");
+    int index = beforeWidget
+        ? layout->indexOf(beforeWidget)
+        : 0;
 
     m_warnLabel = new QLabel(tr("System is in safe mode"), m_parentWidget);
     setWarningStyle(m_warnLabel);
     m_warnLabel->setVisible(false);
 
-    layout->insertWidget(0, m_warnLabel);
+    layout->insertWidget(index, m_warnLabel);
 
     updateReadOnlyMode();
 }

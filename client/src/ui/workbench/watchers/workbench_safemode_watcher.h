@@ -12,10 +12,19 @@ public:
 
     QnWorkbenchSafeModeWatcher(QWidget *parentWidget = nullptr);
 
+    /**
+     * @brief addWarningLabel                   Place warning label with text 'System in Safe Mode' directly on the button box.
+     * @param buttonBox                         Widget to place label.
+     * @param beforeWidget                      Label will be placed to the left of the given widget. Default value is OK button.
+     */
+    void addWarningLabel(QDialogButtonBox *buttonBox, QWidget *beforeWidget = nullptr);
+
+
+    void addControlledWidget(QWidget *widget, ControlMode mode);
+
+private:
     void updateReadOnlyMode();
 
-    void addWarningLabel(QDialogButtonBox *buttonBox);
-    void addControlledWidget(QWidget *widget, ControlMode mode);
 private:
     struct ControlledWidget {
         QWidget* widget;
