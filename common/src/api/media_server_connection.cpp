@@ -716,8 +716,12 @@ int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, QObject
     return sendAsyncGetRequest(RebuildArchiveObject, params, QN_STRINGIZE_TYPE(QnStorageScanData), target, slot);
 }
 
-int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {
-    return sendAsyncGetRequest(StorageSpaceObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnStorageSpaceReply), target, slot);
+int QnMediaServerConnection::getStorageSpaceAsync(bool mainPool, QObject *target, const char *slot) 
+{
+    QnRequestParamList params;
+    params << QnRequestParam("mainPool", mainPool);
+
+    return sendAsyncGetRequest(StorageSpaceObject, params, QN_STRINGIZE_TYPE(QnStorageSpaceReply), target, slot);
 }
 
 int QnMediaServerConnection::getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot) {
