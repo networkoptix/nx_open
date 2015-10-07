@@ -200,10 +200,10 @@ bool QnUniversalRequestProcessor::processRequest()
     if ( !needToStop() )
     {
         copyClientRequestTo(*d->processor);
-        d->processor->execute(d->mutex);
         if (d->processor->isTakeSockOwnership())
             d->socket.clear();
-        else 
+        d->processor->execute(d->mutex);
+        if (!d->processor->isTakeSockOwnership())
             d->processor->releaseSocket();
     }
 
