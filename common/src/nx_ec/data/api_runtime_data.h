@@ -38,9 +38,7 @@ namespace ec2
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate &&
                    mainHardwareIds == other.mainHardwareIds &&
                    compatibleHardwareIds == other.compatibleHardwareIds &&
-                   updateStarted == other.updateStarted &&
-                   nx1mac == other.nx1mac &&
-                   nx1serial == other.nx1serial;
+                   updateStarted == other.updateStarted;
         }
 
         ApiPeerData peer;
@@ -63,15 +61,12 @@ namespace ec2
         QVector<QByteArray> mainHardwareIds;
         QVector<QByteArray> compatibleHardwareIds;
 
-        QString nx1mac;
-        QString nx1serial;
-
         bool updateStarted;
     };
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
-                                                        (mainHardwareIds)(compatibleHardwareIds)(updateStarted)(nx1mac)(nx1serial)
+                                                        (mainHardwareIds)(compatibleHardwareIds)(updateStarted)
 
 
 } // namespace ec2
