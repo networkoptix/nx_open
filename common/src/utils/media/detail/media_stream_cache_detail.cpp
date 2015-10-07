@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "media_stream_cache_detail.h"
 
 #include <core/datapacket/media_data_packet.h>
@@ -339,3 +341,5 @@ qint64 MediaStreamCache::inactivityPeriod() const
 }
 
 }
+
+#endif

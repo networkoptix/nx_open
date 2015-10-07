@@ -1,5 +1,9 @@
 //#include "config.h"
 
+#if defined(Q_OS_ANDROID)
+#  define MOUNTED "" // TODO: #android
+#endif
+
 #if defined(Q_CC_MSVC)
 extern "C"
 {

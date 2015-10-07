@@ -1,5 +1,7 @@
 #include "sign_helper.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QProcess>
 #include <QtCore/QTemporaryFile>
 
@@ -741,3 +743,5 @@ void QnSignHelper::setLicensedToStr(const QString& value)
 {
     m_licensedToStr = value;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

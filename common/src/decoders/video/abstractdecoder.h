@@ -1,6 +1,8 @@
 #ifndef clabstractvideodecoder_h_2155
 #define clabstractvideodecoder_h_2155
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 //#include <QtOpenGL/QGLContext>
 
 #include "core/datapacket/media_data_packet.h"
@@ -147,5 +149,7 @@ public:
 private:
     static CLCodecManufacture m_codecManufacture;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //clabstractvideodecoder_h_2155

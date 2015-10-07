@@ -1,5 +1,10 @@
 #include "multicast_http_transport.h"
 
+#ifdef Q_OS_LINUX
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#endif
 
 namespace QnMulticast
 {

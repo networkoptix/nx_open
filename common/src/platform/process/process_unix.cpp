@@ -1,9 +1,11 @@
-
 #include "process_unix.h"
+
+#ifndef QT_NO_PROCESS
 
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <QtCore/QProcess>
 #include <QtCore/QPointer>
@@ -169,3 +171,5 @@ void QnUnixProcess::setPriority(Priority priority) {
 void QnUnixProcess::at_process_stateChanged() {
     d_func()->tryInitialize();
 }
+
+#endif // QT_NO_PROCESS

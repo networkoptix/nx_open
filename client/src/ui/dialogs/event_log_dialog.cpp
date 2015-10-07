@@ -9,6 +9,7 @@
 #include <utils/common/event_processors.h>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -268,9 +269,12 @@ void QnEventLogDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    const QString cameraButtonText = (m_filterCameraList.empty() ?
-        tr("<Any %1>").arg(getDefaultDeviceNameUpper()) 
-        : lit("<%1>").arg(getNumericDevicesName(m_filterCameraList, false)));
+    const QString cameraButtonText = (m_filterCameraList.empty() 
+        ? QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("<Any Device>"),
+            tr("<Any Camera>")
+            )       
+        : lit("<%1>").arg(QnDeviceDependentStrings::getNumericName(m_filterCameraList, false)));
 
     ui->cameraButton->setText(cameraButtonText);
 

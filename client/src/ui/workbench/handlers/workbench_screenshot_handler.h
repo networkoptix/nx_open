@@ -51,6 +51,7 @@ public:
 
 protected:
     virtual void doLoadAsync() override;
+
 private slots:
     void at_imageLoaded(const QImage &image);
 

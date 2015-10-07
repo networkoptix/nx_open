@@ -23,6 +23,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_type.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -1161,7 +1162,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
     else {
         QnVirtualCameraResourceList cameras = filtered.filtered<QnVirtualCameraResource>();
         if (cameras.size() == filtered.size()) /* Cameras only */
-            layout->setName(getNumericDevicesName(cameras));
+            layout->setName(QnDeviceDependentStrings::getNumericName(cameras));
         else
             layout->setName(tr("%n items", NULL, filtered.size()));
     }
@@ -2258,11 +2259,11 @@ void QnWorkbenchVideoWallHandler::at_navigator_positionChanged() {
     if (display()->isChangingLayout())
         return;
 
-    if (navigator()->position() == qint64(AV_NOPTS_VALUE))
+    if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPositionChanged);
-    message[positionKey] = QString::number(navigator()->position());
+    message[positionKey] = QString::number(navigator()->positionUsec());
     sendMessage(message);
 }
 
@@ -2273,12 +2274,12 @@ void QnWorkbenchVideoWallHandler::at_navigator_speedChanged() {
     if (display()->isChangingLayout())
         return;
 
-    if (navigator()->position() == qint64(AV_NOPTS_VALUE))
+    if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorSpeedChanged);
     message[speedKey] = QString::number(navigator()->speed());
-    message[positionKey] = QString::number(navigator()->position());
+    message[positionKey] = QString::number(navigator()->positionUsec());
     sendMessage(message);
 }
 

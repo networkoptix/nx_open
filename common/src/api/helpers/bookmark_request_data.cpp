@@ -22,6 +22,8 @@ namespace {
     const QString macKey(lit("mac"));
     const QString idKey(lit("id"));
     const QString limitKey(lit("limit"));
+
+    const qint64 USEC_PER_MS = 1000;
 }
 
 QnBookmarkRequestData::QnBookmarkRequestData():
@@ -37,10 +39,10 @@ QnBookmarkRequestData QnBookmarkRequestData::fromParams(const QnRequestParamList
     QnBookmarkRequestData request;
 
     if (params.contains(startTimeKey))
-        request.filter.startTimeMs = parseDateTime(params.value(startTimeKey));
+        request.filter.startTimeMs = parseDateTime(params.value(startTimeKey)) / USEC_PER_MS;
 
     if (params.contains(endTimeKey))
-        request.filter.endTimeMs = parseDateTime(params.value(endTimeKey));
+        request.filter.endTimeMs = parseDateTime(params.value(endTimeKey))  / USEC_PER_MS;
 
     //if (params.contains(strategyKey())) {
         QnLexical::deserialize(params.value(strategyKey), &request.filter.strategy);

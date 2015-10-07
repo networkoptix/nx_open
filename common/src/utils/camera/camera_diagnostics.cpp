@@ -7,7 +7,7 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 
 class QnCameraDiagnosticsErrorCodeStrings
 {
@@ -21,119 +21,225 @@ public:
     {
         using namespace CameraDiagnostics::ErrorCode;
 
+        QnCameraDeviceStringSet detailsRebootRestore(
+            tr("Please try to reboot the device, then restore factory defaults on the web-page."),
+            tr("Please try to reboot the camera, then restore factory defaults on the web-page."),
+            tr("Please try to reboot the IO module, then restore factory defaults on the web-page.")
+            );
+
+        QnCameraDeviceStringSet detailsPluggedReboot(
+            tr("Make sure the device is plugged into the network. Try to reboot the device."),
+            tr("Make sure the camera is plugged into the network. Try to reboot the camera."),
+            tr("Make sure the IO module is plugged into the network. Try to reboot the IO module.")
+            );
+
+        QString firmwareSupport = tr("Finally, try to update firmware. If the problem persists, please contact support.");
 
 
         int requiredParamCount = 0;
         QStringList errorMessageParts;
         switch( val )
         {
-            case noError:
-                requiredParamCount = 0;
-                errorMessageParts << tr("OK");
-                break;
+            case noError: 
+                {
+                    requiredParamCount = 0;
+                    errorMessageParts 
+                        << tr("OK");
+                    break;
+                }
             case mediaServerUnavailable:
-                requiredParamCount = 1;
-                errorMessageParts   << tr("Server %1 is not available.")
-                                    << tr("Check that Server is up and running.");
-                break;
-            case mediaServerBadResponse:
-                requiredParamCount = 2;
-                errorMessageParts   << tr("Received bad response from Server %1: \"%2\".") 
-                                    << tr("Check if Server is up and has the proper version.");
-                break;
+                {
+                    requiredParamCount = 1;
+                    errorMessageParts   
+                        << tr("Server %1 is not available.")
+                        << tr("Check that Server is up and running.");
+                    break;
+                }
+            case mediaServerBadResponse: 
+                {
+                    requiredParamCount = 2;
+                    errorMessageParts   
+                        << tr("Received bad response from Server %1: \"%2\".") 
+                        << tr("Check if Server is up and has the proper version.");
+                    break;
+                }
             case cannotEstablishConnection:
-                requiredParamCount = 1;
-                errorMessageParts   << tr("Cannot connect to http port %1.") 
-                                    << tr("Make sure the %1 is plugged into the network.").arg(getDefaultDeviceNameLower(device));
-                break;
+                {
+                    requiredParamCount = 1;
+                    errorMessageParts   
+                        << tr("Cannot connect to http port %1.") 
+                        << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    break;
+                }
             case cannotOpenCameraMediaPort:
-                requiredParamCount = 2;
-                errorMessageParts   << tr("Cannot open media url %1. Failed to connect to media port %2.")
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.").arg(getDefaultDeviceNameLower(device));
-                break;
+                {
+                    requiredParamCount = 2;
+                    errorMessageParts   << tr("Cannot open media url %1. Failed to connect to media port %2.")
+                        << tr("Make sure port %2 is accessible (e.g. forwarded).")
+                        << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device);
+                    break;
+                }
             case connectionClosedUnexpectedly:
-                requiredParamCount = 2;
-                errorMessageParts   << tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly.")
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("Make sure the %1 is plugged into the network. Try to reboot the %1.").arg(getDefaultDeviceNameLower(device));
-                break;
-            case responseParseError:
-                requiredParamCount = 2;
-                errorMessageParts   << tr("Could not parse %1 response. Url %2, request name %3.").arg(getDefaultDeviceNameLower(device))
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("Please try to reboot the %1, then restore factory defaults on the web-page.").arg(getDefaultDeviceNameLower(device))
-                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
-                break;
-            case noMediaTrack:
-                requiredParamCount = 1;
-                errorMessageParts   << tr("No supported media tracks at url %1.")
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("Please try to reboot the %1, then restore factory defaults on the web-page.").arg(getDefaultDeviceNameLower(device))
-                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
-                break;
-            case notAuthorised:
-                requiredParamCount = 1;
-                errorMessageParts   << tr("Not authorised. Url %1.");
-                break;
-            case unsupportedProtocol:
-                requiredParamCount = 2;
-                errorMessageParts   << tr("Cannot open media url %1. Unsupported media protocol %2.")
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("Please try to reboot the %1, then restore factory defaults on the web-page.").arg(getDefaultDeviceNameLower(device))
-                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
-                break;
-            case cannotConfigureMediaStream:
-                requiredParamCount = 1;
-                errorMessageParts   << tr("Failed to configure parameter %1.")
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("First, try to turn on recording (if it's off) and decrease fps in %1 settings.").arg(getDefaultDeviceNameLower(device))
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("If it doesn't help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.").arg(getDefaultDeviceNameLower(device));
-                break;
-            case requestFailed:
-                requiredParamCount = 2;
-                                    //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..)
-                errorMessageParts   << tr("%1 request \"%2\" failed with error \"%3\".").arg(getDefaultDeviceNameUpper(device))
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("Please try to reboot the %1, then restore factory defaults on the web-page.").arg(getDefaultDeviceNameLower(device))
-                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
-                break;
-            case notImplemented:
-                requiredParamCount = 0;
-                //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..)
-                errorMessageParts   << tr("Unknown %1 Issue.").arg(getDefaultDeviceNameUpper(device))
-                                    << tr("Please contact support.");
-                break;
-            case ioError:
-                requiredParamCount = 1;
-                errorMessageParts   << tr("An input/output error has occurred. OS message: \"%1\".")
-                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                                    << tr("Make sure the %1 is plugged into the network. Try to reboot the %1.").arg(getDefaultDeviceNameLower(device));
-                break;
-            case serverTerminated:
-                errorMessageParts   << tr("Server has been stopped.");
-                break;
-            case cameraInvalidParams:
-                requiredParamCount = 1;
-                //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                errorMessageParts   << tr("Invalid data was received from the %1: %2.").arg(getDefaultDeviceNameLower(device));
-                break;
+                {
+                    requiredParamCount = 2;
+                    errorMessageParts   
+                        << tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly.")
+                        << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    break;
+                }
+            case responseParseError: 
+                {
+                    requiredParamCount = 2;
+                    QnCameraDeviceStringSet detailsBase(
+                        tr("Could not parse device response. Url %1, request name %2."),
+                        tr("Could not parse camera response. Url %1, request name %2."),
+                        tr("Could not parse IO module response. Url %1, request name %2.")
+                        );
+
+                    errorMessageParts   
+                        << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
+                        << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                        << firmwareSupport;
+                    break;
+                }
+            case noMediaTrack: 
+                {
+                    requiredParamCount = 1;
+                    errorMessageParts   << tr("No supported media tracks at url %1.")
+                        << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                        << firmwareSupport;
+                    break;
+                }
+            case notAuthorised: 
+                {
+                    requiredParamCount = 1;
+                    errorMessageParts   << tr("Not authorized. Url %1.");
+                    break;
+                }
+            case unsupportedProtocol: 
+                {
+                    requiredParamCount = 2;
+                    errorMessageParts   
+                        << tr("Cannot open media url %1. Unsupported media protocol %2.")
+                        << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                        << firmwareSupport;
+                    break;
+                }
+            case cannotConfigureMediaStream: 
+                {
+                    requiredParamCount = 1;
+                    QnCameraDeviceStringSet detailsBase(
+                        tr("First, try to turn on recording (if it's off) and decrease fps in device settings."),
+                        tr("First, try to turn on recording (if it's off) and decrease fps in camera settings."),
+                        tr("First, try to turn on recording (if it's off) and decrease fps in IO module settings.")
+                        );
+                    QnCameraDeviceStringSet detailsAdvanced(
+                        tr("If it doesn't help, restore factory defaults on the device web-page."),
+                        tr("If it doesn't help, restore factory defaults on the camera web-page."),
+                        tr("If it doesn't help, restore factory defaults on the IO module web-page.")
+                        );
+
+                    errorMessageParts
+                        << tr("Failed to configure parameter %1.")
+                        << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
+                        << QnDeviceDependentStrings::getNameFromSet(detailsAdvanced, device)
+                        << firmwareSupport;
+                    break;
+                }
+            case requestFailed: 
+                {
+                    requiredParamCount = 2;
+                    QnCameraDeviceStringSet detailsBase(
+                        tr("Device request \"%1\" failed with error \"%2\"."),
+                        tr("Camera request \"%1\" failed with error \"%2\"."),
+                        tr("IO Module request \"%1\" failed with error \"%2\".")
+                        );
+                    errorMessageParts
+                        << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
+                        << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                        << firmwareSupport;
+                    break;
+                }
+            case notImplemented: 
+                {
+                    requiredParamCount = 0;
+                    QnCameraDeviceStringSet details(
+                        tr("Unknown device issue."),
+                        tr("Unknown camera issue."),
+                        tr("Unknown IO module issue.")
+                        );
+
+                    errorMessageParts 
+                        << QnDeviceDependentStrings::getNameFromSet(details, device)
+                        << tr("Please contact support.");
+                    break;
+                }
+            case ioError: 
+                {
+                    requiredParamCount = 1;
+                    errorMessageParts   
+                        << tr("An input/output error has occurred. OS message: \"%1\".")
+                        << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    break;
+                }
+            case serverTerminated: 
+                {
+                    requiredParamCount = 0;
+                    errorMessageParts   << tr("Server has been stopped.");
+                    break;
+                }
+            case cameraInvalidParams: 
+                {
+                    requiredParamCount = 1;
+                    QnCameraDeviceStringSet details(
+                        tr("Invalid data was received from the device %1."),
+                        tr("Invalid data was received from the camera %1."),
+                        tr("Invalid data was received from the IO module %1.")
+                        );
+
+                    errorMessageParts 
+                        << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    break;
+                }
             case badMediaStream:
-                //: %1 - will be substituted by type of device ("camera", "io module", etc..)
-                errorMessageParts   << tr("Too many media errors. Please open %1 issues dialog for more details.").arg(getDefaultDeviceNameLower(device));
-                break;
-            case noMediaStream:
-                errorMessageParts   << tr("Media stream is opened but no media data was received.");
-                break;
-            case cameraInitializationInProgress:
-                //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..)
-                errorMessageParts   << tr("%1 initialization process in progress.").arg(getDefaultDeviceNameUpper(device));
-                break;
+                {
+                    requiredParamCount = 0;
+                    QnCameraDeviceStringSet details(
+                        tr("Too many media errors. Please open device issues dialog for more details."),
+                        tr("Too many media errors. Please open camera issues dialog for more details."),
+                        tr("Too many media errors. Please open IO module issues dialog for more details.")
+                        );
+
+                    errorMessageParts 
+                        << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    break;
+                }
+            case noMediaStream: 
+                {
+                    requiredParamCount = 0;
+                    errorMessageParts 
+                        << tr("Media stream is opened but no media data was received.");
+                    break;
+                }
+            case cameraInitializationInProgress: 
+                {
+                    requiredParamCount = 0;
+                    QnCameraDeviceStringSet details(
+                        tr("Device initialization process in progress."),
+                        tr("Camera initialization process in progress."),
+                        tr("IO Module initialization process in progress.")
+                        );
+
+                    errorMessageParts 
+                        << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    break;
+				}
             case cameraPluginError:
-                requiredParamCount = 1;
-                errorMessageParts   << tr("Camera plugin error. %1");
-                break;
+				{
+	                requiredParamCount = 1;
+    	            errorMessageParts   << tr("Camera plugin error. %1");
+					break;
+				}
             default:
             {
                 int nonEmptyParamCount = 0;

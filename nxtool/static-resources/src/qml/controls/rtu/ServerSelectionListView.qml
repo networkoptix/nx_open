@@ -73,6 +73,16 @@ ListView
                         thisComponent.model.changeItemSelectedState(index);
                     });
                 }
+
+                Connections
+                {
+                    target: thisComponent.model;
+                    onBlinkAtSystem:
+                    {
+                        if (systemItemIndex == itemIndex)
+                            blink();
+                    }
+                }
             }
         }
     
@@ -85,6 +95,7 @@ ListView
                 port: model.port;
                 selectedState: model.selectedState;
 
+                loggedIn: model.loggedIn;
                 availableForSelection: model.loggedIn && !model.isBusy;
                 safeMode: model.safeMode;
                 hasHdd: model.hasHdd;
@@ -112,6 +123,8 @@ ListView
                         thisComponent.model.changeItemSelectedState(index);
                     });
                 }
+
+                onUnauthrizedClicked: { thisComponent.model.blinkForItem(currentItemIndex); }
 
             }
         }

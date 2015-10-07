@@ -24,8 +24,11 @@ QnTimeSliderColors::QnTimeSliderColors() {
     pastMotion = QColor(255, 0, 0, 128);
     futureMotion = QColor(255, 0, 0, 64);
 
-    pastBookmark = QColor(0, 0, 255, 128);
-    futureBookmark = QColor(0, 0, 255, 64);
+    pastBookmark = QColor("#b22e6996");
+    futureBookmark = QColor("#802e6996");
+
+    pastBookmarkBound = QColor("#3882b8");
+    futureBookmarkBound = QColor("#803882b8");
 
     separator = QColor(255, 255, 255, 64);
 

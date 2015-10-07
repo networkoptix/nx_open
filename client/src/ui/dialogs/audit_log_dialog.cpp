@@ -10,6 +10,7 @@
 #include <client/client_settings.h>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -1190,9 +1191,14 @@ void QnAuditLogDialog::retranslateUi()
     ui->retranslateUi(this);
 
     enum { kDevicesTabIndex = 1 };
-    ui->tabWidget->setTabText(kDevicesTabIndex, getDefaultDevicesName());
-    //: "Camera actions" or "Device actions"
-    ui->checkBoxCameras->setText(tr("%1 actions").arg(getDefaultDeviceNameUpper()));
+    ui->tabWidget->setTabText(kDevicesTabIndex, QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Devices"),
+        tr("Cameras")
+    ));
+    ui->checkBoxCameras->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Device actions"),
+        tr("Camera actions")
+    ));
 }
 
 void QnAuditLogDialog::at_exportAction_triggered()
