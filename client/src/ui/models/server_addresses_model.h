@@ -12,6 +12,8 @@
 class QnServerAddressesModel : public Customized<QAbstractItemModel> {
     Q_OBJECT
     Q_PROPERTY(QnRoutingManagementColors colors READ colors WRITE setColors)
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
+
     typedef Customized<QAbstractItemModel> base_type;
 
 public:
@@ -43,6 +45,9 @@ public:
     void addAddress(const QUrl &url, bool isManualAddress = true);
     void removeAddressAtIndex(const QModelIndex &index);
 
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
+
     void clear();
     void resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses, int port);
 
@@ -68,6 +73,7 @@ private:
     QUrl addressAtIndex(const QModelIndex &index, int defaultPort = -1) const;
 
 private:
+    bool m_readOnly;
     int m_port;
     QList<QUrl> m_addresses;
     QList<QUrl> m_manualAddresses;

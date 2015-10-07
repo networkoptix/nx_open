@@ -1,8 +1,8 @@
 #include "workbench_state_dependent_dialog.h"
 
-QnWorkbenchStateDependentButtonBoxDialog::QnWorkbenchStateDependentButtonBoxDialog(QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/):
-    base_type(parent, windowFlags),
-    QnWorkbenchStateDelegate(parent)
+QnWorkbenchStateDependentButtonBoxDialog::QnWorkbenchStateDependentButtonBoxDialog(QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/)
+    : base_type(parent, windowFlags)
+    , QnWorkbenchStateDelegate(parent)
 {
 }
 
@@ -17,5 +17,3 @@ void QnWorkbenchStateDependentButtonBoxDialog::forcedUpdate() {
     retranslateUi();
     tryClose(true);
 }
-
-

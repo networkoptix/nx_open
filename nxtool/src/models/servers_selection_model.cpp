@@ -241,7 +241,10 @@ namespace
         , kDefaultPassword
         , kBusyStateRoleId
         , kSafeModeRoleId
-        , kHasHdd
+        , kHasHddRoleId
+        , kVersionRoleId
+        , kOsRoleId
+        , kOperationRoleId
 
         , kLastCustomRoleId
     };
@@ -267,8 +270,11 @@ namespace
         result.insert(kDefaultPassword, "defaultPassword");
         result.insert(kBusyStateRoleId, "isBusy");
         result.insert(kSafeModeRoleId, "safeMode");
-        result.insert(kHasHdd, "hasHdd");
-
+        result.insert(kHasHddRoleId, "hasHdd");
+        result.insert(kVersionRoleId, "version");
+        result.insert(kOsRoleId, "os");
+        result.insert(kOperationRoleId, "operation");
+        
         return result;
     }();
     
@@ -395,6 +401,8 @@ public:
         , int port);
 
     void serverDiscovered(const BaseServerInfo &baseInfo);
+
+    void blinkForItem(int row);
 
     void addServer(const rtu::ServerInfo &info
         , Qt::CheckState selected = Qt::Unchecked
@@ -526,24 +534,29 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kSystemNameRoleId:
             return systemInfo.name;
         case kNameRoleId:
-            if (info.baseInfo().displayAddress.isEmpty())
-                return QString("%1 (%2) %3").arg(info.baseInfo().name)
-                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST")
-                    .arg(info.baseInfo().version.toString());  /// TODO: remove after inner testing
-            else 
-                return QString("%1 (%2) (%3) %4").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress)
-                    .arg(info.baseInfo().accessibleByHttp ? "HTTP" : "MCAST")
-                    .arg(info.baseInfo().version.toString());  /// TODO: remove after inner testing
+            return info.baseInfo().name;
+        case kIpAddressRoleId:
+            return info.baseInfo().displayAddress;
+        case kVersionRoleId:
+            return info.baseInfo().version.toString();
+        case kOsRoleId:
+            return info.baseInfo().os;
         case kIdRoleId:
             return info.baseInfo().id;
-        case kMacAddressRoleId:
+        case kOperationRoleId:
         {
             if (searchInfo.serverInfoIterator->locked)
                 return searchInfo.serverInfoIterator->lockReason;
+            else if (searchInfo.serverInfoIterator->loginState == kDifferentNetwork)
+                return tr("Server is unavailable");
 
+            return QString();
+        }
+
+        case kMacAddressRoleId:
+        {
             const bool hasMacAddress = info.hasExtraInfo() && !info.extraInfo().interfaces.empty();
-            return (hasMacAddress ? info.extraInfo().interfaces.front().macAddress :
-                (searchInfo.serverInfoIterator->loginState == kDifferentNetwork ? "Server is unavailable" : ""));
+            return (hasMacAddress ? info.extraInfo().interfaces.front().macAddress : QString());
         }
         case kLoggedIn:
             return info.hasExtraInfo();
@@ -551,8 +564,8 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
             return searchInfo.serverInfoIterator->locked;
         case kSafeModeRoleId:
             return searchInfo.serverInfoIterator->serverInfo.baseInfo().safeMode;
-        case kHasHdd:
-            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags && Constants::HasHdd);
+        case kHasHddRoleId:
+            return (searchInfo.serverInfoIterator->serverInfo.baseInfo().flags.testFlag(Constants::HasHdd));
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
@@ -1116,12 +1129,20 @@ void rtu::ServersSelectionModel::Impl::updatePortInfo(const QUuid &id
     changeServer(base);
 }
 
+void rtu::ServersSelectionModel::Impl::blinkForItem(int row)
+{
+    ItemSearchInfoConst searchInfo;
+    if (!findItem(row, m_systems, searchInfo))
+        return;
+
+    emit m_owner->blinkAtSystem(searchInfo.systemRowIndex);
+}
+
 void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &baseInfo)
 {
     ItemSearchInfo searchInfo;
     if (!findServer(baseInfo.id, searchInfo))
         return;
-
     
     enum { kUpdatePeriod = RestClient::kDefaultTimeoutMs * 3 };  /// At least x3 because there is http and multicast timeouts can be occured
 
@@ -1149,7 +1170,7 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     , const QString &lockReason
     , int removeRequestsCounter)
 {
-    const QString systemName = (info.baseInfo().flags & Constants::IsFactoryFlag
+    const QString systemName = (info.baseInfo().flags.testFlag(Constants::IsFactoryFlag)
         ? QString() : info.baseInfo().systemName);
 
     int row = 0;
@@ -1217,12 +1238,16 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     const bool selectionOutdated = (searchInfo.serverInfoIterator->selectedState == Qt::Checked)
         && outdate && (foundServer.baseInfo() != baseInfo);
 
-    if (foundServer.baseInfo().systemName != baseInfo.systemName)
+    const bool newIsFactory = (baseInfo.flags.testFlag(Constants::IsFactoryFlag));
+    const bool currentIsFactory = (foundServer.baseInfo().flags.testFlag(Constants::IsFactoryFlag));
+    const bool diffSystemName = ((foundServer.baseInfo().systemName != baseInfo.systemName)
+        || (newIsFactory != currentIsFactory));
+
+    if (diffSystemName)
     {
         const Qt::CheckState selected = searchInfo.serverInfoIterator->selectedState;
 
-        const QString newSystemName = (baseInfo.flags & Constants::IsFactoryFlag
-            ? QString() : baseInfo.systemName);
+        const QString newSystemName = (newIsFactory ? QString() : baseInfo.systemName);
 
         int targetSystemRow = 0;
         const bool targetSystemExists = 
@@ -1232,15 +1257,18 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
         const bool inplaceRename = !targetSystemExists && (system.servers.size() == 1);
         if (inplaceRename)
         {
-            system.name = baseInfo.systemName;
+            system.name = newSystemName;
             m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
         }
 
         const auto locked = searchInfo.serverInfoIterator->locked;
         const auto lockReason = searchInfo.serverInfoIterator->lockReason;
-        const auto counter = searchInfo.serverInfoIterator->removeRequestsCounter;
 
-        removeServerImpl(baseInfo.id, targetSystemExists, true);
+        /// Remove operation with "force" flag never increases counter, thus 
+        /// increase it manualy
+        const auto counter = searchInfo.serverInfoIterator->removeRequestsCounter + 1;
+
+        removeServerImpl(baseInfo.id, targetSystemExists, true);    
         foundServer.setBaseInfo(baseInfo);
         addServer(foundServer, selected, locked, lockReason, counter);
     }
@@ -1501,6 +1529,11 @@ void rtu::ServersSelectionModel::tryLoginWith(
     , const rtu::Callback &callback)
 {
     m_impl->tryLoginWith(primarySystem, password, callback);
+}
+
+void rtu::ServersSelectionModel::blinkForItem(int row)
+{
+    m_impl->blinkForItem(row);
 }
 
 void rtu::ServersSelectionModel::serverDiscovered(const BaseServerInfo &baseInfo)

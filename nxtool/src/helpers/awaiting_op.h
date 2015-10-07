@@ -17,19 +17,23 @@ namespace rtu
     {
     public:
         typedef std::shared_ptr<AwaitingOp> Holder;
-        typedef std::function<void (const QUuid &id)> TimeoutHandler;
+        typedef std::weak_ptr<AwaitingOp> WeakPtr;
+        typedef std::function<void (const WeakPtr op)> TimeoutHandler;
         typedef std::function<bool (const QString &ip)> UnknownAddedHandler;
         typedef std::function<void (const BaseServerInfo &info)> ServerDiscoveredAction;
 
         static Holder create(const QUuid &id
             , int changesCount
             , qint64 timeout
-            , const ServerDiscoveredAction &discovered
-            , const Callback &disappeared
-            , const UnknownAddedHandler &unknownAdded
             , const TimeoutHandler &timeoutHandler);
 
         virtual ~AwaitingOp();
+
+        void setServerDiscoveredHandler(const ServerDiscoveredAction &handler);
+        
+        void setServerDisappearedHandler(const Callback &handler);
+
+        void setUnknownAddedHandler(const UnknownAddedHandler &handler);
 
         void processServerDiscovered(const BaseServerInfo &info);
 
@@ -37,9 +41,11 @@ namespace rtu
 
         bool processUnknownAdded(const QString &ip);
 
-        const QUuid &id() const;
+        const QUuid &serverId() const;
 
         int changesCount() const;
+
+        void resetChangesCount();
 
     signals:
         void timeout();
@@ -47,20 +53,19 @@ namespace rtu
     private:
         AwaitingOp(const QUuid &id
             , int changesCount
-            , qint64 timeout
-            , const ServerDiscoveredAction &discovered
-            , const UnknownAddedHandler &unknownAdded
-            , const Callback &disappeared);
+            , qint64 timeout);
 
         bool isTimedOut() const;
 
     private:
-        const QUuid m_id;
-        const ServerDiscoveredAction m_discovered;
-        const Callback m_disappeared;
-        const UnknownAddedHandler m_unknownAdded;
-        const int m_changesCount;
+        const QUuid m_serverId;
         const qint64 m_creationTimestamp;
         const qint64 m_timeout;
+
+        int m_changesCount;
+        ServerDiscoveredAction m_discovered;
+        Callback m_disappeared;
+        UnknownAddedHandler m_unknownAdded;
+
     };
 }

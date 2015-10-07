@@ -18,7 +18,7 @@
 
 #include <core/resource/resource_name.h>
 #include <camera/camera_data_manager.h>
-
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/client_storage_resource.h>
@@ -232,16 +232,26 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server) {
     updateReadOnly();
 }
 
-void QnServerSettingsWidget::updateReadOnly() {
-    bool readOnly = isReadOnly();
+void QnServerSettingsWidget::setReadOnlyInternal(bool readOnly) {
+    using ::setReadOnly;
     setReadOnly(ui->failoverCheckBox, readOnly);
     setReadOnly(ui->maxCamerasSpinBox, readOnly);
     setReadOnly(ui->storagesTable, readOnly);
 
+    ui->rebuildGroupBox->setVisible(!readOnly);
+}
+
+void QnServerSettingsWidget::updateReadOnly() {
+    bool readOnly = [&](){
+        if (!m_server)
+            return true;
+        return !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
+    }();
+
+    setReadOnly(readOnly);
+
     /* Edge servers cannot be renamed. */
     ui->nameLineEdit->setReadOnly(readOnly || QnMediaServerResource::isEdgeServer(m_server));
-
-    ui->rebuildGroupBox->setVisible(!readOnly);
 }
 
 bool QnServerSettingsWidget::hasChanges() const {
@@ -265,8 +275,16 @@ bool QnServerSettingsWidget::hasChanges() const {
 }
 
 void QnServerSettingsWidget::retranslateUi() {
-    ui->failoverCheckBox->setText(tr("Enable failover (server will take %1 automatically from offline servers)").arg(getDefaultDevicesName(true, false)));
-    ui->maxCamerasLabel->setText(tr("Max. %1 on this server:").arg(getDefaultDevicesName(true, false)));
+    ui->failoverCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Enable failover (server will take devices automatically from offline servers)"),
+        tr("Enable failover (server will take cameras automatically from offline servers)")
+        ));
+        
+    ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Max devices on this server:"),
+        tr("Max cameras on this server:")
+        ));
+        
     updateFailoverLabel();
 }
 
@@ -535,13 +553,6 @@ int QnServerSettingsWidget::dataRowCount() const {
     return rowCount;
 }
 
-bool QnServerSettingsWidget::isReadOnly() const {
-    if (!m_server)
-        return true;
-    return !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
-}
-
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -692,10 +703,16 @@ void QnServerSettingsWidget::updateFailoverLabel() {
             return tr("At least two servers are required for this feature.");
 
         if (qnResPool->getAllCameras(m_server, true).size() > ui->maxCamerasSpinBox->value())
-            return tr("This server already has more than max %1").arg(getDefaultDeviceNameLower());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("This server already has more than max devices"),
+                tr("This server already has more than max cameras")
+            );
 
         if (!m_server->isRedundancy() && !m_maxCamerasAdjusted)
-            return tr("To avoid malfunction adjust max number of %1").arg(getDefaultDeviceNameLower());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("To avoid malfunction adjust max number of devices"),
+                tr("To avoid malfunction adjust max number of cameras")
+            );
 
         return QString();
     };

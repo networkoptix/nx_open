@@ -31,6 +31,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/layout_resource.h>
@@ -117,7 +118,6 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-
 
 #include <utils/app_server_image_cache.h>
 
@@ -798,10 +798,14 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            //: "Cannot move these 5 cameras to server <server_name>. Server is unresponsive."
-            tr("Cannot move these %n %1 to server %2. Server is unresponsive.", "", modifiedResources.size())
-                .arg(getDefaultDevicesName(modifiedResources, false))
-                .arg(server->getName()),
+            QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
+                    tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
+                    tr("Cannot move these %n IO modules to server %1. Server is unresponsive.", "", modifiedResources.size())
+                ),
+                modifiedResources
+            ).arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -824,10 +828,14 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 errorResources,
                 Qn::MainWindow_Tree_DragCameras_Help,
                 tr("Error"),
-                //: "Server <server_name> is unable to find and access these 5 cameras. Are you sure you would like to move them?"
-                tr("Server %1 is unable to find and access these %n %2. Are you sure you would like to move them?", "", errorResources.size())
-                    .arg(server->getName())
-                    .arg(getDefaultDevicesName(errorResources, false)),
+                QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                        tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
+                        tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
+                        tr("Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?", "", errorResources.size())
+                    ),
+                    modifiedResources
+                ).arg(server->getName()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
                 );
         /* If user is sure, return invalid cameras back to list. */
@@ -1519,7 +1527,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
         mainWindow(),
         resources.toList(),
         tr("Delete Files"),
-        tr("Are you sure you want to permanently delete these %n file(s)?", "", resources.size()),
+        tr("Are you sure you want to permanently delete these %n files?", "", resources.size()),
         QDialogButtonBox::Yes | QDialogButtonBox::No
     );
     if(button != QDialogButtonBox::Yes)
@@ -1537,7 +1545,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
             QnActionParameterTypes::resources(items),
             Qn::RemoveItems_Help,
             tr("Remove Items"),
-            tr("Are you sure you want to remove these %n item(s) from layout?", "", items.size()),
+            tr("Are you sure you want to remove these %n items from layout?", "", items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
         if(button != QDialogButtonBox::Yes)
@@ -1755,28 +1763,55 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
     if (resources.size() == onlineAutoDiscoveredCameras.size()) {
         question =
-            //: "These 5 cameras are auto-discovered."
-            tr("These %n %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getDefaultDevicesName(cameras, false)) + L'\n' 
-          + tr("They may be auto-discovered again after removing.") + L'\n' 
-          + tr("Are you sure you want to delete them?");
+            QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        nullptr, onlineAutoDiscoveredCameras.size()),
+                    tr("These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        nullptr, onlineAutoDiscoveredCameras.size()),
+                    tr("These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        nullptr, onlineAutoDiscoveredCameras.size())
+                ),
+                onlineAutoDiscoveredCameras
+            );
     }
     else 
     /* Second version - some cameras are auto-discovered, some not. */
-    if (!onlineAutoDiscoveredCameras.isEmpty()) {
-        question = 
-            tr("%n of these %1 are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(getDefaultDevicesName(cameras, false)) + L'\n' 
-          + tr("They may be auto-discovered again after removing.") + L'\n' 
-          + tr("Are you sure you want to delete them?");
-    }
-    else if (cameras.size() == resources.size()) {
-        /* Third version - no auto-discovered cameras in the list. */
+    if (cameras.size() == resources.size() && !onlineAutoDiscoveredCameras.isEmpty()) {
         question =
-            tr("Do you really want to delete the following %1?").arg(getNumericDevicesName(cameras, false));
+            QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        nullptr, onlineAutoDiscoveredCameras.size()),
+                    tr("%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        nullptr, onlineAutoDiscoveredCameras.size()),
+                    tr("%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        nullptr, onlineAutoDiscoveredCameras.size())
+                ),
+                cameras
+            );
     }
-    else {
-        /* Forth version - cameras and other items. */
+    else
+    /* Third version - no auto-discovered cameras in the list. */        
+    if (cameras.size() == resources.size()) {
         question =
-            tr("Do you really want to delete the following %n item(s)?", "", resources.size());
+            QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Do you really want to delete the following %n devices?",
+                        nullptr, cameras.size()),
+                    tr("Do you really want to delete the following %n cameras?",
+                        nullptr, cameras.size()),
+                    tr("Do you really want to delete the following %n IO modules?",
+                        nullptr, cameras.size())
+                ),
+                cameras
+            );
+    }
+    else
+    /* Forth version - cameras and other items. */
+    {        
+        question =
+            tr("Do you really want to delete the following %n items?", "", resources.size());
     }
     
     if (moreResourceToDelete.isEmpty())
@@ -2241,6 +2276,9 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
+    if (qnCommon->isReadOnly())
+        return;
+
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if(!watcher->hasMismatches())
         return;
@@ -2322,6 +2360,10 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
 
     /* Check if user already made a decision. */
     if (ec2::Ec2StaticticsReporter::isDefined(servers))
+        return;
+
+    /* User cannot disable statistics collecting, so don't make him sorrow. */
+    if (qnCommon->isReadOnly())
         return;
 
     /* Suppress notification if no server has internet access. */

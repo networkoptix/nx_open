@@ -2,6 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 
 #include <ui/common/ui_resource_name.h>
@@ -98,10 +99,16 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
         {
             QnVirtualCameraResourceList cameras;
             for (const QnCamRecordingStatsData &data: m_data)
-                if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId(data.uniqueId).dynamicCast<QnVirtualCameraResource>())
+                if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
             Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
-            return tr("Total %1").arg(getNumericDevicesName(cameras, false));
+            return QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Total %n devices",      nullptr, cameras.size()),
+                    tr("Total %n cameras",      nullptr, cameras.size()),
+                    tr("Total %n IO modules",   nullptr, cameras.size())
+                ), cameras
+            );
         }
     case BytesColumn:
         return formatBytesString(m_footer.recordedBytes);
@@ -187,9 +194,15 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
     switch (column)
     {
         case CameraNameColumn:
-            return tr("%1 with non-empty archive").arg(getDefaultDevicesName());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Devices with non-empty archive"),
+                tr("Cameras with non-empty archive")
+                );
         case BytesColumn:
-            return tr("Storage space occupied by %1").arg(getDefaultDevicesName());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Storage space occupied by devices"),
+                tr("Storage space occupied by cameras")
+                );
         case DurationColumn:
             return tr("Archived duration in calendar days between the first record and the current moment");
         case BitrateColumn:
@@ -244,7 +257,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
 
     if (role == Qt::DisplayRole) {
         switch(section) {
-        case CameraNameColumn: return getDefaultDeviceNameUpper();
+        case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
         case BytesColumn:      return tr("Space");
         case DurationColumn:   return tr("Calendar Days");
         case BitrateColumn:    return QVariant(); //return tr("Bitrate");

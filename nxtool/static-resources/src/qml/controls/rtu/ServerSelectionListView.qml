@@ -73,6 +73,16 @@ ListView
                         thisComponent.model.changeItemSelectedState(index);
                     });
                 }
+
+                Connections
+                {
+                    target: thisComponent.model;
+                    onBlinkAtSystem:
+                    {
+                        if (systemItemIndex == itemIndex)
+                            blink();
+                    }
+                }
             }
         }
     
@@ -82,12 +92,21 @@ ListView
             
             Rtu.ServerItemDelegate
             {
-                loggedIn: model.loggedIn && !model.isBusy;
-                serverName: model.name;
-                information: model.macAddress;
+                port: model.port;
                 selectedState: model.selectedState;
-                hasHdd: model.hasHdd;
+
+                loggedIn: model.loggedIn;
+                availableForSelection: model.loggedIn && !model.isBusy;
                 safeMode: model.safeMode;
+                hasHdd: model.hasHdd;
+
+                serverName: model.name;
+                version: model.version;
+                hardwareAddress: model.macAddress;
+                displayAddress: model.ipAddress;
+                os: model.os;
+
+                operation: model.operation;
 
                 onExplicitSelectionCalled: 
                 {
@@ -104,6 +123,8 @@ ListView
                         thisComponent.model.changeItemSelectedState(index);
                     });
                 }
+
+                onUnauthrizedClicked: { thisComponent.model.blinkForItem(currentItemIndex); }
 
             }
         }

@@ -1106,6 +1106,29 @@ Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &reso
     return pureIoModules ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResourceList &resources) {
+    bool found = false;
+
+    for (const QnResourcePtr &resource: resources) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return Qn::InvisibleAction;
+
+        if (!QnMediaServerResource::isFakeServer(resource))
+            return Qn::InvisibleAction;
+
+        if (server->getModuleInformation().ecDbReadOnly)
+            return Qn::InvisibleAction;
+
+        found = true;
+    }
+
+    return found 
+        ? Qn::EnabledAction 
+        : Qn::InvisibleAction;
+}
+
+
 Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
     bool found = false;
     foreach (const QnResourcePtr &resource, resources) {

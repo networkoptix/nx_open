@@ -170,3 +170,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
                               .arg(fileName));
     }
 }
+
+void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly) {
+    ui->restoreButton->setEnabled(!readOnly);
+}
