@@ -27,11 +27,11 @@ public:
         \note Required access role: cloud module (e.g., user portal)
     */
     virtual void registerNewAccount(
-        const api::AccountData& accountData,
+        api::AccountData accountData,
         std::function<void(api::ResultCode, api::AccountActivationCode)> completionHandler) = 0;
     //!Activate account supplying code returned by \a AccountManager::registerNewAccount
     virtual void activateAccount(
-        const api::AccountActivationCode& activationCode,
+        api::AccountActivationCode activationCode,
         std::function<void(api::ResultCode)> completionHandler) = 0;
     //!Fetches account info if credentails are account credentials
     /*!

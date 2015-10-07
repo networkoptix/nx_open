@@ -34,11 +34,11 @@ public:
 
     //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(
-        const api::AccountData& accountData,
+        api::AccountData accountData,
         std::function<void(api::ResultCode, api::AccountActivationCode)> completionHandler) override;
     //!Implementation of api::AccountManager::activateAccount
     virtual void activateAccount(
-        const api::AccountActivationCode& activationCode,
+        api::AccountActivationCode activationCode,
         std::function<void(api::ResultCode)> completionHandler) override;
     //!Implementation of api::AccountManager::getAccount
     virtual void getAccount(

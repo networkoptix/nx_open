@@ -32,11 +32,14 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData
     accountData->email = urlQuery.queryItemValue("email").toStdString();
     accountData->passwordHa1 = urlQuery.queryItemValue("passwordHa1").toStdString();
     accountData->fullName = urlQuery.queryItemValue("fullName").toStdString();
+    accountData->customization = urlQuery.queryItemValue("customization").toStdString();
     bool success = true;
     accountData->statusCode = urlQuery.hasQueryItem("statusCode")
         ? QnLexical::deserialized<api::AccountStatus>(
             urlQuery.queryItemValue("statusCode"), api::AccountStatus::invalid, &success )
         : api::AccountStatus::invalid;
+
+    success &= !accountData->email.empty();
     return success;
 }
 
@@ -47,6 +50,7 @@ void serializeToUrlQuery(const AccountData& data, QUrlQuery* const urlQuery)
     urlQuery->addQueryItem("passwordHa1", QString::fromStdString(data.passwordHa1));
     urlQuery->addQueryItem("fullName", QString::fromStdString(data.fullName));
     urlQuery->addQueryItem("statusCode", QnLexical::serialized(data.statusCode));
+    urlQuery->addQueryItem("customization", QString::fromStdString(data.customization));
 }
 
 

@@ -95,10 +95,19 @@ CREATE UNIQUE INDEX system_to_account_primary                                   
 ";
 
 
+//#CLOUD-123
 static const char addCustomizationToSystem[] =
 "                                                                   \
 ALTER TABLE system ADD COLUMN customization VARCHAR(255);           \
 UPDATE system set customization = 'default';                        \
+";
+
+
+//#CLOUD-124
+static const char addCustomizationToAccount[] =
+"                                                                   \
+ALTER TABLE account ADD COLUMN customization VARCHAR(255);          \
+UPDATE account set customization = 'default';                       \
 ";
 
 }   //db

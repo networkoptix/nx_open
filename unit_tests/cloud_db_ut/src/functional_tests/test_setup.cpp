@@ -116,6 +116,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
         accountData->email.c_str(),
         moduleInfo().realm.c_str(),
         password->c_str());
+    accountData->customization = QN_CUSTOMIZATION_NAME;
 
     auto connection = connectionFactory()->createConnection("", "");
 

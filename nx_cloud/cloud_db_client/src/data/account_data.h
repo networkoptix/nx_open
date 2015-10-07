@@ -33,7 +33,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((AccountStatus), (lexical))
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountData* const accountData);
 void serializeToUrlQuery(const AccountData&, QUrlQuery* const urlQuery);
 
-#define AccountData_Fields (id)(email)(passwordHa1)(fullName)(statusCode)
+#define AccountData_Fields (id)(email)(passwordHa1)(fullName)(customization)(statusCode)
 
 
 ////////////////////////////////////////////////////////////

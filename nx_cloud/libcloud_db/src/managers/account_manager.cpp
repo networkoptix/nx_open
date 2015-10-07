@@ -135,7 +135,7 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
     QSqlQuery readAccountsQuery( *connection );
     readAccountsQuery.prepare(
         "SELECT id, email, password_ha1 as passwordHa1, "
-               "full_name as fullName, status_code as statusCode "
+               "full_name as fullName, customization, status_code as statusCode "
         "FROM account" );
     if( !readAccountsQuery.exec() )
     {
@@ -169,8 +169,8 @@ db::DBResult AccountManager::insertAccount(
     //inserting account
     QSqlQuery insertAccountQuery( *connection );
     insertAccountQuery.prepare( 
-        "INSERT INTO account (id, email, password_ha1, full_name, status_code) "
-                    "VALUES  (:id, :email, :passwordHa1, :fullName, :statusCode)");
+        "INSERT INTO account (id, email, password_ha1, full_name, customization, status_code) "
+                    "VALUES  (:id, :email, :passwordHa1, :fullName, :customization, :statusCode)");
     QnSql::bind( accountData, &insertAccountQuery );
     insertAccountQuery.bindValue(
         ":statusCode",

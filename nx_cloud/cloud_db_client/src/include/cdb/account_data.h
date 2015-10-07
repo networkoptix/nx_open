@@ -35,6 +35,7 @@ public:
     //!Hex representation of HA1 (see rfc2617) digest of user's password. Realm is usually NetworkOptix
     std::string passwordHa1;
     std::string fullName;
+    std::string customization;
     AccountStatus statusCode;
 
     AccountData()

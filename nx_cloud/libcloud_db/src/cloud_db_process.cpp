@@ -374,6 +374,7 @@ bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
     dbStructureUpdater.addUpdateScript(db::createSystemData);
     dbStructureUpdater.addUpdateScript(db::systemToAccountMapping);
     dbStructureUpdater.addUpdateScript(db::addCustomizationToSystem);
+    dbStructureUpdater.addUpdateScript(db::addCustomizationToAccount);
     return dbStructureUpdater.updateStructSync();
 }
 

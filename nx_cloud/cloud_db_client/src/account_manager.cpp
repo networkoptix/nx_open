@@ -6,6 +6,7 @@
 #include "account_manager.h"
 
 #include "cdb_request_path.h"
+#include "version.h"
 
 
 namespace nx {
@@ -19,23 +20,24 @@ AccountManager::AccountManager(cc::CloudModuleEndPointFetcher* const cloudModule
 }
 
 void AccountManager::registerNewAccount(
-    const api::AccountData& accountData,
+    api::AccountData accountData,
     std::function<void(api::ResultCode, api::AccountActivationCode)> completionHandler)
 {
+    accountData.customization = QN_CUSTOMIZATION_NAME;
     executeRequest(
         ACCOUNT_REGISTER_PATH,
-        accountData,
+        std::move(accountData),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::AccountActivationCode()));
 }
 
 void AccountManager::activateAccount(
-    const api::AccountActivationCode& activationCode,
+    api::AccountActivationCode activationCode,
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
         ACCOUNT_ACTIVATE_PATH,
-        activationCode,
+        std::move(activationCode),
         completionHandler,
         completionHandler);
 }

@@ -29,6 +29,7 @@ TEST_F(CdbFunctionalTest, accountActivation)
     api::AccountActivationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
     ASSERT_TRUE(!activationCode.code.empty());
 
     //only get_account is allowed for not activated account
@@ -40,6 +41,7 @@ TEST_F(CdbFunctionalTest, accountActivation)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
     ASSERT_EQ(account1.statusCode, api::AccountStatus::awaitingActivation);
 
     result = activateAccount(activationCode);
@@ -47,6 +49,7 @@ TEST_F(CdbFunctionalTest, accountActivation)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
     ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
 }
 
