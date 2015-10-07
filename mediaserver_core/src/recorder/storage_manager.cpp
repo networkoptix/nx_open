@@ -1527,7 +1527,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     }
 
     if (result) {
-        qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
+        qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << (provider ? provider->getResource()->getUrl() : "");
     }
     else {
         if (!m_warnSended && m_firstStorageTestDone) {
@@ -1706,7 +1706,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
     if (!storage)
         return false;
-    if (storageIndex >= 0)
+    if (storageIndex >= 0 && provider)
         storage->releaseBitrate(provider);
         //storage->addWritedSpace(fileSize);
 
@@ -1735,7 +1735,8 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 
     if (storageIndex == -1)
         return false;
-    storage->addBitrate(provider);
+    if (provider)
+        storage->addBitrate(provider);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
     if (catalog == 0)

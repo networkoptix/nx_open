@@ -536,7 +536,7 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
     auto mediaServer = resource.dynamicCast<QnMediaServerResource>();
     Q_ASSERT(mediaServer);
 
-    if (mediaServer && !(mediaServer->getBackupType() & Qn::Backup_RealTime))
+    if (!(mediaServer->getBackupType() & Qn::Backup_RealTime))
         return false;
 
     auto cam = m_device.dynamicCast<QnSecurityCamResource>();

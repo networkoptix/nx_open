@@ -6,6 +6,8 @@
 #include <core/resource_management/resource_pool.h>
 #include "common/common_module.h"
 #include <core/resource/media_server_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include "schedule_sync.h"
 
@@ -93,24 +95,209 @@ QnScheduleSync::~QnScheduleSync()
 }
 
 template<typename NeedStopCB>
+void QnScheduleSync::synchronize(
+    QnServer::ChunksCatalog catalog,
+    const QString           &cameraId,
+    NeedStopCB              needStop
+)
+{
+    auto fromCatalog = qnNormalStorageMan->getFileCatalog(
+        cameraId,
+        catalog
+    );
+    if (!fromCatalog)
+    {
+        NX_LOG(
+            lit("[QnScheduleSync::synchronize] get fromCatalog failed"),
+            cl_logDEBUG1
+        );
+        return;
+    }
+    auto toCatalog = qnBackupStorageMan->getFileCatalog(
+        cameraId,
+        catalog
+    );
+    if (!toCatalog)
+    {
+        NX_LOG(
+            lit("[QnScheduleSync::synchronize] get toCatalog failed"),
+            cl_logDEBUG1
+        );
+        return;
+    }
+
+    DeviceFileCatalog::Chunk chunk;
+    if (toCatalog->isEmpty())
+        chunk = fromCatalog->chunkAt(
+            fromCatalog->findFileIndex(
+                fromCatalog->firstTime(),
+                DeviceFileCatalog::OnRecordHole_PrevChunk
+            )
+        );
+    else
+        chunk = fromCatalog->chunkAt(
+            fromCatalog->findFileIndex(
+                toCatalog->lastChunkStartTime(),
+                DeviceFileCatalog::OnRecordHole_NextChunk
+            )
+        );
+
+    if (chunk.startTimeMs == -1) // not found
+    {
+        NX_LOG(
+            lit("[QnScheduleSync::synchronize] first chunk not found"),
+            cl_logDEBUG1
+        );
+        return;
+    }
+
+    while (true)
+    {
+        // copy file
+        QString fromFileFullName = fromCatalog->fullFileName(chunk);            
+        auto fromStorage = qnNormalStorageMan->getStorageByUrl(fromFileFullName);
+
+        std::unique_ptr<QIODevice> fromFile = std::unique_ptr<QIODevice>(
+            fromStorage->open(
+                fromFileFullName,
+                QIODevice::ReadOnly
+            )
+        );
+        auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
+        auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
+        auto newFileName = toStorage->getUrl() + relativeFileName;
+
+        std::unique_ptr<QIODevice> toFile = std::unique_ptr<QIODevice>(
+            toStorage->open(
+                newFileName,
+                QIODevice::WriteOnly | QIODevice::Append
+            )
+        );
+
+        if (!fromFile || !toFile)
+        {
+            NX_LOG(
+                lit("[QnScheduleSync::synchronize] file %1 or %2 open error")
+                    .arg(fromFileFullName)
+                    .arg(newFileName),
+                cl_logDEBUG1
+            );
+            continue;
+        }
+
+        int bitrate = m_schedule.bitrate;
+        if (bitrate == -1 || bitrate == 0) // not capped
+        {
+            auto data = fromFile->readAll();
+            toFile->write(data);
+        }
+        else
+        {
+            Q_ASSERT(bitrate > 0);
+            qint64 fileSize = fromFile->size();
+            const qint64 timeToWrite = (fileSize / bitrate) * 1000;
+                            
+            const qint64 CHUNK_SIZE = 4096;
+            const qint64 chunksInFile = fileSize / CHUNK_SIZE;
+            const qint64 timeOnChunk = timeToWrite / chunksInFile;
+
+            while (fileSize > 0)
+            {
+                qint64 startTime = qnSyncTime->currentMSecsSinceEpoch();
+                const qint64 writeSize = CHUNK_SIZE < fileSize ? CHUNK_SIZE : fileSize;
+                auto data = fromFile->read(writeSize);
+                if (toFile->write(data) == -1)
+                {
+                    NX_LOG(
+                        lit("[QnScheduleSync::synchronize] file %1 write error")
+                            .arg(newFileName),
+                        cl_logDEBUG1
+                    );
+                    continue;
+                }
+                fileSize -= writeSize;
+                qint64 now = qnSyncTime->currentMSecsSinceEpoch();
+                if (now - startTime < timeOnChunk)
+                    std::this_thread::sleep_for(
+                        std::chrono::milliseconds(timeOnChunk - (now - startTime))
+                    );
+            }
+        }
+
+        // add chunk
+        // TODO: #backup storages #akulikov Deal with null provider
+        qnBackupStorageMan->fileStarted(
+            chunk.startTimeMs,
+            chunk.timeZone,
+            newFileName,
+            nullptr
+        );
+
+        qnBackupStorageMan->fileFinished(
+            chunk.durationMs,
+            newFileName,
+            nullptr,
+            chunk.getFileSize()
+        );
+
+        // get next chunk
+        chunk = fromCatalog->chunkAt(
+            fromCatalog->findFileIndex(
+                chunk.startTimeMs,
+                DeviceFileCatalog::OnRecordHole_NextChunk
+            )
+        );
+
+        if (chunk.startTimeMs == -1 || fromCatalog->isLastChunk(chunk.startTimeMs) || needStop())
+            break;
+    }
+}
+
+template<typename NeedStopCB>
 void QnScheduleSync::synchronize(NeedStopCB needStop)
 {
-    typedef std::deque<DeviceFileCatalog::Chunk>    ChunkContainerType;
-    typedef std::list<DeviceFileCatalog::Chunk>     ChunkListType;
-    typedef ChunkListType::const_iterator           ChunkConstIteratorType;
-    typedef ChunkListType::reverse_iterator         ChunkReverseIteratorType;
-    typedef std::vector<ChunkReverseIteratorType>   CRIteratorVectorType;
-    typedef std::vector<ChunkConstIteratorType>     CCIteratorVectorType;
+    //typedef std::deque<DeviceFileCatalog::Chunk>    ChunkContainerType;
+    //typedef std::list<DeviceFileCatalog::Chunk>     ChunkListType;
+    //typedef ChunkListType::const_iterator           ChunkConstIteratorType;
+    //typedef ChunkListType::reverse_iterator         ChunkReverseIteratorType;
+    //typedef std::vector<ChunkReverseIteratorType>   CRIteratorVectorType;
+    //typedef std::vector<ChunkConstIteratorType>     CCIteratorVectorType;
 
-    const int CATALOG_QUALITY_COUNT = 2;
-
-
+    //const int CATALOG_QUALITY_COUNT = 2;
 
 
-
-
-
-
+    auto resource = qnResPool->getResourceById(
+        qnCommon->moduleGUID()
+    );
+    auto mediaServer = resource.dynamicCast<QnMediaServerResource>();
+    Q_ASSERT(mediaServer);
+    
+    auto allCameras = qnResPool->getAllCameras(mediaServer);
+    std::vector<QString> visitedCameras(allCameras.size());
+    
+    for (auto &camera : allCameras)
+    {
+        auto visitedIt = std::find_if(
+            visitedCameras.cbegin(),
+            visitedCameras.cend(),
+            [&camera](const QString &cameraId)
+            {
+                return camera->getUniqueId() == cameraId;
+            }
+        );
+        if (visitedIt != visitedCameras.cend())
+            break;
+        auto securityCamera = camera.dynamicCast<QnSecurityCamResource>();
+        Q_ASSERT(securityCamera);
+        visitedCameras.push_back(camera->getUniqueId());
+        auto backupType = securityCamera->getBackupType();
+        if (backupType == Qn::CameraBackup_Disabled)
+            break;
+        else if (backupType & Qn::CameraBackup_HighQuality)
+            synchronize(QnServer::HiQualityCatalog, camera->getUniqueId(), needStop);
+        else if (backupType & Qn::CameraBackup_LowQuality)
+            synchronize(QnServer::LowQualityCatalog, camera->getUniqueId(), needStop);
+    }
 
     //for (int qualityIndex = 0; 
     //     qualityIndex < CATALOG_QUALITY_COUNT; 
@@ -416,6 +603,8 @@ void QnScheduleSync::renewSchedule()
         qnCommon->moduleGUID()
     );
     auto mediaServer = resource.dynamicCast<QnMediaServerResource>();
+    Q_ASSERT(mediaServer);
+
     if (mediaServer)
     {
         m_schedule.type     = mediaServer->getBackupType();
@@ -424,14 +613,13 @@ void QnScheduleSync::renewSchedule()
         m_schedule.duration = mediaServer->getBackupDuration();
         m_schedule.bitrate  = mediaServer->getBackupBitrate();
     }
-    Q_ASSERT(mediaServer);
 }
 
 void QnScheduleSync::start()
 {
     static const auto 
     REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(10);
-    m_backupSyncOn = true;
+    m_backupSyncOn         = true;
 
     m_backupFuture = std::async(
         std::launch::async,
@@ -450,6 +638,8 @@ void QnScheduleSync::start()
 
                 auto isItTimeForSync = [this] ()
                 {
+                    if (m_schedule.type != Qn::Backup_Schedule)
+                        return false;
                     if (m_forced)
                         return true;
 
@@ -489,7 +679,7 @@ void QnScheduleSync::start()
                             return false;
                         }
                     );
-                    m_forced = false;
+                    m_forced  = false;
                     m_syncing = false;
                 }
             }

@@ -41,6 +41,14 @@ public:
 private:
     template<typename NeedStopCB>
     void synchronize(NeedStopCB needStop);
+
+    template<typename NeedStopCB>
+    void synchronize(
+        QnServer::ChunksCatalog catalog,
+        const QString           &cameraId,
+        NeedStopCB              needStop
+    );
+
     void start();
     void renewSchedule();
 
