@@ -299,12 +299,10 @@ public:
 
         m_pastColor[Qn::RecordingContent]           = colors.pastRecording;
         m_pastColor[Qn::MotionContent]              = colors.pastMotion;
-        m_pastColor[Qn::BookmarksContent]           = colors.pastBookmark;
         m_pastColor[Qn::TimePeriodContentCount]     = colors.pastBackground;
 
         m_futureColor[Qn::RecordingContent]         = colors.futureRecording;
         m_futureColor[Qn::MotionContent]            = colors.futureMotion;
-        m_futureColor[Qn::BookmarksContent]         = colors.futureBookmark;
         m_futureColor[Qn::TimePeriodContentCount]   = colors.futureBackground;
 
         m_position = m_centralPosition = m_minChunkLength = 0;
@@ -376,23 +374,11 @@ private:
     QColor currentColor(const boost::array<QColor, Qn::TimePeriodContentCount + 1> &colors) const {
         qreal rc = m_weights[Qn::RecordingContent];
         qreal mc = m_weights[Qn::MotionContent];
-        qreal bc = m_weights[Qn::BookmarksContent];
         qreal nc = m_weights[Qn::TimePeriodContentCount];
         qreal sum = m_pendingLength;
 
-        if (!qFuzzyIsNull(bc) && !(qFuzzyIsNull(mc))) {
-            qreal localSum = mc + bc;
-            return linearCombine(mc / localSum, colors[Qn::MotionContent], bc/localSum, colors[Qn::BookmarksContent]);
-        }
-
-        if (!qFuzzyIsNull(bc)) {
-            /* Make sure bookmark is noticeable even if there isn't much of it. 
-             * Note that these adjustments don't change sum. */
-            rc = rc * (1.0 - lineBarMinNoticeableFraction);
-            bc = sum * lineBarMinNoticeableFraction + bc * (1.0 - lineBarMinNoticeableFraction);
-            nc = nc * (1.0 - lineBarMinNoticeableFraction);
-        } else if (!qFuzzyIsNull(mc)) {
-            /* Make sure motion is noticeable even if there isn't much of it. 
+        if (!qFuzzyIsNull(mc)) {
+            /* Make sure motion is noticeable even if there isn't much of it.
              * Note that these adjustments don't change sum. */
             rc = rc * (1.0 - lineBarMinNoticeableFraction);
             mc = sum * lineBarMinNoticeableFraction + mc * (1.0 - lineBarMinNoticeableFraction);
@@ -404,13 +390,7 @@ private:
             nc = sum * (1.0 - lineBarMinNoticeableFraction);
         }
 
-        return 
-            linearCombine(
-                1.0,
-                linearCombine(rc / sum, colors[Qn::RecordingContent], mc / sum, colors[Qn::MotionContent]),
-                1.0, 
-                linearCombine(bc / sum, colors[Qn::BookmarksContent], nc / sum, colors[Qn::TimePeriodContentCount])
-            );
+        return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(mc / sum, colors[Qn::MotionContent], nc / sum, colors[Qn::TimePeriodContentCount]));
     }
 
 private:
@@ -752,9 +732,6 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const Qn
         return;
 
     m_lineData[line].timeStorage.setPeriods(type, timePeriods);
-
-    if (type == Qn::BookmarksContent)
-        calculateCoveringBookmarks();
 }
 
 QnCameraBookmarkList QnTimeSlider::bookmarks() const {
@@ -763,7 +740,7 @@ QnCameraBookmarkList QnTimeSlider::bookmarks() const {
 
 void QnTimeSlider::setBookmarks(const QnCameraBookmarkList &bookmarks) {
     m_bookmarks = bookmarks;
-    calculateCoveringBookmarks();
+    mergeBookmarks();
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -1254,27 +1231,27 @@ void QnTimeSlider::mergeBookmarks() {
     auto mergePendingBookmarks = [this](int firstBookmarkIndex, int lastBookmarkIndex) {
         BookmarkCluster mergedCluster;
 
-        mergedCluster.startTimeMs = m_coveringBookmarks[firstBookmarkIndex].startTimeMs;
+        mergedCluster.startTimeMs = m_bookmarks[firstBookmarkIndex].startTimeMs;
         mergedCluster.firstBookmarkIndex = firstBookmarkIndex;
         mergedCluster.lastBookmarkIndex = lastBookmarkIndex;
 
         mergedCluster.endTimeMs = 0;
         for (int i = firstBookmarkIndex; i <= lastBookmarkIndex; ++i)
-            mergedCluster.endTimeMs = std::max(mergedCluster.endTimeMs, m_coveringBookmarks[i].endTimeMs());
+            mergedCluster.endTimeMs = std::max(mergedCluster.endTimeMs, m_bookmarks[i].endTimeMs());
 
         return mergedCluster;
     };
 
-    for (int i = 0; i < m_coveringBookmarks.size(); ++i) {
-        const QnCameraBookmark &bookmark = m_coveringBookmarks[i];
+    for (int i = 0; i < m_bookmarks.size(); ++i) {
+        const QnCameraBookmark &bookmark = m_bookmarks[i];
 
-        if (firstBookmarkIndex >= 0 && bookmark.startTimeMs - m_coveringBookmarks[firstBookmarkIndex].startTimeMs >= mergeDistance) {
+        if (firstBookmarkIndex >= 0 && bookmark.startTimeMs - m_bookmarks[firstBookmarkIndex].startTimeMs >= mergeDistance) {
             if (lastBookmarkIndex - firstBookmarkIndex + 1 >= minBookmarksToMerge) {
                 m_mergedBookmarks.append(mergePendingBookmarks(firstBookmarkIndex, lastBookmarkIndex));
             } else {
-                qint64 firstStartTimeMs = m_coveringBookmarks[firstBookmarkIndex].startTimeMs;
+                qint64 firstStartTimeMs = m_bookmarks[firstBookmarkIndex].startTimeMs;
                 do {
-                    m_mergedBookmarks.append(BookmarkCluster(m_coveringBookmarks[firstBookmarkIndex], firstBookmarkIndex));
+                    m_mergedBookmarks.append(BookmarkCluster(m_bookmarks[firstBookmarkIndex], firstBookmarkIndex));
                     ++firstBookmarkIndex;
                 } while (firstBookmarkIndex <= lastBookmarkIndex && bookmark.startTimeMs - firstStartTimeMs >= mergeDistance);
             }
@@ -1294,27 +1271,10 @@ void QnTimeSlider::mergeBookmarks() {
         m_mergedBookmarks.append(mergePendingBookmarks(firstBookmarkIndex, lastBookmarkIndex));
     } else {
         while (firstBookmarkIndex <= lastBookmarkIndex) {
-            m_mergedBookmarks.append(BookmarkCluster(m_coveringBookmarks[firstBookmarkIndex], firstBookmarkIndex));
+            m_mergedBookmarks.append(BookmarkCluster(m_bookmarks[firstBookmarkIndex], firstBookmarkIndex));
             ++firstBookmarkIndex;
         }
     }
-}
-
-void QnTimeSlider::calculateCoveringBookmarks() {
-    QnTimePeriodList periods = m_lineData.first().timeStorage.periods(Qn::BookmarksContent);
-    for (const QnCameraBookmark &bookmark: m_bookmarks)
-        periods.excludeTimePeriod(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs));
-
-    m_coveringBookmarks = m_bookmarks;
-
-    for (const QnTimePeriod &period: periods) {
-        QnCameraBookmark bookmark;
-        bookmark.startTimeMs = period.startTimeMs;
-        bookmark.durationMs = period.durationMs;
-        m_coveringBookmarks.insert(std::lower_bound(m_coveringBookmarks.begin(), m_coveringBookmarks.end(), bookmark), bookmark);
-    }
-
-    mergeBookmarks();
 }
 
 QnCameraBookmarkList QnTimeSlider::bookmarksAtPosition(qint64 position) const {
@@ -1323,7 +1283,7 @@ QnCameraBookmarkList QnTimeSlider::bookmarksAtPosition(qint64 position) const {
     for (const BookmarkCluster &cluster: m_mergedBookmarks) {
         if (cluster.startTimeMs <= position && position < cluster.endTimeMs) {
             for (int i = cluster.firstBookmarkIndex; i <= cluster.lastBookmarkIndex; ++i)
-                result.append(m_coveringBookmarks[i]);
+                result.append(m_bookmarks[i]);
         }
     }
 
@@ -1850,7 +1810,6 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
                 m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
-                m_bookmarksVisible && line == m_lineCount - 1 ? m_lineData[line].timeStorage.aggregated(Qn::BookmarksContent) : QnTimePeriodList(),
                 lineRect
             );
 
@@ -2007,7 +1966,7 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
     painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
 }
 
-void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QnTimePeriodList &bookmarks, const QRectF &rect) {
+void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect) {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
 
@@ -2017,7 +1976,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
     /* Note that constness of period lists is important here as requesting
      * iterators from a non-const object will result in detach. */
-    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion, bookmarks};
+    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion};
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
@@ -2037,7 +1996,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
     chunkPainter.start(value, this->sliderPosition(), m_msecsPerPixel, rect);
 
     while(value != maximumValue) {
-        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue, maximumValue};
+        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
         for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if(pos[i] == end[i]) 
                 continue;
@@ -2051,12 +2010,10 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
-        qint64 bestValue = qMin(qMin(nextValue[0], nextValue[1]), nextValue[2]);
+        qint64 bestValue = qMin(nextValue[Qn::RecordingContent], nextValue[Qn::MotionContent]);
         
         Qn::TimePeriodContent content;
-        if (inside[Qn::BookmarksContent]) {
-            content = Qn::BookmarksContent;
-        } else if (inside[Qn::MotionContent]) {
+        if (inside[Qn::MotionContent]) {
             content = Qn::MotionContent;
         } else if (inside[Qn::RecordingContent]) {
             content = Qn::RecordingContent;
@@ -2357,7 +2314,7 @@ void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
         if (bookmarkCluster.firstBookmarkIndex != bookmarkCluster.lastBookmarkIndex)
             continue;
 
-        const QnCameraBookmark &bookmark = m_coveringBookmarks[bookmarkCluster.firstBookmarkIndex];
+        const QnCameraBookmark &bookmark = m_bookmarks[bookmarkCluster.firstBookmarkIndex];
 
         QRectF textRect = bookmarkRect;
         if (i < m_mergedBookmarks.size() - 1)
