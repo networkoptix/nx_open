@@ -873,15 +873,15 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
                                                       const QList<QnServer::ChunksCatalog> &catalogs, int limit) 
 {
     std::vector<QnTimePeriodList> periods;
-    qnNormalStorageMan->getRecordedPeriodsInternal(periods, cameras, startTime, endTime, detailLevel, catalogs, limit);
-    qnBackupStorageMan->getRecordedPeriodsInternal(periods, cameras, startTime, endTime, detailLevel, catalogs, limit);
+    qnNormalStorageMan->getRecordedPeriodsInternal(periods, cameras, startTime, endTime, detailLevel, keepSmallChunks, catalogs, limit);
+    qnBackupStorageMan->getRecordedPeriodsInternal(periods, cameras, startTime, endTime, detailLevel, keepSmallChunks, catalogs, limit);
     return QnTimePeriodList::mergeTimePeriods(periods, limit);
 }
 
 void QnStorageManager::getRecordedPeriodsInternal(
     std::vector<QnTimePeriodList>& periods, 
-    const QnVirtualCameraResourceList &cameras, qint64 
-    startTime, qint64 endTime, qint64 detailLevel, 
+    const QnVirtualCameraResourceList &cameras, 
+    qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
     const QList<QnServer::ChunksCatalog> &catalogs, 
     int limit)
 {
@@ -1006,7 +1006,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         {
             qreal persentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
             Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
-            auto storage = qnStorageMan->storageRoot(itrHiLeft->storageIndex);
+            auto storage = storageRoot(itrHiLeft->storageIndex);
             result.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
             if (storage)
                 result.recordedBytesPerStorage[storage->getId()] += itrHiLeft->getFileSize() * persentUsage;
@@ -1022,7 +1022,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         {
             qreal persentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
             Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
-            auto storage = qnStorageMan->storageRoot(itrLowLeft->storageIndex);
+            auto storage = storageRoot(itrLowLeft->storageIndex);
             result.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
             if (storage)
                 result.recordedBytesPerStorage[storage->getId()] += itrLowLeft->getFileSize() * persentUsage;

@@ -1013,7 +1013,7 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
     for (auto itr = itrLeft; itr != itrRight; ++itr)
     {
         const Chunk& chunk = *itr;
-        auto storage = qnStorageMan->storageRoot(chunk.storageIndex);
+        auto storage = getMyStorageMan()->storageRoot(chunk.storageIndex);
         if (chunk.durationMs != Chunk::UnknownDuration) {
             result.recordedBytes += chunk.getFileSize();
             if (storage)
