@@ -1554,10 +1554,6 @@ void MediaServerProcess::run()
         ) 
     );
 
-    std::unique_ptr<QnScheduleSync> scheduleSync(
-        new QnScheduleSync
-    );
-
     std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
 
     connect(QnResourceDiscoveryManager::instance(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
@@ -2198,6 +2194,9 @@ void MediaServerProcess::run()
         m_moduleFinder->start();
     }
 #endif
+    std::unique_ptr<QnScheduleSync> scheduleSync(
+        new QnScheduleSync
+    );
     emit started();
     exec();
 
