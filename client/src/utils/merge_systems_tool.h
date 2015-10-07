@@ -19,6 +19,7 @@ public:
         BackupError,
         NotFoundError,
         StarterLicenseError,
+        SafeModeError,
         ForbiddenError
     };
 

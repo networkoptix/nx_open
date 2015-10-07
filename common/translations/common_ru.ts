@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -27,10 +27,6 @@
 </context>
 <context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>User Defined (%1)</source>
-        <translation>Определено пользователем (%1)</translation>
-    </message>
     <message>
         <source>Motion on Camera</source>
         <translation>Детектор движения на камере</translation>
@@ -192,10 +188,6 @@
         <translation>Обнаружена потеря RTP пакетов.</translation>
     </message>
     <message>
-        <source>Server started after crash.</source>
-        <translation>Сервер запустился после сбоя.</translation>
-    </message>
-    <message>
         <source>I/O error has occurred at %1.</source>
         <translation>Ошибка ввода/вывода на %1.</translation>
     </message>
@@ -238,10 +230,6 @@
     <message>
         <source>An unknown event has occurred</source>
         <translation>Произошло неизвестное событие</translation>
-    </message>
-    <message>
-        <source>Input Port: %1</source>
-        <translation>Тревожный вход: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
@@ -294,25 +282,48 @@
     </message>
     <message>
         <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>IP конфликт: %1 %2</translation>
-    </message>
-    <message>
-        <source>%1 #%2 MAC: %3</source>
-        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation>%1 #%2, MAC адрес: %3</translation>
-    </message>
-    <message>
-        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation>Подключение к %1 (основной поток) было неожиданно сброшено.</translation>
-    </message>
-    <message>
-        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation>Подключение к %1 (второй поток) было неожиданно сброшено.</translation>
     </message>
     <message>
         <source>Recording on %1 is disabled: </source>
         <translation>Запись на %1 отключена: </translation>
+    </message>
+    <message>
+        <source>Generic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server restarted unexpectedly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -403,14 +414,10 @@
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Убедитесь, что порт %2 доступен (напр. проброшен). Попробуйте перезагрузить устройство, затем сбросить настройки через веб-интерфейс.</translation>
     </message>
     <message>
         <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Убедитесь, что устройство подключено к сети. Попробуйте перезагрузить устройство.</translation>
     </message>
     <message>
@@ -419,23 +426,14 @@
     </message>
     <message>
         <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Попробуйте перезагрузить устройство, затем сбросить настройки через веб-интерфейс.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Сначала попробуйте включить запись (если она отключена) и снизить FPS в настройках устройства.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
         <translation>Если это не поможет, восстановите заводские настройки в веб-интерфейсе устройства. Если проблема не исчезнет, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
@@ -1060,6 +1058,18 @@
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation>Время серверов не синхронизировано и общее время не моэжет быть вычислено автоматически.</translation>
+    </message>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The system is running in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any configuration changes except license activation are impossible.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

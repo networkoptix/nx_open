@@ -1,8 +1,11 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/device_dependent_strings.h>
+
 #include <ui/actions/action_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
+
 
 class QnActionTextFactory: public QObject, public QnWorkbenchContextAware {
 public:
@@ -52,11 +55,11 @@ public:
 
 class QnDevicesNameActionTextFactory: public QnActionTextFactory {
 public:
-    QnDevicesNameActionTextFactory(const QString &textTemplate, QObject *parent = NULL): 
+    QnDevicesNameActionTextFactory(const QnCameraDeviceStringSet &stringSet, QObject *parent = NULL): 
         QnActionTextFactory(parent),
-        m_template(textTemplate)
+        m_stringSet(stringSet)
     {}
     virtual QString text(const QnResourceList &resources) const override;
 private:
-    const QString m_template;
+    const QnCameraDeviceStringSet m_stringSet;
 };

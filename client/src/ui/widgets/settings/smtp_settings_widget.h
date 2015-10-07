@@ -32,6 +32,10 @@ public:
 
     virtual bool confirm() override;
     virtual bool discard() override;
+
+protected:
+    virtual void setReadOnlyInternal(bool readOnly) override;
+
 private:
     QnEmailSettings settings() const;
     void stopTesting(const QString &result = QString());

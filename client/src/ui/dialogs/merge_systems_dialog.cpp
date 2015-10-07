@@ -201,6 +201,9 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     case QnMergeSystemsTool::VersionError:
         updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
         break;
+    case QnMergeSystemsTool::SafeModeError:
+        updateErrorLabel(tr("The discovered system %1 is in safe mode.").arg(moduleInformation.systemName));
+        break;
     default:
         updateErrorLabel(tr("The system was not found."));
         break;
@@ -227,7 +230,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnMod
             message = tr("The password is invalid.");
             break;
         case QnMergeSystemsTool::VersionError:
-            updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
+            message = tr("System has an incompatible version.");
             break;
         case QnMergeSystemsTool::BackupError:
             message = tr("Could not create a backup of the server database.");
@@ -237,6 +240,9 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnMod
             break;
         case QnMergeSystemsTool::ForbiddenError:
             message = tr("Operation is not permitted.");
+            break;
+        case QnMergeSystemsTool::SafeModeError:
+            message = tr("System is in safe mode.");
             break;
         default:
             break;

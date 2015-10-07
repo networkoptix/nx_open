@@ -15,7 +15,6 @@ ScrollView
 
     function tryChangeSelection(func)
     {
-        console.log("tryChangeSelectedServers ", askForSelectionChange);
         if (selectionView.askForSelectionChange)
         {
             confirmationDialog.changeSelectionFunc = function() { func(); };

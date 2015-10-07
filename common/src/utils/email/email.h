@@ -31,7 +31,7 @@ struct QnEmailSettings {
     QString user;                       /**< Username for smtp authorization. */
     QString password;                   /**< Password for smtp authorization. */
     QString signature;                  /**< Signature text. Used in the email text. */
-    QString supportEmail;               /**< Support email. Used in the email text. */
+    QString supportEmail;               /**< Support link. Named as email to maintain compatibility. */
     QnEmail::ConnectionType connectionType;      /**< Connection protocol (TLS/SSL/Unsecure). */
     int port;                           /**< Smtp server port. */
     int timeout;                        /**< Connection timeout. */

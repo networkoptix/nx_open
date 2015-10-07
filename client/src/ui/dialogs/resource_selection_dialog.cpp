@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -87,7 +88,10 @@ void QnResourceSelectionDialog::init() {
         resize(minimumSize());
         break;
     case CameraResourceTarget:
-        setWindowTitle(tr("Select %1...").arg(getDefaultDevicesName()));
+        setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Select Devices..."),
+            tr("Select Cameras...")
+            ));
         break;
     default:
         setWindowTitle(tr("Select Resources..."));
