@@ -24,6 +24,7 @@ QStringList smartSplit(const QString& data, const QChar delimiter, QString::Spli
 
 QByteArray unquoteStr(const QByteArray& v);
 QString unquoteStr(const QString& v);
+
 QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter);
 
 class HttpAuthenticationClientContext;

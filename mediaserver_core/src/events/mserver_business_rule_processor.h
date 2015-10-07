@@ -38,9 +38,72 @@ private:
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &resource);
 
 private:
+    class SendEmailAggregationKey
+    {
+    public:
+        QnBusiness::EventType eventType;
+        QString recipients;
+
+        SendEmailAggregationKey()
+            :
+            eventType( QnBusiness::UndefinedEvent )
+        {
+        }
+
+        SendEmailAggregationKey(
+            QnBusiness::EventType _eventType,
+            QString _recipients )
+            :
+        eventType( _eventType ),
+            recipients( _recipients )
+        {
+        }
+
+        bool operator<( const SendEmailAggregationKey& right ) const
+        {
+            if( eventType < right.eventType )
+                return true;
+            if( right.eventType < eventType )
+                return false;
+            return recipients < right.recipients;
+        }
+    };
+
+    class SendEmailAggregationData
+    {
+    public:
+        QnSendMailBusinessActionPtr action;
+        quint64 periodicTaskID;
+        int eventCount;
+
+        SendEmailAggregationData() : periodicTaskID(0), eventCount(0) {}
+    };
+
 
     QMap<QnUuid, qint64> m_runningBookmarkActions;
+    QScopedPointer<EmailManagerImpl> m_emailManager;
+    QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
+private:
+    bool sendMail(const QnSendMailBusinessActionPtr& action );
+    QVariantHash eventDescriptionMap(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, QnEmailAttachmentList& attachments, bool useIp);
+    void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
+    bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
+    void sendEmailAsync(const ec2::ApiEmailData& data);
+    QString formatEmailList(const QStringList& value);
 
+    static QVariantHash eventDetailsMap(
+        const QnAbstractBusinessActionPtr& action,
+        const QnInfoDetail& aggregationData,
+        bool useIp,
+        bool addSubAggregationData = true );
+
+    static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
+        const QnBusinessAggregationInfo& aggregationInfo,
+        bool useIp);
+    static QVariantList aggregatedEventDetailsMap(
+        const QnAbstractBusinessActionPtr& action,
+        const QList<QnInfoDetail>& aggregationDetailList,
+        bool useIp );
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

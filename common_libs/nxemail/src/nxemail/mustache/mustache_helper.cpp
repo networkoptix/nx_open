@@ -1,12 +1,13 @@
-#include "mustache/mustache_helper.h"
 
-#ifdef ENABLE_SENDMAIL
+#include "mustache_helper.h"
+
 
 #include <QtCore/QFile>
 #include <QtCore/QIODevice>
 #include <QtCore/QFileInfo>
 
 #include <common/common_globals.h>
+
 
 QString renderTemplateFromFile(const QString& filename, const QVariantHash& contextMap) {
     QFile templateFile(filename);
@@ -18,5 +19,3 @@ QString renderTemplateFromFile(const QString& filename, const QVariantHash& cont
     Mustache::QtVariantContext context(contextMap, &partialLoader);
     return renderer.render(_template, &context);
 }
-
-#endif // ENABLE_SENDMAIL

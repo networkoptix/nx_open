@@ -140,7 +140,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     case CameraIpConflictEvent:       
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-        //: Camera IP Conflict at <server_name>
+    		//: Device IP Conflict at <server_name>
             tr("Device IP Conflict at %1"),
 
             //: Camera IP Conflict at <server_name>

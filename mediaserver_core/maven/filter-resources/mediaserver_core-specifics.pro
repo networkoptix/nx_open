@@ -8,6 +8,7 @@ exists( ${libdir}/libcreateprocess.pri ) {
 }
 
 INCLUDEPATH += ${root.dir}/appserver2/src/
+INCLUDEPATH += ${root.dir}/common_libs/nxemail/src/
 
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug

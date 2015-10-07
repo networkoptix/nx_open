@@ -17,7 +17,6 @@
 
 #include <core/resource_management/resource_pool.h>
 #include "qjsonobject.h"
-#include "mustache/mustache.h"
 
 //#define QN_NO_LICENSE_CHECK
 
@@ -268,7 +267,6 @@ QList<Qn::LicenseType> QnLicenseUsageHelper::licenseTypes() const {
 QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage) {
     QString messageId = errorMessage.value(lit("messageId")).toString();
     QString message = errorMessage.value(lit("message")).toString();
-    QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
 
     if(messageId == lit("DatabaseError")) {
         message = tr("There was a problem activating your license key. A database error has occurred.");  //TODO: Feature #3629 case J
@@ -283,7 +281,7 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
         message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.");
     }
 
-    return Mustache::renderTemplate(message, arguments);
+    return message;
 }
 
 /************************************************************************/
