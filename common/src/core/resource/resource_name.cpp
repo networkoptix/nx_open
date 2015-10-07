@@ -33,15 +33,3 @@ QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {
     }
     return baseName;
 }
-
-QString getNumericDevicesName(const QnVirtualCameraResourceList &devices, bool capitalize /* = true*/) {
-    return QnDeviceDependentStrings::getNumericName(devices, capitalize);
-}
-
-QString getDefaultDeviceNameLower(const QnVirtualCameraResourcePtr &device /* = QnVirtualCameraResourcePtr()*/) {
-    return QnDeviceDependentStrings::getDefaultNameLower(device);
-}
-
-QString getDefaultDeviceNameUpper(const QnVirtualCameraResourcePtr &device /* = QnVirtualCameraResourcePtr()*/) {
-    return QnDeviceDependentStrings::getDefaultNameUpper(device);
-}

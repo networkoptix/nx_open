@@ -115,10 +115,13 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Undefined event has occurred on %1").arg(resourceName);
 
     case CameraDisconnectEvent:
-        //: Camera <camera_name> was disconnected
-        return tr("%1 %2 was disconnected")
-            .arg(getDefaultDeviceNameUpper(camera))
-            .arg(resourceName);
+        return QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Device %1 was disconnected"),
+                tr("Camera %1 was disconnected"),
+                tr("IO Module %1 was disconnected")
+            ), camera
+        ).arg(resourceName);
 
     case CameraInputEvent:
         return tr("Input on %1").arg(resourceName);

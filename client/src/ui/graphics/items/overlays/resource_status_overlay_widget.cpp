@@ -6,6 +6,7 @@
 #include <QtCore/QtMath>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 
 #include <utils/common/scoped_painter_rollback.h>
@@ -68,7 +69,13 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(const QnResourcePtr &resource, QGra
     m_staticTexts[OfflineText] = tr("NO SIGNAL");
     m_staticTexts[ServerOfflineText] = tr("Server Offline");
     m_staticTexts[UnauthorizedText] = tr("Unauthorized");
-    m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information in %1 settings").arg(getDefaultDeviceNameLower(camera));
+    m_staticTexts[UnauthorizedSubText] = QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Please check authentication information in device settings"),
+                tr("Please check authentication information in camera settings"),
+                tr("Please check authentication information in IO module settings")
+            ), camera
+        );
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
     m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");

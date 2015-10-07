@@ -2,6 +2,7 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <common/user_permissions.h>
@@ -131,9 +132,10 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user)
         permissionStrings.append(tr("View live video"));
 
     if (permissions & Qn::GlobalEditCamerasPermission)
-        //: "Adjust camera settings" or "Adjust device settings"
-        permissionStrings.append(tr("Adjust %1 settings").arg(getDefaultDeviceNameLower()));
-
+        permissionStrings.append(QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Adjust device settings"),
+            tr("Adjust camera settings")
+        ));
     if (permissions & Qn::GlobalPtzControlPermission)
         permissionStrings.append(tr("Use PTZ controls"));
     if (permissions & Qn::GlobalViewArchivePermission)

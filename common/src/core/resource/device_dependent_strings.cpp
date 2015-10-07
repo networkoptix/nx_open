@@ -142,42 +142,6 @@ bool QnCameraDeviceStringSet::isValid() const {
 /************************************************************************/
 /* QnDeviceDependentStrings                                             */
 /************************************************************************/
-
-QString QnDeviceDependentStrings::getDefaultName(bool plural /*= true*/, bool capitalize /*= true*/) {
-    QnCameraDeviceType deviceType = calculateDefaultDeviceType();
-    if (deviceType == Camera)
-        return QnResourceNameStrings::defaultCameras(plural, capitalize);
-    return QnResourceNameStrings::defaultDevices(plural, capitalize);
-}
-
-QString QnDeviceDependentStrings::getDefaultName(const QnVirtualCameraResourceList &devices, bool capitalize /*= true*/) {
-    bool plural = devices.size() != 1;
-
-    QnCameraDeviceType deviceType = calculateDeviceType(devices);
-    switch (deviceType) {
-    case Camera:
-        return QnResourceNameStrings::defaultCameras(plural, capitalize);
-    case IOModule:
-        return QnResourceNameStrings::defaultIoModules(plural, capitalize);
-    default:
-        break;
-    }
-    Q_ASSERT_X(deviceType == Mixed, Q_FUNC_INFO, "All fixed device types should be handled");
-    return QnResourceNameStrings::defaultDevices(plural, capitalize);
-}
-
-QString QnDeviceDependentStrings::getDefaultNameLower(const QnVirtualCameraResourcePtr &device /*= QnVirtualCameraResourcePtr()*/) {
-    if (device)
-        return getDefaultName(QnVirtualCameraResourceList() << device, false);
-    return getDefaultName(false, false);
-}
-
-QString QnDeviceDependentStrings::getDefaultNameUpper(const QnVirtualCameraResourcePtr &device /*= QnVirtualCameraResourcePtr()*/) {
-    if (device)
-        return getDefaultName(QnVirtualCameraResourceList() << device, true);
-    return getDefaultName(false, true);
-}
-
 QString QnDeviceDependentStrings::getNumericName(const QnVirtualCameraResourceList &devices, bool capitalize /*= true*/) {
     QnCameraDeviceType deviceType = calculateDeviceType(devices);
     switch (deviceType) {
@@ -197,7 +161,11 @@ QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &
 }
 
 QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourcePtr &device) {
-    return set.getString(calculateDeviceType(QnVirtualCameraResourceList() << device), false);
+    return set.getString(
+        device 
+        ? calculateDeviceType(QnVirtualCameraResourceList() << device)
+        : calculateDefaultDeviceType()
+    , false);
 }
 
 QString QnDeviceDependentStrings::getDefaultNameFromSet(const QnCameraDeviceStringSet &set) {
