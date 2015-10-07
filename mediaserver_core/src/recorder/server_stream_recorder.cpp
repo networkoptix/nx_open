@@ -1,5 +1,7 @@
 #include "server_stream_recorder.h"
 
+#include <common/common_module.h>
+#include <common/common_globals.h>
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -39,8 +41,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_queuedSize(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_diskErrorWarned(false),
-    m_rebuildBlocked(false),
-    m_recordRedundant(false)
+    m_rebuildBlocked(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -527,6 +528,30 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
     }
 }
 
+bool QnServerStreamRecorder::isRedundantSyncOn() const 
+{
+    auto resource = qnResPool->getResourceById(
+        qnCommon->moduleGUID()
+    );
+    auto mediaServer = resource.dynamicCast<QnMediaServerResource>();
+    Q_ASSERT(mediaServer);
+
+    if (!(mediaServer->getBackupType() & Qn::Backup_RealTime))
+        return false;
+
+    auto cam = m_device.dynamicCast<QnSecurityCamResource>();
+    Q_ASSERT(cam);
+
+    Qn::CameraBackupTypes cameraBackupMode = cam->getBackupType();
+    if (m_catalog == QnServer::HiQualityCatalog && !(cameraBackupMode & Qn::CameraBackup_HighQuality) ||
+        m_catalog == QnServer::LowQualityCatalog && !(cameraBackupMode & Qn::CameraBackup_LowQuality))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
 {
     if (!m_fixedFileName)
@@ -536,11 +561,11 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
         m_recordingContextVector.clear();
         QnStorageResourcePtr storages[2] = {QnStorageResourcePtr(), QnStorageResourcePtr()};
         
-        storages[0] = qnNormalStorageMan->getOptimalStorageRoot(provider);
-        if (m_recordRedundant)
-            storages[1] = qnBackupStorageMan->getOptimalStorageRoot(provider);
+        storages[QnServer::ArchiveKind::Normal] = qnNormalStorageMan->getOptimalStorageRoot(provider);
+        if (isRedundantSyncOn())
+            storages[QnServer::ArchiveKind::Backup] = qnBackupStorageMan->getOptimalStorageRoot(provider);
 
-        if (storages[0] || storages[1])
+        if (storages[QnServer::ArchiveKind::Normal] || storages[QnServer::ArchiveKind::Backup])
             setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
 
         if (storages[QnServer::ArchiveKind::Normal])

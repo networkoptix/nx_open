@@ -39,9 +39,9 @@ public:
     //!User-given name of camera (can be different from resource name). This is name shown to the user
     QString name;
     QString groupName;
-    QnMediaDewarpingParams dewarpingParams;
-    Qn::FailoverPriority failoverPriority;
-    bool redundantSyncOn;
+    QnMediaDewarpingParams  dewarpingParams;
+    Qn::FailoverPriority    failoverPriority;
+    Qn::CameraBackupTypes   backupType;
 
     QnCameraUserAttributes();
 

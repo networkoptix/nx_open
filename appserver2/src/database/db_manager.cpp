@@ -1715,7 +1715,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             max_archive_days,               \
             prefered_server_id,             \
             license_used,                   \
-            failover_priority               \
+            failover_priority,              \
+            backup_type                     \
             )                               \
          VALUES (                           \
             :cameraID,                      \
@@ -1732,7 +1733,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :maxArchiveDays,                \
             :preferedServerId,              \
             :licenseUsed,                   \
-            :failoverPriority               \
+            :failoverPriority,              \
+            :backupType                     \
             )                               \
         ");
     QnSql::bind(data, &insQuery);
@@ -3111,7 +3113,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
             max_archive_days as maxArchiveDays,          \
             prefered_server_id as preferedServerId,      \
             license_used as licenseUsed,                 \
-            failover_priority as failoverPriority        \
+            failover_priority as failoverPriority,       \
+            backup_type as backupType                    \
          FROM vms_camera_user_attributes                 \
          LEFT JOIN vms_resource r on r.guid = camera_guid     \
          %1                                              \

@@ -59,6 +59,20 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupTypes,
     (Qn::Backup_Schedule,          "BackupSchedule")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::CameraBackupType,
+    (Qn::CameraBackup_Disabled,          "CameraBackupDisabled")
+    (Qn::CameraBackup_HighQuality,       "CameraBackupHighQuality")
+    (Qn::CameraBackup_LowQuality,        "CameraBackupLowQuality")
+    (Qn::CameraBackup_Both,              "CameraBackupBoth")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::CameraBackupTypes,
+    (Qn::CameraBackup_Disabled,          "CameraBackupDisabled")
+    (Qn::CameraBackup_HighQuality,       "CameraBackupHighQuality")
+    (Qn::CameraBackup_LowQuality,        "CameraBackupLowQuality")
+    (Qn::CameraBackup_Both,              "CameraBackupBoth")
+)
+
 // TODO: #Elric #2.3 code duplication ^v
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTrait,
     (Qn::FourWayPtzTrait,          "FourWayPtz")

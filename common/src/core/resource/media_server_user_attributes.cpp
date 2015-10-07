@@ -9,7 +9,9 @@
 QnMediaServerUserAttributes::QnMediaServerUserAttributes()
 :
     maxCameras(0),
-    isRedundancyEnabled(false)
+    isRedundancyEnabled(false),
+    backupType(Qn::Backup_Disabled),
+    backupDaysOfTheWeek(-1)
 {
 }
 
@@ -24,17 +26,20 @@ void QnMediaServerUserAttributes::assign(
     if (name != right.name)
         modifiedFields->insert("nameChanged");
 
+    if (backupType != right.backupType)
+        modifiedFields->insert("backupType");
+
     if (backupDaysOfTheWeek != right.backupDaysOfTheWeek)
-        modifiedFields->insert("redundantDaysOfTheWeekChanged");
+        modifiedFields->insert("backupDaysOfTheWeekChanged");
 
     if (backupBitrate != right.backupBitrate)
-        modifiedFields->insert("redundantBitrateChanged");
+        modifiedFields->insert("backupBitrateChanged");
 
     if (backupDuration != right.backupDuration)
-        modifiedFields->insert("redundantDurationChanged");
+        modifiedFields->insert("backupDurationChanged");
 
     if (backupStart != right.backupStart)
-        modifiedFields->insert("redundantStartChanged");
+        modifiedFields->insert("backupStartChanged");
 
     *this = right;
 }

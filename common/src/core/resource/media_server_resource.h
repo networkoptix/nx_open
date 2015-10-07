@@ -72,6 +72,7 @@ public:
     void setRedundancy(bool value);
     bool isRedundancy() const;
 
+    Qn::BackupTypes getBackupType() const;
     int getBackupDOW() const;
     int getBackupStart() const;
     int getBackupDuration() const;

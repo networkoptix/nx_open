@@ -56,6 +56,16 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
 }
 
+Qn::BackupTypes QnMediaServerResource::getBackupType() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+    );
+
+    return (*lk)->backupType;
+}
+
 QnMediaServerResource::~QnMediaServerResource()
 {
     QnMutexLocker lock( &m_mutex );

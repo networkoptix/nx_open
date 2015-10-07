@@ -160,6 +160,9 @@ public:
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
 
+    Qn::CameraBackupTypes getBackupType() const;
+    void setBackupType(Qn::CameraBackupTypes value);
+
     QString getModel() const;
     void setModel(const QString &model);
 

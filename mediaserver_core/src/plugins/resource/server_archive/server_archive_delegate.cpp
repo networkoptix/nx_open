@@ -454,13 +454,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newCh
     QString url = newCatalog->fullFileName(m_currentChunk);
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));
     m_aviDelegate->close();
-    
-    if (newCatalog->getKind() == QnServer::ArchiveKind::Normal)
-        m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url));
-    else if (newCatalog->getKind() == QnServer::ArchiveKind::Backup)
-        m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url));
-    else
-        assert(0);
+    m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url));
 
     bool rez = m_aviDelegate->open(m_fileRes);
     if (rez)
@@ -518,19 +512,11 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
             m_newQualityAviDelegate->setUseAbsolutePos(false);
             m_newQualityAviDelegate->setFastStreamFind(true);
 
-            if (i == QnServer::ArchiveKind::Normal)
-                m_newQualityAviDelegate->setStorage(
-                    QnStorageManager::getStorageByUrl(
-                        m_newQualityFileRes->getUrl()
-                    )
-                );
-
-            else if (i == QnServer::ArchiveKind::Backup)
-                m_newQualityAviDelegate->setStorage(
-                    QnStorageManager::getStorageByUrl(
-                        m_newQualityFileRes->getUrl()
-                    )
-                );
+            m_newQualityAviDelegate->setStorage(
+                QnStorageManager::getStorageByUrl(
+                    m_newQualityFileRes->getUrl()
+                )
+            );
 
             if (!m_newQualityAviDelegate->open(m_newQualityFileRes))
                 continue;

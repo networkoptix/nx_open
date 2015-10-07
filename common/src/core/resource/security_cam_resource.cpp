@@ -762,6 +762,18 @@ void QnSecurityCamResource::setManuallyAdded(bool value) {
     m_manuallyAdded = value;
 }
 
+Qn::CameraBackupTypes QnSecurityCamResource::getBackupType() const
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+    return (*userAttributesLock)->backupType;
+}
+
+void QnSecurityCamResource::setBackupType(Qn::CameraBackupTypes value)
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+    (*userAttributesLock)->backupType = value;
+}
+
 void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality) {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     (*userAttributesLock)->secondaryQuality = quality;

@@ -181,15 +181,6 @@ private:
     // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalizePeriodMs
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
 
-    // redundant storages
-    void startRedundantSyncWatchdog();
-    void stopRedundantSyncWatchdog();
-
-    template<typename NeedStopCB>
-    void synchronizeStorages(
-        QnStorageResourcePtr   storage,
-        NeedStopCB             needStop
-    );
 private:
     QnServer::ArchiveKind   m_kind;
     StorageMap              m_storageRoots;
@@ -230,9 +221,6 @@ private:
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
     QElapsedTimer m_removeEmtyDirTimer;
-
-    std::atomic<bool>   m_redundantSyncOn;
-    std::future<void>   m_redundantFuture;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
