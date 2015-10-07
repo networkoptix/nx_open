@@ -17,6 +17,7 @@ Window {
 
     property string activeResourceId
 
+    property string currentSystemName
     property string currentHost
     property int currentPort
     property string currentLogin
@@ -187,14 +188,11 @@ Window {
         }
 
         onConnectionFailed: {
-            if (stackView.depth > 1) /* we are in login page */
-                return
-
             Main.openFailedSession(
                         currentSessionId,
                         currentHost, currentPort,
                         currentLogin, currentPasswrod,
-                        loginSessionManager.lastUsedSessionSystemName(),
+                        currentSystemName,
                         status, statusMessage)
         }
     }
@@ -207,6 +205,7 @@ Window {
     Component.onCompleted: {
         updateNavigationBarPlaceholderSize()
         if (loginSessionManager.lastUsedSessionId) {
+            currentSystemName = loginSessionManager.lastUsedSessionSystemName()
             stackView.push(resourcesPageComponent)
             LoginFunctions.connectToServer(
                         loginSessionManager.lastUsedSessionId,

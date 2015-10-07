@@ -65,30 +65,53 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
 }
 
 function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, statusMessage) {
+    var push = stackView.depth == 1
+    var item
+
+    if (!push) {
+        item = stackView.find(function(item, index) {return item.objectName === "loginPage"})
+        if (!item)
+            push = true
+    }
+
     sideNavigation.hide()
-    sideNavigation.enabled = false
     menuBackButton.animateToBack()
+    sideNavigation.enabled = false
 
-    stackView.push({
-        item: Qt.resolvedUrl("items/QnLoginPage.qml"),
-        properties: {
-            title: _systemName,
-            host: _host,
-            port: _port,
-            login: _login,
-            password: _password,
-            sessionId: _sessionId,
-            state: "FailedSaved"
-        }
-    })
+    if (push) {
+        var pushList = []
+        if (stackView.depth == 1)
+            pushList.push(loginPageComponent)
+        pushList.push({
+            item: Qt.resolvedUrl("items/QnLoginPage.qml"),
+            properties: {
+                title: _systemName,
+                host: _host,
+                port: _port,
+                login: _login,
+                password: _password,
+                sessionId: _sessionId,
+                state: "FailedSaved"
+            }
+        })
+        stackView.push(pushList)
+        item = stackView.get(stackView.depth - 1)
+    } else {
+        item.title = _systemName
+        item.host = _host
+        item.port = _port
+        item.login = _login
+        item.password = _password
+        item.sessionId = _sessionId
+    }
 
-    var item = stackView.get(stackView.depth - 1)
     item.showWarning(status, statusMessage)
 }
 
 function gotoNewSession() {
     mainWindow.currentSessionId = ""
     sideNavigation.enabled = true
+    menuBackButton.animateToMenu()
 
     if (connectionManager.connected) {
         connectionManager.disconnectFromServer(true)
@@ -97,12 +120,10 @@ function gotoNewSession() {
 
     var item = stackView.find(function(item, index) { return item.objectName === "newConnectionPage" })
 
-    if (item) {
-        menuBackButton.animateToMenu()
+    if (item)
         stackView.pop(item)
-    } else {
+    else
         stackView.push(loginPageComponent)
-    }
 }
 
 function gotoResources() {
@@ -112,7 +133,7 @@ function gotoResources() {
         menuBackButton.animateToMenu()
         sideNavigation.enabled = true
     }
-    stackView.pop(stackView.get(0))
+    stackView.pop(item)
 }
 
 function gotoMainScreen() {
@@ -146,7 +167,7 @@ function backPressed() {
     if (sideNavigation.open) {
         sideNavigation.hide()
         return true
-    } else if (stackView.depth > 1) {
+    } else if (stackView.depth == 1 || stackView.get(stackView.depth - 1).objectName == "newConnectionPage") {
         gotoMainScreen()
         return true
     }
