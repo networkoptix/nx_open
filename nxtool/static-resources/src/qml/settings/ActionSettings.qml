@@ -65,7 +65,7 @@ Expandable.GenericSettingsPanel
 
                 onClicked:
                 {
-                    confirmationDialog.message = qsTr("Are you sure you want to restart server(s)?");
+                    confirmationDialog.message = qsTr("Are you sure you want to restart the server(s)?");
                     confirmationDialog.confirmedHandler = function()
                     {
                         rtuContext.changesManager().changeset().addSoftRestartAction();
@@ -86,7 +86,7 @@ Expandable.GenericSettingsPanel
 
                 onClicked:
                 {
-                    confirmationDialog.message = qsTr("Are you sure you want to reboot server(s)?");
+                    confirmationDialog.message = qsTr("Are you sure you want to reboot the server(s)?");
                     confirmationDialog.confirmedHandler = function()
                     {
                         rtuContext.changesManager().changeset().addOsRestartAction();
@@ -121,7 +121,7 @@ Expandable.GenericSettingsPanel
 
                 onClicked:
                 {
-                    confirmationDialog.message = qsTr("Are you sure you want to restore factory default settings on selected server(s)?");
+                    confirmationDialog.message = qsTr("Are you sure you want to restore factory default settings on the selected server(s)?");
                     confirmationDialog.confirmedHandler = function()
                     {
                         rtuContext.changesManager().changeset().addFactoryDefaultsAction();
@@ -144,7 +144,7 @@ Expandable.GenericSettingsPanel
 
                 onClicked:
                 {
-                    confirmationDialog.message = qsTr("Are you sure you want to restore factory default settings on selected server(s)?");
+                    confirmationDialog.message = qsTr("Are you sure you want to restore factory default settings on the selected server(s)?");
                     confirmationDialog.confirmedHandler = function()
                     {
                         rtuContext.changesManager().changeset().addFactoryDefaultsButNetworkAction();

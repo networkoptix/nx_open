@@ -937,6 +937,11 @@ namespace Qn {
         ToggleThumbnailsAction,
 
         /**
+         * Shows/hides bookmarks.
+         */
+        BookmarksModeAction,
+
+        /**
          * Shows/hides calendar.
          */
         ToggleCalendarAction,

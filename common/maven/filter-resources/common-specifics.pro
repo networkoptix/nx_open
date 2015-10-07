@@ -2,7 +2,7 @@ exists( ${libdir}/libcreateprocess.pri ) {
   include( ${libdir}/libcreateprocess.pri )
 }
 
-mac {
+mac:!ios {
   OBJECTIVE_SOURCES += ${basedir}/src/utils/mac_utils.mm
   LIBS += -lobjc -framework Foundation -framework AppKit
 }

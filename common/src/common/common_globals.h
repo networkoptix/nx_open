@@ -458,6 +458,7 @@ public:
         LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
+        LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
@@ -556,7 +557,9 @@ public:
         AlternateColorRole,                         /**< Use alternate color in painting */
         AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
 
-        LastItemDataRole
+        LastItemDataRole,
+
+        RoleCount
     };
 
     // TODO: #Elric #EC2 rename

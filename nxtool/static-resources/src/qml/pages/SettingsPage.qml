@@ -198,8 +198,8 @@ FocusScope
             font.pixelSize: Common.SizeManager.fontSizes.medium;
 
             text: (rtuContext.selection.count == 1
-                ? qsTr("Selected server is in Safe Mode.\nAny changes cannot be applied")
-                : qsTr("Some of selected servers are in Safe Mode.\nAny changes cannot be applied"))
+                ? qsTr("Selected server is in Safe Mode.\nNo changes can be applied")
+                : qsTr("Some of selected servers are in Safe Mode.\nNo changes can be applied"))
             color: "#4B1010";
         }
     }

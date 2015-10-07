@@ -18,12 +18,12 @@ public:
     QnNetworkProxyFactory();
     virtual ~QnNetworkProxyFactory();
 
-    QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString());
+    virtual QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString());
 
     /*!
         \param via In not NULL filled with server, request is to be sent to
     */
-    QNetworkProxy proxyToResource(
+    virtual QNetworkProxy proxyToResource(
         const QnResourcePtr &resource,
         QnMediaServerResourcePtr* const via = nullptr );
 

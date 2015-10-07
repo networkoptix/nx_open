@@ -12,9 +12,8 @@ bool QnCameraBookmark::isNull() const {
     return guid.isNull();
 }
 
-QString QnCameraBookmark::tagsAsString() const {
-    static const QString kDelimiter = lit(" ");
-    return tags.join(kDelimiter);
+QString QnCameraBookmark::tagsAsString(QChar delimiter) const {
+    return QStringList(tags.toList()).join(delimiter);
 }
 
 //TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
@@ -125,6 +124,14 @@ bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {
     return first.startTimeMs < other.startTimeMs;
 }
 
+bool operator<(qint64 first, const QnCameraBookmark &other) {
+    return first < other.startTimeMs;
+}
+
+bool operator<(const QnCameraBookmark &first, qint64 other) {
+    return first.startTimeMs < other;
+}
+
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
     if (bookmark.durationMs > 0)
         dbg.nospace() << "QnCameraBookmark(" << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs).toString(lit("dd hh:mm"))
@@ -133,7 +140,7 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
         dbg.nospace() << "QnCameraBookmark INSTANT (" << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs).toString(lit("dd hh:mm")) << ')';
     dbg.space() << "timeout" << bookmark.timeout;
     dbg.space() << bookmark.name << bookmark.description;
-    dbg.space() << bookmark.tags.join(lit(", "));
+    dbg.space() << bookmark.tagsAsString(L' ');
     return dbg.space();
 }
 
@@ -144,9 +151,12 @@ QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
     strategy(Qn::EarliestFirst)
 {}
 
+bool QnCameraBookmarkSearchFilter::isValid() const {
+    return startTimeMs <= endTimeMs && limit > 0;
+}
 
-void serialize_field(const QStringList& /*value*/, QVariant* /*target*/) {return ;}
-void deserialize_field(const QVariant& /*value*/, QStringList* /*target*/) {return ;}
+void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/) {return ;}
+void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmark_Fields, (optional, true) )
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq), QnCameraBookmarkSearchFilter_Fields, (optional, true) )

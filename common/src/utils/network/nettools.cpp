@@ -20,7 +20,9 @@
 #   include <arpa/inet.h>
 #   include <sys/socket.h>
 #   include <netdb.h>
-#   include <ifaddrs.h>
+#   ifndef Q_OS_ANDROID
+#      include <ifaddrs.h>
+#   endif
 #   include <unistd.h>
 #   include <net/if.h>
 #   include <sys/types.h>
@@ -32,13 +34,15 @@
 #   include <sys/sysctl.h>
 #   include <net/if.h>
 #   include <net/if_dl.h>
-#   include <net/route.h>
 #   include <netinet/in.h>
-#   include <netinet/if_ether.h>
 #   include <arpa/inet.h>
 #   include <err.h>
 #   include <stdio.h>
 #   include <stdlib.h>
+#   ifndef Q_OS_IOS
+#      include <net/route.h>
+#      include <netinet/if_ether.h>
+#   endif
 #endif
 
 /*
@@ -517,6 +521,12 @@ QHostAddress getGatewayOfIf( const QString& ip )
 #elif defined(Q_OS_MAC)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
+#ifdef Q_OS_IOS
+QString getMacByIP(const QHostAddress& ip, bool /*net*/) {
+    return QString();
+}
+#else
+
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
@@ -574,6 +584,8 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     return QString();
 }
+
+#endif
 
 QHostAddress getGatewayOfIf(const QString& ip)
 {

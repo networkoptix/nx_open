@@ -1,5 +1,7 @@
 #include "qtfile_storage_resource.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDir>
 
 #include "utils/common/util.h"
@@ -117,3 +119,5 @@ QnStorageResource* QnQtFileStorageResource::instance(const QString&)
 {
     return new QnQtFileStorageResource();
 }
+
+#endif //ENABLE_DATA_PROVIDERS

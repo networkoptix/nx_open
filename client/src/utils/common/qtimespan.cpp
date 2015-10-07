@@ -188,6 +188,7 @@ const QTimeSpan QTimeSpan::Day    = QTimeSpan(qint64(1000 * 60 * 60 * 24));
 const QTimeSpan QTimeSpan::Week   = QTimeSpan(qint64(1000 * 60 * 60 * 24 * 7));
 
 class QTimeSpanPrivate : public QSharedData {
+    Q_DECLARE_TR_FUNCTIONS(QTimeSpanPrivate)
 public:
     qint64 interval;
     QDateTime reference;
@@ -278,21 +279,21 @@ public:
     {
         switch (unit) {
         case::Qt::Milliseconds:
-            return qApp->translate("QTimeSpanPrivate", "%n millisecond(s)", "", num);
+            return tr("%n millisecond(s)", "", num);
         case::Qt::Seconds:
-            return qApp->translate("QTimeSpanPrivate", "%n second(s)", "", num);
+            return tr("%n second(s)", "", num);
         case::Qt::Minutes:
-            return qApp->translate("QTimeSpanPrivate", "%n minute(s)", "", num);
+            return tr("%n minute(s)", "", num);
         case::Qt::Hours:
-            return qApp->translate("QTimeSpanPrivate", "%n hour(s)", "", num);
+            return tr("%n hour(s)", "", num);
         case::Qt::Days:
-            return qApp->translate("QTimeSpanPrivate", "%n day(s)", "", num);
+            return tr("%n day(s)", "", num);
         case::Qt::Weeks:
-            return qApp->translate("QTimeSpanPrivate", "%n week(s)", "", num);
+            return tr("%n week(s)", "", num);
         case::Qt::Months:
-            return qApp->translate("QTimeSpanPrivate", "%n month(s)", "", num);
+            return tr("%n month(s)", "", num);
         case::Qt::Years:
-            return qApp->translate("QTimeSpanPrivate", "%n year(s)", "", num);
+            return tr("%n year(s)", "", num);
         default:
             return QString();
         }

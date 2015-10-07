@@ -93,26 +93,23 @@ public:
      * Average compressed QnTimePeriod size is close to 6 bytes in high-optimized mode and 7 bytes otherwise.
      * 
      * \param stream                    Byte array to compress time periods to. 
-     * \param intersected               Disables high-optimized mode. That allow time periods to be intersected.
      */
-    bool encode(QByteArray &stream, bool intersected = false);
+    bool encode(QByteArray &stream);
     
     /** 
      * Decode (decompress) data from a byte array. 
      * 
      * \param[in] stream                Byte array to decompress time periods from.
-     * \param[in] intersected           Flag that incoming time periods were encoded as intersected values.
      */
-    bool decode(QByteArray &stream, bool intersected = false);
+    bool decode(QByteArray &stream);
 
     /**
      * Decode (decompress) data from a byte array. 
      * 
      * \param[in] data                  Compressed data pointer.
      * \param[in] dataSize              Size of the compressed data.
-     * \param[in] intersected           Flag that incoming time periods were encoded as intersected values.
      */
-    bool decode(const quint8 *data, int dataSize, bool intersected = false);
+    bool decode(const quint8 *data, int dataSize);
 
     /** 
      * Find nearest period for specified time.
@@ -145,8 +142,34 @@ public:
 
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
 
-private:
+    /**
+     * Include a period to the period list
+     *
+     * \param[in] period                A period to be included.
+     *
+     * The function includes the given period to the list.
+     * If the period overlaps the other periods, all of them will be merged.
+     * If the period list is unsorted or contains overlapping periods
+     * the result is undefined.
+     */
+    void includeTimePeriod(const QnTimePeriod &period);
+
+    /**
+     * Exclude a period to the period list
+     *
+     * \param[in] period                A period to be excluded.
+     *
+     * The function excludes the given period from the list.
+     * If the period overlaps the other periods, intersected pieces or whole periods will be romoved.
+     * If the period list is unsorted or contains overlapping periods
+     * the result is undefined.
+     */
     void excludeTimePeriod(const QnTimePeriod &period);
+
+    /**
+     * Converts any period list to a simple list: sorted and containing only non-overlapped periods.
+     */
+    QnTimePeriodList simplified() const;
 };
 
 struct MultiServerPeriodData

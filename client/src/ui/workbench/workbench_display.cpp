@@ -1654,6 +1654,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     if (layout->resource())
         disconnect(layout->resource(), NULL, this, NULL);
 
+    layout->setData(Qn::LayoutBookmarksModeRole, action(Qn::BookmarksModeAction)->isChecked());
+
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
 
@@ -1708,6 +1710,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->start();
         }
     }
+
+    action(Qn::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
 
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());

@@ -15,6 +15,7 @@
 #include <business/business_resource_validation.h>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -74,8 +75,15 @@ QnBusinessRuleWidget::~QnBusinessRuleWidget()
 }
 
 void QnBusinessRuleWidget::retranslateUi() {
-    ui->eventResourcesHolder->setText(tr("<Any %1>").arg(getDefaultDeviceNameUpper()));
-    ui->actionResourcesHolder->setText(tr("<Select at least one %1>").arg(getDefaultDeviceNameLower()));
+    ui->eventResourcesHolder->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("<Any Device>"),
+        tr("<Any Camera>")
+    ));
+    
+    ui->actionResourcesHolder->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("<Select at least one device>"),
+        tr("<Select at least one camera>")
+    ));
 }
 
 

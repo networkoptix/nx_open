@@ -23,6 +23,11 @@ Item
 
     height: column.height + buttonSpacer.height;
 
+    function blink()
+    {
+        loginButton.blink();
+    }
+
     Base.Column
     {
         id: column;

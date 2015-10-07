@@ -10,7 +10,7 @@
 #include <common/systemexcept_win32.h>
 #include <common/systemexcept_linux.h>
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #   include <sys/types.h>
 #   include <linux/unistd.h>
 static pid_t gettid(void) { return syscall(__NR_gettid); }
@@ -130,7 +130,9 @@ QnLongRunnable::QnLongRunnable():
     connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
     connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
 
+#ifndef Q_OS_ANDROID // not supported on Android
     setStackSize( DEFAULT_THREAD_STACK_SIZE );
+#endif
 }
 
 QnLongRunnable::~QnLongRunnable() {
@@ -233,7 +235,7 @@ void QnLongRunnable::at_started() {
     win32_exception::installThreadSpecificUnhandledExceptionHandler();
 #endif
 
-#ifdef __linux__
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     linux_exception::installQuitThreadBacktracer();
 #endif
 
@@ -242,7 +244,7 @@ void QnLongRunnable::at_started() {
 }
 
 void QnLongRunnable::at_finished() {
-#ifdef __linux__
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     linux_exception::uninstallQuitThreadBacktracer();
 #endif
 

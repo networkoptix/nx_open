@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <QtCore/QDateTime>
+#include <QtCore/QElapsedTimer>
 
 #include "../system_socket.h"
 #include "../udt_socket.h"
@@ -23,12 +24,6 @@
     //before async stop completion socket is polled again. In this case remove task should not remove tasks 
     //from new polling "session"? Something needs to be done about it
 
-
-//!used as clock for periodic events. Function introduced since implementation can be changed
-static qint64 getSystemTimerVal()
-{
-    return QDateTime::currentMSecsSinceEpoch();
-}
 
 namespace aio
 {
@@ -233,6 +228,13 @@ namespace aio
             newWriteMonitorTaskCount( 0 ),
             processingPostedCalls( 0 )
         {
+            m_monotonicClock.restart();
+        }
+
+        //!used as clock for periodic events. Function introduced since implementation can be changed
+        qint64 getSystemTimerVal() const
+        {
+            return m_monotonicClock.elapsed();
         }
 
         void processPollSetModificationQueue( TaskType taskFilter )
@@ -625,6 +627,9 @@ namespace aio
                     ++it;
             }
         }
+
+    private:
+        QElapsedTimer m_monotonicClock;
     };
 
 
@@ -904,7 +909,7 @@ namespace aio
             //processing tasks that have been added from within \a processPostedCalls() call
             m_impl->processPollSetModificationQueue( TaskType::tAll );
 
-            qint64 curClock = getSystemTimerVal();
+            qint64 curClock = m_impl->getSystemTimerVal();
             //taking clock of the next periodic task
             qint64 nextPeriodicEventClock = 0;
             {
@@ -932,7 +937,7 @@ namespace aio
                 msleep(ERROR_RESET_TIMEOUT);
                 continue;
             }
-            curClock = getSystemTimerVal(); 
+            curClock = m_impl->getSystemTimerVal(); 
             if( triggeredSocketCount == 0 )
             {
                 if( nextPeriodicEventClock == 0 ||      //no periodic event
