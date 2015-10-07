@@ -7,6 +7,7 @@
 
 #include "cdb_request_path.h"
 #include "data/system_data.h"
+#include "version.h"
 
 
 namespace nx {
@@ -23,9 +24,10 @@ void SystemManager::bindSystem(
     api::SystemRegistrationData registrationData,
     std::function<void(api::ResultCode, api::SystemData)> completionHandler)
 {
+    registrationData.customization = QN_CUSTOMIZATION_NAME;
     executeRequest(
         SYSTEM_BIND_PATH,
-        registrationData,
+        std::move(registrationData),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemData()));
 }

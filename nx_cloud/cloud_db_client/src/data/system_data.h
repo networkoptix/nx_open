@@ -28,7 +28,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemAccessRole), (lexical))
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemStatus)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))
 
-#define SystemRegistrationData_Fields (name)
+#define SystemRegistrationData_Fields (name)(customization)
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
@@ -38,7 +38,7 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
 
-#define SystemData_Fields (id)(name)(authKey)(ownerAccountID)(status)(cloudConnectionSubscriptionStatus)
+#define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountID)(status)(cloudConnectionSubscriptionStatus)
 
 
 #define SystemDataList_Fields (systems)

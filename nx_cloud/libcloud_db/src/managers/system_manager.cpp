@@ -160,10 +160,11 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 {
     QSqlQuery insertSystemQuery(*connection);
     insertSystemQuery.prepare(
-        "INSERT INTO system( id, name, auth_key, owner_account_id, status_code ) "
-        " VALUES( :id, :name, :authKey, :ownerAccountID, :status )");
+        "INSERT INTO system( id, name, customization, auth_key, owner_account_id, status_code ) "
+        " VALUES( :id, :name, :customization, :authKey, :ownerAccountID, :status )");
     systemData->id = QnUuid::createUuid();
     systemData->name = newSystem.name;
+    systemData->customization = newSystem.customization;
     systemData->authKey = QnUuid::createUuid().toStdString();
     systemData->ownerAccountID = newSystem.accountID;
     systemData->status = api::SystemStatus::ssNotActivated;
@@ -353,8 +354,8 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
 {
     QSqlQuery readSystemsQuery(*connection);
     readSystemsQuery.prepare(
-        "SELECT id, name, auth_key as authKey, "
-        "owner_account_id as ownerAccountID, status_code as status "
+        "SELECT id, name, customization, auth_key as authKey, "
+        "   owner_account_id as ownerAccountID, status_code as status "
         "FROM system");
     if (!readSystemsQuery.exec())
     {

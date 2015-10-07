@@ -33,15 +33,17 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemStatus,
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData)
 {
-    if (!urlQuery.hasQueryItem("name"))
+    if (!urlQuery.hasQueryItem("name") || !urlQuery.hasQueryItem("customization"))
         return false;
     systemData->name = urlQuery.queryItemValue("name").toStdString();
+    systemData->customization = urlQuery.queryItemValue("customization").toStdString();
     return true;
 }
 
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem("name", data.name.c_str());
+    urlQuery->addQueryItem("customization", data.customization.c_str());
 }
 
 

@@ -41,6 +41,7 @@ class SystemRegistrationData
 public:
     //!Not unique system name
     std::string name;
+    std::string customization;
 };
 
 
@@ -59,6 +60,7 @@ public:
     QnUuid id;
     //!Not unique system name
     std::string name;
+    std::string customization;
     //!Key, system uses to authenticate requests to any cloud module
     std::string authKey;
     QnUuid ownerAccountID;
@@ -78,6 +80,7 @@ public:
         return
             id == right.id &&
             name == right.name &&
+            customization == right.customization &&
             authKey == right.authKey &&
             ownerAccountID == right.ownerAccountID &&
             status == right.status &&

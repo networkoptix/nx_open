@@ -95,6 +95,12 @@ CREATE UNIQUE INDEX system_to_account_primary                                   
 ";
 
 
+static const char addCustomizationToSystem[] =
+"                                                                   \
+ALTER TABLE system ADD COLUMN customization VARCHAR(255);           \
+UPDATE system set customization = 'default';                        \
+";
+
 }   //db
 }   //cdb
 }   //nx

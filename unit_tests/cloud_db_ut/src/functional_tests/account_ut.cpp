@@ -72,6 +72,7 @@ TEST_F(CdbFunctionalTest, generalTest)
     {
         const auto result = bindRandomSystem(account1.email, account1Password, &system1);
         ASSERT_EQ(result, api::ResultCode::ok);
+        ASSERT_EQ(system1.customization, QN_CUSTOMIZATION_NAME);
     }
 
     {

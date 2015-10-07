@@ -204,7 +204,7 @@ void CloudDBProcess::stop()
 bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
 {
     if (m_terminated)
-        exit(0);
+        application()->quit();
     return false;
 }
 
@@ -366,13 +366,14 @@ bool CloudDBProcess::configureDB( nx::db::DBManager* const dbManager )
     return future.get() == nx::db::DBResult::ok;
 }
 
-bool CloudDBProcess::updateDB( nx::db::DBManager* const dbManager )
+bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
 {
     //updating DB structure to actual state
-    nx::db::DBStructureUpdater dbStructureUpdater( dbManager );
-    dbStructureUpdater.addUpdateScript( db::createAccountData );
-    dbStructureUpdater.addUpdateScript( db::createSystemData );
-    dbStructureUpdater.addUpdateScript( db::systemToAccountMapping );
+    nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
+    dbStructureUpdater.addUpdateScript(db::createAccountData);
+    dbStructureUpdater.addUpdateScript(db::createSystemData);
+    dbStructureUpdater.addUpdateScript(db::systemToAccountMapping);
+    dbStructureUpdater.addUpdateScript(db::addCustomizationToSystem);
     return dbStructureUpdater.updateStructSync();
 }
 
