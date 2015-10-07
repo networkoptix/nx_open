@@ -69,6 +69,9 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
     if(nodeType == Qn::UsersNode)
         return false; /* We don't want users in search. */
 
+    if (nodeType == Qn::OtherSystemsNode)
+        return false; /* We don't want other systems in search. */
+
     if(nodeType == Qn::RecorderNode) {
         for (int i = 0; i < sourceModel()->rowCount(index); i++) {
             if (filterAcceptsRow(i, index))

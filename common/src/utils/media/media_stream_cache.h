@@ -5,6 +5,8 @@
 #ifndef MEDIASTREAMCACHE_H
 #define MEDIASTREAMCACHE_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 #include <functional> /* For std::function. */
 
@@ -116,9 +118,12 @@ public:
 
     //!Time (millis) from last usage of this object
     qint64 inactivityPeriod() const;
-
+protected:
+    virtual bool needConfigureProvider() const override { return false; }
 private:
     std::shared_ptr<detail::MediaStreamCache> m_sharedImpl;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //MEDIASTREAMCACHE_H

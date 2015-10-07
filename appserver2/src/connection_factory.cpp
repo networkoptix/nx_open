@@ -9,8 +9,7 @@
 
 #include <utils/thread/mutex.h>
 
-#include <network/authenticate_helper.h>
-#include <network/universal_tcp_listener.h>
+#include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
 #include <utils/network/http/auth_tools.h>
@@ -97,6 +96,13 @@ namespace ec2
         QUrl url = addr;
         url.setUserName(url.userName().toLower());
 
+        if (m_transactionMessageBus->localPeer().isMobileClient()) {
+            QUrlQuery query(url);
+            query.removeQueryItem(lit("format"));
+            query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+            url.setQuery(query);
+        }
+
         if (url.isEmpty())
             return testDirectConnection(url, handler);
         else
@@ -110,18 +116,25 @@ namespace ec2
         QUrl url = addr;
         url.setUserName(url.userName().toLower());
 
+        if (m_transactionMessageBus->localPeer().isMobileClient()) {
+            QUrlQuery query(url);
+            query.removeQueryItem(lit("format"));
+            query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+            url.setQuery(query);
+        }
+
         if (url.scheme() == "file")
             return establishDirectConnection(url, handler);
         else
             return establishConnectionToRemoteServer(url, handler, clientInfo);
     }
 
-    void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
+    void Ec2DirectConnectionFactory::registerTransactionListener(QnHttpConnectionListener* httpConnectionListener)
     {
-        universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
-        universalTcpListener->addHandler<QnHttpTransactionReceiver>("HTTP", INCOMING_TRANSACTIONS_PATH);
+        httpConnectionListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
+        httpConnectionListener->addHandler<QnHttpTransactionReceiver>("HTTP", INCOMING_TRANSACTIONS_PATH);
 
-        m_sslEnabled = universalTcpListener->isSslEnabled();
+        m_sslEnabled = httpConnectionListener->isSslEnabled();
     }
 
     void Ec2DirectConnectionFactory::registerRestHandlers( QnRestProcessorPool* const restProcessorPool )

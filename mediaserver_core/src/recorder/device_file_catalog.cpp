@@ -481,6 +481,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             }
             else {
                 //qnFileDeletor->deleteFile(fi.absoluteFilePath());
+                qDebug() << "remove file" << fi.absoluteFilePath() << "because of empty chunk. duration=" << chunk.durationMs << "startTime=" << chunk.startTimeMs;
                 emptyFileList 
                     << EmptyFileInfo(/*fi.created().toMSecsSinceEpoch()*/
                            chunk.startTimeMs, 
@@ -861,7 +862,7 @@ void DeviceFileCatalog::close()
 {
 }
 
-QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, int limit)
+QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmalChunks, int limit)
 {
     //qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");
 
@@ -900,7 +901,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         else if (qAbs(lastEndTime - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
             last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
         else {
-            if (last.durationMs < detailLevel && result.size() > 1)
+            if (last.durationMs < detailLevel && result.size() > 1 && !keepSmalChunks)
                 result.pop_back();
             if (result.size() >= limit)
                 break;
@@ -1012,8 +1013,11 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
     for (auto itr = itrLeft; itr != itrRight; ++itr)
     {
         const Chunk& chunk = *itr;
+        auto storage = qnStorageMan->storageRoot(chunk.storageIndex);
         if (chunk.durationMs != Chunk::UnknownDuration) {
             result.recordedBytes += chunk.getFileSize();
+            if (storage)
+                result.recordedBytesPerStorage[storage->getId()] += chunk.getFileSize();
             result.recordedSecs += chunk.durationMs;
 
             if (chunk.startTimeMs >= bitrateThreshold) {

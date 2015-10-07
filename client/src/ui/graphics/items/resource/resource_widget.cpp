@@ -120,6 +120,7 @@ QnResourceWidget::OverlayWidgets::OverlayWidgets():
     , mainTimeLabel(createGraphicsLabel())
     , infoNameLabel(createGraphicsLabel())
     , infoTimeLabel(createGraphicsLabel())
+    , bookmarksLabel(new QnProxyLabel())
 {}
 
 // -------------------------------------------------------------------------- //
@@ -164,12 +165,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     addInfoOverlay();
     addMainOverlay();
-
-//     createHeaderOverlay();
-//     createFooterOverlay();
-
-    /* Custom overlays should be added below the status overlay. */
-    createCustomOverlays();
 
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(m_resource, this);
@@ -253,29 +248,14 @@ void QnResourceWidget::addMainOverlay() {
 
 
     {
-        /// Creates bookmarks description area
-        //auto bookmarksLayout = createGraphicsLayout(Qt::Vertical);
-
-        enum { kSpacerFactor = 3 , kBookmarkFactor = 2 };
-
-        m_footerBookmarkDescriptionLabel = new QnProxyLabel();
-        //bookmarksLayout->addItem(m_footerBookmarkDescriptionLabel);
-        //bookmarksLayout->setStretchFactor(m_footerBookmarkDescriptionLabel, kBookmarkFactor);
-        m_footerBookmarkDescriptionLabel->setVisible(true);
-        m_footerBookmarkDescriptionLabel->setText(lit("Test bookmarks text"));
-        m_footerBookmarkDescriptionLabel->setWordWrap(true);
-        m_footerBookmarkDescriptionLabel->setOpacity(0.0);
-        m_footerBookmarkDescriptionLabel->setAcceptedMouseButtons(0);
-        setPaletteColor(m_footerBookmarkDescriptionLabel, QPalette::Window, overlayBackgroundColor);
-
-        //bookmarksLayout->addStretch(kSpacerFactor);
+        m_overlayWidgets.bookmarksLabel->setWordWrap(true);
+        m_overlayWidgets.bookmarksLabel->setAcceptedMouseButtons(0);
+        setPaletteColor(m_overlayWidgets.bookmarksLabel, QPalette::Window, overlayBackgroundColor);
     }
 
     /* Footer overlay. */
     auto footerLayout = createGraphicsLayout(Qt::Horizontal);
     footerLayout->addItem(m_overlayWidgets.mainDetailsLabel);
-    footerLayout->addStretch();
-    footerLayout->addItem(m_footerBookmarkDescriptionLabel);
     footerLayout->addStretch();
     footerLayout->addItem(m_overlayWidgets.mainTimeLabel);
 
@@ -284,6 +264,7 @@ void QnResourceWidget::addMainOverlay() {
     QGraphicsLinearLayout *overlayLayout = createGraphicsLayout(Qt::Vertical);
     overlayLayout->addItem(headerWidget);
     overlayLayout->addStretch();
+    overlayLayout->addItem(m_overlayWidgets.bookmarksLabel);
     overlayLayout->addItem(footerWidget);
 
     m_overlayWidgets.mainOverlay = new QnViewportBoundWidget(this);
@@ -300,9 +281,8 @@ void QnResourceWidget::addMainOverlay() {
 
 void QnResourceWidget::setBookmarksLabelText(const QString &text)
 {
-    return;
-    m_footerBookmarkDescriptionLabel->setText(text);
-    m_footerBookmarkDescriptionLabel->setVisible(!text.isEmpty());
+    m_overlayWidgets.bookmarksLabel->setText(text);
+    setOverlayWidgetVisible(m_overlayWidgets.bookmarksLabel, !text.isEmpty(), true);
 }
 
 void QnResourceWidget::createButtons() {
@@ -341,11 +321,6 @@ void QnResourceWidget::createButtons() {
     m_iconButton->setPreferredSize(24.0, 24.0);
     m_iconButton->setVisible(false);
 }
-
-void QnResourceWidget::createCustomOverlays() {
-    //no custom overlays in the base widget
-}
-
 
 const QnResourcePtr &QnResourceWidget::resource() const {
     return m_resource;

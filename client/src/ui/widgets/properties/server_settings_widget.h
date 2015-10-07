@@ -32,10 +32,13 @@ public:
 
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
+
+protected:
+    void setReadOnlyInternal(bool readOnly) override;
+
 private:
     void updateFailoverLabel();
     
-    bool isReadOnly() const;
     void updateReadOnly();
 
 private slots:

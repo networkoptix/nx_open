@@ -1,6 +1,8 @@
 #ifndef _QTFILE_STORAGE_PROTOCOL_H__
 #define _QTFILE_STORAGE_PROTOCOL_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 extern "C"
 {
     #include <libavformat/avio.h>
@@ -40,5 +42,7 @@ private:
 private:
     int  m_capabilities; // see QnAbstractStorageResource::cap flags
 };
+
+#endif //ENABLE_DATA_PROVIDERS
 
 #endif // _FILE_STORAGE_PROTOCOL_H__

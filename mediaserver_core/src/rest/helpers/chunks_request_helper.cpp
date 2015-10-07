@@ -33,28 +33,23 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
                 bookmarksFilter.text = request.filter;
                 QnCameraBookmarkList bookmarks;
                 
-                std::vector<QnTimePeriodList> tmpData;
-                for (const QnVirtualCameraResourcePtr& res: request.resList)
-                {
-                    QnTimePeriodList periods;
-                    if (qnNormalStorageMan->getBookmarks(res->getPhysicalId().toUtf8(), bookmarksFilter, bookmarks)) {
+                for (const QnVirtualCameraResourcePtr& res: request.resList) {
+                    if (qnStorageMan->getBookmarks(res->getPhysicalId().toUtf8(), bookmarksFilter, bookmarks)) {
                         for (const QnCameraBookmark &bookmark: bookmarks)
-                            periods.push_back(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs));
+                            periods.includeTimePeriod(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs));
                     }
-                    tmpData.push_back(std::move(periods));
                 }
-                periods = QnTimePeriodList::mergeTimePeriods(tmpData);
             } else {
                 //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = QnStorageManager::getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
+                periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel, request.keepSmallChunks,
                     QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog,
-                    request.limit);
+                    request.limit).simplified();
             }
             break;
         }
     case Qn::RecordingContent:
     default:
-        periods = QnStorageManager::getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
+        periods = QnStorageManager::getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel, request.keepSmallChunks,
             QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog,
             request.limit);
         break;

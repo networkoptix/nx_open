@@ -34,7 +34,7 @@
 #include "ec_api_fwd.h"
 
 class QnRestProcessorPool;
-class QnUniversalTcpListener;
+class QnHttpConnectionListener;
 struct QnModuleInformation;
 
 //!Contains API classes for the new Server
@@ -1221,7 +1221,7 @@ namespace ec2
         }
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
-        virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) = 0;
+        virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setContext( const ResourceContext& resCtx ) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
 

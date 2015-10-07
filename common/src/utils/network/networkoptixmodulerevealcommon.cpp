@@ -57,7 +57,8 @@ QByteArray RevealResponse::serialize() {
     map[lit("authHash")] = authHash.toBase64();
     map[lit("protoVersion")] = protoVersion;
     map[lit("runtimeId")] = runtimeId.toString();
-    map[lit("flags")] = QnLexical::serialized(flags);
+    map[lit("flags")] = QnLexical::serialized(serverFlags);
+    map[lit("ecDbReadOnly")] = ecDbReadOnly;
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
@@ -80,7 +81,8 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
-    flags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
+    serverFlags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
+    ecDbReadOnly =  map.value(lit("ecDbReadOnly"), ecDbReadOnly).toBool();
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();

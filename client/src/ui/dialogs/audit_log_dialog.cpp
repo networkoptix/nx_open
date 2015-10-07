@@ -10,6 +10,7 @@
 #include <client/client_settings.h>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -1147,8 +1148,12 @@ void QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested(const QPoint&)
     {
         QnResourcePtr resource = gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
+       
         if (resource) {
-            menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));
+            QnActionParameters parameters(resource);
+            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+
+            menu = manager->newMenu(Qn::TreeScope, this, parameters);
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -1186,9 +1191,14 @@ void QnAuditLogDialog::retranslateUi()
     ui->retranslateUi(this);
 
     enum { kDevicesTabIndex = 1 };
-    ui->tabWidget->setTabText(kDevicesTabIndex, getDefaultDevicesName());
-    //: "Camera actions" or "Device actions"
-    ui->checkBoxCameras->setText(tr("%1 actions").arg(getDefaultDeviceNameUpper()));
+    ui->tabWidget->setTabText(kDevicesTabIndex, QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Devices"),
+        tr("Cameras")
+    ));
+    ui->checkBoxCameras->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Device actions"),
+        tr("Camera actions")
+    ));
 }
 
 void QnAuditLogDialog::at_exportAction_triggered()

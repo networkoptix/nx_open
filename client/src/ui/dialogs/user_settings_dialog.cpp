@@ -6,6 +6,7 @@
 #include <QtGui/QKeyEvent>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/event_processors.h>
@@ -508,7 +509,10 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
         previous = createAccessRightCheckBox(tr("Administrator"),
                      Qn::ExcludingAdminPermission,
                      previous);
-    previous = createAccessRightCheckBox(tr("Can adjust %1 settings").arg(getDefaultDevicesName(true, false)), Qn::GlobalEditCamerasPermission, previous);
+    previous = createAccessRightCheckBox(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Can adjust devices settings"),
+        tr("Can adjust cameras settings")
+        ), Qn::GlobalEditCamerasPermission, previous);
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);

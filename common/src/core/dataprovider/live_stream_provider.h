@@ -142,10 +142,6 @@ private:
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
     void saveBitrateIfNotExists( const QnCompressedVideoDataPtr& videoData,
                                  const QnLiveStreamParams& liveParams );
-    void extractSpsPps(
-        const QnCompressedVideoDataPtr& videoData,
-        QSize* const newResolution,
-        std::map<QString, QString>* const customStreamParams );
 
 private:
     QnAbstractVideoCamera* m_owner;

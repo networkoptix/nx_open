@@ -7,12 +7,11 @@ Item
 {
     id: thisComponent;
     property var parentColumn;
-    property int verticalSpace: Common.SizeManager.spacing.medium;
     property alias color: textItem.color;
     property alias text: textItem.text;
     property alias fontSize: textItem.font.pixelSize;
 
-    height: textItem.height + verticalSpace;
+    height: Common.SizeManager.clickableSizes.medium;
 
     Base.Text
     {

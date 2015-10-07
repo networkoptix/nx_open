@@ -1,6 +1,8 @@
 #ifndef __MJPEG_RTP_PARSER_H
 #define __MJPEG_RTP_PARSER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
@@ -46,4 +48,7 @@ private:
     int m_frameSize;
 };
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif
+

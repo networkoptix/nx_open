@@ -18,7 +18,6 @@ private:
     enum ChunkFormat {
         ChunkFormat_Unknown, 
         ChunkFormat_Binary, 
-        ChunkFormat_BinaryIntersected,
         ChunkFormat_XML, 
         ChunkFormat_Json, 
         ChunkFormat_Text

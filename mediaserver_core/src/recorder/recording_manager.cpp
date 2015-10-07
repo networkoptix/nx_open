@@ -679,5 +679,3 @@ QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
 {
     return qn_serverDataProviderFactory_instance();
 }
-
-

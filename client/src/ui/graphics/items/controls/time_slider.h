@@ -185,6 +185,10 @@ public:
 
     QnBookmarksViewer *bookmarksViewer();
 
+    bool isBookmarksVisible() const;
+    void setBookmarksVisible(bool bookmarksVisible);
+    QnCameraBookmarkList bookmarksAtPosition(qint64 position) const;
+
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -274,6 +278,16 @@ private:
         bool selecting;
     };
 
+    struct BookmarkCluster {
+        qint64 startTimeMs;
+        qint64 endTimeMs;
+        int firstBookmarkIndex;
+        int lastBookmarkIndex;
+
+        BookmarkCluster();
+        BookmarkCluster(const QnCameraBookmark &bookmark, int index);
+    };
+
 private:
     Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
@@ -326,6 +340,9 @@ private:
     Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
     Q_SLOT void clearThumbnails();
 
+    void mergeBookmarks();
+    void calculateCoveringBookmarks();
+
     void animateStepValues(int deltaMSecs);
     void animateThumbnails(int deltaMSecs);
     bool animateThumbnail(qreal dt, ThumbnailData &data);
@@ -375,6 +392,8 @@ private:
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
     QnCameraBookmarkList m_bookmarks;
+    QnCameraBookmarkList m_coveringBookmarks;
+    QList<BookmarkCluster> m_mergedBookmarks;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
@@ -414,6 +433,7 @@ private:
     qreal m_lastLineBarValue;
 
     QnBookmarksViewer *m_bookmarksViewer;
+    bool m_bookmarksVisible;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

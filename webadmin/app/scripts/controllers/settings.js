@@ -14,7 +14,8 @@ angular.module('webadminApp')
             $scope.settings = {
                 systemName: r.data.reply.systemName,
                 port: r.data.reply.port,
-                id: r.data.reply.id
+                id: r.data.reply.id,
+                ecDbReadOnly:r.data.reply.ecDbReadOnly
             };
 
             $scope.oldSystemName = r.data.reply.systemName;
@@ -116,9 +117,9 @@ angular.module('webadminApp')
 
         mediaserver.getScripts().then(function(data){
             if(data.data && data.data.reply) {
-                $scope.canHardwareRestart = data.data.result.indexOf('reboot') >= 0;
-                $scope.canRestoreSettings = data.data.result.indexOf('restore') >= 0;
-                $scope.canRestoreSettingsNotNetwork = data.data.result.indexOf('restore_keep_ip') >= 0;
+                $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
+                $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
+                $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
             }
         });
 

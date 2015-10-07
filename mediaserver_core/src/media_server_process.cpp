@@ -1964,7 +1964,7 @@ void MediaServerProcess::run()
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
-    selfInformation.flags = m_mediaServer->getServerFlags();
+    selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
     qnCommon->setModuleInformation(selfInformation);

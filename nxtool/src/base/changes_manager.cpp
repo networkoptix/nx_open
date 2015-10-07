@@ -21,14 +21,14 @@ namespace
 
         const auto ids = task->targetServerIds();
         const auto locker = task->id();
-        selectionModel->setLockedState(ids, locker, true);
+        selectionModel->lockItems(ids, task->minimizedText());
 
         typedef std::weak_ptr<rtu::ApplyChangesTask> TaskWeak;
         const TaskWeak weak = task;
         QObject::connect(task.get(), &rtu::ApplyChangesTask::changesApplied
             , context, [ids, locker, context, weak, selectionModel]() 
         {
-            selectionModel->setLockedState(ids, locker, false);
+            selectionModel->unlockItems(ids);
 
             if (weak.expired())
                 return;

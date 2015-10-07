@@ -370,7 +370,7 @@ namespace
         enum { kFirstPosition = 0 };
         int position = renewLabel(m_name, bookmark.name, this, m_layout, kFirstPosition, kNameLabelIndex);
         position = renewLabel(m_description, bookmark.description, this, m_layout, position, kDescriptionLabelIndex);
-        position = renewLabel(m_tags, m_bookmark.tagsAsString(), this, m_layout, position, kTagsLabelIndex);
+        position = renewLabel(m_tags, m_bookmark.tagsAsString(L','), this, m_layout, position, kTagsLabelIndex);
     }
 
     const QnCameraBookmark &BookmarkToolTipFrame::bookmark() const
@@ -692,11 +692,6 @@ void QnBookmarksViewer::Impl::resetTimer()
 }
 
 ///
-
-QnBookmarksViewer *QnBookmarksViewer::create(QGraphicsItem *parent)
-{
-    return (new QnBookmarksViewer(parent));
-}
 
 QnBookmarksViewer::QnBookmarksViewer(QGraphicsItem *parent)
     : QGraphicsWidget(parent)

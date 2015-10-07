@@ -108,6 +108,13 @@ Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameter
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnForbiddenInSafeModeCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+    if (qnCommon->isReadOnly())
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
 QnConjunctionActionCondition::QnConjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
     QnActionCondition(parent),
     m_conditions(conditions)
@@ -126,6 +133,15 @@ QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *co
     m_conditions.append(condition1);
     m_conditions.append(condition2);
     m_conditions.append(condition3);
+}
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QnActionCondition *condition4, QObject *parent):
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+    m_conditions.append(condition3);
+    m_conditions.append(condition4);
 }
 
 Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameters &parameters) {
@@ -1089,6 +1105,29 @@ Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &reso
 
     return pureIoModules ? Qn::EnabledAction : Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResourceList &resources) {
+    bool found = false;
+
+    for (const QnResourcePtr &resource: resources) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return Qn::InvisibleAction;
+
+        if (!QnMediaServerResource::isFakeServer(resource))
+            return Qn::InvisibleAction;
+
+        if (server->getModuleInformation().ecDbReadOnly)
+            return Qn::InvisibleAction;
+
+        found = true;
+    }
+
+    return found 
+        ? Qn::EnabledAction 
+        : Qn::InvisibleAction;
+}
+
 
 Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
     bool found = false;

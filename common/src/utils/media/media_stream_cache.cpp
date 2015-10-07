@@ -4,6 +4,8 @@
 
 #include "media_stream_cache.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <cstdlib>
 #include <algorithm>
 
@@ -173,3 +175,5 @@ qint64 MediaStreamCache::inactivityPeriod() const
 {
     return m_sharedImpl->inactivityPeriod();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

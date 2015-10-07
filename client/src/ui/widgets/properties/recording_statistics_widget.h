@@ -35,17 +35,17 @@ public:
     void setServer(const QnMediaServerResourcePtr &server);
 private:
     void updateData();
+    void updateColors();
 
 private slots:
     void at_gotStatiscits(int status, const QnRecordingStatsReply& data, int requestNum);
     void at_gotStorageSpace(int status, const QnStorageSpaceReply& data, int requestNum);
-    void at_eventsGrid_clicked(const QModelIndex & index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
     void at_forecastParamsChanged();
-    void at_updateColors();
+    
 
 private:
     void requestFinished();

@@ -89,7 +89,7 @@ Base.Column
                 font.pixelSize: Common.SizeManager.fontSizes.large;
                 horizontalAlignment: Text.AlignLeft;
 
-                text: qsTr("Servers and Systems.");
+                text: qsTr("Servers and Systems");
             }
         }
     }

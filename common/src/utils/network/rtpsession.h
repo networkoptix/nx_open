@@ -1,6 +1,8 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <fstream>
 #include <memory>
 #include <vector>
@@ -19,7 +21,7 @@ extern "C"
 #include <QtCore/QUrl>
 #include "../common/threadqueue.h"
 #include "utils/camera/camera_diagnostics.h"
-#include <network/authenticate_helper.h>
+#include "network/client_authenticate_helper.h"
 
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM
@@ -401,5 +403,7 @@ private:
     */
     bool sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responce );
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //rtp_session_h_1935_h

@@ -124,8 +124,12 @@ QString QnAppInfo::companyUrl() {
     return QStringLiteral("${company.url}");
 }
 
-QString QnAppInfo::supportAddress() {
+QString QnAppInfo::supportEmailAddress() {
     return QStringLiteral("${company.support.address}");
+}
+
+QString QnAppInfo::supportLink() {
+    return QStringLiteral("${company.support.link}");
 }
 
 QString QnAppInfo::showcaseUrl() {

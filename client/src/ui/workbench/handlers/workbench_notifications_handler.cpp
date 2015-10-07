@@ -59,10 +59,6 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged,          this,   &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
-
-
-
-    
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
@@ -160,8 +156,12 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSys
 
     if (!connected) {
         canShow = (message == QnSystemHealth::ConnectionLost);
-        if (visible)
-            Q_ASSERT_X(canShow, Q_FUNC_INFO, "No events but 'Connection lost' should be displayed if we are disconnected");
+        if (visible) {
+            /* In unit tests there can be users when we are disconnected. */
+            QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
+            if (guiApp)
+                Q_ASSERT_X(canShow, Q_FUNC_INFO, "No events but 'Connection lost' should be displayed if we are disconnected");
+        }
     } else {
         /* Only admins can see some system health events */
         if (adminOnlyMessage(message) && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))

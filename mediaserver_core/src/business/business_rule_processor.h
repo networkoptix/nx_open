@@ -145,7 +145,7 @@ private slots:
 
 
 protected:
-    virtual QByteArray getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const;
+    virtual QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const;
     
     bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
@@ -161,58 +161,15 @@ protected:
 private:
     void at_businessRuleChanged_i(const QnBusinessEventRulePtr& bRule);
 
-    bool sendMail(const QnSendMailBusinessActionPtr& action );
-
     QnAbstractBusinessActionPtr processToggleAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
     QnAbstractBusinessActionPtr processInstantAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
     bool checkRuleCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule) const;
-    QString formatEmailList(const QStringList& value);
     bool needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
-
+protected:
+    mutable QnMutex m_mutex;
 private:
-    class SendEmailAggregationKey
-    {
-    public:
-        QnBusiness::EventType eventType;
-        QString recipients;
-
-        SendEmailAggregationKey()
-        :
-            eventType( QnBusiness::UndefinedEvent )
-        {
-        }
-
-        SendEmailAggregationKey(
-            QnBusiness::EventType _eventType,
-            QString _recipients )
-        :
-            eventType( _eventType ),
-            recipients( _recipients )
-        {
-        }
-
-        bool operator<( const SendEmailAggregationKey& right ) const
-        {
-            if( eventType < right.eventType )
-                return true;
-            if( right.eventType < eventType )
-                return false;
-            return recipients < right.recipients;
-        }
-    };
-
-    class SendEmailAggregationData
-    {
-    public:
-        QnSendMailBusinessActionPtr action;
-        quint64 periodicTaskID;
-        int eventCount;
-
-        SendEmailAggregationData() : periodicTaskID(0), eventCount(0) {}
-    };
-
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
@@ -229,7 +186,6 @@ private:
      * @brief m_eventsInProgress         Stores events that are toggled and state is On
      */
     RunningRuleMap m_rulesInProgress;
-    QScopedPointer<EmailManagerImpl> m_emailManager;
 
 
     /**
@@ -239,17 +195,12 @@ private:
 
     QMap<QString, QnProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, int> m_actionInProgress;              // remove duplicates for long actions
-    mutable QnMutex m_mutex;
     QTimer m_timer;
-    QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
 
     /*!
         \param isRuleAdded \a true - rule added, \a false - removed
     */
     void notifyResourcesAboutEventIfNeccessary( const QnBusinessEventRulePtr& businessRule, bool isRuleAdded );
-    void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
-    bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
-    void sendEmailAsync(const ec2::ApiEmailData& data);
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

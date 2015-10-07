@@ -65,6 +65,7 @@ libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnxemail.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
@@ -149,10 +150,13 @@ cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$
 
 #start script and platform specific scripts
 cp -R ./etc $BUILD_DIR
+cp -R ./opt $BUILD_DIR
 chmod -R 755 $BUILD_DIR/etc/init.d
+chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts
 mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
 
 #additional platform specific files
+cp -R ./var $BUILD_DIR
 cp -R ./root $BUILD_DIR
 mkdir -p $BUILD_DIR/root/tools/nx
 cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
@@ -160,7 +164,7 @@ mv -f $BUILD_DIR/opt/networkoptix $BUILD_DIR/opt/$CUSTOMIZATION
 
 #building package
 pushd $BUILD_DIR
-  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root
+  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root ./var
   cp $PACKAGE_NAME ${project.build.directory}
 popd
 

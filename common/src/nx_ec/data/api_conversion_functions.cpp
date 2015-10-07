@@ -21,7 +21,6 @@
 #include <core/misc/screen_snap.h>
 
 #include <nx_ec/ec_api.h>
-#include <network/authenticate_helper.h>
 
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"

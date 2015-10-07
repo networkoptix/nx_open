@@ -16,7 +16,7 @@
 namespace
 {
     const QByteArray UT_SERVER_GUID("{9DBF7579-3235-4910-A66C-0EB5DE8C443B}");
-    const int MT_REQUESTS = 20;
+    const int MT_REQUESTS = 10;
 
 }
 
@@ -213,7 +213,7 @@ public:
                 ASSERT_TRUE(!response.messageBody.isEmpty());
                 QJsonDocument d = QJsonDocument::fromJson(response.messageBody);
                 ASSERT_TRUE(!d.isEmpty());
-                if (response.messageBody.contains("\"flags\""))
+                if (response.messageBody.contains("\"serverFlags\""))
                     ++m_firstRequest;
                 qDebug() << "doParallelTest(). completed: " << m_requests << "of" << MT_REQUESTS * 2;
                 if (++m_requests == MT_REQUESTS * 2) 

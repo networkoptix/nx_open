@@ -8,42 +8,19 @@
 
 namespace {
 
-void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformationWithAddresses &moduleInformation) {
-    QList<QHostAddress> addressList;
-    foreach (const QString &address, moduleInformation.remoteAddresses)
-        addressList.append(QHostAddress(address));
-    server->setNetAddrList(addressList);
+    QnMediaServerResourcePtr makeResource(const QnModuleInformationWithAddresses &moduleInformation, Qn::ResourceStatus initialStatus) {
+        QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
 
-    if (!addressList.isEmpty()) {
-        QString address = addressList.first().toString();
-        quint16 port = moduleInformation.port;
-        QString url = QString(lit("http://%1:%2")).arg(address).arg(port);
-        server->setApiUrl(url);
-        server->setUrl(url);
+        server->setId(QnUuid::createUuid());
+        server->setStatus(initialStatus, true);
+        server->setOriginalGuid(moduleInformation.id);
+        server->setModuleInformation(moduleInformation);
+        return server;
     }
-    if (!moduleInformation.name.isEmpty())
-        server->setName(moduleInformation.name);
-    server->setVersion(moduleInformation.version);
-    server->setSystemInfo(moduleInformation.systemInformation);
-    server->setSystemName(moduleInformation.systemName);
-    server->setProperty(lit("protoVersion"), QString::number(moduleInformation.protoVersion));
-}
 
-QnMediaServerResourcePtr makeResource(const QnModuleInformationWithAddresses &moduleInformation, Qn::ResourceStatus initialStatus) {
-    QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
-
-    server->setId(QnUuid::createUuid());
-    server->setStatus(initialStatus, true);
-    server->setOriginalGuid(moduleInformation.id);
-
-    updateServer(server, moduleInformation);
-
-    return server;
-}
-
-bool isSuitable(const QnModuleInformation &moduleInformation) {
-    return moduleInformation.version >= QnSoftwareVersion(2, 3, 0, 0);
-}
+    bool isSuitable(const QnModuleInformation &moduleInformation) {
+        return moduleInformation.version >= QnSoftwareVersion(2, 3, 0, 0);
+    }
 
 } // anonymous namespace
 
@@ -64,7 +41,8 @@ void QnIncompatibleServerWatcher::start() {
 }
 
 void QnIncompatibleServerWatcher::stop() {
-    disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
+    if (QnCommonMessageProcessor::instance())
+        disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
     disconnect(qnResPool, 0, this, 0);
 
     QList<QnUuid> ids;
@@ -197,7 +175,7 @@ void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddre
         Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
         if (!server)
             return;
-        updateServer(server, moduleInformation);
+        server->setModuleInformation(moduleInformation);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
             .arg(moduleInformation.id.toString())

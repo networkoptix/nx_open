@@ -20,6 +20,8 @@
 #include <base/server_info.h>
 #include <base/requests.h>
 
+#include <helpers/itf_helpers.h>
+
 #ifdef WIN32
     #include <WinSock2.h>
     #include <WS2tcpip.h>
@@ -85,31 +87,41 @@ namespace
         return (firstFlags != secondFlags);
     }
     
-    QUuid extractMulticastId(const QByteArray &data)
+    typedef bool IsServerPeerType;
+    typedef QPair<QUuid, IsServerPeerType> MagicData;
+
+    MagicData extractMulticastData(const QByteArray &data)
     {
         enum { kDelimiterSize = 2 };
 
+        MagicData result = MagicData(QUuid(), false);
         if (!data.contains(kSearchRequestBody) || (data.size() <= kSearchRequestSize))
-            return QUuid();
+            return result;
 
         const QByteArray extraData = data.right(data.size() - (kSearchRequestSize + kDelimiterSize));
 
         static const char kFieldsDelimiter = ',';
         static const char kValueDelimiter = ':';
         static const QByteArray kSeedTag = "seed";
+        static const QByteArray kPeerTypeTag = "peerType";
         
         const auto fieldsData = extraData.split(kFieldsDelimiter);
         for (QString field: fieldsData)
         {
-            if (!field.contains(kSeedTag))
+            const bool isSeed = field.contains(kSeedTag);
+            const bool isPeerType = field.contains(kPeerTypeTag);
+            if (!isSeed && !isPeerType)
                 continue;
-
+                
             field.remove(QRegularExpression("[{}\"]"));
-            const auto idValue = field.trimmed().split(kValueDelimiter).back();
-            return QUuid(idValue.trimmed());
+            const auto value = field.trimmed().split(kValueDelimiter).back();
+            if (isSeed)
+                result.first = QUuid(value.trimmed());
+            else
+                result.second = value.contains("PT_Server");
         }
 
-        return QUuid();
+        return result;
     }
 }
 
@@ -130,7 +142,7 @@ namespace
             (itNativeType != jsonObject.end() && itNativeType.value().toString() == kMediaServerType);
         if (!isCorrectApp && !isCorrectNative)
             return false;
-
+        
 //        if (!jsonObject.value("systemName").toString().contains("000_nx1_"))
 //            return false;
 
@@ -256,7 +268,25 @@ void rtu::ServersFinder::Impl::updateServerByMulticast(const QUuid &id
     const auto successful = [this, address](const BaseServerInfo &info)
         { processNewServer(info, address, false); };
 
-    multicastModuleInformation(id, successful, OperationCallback(), kMulticastUpdatePeriod / 2);
+    const auto failed = [this, address](const RequestError /* errorCode */
+        , Constants::AffectedEntities /* affectedEntities */)
+    {
+        if (m_knownHosts.find(address) != m_knownHosts.end())
+            return;
+
+        /// if entity
+        /// 1) discoverable from current network
+        /// 2) but has not added to known servers list up to now
+        /// 3) and not available by multicast 
+        /// - we assume that it is not a server (may be client, for example)
+        if (helpers::isDiscoverableFromCurrentNetwork(address))
+            return;
+
+        if (onEntityDiscovered(address, m_unknownHosts))
+            emit m_owner->unknownAdded(address);
+    };
+
+    multicastModuleInformation(id, successful, failed, kMulticastUpdatePeriod / 2);
 }
 void rtu::ServersFinder::Impl::updateOutdatedByMulticast()
 {
@@ -448,11 +478,18 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
         return true;
 
     const QString &address = sender.toString();
-    
+
+    /// Assume localhost servers are always visible.
+    if (QHostAddress(address) == QHostAddress::LocalHost)
+        return true;
+
+    const auto magicData = extractMulticastData(data);
+    if (!magicData.first.isNull() && !magicData.second)  /// Extra magic data exist, but peer is not a server.
+        return true;                                     /// So, drop this entity. Possibly it is a new client or something else
+
     const auto &firstTimeProcessor = 
-        [this, address, data](const Callback &secondTimeProcessor)
+        [this, address, magicData](const Callback &secondTimeProcessor)
     {
-        const QUuid muticastId = extractMulticastId(data);
         const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
         const bool isUnknown = (m_unknownHosts.find(address) != m_unknownHosts.end());
         const bool notKnown = !isKnown && !isUnknown;
@@ -467,7 +504,7 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
                 QTimer::singleShot(kDelayTimeout, secondTimeProcessor);
             }
             else
-                updateServerByMulticast(muticastId, address);
+                updateServerByMulticast(magicData.first, address);
         }
         else if (!isKnown && onEntityDiscovered(address, m_unknownHosts))
             emit m_owner->unknownAdded(address);
@@ -532,7 +569,7 @@ bool rtu::ServersFinder::Impl::processNewServer(rtu::BaseServerInfo info
         m_infos.insert(info.id, ServerInfoData(timestamp, info));
         emit m_owner->serverAdded(info);
     }
-    else if (accessibleByHttp                                      ///< Gives change to http to discover server.
+    else if (accessibleByHttp                                      ///< Gives chance to http to discover server.
         || ((timestamp - it->timestamp) > kMulticastUpdatePeriod)) /// Http access method has priority under multicast
                                                                                             
     {

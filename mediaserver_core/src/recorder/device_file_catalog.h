@@ -109,7 +109,7 @@ public:
     // All information less than detail level is discarded
     typedef std::deque<Chunk> ChunkMap;
 
-    QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, int limit = INT_MAX);
+    QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmalChunks, int limit);
     void close();
 
     QString rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const;

@@ -36,6 +36,8 @@ namespace rtu
             , const QString &password
             , const Callback &callback);
 
+        void blinkForItem(int row);
+
         ///
 
         int selectedCount() const;
@@ -80,14 +82,17 @@ namespace rtu
         void updatePasswordInfo(const QUuid &id
             , const QString &password);
 
-        void setLockedState(const IDsVector &ids
-            , const QUuid &locker
-            , bool locked);
+        void lockItems(const IDsVector &ids
+            , const QString &reason);
+
+        void unlockItems(const IDsVector &ids);
 
         void changeAccessMethod(const QUuid &id
             , bool byHttp);
 
     signals:
+        void blinkAtSystem(int systemItemIndex);
+
         void layoutChanged();
 
         void selectionChanged();    /// Signals that new items are selected or 

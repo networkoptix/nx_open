@@ -150,7 +150,8 @@ private:
     int detectStorageIndex(const QString& path);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
-    void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
+    void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
+                               const DeviceFileCatalogPtr &catalog);
     bool existsStorageWithID(const QnStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
     QnStorageResourcePtr getStorageByUrlInternal(const QString& fileName);

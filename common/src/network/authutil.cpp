@@ -1,48 +1,59 @@
 #include "authutil.h"
+#include <QCryptographicHash>
 
-//!Splits \a data by \a delimiter not closed within quotes
-/*!
-    E.g.: 
-    \code
-    one, two, "three, four"
-    \endcode
-
-    will be splitted to 
-    \code
-    one
-    two
-    "three, four"
-    \endcode
-*/
-QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
+template <class T, class T2>
+QList<T> smartSplitInternal(const T& data, const T2 delimiter, const T2 quoteChar, bool keepEmptyParts)
 {
     bool quoted = false;
-    QList<QByteArray> rez;
+    QList<T> rez;
     if (data.isEmpty())
         return rez;
 
     int lastPos = 0;
     for (int i = 0; i < data.size(); ++i)
     {
-        if (data[i] == '\"')
+        if (data[i] == quoteChar)
             quoted = !quoted;
         else if (data[i] == delimiter && !quoted)
         {
-            rez << QByteArray(data.constData() + lastPos, i - lastPos);
+            T value = data.mid(lastPos, i - lastPos);
+            if (!value.isEmpty() || keepEmptyParts)
+                rez << value;
             lastPos = i + 1;
         }
     }
-    rez << QByteArray(data.constData() + lastPos, data.size() - lastPos);
+    rez << data.mid(lastPos, data.size() - lastPos);
 
     return rez;
 }
 
+QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
+{
+    return smartSplitInternal(data, delimiter, '\"', true);
+}
+
+QStringList smartSplit(const QString& data, const QChar delimiter, QString::SplitBehavior splitBehavior )
+{
+    return smartSplitInternal(data, delimiter, QChar(L'\"'), splitBehavior == QString::KeepEmptyParts);
+}
+
+template <class T, class T2>
+T unquoteStrInternal(const T& v, T2 quoteChar)
+{
+    T value = v.trimmed();
+    int pos1 = value.startsWith(quoteChar) ? 1 : 0;
+    int pos2 = value.endsWith(quoteChar) ? 1 : 0;
+    return value.mid(pos1, value.length()-pos1-pos2);
+}
+
 QByteArray unquoteStr(const QByteArray& v)
 {
-    QByteArray value = v.trimmed();
-    int pos1 = value.startsWith('\"') ? 1 : 0;
-    int pos2 = value.endsWith('\"') ? 1 : 0;
-    return value.mid(pos1, value.length()-pos1-pos2);
+    return unquoteStrInternal(v, '\"');
+}
+
+QString unquoteStr(const QString& v)
+{
+    return unquoteStrInternal(v, L'\"');
 }
 
 QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter) {
@@ -64,5 +75,48 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char deli
     }
 
     return result;
+}
+
+QByteArray createUserPasswordDigest(
+    const QString& userName,
+    const QString& password,
+    const QString& realm )
+{
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(QString(lit("%1:%2:%3")).arg(userName, realm, password).toLatin1());
+    return md5.result().toHex();
+}
+
+QByteArray createHttpQueryAuthParam(
+    const QString& userName,
+    const QString& password,
+    const QString& realm,
+    const QByteArray& method,
+    QByteArray nonce)
+{
+    return createHttpQueryAuthParam(userName, createUserPasswordDigest(userName, password, realm), method, nonce);
+}
+
+QByteArray createHttpQueryAuthParam(
+    const QString& userName,
+    const QByteArray& digest,
+    const QByteArray& method,
+    QByteArray nonce)
+{
+    //calculating "HA2"
+    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+    md5Hash.addData( method );
+    md5Hash.addData( ":" );
+    const QByteArray nedoHa2 = md5Hash.result().toHex();
+
+    //calculating auth digest
+    md5Hash.reset();
+    md5Hash.addData( ":" );
+    md5Hash.addData( nonce );
+    md5Hash.addData( ":" );
+    md5Hash.addData( nedoHa2 );
+    const QByteArray& authDigest = md5Hash.result().toHex();
+
+    return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
 }
 

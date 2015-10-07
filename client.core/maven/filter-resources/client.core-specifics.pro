@@ -3,12 +3,12 @@ TEMPLATE = lib
 INCLUDEPATH +=  ${qt.dir}/include/QtGui/$$QT_VERSION/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/
 
-mac {
+mac:!ios {
     INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ \
                    ${qt.dir}/lib/QtGui.framework/Headers/$$QT_VERSION/QtGui \
 }
 
-mac {
+mac:!ios {
     LIBS += -lobjc -framework Foundation -framework AppKit
 }
 

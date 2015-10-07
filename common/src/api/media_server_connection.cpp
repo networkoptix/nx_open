@@ -143,9 +143,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         QnTimePeriodList reply;
         if(status == 0) {
             if (response.data.startsWith("BIN")) {
-                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3, false);
-            } else if (response.data.startsWith("BII")) {
-                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3, true);
+                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3);
             } else {
                 qWarning() << "QnMediaServerConnection: unexpected message received.";
                 status = -1;
@@ -394,10 +392,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnVirtualCameraResourcePt
     params << QnRequestParam("startTime", QString::number(startTimeMs));
     params << QnRequestParam("endTime", QString::number(endTimeMs));
     params << QnRequestParam("detail", QString::number(detail));
-    if (periodsType == Qn::BookmarksContent)
-        params << QnRequestParam("format", "bii");
-    else
-        params << QnRequestParam("format", "bin");
+    params << QnRequestParam("format", "bin");
     params << QnRequestParam("periodsType", QString::number(static_cast<int>(periodsType)));
     params << QnRequestParam("filter", filter);
 

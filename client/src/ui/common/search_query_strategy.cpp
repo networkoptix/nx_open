@@ -17,11 +17,13 @@ public:
 
     virtual ~Impl();
 
-    void changeQuery(const QString &query
+    void changeQuery(const QString &currentQuery
         , bool forcibly);
 
+    QString currentQuery() const;
+
 private:
-    void updateQuery(const QString &query
+    void updateQuery(const QString &currentQuery
         , bool forcibly);
 
 private:
@@ -77,6 +79,11 @@ void QnSearchQueryStrategy::Impl::changeQuery(const QString &query
     }
 }
 
+QString QnSearchQueryStrategy::Impl::currentQuery() const
+{
+    return m_currentQuery;
+}
+
 void QnSearchQueryStrategy::Impl::updateQuery(const QString &query
     , bool forcibly)
 {
@@ -116,6 +123,11 @@ QnSearchQueryStrategy::QnSearchQueryStrategy(QObject *parent
 
 QnSearchQueryStrategy::~QnSearchQueryStrategy() 
 {
+}
+
+QString QnSearchQueryStrategy::query() const
+{
+    return m_impl->currentQuery();
 }
 
 void QnSearchQueryStrategy::changeQuery(const QString &query)

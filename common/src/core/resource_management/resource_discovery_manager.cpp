@@ -24,7 +24,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 
-#include <plugins/resource/upnp/upnp_device_searcher.h>
 #include <plugins/storage/dts/abstract_dts_searcher.h>
 
 #include <utils/common/sleep.h>
@@ -191,9 +190,6 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
     QElapsedTimer discoveryTime;
     discoveryTime.restart();
-    if( UPNPDeviceSearcher::instance() )
-        UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
-
     ResourceSearcherList searchersList;
     {
         QnMutexLocker locker( &m_searchersListMutex );
@@ -634,9 +630,11 @@ void QnResourceDiscoveryManager::dtsAssignment()
 
             Q_ASSERT(unit.factory!=0);
 
+#ifdef ENABLE_DATA_PROVIDERS
             vcRes->lockDTSFactory();
             vcRes->setDTSFactory(unit.factory);
             vcRes->unLockDTSFactory();
+#endif
         }
     }
 }

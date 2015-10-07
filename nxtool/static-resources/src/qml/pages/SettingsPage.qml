@@ -79,8 +79,21 @@ FocusScope
         }
     }
 
+    Dialogs.ErrorDialog
+    {
+        id: errorDialog;
+    }
+
     function applyChanges()
     {
+        if (rtuContext.selection.safeMode)
+        {
+            rtuContext.changesManager().clearChanges();
+            errorDialog.message = safeModeWarningText.text;
+            errorDialog.show();
+            return;
+        }
+
         var children = settingsColumn.children;
         var childrenCount = children.length;
         var changesCount = 0;
@@ -151,12 +164,53 @@ FocusScope
         width: parent.width;
     }
 
+    Rectangle
+    {
+        id: safeModeWarning;
+
+        height: safeModeWarningText.height + Common.SizeManager.spacing.medium * 2;
+
+        anchors
+        {
+            left: parent.left;
+            right: parent.right;
+        }
+        visible: rtuContext.selection.safeMode;
+
+        color: "#F0E9D9"
+        border.color: "#DBC9B7";
+
+        Base.Text
+        {
+            id: safeModeWarningText;
+
+            anchors
+            {
+                left: parent.left;
+                right: parent.right;
+                leftMargin: Common.SizeManager.spacing.large;
+                rightMargin: Common.SizeManager.spacing.large;
+
+                verticalCenter: parent.verticalCenter;
+            }
+
+            thin: true;
+            font.pixelSize: Common.SizeManager.fontSizes.medium;
+
+            text: (rtuContext.selection.count == 1
+                ? qsTr("Selected server is in Safe Mode.\nNo changes can be applied")
+                : qsTr("Some of selected servers are in Safe Mode.\nNo changes can be applied"))
+            color: "#4B1010";
+        }
+    }
+
     ScrollView
     {
         width: parent.width;
         anchors
         {
-            top: outdatedWarning.bottom;
+            top: (outdatedWarning.visible || !safeModeWarning.visible
+                  ? outdatedWarning.bottom : safeModeWarning.bottom);
             bottom: buttonsPanel.top;
         }
         
@@ -188,16 +242,32 @@ FocusScope
                 Settings.IpPortSettings
                 {
                     id: ipPortSettings;
+
+                    extraWarned: rtuContext.selection.safeMode;
+                    enabled: !rtuContext.selection.safeMode;
                 }
 
                 Settings.DateTimeSettings
                 {
                     id: dateTimeSettings;
+
+                    pseudoEnabled: !rtuContext.selection.safeMode;
                 }
 
                 Settings.SystemAndPasswordSetting
                 {
                     id: systemAndPasswordSettings;
+
+                    extraWarned: rtuContext.selection.safeMode;
+                    enabled: !rtuContext.selection.safeMode;
+                }
+
+                Settings.ActionSettings
+                {
+                    id: actionSettings;
+
+                    nextTab: applyButton;
+                    flags: rtuContext.selection.SystemCommands;
                 }
 
                 Base.EmptyCell {}

@@ -9,6 +9,7 @@ QtControls.Button
 {
     id: thisComponent;
 
+    property bool thin: false;
     property color textColor: "#000000";
 
     property color normalColor: "#FFFFFF";
@@ -47,7 +48,7 @@ QtControls.Button
         {
             id: styleLabel;
 
-            thin: false;
+            thin: thisComponent.thin;
             text: thisComponent.text;
             color: thisComponent.textColor;
             verticalAlignment: Text.AlignVCenter;
@@ -76,4 +77,49 @@ QtControls.Button
             border.color: { getColor(false); }
         }
     }
+
+    Rectangle
+    {
+        id: blinkArea;
+        readonly property int offset: 3;
+
+        x: -offset;
+        y: -offset;
+        width: parent.width + offset * 2;
+        height: parent.height + offset * 2;
+
+        opacity: 0;
+
+        color: "#992FA2DB";
+        radius: blinkArea.offset;
+
+        Rectangle
+        {
+            anchors.fill: parent;
+
+            color: "#00000000";
+
+            border
+            {
+                width: 2;
+                color: "#992FA2DB";
+            }
+            radius: blinkArea.offset;
+        }
+
+        SequentialAnimation
+        {
+            id: animtaion;
+            loops: 2;
+
+            NumberAnimation { target: blinkArea; property: "opacity"; to: 1; duration: 100; }
+            NumberAnimation { target: blinkArea; property: "opacity"; to: 0; duration: 400; }
+        }
+    }
+
+    function blink()
+    {
+        animtaion.start();
+    }
+
 }

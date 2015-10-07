@@ -442,7 +442,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
 {
     // sometime function may return zero packet if no data arrived
     QnAbstractMediaDataPtr result;
-    int errCnt = 0;
+    //int errCnt = 0;
     QTime receiveTimer;
     receiveTimer.restart();
     while(!result)
@@ -455,11 +455,12 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
 
         int rtpChannelNum = 0;
         int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
-        if (blockSize < 0 && !m_closing) {
+        if (blockSize <= 0 && !m_closing) {
             //m_rtspSession.stop(); // reconnect
             reopen();
             return result; 
         }
+        /*
         else if (blockSize == 0) {
             static const int MAX_ERROR_COUNT = 10;
 
@@ -470,7 +471,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
                 continue;
         }
         errCnt = 0;
-
+        */
+        
 #ifdef DEBUG_RTSP
         static QFile* binaryFile = 0;
         if (!binaryFile) {

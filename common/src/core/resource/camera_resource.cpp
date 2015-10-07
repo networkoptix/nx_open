@@ -16,11 +16,31 @@ static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+namespace {
+    const int CODEC_ID_H264 = 25;
+    const int CODEC_ID_MPEG4 = 13;
+    const int CODEC_ID_MJPEG = 8;
+}
+#endif
+
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0),
     m_issueCounter(0),
     m_lastIssueTimer()
 {}
+
+QString QnVirtualCameraResource::getUniqueId() const
+{
+    return getPhysicalId();
+}
+
+QString QnVirtualCameraResource::toSearchString() const
+{
+    QString result;
+    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
+    return result;
+}
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
     QnVirtualCameraResource(),
@@ -357,11 +377,6 @@ void QnVirtualCameraResource::unLockDTSFactory()
 }
 
 
-QString QnVirtualCameraResource::getUniqueId() const
-{
-    return getPhysicalId();
-}
-
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
     QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;
@@ -392,14 +407,6 @@ void QnVirtualCameraResource::saveParamsAsync()
 {
     propertyDictionary->saveParamsAsync(getId());
 }
-
-QString QnVirtualCameraResource::toSearchString() const
-{
-    QString result;
-    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
-    return result;
-}
-
 
 int QnVirtualCameraResource::saveAsync()
 {
