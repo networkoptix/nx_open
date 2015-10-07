@@ -7,6 +7,10 @@
 #include <QSqlError>
 #include "qcoreapplication.h"
 
+namespace {
+    const QString sqlDateTimeFormat = "yyyy-MM-dd hh:mm:ss";
+}
+
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 
     //and no concurrent transactions supported. Maybe QnDbConnection?
 QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex): 
@@ -225,3 +229,9 @@ bool QnDbHelper::afterInstallUpdate(const QString& updateName) {
     Q_UNUSED(updateName);
     return true;
 }
+
+QString QnDbHelper::toSQLDate(qint64 timeMs) const {
+    return QDateTime::fromMSecsSinceEpoch(timeMs).toString(sqlDateTimeFormat);
+}
+
+

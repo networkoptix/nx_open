@@ -54,6 +54,7 @@ protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);
 
+    QString toSQLDate(qint64 timeMs) const;
 protected:
     QSqlDatabase m_sdb;
     //QnDbTransaction m_tran;

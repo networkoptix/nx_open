@@ -1514,7 +1514,6 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("/proxy/*/hls/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
-    QnEventsDB::init();
 
     QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
 
@@ -2272,9 +2271,6 @@ void MediaServerProcess::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
     
-    // destroy events db
-    QnEventsDB::fini();
-
     mserverResourceDiscoveryManager.reset();
 
     av_lockmgr_register(NULL);
@@ -2388,11 +2384,6 @@ protected:
     virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
-
-        QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
-        QCoreApplication::setApplicationName(lit(QN_APPLICATION_NAME));
-        if (QCoreApplication::applicationVersion().isEmpty())
-            QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
         if (application->isRunning())
         {
@@ -2622,7 +2613,9 @@ int MediaServerProcess::main(int argc, char* argv[])
     QString rwConfigFilePath;
     bool showVersion = false;
     bool showHelp = false;
+#ifdef __linux__
     bool disableCrashHandler = false;
+#endif
     QString engineVersion;
 
     QnCommandLineParser commandLineParser;

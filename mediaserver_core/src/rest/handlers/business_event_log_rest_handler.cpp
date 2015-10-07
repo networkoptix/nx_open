@@ -6,7 +6,7 @@
 #include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
 
-#include "events/events_db.h"
+#include <database/server_db.h>
 
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
@@ -75,7 +75,7 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
         return CODE_INVALID_PARAMETER;
     }
 
-    qnEventsDB->getAndSerializeActions(
+    qnServerDb->getAndSerializeActions(
         result,
         period, 
         resList,

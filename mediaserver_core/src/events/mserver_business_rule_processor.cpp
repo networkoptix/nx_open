@@ -13,6 +13,8 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
 
+#include <database/server_db.h>
+
 #include "camera/camera_pool.h"
 #include "decoders/video/ffmpeg.h"
 
@@ -38,7 +40,7 @@ QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
 
 void QnMServerBusinessRuleProcessor::onRemoveResource(const QnResourcePtr &resource)
 {
-    QnEventsDB::instance()->removeLogForRes(resource->getId());
+    qnServerDb->removeLogForRes(resource->getId());
 }
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
@@ -66,7 +68,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
     }
     
     if (result)
-        QnEventsDB::instance()->saveActionToDB(action, res);
+        qnServerDb->saveActionToDB(action, res);
 
     return result;
 }

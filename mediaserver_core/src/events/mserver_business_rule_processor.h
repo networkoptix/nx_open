@@ -3,7 +3,6 @@
 
 #include <business/business_rule_processor.h>
 #include <business/actions/recording_business_action.h>
-#include "events_db.h"
 
 #include <core/resource/resource_fwd.h>
 
