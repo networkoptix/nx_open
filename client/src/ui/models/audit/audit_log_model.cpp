@@ -13,6 +13,8 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
@@ -303,9 +305,15 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_ExportVideo:
             return tr("Exporting video");
         case Qn::AR_CameraUpdate:
-            return tr("%1 updated").arg(getDefaultDeviceNameUpper());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Device updated"),
+                tr("Camera updated")
+                );
         case Qn::AR_CameraInsert:
-            return tr("%1 added").arg(getDefaultDeviceNameUpper());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Device added"),
+                tr("Camera added")
+                );
         case Qn::AR_SystemNameChanged:
             return tr("System name changed");
         case Qn::AR_SystemmMerge:
@@ -319,7 +327,10 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_EmailSettings:
             return tr("E-mail settings changed");
         case Qn::AR_CameraRemove:
-            return tr("%1 removed").arg(getDefaultDeviceNameUpper());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Device removed"),
+                tr("Camera removed")
+                );
         case Qn::AR_ServerRemove:
             return tr("Server removed");
         case Qn::AR_BEventRemove:
@@ -394,7 +405,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
         result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
-        result += getNumericDevicesName(getCameras(data->resources));
+        result += QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
         break;
     default:
         result = getResourcesString(data->resources);
@@ -422,7 +433,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
         case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
-            QString txt = getNumericDevicesName(getCameras(data->resources));
+            QString txt = QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
             QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
             if (hovered)
                 result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
@@ -612,7 +623,10 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
             case EventTypeColumn:
                 return tr("Activity");
             case CameraNameColumn:
-                return tr("%1 name").arg(getDefaultDeviceNameUpper());
+                return QnDeviceDependentStrings::getDefaultNameFromSet(
+                    tr("Device name"),
+                    tr("Camera name")
+                    );
             case CameraIpColumn:
                 return tr("IP");
             case DateColumn:

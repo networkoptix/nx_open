@@ -1191,7 +1191,10 @@ void QnAuditLogDialog::retranslateUi()
     ui->retranslateUi(this);
 
     enum { kDevicesTabIndex = 1 };
-    ui->tabWidget->setTabText(kDevicesTabIndex, QnDeviceDependentStrings::getDefaultName());
+    ui->tabWidget->setTabText(kDevicesTabIndex, QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Devices"),
+        tr("Cameras")
+    ));
     ui->checkBoxCameras->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Device actions"),
         tr("Camera actions")

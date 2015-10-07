@@ -14,6 +14,7 @@
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
@@ -140,8 +141,13 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
 }
 
 void QnSingleCameraSettingsWidget::retranslateUi() {
-    //: "Camera Settings" or "IO Module settings", etc
-    setWindowTitle(tr("%1 Settings").arg(getDefaultDeviceNameUpper(m_camera)));
+    setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
+        QnCameraDeviceStringSet(
+            tr("Device Settings"),
+            tr("Camera Settings"),
+            tr("IO Module Settings")
+        ), m_camera
+    ));
 }
 
 
