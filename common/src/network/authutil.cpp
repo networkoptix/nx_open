@@ -111,7 +111,6 @@ QByteArray createHttpQueryAuthParam(
 
     //calculating auth digest
     md5Hash.reset();
-    md5Hash.addData( digest );
     md5Hash.addData( ":" );
     md5Hash.addData( nonce );
     md5Hash.addData( ":" );
@@ -120,3 +119,4 @@ QByteArray createHttpQueryAuthParam(
 
     return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
 }
+
