@@ -59,7 +59,7 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     tableView->resizeColumnsToContents();
     tableView->horizontalHeader()->setSectionsClickable(false);
     tableView->horizontalHeader()->setStretchLastSection(false);
-    //tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     tableView->horizontalHeader()->setSectionResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
     tableView->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));

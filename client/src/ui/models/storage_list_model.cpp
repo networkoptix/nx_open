@@ -19,7 +19,9 @@ QnStorageListModel::~QnStorageListModel() {}
 
 void QnStorageListModel::setModelData(const QnStorageSpaceReply& data)
 {
+    beginResetModel();
     m_data = data;
+    endResetModel();
 }
 
 int QnStorageListModel::rowCount(const QModelIndex &parent) const {

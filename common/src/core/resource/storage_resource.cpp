@@ -5,7 +5,9 @@
 QnStorageResource::QnStorageResource():
     m_spaceLimit(0),
     m_maxStoreTime(0),
-    m_usedForWriting(false)
+    m_usedForWriting(false),
+    m_storageBitrateCoeff(0.0),
+    m_backup(false)
 {
     setStatus(Qn::Offline);
 }
