@@ -2,6 +2,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -12,16 +13,28 @@ namespace {
     class QnBusinessResourceValidationStrings {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
     public:
-        static QString subsetCameras(int count, const QnVirtualCameraResourceList &total) { 
-            return tr("%n of %1", "", count).arg(getNumericDevicesName(total, false)); 
+        static QString subsetCameras(int count, const QnVirtualCameraResourceList &total) {
+            return QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("%1 of %n devices"),
+                    tr("%1 of %n cameras"),
+                    tr("%1 of %n IO modules")
+                ), total
+            ).arg(count);
         } 
 
         static QString anyCamera() {
-            return tr("<Any %1>").arg(getDefaultDeviceNameUpper());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("<Any Device>"),
+                tr("<Any Camera>")
+                );
         }
 
         static QString selectCamera() {
-            return tr("Select at least one %1.").arg(getDefaultDeviceNameLower());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("<Select at least one device>"),
+                tr("<Select at least one camera>")
+                );
         }
     };
 
@@ -52,8 +65,7 @@ namespace {
                            );
         if (cameras.size() == 1)
             return getShortResourceName(cameras.first());
-        return getNumericDevicesName(cameras);
-
+        return QnDeviceDependentStrings::getNumericName(cameras);
     }
 
 }

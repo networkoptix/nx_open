@@ -179,7 +179,10 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
 }
 
 void QnCameraListDialog::at_exportAction_triggered() {
-    QnGridWidgetHelper::exportToFile(ui->camerasView, this, tr("Export selected %1 to a file.").arg(getDefaultDeviceNameLower()));
+    QnGridWidgetHelper::exportToFile(ui->camerasView, this, QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Export selected devices to a file."),
+        tr("Export selected cameras to a file.")
+        ));
 }
 
 void QnCameraListDialog::at_clipboardAction_triggered() {

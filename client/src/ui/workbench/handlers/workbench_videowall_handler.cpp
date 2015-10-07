@@ -23,6 +23,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_type.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -1161,7 +1162,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
     else {
         QnVirtualCameraResourceList cameras = filtered.filtered<QnVirtualCameraResource>();
         if (cameras.size() == filtered.size()) /* Cameras only */
-            layout->setName(getNumericDevicesName(cameras));
+            layout->setName(QnDeviceDependentStrings::getNumericName(cameras));
         else
             layout->setName(tr("%n items", NULL, filtered.size()));
     }

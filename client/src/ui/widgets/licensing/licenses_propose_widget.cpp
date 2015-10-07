@@ -3,6 +3,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/checkbox_utils.h>
@@ -86,7 +87,13 @@ void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &came
     if (analogCameras == m_cameras.size())
         title = tr("Use analog licenses to view these %n cameras", "", analogCameras);
     else 
-        title = tr("Use licenses for selected %1").arg(getNumericDevicesName(m_cameras));
+        title = QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Use licenses for selected %n devices",      nullptr,    m_cameras.size()),
+                tr("Use licenses for selected %n cameras",      nullptr,    m_cameras.size()),
+                tr("Use licenses for selected %n IO modules",   nullptr,    m_cameras.size())
+            ), m_cameras
+        );
     ui->useLicenseCheckBox->setText(title);
 
     bool licenseUsed = m_cameras.isEmpty() ? false : m_cameras.front()->isLicenseUsed();

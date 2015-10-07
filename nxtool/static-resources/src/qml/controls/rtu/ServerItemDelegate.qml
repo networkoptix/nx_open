@@ -14,6 +14,7 @@ Rectangle
     property int port;
     property int selectedState;
 
+    property bool loggedIn: false;
     property bool availableForSelection: false;
     property bool safeMode: true;
     property bool hasHdd: false;
@@ -25,6 +26,7 @@ Rectangle
     property string hardwareAddress;
     property string os;
 
+    signal unauthrizedClicked(int currentItemIndex);
     signal selectionStateShouldBeChanged(int currentItemIndex);
     signal explicitSelectionCalled(int currentItemIndex);
     
@@ -95,6 +97,12 @@ Rectangle
 
                 onClicked:
                 {
+                    if (!thisComponent.loggedIn)
+                    {
+                        unauthrizedClicked(index);
+                        return;
+                    }
+
                     if (!thisComponent.availableForSelection)
                         return;
 

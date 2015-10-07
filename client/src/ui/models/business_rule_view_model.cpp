@@ -2,6 +2,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -832,9 +833,12 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
     } else /*if (QnBusiness::requiresCameraResource(eventType))*/ {
         QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
         if (cameras.isEmpty())
-            return tr("<Any %1>").arg(getDefaultDeviceNameUpper());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("<Any Device>"),
+                tr("<Any Camera>")
+            );
         else
-            return getNumericDevicesName(cameras);
+            return QnDeviceDependentStrings::getNumericName(cameras);
     }
 }
 
@@ -899,9 +903,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         return getResourceName(cameras.first());
     
     if (cameras.isEmpty())
-        return tr("Select at least one %1").arg(getDefaultDeviceNameLower());
+        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Select at least one device"),
+            tr("Select at least one camera")
+        );
     
-    return getNumericDevicesName(cameras);  
+    return QnDeviceDependentStrings::getNumericName(cameras);  
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const {
@@ -935,7 +942,7 @@ QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState
     case QnBusiness::ActiveState:
         return tr("Starts");
     case QnBusiness::UndefinedState:
-        return tr("Occures");
+        return tr("Occurs");
     }
     return QString();
 }
