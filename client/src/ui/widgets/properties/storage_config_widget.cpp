@@ -8,6 +8,7 @@
 #include "utils/common/event_processors.h"
 #include <core/resource/media_server_resource.h>
 #include "ui/models/storage_list_model.h"
+#include "api/app_server_connection.h"
 
 namespace {
     //setting free space to zero, since now client does not change this value, so it must keep current value
@@ -137,4 +138,60 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
 
 void QnStorageConfigWidget::updateRebuildInfo() 
 {
+}
+
+void QnStorageConfigWidget::processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& modifiedData, bool isBackupPool)
+{
+    for(const auto& storageData: modifiedData)
+    {
+        QnStorageResourcePtr storage = m_server->getStorageByUrl(storageData.url);
+        if (storage) {
+            if (storageData.isUsedForWriting != storage->isUsedForWriting() || isBackupPool != storage->isBackup()) 
+            {
+                storage->setUsedForWriting(storageData.isUsedForWriting);
+                storage->setBackup(isBackupPool);
+                result << storage;
+            }
+        }
+        else {
+            // create or remove new storage
+            QnStorageResourcePtr storage(new QnClientStorageResource());
+            if (!storageData.storageId.isNull())
+                storage->setId(storageData.storageId);
+            QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+            if (resType)
+                storage->setTypeId(resType->getId());
+            storage->setName(QnUuid::createUuid().toString());
+            storage->setParentId(m_server->getId());
+            storage->setUrl(storageData.url);
+            storage->setSpaceLimit(storageData.reservedSpace); //client does not change space limit anymore
+            storage->setUsedForWriting(storageData.isUsedForWriting);
+            storage->setStorageType(storageData.storageType);
+            storage->setBackup(isBackupPool);
+            result << storage;
+        }
+    }
+}
+
+void QnStorageConfigWidget::submitToSettings() 
+{
+    if (isReadOnly())
+        return;
+
+    QnStorageResourceList storagesToUpdate;
+    ec2::ApiIdDataList storagesToRemove;
+
+    processStorages(storagesToUpdate, m_mainPool.model->modelData().storages, false);
+    processStorages(storagesToUpdate, m_backupPool.model->modelData().storages, true);
+
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    if (!conn)
+        return;
+
+    //TODO: #GDM SafeMode
+    if (!storagesToUpdate.isEmpty())
+        conn->getMediaServerManager()->saveStorages(storagesToUpdate, this, []{});
+
+    if (!storagesToRemove.empty())
+        conn->getMediaServerManager()->removeStorages(storagesToRemove, this, []{});
 }

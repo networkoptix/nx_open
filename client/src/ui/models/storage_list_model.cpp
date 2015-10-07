@@ -24,6 +24,11 @@ void QnStorageListModel::setModelData(const QnStorageSpaceReply& data)
     endResetModel();
 }
 
+QnStorageSpaceReply QnStorageListModel::modelData() const
+{
+    return m_data;
+}
+
 int QnStorageListModel::rowCount(const QModelIndex &parent) const {
     if (!parent.isValid())
         return m_data.storages.size();

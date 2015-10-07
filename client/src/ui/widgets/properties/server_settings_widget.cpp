@@ -212,7 +212,7 @@ void QnServerSettingsWidget::updateFromSettings() {
 void QnServerSettingsWidget::submitToSettings() {
     if (isReadOnly())
         return;
-
+    
     qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
         server->setName(ui->nameLineEdit->text());
         server->setMaxCameras(ui->maxCamerasSpinBox->value());

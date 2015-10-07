@@ -33,6 +33,7 @@ public:
 
     void setServer(const QnMediaServerResourcePtr &server);
     bool hasChanges() const { return m_hasStorageChanges; }
+    virtual void submitToSettings() override;
 private:
     void updateRebuildInfo();
 private slots:
@@ -55,4 +56,5 @@ private:
     StoragePool m_backupPool;
 private:
     void setupGrid(QTableView* tableView, StoragePool* storagePool);
+    void processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& newData, bool isBackupPool);
 };
