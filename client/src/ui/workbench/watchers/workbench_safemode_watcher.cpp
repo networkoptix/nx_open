@@ -19,13 +19,21 @@ void QnWorkbenchSafeModeWatcher::updateReadOnlyMode() {
     if (m_warnLabel)
         m_warnLabel->setVisible(readOnly);
 
-    for (QWidget* widget: m_autoHiddenWidgets)
-        widget->setVisible(!readOnly);
-
-    using ::setReadOnly;
-    for (QWidget* widget: m_autoReadOnlyWidgets)
-        setReadOnly(widget, readOnly);
+    for (const ControlledWidget &widget: m_controlledWidgets) {
+        switch (widget.mode) {
+        case ControlMode::Hide:
+            widget.widget->setVisible(!readOnly);
+            break;
+        case ControlMode::Disable:
+            widget.widget->setEnabled(!readOnly);
+            break;
+        case ControlMode::MakeReadOnly:
+            setReadOnly(widget.widget, readOnly);
+            break;
+        }
+    }
 }
+        
 
 void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox) {
     QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(buttonBox->layout());
@@ -41,12 +49,7 @@ void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox) {
     updateReadOnlyMode();
 }
 
-void QnWorkbenchSafeModeWatcher::addAutoHiddenWidget(QWidget *widget) {
-    m_autoHiddenWidgets << widget;
-    updateReadOnlyMode();
-}
-
-void QnWorkbenchSafeModeWatcher::addAutoReadOnlyWidget(QWidget *widget) {
-    m_autoReadOnlyWidgets << widget;
+void QnWorkbenchSafeModeWatcher::addControlledWidget(QWidget *widget, ControlMode mode) {
+    m_controlledWidgets << ControlledWidget(widget, mode);
     updateReadOnlyMode();
 }
