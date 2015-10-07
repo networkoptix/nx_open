@@ -19,6 +19,7 @@ namespace Ui {
     class StorageConfigWidget;
 }
 
+class QnStorageListModel;
 class QnStorageConfigWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware 
 {
     Q_OBJECT
@@ -33,10 +34,9 @@ public:
     void setServer(const QnMediaServerResourcePtr &server);
     bool hasChanges() const { return m_hasStorageChanges; }
 private:
-    void setupGrid(QTableWidget* tableWidget);
     void updateRebuildInfo();
 private slots:
-    void at_replyReceived(int status, const QnStorageSpaceReply &reply, int);
+    void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();
 private:
     Ui::StorageConfigWidget* ui;
@@ -44,12 +44,15 @@ private:
     QnMediaServerResourcePtr m_server;
     QnStorageResourceList m_storages;
     
-    struct RequestInfo
+    struct StoragePool
     {
-        RequestInfo(): storageSpaceHandle(-1) {}
+        StoragePool(): storageSpaceHandle(-1), model(0) {}
         int storageSpaceHandle;
+        QnStorageListModel* model;
     };
 
-    RequestInfo m_mainPool;
-    RequestInfo m_backupPool;
+    StoragePool m_mainPool;
+    StoragePool m_backupPool;
+private:
+    void setupGrid(QTableView* tableView, StoragePool* storagePool);
 };

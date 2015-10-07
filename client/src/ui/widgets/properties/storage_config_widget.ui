@@ -25,7 +25,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="mainStoragesTable">
+       <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
@@ -34,12 +34,6 @@
         </property>
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>
-        </property>
-        <property name="rowCount">
-         <number>0</number>
-        </property>
-        <property name="columnCount">
-         <number>7</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -56,41 +50,6 @@
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
         </attribute>
-        <column>
-         <property name="text">
-          <string>In Use</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Protocol</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Path</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Capacity</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Login</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Password</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Space</string>
-         </property>
-        </column>
        </widget>
       </item>
       <item>
@@ -132,7 +91,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="backupStoragesTable">
+       <widget class="QnTableView" name="backupStoragesTable">
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
@@ -142,10 +101,10 @@
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>
         </property>
-        <property name="rowCount">
+        <property name="rowCount" stdset="0">
          <number>0</number>
         </property>
-        <property name="columnCount">
+        <property name="columnCount" stdset="0">
          <number>7</number>
         </property>
         <attribute name="horizontalHeaderVisible">
@@ -163,41 +122,6 @@
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
         </attribute>
-        <column>
-         <property name="text">
-          <string>In Use</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Protocol</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Path</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Capacity</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Login</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Password</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Space</string>
-         </property>
-        </column>
        </widget>
       </item>
       <item>
@@ -386,6 +310,11 @@ It won't deny oldest footage removing from the drive.</string>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnTableView</class>
+   <extends>QTableView</extends>
+   <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

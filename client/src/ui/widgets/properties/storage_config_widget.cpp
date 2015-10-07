@@ -7,27 +7,7 @@
 #include <ui/style/warning_style.h>
 #include "utils/common/event_processors.h"
 #include <core/resource/media_server_resource.h>
-
-namespace
-{
-    const int ReservedSpaceRole = Qt::UserRole;
-    const int FreeSpaceRole = Qt::UserRole + 1;
-    const int TotalSpaceRole = Qt::UserRole + 2;
-    const int StorageIdRole = Qt::UserRole + 3;
-    const int ExternalRole = Qt::UserRole + 4;
-    const int StorageType = Qt::UserRole + 5;
-
-    enum Column {
-        CheckBoxColumn,
-        TypeColumn,
-        PathColumn,
-        CapacityColumn,
-        LoginColumn,
-        ArchiveSpaceColumn,
-        ColumnCount
-    };
-
-}
+#include "ui/models/storage_list_model.h"
 
 namespace {
     //setting free space to zero, since now client does not change this value, so it must keep current value
@@ -45,29 +25,10 @@ namespace {
         }
 
         virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override {
-            QnStorageSpaceSlider *slider = dynamic_cast<QnStorageSpaceSlider *>(editor);
-            if(!slider) {
-                base_type::setEditorData(editor, index);
-                return;
-            }
-
-            qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
-            qint64 videoSpace = totalSpace - index.data(ReservedSpaceRole).toLongLong();
-
-            slider->setRange(0, totalSpace / bytesInMiB);
-            slider->setValue(videoSpace / bytesInMiB);
         }
 
-        virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
-            QnStorageSpaceSlider *slider = dynamic_cast<QnStorageSpaceSlider *>(editor);
-            if(!slider) {
-                base_type::setModelData(editor, model, index);
-                return;
-            }
-
-            qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
-            qint64 videoSpace = slider->value() * bytesInMiB;
-            model->setData(index, totalSpace - videoSpace, ReservedSpaceRole);
+        virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override 
+        {
         }
     };
 
@@ -81,8 +42,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     m_hasStorageChanges(false)
 {
     ui->setupUi(this);
-    setupGrid(ui->mainStoragesTable);
-
+    
+    setupGrid(ui->mainStoragesTable, &m_mainPool);
+    setupGrid(ui->backupStoragesTable, &m_backupPool);
+    
+    m_backupPool.model->setBackupRole(true);
 }
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
@@ -90,28 +54,27 @@ QnStorageConfigWidget::~QnStorageConfigWidget()
 
 }
 
-void QnStorageConfigWidget::setupGrid(QTableWidget* tableWidget)
+void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storagePool)
 {
-    tableWidget->resizeColumnsToContents();
-    tableWidget->horizontalHeader()->setSectionsClickable(false);
-    tableWidget->horizontalHeader()->setStretchLastSection(false);
-    tableWidget->horizontalHeader()->setSectionResizeMode(CheckBoxColumn, QHeaderView::Fixed);
-    tableWidget->horizontalHeader()->setSectionResizeMode(TypeColumn, QHeaderView::ResizeToContents);
-    tableWidget->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::Stretch);
-    tableWidget->horizontalHeader()->setSectionResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
-    tableWidget->horizontalHeader()->setSectionResizeMode(LoginColumn, QHeaderView::ResizeToContents);
+    tableView->resizeColumnsToContents();
+    tableView->horizontalHeader()->setSectionsClickable(false);
+    tableView->horizontalHeader()->setStretchLastSection(false);
+    //tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
-    tableWidget->horizontalHeader()->setSectionResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
-    tableWidget->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
+    tableView->horizontalHeader()->setSectionResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
+    tableView->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
 #else
-    tableWidget->setColumnCount(ColumnCount - 1);
 #endif
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
 
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
     signalizer->setEventType(QEvent::ContextMenu);
-    tableWidget->installEventFilter(signalizer);
+    tableView->installEventFilter(signalizer);
+
+    storagePool->model = new QnStorageListModel();
+    tableView->setModel(storagePool->model);
+
     //connect(signalizer, &QnAbstractEventSignalizer::activated,  this,   &QnStorageConfigWidget::at_storagesTable_contextMenuEvent);
     //connect(tableWidget,          &QTableWidget::cellChanged, this,   &QnStorageConfigWidget::at_storagesTable_cellChanged);
 }
@@ -128,20 +91,26 @@ void QnStorageConfigWidget::sendStorageSpaceRequest() {
     m_backupPool.storageSpaceHandle = m_server->apiConnection()->getStorageSpaceAsync(false, this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
 }
 
-void QnStorageConfigWidget::at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle) 
+void QnStorageConfigWidget::at_replyReceived(int status, QnStorageSpaceReply reply, int handle) 
 {
     if(status != 0) {
         //setBottomLabelText(tr("Could not load storages from server."));
         return;
     }
-
-    QList<QnStorageSpaceData> items = reply.storages;
-    qSort(items.begin(), items.end(), [](const QnStorageSpaceData &l, const QnStorageSpaceData &r) 
+    
+    qSort(reply.storages.begin(), reply.storages.end(), [](const QnStorageSpaceData &l, const QnStorageSpaceData &r) 
     {
         if (l.isExternal != r.isExternal)
             return l.isExternal < r.isExternal; 
         return l.url < r.url;
     });
+    
+    
+    if (handle == m_mainPool.storageSpaceHandle)
+        m_mainPool.model->setModelData(reply);
+    else if (handle == m_backupPool.storageSpaceHandle)
+        m_backupPool.model->setModelData(reply);
+    
 }
 
 void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)

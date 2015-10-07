@@ -10,8 +10,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include "api/model/storage_space_reply.h"
 
-class QnStorageListModelPrivate;
-class QnStorageListModel : public Customized<QAbstractListModel>, public QnWorkbenchContextAware {
+class QnStorageListModel : public Customized<QAbstractListModel> {
     Q_OBJECT
     typedef Customized<QAbstractListModel> base_type;
 
@@ -20,7 +19,7 @@ public:
         CheckBoxColumn,
         UrlColumn,
         TypeColumn,
-        SizeColumn,
+        TotalSpaceColumn,
         RemoveActionColumn,
         ChangeGroupActionColumn,
 
@@ -38,6 +37,16 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+    void setBackupRole(bool value);
+private:
+    QString displayData(const QModelIndex &index) const;
+    QVariant fontData(const QModelIndex &index) const;
+    QVariant foregroundData(const QModelIndex &index) const;
+    QVariant mouseCursorData(const QModelIndex &index) const;
+    QVariant checkstateData(const QModelIndex &index) const;
 private:
     QnStorageSpaceReply m_data;
+    bool m_isBackupRole;
+    QBrush m_linkBrush;
+    QFont m_linkFont;
 };
