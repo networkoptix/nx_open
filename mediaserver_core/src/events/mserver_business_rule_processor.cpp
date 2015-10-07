@@ -269,6 +269,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.guid = QnUuid::createUuid();
     bookmark.startTimeMs = startTime;
     bookmark.durationMs = endTime - startTime;
+    bookmark.cameraId = camera->getUniqueId();
 
     bookmark.name = "Auto-Generated Bookmark";
     bookmark.description = QString("Rule %1\nFrom %2 to %3")
@@ -276,7 +277,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
         .arg(QDateTime::fromMSecsSinceEpoch(startTime).toString())
         .arg(QDateTime::fromMSecsSinceEpoch(endTime).toString());
 
-    return qnStorageMan->addBookmark(camera->getUniqueId().toUtf8(), bookmark, true);
+    return qnServerDb->addOrUpdateCameraBookmark(bookmark);
 }
 
 

@@ -319,52 +319,6 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
     return result;
 }
 
-QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
-    QWriteLocker lock(&m_mutex);
-
-    QVector<DeviceFileCatalogPtr> result;
-
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT unique_id, start_time, duration FROM storage_bookmark ORDER BY unique_id, start_time");
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        m_needReopenDB = true;
-        return result;
-    }
-    QSqlRecord queryInfo = query.record();
-    int idFieldIdx = queryInfo.indexOf("unique_id");
-    int startTimeFieldIdx = queryInfo.indexOf("start_time");
-    int durationFieldIdx = queryInfo.indexOf("duration");
-
-    DeviceFileCatalogPtr fileCatalog;
-    std::deque<DeviceFileCatalog::Chunk> chunks;
-    QByteArray prevId;
-    while (query.next())
-    {
-        QByteArray id = query.value(idFieldIdx).toByteArray();
-        if (id != prevId) 
-        {
-            if (fileCatalog) {
-                fileCatalog->addChunks(chunks);
-                result << fileCatalog;
-                chunks.clear();
-            }
-            prevId = id;
-            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(QString::fromUtf8(id), QnServer::BookmarksCatalog));
-        }
-        qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
-        int durationMs = query.value(durationFieldIdx).toInt();
-        chunks.push_back(DeviceFileCatalog::Chunk(startTime, m_storageIndex, 0, durationMs, 0, 0, 0));
-    }
-    if (fileCatalog) {
-        fileCatalog->addChunks(chunks);
-        result << fileCatalog;
-    }
-
-    return result;
-}
-
 QnStorageDb::QnDbTransaction* QnStorageDb::getTransaction()
 {
     if( m_needReopenDB )

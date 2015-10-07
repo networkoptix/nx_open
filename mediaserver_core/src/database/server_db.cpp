@@ -837,7 +837,9 @@ bool QnServerDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBookm
     return true;
 }
 
-bool QnServerDb::addOrUpdateCameraBookmark(const QString& cameraUniqueId, const QnCameraBookmark &bookmark) {
+bool QnServerDb::addOrUpdateCameraBookmark( const QnCameraBookmark &bookmark) {
+    Q_ASSERT_X(!bookmark.cameraId.isNull(), Q_FUNC_INFO, "Empty bookmark id");
+
     QnDbTransactionLocker tran(getTransaction());
 
     int docId = 0;
@@ -847,11 +849,10 @@ bool QnServerDb::addOrUpdateCameraBookmark(const QString& cameraUniqueId, const 
                          guid, unique_id, start_time, duration, \
                          name, description, timeout \
                          ) VALUES ( \
-                         :guid, :cameraUniqueId, :startTimeMs, :durationMs, \
+                         :guid, :cameraId, :startTimeMs, :durationMs, \
                          :name, :description, :timeout \
                          )");
         QnSql::bind(bookmark, &insQuery);
-        insQuery.bindValue(":cameraUniqueId", cameraUniqueId); // unique_id
         if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
             return false;

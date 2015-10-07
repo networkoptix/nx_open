@@ -58,7 +58,6 @@ private:
     bool addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
-    QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 
     void addCatalogFromMediaFolder(
         const QString&                  postfix, 
