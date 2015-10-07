@@ -12,7 +12,7 @@ Item {
     signal clicked()
 
     width: parent.width
-    height: dp(56)
+    height: dp(48)
 
     Rectangle {
         id: background

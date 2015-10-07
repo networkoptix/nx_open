@@ -48,7 +48,7 @@ public:
     void setDisplayMode(DisplayModeFlags displayMode);
 
 public slots:
-    QString updateSession(const QString &sessionId, const QString &address, const int port, const QString &user, const QString &password, const QString &systemName);
+    QString updateSession(const QString &sessionId, const QString &address, const int port, const QString &user, const QString &password, const QString &systemName, bool moveTop = false);
     void deleteSession(const QString &id);
 
 signals:

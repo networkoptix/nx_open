@@ -20,7 +20,7 @@ Item {
     signal pressAndHold
 
     width: content.width
-    height: content.height
+    height: content.height + dp(8)
 
     QtObject {
         id: d
@@ -113,7 +113,7 @@ Item {
                 QnStatusIndicator {
                     id: statusIndicator
                     status: cameraItem.status
-                    y: dp(2)
+                    y: dp(4)
                 }
 
                 Text {
@@ -146,19 +146,19 @@ Item {
         Column {
             width: parent.width
             anchors.centerIn: parent
-            spacing: dp(8)
 
             Text {
                 width: parent.width
+                height: dp(56)
 
-                text: qsTr("Camera hidden")
+                text: qsTr("Camera\nhidden")
 
                 horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
                 font.pixelSize: sp(16)
-                font.weight: Font.Light
                 maximumLineCount: 2
                 wrapMode: Text.WordWrap
-                color: QnTheme.cameraOfflineText
+                color: QnTheme.cameraHiddenText
             }
 
             QnButton {
@@ -169,6 +169,7 @@ Item {
                 flat: true
                 text: qsTr("Undo")
                 icon: "image://icon/undo.png"
+                font.pixelSize: sp(18)
 
                 onClicked: {
                     cameraItem.z = -1

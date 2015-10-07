@@ -8,10 +8,10 @@ import "../controls"
 QnListView {
     id: camerasList
 
-    leftMargin: dp(16)
-    rightMargin: dp(16)
-    topMargin: dp(16)
-    bottomMargin: dp(16)
+    leftMargin: dp(8)
+    rightMargin: dp(8)
+    topMargin: dp(8)
+    bottomMargin: dp(8)
     spacing: dp(8)
 
     delegate: QnCameraListItem {

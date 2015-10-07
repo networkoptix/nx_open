@@ -40,7 +40,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: QnTheme.popupMenuText
             font.weight: Font.Normal
-            font.pixelSize: sp(14)
+            font.pixelSize: sp(16)
         }
     }
 }

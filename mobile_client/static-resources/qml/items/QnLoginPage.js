@@ -4,8 +4,8 @@ function makeUrl(host, port, login, password) {
     return "http://" + login + ":" + password + "@" + host + ":" + port
 }
 
-function updateSession(sessionId, host, port, login, password, systemName) {
-    return sideNavigation.savedSessionsModel.updateSession(sessionId, host, port, login, password, systemName)
+function updateSession(sessionId, host, port, login, password, systemName, moveTop) {
+    return sideNavigation.savedSessionsModel.updateSession(sessionId, host, port, login, password, systemName, moveTop)
 }
 
 function clearCurrentSession() {
@@ -18,7 +18,8 @@ function saveCurrentSession() {
                     mainWindow.currentSessionId,
                     mainWindow.currentHost, mainWindow.currentPort,
                     mainWindow.currentLogin, mainWindow.currentPasswrod,
-                    connectionManager.systemName)
+                    connectionManager.systemName,
+                    true)
     }
 }
 
@@ -34,7 +35,7 @@ function connectToServer(sessionId, host, port, login, password) {
 }
 
 function saveSession(sessionId, host, port, login, password, systemName) {
-    updateSession(sessionId, host, port, login, password, systemName)
+    updateSession(sessionId, host, port, login, password, systemName, false)
 
     Main.gotoMainScreen()
 
@@ -44,6 +45,9 @@ function saveSession(sessionId, host, port, login, password, systemName) {
 
 function deleteSesion(sessionId) {
     sideNavigation.savedSessionsModel.deleteSession(sessionId)
-    Main.gotoNewSession()
+    if (mainWindow.currentSessionId == sessionId)
+        Main.gotoNewSession()
+    else
+        Main.gotoMainScreen()
     sideNavigation.show()
 }

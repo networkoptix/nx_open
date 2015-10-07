@@ -96,7 +96,7 @@ Item {
 
         y: dp(16)
         anchors.left: header.right
-        width: 7 * dp(48)
+        width: 7 * dp(48) + dp(32)
         spacing: dp(8)
 
         QnCalendarDayNamesRow {

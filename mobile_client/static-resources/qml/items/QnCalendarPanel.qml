@@ -15,7 +15,7 @@ QnPopup {
     property alias date: calendar.date
     property alias chunkProvider: calendar.chunkProvider
 
-    width: parent.width
+    width: calendar.width
     height: calendar.height
     anchors.bottom: parent.bottom
 
@@ -40,7 +40,6 @@ QnPopup {
 
     QnChunkedCalendar {
         id: calendar
-        width: parent.width
         onDatePicked: calendarPanel.datePicked(date)
     }
 

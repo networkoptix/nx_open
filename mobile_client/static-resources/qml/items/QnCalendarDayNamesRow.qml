@@ -46,7 +46,7 @@ Item {
         for (var i = 0; i < d.daysPerWeek; ++i) {
             var day = (i + s) % d.daysPerWeek
             dayNamesModel.append({
-                "dayName" : d.locale.dayName(day, Locale.ShortFormat),
+                "dayName" : d.locale.standaloneDayName(day, Locale.ShortFormat),
                 "holiday" : d.locale.weekDays.indexOf(day) == -1
             })
         }

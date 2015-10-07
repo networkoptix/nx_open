@@ -74,6 +74,12 @@ Window {
     Item {
         id: navigationBarPlaceholder
 
+        property real realWidth: 0
+        property real realHeight: 0
+
+        width: realWidth == 0 ? 1 : realWidth
+        height: realHeight == 0 ? 1 : realHeight
+
         anchors.bottom: parent.bottom
         anchors.right: parent.right
     }
@@ -173,7 +179,7 @@ Window {
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
                 Main.gotoResources()
-            } else {
+            } else if (currentSessionId == "") {
                 loginSessionManager.lastUsedSessionId = ""
                 settings.sessionId = ""
                 Main.gotoNewSession()
@@ -200,11 +206,10 @@ Window {
 
     Component.onCompleted: {
         updateNavigationBarPlaceholderSize()
-        currentSessionId = loginSessionManager.lastUsedSessionId
-        if (currentSessionId) {
+        if (loginSessionManager.lastUsedSessionId) {
             stackView.push(resourcesPageComponent)
             LoginFunctions.connectToServer(
-                        currentSessionId,
+                        loginSessionManager.lastUsedSessionId,
                         loginSessionManager.lastUsedSessionHost(), loginSessionManager.lastUsedSessionPort(),
                         loginSessionManager.lastUsedSessionLogin(), loginSessionManager.lastUsedSessionPassword())
         } else {
@@ -219,11 +224,11 @@ Window {
         var navBarSize = getNavigationBarHeight()
 
         if (isPhone && Screen.primaryOrientation == Qt.LandscapeOrientation) {
-            navigationBarPlaceholder.width = navBarSize
-            navigationBarPlaceholder.height = 1
+            navigationBarPlaceholder.realWidth = navBarSize
+            navigationBarPlaceholder.realHeight = 1
         } else {
-            navigationBarPlaceholder.width = 1
-            navigationBarPlaceholder.height = navBarSize
+            navigationBarPlaceholder.realWidth = 1
+            navigationBarPlaceholder.realHeight = navBarSize
         }
     }
 

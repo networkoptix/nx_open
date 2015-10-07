@@ -12,6 +12,7 @@ Item {
 
     property alias text: textLabel.text
     property alias icon: icon.source
+    property alias font: textLabel.font
 
     readonly property alias pressed: materialSurface.pressed
 
@@ -65,9 +66,9 @@ Item {
             visible: text != ""
             anchors.verticalCenter: parent.verticalCenter
             color: textColor
-            font.pixelSize: sp(14)
+            font.pixelSize: sp(16)
             font.weight: Font.DemiBold
-            font.capitalization: Font.AllUppercase
+            font.capitalization: flat ? Font.AllUppercase : Font.MixedCase
         }
     }
 }

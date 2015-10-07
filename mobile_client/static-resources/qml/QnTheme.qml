@@ -54,8 +54,10 @@ QtObject {
     property color cameraOfflineText
     property color cameraRecordingIndicator
     property color cameraOfflineBackground
+    property color cameraHiddenText
     property color cameraHiddenBackground
     property color cameraDummyBorder
+    property color cameraShowButtonBackground
 
     property color toastBackground
     property color toastText
@@ -78,6 +80,9 @@ QtObject {
     property color preloaderDot
     property color preloaderCircle
     property color scrollIndicator
+    property color playPause
+    property color playPauseBackground
+    property color navigationPanelBackground
 
     function loadColors() {
         windowBackground        = colorTheme.color("window.background")
@@ -120,8 +125,10 @@ QtObject {
         cameraOfflineText       = colorTheme.color("cameras.offlineText")
         cameraRecordingIndicator = colorTheme.color("cameras.recordingIndicator")
         cameraOfflineBackground = colorTheme.color("cameras.offlineBackground")
+        cameraHiddenText        = colorTheme.color("cameras.hiddenText")
         cameraHiddenBackground  = colorTheme.color("cameras.hiddenBackground")
         cameraDummyBorder       = colorTheme.color("cameras.dummyBorder")
+        cameraShowButtonBackground = colorTheme.color("cameras.showButtonBackground")
         toastBackground         = colorTheme.color("toast.background")
         toastText               = colorTheme.color("toast.text")
         timelineText            = colorTheme.color("timeline.text")
@@ -140,6 +147,9 @@ QtObject {
         preloaderDot            = colorTheme.color("other.preloaderDot")
         preloaderCircle         = colorTheme.color("other.preloaderCircle")
         scrollIndicator         = colorTheme.color("other.scrollIndicator")
+        playPause               = colorTheme.color("other.playPause")
+        playPauseBackground     = colorTheme.color("other.playPauseBackground")
+        navigationPanelBackground = colorTheme.color("other.navigationPanelBackground")
     }
 
     function transparent(color, opacity) {

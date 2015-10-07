@@ -12,7 +12,7 @@ Rectangle {
     property int port
 
     width: parent.width
-    height: dp(72)
+    height: dp(79)
     color: QnTheme.sessionItemBackground
     radius: dp(2)
 
@@ -29,14 +29,15 @@ Rectangle {
         Text {
             text: systemName
             color: QnTheme.listText
-            font.pixelSize: sp(16)
-            font.weight: Font.Bold
+            font.pixelSize: sp(18)
+            font.weight: Font.DemiBold
         }
 
         Text {
             text: host + ":" + port
             color: QnTheme.listSubText
-            font.pixelSize: sp(14)
+            font.pixelSize: sp(15)
+            font.weight: Font.DemiBold
         }
     }
 }

@@ -9,10 +9,10 @@ Item {
 
     readonly property var _locale: Qt.locale()
 
-    height: sp(48)
+    height: dp(32)
     width: dp(96 + 64)
 
-    property int _fontPixelSize: sp(36)
+    property int _fontPixelSize: sp(28)
 
     TextMetrics {
         id: spaceMetrics

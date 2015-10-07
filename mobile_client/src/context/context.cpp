@@ -36,7 +36,7 @@ int QnContext::dp(qreal dpix) const {
 }
 
 int QnContext::dps(qreal dpix) const {
-    return m_resolutionUtil->dp(dpix) / m_resolutionUtil->pixelRatio();
+    return m_resolutionUtil->dp(dpix) * m_resolutionUtil->pixelRatio();
 }
 
 int QnContext::sp(qreal dpix) const {

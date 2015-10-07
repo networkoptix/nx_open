@@ -14,10 +14,10 @@ QnFlickable {
 
     contentWidth: width
     contentHeight: content.height
-    topMargin: dp(16)
-    leftMargin: dp(16)
-    rightMargin: dp(16)
-    bottomMargin: dp(16)
+    topMargin: dp(8)
+    leftMargin: dp(8)
+    rightMargin: dp(8)
+    bottomMargin: dp(8)
 
     QtObject {
         id: d
@@ -54,7 +54,7 @@ QnFlickable {
 
                 property bool loaded: false
 
-                spacing: dp(16)
+                spacing: dp(8)
                 width: parent.width - cameraFlow.leftMargin - cameraFlow.rightMargin
                 x: cameraFlow.leftMargin
 
@@ -165,7 +165,7 @@ QnFlickable {
                     anchors.verticalCenter: parent.verticalCenter
                     x: dp(72)
                     text: qsTr("Hidden cameras")
-                    font.pixelSize: sp(15)
+                    font.pixelSize: sp(16)
                     font.weight: Font.DemiBold
                     color: QnTheme.listSectionText
                 }

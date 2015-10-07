@@ -52,6 +52,8 @@ QnPage {
 
         anchors.fill: parent
         anchors.topMargin: -toolBar.fullHeight
+        anchors.bottomMargin: -navigationBarPlaceholder.realHeight
+        anchors.rightMargin: -navigationBarPlaceholder.realWidth
 
         source: mediaPlayer.mediaPlayer
 

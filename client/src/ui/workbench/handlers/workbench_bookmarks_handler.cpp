@@ -103,6 +103,8 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     dialog->submitData(bookmark);
 
     qnCameraBookmarksManager->addCameraBookmark(camera, bookmark);
+
+    action(Qn::BookmarksModeAction)->setChecked(true);
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {

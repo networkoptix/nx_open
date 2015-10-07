@@ -12,8 +12,8 @@ FocusScope {
     property alias validator: textInput.validator
     property alias echoMode: textInput.echoMode
     property alias inputMethodHints: textInput.inputMethodHints
-    property int leftPadding: dp(6)
-    property int rightPadding: dp(6)
+    property int leftPadding: dp(8)
+    property int rightPadding: dp(8)
     property alias passwordCharacter: textInput.passwordCharacter
     property bool showError: false
     property alias showDecoration: decoration.visible
@@ -28,7 +28,7 @@ FocusScope {
     signal accepted()
     signal editingFinished()
 
-    height: dp(36)
+    height: dp(48)
 
     implicitWidth: Math.round(textInput.contentHeight * 8)
 
@@ -37,13 +37,14 @@ FocusScope {
     Item {
         id: decoration
         anchors.fill: parent
+        anchors.margins: dp(4)
 
         Rectangle {
             anchors {
                 left: parent.left
                 right: parent.right
+                bottom: parent.bottom
             }
-            y: parent.height
             border.width: 0
             height: textInput.activeFocus ? CommonFunctions.dp(1) : CommonFunctions.dp(1)
             color: textInput.activeFocus ? activeColor : inactiveColor

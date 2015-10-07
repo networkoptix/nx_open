@@ -25,6 +25,9 @@ Item {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         z: 1
+        font.pixelSize: sp(13)
+        font.weight: Font.DemiBold
+        color: QnTheme.cameraShowButtonBackground
 
         onClicked: cameraItem.showClicked()
     }
@@ -46,8 +49,12 @@ Item {
         Text {
             id: label
             width: parent.width - statusIndicator.width - 2 * anchors.margins
-            font.pixelSize: sp(15)
-            font.weight: Font.DemiBold
+            height: dp(48)
+            verticalAlignment: Text.AlignVCenter
+            maximumLineCount: 2
+            wrapMode: Text.WordWrap
+            font.pixelSize: sp(16)
+            font.weight: _offline ? Font.DemiBold : Font.Normal
             elide: Text.ElideRight
             color: _offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
         }

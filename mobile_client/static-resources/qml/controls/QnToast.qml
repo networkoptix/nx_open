@@ -37,7 +37,7 @@ QnPopup {
             id: text
             anchors.verticalCenter: parent.verticalCenter
             color: QnTheme.toastText
-            font.pixelSize: sp(14)
+            font.pixelSize: sp(18)
             width: parent.width - buttonBox.width - dp(8)
             wrapMode: Text.WordWrap
         }
