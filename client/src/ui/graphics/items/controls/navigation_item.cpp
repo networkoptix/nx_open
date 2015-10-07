@@ -93,9 +93,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
 
-    m_thumbnailsButton = newActionButton(action(Qn::ToggleThumbnailsAction));
-    m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
-    m_thumbnailsButton->setPreferredSize(48, 24);
+    m_bookmarksModeButton = newActionButton(action(Qn::BookmarksModeAction));
+    m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/bookmarks.png"));
+    m_bookmarksModeButton->setPreferredSize(48, 24);
 
     m_calendarButton = newActionButton(action(Qn::ToggleCalendarAction));
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
@@ -164,7 +164,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     QGraphicsLinearLayout *rightLayoutHL = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHL->setContentsMargins(0, 0, 0, 0);
     rightLayoutHL->setSpacing(3);
-    rightLayoutHL->addItem(m_thumbnailsButton);
+    rightLayoutHL->addItem(m_bookmarksModeButton);
     rightLayoutHL->addItem(m_calendarButton);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
@@ -263,7 +263,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     /* Set help topics. */
     setHelpTopic(this,                  Qn::MainWindow_Playback_Help);
-    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
+    // setHelpTopic(m_bookmarksModeButton, Qn::MainWindow_???_Help); // TODO: #dklychkov Use correct help ID
     setHelpTopic(m_volumeSlider,        Qn::MainWindow_Slider_Volume_Help);
     setHelpTopic(m_muteButton,          Qn::MainWindow_Slider_Volume_Help);
     setHelpTopic(m_liveButton,          Qn::MainWindow_Navigation_Help);
@@ -273,7 +273,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setHelpTopic(m_jumpBackwardButton,  Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_jumpForwardButton,   Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
-    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
     setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);
 
 

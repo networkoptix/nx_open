@@ -217,11 +217,6 @@
 #include "nx1/info.h"
 #endif
 
-
-#ifdef __arm__
-#include "nx1/info.h"
-#endif
-
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";

@@ -1,6 +1,8 @@
 #ifndef _UNICLIENT_FFMPEG_CODEC_H
 #define _UNICLIENT_FFMPEG_CODEC_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 // ffmpeg headers
 extern "C" {
     #include <libavcodec/avcodec.h>
@@ -45,5 +47,6 @@ enum CLCodecType
 CLCodecType ffmpegCodecIdToInternal(CodecID ffmpegVideoCodecId);
 CodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId);
 
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // _UNICLIENT_FFMPEG_CODEC_H

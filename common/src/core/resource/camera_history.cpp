@@ -16,11 +16,6 @@
 
 namespace {
 
-    /** Current server for the given camera. */
-    QnMediaServerResourcePtr currentServerForCamera(const QnVirtualCameraResourcePtr &camera) {
-        return camera->getParentResource().dynamicCast<QnMediaServerResource>();
-    }
-
     ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& data, qint64 timestamp) {
         /* Find first data with timestamp not less than given. */
         auto iter = std::lower_bound(data.cbegin(), data.cend(), timestamp, [](const ec2::ApiCameraHistoryItemData& data, qint64 timestamp) { 
@@ -236,7 +231,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtu
     QnMutexLocker lock(&m_mutex);
     const auto& itr = m_historyDetail.find(camera->getId());
     if (itr == m_historyDetail.end())
-        return currentServerForCamera(camera); // no history data. use current server constantly
+        return camera->getParentServer(); // no history data. use current server constantly
 
     const auto detailData = filterOnlineServers(itr.value());
     auto detailItr = getMediaServerOnTimeInternal(detailData, timestamp);

@@ -1,12 +1,9 @@
-#ifndef QN_CAMERA_BOOKMARK_FWD_H
-#define QN_CAMERA_BOOKMARK_FWD_H
+#pragma once
 
 #include <functional>
 
 #include <QtCore/QList>
 #include <QtCore/QStringList>
-
-#include <utils/common/model_functions_fwd.h>
 
 struct QnCameraBookmark;
 typedef QVector<QnCameraBookmark> QnCameraBookmarkList;
@@ -14,11 +11,4 @@ typedef std::vector<QnCameraBookmarkList> MultiServerCameraBookmarkList;
 
 struct QnCameraBookmarkSearchFilter;
 
-typedef QStringList QnCameraBookmarkTags;
-typedef std::function<void (bool success, const QnCameraBookmarkList &bookmarks)> BookmarksCallbackType;
-
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq))
-
-#endif // QN_CAMERA_BOOKMARK_FWD_H
-
+typedef QSet<QString> QnCameraBookmarkTags;

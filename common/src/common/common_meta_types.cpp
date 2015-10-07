@@ -58,6 +58,8 @@
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 
+#include <core/datapacket/abstract_data_packet.h>
+
 #include <core/onvif/onvif_config_data.h>
 
 #include <business/actions/abstract_business_action.h>
