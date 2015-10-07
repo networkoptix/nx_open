@@ -2098,28 +2098,29 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaSe
 ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& data)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("                                              \
-        INSERT OR REPLACE INTO vms_server_user_attributes (         \
-            server_guid,                                            \
-            server_name,                                            \
-            max_cameras,                                            \
-            redundancy,                                             \
+    insQuery.prepare("                                           \
+        INSERT OR REPLACE INTO vms_server_user_attributes (      \
+            server_guid,                                         \
+            server_name,                                         \
+            max_cameras,                                         \
+            redundancy,                                          \
             backup_type,                                         \
             backup_days_of_the_week,                             \
             backup_start,                                        \
             backup_duration,                                     \
             backup_bitrate                                       \
-        )                                                           \
-        VALUES(                                                     \
-            :serverID,                                              \
-            :serverName,                                            \
-            :maxCameras,                                            \
-            :allowAutoRedundancy,                                   \
+        )                                                        \
+        VALUES(                                                  \
+            :serverID,                                           \
+            :serverName,                                         \
+            :maxCameras,                                         \
+            :allowAutoRedundancy,                                \
             :backupType,                                         \
             :backupDaysOfTheWeek,                                \
             :backupStart,                                        \
             :backupDuration,                                     \
             :backupBitrate                                       \
+        )                                                        \
         ");
     QnSql::bind(data, &insQuery);
 

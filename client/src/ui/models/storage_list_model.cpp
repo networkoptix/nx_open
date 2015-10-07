@@ -98,7 +98,8 @@ QVariant QnStorageListModel::checkstateData(const QModelIndex &index) const
     return QVariant();
 }
 
-QVariant QnStorageListModel::data(const QModelIndex &index, int role) const {
+QVariant QnStorageListModel::data(const QModelIndex &index, int role) const 
+{
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
@@ -120,6 +121,24 @@ QVariant QnStorageListModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 
     return QVariant();
+}
+
+bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+        return false;
+
+    QnStorageSpaceData& storageData = m_data.storages[index.row()];
+
+    if (role == Qt::CheckStateRole)
+    {
+        storageData.isUsedForWriting = (value == Qt::Checked);
+        emit dataChanged(index, index, QVector<int>() << role);
+        return true;
+    }
+    else {
+        return base_type::setData(index, value, role);
+    }
 }
 
 QVariant QnStorageListModel::headerData(int section, Qt::Orientation orientation, int role) const 
