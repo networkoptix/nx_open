@@ -46,22 +46,21 @@ namespace ec2
 
     struct ApiStorageData: ApiResourceData
     {
-        ApiStorageData(): spaceLimit(0), usedForWriting(0) {}
+        ApiStorageData(): spaceLimit(0), usedForWriting(0), isBackup(false) {}
 
         qint64          spaceLimit;
         bool            usedForWriting;
         QString         storageType;
-        bool            backup;              // is storage used for backup
-
         std::vector<ApiResourceParamData> addParams;
+        bool            isBackup;              // is storage used for backup
     };
 #define ApiStorageData_Fields   \
     ApiResourceData_Fields      \
     (spaceLimit)                \
     (usedForWriting)            \
     (storageType)               \
-    (backup)                    \
-    (addParams)
+    (addParams)                 \
+    (isBackup)                  
 
 
     struct ApiMediaServerData: ApiResourceData

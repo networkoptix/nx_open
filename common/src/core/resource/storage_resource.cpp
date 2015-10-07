@@ -159,9 +159,9 @@ QString QnStorageResource::toNativeDirPath(const QString &dirPath)
     return result;
 }
 
-void QnStorageResource::setBackup(bool v) 
+void QnStorageResource::setBackup(bool value) 
 {
-    m_backup = v; 
+    m_backup = value;
 }
 
 bool QnStorageResource::isBackup() const 

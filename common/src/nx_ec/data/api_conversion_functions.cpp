@@ -539,7 +539,7 @@ void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
     dst.storageType = src->getStorageType();
-    dst.backup = src->isBackup();
+    dst.isBackup = src->isBackup();
 }
 
 void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
@@ -558,7 +558,7 @@ void fromApiToResource(const ApiStorageData &src, QnStorageResourcePtr &dst) {
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
     dst->setStorageType(src.storageType);
-    dst->setBackup(src.backup);
+    dst->setBackup(src.isBackup);
 }
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst) {
