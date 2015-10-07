@@ -178,7 +178,11 @@ bool StreamingChunkTranscoder::transcodeAsync(
                 chunk->doneModification( StreamingChunk::rcError );
                 return false;
             }
-            archiveReader->setQuality(transcodeParams.streamQuality(), true);
+            archiveReader->setQuality(
+                transcodeParams.streamQuality() == MEDIA_Quality_High
+                    ? MEDIA_Quality_ForceHigh
+                    : transcodeParams.streamQuality(),
+                true);
             archiveReader->setPlaybackRange( QnTimePeriod( transcodeParams.startTimestamp() / USEC_IN_MSEC, transcodeParams.duration() ) );
             mediaDataProvider = OnDemandMediaDataProviderPtr( new OnDemandMediaDataProvider( dp ) );
             archiveReader->start();
@@ -403,12 +407,18 @@ void StreamingChunkTranscoder::onTranscodingFinished(
     const StreamingChunkCacheKey& key,
     DataSourceContextPtr data )
 {
+    //when switching hi<->lo quality hls player can delay stream for up to 20 seconds
+    static const int ADDITIONAL_TRANSCODER_LIVE_DELAY_MS = 20*1000;
+
     if( !result )
     {
         //TODO/HLS #ak: MUST remove chunk from cache
         return;
     }
-    m_dataSourceCache.put( key, data, (key.duration() / USEC_IN_MSEC) * 3 );  //ideally, <max chunk length from previous playlist> * <chunk count in playlist>
+    m_dataSourceCache.put(
+        key,
+        data,
+        (key.duration() / USEC_IN_MSEC) * 3 + ADDITIONAL_TRANSCODER_LIVE_DELAY_MS);  //ideally, <max chunk length from previous playlist> * <chunk count in playlist>
 }
 
 void StreamingChunkTranscoder::onResourceRemoved( const QnResourcePtr& resource )
