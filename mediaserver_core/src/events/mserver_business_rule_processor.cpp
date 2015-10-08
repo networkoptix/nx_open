@@ -603,8 +603,14 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         detailsMap[tpInputPort] = params.inputPortId;
         break;
                            }
-    case StorageFailureEvent:
+
     case NetworkIssueEvent:
+        {
+            detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+            detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+            break;
+        }
+    case StorageFailureEvent:
     case ServerFailureEvent: 
     case LicenseIssueEvent:
         {

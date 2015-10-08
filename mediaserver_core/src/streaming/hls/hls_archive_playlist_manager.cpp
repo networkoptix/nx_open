@@ -60,7 +60,9 @@ namespace nx_hls
                 return false;
         }
 
-        if( !archiveDelegate->setQuality( m_streamQuality, true ) )
+        if( !archiveDelegate->setQuality(
+                m_streamQuality == MEDIA_Quality_High ? MEDIA_Quality_ForceHigh : m_streamQuality,
+                true ) )
             return false;
         m_delegate.reset( new QnThumbnailsArchiveDelegate(archiveDelegate) );
         m_delegate->setRange( m_startTimestamp, std::numeric_limits<qint64>::max(), m_targetDurationUsec );
@@ -149,6 +151,7 @@ namespace nx_hls
         AbstractPlaylistManager::ChunkData chunkData;
         chunkData.mediaSequence = ++m_chunkMediaSequence;
         chunkData.startTimestamp = m_prevChunkEndTimestamp;
+        chunkData.discontinuity = m_discontinuityDetected;
         if( nextData->flags & QnAbstractMediaData::MediaFlags_BOF )
         {
             //gap in archive detected
@@ -163,6 +166,7 @@ namespace nx_hls
                 //TODO/HLS: #ak some correction is required to call addOneMoreChunk() at appropriate time
                 chunkData.duration = m_targetDurationUsec;
             }
+            //have to insert EXT-X-DISCONTINUITY tag before next chunk
             m_discontinuityDetected = true;
         }
         else
@@ -170,7 +174,6 @@ namespace nx_hls
             chunkData.duration = currentChunkEndTimestamp - chunkData.startTimestamp;
             m_discontinuityDetected = false;
         }
-        chunkData.discontinuity = m_discontinuityDetected;
         m_totalPlaylistDuration += chunkData.duration;
         m_chunks.push_back( chunkData );
 
