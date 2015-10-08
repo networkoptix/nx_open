@@ -1,24 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
+
     A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
+    It should also be possible to have one maven project per solution project,
     and have a parent pom to deletegate the build.
   -->
-	<parent>
-		<artifactId>cpp</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>3.0.0-SNAPSHOT</version>
-		<relativePath>../cpp</relativePath>
-	</parent>
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.0.0-SNAPSHOT</version>
+        <relativePath>../cpp</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>3.0.0-SNAPSHOT</version>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>common</artifactId>
-	<packaging>pom</packaging>
-	<name>HD Witness Common Lib</name>
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>common</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Common Lib</name>
 
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
@@ -30,7 +30,7 @@
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32</windows.oslibs>
-        <linux.oslibs>-lssl -lsigar</linux.oslibs>
+        <linux.oslibs>-lssl -lsigar -lswscale -lquazip</linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
         <android.oslibs>-lssl -lcrypto -lz</android.oslibs>
         <!--Global defines-->
@@ -38,9 +38,9 @@
         <!--Specific os defines-->
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <linux.defines/>
-        <mac.defines/>      
+        <mac.defines/>
         <android.defines/>
-    </properties>   
+    </properties>
 
     <dependencies>
         <dependency>
@@ -63,7 +63,7 @@
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>            
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>
@@ -73,12 +73,12 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <buildLib>sharedlib</buildLib>
             </properties>
-        </profile>	
+        </profile>
         <profile>
             <id>linux-arm-isd</id>
             <activation>
@@ -86,16 +86,16 @@
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                </os> 
+                </os>
                 <property>
                     <name>box</name>
                     <value>isd</value>
                 </property>
-            </activation>            
+            </activation>
             <properties>
                 <qt.libs>core network xml sql</qt.libs>
             </properties>
-        </profile>          
+        </profile>
 
         <profile>
             <id>linux-arm-rpi</id>
@@ -141,6 +141,6 @@
                 <buildLib>staticlib</buildLib>
             </properties>
         </profile>
-    </profiles>	
+    </profiles>
 
 </project>
