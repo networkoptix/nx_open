@@ -120,7 +120,6 @@ QnResourceWidget::OverlayWidgets::OverlayWidgets():
     , mainTimeLabel(createGraphicsLabel())
     , infoNameLabel(createGraphicsLabel())
     , infoTimeLabel(createGraphicsLabel())
-    , bookmarksLabel(new QnProxyLabel())
 {}
 
 // -------------------------------------------------------------------------- //
@@ -246,13 +245,6 @@ void QnResourceWidget::addMainOverlay() {
 
     auto headerWidget = createGraphicsWidget(headerLayout);
 
-
-    {
-        m_overlayWidgets.bookmarksLabel->setWordWrap(true);
-        m_overlayWidgets.bookmarksLabel->setAcceptedMouseButtons(0);
-        setPaletteColor(m_overlayWidgets.bookmarksLabel, QPalette::Window, overlayBackgroundColor);
-    }
-
     /* Footer overlay. */
     auto footerLayout = createGraphicsLayout(Qt::Horizontal);
     footerLayout->addItem(m_overlayWidgets.mainDetailsLabel);
@@ -264,7 +256,6 @@ void QnResourceWidget::addMainOverlay() {
     QGraphicsLinearLayout *overlayLayout = createGraphicsLayout(Qt::Vertical);
     overlayLayout->addItem(headerWidget);
     overlayLayout->addStretch();
-    overlayLayout->addItem(m_overlayWidgets.bookmarksLabel);
     overlayLayout->addItem(footerWidget);
 
     m_overlayWidgets.mainOverlay = new QnViewportBoundWidget(this);
@@ -277,12 +268,6 @@ void QnResourceWidget::addMainOverlay() {
 
     addOverlayWidget(m_overlayWidgets.mainOverlay, visibility, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, false, false);
-}
-
-void QnResourceWidget::setBookmarksLabelText(const QString &text)
-{
-    m_overlayWidgets.bookmarksLabel->setText(text);
-    setOverlayWidgetVisible(m_overlayWidgets.bookmarksLabel, !text.isEmpty(), true);
 }
 
 void QnResourceWidget::createButtons() {

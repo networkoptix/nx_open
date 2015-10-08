@@ -47,6 +47,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
+#include <ui/graphics/items/overlays/bookmarks_overlay_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/globals.h>
@@ -172,6 +173,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_homePtzController(nullptr)
     , m_dewarpingParams()
     , m_bookmarks()
+    , m_bookmarksOverlayWidget(nullptr)
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
 {
@@ -258,6 +260,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
 
+    if (m_camera) {
+        m_bookmarksOverlayWidget = new QnBookmarksOverlayWidget();
+        addOverlayWidget(m_bookmarksOverlayWidget, Visible, true, true);
+    }
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module)) 
@@ -1576,24 +1582,13 @@ void QnMediaResourceWidget::updateBookmarksMode() {
 
 void QnMediaResourceWidget::updateBookmarks() {
     if (!m_bookmarksQuery) {
-        setBookmarksLabelText(QString());
+        m_bookmarksOverlayWidget->setBookmarks(QnCameraBookmarkList());
+        setOverlayWidgetVisibility(m_bookmarksOverlayWidget, Invisible);
         return;
     }
 
-    auto dt = [](const QnCameraBookmark &b) {
-        static const QString fmt(lit("mm:ss"));
-        return lit("%1 - %2")
-            .arg(QDateTime::fromMSecsSinceEpoch(b.startTimeMs).toString(fmt))
-            .arg(QDateTime::fromMSecsSinceEpoch(b.endTimeMs()).toString(fmt));
-    };
-
-    static const QString outputTemplate = lit("<b>%1</b><br>%2<br>%3<hr color = \"lightgrey\">");
-
-    QString text;
-    for (const QnCameraBookmark &bookmark: getBookmarksAtPosition(m_bookmarksQuery->executeLocal(), getUtcCurrentTimeMs())) {
-        text += outputTemplate.arg(bookmark.name, bookmark.description, dt(bookmark));
-    }
-    setBookmarksLabelText(text);
+    m_bookmarksOverlayWidget->setBookmarks(getBookmarksAtPosition(m_bookmarksQuery->executeLocal(), getUtcCurrentTimeMs()));
+    setOverlayWidgetVisibility(m_bookmarksOverlayWidget, Visible);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const {
