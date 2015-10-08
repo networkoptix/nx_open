@@ -19,7 +19,10 @@ QnListView {
         status: model.resourceStatus
         thumbnail: model.thumbnail
 
-        onClicked: Main.openMediaResource(model.uuid)
+        onClicked: {
+            var point = mapToItem(stackView, width / 2, height / 2)
+            Main.openMediaResource(model.uuid, Math.max(0, point.x), Math.max(0, point.y))
+        }
     }
 
     QnScrollIndicator {

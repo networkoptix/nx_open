@@ -1539,11 +1539,9 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
-    if (m_currentWidget && m_timeSlider->timePeriods(CurrentLine, Qn::BookmarksContent).containTime(position)) {
-        QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
-        if (!bookmarks.isEmpty())
-            parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
-    }
+    QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
+    if (!bookmarks.isEmpty())
+        parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
     
 
     QScopedPointer<QMenu> menu(manager->newMenu(

@@ -992,7 +992,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
             minimumValue, maximumValue);
 
     while (value != maximumValue) {
-        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue, maximumValue};
+        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
         for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if(pos[i] == end[i])
                 continue;
@@ -1006,12 +1006,10 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
-        qint64 bestValue = qMin(qMin(nextValue[0], nextValue[1]), nextValue[2]);
+        qint64 bestValue = qMin(nextValue[Qn::RecordingContent], nextValue[Qn::MotionContent]);
 
         Qn::TimePeriodContent content;
-        if (inside[Qn::BookmarksContent]) {
-            content = Qn::BookmarksContent;
-        } else if (inside[Qn::MotionContent]) {
+        if (inside[Qn::MotionContent]) {
             content = Qn::MotionContent;
         } else if (inside[Qn::RecordingContent]) {
             content = Qn::RecordingContent;

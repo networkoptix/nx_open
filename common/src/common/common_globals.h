@@ -411,7 +411,7 @@ public:
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
-        BookmarksContent,
+
         TimePeriodContentCount
     };
 

@@ -160,9 +160,9 @@ int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequ
         QnTimePeriodList timePeriodList = QnTimePeriodList::mergeTimePeriods(periodsList);
 
         if (request.format == Qn::CompressedPeriodsFormat)
-        {
-            bool signedSerialization = request.periodsType == Qn::BookmarksContent;
-            result = QnCompressedTime::serialized(timePeriodList, signedSerialization);
+        {            
+            //TODO: #GDM #Bookmarks possibly we should get rid of signed serialization
+            result = QnCompressedTime::serialized(timePeriodList, false);
             contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
         }
         else {
@@ -173,8 +173,7 @@ int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequ
     else {
         if (request.format == Qn::CompressedPeriodsFormat)
         {
-            bool signedSerialization = request.periodsType == Qn::BookmarksContent;
-            result = QnCompressedTime::serialized(outputData, signedSerialization);
+            result = QnCompressedTime::serialized(outputData, false);
             contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
         }
         else {

@@ -34,7 +34,7 @@ QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
 
 namespace {
-    boost::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality", "bookmarks"};
+    boost::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality"};
 }
 
 QString DeviceFileCatalog::prefixByCatalog(QnServer::ChunksCatalog catalog) {

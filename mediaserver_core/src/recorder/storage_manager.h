@@ -12,7 +12,6 @@
 #include <server/server_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/camera_bookmark_fwd.h>
 
 #include "recording/time_period_list.h"
 #include "device_file_catalog.h"
@@ -112,10 +111,6 @@ public:
     */
     QStringList getAllStoragePathes() const;
 
-    bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark, bool forced = false);
-    bool updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
-    bool deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
-    bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
     void initDone();
     int getStorageIndex(const QnStorageResourcePtr& storage);
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
