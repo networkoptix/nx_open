@@ -18,7 +18,7 @@ TEST(RandomOnlineEndpointSelector, common)
     std::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
 
     std::vector<SocketAddress> endpoints;
-#if 1
+#if 0
     endpoints.emplace_back("10.0.2.103", 80);
     //endpoints.emplace_back("93.158.134.3", 80);
     //endpoints.emplace_back("38.17.11.231", 80);
@@ -39,7 +39,10 @@ TEST(RandomOnlineEndpointSelector, common)
             promiseToSelect.set_value(std::make_pair(result, std::move(endpoint)));
         });
 
-    ASSERT_EQ(selected.get().first, nx_http::StatusCode::ok);
-    ASSERT_TRUE(selected.get().second == endpoints[0] ||
-                selected.get().second == endpoints[1]);
+    const auto result = selected.get();
+
+    ASSERT_EQ(result.first, nx_http::StatusCode::ok);
+    ASSERT_TRUE(
+        result.second == endpoints[0] ||
+        result.second == endpoints[1]);
 }
