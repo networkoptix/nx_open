@@ -31,8 +31,6 @@ Window {
     QnToolBar {
         id: toolBar
 
-        z: 5.0
-
         width: mainWindow.width - navigationBarPlaceholder.width
 
         QnMenuBackButton {
@@ -90,7 +88,7 @@ Window {
         activeSessionId: currentSessionId
     }
 
-    StackView {
+    QnMainStackView {
         id: stackView
         anchors.top: toolBar.bottom
         anchors.bottom: navigationBarPlaceholder.top
@@ -179,6 +177,7 @@ Window {
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
+                stackView.setFadeTransition()
                 Main.gotoResources()
             } else if (currentSessionId == "") {
                 loginSessionManager.lastUsedSessionId = ""

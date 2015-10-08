@@ -73,7 +73,10 @@ QnFlickable {
                         thumbnail: model.thumbnail
                         thumbnailWidth: d.thumbnailWidth
 
-                        onClicked: Main.openMediaResource(model.uuid)
+                        onClicked: {
+                            var point = mapToItem(stackView, width / 2, height / 2)
+                            Main.openMediaResource(model.uuid, Math.max(0, point.x), Math.max(0, point.y))
+                        }
                         onHiddenChanged: {
                             // use temporary object to update QML property correctly
                             var items = d.pendingHiddenItems
@@ -200,7 +203,10 @@ QnFlickable {
                             text: model.resourceName
                             status: model.resourceStatus
 
-                            onClicked: Main.openMediaResource(model.uuid)
+                            onClicked: {
+                                var point = mapToItem(stackView, width / 2, height / 2)
+                                Main.openMediaResource(model.uuid, Math.max(0, point.x), Math.max(0, point.y))
+                            }
                             onShowClicked: {
                                 var originalList = settings.hiddenCameras
 

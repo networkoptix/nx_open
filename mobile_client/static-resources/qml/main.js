@@ -33,6 +33,7 @@ function openDiscoveredSession(_host, _port, _systemName) {
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
 
+    stackView.setSlideTransition()
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
@@ -50,6 +51,7 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
 
+    stackView.setSlideTransition()
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
@@ -94,6 +96,7 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
                 state: "FailedSaved"
             }
         })
+        stackView.setSlideTransition()
         stackView.push(pushList)
         item = stackView.get(stackView.depth - 1)
     } else {
@@ -120,10 +123,14 @@ function gotoNewSession() {
 
     var item = stackView.find(function(item, index) { return item.objectName === "newConnectionPage" })
 
-    if (item)
+
+    if (item) {
+        stackView.setSlideTransition()
         stackView.pop(item)
-    else
+    } else {
+        stackView.setInvertedSlideTransition()
         stackView.push(loginPageComponent)
+    }
 }
 
 function gotoResources() {
@@ -137,6 +144,11 @@ function gotoResources() {
 }
 
 function gotoMainScreen() {
+    if (activeResourceId)
+        stackView.setScaleTransition()
+
+    activeResourceId = ""
+
     toolBar.opacity = 1.0
     toolBar.backgroundOpacity = 1.0
     exitFullscreen()
@@ -147,12 +159,12 @@ function gotoMainScreen() {
         gotoNewSession()
 }
 
-function openMediaResource(uuid) {
+function openMediaResource(uuid, xHint, yHint) {
     mainWindow.activeResourceId = uuid
     sideNavigation.hide()
     sideNavigation.enabled = false
-    menuBackButton.animateToBack()
-    toolBar.backgroundOpacity = 0.0
+
+    stackView.setScaleTransition(xHint, yHint)
     stackView.push(videoPlayerComponent)
 }
 
@@ -160,6 +172,7 @@ function openSettings() {
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
+    stackView.setSlideTransition()
     stackView.push(settingsPageComponent)
 }
 
