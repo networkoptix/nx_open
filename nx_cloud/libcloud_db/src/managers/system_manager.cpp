@@ -86,7 +86,6 @@ void SystemManager::getSystems(
     DataFilter filter,
     std::function<void(api::ResultCode, data::SystemDataList)> completionHandler )
 {
-    stree::MultiIteratableResourceReader wholeFilter(filter, authzInfo);
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     data::SystemDataList resultData;
@@ -94,7 +93,7 @@ void SystemManager::getSystems(
     {
         //selecting system by id
         auto system = m_cache.find(systemID.get().value<QnUuid>());
-        if (!system || !applyFilter(system.get(), wholeFilter))
+        if (!system || !applyFilter(system.get(), filter))
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
     }
@@ -116,7 +115,7 @@ void SystemManager::getSystems(
         //filtering full system list
         m_cache.forEach(
             [&](const std::pair<const QnUuid, data::SystemData>& data) {
-                if (applyFilter(data.second, wholeFilter))
+                if (applyFilter(data.second, filter))
                     resultData.systems.push_back(data.second);
             });
     }
