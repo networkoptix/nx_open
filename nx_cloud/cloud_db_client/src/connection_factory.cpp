@@ -6,6 +6,7 @@
 #include "connection_factory.h"
 
 #include <utils/common/cpp14.h>
+#include <utils/network/cloud_connectivity/random_online_endpoint_selector.h>
 
 #include "cdb_connection.h"
 #include "version.h"
@@ -17,7 +18,9 @@ namespace cl {
 
 ConnectionFactory::ConnectionFactory()
 :
-    m_endPointFetcher("cdb")
+    m_endPointFetcher(
+        "cdb",
+        std::make_unique<nx::cc::RandomOnlineEndpointSelector>())
 {
 }
 

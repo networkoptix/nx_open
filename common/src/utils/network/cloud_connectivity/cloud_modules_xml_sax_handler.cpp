@@ -109,11 +109,11 @@ bool CloudModulesXmlHandler::fatalError(const QXmlParseException& exception)
     return false;
 }
 
-std::list<SocketAddress> CloudModulesXmlHandler::moduleUrls(QString moduleName) const
+std::vector<SocketAddress> CloudModulesXmlHandler::moduleUrls(QString moduleName) const
 {
     auto it = m_endpoints.find(moduleName);
     return it == m_endpoints.end()
-        ? std::list<SocketAddress>()
+        ? std::vector<SocketAddress>()
         : it->second;
 }
 

@@ -40,7 +40,7 @@ public:
     virtual bool error( const QXmlParseException& exception ) override;
     virtual bool fatalError( const QXmlParseException& exception ) override;
 
-    std::list<SocketAddress> moduleUrls(QString moduleName) const;
+    std::vector<SocketAddress> moduleUrls(QString moduleName) const;
 
 private:
     enum State
@@ -53,7 +53,7 @@ private:
 
     State m_state;
     QString m_errorDescription;
-    std::map<QString, std::list<SocketAddress>> m_endpoints;
+    std::map<QString, std::vector<SocketAddress>> m_endpoints;
     QString m_currentModule;
 };
 
