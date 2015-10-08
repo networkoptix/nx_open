@@ -55,7 +55,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="addExtStorageToMainBtn">
           <property name="text">
            <string>Add externalStorage</string>
           </property>
@@ -127,7 +127,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="addExtStorageToBackupBtn">
           <property name="text">
            <string>Add externalStorage</string>
           </property>

@@ -30,6 +30,7 @@ public:
     ~QnStorageListModel();
 
     void setModelData(const QnStorageSpaceReply& data);
+    void addModelData(const QnStorageSpaceData& data);
     QnStorageSpaceReply modelData() const;
 
     virtual int rowCount(const QModelIndex &parent) const override;

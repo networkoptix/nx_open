@@ -24,6 +24,13 @@ void QnStorageListModel::setModelData(const QnStorageSpaceReply& data)
     endResetModel();
 }
 
+void QnStorageListModel::addModelData(const QnStorageSpaceData& data)
+{
+    beginResetModel();
+    m_data.storages.push_back(data);
+    endResetModel();
+}
+
 QnStorageSpaceReply QnStorageListModel::modelData() const
 {
     return m_data;
@@ -43,10 +50,13 @@ int QnStorageListModel::columnCount(const QModelIndex &parent) const {
 
 QString urlPath(const QString& url)
 {
-    if (url.indexOf(lit("://")) > 0)
-        return QUrl(url).path().mid(1);
-    else
+    if (url.indexOf(lit("://")) > 0) {
+        QUrl u(url);
+        return u.host() + (u.port() != -1 ? lit(":").arg(u.port()) : lit(""))  + u.path();
+    }
+    else {
         return url;
+    }
 }
 
 QString QnStorageListModel::displayData(const QModelIndex &index) const

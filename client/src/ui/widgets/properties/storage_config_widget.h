@@ -32,19 +32,17 @@ public:
     virtual void updateFromSettings() override;
 
     void setServer(const QnMediaServerResourcePtr &server);
-    bool hasChanges() const { return m_hasStorageChanges; }
     virtual void submitToSettings() override;
 private:
     void updateRebuildInfo();
 private slots:
     void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();
+    void at_addExtStorage(bool addToMain);
 private:
     Ui::StorageConfigWidget* ui;
-    bool m_hasStorageChanges;
     QnMediaServerResourcePtr m_server;
     QnStorageResourceList m_storages;
-    
     struct StoragePool
     {
         StoragePool(): storageSpaceHandle(-1), model(0) {}

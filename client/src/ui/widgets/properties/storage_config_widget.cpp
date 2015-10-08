@@ -14,8 +14,6 @@ namespace {
     //setting free space to zero, since now client does not change this value, so it must keep current value
     const qint64 defaultReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
 
-    const qint64 bytesInMiB = 1024 * 1024;
-
     class ArchiveSpaceItemDelegate: public QStyledItemDelegate {
         typedef QStyledItemDelegate base_type;
     public:
@@ -39,13 +37,15 @@ namespace {
 QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::StorageConfigWidget),
-    m_hasStorageChanges(false)
+    ui(new Ui::StorageConfigWidget)
 {
     ui->setupUi(this);
     
     setupGrid(ui->mainStoragesTable, &m_mainPool);
     setupGrid(ui->backupStoragesTable, &m_backupPool);
+
+    connect(ui->addExtStorageToMainBtn, &QPushButton::clicked, this, [this]() {at_addExtStorage(true); });
+    connect(ui->addExtStorageToBackupBtn, &QPushButton::clicked, this, [this]() {at_addExtStorage(false); });
     
     m_backupPool.model->setBackupRole(true);
 }
@@ -53,6 +53,24 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
 QnStorageConfigWidget::~QnStorageConfigWidget()
 {
 
+}
+
+void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
+{
+    QnStorageListModel* model = addToMain ? m_mainPool.model : m_backupPool.model;
+
+    QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
+    dialog->setProtocols(model->modelData().storageProtocols);
+    if(!dialog->exec())
+        return;
+
+    QnStorageSpaceData item = dialog->storage();
+    if(!item.storageId.isNull())
+        return;
+    item.isUsedForWriting = true;
+    item.isExternal = true;
+
+    model->addModelData(item);
 }
 
 void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storagePool)
@@ -183,6 +201,14 @@ void QnStorageConfigWidget::submitToSettings()
 
     processStorages(storagesToUpdate, m_mainPool.model->modelData().storages, false);
     processStorages(storagesToUpdate, m_backupPool.model->modelData().storages, true);
+
+    QSet<QnUuid> newIdList;
+    for (const auto& storageData: m_mainPool.model->modelData().storages + m_backupPool.model->modelData().storages)
+        newIdList << storageData.storageId;
+    for (const auto& storage: m_storages) {
+        if (!newIdList.contains(storage->getId()))
+            storagesToRemove.push_back(storage->getId());
+    }
 
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn)
