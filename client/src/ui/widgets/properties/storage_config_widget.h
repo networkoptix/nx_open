@@ -14,6 +14,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
+#include "api/model/rebuild_archive_reply.h"
 
 namespace Ui {
     class StorageConfigWidget;
@@ -36,10 +37,17 @@ public:
 private:
     void updateRebuildInfo();
     void at_eventsGrid_clicked(const QModelIndex& index);
+    void sendNextArchiveRequest(bool isMain);
+    void updateRebuildUi(const QnStorageScanData& reply, bool isMainPool);
 private slots:
     void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();
     void at_addExtStorage(bool addToMain);
+    void at_rebuildButton_clicked();
+    void at_rebuildCancel_clicked();
+    void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle);
+    void sendNextArchiveRequestForMain();
+    void sendNextArchiveRequestForBackup();
 private:
     Ui::StorageConfigWidget* ui;
     QnMediaServerResourcePtr m_server;
@@ -48,7 +56,9 @@ private:
     {
         StoragePool(): storageSpaceHandle(-1), model(0) {}
         int storageSpaceHandle;
+        int rebuildHandle;
         QnStorageListModel* model;
+        QnStorageScanData prevRebuildState;
     };
 
     StoragePool m_mainPool;

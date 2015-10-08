@@ -21,16 +21,16 @@ void QnDualQualityHelper::setResource(const QnNetworkResourcePtr &netResource) {
 }
 
 void QnDualQualityHelper::openCamera(const QString& cameraUniqueId) {
-    m_catalogHi[QnServer::ArchiveKind::Normal] = 
+    m_catalogHi[(int)QnServer::StoragePool::Normal] = 
         qnNormalStorageMan->getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
 
-    m_catalogHi[QnServer::ArchiveKind::Backup] = 
+    m_catalogHi[(int)QnServer::StoragePool::Backup] = 
         qnBackupStorageMan->getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
 
-    m_catalogLow[QnServer::ArchiveKind::Normal] = 
+    m_catalogLow[(int)QnServer::StoragePool::Normal] = 
         qnNormalStorageMan->getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
 
-    m_catalogLow[QnServer::ArchiveKind::Backup] = 
+    m_catalogLow[(int)QnServer::StoragePool::Backup] = 
         qnBackupStorageMan->getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
 }
 

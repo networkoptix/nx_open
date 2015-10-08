@@ -701,20 +701,21 @@ int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
     return sendAsyncGetRequest(CameraDiagnosticsObject, params, QN_STRINGIZE_TYPE(QnCameraDiagnosticsReply), target, slot);
 }
 
-int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot)
+int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, bool isMainPool, QObject *target, const char *slot)
 {
     QnRequestParamList params;
     if (action == RebuildAction_Start)
         params << QnRequestParam("action",  lit("start"));
     else if (action == RebuildAction_Cancel)
         params << QnRequestParam("action",  lit("stop"));
+    params << QnRequestParam("mainPool", isMainPool);
     return sendAsyncGetRequest(RebuildArchiveObject, params, QN_STRINGIZE_TYPE(QnStorageScanData), target, slot);
 }
 
-int QnMediaServerConnection::getStorageSpaceAsync(bool mainPool, QObject *target, const char *slot) 
+int QnMediaServerConnection::getStorageSpaceAsync(bool isMainPool, QObject *target, const char *slot) 
 {
     QnRequestParamList params;
-    params << QnRequestParam("mainPool", mainPool);
+    params << QnRequestParam("mainPool", isMainPool);
 
     return sendAsyncGetRequest(StorageSpaceObject, params, QN_STRINGIZE_TYPE(QnStorageSpaceReply), target, slot);
 }

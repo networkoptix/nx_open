@@ -206,7 +206,7 @@ public:
         \param slot Slot MUST have signature (int, QnStorageScanData, int)
         \returns Request handle. -1 In case of failure to start async request
      */
-    int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
+    int doRebuildArchiveAsync(RebuildAction action, bool isMainPool, QObject *target, const char *slot);
 
     int addBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int updateBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);

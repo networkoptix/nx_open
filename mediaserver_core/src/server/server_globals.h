@@ -18,16 +18,16 @@ public:
 #endif
 
 
-        enum ChunksCatalog {
-            LowQualityCatalog,
-            HiQualityCatalog,
-            BookmarksCatalog,
+    enum ChunksCatalog {
+        LowQualityCatalog,
+        HiQualityCatalog,
+        BookmarksCatalog,
 
-            ChunksCatalogCount
+        ChunksCatalogCount
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ChunksCatalog)
 
-    enum ArchiveKind
+    enum class StoragePool
     {
         Normal  = 0,
         Backup  = 1,

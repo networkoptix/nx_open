@@ -256,8 +256,8 @@ TestStorageThread* QnStorageManager::m_testStorageThread;
 static QnStorageManager* QnNormalStorageManager_instance = nullptr;
 static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
-QnStorageManager::QnStorageManager(QnServer::ArchiveKind kind):
-    m_kind(kind),
+QnStorageManager::QnStorageManager(QnServer::StoragePool role):
+    m_role(role),
     m_mutexStorages(QnMutex::Recursive),
     m_mutexCatalog(QnMutex::Recursive),
     m_storagesStatisticsReady(false),
@@ -267,15 +267,16 @@ QnStorageManager::QnStorageManager(QnServer::ArchiveKind kind):
     m_rebuildArchiveThread(0),
     m_firstStorageTestDone(false)
 {
+    Q_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
 
-    if (m_kind == QnServer::ArchiveKind::Normal)
+    if (m_role == QnServer::StoragePool::Normal)
     {
         assert( QnNormalStorageManager_instance == nullptr );
         QnNormalStorageManager_instance = this;
     }
-    else if (m_kind == QnServer::ArchiveKind::Backup)
+    else if (m_role == QnServer::StoragePool::Backup)
     {
         assert( QnBackupStorageManager_instance == nullptr );
         QnBackupStorageManager_instance = this;
@@ -453,7 +454,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
                 new DeviceFileCatalog(
                     it.key(), 
                     catalog,
-                    m_kind
+                    m_role
                 )
             );
             
@@ -480,7 +481,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         else {
             currentPos.save(); // save to persistent storage
             qint64 rebuildEndTime = qnSyncTime->currentMSecsSinceEpoch() - QnRecordingManager::RECORDING_CHUNK_LEN * 1250;
-            DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(cameraUniqueId, catalog, QnServer::ArchiveKind::None));
+            DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(cameraUniqueId, catalog, m_role));
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
         
@@ -784,9 +785,9 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 QnStorageManager::~QnStorageManager()
 {
     // stopRedundantSyncWatchdog();
-    if (m_kind == QnServer::ArchiveKind::Normal)
+    if (m_role == QnServer::StoragePool::Normal)
         QnNormalStorageManager_instance = nullptr;
-    else if (m_kind == QnServer::ArchiveKind::Backup)
+    else if (m_role == QnServer::StoragePool::Backup)
         QnBackupStorageManager_instance = nullptr;
 
     stopAsyncTasks();
@@ -1625,7 +1626,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& cam
             new DeviceFileCatalog(
                 cameraUniqueId, 
                 catalog,
-                m_kind
+                m_role
             )
        );
         catalogMap[cameraUniqueId] = fileCatalog;
@@ -1817,7 +1818,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
     for(QFileInfo fi: list)
     {
         QByteArray mac = fi.fileName().toUtf8();
-        DeviceFileCatalogPtr catalogFile(new DeviceFileCatalog(mac, catalogType, m_kind));
+        DeviceFileCatalogPtr catalogFile(new DeviceFileCatalog(mac, catalogType, m_role));
         QString catalogName = closeDirPath(fi.absoluteFilePath()) + lit("title.csv");
         QVector<DeviceFileCatalog::Chunk> notMigratedChunks;
         if (catalogFile->fromCSVFile(catalogName))

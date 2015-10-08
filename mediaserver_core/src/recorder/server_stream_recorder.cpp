@@ -561,35 +561,35 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
         m_recordingContextVector.clear();
         QnStorageResourcePtr storages[2] = {QnStorageResourcePtr(), QnStorageResourcePtr()};
         
-        storages[QnServer::ArchiveKind::Normal] = qnNormalStorageMan->getOptimalStorageRoot(provider);
+        storages[(int)QnServer::StoragePool::Normal] = qnNormalStorageMan->getOptimalStorageRoot(provider);
         if (isRedundantSyncOn())
-            storages[QnServer::ArchiveKind::Backup] = qnBackupStorageMan->getOptimalStorageRoot(provider);
+            storages[(int)QnServer::StoragePool::Backup] = qnBackupStorageMan->getOptimalStorageRoot(provider);
 
-        if (storages[QnServer::ArchiveKind::Normal] || storages[QnServer::ArchiveKind::Backup])
+        if (storages[(int)QnServer::StoragePool::Normal] || storages[(int)QnServer::StoragePool::Backup])
             setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
 
-        if (storages[QnServer::ArchiveKind::Normal])
+        if (storages[(int)QnServer::StoragePool::Normal])
             m_recordingContextVector.emplace_back(
                 qnNormalStorageMan->getFileName(
                     m_startDateTime/1000, 
                     m_currentTimeZone, 
                     netResource, 
                     DeviceFileCatalog::prefixByCatalog(m_catalog), 
-                    storages[QnServer::ArchiveKind::Normal]
+                    storages[(int)QnServer::StoragePool::Normal]
                 ), 
-                storages[QnServer::ArchiveKind::Normal]
+                storages[(int)QnServer::StoragePool::Normal]
             );
 
-        if (storages[QnServer::ArchiveKind::Backup])
+        if (storages[(int)QnServer::StoragePool::Backup])
             m_recordingContextVector.emplace_back(
                 qnBackupStorageMan->getFileName(
                     m_startDateTime/1000, 
                     m_currentTimeZone, 
                     netResource, 
                     DeviceFileCatalog::prefixByCatalog(m_catalog), 
-                    storages[QnServer::ArchiveKind::Backup]
+                    storages[(int)QnServer::StoragePool::Backup]
                 ), 
-                storages[QnServer::ArchiveKind::Backup]
+                storages[(int)QnServer::StoragePool::Backup]
             );
     }
 }

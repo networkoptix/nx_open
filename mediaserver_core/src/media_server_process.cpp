@@ -1544,13 +1544,13 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnStorageManager> normalStorageManager(
         new QnStorageManager(
-            QnServer::ArchiveKind::Normal
+            QnServer::StoragePool::Normal
         )
     );
     
     std::unique_ptr<QnStorageManager> backupStorageManager(
         new QnStorageManager(
-            QnServer::ArchiveKind::Backup
+            QnServer::StoragePool::Backup
         ) 
     );
 

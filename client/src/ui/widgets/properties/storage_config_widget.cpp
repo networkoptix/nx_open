@@ -9,27 +9,17 @@
 #include <core/resource/media_server_resource.h>
 #include "ui/models/storage_list_model.h"
 #include "api/app_server_connection.h"
+#include "api/media_server_connection.h"
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <camera/camera_data_manager.h>
 
 namespace {
     //setting free space to zero, since now client does not change this value, so it must keep current value
     const qint64 defaultReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
 
-    class ArchiveSpaceItemDelegate: public QStyledItemDelegate {
-        typedef QStyledItemDelegate base_type;
-    public:
-        ArchiveSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {}
-
-        virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
-            return new QnStorageSpaceSlider(parent);
-        }
-
-        virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override {
-        }
-
-        virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override 
-        {
-        }
-    };
+    static const int rebuildProgressPageIndex = 1;
+    static const int rebuildPreparePageIndex = 0;
 
 } // anonymous namespace
 
@@ -46,7 +36,13 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
 
     connect(ui->addExtStorageToMainBtn, &QPushButton::clicked, this, [this]() {at_addExtStorage(true); });
     connect(ui->addExtStorageToBackupBtn, &QPushButton::clicked, this, [this]() {at_addExtStorage(false); });
-    
+
+    connect(ui->rebuildMainBtn, &QPushButton::clicked, this, &QnStorageConfigWidget::at_rebuildButton_clicked);
+    connect(ui->rebuildBackupBtn, &QPushButton::clicked, this, &QnStorageConfigWidget::at_rebuildButton_clicked);
+
+    connect(ui->rebuildStopButtonMain, &QPushButton::clicked, this, &QnStorageConfigWidget::at_rebuildCancel_clicked);
+    connect(ui->rebuildStopButtonBackup, &QPushButton::clicked, this, &QnStorageConfigWidget::at_rebuildCancel_clicked);
+
     m_backupPool.model->setBackupRole(true);
 }
 
@@ -79,11 +75,6 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     tableView->horizontalHeader()->setSectionsClickable(false);
     tableView->horizontalHeader()->setStretchLastSection(false);
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
-    tableView->horizontalHeader()->setSectionResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
-    tableView->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
-#else
-#endif
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
 
@@ -189,6 +180,17 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
 
 void QnStorageConfigWidget::updateRebuildInfo() 
 {
+    if (isReadOnly())
+        return;
+
+    if (m_server->getStatus() == Qn::Online) {
+        sendNextArchiveRequest(true);
+        sendNextArchiveRequest(false);
+    }
+    else {
+        updateRebuildUi(QnStorageScanData(), true);
+        updateRebuildUi(QnStorageScanData(), false);
+    }
 }
 
 void QnStorageConfigWidget::processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& modifiedData, bool isBackupPool)
@@ -254,3 +256,151 @@ void QnStorageConfigWidget::submitToSettings()
     if (!storagesToRemove.empty())
         conn->getMediaServerManager()->removeStorages(storagesToRemove, this, []{});
 }
+
+void QnStorageConfigWidget::at_rebuildButton_clicked() 
+{
+    if (!m_server)
+        return;
+
+    QPushButton* button = dynamic_cast<QPushButton*>(sender());
+    if (!button)
+        return;
+
+    bool isMain = (button == ui->rebuildMainBtn);
+
+    int warnResult = QMessageBox::warning(
+        this,
+        tr("Warning"),
+        tr("You are about to launch the archive re-synchronization routine.") + L'\n' 
+        + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n' 
+        + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.") + L'\n' 
+        + tr("Are you sure you want to continue?"),
+        QMessageBox::Ok | QMessageBox::Cancel
+        );
+    if(warnResult != QMessageBox::Ok)
+        return;
+    
+    StoragePool& storagePool = isMain ? m_mainPool : m_backupPool;
+    button->setDisabled(true);
+    storagePool.rebuildHandle = m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_Start, isMain, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
+}
+
+void QnStorageConfigWidget::at_rebuildCancel_clicked() 
+{
+    if (!m_server)
+        return;
+
+    QPushButton* button = dynamic_cast<QPushButton*>(sender());
+    if (!button)
+        return;
+
+    bool isMain = (button == ui->rebuildStopButtonMain);
+
+    StoragePool& storagePool = isMain ? m_mainPool : m_backupPool;
+    button->setDisabled(true);
+    storagePool.rebuildHandle = m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_Cancel, isMain, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
+
+}
+
+void QnStorageConfigWidget::at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle)
+{
+    Q_UNUSED(status);
+    bool isMainPool = false;
+    if (handle == m_mainPool.rebuildHandle)
+        isMainPool = true;
+    else if (handle == m_backupPool.rebuildHandle)
+        isMainPool = false;
+    else
+        return; // unknown answer
+
+    updateRebuildUi(reply, isMainPool);
+
+    if (reply.state > Qn::RebuildState_None) {
+        if (isMainPool)
+            QTimer::singleShot(500, this, SLOT(sendNextArchiveRequestForMain()));
+        else
+            QTimer::singleShot(500, this, SLOT(sendNextArchiveRequestForBackup()));
+    }
+    else
+        sendStorageSpaceRequest();
+}
+
+void QnStorageConfigWidget::sendNextArchiveRequestForMain()
+{
+    sendNextArchiveRequest(true);
+}
+
+void QnStorageConfigWidget::sendNextArchiveRequestForBackup()
+{
+    sendNextArchiveRequest(false);
+}
+
+void QnStorageConfigWidget::sendNextArchiveRequest(bool isMain) {
+    if (!m_server)
+        return;
+
+    StoragePool& storagePool = isMain ? m_mainPool : m_backupPool;
+    storagePool.rebuildHandle = m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, isMain, 
+                                this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
+}
+
+void QnStorageConfigWidget::updateRebuildUi(const QnStorageScanData& reply, bool isMainPool)
+{
+    StoragePool& pool = (isMainPool ? m_mainPool : m_backupPool);
+
+    QnStorageScanData oldState = pool.prevRebuildState;
+    pool.prevRebuildState = reply;
+
+    //ui->rebuildGroupBox->setEnabled(reply.state != Qn::RebuildState_Unknown);
+
+    QPushButton* rebuildStartButton;
+    QPushButton* rebuildStopButton;
+    QProgressBar* rebuildProgressBar;
+    QnWordWrappedLabel* rebuildStatusLabel;
+    QStackedWidget* stackedWidget;
+
+    if (isMainPool) {
+        rebuildStartButton = ui->rebuildMainBtn;
+        rebuildStopButton = ui->rebuildStopButtonMain;
+        rebuildProgressBar = ui->rebuildProgressBarMain;
+        rebuildStatusLabel = ui->rebuildStatusLabelMain;
+        stackedWidget = ui->stackedWidgetMain;
+    }
+    else {
+        rebuildStartButton = ui->rebuildBackupBtn;
+        rebuildStopButton = ui->rebuildStopButtonBackup;
+        rebuildProgressBar = ui->rebuildProgressBarBackup;
+        rebuildStatusLabel = ui->rebuildStatusLabelBackup;
+        stackedWidget = ui->stackedWidgetBackup;
+    }
+
+    QString status;
+    if (!reply.path.isEmpty()) {
+        if (reply.state == Qn::RebuildState_FullScan)
+            status = tr("Rebuild archive index for storage '%1' is in progress").arg(reply.path);
+        else if (reply.state == Qn::RebuildState_PartialScan)
+            status = tr("Fast archive scan for storage '%1' is in progress").arg(reply.path);
+    }
+    else if (reply.state == Qn::RebuildState_FullScan)
+        status = tr("Rebuild archive index for storage '%1' is in progress").arg(reply.path);
+    else if (reply.state == Qn::RebuildState_PartialScan)
+        status = tr("Fast archive scan for storage '%1' is in progress").arg(reply.path);
+
+    rebuildStatusLabel->setText(status);
+
+    if (reply.progress >= 0)
+        rebuildProgressBar->setValue(reply.progress * 100 + 0.5);
+    rebuildStartButton->setEnabled(reply.state == Qn::RebuildState_None);
+    rebuildStopButton->setEnabled(reply.state == Qn::RebuildState_FullScan);
+
+    if (oldState.state == Qn::RebuildState_FullScan && reply.state == Qn::RebuildState_None) 
+    {
+        context()->instance<QnCameraDataManager>()->clearCache();
+        QMessageBox::information(this,
+            tr("Finished"),
+            tr("Rebuilding archive index is completed."));
+    }
+
+    stackedWidget->setCurrentIndex(reply.state > Qn::RebuildState_None ? rebuildProgressPageIndex : rebuildPreparePageIndex);
+}
+

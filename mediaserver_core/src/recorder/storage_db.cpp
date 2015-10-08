@@ -261,7 +261,7 @@ void QnStorageDb::addCatalogFromMediaFolder(
                         new DeviceFileCatalog(
                             uniqueId, 
                             catalog,
-                            QnServer::ArchiveKind::None
+                            QnServer::StoragePool::None
                         )
                     );
         }
@@ -547,7 +547,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
                 new DeviceFileCatalog(
                     QString::fromUtf8(id), 
                     catalog,
-                    QnServer::ArchiveKind::None // It's not important here
+                    QnServer::StoragePool::None // It's not important here
                 )
             );
         }
@@ -602,7 +602,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
                 new DeviceFileCatalog(
                     QString::fromUtf8(id), 
                     QnServer::BookmarksCatalog,
-                    QnServer::ArchiveKind::None
+                    QnServer::StoragePool::None
                 )
             );
         }

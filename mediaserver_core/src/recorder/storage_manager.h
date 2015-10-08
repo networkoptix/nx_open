@@ -44,7 +44,7 @@ public:
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
     
-    QnStorageManager(QnServer::ArchiveKind kind);
+    QnStorageManager(QnServer::StoragePool kind);
     virtual ~QnStorageManager();
     static QnStorageManager* normalInstance();
     static QnStorageManager* backupInstance();
@@ -184,7 +184,7 @@ private:
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
 
 private:
-    QnServer::ArchiveKind   m_kind;
+    const QnServer::StoragePool   m_role;
     StorageMap              m_storageRoots;
     FileCatalogMap          m_devFileCatalog[QnServer::ChunksCatalogCount];
 

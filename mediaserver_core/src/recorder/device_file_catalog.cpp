@@ -80,13 +80,13 @@ void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
 DeviceFileCatalog::DeviceFileCatalog(
     const QString           &cameraUniqueId, 
     QnServer::ChunksCatalog catalog, 
-    QnServer::ArchiveKind   kind
+    QnServer::StoragePool   storagePool
 ) :
     m_mutex(QnMutex::Recursive),
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
     m_recordingChunkTime(-1),
-    m_kind(kind)
+    m_storagePool(storagePool)
 {
 }
 
@@ -349,25 +349,26 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
 
 QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
 {
-    QnStorageManager *storageMan = nullptr;
-    if (m_kind == QnServer::ArchiveKind::Normal)
-        storageMan = qnNormalStorageMan;
-    else if (m_kind == QnServer::ArchiveKind::Backup)
-        storageMan = qnBackupStorageMan;
-
-    return storageMan;
+    if (m_storagePool == QnServer::StoragePool::Normal)
+        return qnNormalStorageMan;
+    else if (m_storagePool == QnServer::StoragePool::Backup)
+        return qnBackupStorageMan;
+    else {
+        Q_ASSERT(0);
+        return nullptr;
+    }
 }
 
-QnServer::ArchiveKind DeviceFileCatalog::getKind() const
+QnServer::StoragePool DeviceFileCatalog::getStoragePool() const
 {
     QnMutexLocker lk(&m_mutex);
-    return m_kind;
+    return m_storagePool;
 }
 
-void DeviceFileCatalog::setArchiveKind(QnServer::ArchiveKind kind)
+void DeviceFileCatalog::setStoragePool(QnServer::StoragePool kind)
 {
     QnMutexLocker lk(&m_mutex);
-    m_kind = kind;
+    m_storagePool = kind;
 }
 
 QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName)

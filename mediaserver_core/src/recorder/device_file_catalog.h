@@ -73,7 +73,7 @@ public:
     DeviceFileCatalog(
         const QString           &cameraUniqueId, 
         QnServer::ChunksCatalog catalog, 
-        QnServer::ArchiveKind   kind
+        QnServer::StoragePool   role
     );
     //void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
@@ -147,8 +147,8 @@ public:
     QnServer::ChunksCatalog getRole() const;
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 
-    QnServer::ArchiveKind getKind() const;
-    void setArchiveKind(QnServer::ArchiveKind kind);
+    QnServer::StoragePool getStoragePool() const;
+    void setStoragePool(QnServer::StoragePool value);
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
@@ -191,7 +191,7 @@ private:
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
     QnMutex m_IOMutex;
-    QnServer::ArchiveKind m_kind;
+    QnServer::StoragePool m_storagePool;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;
