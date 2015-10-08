@@ -140,6 +140,9 @@
 #include <rest/handlers/log_level_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
+#ifdef _DEBUG
+#include <rest/handlers/debug_events_rest_handler.h>
+#endif
 
 #include <rtsp/rtsp_connection.h>
 
@@ -1384,6 +1387,10 @@ bool MediaServerProcess::initTcpListener()
 #endif
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
+
+#ifdef _DEBUG
+    QnRestProcessorPool::instance()->registerHandler("api/debugEvent", new QnDebugEventsRestHandler());
+#endif
 
     m_universalTcpListener = new QnUniversalTcpListener(
         QHostAddress::Any,
