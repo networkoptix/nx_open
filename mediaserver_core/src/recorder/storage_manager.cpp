@@ -682,14 +682,23 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
     updateStorageStatistics();
 }
 
+bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) const
+{
+    if ((m_role == QnServer::StoragePool::Backup && !storage->isBackup()) ||
+        (m_role == QnServer::StoragePool::Normal && storage->isBackup()))
+    {
+        return false;
+    }
+    return true;
+}
+
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == qnCommon->moduleGUID()) 
     {
         connect(resource.data(), &QnResource::resourceChanged, this, &QnStorageManager::at_storageChanged);
-        bool isBackup = (m_role == QnServer::StoragePool::Backup);
-        if (isBackup == storage->isBackup())
+        if (checkIfMyStorage(storage))
             addStorage(storage);
     }
 }
@@ -697,7 +706,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == qnCommon->moduleGUID()) {
+    if (storage && storage->getParentId() == qnCommon->moduleGUID() && checkIfMyStorage(storage)) {
         removeStorage(storage);
         updateStorageStatistics();
     }
@@ -755,8 +764,7 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
     if (!storage)
         return;
 
-    bool isBackup = (m_role == QnServer::StoragePool::Backup);
-    if (isBackup == storage->isBackup()) {
+    if (checkIfMyStorage(storage)) {
         if (!hasStorage(storage))
             addStorage(storage);
     }

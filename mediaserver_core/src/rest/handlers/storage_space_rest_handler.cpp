@@ -30,8 +30,9 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
     bool useMainPool = !params.contains("mainPool") || params.value("mainPool").toInt() != 0;
     bool useBackup = !useMainPool;
 
+    auto storageMan = useMainPool ? qnNormalStorageMan : qnBackupStorageMan;
     QList<QString> storagePaths;
-    for(const QnStorageResourcePtr &storage: qnNormalStorageMan->getStorages()) 
+    for(const QnStorageResourcePtr &storage: storageMan->getStorages()) 
     {
         QString path;
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource>(storage);
@@ -39,8 +40,6 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
             path = QnStorageResource::toNativeDirPath(fileStorage->getLocalPath());
         
         if (storage->hasFlags(Qn::deprecated))
-            continue;
-        if (storage->isBackup() != useBackup)
             continue;
 
         QnStorageSpaceData data;
