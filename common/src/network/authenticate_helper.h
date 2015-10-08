@@ -88,6 +88,8 @@ public:
     {
     }
 
+    bool isValid() const { return authenticateHeader; }
+
     void clear()
     {
         authenticateHeader.reset();
