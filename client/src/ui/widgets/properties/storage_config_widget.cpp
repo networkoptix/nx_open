@@ -87,20 +87,43 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
 
-    QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
-    signalizer->setEventType(QEvent::ContextMenu);
-    tableView->installEventFilter(signalizer);
+    //QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
+    //signalizer->setEventType(QEvent::ContextMenu);
+    //tableView->installEventFilter(signalizer);
 
     storagePool->model = new QnStorageListModel();
     tableView->setModel(storagePool->model);
 
     //connect(signalizer, &QnAbstractEventSignalizer::activated,  this,   &QnStorageConfigWidget::at_storagesTable_contextMenuEvent);
     //connect(tableWidget,          &QTableWidget::cellChanged, this,   &QnStorageConfigWidget::at_storagesTable_cellChanged);
+    connect(tableView,         &QTableView::clicked,               this,   &QnStorageConfigWidget::at_eventsGrid_clicked);
+    tableView->setMouseTracking(true);
 }
 
 void QnStorageConfigWidget::updateFromSettings()
 {
     sendStorageSpaceRequest();
+}
+
+void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
+{
+    bool isMain = sender() == ui->mainStoragesTable;
+
+    if (index.column() == QnStorageListModel::ChangeGroupActionColumn)
+    {
+        QnStorageListModel* fromModel = m_mainPool.model;
+        QnStorageListModel* toModel = m_backupPool.model;
+        if (!isMain)
+            qSwap(fromModel, toModel);
+
+        QVariant data = index.data(Qn::StorageSpaceDataRole);
+        if (!data.canConvert<QnStorageSpaceData>())
+            return;
+        QnStorageSpaceData record = data.value<QnStorageSpaceData>();
+        fromModel->removeRow(index.row());
+        toModel->addModelData(record);
+        return;
+    }
 }
 
 void QnStorageConfigWidget::sendStorageSpaceRequest() {

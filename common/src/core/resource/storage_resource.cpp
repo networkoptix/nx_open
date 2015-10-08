@@ -7,7 +7,7 @@ QnStorageResource::QnStorageResource():
     m_maxStoreTime(0),
     m_usedForWriting(false),
     m_storageBitrateCoeff(0.0),
-    m_backup(false)
+    m_isBackup(false)
 {
     setStatus(Qn::Offline);
 }
@@ -126,6 +126,7 @@ void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
     m_spaceLimit = storage->m_spaceLimit;
     m_maxStoreTime = storage->m_maxStoreTime;
     m_usedForWriting = storage->m_usedForWriting;
+    m_isBackup = storage->m_isBackup;
 }
 
 void QnStorageResource::setUrl(const QString& value)
@@ -159,12 +160,12 @@ QString QnStorageResource::toNativeDirPath(const QString &dirPath)
     return result;
 }
 
-void QnStorageResource::setBackup(bool value) 
+void QnStorageResource::setBackup(bool value)
 {
-    m_backup = value;
+    m_isBackup = value;
 }
 
 bool QnStorageResource::isBackup() const 
 { 
-    return m_backup; 
+    return m_isBackup; 
 }

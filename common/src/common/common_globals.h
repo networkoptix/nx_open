@@ -558,6 +558,8 @@ public:
 
         LastItemDataRole,
 
+        StorageSpaceDataRole,                       /** return StorageSpaceData object at QnStorageConfigWidget */
+
         RoleCount
     };
 

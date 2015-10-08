@@ -58,7 +58,7 @@ public:
 
     static QString toNativeDirPath(const QString &dirPath);
 
-    void setBackup(bool v);
+    void setBackup(bool value);
     bool isBackup() const;
 
 signals:
@@ -76,7 +76,7 @@ private:
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
-    bool m_backup;
+    bool m_isBackup;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

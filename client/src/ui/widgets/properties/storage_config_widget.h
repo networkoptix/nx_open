@@ -35,6 +35,7 @@ public:
     virtual void submitToSettings() override;
 private:
     void updateRebuildInfo();
+    void at_eventsGrid_clicked(const QModelIndex& index);
 private slots:
     void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();

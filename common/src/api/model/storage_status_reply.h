@@ -18,6 +18,7 @@ struct QnStorageSpaceData {
     bool isUsedForWriting;
     QString storageType;
 };
+Q_DECLARE_METATYPE(QnStorageSpaceData);
 
 #define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)(storageType)
 

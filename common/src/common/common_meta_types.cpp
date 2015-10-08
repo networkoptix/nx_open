@@ -179,6 +179,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();
 
+    qRegisterMetaType<QnStorageSpaceData>();
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();

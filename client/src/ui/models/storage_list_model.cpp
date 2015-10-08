@@ -130,6 +130,8 @@ QVariant QnStorageListModel::data(const QModelIndex &index, int role) const
         return mouseCursorData(index);
     case Qt::CheckStateRole:
         return checkstateData(index);
+    case Qn::StorageSpaceDataRole:
+        return QVariant::fromValue<QnStorageSpaceData>(m_data.storages[index.row()]);
     default:
         break;
     }
@@ -175,4 +177,15 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
 void QnStorageListModel::setBackupRole(bool value)
 {
     m_isBackupRole = value;
+}
+
+bool QnStorageListModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    if (parent.isValid())
+        return false;
+
+    beginResetModel();
+    m_data.storages.erase(m_data.storages.begin() + row, m_data.storages.begin() + row + count);
+    endResetModel();
+    return true;
 }
