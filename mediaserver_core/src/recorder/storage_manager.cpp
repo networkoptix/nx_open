@@ -684,27 +684,16 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
     updateStorageStatistics();
 }
 
-class AddStorageTask: public QRunnable
-{
-public:
-    AddStorageTask(QnStorageResourcePtr storage): m_storage(storage) {}
-    void run()
-    {
-        if (m_storage->isBackup())
-            qnBackupStorageMan->addStorage(m_storage);
-        else if (!m_storage->isBackup())
-            qnNormalStorageMan->addStorage(m_storage);
-    }
-private:
-    QnStorageResourcePtr m_storage;
-};
-
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
-    connect(resource.data(), &QnResource::resourceChanged, this, &QnStorageManager::at_storageChanged);
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == qnCommon->moduleGUID()) 
-        addStorage(storage);
+    {
+        connect(resource.data(), &QnResource::resourceChanged, this, &QnStorageManager::at_storageChanged);
+        bool isBackup = (m_role == QnServer::StoragePool::Backup);
+        if (isBackup == storage->isBackup())
+            addStorage(storage);
+    }
 }
 
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
@@ -719,6 +708,17 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 QStringList QnStorageManager::getAllStoragePathes() const
 {
     return m_storageIndexes.keys();
+}
+
+bool QnStorageManager::hasStorage(const QnStorageResourcePtr &storage) const
+{
+    QnMutexLocker lock( &m_mutexStorages );
+    for (auto itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        if (itr.value()->getId() == storage->getId())
+            return true;
+    }
+    return false;
 }
 
 void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
@@ -751,8 +751,22 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
     }
 }
 
-void QnStorageManager::at_storageChanged(const QnResourcePtr &)
+void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
 {
+    QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
+    if (!storage)
+        return;
+
+    bool isBackup = (m_role == QnServer::StoragePool::Backup);
+    if (isBackup == storage->isBackup()) {
+        if (!hasStorage(storage))
+            addStorage(storage);
+    }
+    else {
+        if (hasStorage(storage))
+            removeStorage(storage);
+    }
+
     {
         QnMutexLocker lock( &m_mutexStorages );
         m_storagesStatisticsReady = false;

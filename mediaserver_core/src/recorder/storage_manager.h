@@ -49,7 +49,7 @@ public:
     static QnStorageManager* normalInstance();
     static QnStorageManager* backupInstance();
     void removeStorage(const QnStorageResourcePtr &storage);
-
+    bool hasStorage(const QnStorageResourcePtr &storage) const;
 
     /*
     * Remove storage if storage is absent in specified list
