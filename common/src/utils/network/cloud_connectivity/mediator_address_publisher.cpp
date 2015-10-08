@@ -93,8 +93,7 @@ bool MediatorAddressPublisher::isCloudReady()
         }
         else
         {
-            NX_LOG( lit( "%1 Mediator address is not resolved yet" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logDEBUG1 );
+            NX_LOGX( lit( "Mediator address is not resolved yet" ), cl_logDEBUG1 );
         }
     }
 
@@ -123,14 +122,12 @@ void MediatorAddressPublisher::updateExternalAddresses()
 
         if( const auto error = stun::AsyncClient::hasError( code, response ) )
         {
-            NX_LOG( lit( "%1 %2" ).arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                                  .arg( *error ), cl_logERROR );
+            NX_LOGX( *error, cl_logERROR );
             m_isExternalChanged = true;
         }
         else
         {
-            NX_LOG( lit( "%1 Updated external addresses: %2" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+            NX_LOGX( lit( "Updated external addresses: %1" )
                     .arg( containerString( m_external ) ), cl_logDEBUG1 );
         }
 
@@ -140,8 +137,7 @@ void MediatorAddressPublisher::updateExternalAddresses()
 
     if( !ret )
     {
-        NX_LOG( lit( "%1 Could not sendRequest" )
-                .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logERROR );
+        NX_LOGX( lit( "Could not sendRequest" ), cl_logERROR );
         return;
     }
 
@@ -167,16 +163,14 @@ void MediatorAddressPublisher::checkAddresses( const std::list< SocketAddress >&
     {
         if( const auto error = stun::AsyncClient::hasError( code, response ) )
         {
-            NX_LOG( lit( "%1 %2" ).arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                                  .arg( *error ), cl_logERROR );
+            NX_LOGX( *error, cl_logERROR );
             return;
         }
 
         const auto eps = response.getAttribute< stun::cc::attrs::PublicEndpointList >();
         if( !eps )
         {
-            NX_LOG( lit( "%1 No PublicEndpointList in response" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logERROR );
+            NX_LOGX( lit( "No PublicEndpointList in response" ), cl_logERROR );
             return;
         }
 
@@ -187,8 +181,7 @@ void MediatorAddressPublisher::checkAddresses( const std::list< SocketAddress >&
         m_external.insert( addresses.begin(), addresses.end() );
         m_isExternalChanged = (size < m_external.size());
 
-        NX_LOG( lit( "%1 Pinged external addresses: %2, was %3, need update: %4" )
-                .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+        NX_LOGX( lit( "Pinged external addresses: %1, was %2, need update: %3" )
                 .arg( containerString( m_external ) )
                 .arg( size ).arg( m_isExternalChanged ), cl_logDEBUG1 );
 
@@ -196,8 +189,7 @@ void MediatorAddressPublisher::checkAddresses( const std::list< SocketAddress >&
     } );
 
     if (!ret )
-        NX_LOG( lit( "%1 Could not sendRequest" )
-                .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logERROR );
+        NX_LOGX( lit( "Could not sendRequest" ), cl_logERROR );
 }
 
 } // namespase cc

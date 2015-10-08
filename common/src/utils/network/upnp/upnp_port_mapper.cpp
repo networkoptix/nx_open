@@ -178,9 +178,9 @@ void PortMapper::addNewDevice( const HostAddress& localAddress,
     for( const auto map : m_mapRequests )
         ensureMapping( newDevice, map.first.port, map.first.protocol );
 
-    NX_LOG( lit( "%1 New device %2 ( %3 ) has been found on %4" )
-            .arg( QLatin1String( Q_FUNC_INFO ) ).arg( url.toString() )
-            .arg( serial ).arg( localAddress.toString() ), cl_logDEBUG2 );
+    NX_LOGX( lit( "New device %1 ( %2 ) has been found on %3" )
+             .arg( url.toString() )
+             .arg( serial ).arg( localAddress.toString() ), cl_logDEBUG2 );
 }
 
 void PortMapper::updateExternalIp( Device& device )
@@ -194,10 +194,9 @@ void PortMapper::updateExternalIp( Device& device )
         std::list< Guard > callbackGuards;
         {
             QnMutexLocker lock( &m_mutex );
-            NX_LOG( lit( "%1 externalIp='%2' on device %3" )
-                    .arg( QLatin1String( Q_FUNC_INFO ) )
-                    .arg( externalIp.toString() )
-                    .arg( device.url.toString() ), cl_logDEBUG1 );
+            NX_LOGX( lit( "externalIp='%1' on device %2" )
+                     .arg( externalIp.toString() )
+                     .arg( device.url.toString() ), cl_logDEBUG1 );
 
             if( externalIp == HostAddress() )
             {
@@ -292,9 +291,8 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
                 mapping.protocol == protocol &&
                 ( mapping.duration == 0 || mapping.duration > m_checkMappingsInterval ) )
             {
-                NX_LOG( lit( "%1 Already mapped %2" )
-                        .arg( QLatin1String( Q_FUNC_INFO ) )
-                        .arg( mapping.toString() ), cl_logDEBUG1 );
+                NX_LOGX( lit( "Already mapped %1" ).arg( mapping.toString() ),
+                         cl_logDEBUG1 );
 
                 if( deviceMap == device.mapped.end() ||
                     deviceMap->second != mapping.externalPort )
@@ -359,9 +357,8 @@ void PortMapper::makeMapping( Device& device, quint16 inPort,
             if( retries > 0 )
                 makeMapping( device, inPort, protocol, retries - 1 );
             else
-                NX_LOG( lit( "%1 Cound not forward any port on %2" )
-                        .arg( QLatin1String( Q_FUNC_INFO ) )
-                        .arg( device.url.toString() ), cl_logERROR );
+                NX_LOGX( lit( "Cound not forward any port on %1" )
+                         .arg( device.url.toString() ), cl_logERROR );
             return;
         }
 

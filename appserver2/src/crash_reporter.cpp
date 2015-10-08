@@ -40,8 +40,8 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
         return QFileInfoList(); // do nothing. not implemented
     #endif
 
-    NX_LOG(lit("CrashReporter::readCrashes: scan %1 for files %2")
-        .arg(crashDir.absolutePath()).arg(crashFilter), cl_logDEBUG1);
+    NX_LOG(lit("readCrashes: scan %1 for files %2")
+           .arg(crashDir.absolutePath()).arg(crashFilter), cl_logDEBUG1);
 
     return crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files, QDir::Time);
 }
@@ -85,8 +85,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     const auto msManager = QnAppServerConnectionFactory::getConnection2()->getMediaServerManager();
     if (!Ec2StaticticsReporter::isAllowed(msManager))
     {
-        NX_LOG(lit("CrashReporter::scanAndReport: Automatic report system is disabled"),
-               cl_logINFO);
+        NX_LOGX(lit("Automatic report system is disabled"), cl_logINFO);
         return false;
     }
 
@@ -97,8 +96,8 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     if (now < lastTime.addSecs(SENDING_MIN_INTERVAL) &&
         lastTime < now.addSecs(SENDING_MIN_INTERVAL)) // avoid possible long resync problem
     {
-        NX_LOG(lit("CrashReporter::scanAndReport: previous crash was reported %1")
-            .arg(lastTime.toString(Qt::ISODate)), cl_logDEBUG1);
+        NX_LOGX(lit("Previous crash was reported %1, exit")
+                .arg(lastTime.toString(Qt::ISODate)), cl_logDEBUG1);
         return false;
     }
 
@@ -126,14 +125,11 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
     // This function is not supposed to be called more then once per binary, but anyway:
     if (m_activeCollection.isInProgress())
     {
-        NX_LOG(lit("CrashReporter::scanAndReportAsync: Previous report is in progress"),
-               cl_logERROR);
+        NX_LOGX(lit("Previous report is in progress, exit"), cl_logERROR);
         return;
     }
 
-    NX_LOG(lit("CrashReporter::scanAndReportAsync: Start new asyn operation"),
-           cl_logINFO);
-
+    NX_LOGX(lit("Start new async report"), cl_logINFO);
     m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
         // \class QnConcurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock
@@ -160,8 +156,8 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
     auto content = file.readAll();
     if (content.size() == 0)
     {
-        NX_LOG(lit("CrashReporter::send: Error: %1 is not readable or empty: %2")
-            .arg(filePath).arg(file.errorString()), cl_logWARNING);
+        NX_LOGX(lit("Error: %1 is not readable or empty: %2")
+                .arg(filePath).arg(file.errorString()), cl_logWARNING);
         return false;
     }
 
@@ -177,12 +173,11 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
     QnMutexLocker lock(&m_mutex);
     if (m_activeHttpClient)
     {
-        NX_LOG(lit("CrashReporter::send: another report is in progress!"), cl_logWARNING);
+        NX_LOGX(lit("Another report already is in progress!"), cl_logWARNING);
         return false;
     }
 
-    NX_LOG(lit("CrashReporter::send: %1 to %2")
-           .arg(filePath).arg(serverApi.toString()), cl_logINFO);
+    NX_LOGX(lit("Send %1 to %2").arg(filePath).arg(serverApi.toString()), cl_logINFO);
 
     if (httpClient->doPost(serverApi, "application/octet-stream", content))
     {
@@ -206,14 +201,14 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
 {
     if (!httpClient->hasRequestSuccesed())
     {
-        NX_LOG(lit("CrashReporter::finishReport: sending %1 to %2 has failed")
-               .arg(m_crashFile.absoluteFilePath())
-               .arg(httpClient->url().toString()), cl_logWARNING);
+        NX_LOGX(lit("Sending %1 to %2 has failed")
+                .arg(m_crashFile.absoluteFilePath())
+                .arg(httpClient->url().toString()), cl_logWARNING);
     }
     else
     {
-        NX_LOG(lit("CrashReporter::finishReport: crash %1 has been sent successfully")
-               .arg(m_crashFile.absoluteFilePath()), cl_logDEBUG1);
+        NX_LOGX(lit("Report %1 has been sent successfully")
+                .arg(m_crashFile.absoluteFilePath()), cl_logDEBUG1);
 
         const auto now = qnSyncTime->currentDateTime().toUTC();
         m_settings->setValue(LAST_CRASH, now.toString(Qt::ISODate));

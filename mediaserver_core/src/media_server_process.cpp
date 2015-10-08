@@ -977,8 +977,8 @@ void MediaServerProcess::updateAddressesList()
         serverAddresses << SocketAddress(host.first, host.second);
 
     m_mediaServer->setNetAddrList(serverAddresses);
-    NX_LOG(lit("%1 Update mediaserver addresses: %2")
-           .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
+    NX_LOGX(lit("Update mediaserver addresses: %1")
+            .arg(containerToQString(serverAddresses)), cl_logDEBUG1);
 
     const QUrl defaultUrl(m_mediaServer->getApiUrl());
     const SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
@@ -1270,8 +1270,8 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     SocketAddress mappedAddress(address);
     if (mappedAddress.port)
     {
-        NX_LOG(lit("%1 New external address %2 has been mapped")
-               .arg(Q_FUNC_INFO).arg(address), cl_logALWAYS)
+        NX_LOGX(lit("New external address %1 has been mapped")
+                .arg(address), cl_logALWAYS)
 
         m_forwardedAddresses[mappedAddress.address] = mappedAddress.port;
         updateAddressesList();
@@ -1281,9 +1281,8 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         const auto oldIp = m_forwardedAddresses.find(mappedAddress.address);
         if (oldIp != m_forwardedAddresses.end())
         {
-            NX_LOG(lit("%1 External address %2:%3 has been unmapped")
-                   .arg(Q_FUNC_INFO).arg(oldIp->first.toString())
-                   .arg(oldIp->second), cl_logALWAYS)
+            NX_LOGX(lit("External address %1:%2 has been unmapped")
+                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS)
 
             m_forwardedAddresses.erase(oldIp);
             updateAddressesList();
