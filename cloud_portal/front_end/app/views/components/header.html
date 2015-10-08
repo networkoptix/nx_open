@@ -1,7 +1,9 @@
 <div class="container header clearfix">
+
+    <h3 class="text-muted pull-left">Nx Connect </h3>
     <nav>
-        <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="active"><a href="#">Home</a></li>
+        <ul class="nav nav-pills ">
+            <li role="presentation"><a href="#">Support</a></li>
             <li role="presentation" class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">About <span class="caret"></span></a>
                 <ul class="dropdown-menu">
@@ -10,8 +12,9 @@
                     <li><a href="#">About Networkoptix</a></li>
                 </ul>
             </li>
-            <li role="presentation"><a href="#">Sign In</a></li>
+
+            <li role="presentation" class="active pull-right"><a href="#register" ng-click="register();$event.preventDefault();">Register</a></li>
+            <li role="presentation" class="pull-right"><a href="#login" ng-click="login();$event.preventDefault();">Log in</a></li>
         </ul>
     </nav>
-    <h3 class="text-muted">Nx Connect</h3>
 </div>

@@ -5,17 +5,19 @@ angular.module('cloudApp', [
     'ngResource',
     'ngSanitize',
     'ngRoute',
-    //'ngTouch',
     'ui.bootstrap',
     'ngStorage'
 ]).config(function ($routeProvider) {
     $routeProvider
-        .when('/register', {
-            templateUrl: 'views/settings.html',
-            controller: 'SettingsCtrl'
+        .when('/login', {
+            templateUrl: 'views/login.html',
+            controller: 'LoginCtrl'
         })
         .otherwise({
             templateUrl: 'views/startPage.html',
             controller: 'StartPageCtrl'
         });
 });
+
+
+
