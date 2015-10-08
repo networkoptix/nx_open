@@ -1,0 +1,10 @@
+front_end/node_modules 
+front_end/dist 
+front_end/.tmp 
+front_end/.idea 
+front_end/.sass-cache
+front_end/bower_components
+app/bower_components
+
+cloud/.idea
+.DS_Store
