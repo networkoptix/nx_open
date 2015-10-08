@@ -36,6 +36,9 @@ QnCameraBookmarkList QnCameraBookmarksManager::getLocalBookmarks(const QnVirtual
 
 void QnCameraBookmarksManager::addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
     Q_D(QnCameraBookmarksManager);
+
+    Q_ASSERT_X(!bookmark.cameraId.isEmpty(), Q_FUNC_INFO, "Camera ID should not be empty!");
+
     d->addCameraBookmark(camera, bookmark, callback);
 }
 

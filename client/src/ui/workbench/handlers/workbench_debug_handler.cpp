@@ -170,6 +170,7 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
                     bookmark.name = getRandomName(dict);
                     bookmark.description = getRandomDescription(dict);
                     bookmark.tags = getRandomTags(dict);
+                    bookmark.cameraId = camera->getUniqueId();
 
                     QDateTime startDt = QDateTime::fromMSecsSinceEpoch(start);
                     bookmark.timeout = startDt.addMonths(6).toMSecsSinceEpoch() - start;
