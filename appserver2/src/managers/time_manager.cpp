@@ -593,8 +593,8 @@ namespace ec2
     {
         Q_ASSERT( remotePeerTimePriorityKey.seed > 0 );
 
-        NX_LOGX( lit("Received sync time update from peer %1, "
-            "peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5").
+        NX_LOGX(lm("Received sync time update from peer %1, peer's sync time (%2), "
+                "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5").
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
             arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
             arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
@@ -616,8 +616,8 @@ namespace ec2
             return; //not applying time
         }
 
-        NX_LOGX( lit("Received sync time update from peer %1, peer's sync time (%2), "
-            "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
+        NX_LOGX(lm("Received sync time update from peer %1, peer's sync time (%2), "
+                "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
             arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
             arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
