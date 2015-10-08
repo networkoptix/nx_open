@@ -78,8 +78,8 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(m_buttonBox);
-    safeModeWatcher->addAutoHiddenWidget(m_okButton);
-    safeModeWatcher->addAutoHiddenWidget(m_applyButton);
+    safeModeWatcher->addControlledWidget(m_okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(m_applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
@@ -146,7 +146,7 @@ void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_okButton->setEnabled(isValidMode);
+    m_okButton->setEnabled(isValidMode && !qnCommon->isReadOnly());
     m_openButton->setVisible(isValidMode);
     m_diagnoseButton->setVisible(isValidMode);
     m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement

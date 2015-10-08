@@ -46,12 +46,14 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
 
     loadData();
 
+    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
-    safeModeWatcher->addAutoHiddenWidget(ui->buttonBox->button(QDialogButtonBox::Ok));
-    safeModeWatcher->addAutoReadOnlyWidget(generalWidget);
-    safeModeWatcher->addAutoReadOnlyWidget(smtpWidget);
-    safeModeWatcher->addAutoReadOnlyWidget(routingWidget);
+    safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(m_updatesWidget, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(generalWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
+    safeModeWatcher->addControlledWidget(smtpWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
+    safeModeWatcher->addControlledWidget(routingWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
 
     connect(qnCommon, &QnCommonModule::readOnlyChanged, this, [this](bool readOnly){
         setPageEnabled(UpdatesPage, !readOnly);

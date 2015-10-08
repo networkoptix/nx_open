@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
+#include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     : base_type(parent)
@@ -50,6 +51,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
         if (!servers.isEmpty())
             setServer(servers.first());
     });  
+
+    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
+    safeModeWatcher->addWarningLabel(ui->buttonBox);
+    safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 

@@ -348,7 +348,10 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
     QnRequestParamList params;
 
     params << QnRequestParam("res_id", camera->getPhysicalId());
-    params << QnRequestParam("time", timeUsec);
+    if (timeUsec < 0)
+        params << QnRequestParam("time", "latest");
+    else
+        params << QnRequestParam("time", timeUsec);
     if (size.width() > 0)
         params << QnRequestParam("width", size.width());
     if (size.height() > 0)

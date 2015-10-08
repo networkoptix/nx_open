@@ -7,6 +7,9 @@
 #include <signal.h>
 #ifdef __linux__
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 
 #include <qtsinglecoreapplication.h>
@@ -140,6 +143,9 @@
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
+#ifdef _DEBUG
+#include <rest/handlers/debug_events_rest_handler.h>
+#endif
 
 #include <rtsp/rtsp_connection.h>
 
@@ -1378,6 +1384,10 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
 
+#ifdef _DEBUG
+    QnRestProcessorPool::instance()->registerHandler("api/debugEvent", new QnDebugEventsRestHandler());
+#endif
+
     m_universalTcpListener = new QnUniversalTcpListener(
         QHostAddress::Any,
         rtspPort,
@@ -1572,16 +1582,15 @@ void MediaServerProcess::run()
 #ifdef __arm__
     serverFlags |= Qn::SF_ArmServer;
 
-    auto partitions = qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-        QnPlatformMonitor::LocalDiskPartition);
-    for (const auto& partition: partitions)
-    {
-        if (partition.devName.startsWith(lit("/dev/sd")))
-        {
-            serverFlags |= Qn::SF_Has_HDD;
-            break;
-        }
-    }
+    struct stat st;
+    memset(&st, 0, sizeof(st));
+    const bool hddPresent = 
+        ::stat("/dev/sda", &st) == 0 ||
+        ::stat("/dev/sdb", &st) == 0 ||
+        ::stat("/dev/sdc", &st) == 0 ||
+        ::stat("/dev/sdd", &st) == 0;
+    if (hddPresent)
+        serverFlags |= Qn::SF_Has_HDD;
 #else
     serverFlags |= Qn::SF_Has_HDD;
 #endif
