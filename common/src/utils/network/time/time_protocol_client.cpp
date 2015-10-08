@@ -60,7 +60,7 @@ void TimeProtocolClient::join()
 
 bool TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc )
 {
-    NX_LOG( lit( "rfc868 time_sync. Starting time synchronization with server %1:%2" ).
+    NX_LOGX( lit( "rfc868 time_sync. Starting time synchronization with server %1:%2" ).
         arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
 
     {
@@ -95,7 +95,7 @@ bool TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::E
             std::bind( &TimeProtocolClient::onConnectionEstablished, this, _1 ) ) )
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit( "rfc868 time_sync. Failed to start async connect (2) from %1:%2. %3" ).
+        NX_LOGX( lit( "rfc868 time_sync. Failed to start async connect (2) from %1:%2. %3" ).
             arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
         m_handlerFunc = std::function<void( qint64, SystemError::ErrorCode )>();
         m_tcpSock->terminateAsyncIO( true );
@@ -123,7 +123,7 @@ namespace
 
 void TimeProtocolClient::onConnectionEstablished( SystemError::ErrorCode errorCode )
 {
-    NX_LOG( lit( "rfc868 time_sync. Connection to time server %1:%2 completed with following result: %3" ).
+    NX_LOGX( lit( "rfc868 time_sync. Connection to time server %1:%2 completed with following result: %3" ).
         arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg(SystemError::toString(errorCode)), cl_logDEBUG2 );
 
     if( errorCode )
@@ -139,7 +139,7 @@ void TimeProtocolClient::onConnectionEstablished( SystemError::ErrorCode errorCo
     if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &TimeProtocolClient::onSomeBytesRead, this, _1, _2 ) ) )
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit( "rfc868 time_sync. Failed to start async read (1) from %1:%2. %3" ).
+        NX_LOGX( lit( "rfc868 time_sync. Failed to start async read (1) from %1:%2. %3" ).
             arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
         m_handlerFunc( -1, errorCode );
     }
@@ -151,7 +151,7 @@ void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size
 
     if( errorCode )
     {
-        NX_LOG( lit( "rfc868 time_sync. Failed to read from time server %1:%2. %3" ).
+        NX_LOGX( lit( "rfc868 time_sync. Failed to read from time server %1:%2. %3" ).
             arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
 
         m_handlerFunc( -1, errorCode );
@@ -160,7 +160,7 @@ void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size
 
     if( bytesRead == 0 )
     {
-        NX_LOG( lit( "rfc868 time_sync. Connection to time server %1:%2 closed. Read text %3" ).
+        NX_LOGX( lit( "rfc868 time_sync. Connection to time server %1:%2 closed. Read text %3" ).
             arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( QLatin1String(m_timeStr.trimmed()) ), cl_logDEBUG2 );
 
         //connection closed
@@ -168,12 +168,12 @@ void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size
         return;
     }
 
-    NX_LOG( lit( "rfc868 time_sync. Read %1 bytes from time server %2:%3" ).
+    NX_LOGX( lit( "rfc868 time_sync. Read %1 bytes from time server %2:%3" ).
         arg( bytesRead ).arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
 
     if( m_timeStr.size() >= m_timeStr.capacity() )
     {
-        NX_LOG( lit( "rfc868 time_sync. Read %1 from time server %2:%3" ).
+        NX_LOGX( lit( "rfc868 time_sync. Read %1 from time server %2:%3" ).
             arg( QLatin1String(m_timeStr.toHex()) ).arg(m_timeServer).arg(TIME_PROTOCOL_DEFAULT_PORT), cl_logDEBUG1 );
 
         //max data size has been read, ignoring futher data
@@ -186,7 +186,7 @@ void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &TimeProtocolClient::onSomeBytesRead, this, _1, _2 ) ) )
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit( "rfc868 time_sync. Failed to start async read (2) from %1:%2. %3" ).
+        NX_LOGX( lit( "rfc868 time_sync. Failed to start async read (2) from %1:%2. %3" ).
             arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
         m_handlerFunc( -1, errorCode );
     }

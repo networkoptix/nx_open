@@ -65,8 +65,7 @@ void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
 
             if( auto connection = collector->connection.lock() )
             {
-                NX_LOG( lit("%1 Peer %2/%3 succesfully pinged %4")
-                        .arg( Q_FUNC_INFO )
+                NX_LOGX( lit("Peer %1/%2 succesfully pinged %3")
                         .arg( QString::fromUtf8( mediaserver->systemId ) )
                         .arg( QString::fromUtf8( mediaserver->serverId ) )
                         .arg( containerString( collector->endpoints ) ), cl_logDEBUG1 );
@@ -126,8 +125,8 @@ void MediaserverApi::pingServer( const SocketAddress& address, const String& exp
 
             if( !httpClient->hasRequestSuccesed() )
             {
-                NX_LOG( lit("%1 Response from %2 failed").arg( Q_FUNC_INFO )
-                        .arg( address.toString() ), cl_logDEBUG1 );
+                NX_LOGX( lit("Response from %1 has failed")
+                         .arg( address.toString() ), cl_logDEBUG1 );
                 return onPinged( std::move( address ), false );
             }
 
@@ -135,8 +134,8 @@ void MediaserverApi::pingServer( const SocketAddress& address, const String& exp
             const auto error = scanResponseForErrors( buffer, expectedId );
             if( !error.isEmpty() )
             {
-                NX_LOG( lit("%1 Response from %2 %3").arg( Q_FUNC_INFO )
-                        .arg( address.toString() ).arg( error ), cl_logDEBUG1 );
+                NX_LOGX( lit("Response from %1 has error: %2")
+                         .arg( address.toString() ).arg( error ), cl_logDEBUG1 );
                 return onPinged( std::move( address ), false );
             }
             onPinged( std::move( address ), true );
@@ -144,8 +143,8 @@ void MediaserverApi::pingServer( const SocketAddress& address, const String& exp
 
     if( !httpClient->doGet( lit( "http://%1/api/ping" ).arg( address.toString() ) ) )
     {
-        NX_LOG( lit("%1 Mediaserver %2 is unaccesible")
-                .arg( Q_FUNC_INFO ).arg( address.toString() ), cl_logDEBUG1 )
+        NX_LOGX( lit("Mediaserver %1 is unaccesible")
+                 .arg( address.toString() ), cl_logDEBUG1 )
         return onPinged( address, false );
     }
 

@@ -186,9 +186,8 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
             }
         }
 
-        NX_LOG( lit( "%1 Could not parse message from %2" )
-                .arg( QLatin1String( Q_FUNC_INFO ) )
-                .arg( url.toString() ), cl_logERROR );
+        NX_LOGX( lit( "Could not parse message from %1" )
+                 .arg( url.toString() ), cl_logERROR );
 
         callback( Message() );
     };
@@ -203,9 +202,8 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
     m_httpClients.insert( httpClient );
     if( !httpClient->doPost( url, "text/xml", request.toUtf8() ) )
     {
-        NX_LOG( lit( "%1 Could not send request to %2" )
-                .arg( QLatin1String( Q_FUNC_INFO ) )
-                .arg( url.toString() ), cl_logERROR );
+        NX_LOGX( lit( "Could not send request to %1" )
+                 .arg( url.toString() ), cl_logERROR );
 
         m_httpClients.erase( httpClient );
         return false;

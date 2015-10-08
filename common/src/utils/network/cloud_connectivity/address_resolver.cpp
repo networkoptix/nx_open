@@ -116,9 +116,9 @@ void AddressResolver::resolveAsync(
     {
         auto entries = info->second.getAll();
         lk.unlock();
-        NX_LOG( lit( "%1 address %2 resolved from cache: %3" )
-                .arg( QString::fromUtf8( Q_FUNC_INFO ) ).arg( hostName.toString() )
-                .arg( containerString( entries ) ), cl_logDEBUG2 );
+        NX_LOGX( lit( "Address %1 resolved from cache: %2" )
+                 .arg( hostName.toString() )
+                 .arg( containerString( entries ) ), cl_logDEBUG2 );
 
         return handler( SystemError::noError, std::move( entries ) );
     }
@@ -127,9 +127,9 @@ void AddressResolver::resolveAsync(
     m_requests.insert( std::make_pair( requestId,
         RequestInfo( info->first, natTraversal, std::move( handler ) ) ) );
 
-    NX_LOG( lit( "%1 address %2 will be resolved later by request %3" )
-            .arg( QString::fromUtf8( Q_FUNC_INFO ) ).arg( hostName.toString() )
-            .arg( reinterpret_cast< size_t >( requestId ) ), cl_logDEBUG1 );
+    NX_LOGX( lit( "Address %1 will be resolved later by request %2" )
+             .arg( hostName.toString() )
+             .arg( reinterpret_cast< size_t >( requestId ) ), cl_logDEBUG1 );
 
     // Initiate resolution only if it is not initeated yet
     // NOTE: in case of failure or information outdates state will be dropped to init
@@ -150,10 +150,9 @@ std::vector< AddressEntry > AddressResolver::resolveSync(
                           std::vector< AddressEntry > entries )
     {
         if( code != SystemError::noError )
-            NX_LOG( lit( "%1 address %2 could not be resolved: %3" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                    .arg( hostName.toString() )
-                    .arg( SystemError::toString( code ) ), cl_logERROR );
+            NX_LOGX( lit( "Address %1 could not be resolved: %2" )
+                     .arg( hostName.toString() )
+                     .arg( SystemError::toString( code ) ), cl_logERROR );
 
         promise.set_value( std::move( entries ) );
     };
@@ -277,18 +276,16 @@ void AddressResolver::dnsResolve( HaInfoIterator info )
         if( code == SystemError::noError )
         {
             entries.push_back( AddressEntry( AddressType::regular, hostAddress ) );
-            NX_LOG( lit( "%1 address %2 is resolved to %3" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                    .arg( info->first.toString() )
-                    .arg( hostAddress.toString() ), cl_logDEBUG1 );
+            NX_LOGX( lit( "Address %1 is resolved to %2" )
+                     .arg( info->first.toString() )
+                     .arg( hostAddress.toString() ), cl_logDEBUG1 );
         }
         else
         {
             // count failure as unresolvable, better luck next time
-            NX_LOG( lit( "%1 address %2 could not be resolved: %3" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                    .arg( info->first.toString() )
-                    .arg( SystemError::toString( code ) ), cl_logDEBUG1 );
+            NX_LOGX( lit( "Address %1 could not be resolved: %2" )
+                     .arg( info->first.toString() )
+                     .arg( SystemError::toString( code ) ), cl_logDEBUG1 );
         }
 
         info->second.setDnsEntries( entries );
@@ -311,10 +308,9 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
         return mediatorStunResolve( info, lk );
     }
 
-    NX_LOG( lit( "%1 Mediator address is not resolved yet" )
-            .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logDEBUG1 );
-
+    NX_LOGX( lit( "Mediator address is not resolved yet" ), cl_logDEBUG1 );
     info->second.setMediatorEntries();
+
     const auto guards = grabHandlers( SystemError::dnsServerFailure, info );
     lk->unlock();
 }
@@ -335,9 +331,7 @@ void AddressResolver::mediatorStunResolve( HaInfoIterator info, QnMutexLockerBas
         if( const auto error = stun::AsyncClient::hasError( code, message ) )
         {
             // count failure as unresolvable, better luck next time
-            NX_LOG( lit( "%1 %2" ).arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                                  .arg( *error ), cl_logDEBUG1 );
-
+            NX_LOGX( *error, cl_logDEBUG1 );
             code = SystemError::dnsServerFailure;
         }
         else
@@ -392,11 +386,10 @@ std::vector< Guard > AddressResolver::grabHandlers(
                 it->second.handler( code, std::move( entries ) );
 
                 QnMutexLocker lk( &m_mutex );
-                NX_LOG( lit( "%1 address %2 is resolved by request %3 to %4" )
-                        .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                        .arg( info->first.toString() )
-                        .arg( reinterpret_cast< size_t >( it->first ) )
-                        .arg( containerString( entries ) ), cl_logDEBUG2 );
+                NX_LOGX( lit( "Address %1 is resolved by request %2 to %3" )
+                         .arg( info->first.toString() )
+                         .arg( reinterpret_cast< size_t >( it->first ) )
+                         .arg( containerString( entries ) ), cl_logDEBUG2 );
 
                 m_requests.erase( it );
                 m_condition.wakeAll();
@@ -409,10 +402,9 @@ std::vector< Guard > AddressResolver::grabHandlers(
             ++req;
     }
 
-    NX_LOG( lit( "%1 there are %2 about to be notified: %3 resolved to %4" )
-            .arg( QString::fromUtf8( Q_FUNC_INFO ) ).arg( guards.size() )
-            .arg( info->first.toString() ).arg( containerString( entries ) ),
-            cl_logDEBUG1 );
+    NX_LOGX( lit( "There are %1 about to be notified: %2 is resolved to %3" )
+             .arg( guards.size() ).arg( info->first.toString() )
+             .arg( containerString( entries ) ), cl_logDEBUG1 );
     return guards;
 }
 

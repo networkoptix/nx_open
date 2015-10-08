@@ -289,11 +289,11 @@ namespace nx_http
             if( m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) ) )
                 return;
 
-            NX_LOG( lit( "Failed to send request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+            NX_LOGX( lit( "Failed to send request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
         }
         else
         {
-            NX_LOG( lit( "AsyncHttpClient. Failed to establish tcp connection to %1. %2" ).
+            NX_LOGX( lit( "Failed to establish tcp connection to %1. %2" ).
                 arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
             m_lastSysErrorCode = errorCode;
             if( reconnectIfAppropriate() )
@@ -326,7 +326,7 @@ namespace nx_http
         {
             if( reconnectIfAppropriate() )
                 return;
-            NX_LOG( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            NX_LOGX( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
             lk.unlock();
@@ -344,7 +344,7 @@ namespace nx_http
         {
             if( !m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) ) )
             {
-                NX_LOG( lit( "Error sending (2) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                NX_LOGX( lit( "Error sending (2) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                 m_state = sFailed;
                 lk.unlock();
                 emit done( sharedThis );
@@ -353,13 +353,13 @@ namespace nx_http
             return;
         }
 
-        NX_LOG( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
+        NX_LOGX( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
         m_state = sReceivingResponse;
         m_responseBuffer.resize( 0 );
         if( !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) ||
             !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
         {
-            NX_LOG( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+            NX_LOGX( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
             m_state = sFailed;
             lk.unlock();
             emit done( sharedThis );
@@ -383,7 +383,7 @@ namespace nx_http
         {
             if( reconnectIfAppropriate() )
                 return;
-            NX_LOG(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            NX_LOGX(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
             m_state = 
                 ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
                     m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
@@ -423,7 +423,7 @@ namespace nx_http
                             &m_responseBuffer,
                             std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
-                        NX_LOG( lit( "Failed to read (1) response from %1. %2" ).
+                        NX_LOGX( lit( "Failed to read (1) response from %1. %2" ).
                             arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
@@ -436,7 +436,7 @@ namespace nx_http
                 //read http message headers
                 if( m_httpStreamReader.message().type != nx_http::MessageType::response )
                 {
-                    NX_LOG( lit( "Unexpectedly received request from %1:%2 while expecting response! Ignoring..." ).
+                    NX_LOGX( lit( "Unexpectedly received request from %1:%2 while expecting response! Ignoring..." ).
                         arg( m_url.host() ).arg( m_url.port() ), cl_logDEBUG1 );
                     m_state = sFailed;
                     lk.unlock();
@@ -446,7 +446,7 @@ namespace nx_http
                 }
 
                 //response read
-                NX_LOG( lit( "Http response from %1 has been successfully read. Status line: %2(%3)" ).
+                NX_LOGX( lit( "Http response from %1 has been successfully read. Status line: %2(%3)" ).
                     arg( m_url.toString() ).arg( m_httpStreamReader.message().response->statusLine.statusCode ).
                     arg( QLatin1String( m_httpStreamReader.message().response->statusLine.reasonPhrase ) ), cl_logDEBUG2 );
 
@@ -518,7 +518,7 @@ namespace nx_http
                     if( !m_socket->setRecvTimeout( m_msgBodyReadTimeoutMs ) ||
                         !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
-                        NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                        NX_LOGX( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
                         emit done( sharedThis );
@@ -559,7 +559,7 @@ namespace nx_http
                     }
                     else
                     {
-                        NX_LOG( lit( "Failed to read (2) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                        NX_LOGX( lit( "Failed to read (2) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
                     }
                 }
@@ -616,7 +616,7 @@ namespace nx_http
                         m_requestBuffer,
                         std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
                 {
-                    NX_LOG( lit("Failed to init async socket call (connecting to %1) to aio service. %2").
+                    NX_LOGX( lit("Failed to init async socket call (connecting to %1) to aio service. %2").
                         arg(remoteEndpoint.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                     m_socket.clear();
                     return false;
@@ -650,7 +650,7 @@ namespace nx_http
             !m_socket->setSendTimeout( m_sendTimeoutMs ) ||
             !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
         {
-            NX_LOG( lit("Failed to put socket to non blocking mode. %1").
+            NX_LOGX( lit("Failed to put socket to non blocking mode. %1").
                 arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.clear();
             return false;
@@ -663,7 +663,7 @@ namespace nx_http
                 remoteAddress,
                 std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), std::placeholders::_1 ) ) )
         {
-            NX_LOG( lit("Failed to perform async connect to %1. %2").
+            NX_LOGX( lit("Failed to perform async connect to %1. %2").
                 arg(remoteAddress.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.clear();
             m_url.clear();
@@ -697,7 +697,7 @@ namespace nx_http
 
         if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
         {
-            NX_LOG( lit("Error parsing http response from %1. %2").
+            NX_LOGX( lit("Error parsing http response from %1. %2").
                 arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logDEBUG1 );
             m_state = sFailed;
             return -1;

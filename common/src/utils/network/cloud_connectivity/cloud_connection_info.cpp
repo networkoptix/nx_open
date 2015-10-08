@@ -19,15 +19,13 @@ void CloudConnectionInfo::enableMediator()
     {
         if( status != nx_http::StatusCode::ok )
         {
-            NX_LOG( lit( "%1 Can not fetch mediator address: HTTP %2" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) ).arg( status ),
-                    cl_logERROR );
+            NX_LOGX( lit( "Can not fetch mediator address: HTTP %1" )
+                     .arg( status ), cl_logERROR );
             return;
         }
 
-        NX_LOG( lit( "%1 Fetched mediator address: %2" )
-                .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                .arg( address.toString() ), cl_logALWAYS );
+        NX_LOGX( lit( "Fetched mediator address: %1" )
+                 .arg( address.toString() ), cl_logALWAYS );
 
         QnMutexLocker lk( &m_mutex );
         m_mediatorAddress = std::move( address );

@@ -65,8 +65,7 @@ bool AsyncClient::sendRequest( Message request, RequestHandler requestHandler )
 
         default:
             Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
-            NX_LOG( lit( "%1 m_state has invalid value: %2" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+            NX_LOGX( lit( "m_state has invalid value: %1" )
                     .arg( static_cast< int >( m_state ) ), cl_logERROR );
             return false;
     };
@@ -146,9 +145,8 @@ bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
 
         default:
             Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
-            NX_LOG( lit( "%1 m_state has invalid value: %2" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                    .arg( static_cast< int >( m_state ) ), cl_logERROR );
+            NX_LOGX( lit( "m_state has invalid value: %1" )
+                     .arg( static_cast< int >( m_state ) ), cl_logERROR );
             return false;
     }
 }
@@ -193,8 +191,7 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
                          transactionId, std::move( handler ) ).second )
                 {
                     Q_ASSERT_X( false, Q_FUNC_INFO, "transactionId is not unique" );
-                    NX_LOG( lit( "%1 transactionId is not unique: %2" )
-                            .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+                    NX_LOGX( lit( "transactionId is not unique: %1" )
                             .arg( QString::fromUtf8( transactionId.toHex() ) ),
                             cl_logERROR );
                 }
@@ -251,8 +248,7 @@ void AsyncClient::processMessage( Message message )
     {
         case MessageClass::request:
             Q_ASSERT_X( false, Q_FUNC_INFO, "client does not support requests" );
-            NX_LOG( lit( "%1 client does not support requests" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logERROR );
+            NX_LOGX( lit( "Client does not support requests" ), cl_logERROR );
             return;
 
         case MessageClass::errorResponse:
@@ -263,10 +259,9 @@ void AsyncClient::processMessage( Message message )
             if( it == m_requestsInProgress.end() )
             {
                 Q_ASSERT_X( false, Q_FUNC_INFO, "unexpected transactionId" );
-                NX_LOG( lit( "%1 unexpected transactionId: %2" )
-                        .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                        .arg( QString::fromUtf8( message.header.transactionId.toHex() ) ),
-                        cl_logERROR );
+                NX_LOGX( lit( "Unexpected transactionId: %2" )
+                         .arg( QString::fromUtf8( message.header.transactionId.toHex() ) ),
+                         cl_logERROR );
                 return;
             }
 
@@ -291,10 +286,9 @@ void AsyncClient::processMessage( Message message )
 
         default:
             Q_ASSERT_X( false, Q_FUNC_INFO, "messageClass is invalid" );
-            NX_LOG( lit( "%1 messageClass has invalid value: %2" )
-                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
-                    .arg( static_cast< int >( message.header.messageClass ) ),
-                    cl_logERROR );
+            NX_LOGX( lit( "messageClass has invalid value: %1" )
+                     .arg( static_cast< int >( message.header.messageClass ) ),
+                     cl_logERROR );
             return;
     }
 }

@@ -280,7 +280,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             item.lastConflictResponse = currentTime;
 
             if (item.conflictResponseCount >= noticeableConflictCount && item.conflictResponseCount % noticeableConflictCount == 0) {
-                NX_LOG(lit("QnModuleFinder: Server %1 conflict: %2")
+                NX_LOGX(lit("Server %1 conflict: %2")
                        .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logWARNING);
             }
 
@@ -298,7 +298,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     m_lastResponse[address] = currentTime;
 
     if (item.moduleInformation != moduleInformation) {
-        NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+        NX_LOGX(lit("Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
         emit moduleChanged(moduleInformation);
 
         if (item.moduleInformation.port != moduleInformation.port) {
@@ -348,7 +348,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
         lk.unlock();
 
-        NX_LOG(lit("QnModuleFinder: New module URL: %1 %2")
+        NX_LOGX(lit("New module URL: %1 %2")
                .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
 
         emit moduleAddressFound(moduleInformation, address);
@@ -424,14 +424,14 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
         lk.unlock();
     }
 
-    NX_LOG(lit("QnModuleFinder: Module URL lost: %1 %2:%3")
+    NX_LOGX(lit("Module URL lost: %1 %2:%3")
            .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);
     emit moduleAddressLost(moduleInformation, address);
 
     if (!it->addresses.isEmpty())
         return;
 
-    NX_LOG(lit("QnModuleFinder: Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+    NX_LOGX(lit("Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
 
     QnModuleInformation moduleInformationCopy = moduleInformation;
     SocketAddress primaryAddress = it->primaryAddress;
