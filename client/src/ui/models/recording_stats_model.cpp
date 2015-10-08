@@ -99,10 +99,16 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
         {
             QnVirtualCameraResourceList cameras;
             for (const QnCamRecordingStatsData &data: m_data)
-                if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId(data.uniqueId).dynamicCast<QnVirtualCameraResource>())
+                if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
             Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
-            return tr("Total %1").arg(getNumericDevicesName(cameras, false));
+            return QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Total %n devices",      nullptr, cameras.size()),
+                    tr("Total %n cameras",      nullptr, cameras.size()),
+                    tr("Total %n IO modules",   nullptr, cameras.size())
+                ), cameras
+            );
         }
     case BytesColumn:
         return formatBytesString(m_footer.recordedBytes);
@@ -251,7 +257,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
 
     if (role == Qt::DisplayRole) {
         switch(section) {
-        case CameraNameColumn: return getDefaultDeviceNameUpper();
+        case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
         case BytesColumn:      return tr("Space");
         case DurationColumn:   return tr("Calendar Days");
         case BitrateColumn:    return QVariant(); //return tr("Bitrate");

@@ -13,6 +13,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -333,7 +334,13 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             : qnSkin->icon("events/camera.png");
         item->addActionButton(
             icon,
-            tr("Open %1").arg(getDefaultDeviceNameUpper(camera)),
+            QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Open Device"),
+                    tr("Open Camera"),
+                    tr("Open IO Module")
+                ), camera
+            ),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
         );
@@ -344,8 +351,13 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         item->addActionButton(
             //TODO: #GDM #design #2.6 change icon if the device was IO Module
             qnSkin->icon("events/camera.png"),
-            //: "Camera Settings..." or "Device Settings..."
-            tr("%1 Settings...").arg(getDefaultDeviceNameUpper(camera)),
+            QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Device Settings..."),
+                    tr("Camera Settings..."),
+                    tr("IO Module Settings...")
+                ), camera
+            ),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
@@ -365,7 +377,13 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         item->addActionButton(
             //TODO: #GDM #design #2.6 change icon if the device was IO Module
             qnSkin->icon("events/camera.png"),
-            tr("%1 Settings...").arg(getDefaultDeviceNameUpper(camera)),
+            QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Device Settings..."),
+                    tr("Camera Settings..."),
+                    tr("IO Module Settings...")
+                ), camera
+            ),
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
@@ -377,12 +395,19 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
-            tr("Open %1 Web Page...").arg(getDefaultDeviceNameUpper(camera)),
+            QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Open Device Web Page..."),
+                    tr("Open Camera Web Page..."),
+                    tr("Open IO Module Web Page...")
+                ), camera
+            ),
             Qn::BrowseUrlAction,
             QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
         );
         break;
     }
+    case QnBusiness::ServerStartEvent:
     case QnBusiness::ServerFailureEvent: {
         item->addActionButton(
             qnSkin->icon("events/server.png"),
@@ -392,13 +417,11 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         );
         break;
     }
-    case QnBusiness::ServerConflictEvent:
-    case QnBusiness::ServerStartEvent: {
+    case QnBusiness::ServerConflictEvent: {
         item->addActionButton(
             qnSkin->icon("events/server.png"),
-            tr("Server Settings..."),
-            Qn::ServerSettingsAction,
-            QnActionParameters(resource)
+            QString(),
+            Qn::NoAction
         );
         break;
     }
