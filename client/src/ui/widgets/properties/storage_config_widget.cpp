@@ -107,7 +107,7 @@ void QnStorageConfigWidget::updateFromSettings()
 
 void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
 {
-    bool isMain = sender() == ui->mainStoragesTable;
+    bool isMain = index.model() == m_mainPool.model;
 
     if (index.column() == QnStorageListModel::ChangeGroupActionColumn)
     {
@@ -122,7 +122,17 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
         QnStorageSpaceData record = data.value<QnStorageSpaceData>();
         fromModel->removeRow(index.row());
         toModel->addModelData(record);
-        return;
+    }
+    else if (index.column() == QnStorageListModel::RemoveActionColumn)
+    {
+        QnStorageListModel* model = isMain ? m_mainPool.model : m_backupPool.model;
+
+        QVariant data = index.data(Qn::StorageSpaceDataRole);
+        if (!data.canConvert<QnStorageSpaceData>())
+            return;
+        QnStorageSpaceData record = data.value<QnStorageSpaceData>();
+        if (record.isExternal)
+            model->removeRow(index.row());
     }
 }
 
