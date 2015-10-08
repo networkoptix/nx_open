@@ -22,7 +22,7 @@ int main( int argc, char **argv )
         QnLogLevel::cl_logDEBUG2 );
 #endif
 
-    QnLog::initLog("DEBUG2");
+    //QnLog::initLog("DEBUG2");
 
     ::testing::InitGoogleTest(&argc, argv);
     const int result = RUN_ALL_TESTS();
