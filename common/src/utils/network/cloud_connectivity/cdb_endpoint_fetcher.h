@@ -7,6 +7,7 @@
 #define NX_CC_CDB_ENDPOINT_FETCHER_H
 
 #include <functional>
+#include <vector>
 
 #include <boost/optional.hpp>
 
@@ -16,6 +17,9 @@
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/thread/mutex.h>
 
+#include "endpoint_selector.h"
+
+
 namespace nx {
 namespace cc {
 
@@ -23,7 +27,9 @@ namespace cc {
 class CloudModuleEndPointFetcher
 {
 public:
-    CloudModuleEndPointFetcher(QString moduleName);
+    CloudModuleEndPointFetcher(
+        QString moduleName,
+        std::unique_ptr<AbstractEndpointSelector> endpointSelector);
     ~CloudModuleEndPointFetcher();
 
     //!Specify endpoint explicitely
@@ -37,11 +43,19 @@ private:
     boost::optional<SocketAddress> m_endpoint;
     nx_http::AsyncHttpClientPtr m_httpClient;
     QString m_moduleName;
+    std::vector<std::function<void(nx_http::StatusCode::Value, SocketAddress)>> m_resolveHandlers;
+    std::unique_ptr<AbstractEndpointSelector> m_endpointSelector;
 
-    void onHttpClientDone(
-        nx_http::AsyncHttpClientPtr client,
-        std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler);
-    void parseCloudXml(QByteArray xmlData);
+    void onHttpClientDone(nx_http::AsyncHttpClientPtr client);
+    bool parseCloudXml(
+        QByteArray xmlData,
+        std::vector<SocketAddress>* const endpoints);
+    void signalWaitingHandlers(
+        nx_http::StatusCode::Value statusCode,
+        const SocketAddress& endpoint);
+    void endpointSelected(
+        nx_http::StatusCode::Value result,
+        SocketAddress selectedEndpoint);
 };
 
 }   //cc

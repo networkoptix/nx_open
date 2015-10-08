@@ -133,5 +133,10 @@ TEST_F(CdbFunctionalTest, generalTest)
     }
 }
 
+TEST_F(CdbFunctionalTest, badAccountRegistration)
+{
+    //TODO #ak register account with improper arguments
+}
+
 }   //cdb
 }   //nx

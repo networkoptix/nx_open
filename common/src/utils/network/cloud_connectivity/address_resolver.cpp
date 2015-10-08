@@ -164,9 +164,9 @@ std::vector< AddressEntry > AddressResolver::resolveSync(
 void AddressResolver::cancel( void* requestId, bool waitForRunningHandlerCompletion )
 {
     QnMutexLocker lk( &m_mutex );
-    bool needToWait = false;
     for( ;; )
     {
+        bool needToWait = false;
         const auto range = m_requests.equal_range( requestId );
         for( auto it = range.first; it != range.second; )
         {

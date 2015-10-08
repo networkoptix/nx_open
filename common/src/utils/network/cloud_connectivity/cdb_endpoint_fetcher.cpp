@@ -13,12 +13,16 @@
 #include "cloud_modules_xml_sax_handler.h"
 #include "version.h"
 
+
 namespace nx {
 namespace cc {
 
-CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(QString moduleName)
+CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(
+    QString moduleName,
+    std::unique_ptr<AbstractEndpointSelector> endpointSelector)
 :
-    m_moduleName(std::move(moduleName))
+    m_moduleName(std::move(moduleName)),
+    m_endpointSelector(std::move(endpointSelector))
 {
 }
 
@@ -29,6 +33,8 @@ CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
     lk.unlock();
     if (httpClientLocal)
         httpClientLocal->terminate();
+    //assuming m_endpointSelector will wait for completion handler to return
+    m_endpointSelector.reset();
 }
 
 void CloudModuleEndPointFetcher::setEndpoint(SocketAddress endpoint)
@@ -41,8 +47,6 @@ void CloudModuleEndPointFetcher::setEndpoint(SocketAddress endpoint)
 void CloudModuleEndPointFetcher::get(
     std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler)
 {
-    //TODO #ak if async resolve is already started, should wait for its completion
-
     //if requested endpoint is known, providing it to the output
     QnMutexLocker lk(&m_mutex);
     if (m_endpoint)
@@ -53,58 +57,60 @@ void CloudModuleEndPointFetcher::get(
         return;
     }
 
-    //TODO #ak if requested url is unknown, fetching description xml
+    //if requested url is unknown, fetching description xml
     m_httpClient = nx_http::AsyncHttpClient::create();
     QObject::connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-        m_httpClient.get(), [this, handler](nx_http::AsyncHttpClientPtr client){
-            onHttpClientDone(std::move(client), std::move(handler)); },
+        m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client){
+            onHttpClientDone(std::move(client));
+        },
         Qt::DirectConnection);
     if (!m_httpClient->doGet(QUrl(lit(QN_CLOUD_MODULES_XML))))
     {
         m_httpClient.reset();
         return handler(nx_http::StatusCode::serviceUnavailable, SocketAddress());
     }
+
+    //if async resolve is already started, should wait for its completion
+    m_resolveHandlers.emplace_back(std::move(handler));
 }
 
-void CloudModuleEndPointFetcher::onHttpClientDone(
-    nx_http::AsyncHttpClientPtr client,
-    std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler)
+void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
 {
-    auto localHandler = [this, handler](nx_http::StatusCode::Value resCode,
-                                        SocketAddress endpoint)
-    {
-        handler(resCode, std::move(endpoint));
-        QnMutexLocker lk(&m_mutex);
-        m_httpClient.reset();
-    };
-
     if (!client->response())
-        return localHandler(nx_http::StatusCode::serviceUnavailable,
-                            SocketAddress());
-
-    if (client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
-        return localHandler(
-            static_cast< nx_http::StatusCode::Value >(
-                client->response()->statusLine.statusCode ),
+        return signalWaitingHandlers(
+            nx_http::StatusCode::serviceUnavailable,
             SocketAddress());
 
-    parseCloudXml(client->fetchMessageBodyBuffer());
+    if (client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        return signalWaitingHandlers(
+            static_cast<nx_http::StatusCode::Value>(
+                client->response()->statusLine.statusCode),
+            SocketAddress());
 
-    //TODO #ak selecting endpoint we're able to connect to
+    std::vector<SocketAddress> endpoints;
+    if (!parseCloudXml(client->fetchMessageBodyBuffer(), &endpoints) ||
+        endpoints.empty())
+    {
+        return signalWaitingHandlers(
+            nx_http::StatusCode::serviceUnavailable,
+            SocketAddress());
+    }
+
+    using namespace std::placeholders;
+    //selecting "best" endpoint
+    m_endpointSelector->selectBestEndpont(
+        m_moduleName,
+        std::move(endpoints),
+        std::bind(&CloudModuleEndPointFetcher::endpointSelected, this, _1, _2));
 
     QnMutexLocker lk(&m_mutex);
-    auto endpoint = m_endpoint;
-    lk.unlock();
-
-    if (!endpoint)
-        return localHandler(nx_http::StatusCode::serviceUnavailable,
-                            SocketAddress());
-
-    localHandler(nx_http::StatusCode::ok, m_endpoint.get());
+    m_httpClient.reset();
 }
 
-void CloudModuleEndPointFetcher::parseCloudXml(QByteArray xmlData)
+bool CloudModuleEndPointFetcher::parseCloudXml(
+    QByteArray xmlData,
+    std::vector<SocketAddress>* const endpoints)
 {
     CloudModulesXmlHandler xmlHandler;
 
@@ -119,16 +125,38 @@ void CloudModuleEndPointFetcher::parseCloudXml(QByteArray xmlData)
         NX_LOG(lit("Failed to parse cloud_modules.xml from %1. %2")
                .arg(lit(QN_CLOUD_MODULES_XML)).arg(xmlHandler.errorString()),
                cl_logERROR);
-        return;
+        return false;
     }
 
-    const auto endpoints = xmlHandler.moduleUrls(m_moduleName);
-    if (!endpoints.empty())
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (!m_endpoint)
-            m_endpoint = std::move(endpoints.front());
-    }
+    *endpoints = xmlHandler.moduleUrls(m_moduleName);
+    return true;
+}
+
+void CloudModuleEndPointFetcher::signalWaitingHandlers(
+    nx_http::StatusCode::Value statusCode,
+    const SocketAddress& endpoint)
+{
+    QnMutexLocker lk(&m_mutex);
+    auto handlers = std::move(m_resolveHandlers);
+    lk.unlock();
+    for (auto& handler : handlers)
+        handler(statusCode, endpoint);
+    lk.relock();
+    m_httpClient.reset();
+}
+
+void CloudModuleEndPointFetcher::endpointSelected(
+    nx_http::StatusCode::Value result,
+    SocketAddress selectedEndpoint)
+{
+    if (result != nx_http::StatusCode::ok)
+        return signalWaitingHandlers(result, std::move(selectedEndpoint));
+
+    QnMutexLocker lk(&m_mutex);
+    Q_ASSERT(!m_endpoint);
+    m_endpoint = selectedEndpoint;
+    lk.unlock();
+    signalWaitingHandlers(result, selectedEndpoint);
 }
 
 }   //cc

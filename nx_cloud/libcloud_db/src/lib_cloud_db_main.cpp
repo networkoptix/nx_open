@@ -7,6 +7,8 @@
 
 #ifdef _WIN32
     #include <windows.h>
+    
+    #include <common/systemexcept_win32.h>
 #else
     #include <sys/types.h>
     #include <signal.h>
@@ -33,6 +35,8 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 int libCloudDBMain(int argc, char* argv[])
 {
 #ifdef _WIN32
+    win32_exception::installGlobalUnhandledExceptionHandler();
+
     SetConsoleCtrlHandler(stopServer_WIN, TRUE);
 #else
     signal(SIGINT, stopServer);

@@ -3,9 +3,10 @@
 * akolesnikov
 ***********************************************************/
 
-#include <utils/network/cloud_connectivity/cdb_endpoint_fetcher.h>
-
 #include <future>
+
+#include <utils/common/cpp14.h>
+#include <utils/network/cloud_connectivity/cdb_endpoint_fetcher.h>
 
 #include <gtest/gtest.h>
 
@@ -16,7 +17,9 @@ namespace cl {
 
 TEST(CloudModuleEndPointFetcher, common)
 {
-    nx::cc::CloudModuleEndPointFetcher endPointFetcher("cdb");
+    nx::cc::CloudModuleEndPointFetcher endPointFetcher(
+        "cdb",
+        std::make_unique<nx::cc::RandomEndpointSelector>());
     std::promise<nx_http::StatusCode::Value> endpointPromise;
     auto endpointFuture = endpointPromise.get_future();
     SocketAddress cdbEndpoint;
@@ -28,7 +31,6 @@ TEST(CloudModuleEndPointFetcher, common)
             endpointPromise.set_value(resCode);
             cdbEndpoint = endpoint;
         });
-    endpointFuture.wait();
     ASSERT_EQ(endpointFuture.get(), nx_http::StatusCode::ok);
 }
 

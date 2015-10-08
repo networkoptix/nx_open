@@ -1,13 +1,16 @@
 #include "cloud_connection_info.h"
 
 #include "common/common_globals.h"
+#include "utils/common/cpp14.h"
 #include "utils/common/log.h"
 
 namespace nx {
 namespace cc {
 
 CloudConnectionInfo::CloudConnectionInfo()
-    : m_mediatorEndpointFetcher( lit( "hpm" ) )
+    : m_mediatorEndpointFetcher(
+        lit( "hpm" ),
+        std::make_unique<RandomEndpointSelector>() )
 {
 }
 

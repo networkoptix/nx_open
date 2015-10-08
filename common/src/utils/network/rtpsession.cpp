@@ -1866,7 +1866,8 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
 {
     int prevStatusCode = nx_http::StatusCode::ok;
 
-    addAuth( &request );
+    if (m_rtspAuthCtx.authenticateHeader)
+        addAuth( &request );
     addAdditionAttrs( &request );
 
     for( int i = 0; i < 3; ++i )    //needed to avoid infinite loop in case of incorrect server behavour
