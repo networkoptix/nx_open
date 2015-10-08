@@ -12,6 +12,7 @@
 #include <utils/thread/wait_condition.h>
 
 #include <rest/server/request_handler.h>
+#include <rest/server/rest_connection_processor.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/model_functions.h>
 #include <utils/network/http/httptypes.h>

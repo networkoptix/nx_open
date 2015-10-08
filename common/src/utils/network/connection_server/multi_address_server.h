@@ -9,6 +9,7 @@
 #include <list>
 #include <memory>
 
+#include <common/common_globals.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/network/socket_common.h>
