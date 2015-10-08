@@ -61,7 +61,7 @@ public:
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);    
     bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark);
     bool removeAllCameraBookmarks(const QString& cameraUniqueId);
-    bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
+    bool deleteCameraBookmark(const QnUuid &bookmarkId);
 
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;

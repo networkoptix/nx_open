@@ -939,12 +939,12 @@ bool QnServerDb::removeAllCameraBookmarks(const QString& cameraUniqueId) {
     return true;
 }
 
-bool QnServerDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
+bool QnServerDb::deleteCameraBookmark(const QnUuid &bookmarkId) {
     QnDbTransactionLocker tran(getTransaction());
 
     QSqlQuery cleanTagQuery(m_sdb);
     cleanTagQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid = ?");
-    cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
+    cleanTagQuery.addBindValue(bookmarkId.toRfc4122());
     if (!cleanTagQuery.exec()) {
         qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
         return false;
@@ -952,7 +952,7 @@ bool QnServerDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
 
     QSqlQuery cleanQuery(m_sdb);
     cleanQuery.prepare("DELETE FROM storage_bookmark WHERE guid = ?");
-    cleanQuery.addBindValue(bookmark.guid.toRfc4122());
+    cleanQuery.addBindValue(bookmarkId.toRfc4122());
     if (!cleanQuery.exec()) {
         qWarning() << Q_FUNC_INFO << cleanQuery.lastError().text();
         return false;

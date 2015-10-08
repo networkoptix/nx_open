@@ -15,35 +15,39 @@ int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnReque
         return addOrUpdateCameraBookmarkAction(params, body, result);
     if (action == "delete")
         return deleteCameraBookmarkAction(params, body, result);
-    return CODE_NOT_FOUND;
+    return nx_http::StatusCode::notFound;
 }
 
 int QnCameraBookmarksRestHandler::addOrUpdateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) { 
+    Q_UNUSED(params)
+
     QnCameraBookmark bookmark;
     if (!QJson::deserialize(body, &bookmark))
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     if (bookmark.cameraId.isEmpty())
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     if (!qnServerDb->addOrUpdateCameraBookmark(bookmark))
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     if (!bookmark.tags.isEmpty())
         QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {});
 
     result.setReply(bookmark);
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }
 
 int QnCameraBookmarksRestHandler::deleteCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {   
-    QnCameraBookmark bookmark;
-    if (!QJson::deserialize(body, &bookmark))
-        return CODE_INVALID_PARAMETER;
+    Q_UNUSED(body)
+    Q_UNUSED(result)
 
-    if (!qnServerDb->deleteCameraBookmark(bookmark))
-        return CODE_INVALID_PARAMETER;
+    QnUuid bookmarkId = QnUuid::fromStringSafe(params.value(lit("id")));
+    if (bookmarkId.isNull())
+        return nx_http::StatusCode::invalidParameter;
 
-    result.setReply(bookmark);
-    return CODE_OK;
+    if (!qnServerDb->deleteCameraBookmark(bookmarkId))
+        return nx_http::StatusCode::invalidParameter;
+
+    return nx_http::StatusCode::ok;
 }
