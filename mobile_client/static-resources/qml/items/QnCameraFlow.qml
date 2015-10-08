@@ -12,6 +12,8 @@ QnFlickable {
 
     property alias model: repeater.model
 
+    clip: true
+
     contentWidth: width
     contentHeight: content.height
     topMargin: dp(8)
