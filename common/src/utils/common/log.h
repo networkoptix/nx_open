@@ -1,6 +1,7 @@
 #ifndef QN_LOG_H
 #define QN_LOG_H
 
+#include <memory>
 #include <mutex>
 #include <boost/core/demangle.hpp>
 
