@@ -201,7 +201,7 @@ private:
     bool m_warnSended;
     bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
-    static TestStorageThread* m_testStorageThread;
+    TestStorageThread* m_testStorageThread;
     QMap<QnUuid, bool> m_diskFullWarned;
     
     //RebuildState m_rebuildState;

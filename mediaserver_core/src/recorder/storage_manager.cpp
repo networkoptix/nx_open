@@ -248,8 +248,6 @@ private:
     QnStorageManager* m_owner;
 };
 
-TestStorageThread* QnStorageManager::m_testStorageThread;
-
 // -------------------- QnStorageManager --------------------
 
 
