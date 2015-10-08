@@ -1,11 +1,11 @@
--- Bookmark tags table
+-- Bookmark tags table.
 CREATE TABLE "storage_bookmark_tag" (
     bookmark_guid   BLOB NOT NULL,
     name            TEXT NOT NULL,
     PRIMARY KEY(bookmark_guid, name)
     );
 
--- Bookmarks table
+-- Bookmarks table.
 CREATE TABLE "storage_bookmark" (
     guid            BLOB NOT NULL UNIQUE PRIMARY KEY,
     unique_id       TEXT NOT NULL,                          -- unique id of the related camera resource
@@ -20,3 +20,10 @@ CREATE UNIQUE INDEX idx_bookmark_guid ON storage_bookmark(guid);
 
 -- Index for faster duration-based requests
 CREATE INDEX idx_bookmark_duration ON storage_bookmark(duration);
+
+-- FTS table for quick bookmarks search
+CREATE VIRTUAL TABLE fts_bookmarks USING fts3(
+    name,                                                   -- contents of the name field
+    description,                                            -- contents of the description field
+    tags                                                    -- joined tags text
+);
