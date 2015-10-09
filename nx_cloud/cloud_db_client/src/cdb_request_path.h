@@ -18,6 +18,7 @@ extern const char* SYSTEM_BIND_PATH;
 extern const char* SYSTEM_UNBIND_PATH;
 extern const char* SYSTEM_GET_PATH;
 extern const char* SYSTEM_SHARE_PATH;
+extern const char* SYSTEM_GET_CLOUD_USERS_PATH;
 
 extern const char* AUTH_GET_NONCE_PATH;
 extern const char* AUTH_GET_AUTHENTICATION_PATH;

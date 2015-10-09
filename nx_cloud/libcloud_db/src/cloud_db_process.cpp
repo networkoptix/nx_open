@@ -30,6 +30,7 @@
 #include "http_handlers/add_account_handler.h"
 #include "http_handlers/bind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
+#include "http_handlers/get_cloud_users_of_system.h"
 #include "http_handlers/get_systems_handler.h"
 #include "http_handlers/get_cdb_nonce_handler.h"
 #include "http_handlers/get_authentication_response_handler.h"
@@ -61,7 +62,8 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
     QtService<QtSingleCoreApplication>(argc, argv, QN_APPLICATION_NAME),
     m_argc( argc ),
     m_argv( argv ),
-    m_terminated( false )
+    m_terminated( false ),
+    m_timerID( 0 )
 {
     setServiceDescription(QN_APPLICATION_NAME);
 
@@ -171,7 +173,7 @@ int CloudDBProcess::executeApplication()
         //application's main loop
 
         //starting timer to check for m_terminated again after event loop start
-        application()->startTimer(0);
+        m_timerID = application()->startTimer(0);
         const int result = application()->exec();
     
         return result;
@@ -203,6 +205,9 @@ void CloudDBProcess::stop()
 
 bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
 {
+    if (m_timerID != -1)
+        application()->killTimer(m_timerID);
+
     if (m_terminated)
         application()->quit();
     return false;
@@ -283,6 +288,12 @@ void CloudDBProcess::registerApiHandlers(
         ShareSystemHttpHandler::HANDLER_PATH,
         [systemManager, &authorizationManager]() -> std::unique_ptr<ShareSystemHttpHandler> {
             return std::make_unique<ShareSystemHttpHandler>(systemManager, authorizationManager);
+        } );
+
+    msgDispatcher->registerRequestProcessor<GetCloudUsersOfSystemHandler>(
+        GetCloudUsersOfSystemHandler::HANDLER_PATH,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<GetCloudUsersOfSystemHandler> {
+            return std::make_unique<GetCloudUsersOfSystemHandler>(systemManager, authorizationManager);
         } );
 
     //authentication

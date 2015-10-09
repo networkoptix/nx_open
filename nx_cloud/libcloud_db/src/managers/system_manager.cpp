@@ -137,6 +137,33 @@ void SystemManager::shareSystem(
         std::bind(&SystemManager::systemSharingAdded, this, _1, _2, std::move(completionHandler)));
 }
 
+void SystemManager::getCloudUsersOfSystem(
+    const AuthorizationInfo& authzInfo,
+    const data::SystemID& systemID,
+    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+{
+    api::SystemSharingList resultData;
+
+    QnMutexLocker lk(&m_mutex);
+    for (const auto& val: m_accountAccessRoleForSystem)
+    {
+        if (val.first.second != systemID.id)
+            continue;
+        api::SystemSharing sharing;
+        sharing.accountID = val.first.first;
+        sharing.systemID = val.first.second;
+        sharing.accessRole = val.second;
+        resultData.sharing.emplace_back(std::move(sharing));
+    }
+    lk.unlock();
+
+    completionHandler(
+        resultData.sharing.empty()
+            ? api::ResultCode::notFound
+            : api::ResultCode::ok,
+        std::move(resultData));
+}
+
 boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const
 {
     return m_cache.find(id);

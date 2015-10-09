@@ -58,6 +58,7 @@ private:
     int m_argc;
     char** m_argv;
     std::atomic<bool> m_terminated;
+    int m_timerID;
 
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(

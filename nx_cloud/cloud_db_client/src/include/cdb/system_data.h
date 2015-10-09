@@ -110,6 +110,12 @@ public:
     }
 };
 
+class SystemSharingList
+{
+public:
+    std::vector<SystemSharing> sharing;
+};
+
 }   //api
 }   //cdb
 }   //nx

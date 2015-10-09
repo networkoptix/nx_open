@@ -96,7 +96,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemDataList),
+    (SystemDataList)(SystemSharingList),
     (json),
     _Fields);
 

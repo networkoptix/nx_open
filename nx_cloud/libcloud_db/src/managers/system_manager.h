@@ -64,6 +64,11 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler);
+    //!Provides list of cloud accounts who have access to this system
+    void getCloudUsersOfSystem(
+        const AuthorizationInfo& authzInfo,
+        const data::SystemID& systemID,
+        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler);
 
     void addSubscription(
         const AuthorizationInfo& authzInfo,
@@ -94,6 +99,7 @@ public:
         
 private:
     nx::db::DBManager* const m_dbManager;
+    //!map<id, system>
     Cache<QnUuid, data::SystemData> m_cache;
     mutable QnMutex m_mutex;
     //!map<pair<accountID, systemID>, accessRole>

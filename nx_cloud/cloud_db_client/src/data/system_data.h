@@ -49,6 +49,8 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 
 #define SystemSharing_Fields (accountID)(systemID)(accessRole)
 
+#define SystemSharingList_Fields (sharing)
+
 
 //!for requests passing just system id
 class SystemID
@@ -75,7 +77,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json)(sql_record));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemDataList),
+    (SystemDataList)(SystemSharingList),
     (json));
 
 
