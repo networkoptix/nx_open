@@ -42,32 +42,6 @@ private:
 class QnDeviceDependentStrings {
 public:
     /**
-    * @brief Calculate default devices name.
-    * @details Following rules are applied:
-    * * If all devices in the system are cameras - "Cameras";
-    * * Otherwise "Devices" is used;
-    * @param plural        Should the word be in the plural form, default value is true.
-    * @param capitalize    Should the word begin from the capital letter, default value is true.
-    */
-    static QString getDefaultName(bool plural = true, bool capitalize = true);
-
-    /**
-    * @brief Calculate default devices name for the given devices list.
-    * @details Following rules are applied:
-    * * If all devices in the list are cameras - "Cameras";
-    * * If all devices in the list are IO modules - "IO Modules";
-    * * Otherwise "Devices" is used;
-    * @param capitalize    Should the word begin from the capital letter, default value is true.
-    */
-    static QString getDefaultName(const QnVirtualCameraResourceList &devices, bool capitalize = true);
-
-    /** Shortcut for single device or singular form. */
-    static QString getDefaultNameLower(const QnVirtualCameraResourcePtr &device = QnVirtualCameraResourcePtr());
-
-    /** Shortcut for single device or singular form. */
-    static QString getDefaultNameUpper(const QnVirtualCameraResourcePtr &device = QnVirtualCameraResourcePtr());
-
-    /**
     * @brief Calculate common name for the target devices list.
     * @details Following rules are applied:
     * * If all devices are cameras - "%n Cameras";

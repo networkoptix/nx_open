@@ -149,6 +149,7 @@
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
+        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
         <translation>Конфликтующий сервер #%1:%2</translation>
     </message>
     <message>
@@ -248,48 +249,6 @@
         </translation>
     </message>
     <message>
-        <source>%1 output</source>
-        <translation>%1: Тревожный выход</translation>
-    </message>
-    <message>
-        <source>%1 output for 30 sec</source>
-        <translation>%1: Тревожный выход на 30 секунд</translation>
-    </message>
-    <message>
-        <source>%1 recording</source>
-        <translation>%1: Запись</translation>
-    </message>
-    <message>
-        <source>Input Signal on %1</source>
-        <translation>%1: Сигнал входа</translation>
-    </message>
-    <message>
-        <source>%1 Disconnected</source>
-        <translation>%1: Отключение</translation>
-    </message>
-    <message>
-        <source>%1 IP Conflict</source>
-        <translation>%1: IP конфликт</translation>
-    </message>
-    <message>
-        <source>Any %1 Issue</source>
-        <translation>%1: Любое событие</translation>
-    </message>
-    <message>
-        <source>%1 %2 was disconnected</source>
-        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
-        <translation>%1 %2 отключена</translation>
-    </message>
-    <message>
-        <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-        <translation>IP конфликт: %1 %2</translation>
-    </message>
-    <message>
-        <source>Recording on %1 is disabled: </source>
-        <translation>Запись на %1 отключена: </translation>
-    </message>
-    <message>
         <source>Generic Event</source>
         <translation type="unfinished"></translation>
     </message>
@@ -307,10 +266,7 @@
     </message>
     <message>
         <source>MAC #%1: %2 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to %1 was unexpectedly closed.</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -323,6 +279,100 @@
     </message>
     <message>
         <source>Server restarted unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device output for 30 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera output for 30 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Signal on Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Signal on Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Device Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device IP Conflict at %1</source>
+        <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict at %1</source>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to device was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on devices is disabled:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on cameras is disabled:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on IO modules is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -405,61 +455,132 @@
         <translation>Параметры:</translation>
     </message>
     <message>
-        <source>Not authorised. Url %1.</source>
-        <translation>Ошибка авторизации. Адрес %1.</translation>
+        <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network.</source>
-        <translation>Убедитесь, что %1 находится в сети.</translation>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <translation>Убедитесь, что порт %2 доступен (напр. проброшен). Попробуйте перезагрузить устройство, затем сбросить настройки через веб-интерфейс.</translation>
+        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <translation>Убедитесь, что устройство подключено к сети. Попробуйте перезагрузить устройство.</translation>
+        <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation>Невозможно разобрать ответ устройства. URL %2, имя запроса %3.</translation>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <translation>Попробуйте перезагрузить устройство, затем сбросить настройки через веб-интерфейс.</translation>
+        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <translation>Сначала попробуйте включить запись (если она отключена) и снизить FPS в настройках устройства.</translation>
+        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <translation>Если это не поможет, восстановите заводские настройки в веб-интерфейсе устройства. Если проблема не исчезнет, свяжитесь с техподдержкой.</translation>
+        <source>Could not parse device response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Запрос к устройству &quot;%2&quot; вернул ошибку &quot;%3&quot;.</translation>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown %1 Issue.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Неизвестная ошибка устройства.</translation>
+        <source>Could not parse IO module response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid data was received from the %1: %2.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Устройство вернуло некорректные данные: %2.</translation>
+        <source>Not authorized. Url %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Слишком много ошибок. Откройте диалог ошибок устройства для побробной информации.</translation>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 initialization process in progress.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Идёт процесс инициализации устройства.</translation>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown device issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown camera issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown IO module issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the device %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the IO module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open device issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open camera issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device initialization process in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera initialization process in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module initialization process in progress.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

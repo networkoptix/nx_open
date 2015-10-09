@@ -36,6 +36,8 @@ namespace rtu
             , const QString &password
             , const Callback &callback);
 
+        void blinkForItem(int row);
+
         ///
 
         int selectedCount() const;
@@ -89,6 +91,8 @@ namespace rtu
             , bool byHttp);
 
     signals:
+        void blinkAtSystem(int systemItemIndex);
+
         void layoutChanged();
 
         void selectionChanged();    /// Signals that new items are selected or 

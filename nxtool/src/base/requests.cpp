@@ -108,7 +108,7 @@ namespace
             }
         }
 
-        return QStringLiteral("Unknown Os");
+        return QStringLiteral("Unknown OS");
     }
 
     typedef QHash<QString, std::function<void (const QJsonObject &object

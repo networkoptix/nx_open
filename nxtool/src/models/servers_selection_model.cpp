@@ -245,6 +245,7 @@ namespace
         , kVersionRoleId
         , kOsRoleId
         , kOperationRoleId
+        , kAvailableByHttp
 
         , kLastCustomRoleId
     };
@@ -274,6 +275,7 @@ namespace
         result.insert(kVersionRoleId, "version");
         result.insert(kOsRoleId, "os");
         result.insert(kOperationRoleId, "operation");
+        result.insert(kAvailableByHttp, "availableByHttp");
         
         return result;
     }();
@@ -401,6 +403,8 @@ public:
         , int port);
 
     void serverDiscovered(const BaseServerInfo &baseInfo);
+
+    void blinkForItem(int row);
 
     void addServer(const rtu::ServerInfo &info
         , Qt::CheckState selected = Qt::Unchecked
@@ -550,7 +554,8 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
 
             return QString();
         }
-
+        case kAvailableByHttp:
+            return info.baseInfo().accessibleByHttp;
         case kMacAddressRoleId:
         {
             const bool hasMacAddress = info.hasExtraInfo() && !info.extraInfo().interfaces.empty();
@@ -1127,12 +1132,20 @@ void rtu::ServersSelectionModel::Impl::updatePortInfo(const QUuid &id
     changeServer(base);
 }
 
+void rtu::ServersSelectionModel::Impl::blinkForItem(int row)
+{
+    ItemSearchInfoConst searchInfo;
+    if (!findItem(row, m_systems, searchInfo))
+        return;
+
+    emit m_owner->blinkAtSystem(searchInfo.systemRowIndex);
+}
+
 void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &baseInfo)
 {
     ItemSearchInfo searchInfo;
     if (!findServer(baseInfo.id, searchInfo))
         return;
-
     
     enum { kUpdatePeriod = RestClient::kDefaultTimeoutMs * 3 };  /// At least x3 because there is http and multicast timeouts can be occured
 
@@ -1519,6 +1532,11 @@ void rtu::ServersSelectionModel::tryLoginWith(
     , const rtu::Callback &callback)
 {
     m_impl->tryLoginWith(primarySystem, password, callback);
+}
+
+void rtu::ServersSelectionModel::blinkForItem(int row)
+{
+    m_impl->blinkForItem(row);
 }
 
 void rtu::ServersSelectionModel::serverDiscovered(const BaseServerInfo &baseInfo)
