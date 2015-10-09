@@ -262,7 +262,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     if (m_camera) {
         m_bookmarksOverlayWidget = new QnBookmarksOverlayWidget();
-        addOverlayWidget(m_bookmarksOverlayWidget, Visible, true, true);
+        addOverlayWidget(m_bookmarksOverlayWidget, Invisible, true, true);
+        updateBookmarksVisibility();
     }
 
     /* Set up overlays */
@@ -1045,6 +1046,9 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
     if(changedFlags & (DisplayMotion | DisplayMotionSensitivity | ControlZoomWindow))
         updateCursor();
 
+    if (changedFlags.testFlag(DisplayInfo))
+        updateBookmarksVisibility();
+
     base_type::optionsChangedNotify(changedFlags);
 }
 
@@ -1578,17 +1582,27 @@ void QnMediaResourceWidget::updateBookmarksMode() {
         m_bookmarksQuery.clear();
     }
     updateBookmarks();
+    updateBookmarksVisibility();
 }
 
 void QnMediaResourceWidget::updateBookmarks() {
     if (!m_bookmarksQuery) {
         m_bookmarksOverlayWidget->setBookmarks(QnCameraBookmarkList());
-        setOverlayWidgetVisibility(m_bookmarksOverlayWidget, Invisible);
         return;
     }
 
     m_bookmarksOverlayWidget->setBookmarks(getBookmarksAtPosition(m_bookmarksQuery->executeLocal(), getUtcCurrentTimeMs()));
-    setOverlayWidgetVisibility(m_bookmarksOverlayWidget, Visible);
+}
+
+void QnMediaResourceWidget::updateBookmarksVisibility() {
+    auto visibility = Invisible;
+    if (m_bookmarksQuery) {
+        if (options().testFlag(DisplayInfo))
+            visibility = Visible;
+        else
+            visibility = AutoVisible;
+    }
+    setOverlayWidgetVisibility(m_bookmarksOverlayWidget, visibility);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const {

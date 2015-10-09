@@ -203,6 +203,7 @@ private:
     void updateBookmarksMode();
     void updateBookmarksFilter();
     void updateBookmarks();
+    void updateBookmarksVisibility();
 
     qint64 getDisplayTimeMs() const;
     qint64 getUtcCurrentTimeMs() const;
