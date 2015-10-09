@@ -12,6 +12,8 @@ namespace {
     const int maximumCaptionLength = 64;
     const int maximumDescriptionLength = 256;
     const int radius = 4;
+    const int captionFontSize = 16;
+    const int descriptionFontSize = 12;
 
     QString elidedString(const QString &string, int length) {
         static const QString tail = lit("...");
@@ -107,7 +109,9 @@ void QnBookmarkItemPrivate::updatePixmap() {
     int maxTextWidth = maximumBookmarkWidth - 2 * padding;
 
     QFont descriptionFont = q->font();
+    descriptionFont.setPixelSize(descriptionFontSize);
     QFont captionFont = q->font();
+    captionFont.setPixelSize(captionFontSize);
     captionFont.setBold(true);
 
     QRect captionRect;
@@ -150,7 +154,6 @@ void QnBookmarkItemPrivate::updatePixmap() {
     painter.setFont(descriptionFont);
     painter.drawText(descriptionRect, Qt::TextWordWrap, description);
 
-    q->setMinimumSize(QSizeF(pixmap.size()));
-    q->setMaximumSize(QSizeF(pixmap.size()));
+    q->resize(QSizeF(pixmap.size()));
     q->update();
 }
