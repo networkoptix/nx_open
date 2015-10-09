@@ -39,6 +39,7 @@
 #include <chrono>
 #include <algorithm>
 #include <vector>
+#include <random>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -862,12 +863,14 @@ void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &peri
 
 bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs)
 {
-    return qnNormalStorageMan->isArchiveTimeExists(cameraUniqueId, timeMs) || qnBackupStorageMan->isArchiveTimeExists(cameraUniqueId, timeMs);
+    return qnNormalStorageMan->isArchiveTimeExistsInternal(cameraUniqueId, timeMs) || 
+           qnBackupStorageMan->isArchiveTimeExistsInternal(cameraUniqueId, timeMs);
 }
 
 bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period)
 {
-    return qnNormalStorageMan->isArchiveTimeExists(cameraUniqueId, period) || qnBackupStorageMan->isArchiveTimeExists(cameraUniqueId, period);
+    return qnNormalStorageMan->isArchiveTimeExistsInternal(cameraUniqueId, period) || 
+           qnBackupStorageMan->isArchiveTimeExistsInternal(cameraUniqueId, period);
 }
 
 bool QnStorageManager::isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs)
@@ -1486,32 +1489,132 @@ void QnStorageManager::stopAsyncTasks()
     qnScheduleSync->stop();
 }
 
+//void QnStorageManager::updateStorageStatistics()
+//{
+//    QnMutexLocker lock( &m_mutexStorages );
+//    if (m_storagesStatisticsReady) 
+//        return;
+//
+//    qint64 totalSpace = 0;
+//    qint64 minSpace = INT64_MAX;
+//    QSet<QnStorageResourcePtr> storages = getWritableStorages();
+//    m_isWritableStorageAvail = !storages.isEmpty();
+//    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+//    {
+//        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
+//        qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
+//        totalSpace += storageSpace;
+//        minSpace = qMin(minSpace, storageSpace);
+//    }
+//
+//    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+//    {
+//        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
+//        qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
+//        // write to large HDD more often then small HDD
+//        fileStorage->setStorageBitrateCoeff(storageSpace / (double) minSpace);
+//    }
+//    m_storagesStatisticsReady = true;
+//    m_warnSended = false;
+//}
+//
+//QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider *provider)
+//{
+//    QnStorageResourcePtr result;
+//    float minBitrate = (float) INT_MAX;
+//
+//    updateStorageStatistics();
+//
+//    QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;
+//    QVector<QnStorageResourcePtr> candidates;
+//
+//    // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
+//    QSet<QnStorageResourcePtr> storages = getWritableStorages();
+//    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+//    {
+//        QnStorageResourcePtr storage = *itr;
+//        qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
+//        float bitrate = storage->bitrate() / storage->getStorageBitrateCoeff();
+//        minBitrate = qMin(minBitrate, bitrate);
+//        bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
+//    }
+//    for (int i = 0; i < bitrateInfo.size(); ++i)
+//    {
+//        if (bitrateInfo[i].first <= minBitrate*1.1f)
+//            candidates << bitrateInfo[i].second;
+//    }
+//
+//    // select storage with maximum free space and do not use storages without free space at all
+//    qint64 maxFreeSpace = 0;
+//    for (int i = 0; i < candidates.size(); ++i)
+//    {   
+//        qint64 freeSpace = candidates[i]->getFreeSpace();
+//        if (freeSpace > maxFreeSpace)
+//        {
+//            maxFreeSpace = freeSpace;
+//            result = candidates[i];
+//        }
+//    }
+//
+//    if (result) {
+//        qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << (provider ? provider->getResource()->getUrl() : "");
+//    }
+//    else {
+//        if (!m_warnSended && m_firstStorageTestDone) {
+//            qWarning() << "No storage available for recording";
+//            emit noStoragesAvailable();
+//            m_warnSended = true;
+//        }
+//    }
+//
+//    return result;
+//}
+
 void QnStorageManager::updateStorageStatistics()
 {
     QnMutexLocker lock( &m_mutexStorages );
-    if (m_storagesStatisticsReady) 
-        return;
 
-    qint64 totalSpace = 0;
-    qint64 minSpace = INT64_MAX;
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     m_isWritableStorageAvail = !storages.isEmpty();
-    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+
+    struct StorageSpaceInfo {
+        QnStorageResourcePtr storage;
+        qint64 availableSpace;
+    };
+    std::vector<StorageSpaceInfo> storagesInfo;
+
+    for (auto itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
-        qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
-        totalSpace += storageSpace;
-        minSpace = qMin(minSpace, storageSpace);
+        qint64 storageSpace = qMax(0ll, fileStorage->getFreeSpace() - fileStorage->getSpaceLimit());
+        StorageSpaceInfo tmp = {fileStorage, storageSpace};
+        storagesInfo.push_back(tmp);
     }
 
-    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
-    {
-        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
-        qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
-        // write to large HDD more often then small HDD
-        fileStorage->setStorageBitrateCoeff(storageSpace / (double) minSpace);
+    std::sort(storagesInfo.begin(), storagesInfo.end(),
+              [](const StorageSpaceInfo &s1, const StorageSpaceInfo &s2) {
+                  return s1.availableSpace > s2.availableSpace;
+              });
+    
+    if (!storagesInfo.empty()) {
+        if (storagesInfo[0].availableSpace == 0) {
+            for (auto &sinfo : storagesInfo) {
+                sinfo.storage->setWritedCoeff(-1.0);
+            }
+        } else {
+            storagesInfo[0].storage->setWritedCoeff(1.0);
+            for (size_t i = 1; i < storagesInfo.size(); ++i) {
+                if (storagesInfo[i].availableSpace == 0) {
+                    storagesInfo[i].storage->setWritedCoeff(-1.0);
+                } else {
+                    storagesInfo[i].storage->setWritedCoeff((double)storagesInfo[i].availableSpace / 
+                                                            (double)storagesInfo[0].availableSpace);
+                }
+            }
+        }
     }
-    m_storagesStatisticsReady = true;
+    
+    //m_storagesStatisticsReady = true;
     m_warnSended = false;
 }
 
@@ -1520,41 +1623,46 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QnStorageResourcePtr result;
     float minBitrate = (float) INT_MAX;
 
+    struct StorageSpaceInfo {
+        QnStorageResourcePtr storage;
+        qint64 usageCoeff;
+    };
+    std::vector<StorageSpaceInfo> storagesInfo;
+
     updateStorageStatistics();
-
-    QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;
-    QVector<QnStorageResourcePtr> candidates;
-
-    // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
-    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
-    {
-        QnStorageResourcePtr storage = *itr;
-        qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
-        float bitrate = storage->bitrate() / storage->getStorageBitrateCoeff();
-        minBitrate = qMin(minBitrate, bitrate);
-        bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
-    }
-    for (int i = 0; i < bitrateInfo.size(); ++i)
-    {
-        if (bitrateInfo[i].first <= minBitrate*1.1f)
-            candidates << bitrateInfo[i].second;
-    }
-
-    // select storage with maximum free space and do not use storages without free space at all
-    qint64 maxFreeSpace = 0;
-    for (int i = 0; i < candidates.size(); ++i)
-    {   
-        qint64 freeSpace = candidates[i]->getFreeSpace();
-        if (freeSpace > maxFreeSpace)
-        {
-            maxFreeSpace = freeSpace;
-            result = candidates[i];
+    for (auto it = storages.cbegin(); it != storages.cend(); ++it) {
+        qDebug() << lit("Storage %1 usage coeff: %2")
+                        .arg((*it)->getUrl())
+                        .arg((*it)->calcUsageCoeff());
+        if ((*it)->calcUsageCoeff() >= 0) {
+            StorageSpaceInfo tmp = {*it, (*it)->calcUsageCoeff()};
+            storagesInfo.push_back(tmp);
         }
+    }
+    std::sort(storagesInfo.begin(), storagesInfo.end(),
+              [](const StorageSpaceInfo &s1, const StorageSpaceInfo &s2) {
+                  return s1.usageCoeff < s2.usageCoeff;
+              });
+    
+    if (!storagesInfo.empty()) {
+        size_t lastIndex = 0;
+        for (size_t i = 1; i < storagesInfo.size(); ++i) {
+            if (storagesInfo[i].usageCoeff == storagesInfo[0].usageCoeff) {
+                ++lastIndex;
+            } else {
+                break;
+            }
+        }
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, lastIndex);
+        result = storagesInfo[dis(gen)].storage;
     }
 
     if (result) {
-        qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << (provider ? provider->getResource()->getUrl() : "");
+        qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() 
+                 << "for provider" << (provider ? provider->getResource()->getUrl() : "");
     }
     else {
         if (!m_warnSended && m_firstStorageTestDone) {
@@ -1733,9 +1841,9 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
     if (!storage)
         return false;
-    if (storageIndex >= 0 && provider)
-        storage->releaseBitrate(provider);
-        //storage->addWritedSpace(fileSize);
+    //if (storageIndex >= 0 && provider)
+    //    storage->releaseBitrate(provider);
+    storage->addWrited(fileSize);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, quality);
     if (catalog == 0)
@@ -1762,8 +1870,8 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 
     if (storageIndex == -1)
         return false;
-    if (provider)
-        storage->addBitrate(provider);
+    //if (provider)
+    //    storage->addBitrate(provider);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
     if (catalog == 0)

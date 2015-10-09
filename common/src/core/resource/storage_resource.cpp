@@ -7,7 +7,9 @@ QnStorageResource::QnStorageResource():
     m_maxStoreTime(0),
     m_usedForWriting(false),
     m_storageBitrateCoeff(0.0),
-    m_isBackup(false)
+    m_isBackup(false),
+    m_writed(0),
+    m_writedCoeff(-1.0)
 {
     setStatus(Qn::Offline);
 }
@@ -162,10 +164,41 @@ QString QnStorageResource::toNativeDirPath(const QString &dirPath)
 
 void QnStorageResource::setBackup(bool value)
 {
+    QnMutexLocker lk(&m_mutex);
     m_isBackup = value;
 }
 
 bool QnStorageResource::isBackup() const 
 { 
+    QnMutexLocker lk(&m_mutex);
     return m_isBackup; 
+}
+
+void QnStorageResource::addWrited(qint64 value)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_writed += value;
+}
+
+qint64 QnStorageResource::getWrited() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_writed;
+}
+
+void QnStorageResource::setWritedCoeff(double value)
+{
+    m_writedCoeff = value;
+}
+
+double QnStorageResource::getWritedCoeff() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_writedCoeff;
+}
+
+qint64 QnStorageResource::calcUsageCoeff() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_writed / m_writedCoeff;
 }
