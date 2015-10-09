@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja" sourcelanguage="en">
+<TS version="2.0" language="ja" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Network Issue</source>
-        <translation>ネットワークの問題</translation>
+        <translation>ネットワーク障害</translation>
     </message>
     <message>
         <source>Input on %1</source>
@@ -93,11 +93,11 @@
     </message>
     <message>
         <source>Any Server Issue</source>
-        <translation>全てのサーバー異常</translation>
+        <translation>全サーバー障害</translation>
     </message>
     <message>
         <source>Any Event</source>
-        <translation>全てのイベント</translation>
+        <translation>全イベント</translation>
     </message>
     <message>
         <source>Undefined event has occurred on %1</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
         <source>License Issue</source>
-        <translation>ライセンス問題</translation>
+        <translation>ライセンス障害</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Failure</source>
@@ -244,130 +244,130 @@
     </message>
     <message>
         <source>Generic Event</source>
-        <translation type="unfinished"></translation>
+        <translation>一般的イベント</translation>
     </message>
     <message>
         <source> (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation> (%1)</translation>
     </message>
     <message>
         <source>Caption: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>キャプション: %1</translation>
     </message>
     <message>
         <source>Input port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ポート: %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>MAC #%1: %2 </translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ(プライマリーストリーム)との接続は閉じられました.</translation>
     </message>
     <message>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ(セコンダリーストリーム)との接続は閉じられました.</translation>
     </message>
     <message>
         <source>Server restarted unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーは予期せずに再起動しました.</translation>
     </message>
     <message>
         <source>Device output</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス出力</translation>
     </message>
     <message>
         <source>Camera output</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ出力</translation>
     </message>
     <message>
         <source>Device output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス出力30秒</translation>
     </message>
     <message>
         <source>Camera output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ出力30秒</translation>
     </message>
     <message>
         <source>Device recording</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス録画</translation>
     </message>
     <message>
         <source>Camera recording</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ録画</translation>
     </message>
     <message>
         <source>Input Signal on Device</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス入力</translation>
     </message>
     <message>
         <source>Input Signal on Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ入力</translation>
     </message>
     <message>
         <source>Device Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス切断</translation>
     </message>
     <message>
         <source>Camera Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ切断</translation>
     </message>
     <message>
         <source>Device IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスIP重複</translation>
     </message>
     <message>
         <source>Camera IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラIP重複</translation>
     </message>
     <message>
         <source>Any Device Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>全デバイス障害</translation>
     </message>
     <message>
         <source>Any Camera Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>全カメラ障害</translation>
     </message>
     <message>
         <source>Device %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス %1 切断</translation>
     </message>
     <message>
         <source>Camera %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ %1 切断</translation>
     </message>
     <message>
         <source>IO Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュール %1 切断</translation>
     </message>
     <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>デバイスIPが %1 と重複</translation>
     </message>
     <message>
         <source>Camera IP Conflict at %1</source>
         <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>カメラIPが %1 と重複</translation>
     </message>
     <message>
         <source>Connection to device was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスとの通信が予期せずに閉じられました.</translation>
     </message>
     <message>
         <source>Recording on devices is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス録画無効:</translation>
     </message>
     <message>
         <source>Recording on cameras is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ録画無効:</translation>
     </message>
     <message>
         <source>Recording on IO modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュール録画無効:</translation>
     </message>
 </context>
 <context>
@@ -450,131 +450,131 @@
     </message>
     <message>
         <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス再起動後にWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ再起動後にWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ再起動後にWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスがネットワークに接続されている事を確認して再起動を行ってください.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラがネットワークに接続されている事を確認して再起動を行ってください.</translation>
     </message>
     <message>
         <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュールがネットワークに接続されている事を確認して再起動を行ってください.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished"></translation>
+        <translation>ポートt %2 にアクセス可能か確認してください.</translation>
     </message>
     <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス応答がありません Url %1 リクエスト名 %2.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ応答がありません Url %1 リクエスト名 %2.</translation>
     </message>
     <message>
         <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュール応答がありません Url %1 リクエスト名 %2.</translation>
     </message>
     <message>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>許可されないUrl %1.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>録画を開始してデバイス設定のFPSを減らしてください.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>録画を開始してカメラ設定のFPSを減らしてください.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>録画を開始してIOモジュール設定のFPSを減らしてください.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>解決しない場合はデバイスWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>解決しない場合はカメラWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>解決しない場合はIOモジュールWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスリクエスト &quot;%1&quot;がエラー&quot;%2 で失敗.　</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラリクエスト &quot;%1&quot;がエラー&quot;%2 で失敗.　</translation>
     </message>
     <message>
         <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュールリクエスト &quot;%1&quot;がエラー&quot;%2 で失敗.　</translation>
     </message>
     <message>
         <source>Unknown device issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>不明なデバイス障害.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>不明なカメラ障害.</translation>
     </message>
     <message>
         <source>Unknown IO module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>不明なIOモジュール障害.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス %1.より無効なデータ受信.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ %1.より無効なデータ受信.</translation>
     </message>
     <message>
         <source>Invalid data was received from the IO module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュール %1.より無効なデータ受信.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアエラー発生 デバイス障害を開いて詳細を確認してください.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアエラー発生 カメラ障害を開いて詳細を確認してください.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアエラー発生 IOモジュール障害を開いて詳細を確認してください.</translation>
     </message>
     <message>
         <source>Device initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスイニシャライズ中.</translation>
     </message>
     <message>
         <source>Camera initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメライニシャライズ中.</translation>
     </message>
     <message>
         <source>IO Module initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>IOモジュールイニシャライズ中.</translation>
     </message>
 </context>
 <context>
@@ -1156,15 +1156,15 @@
     </message>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
+        <translation>セーフモード</translation>
     </message>
     <message>
         <source>The system is running in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>セーフモード.</translation>
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスアクティベートを除くすべてのコンフィグレーションが無効.</translation>
     </message>
 </context>
 <context>
