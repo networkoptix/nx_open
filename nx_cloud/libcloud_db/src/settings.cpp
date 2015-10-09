@@ -19,13 +19,13 @@
 namespace
 {
     //log settings
-    static const QLatin1String LOG_LEVEL( "logLevel" );
+    static const QLatin1String LOG_LEVEL( "log/logLevel" );
 #ifdef _DEBUG
     static const QLatin1String DEFAULT_LOG_LEVEL( "DEBUG" );
 #else
     static const QLatin1String DEFAULT_LOG_LEVEL( "INFO" );
 #endif
-    static const QLatin1String LOG_DIR( "logDir" );
+    static const QLatin1String LOG_DIR( "log/logDir" );
 
     static const QLatin1String ENDPOINTS_TO_LISTEN( "listenOn" );
     static const QLatin1String DEFAULT_ENDPOINTS_TO_LISTEN( "0.0.0.0:3346" );
