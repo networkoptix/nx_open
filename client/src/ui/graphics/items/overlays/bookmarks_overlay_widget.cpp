@@ -24,9 +24,8 @@ public:
     QGraphicsWidget *contentWidget;
     QnGraphicsScrollArea *scrollArea;
     QGraphicsLinearLayout *mainLayout;
-    QGraphicsLinearLayout *bookmarksLayout;
+    QList<QnBookmarkItem*> bookmarkItems;
 
-    void clearLayout();
     void setBookmarks(const QnCameraBookmarkList &bookmarks);
 };
 
@@ -41,11 +40,6 @@ QnBookmarksOverlayWidget::QnBookmarksOverlayWidget(QGraphicsWidget *parent)
     setAcceptedMouseButtons(0);
 
     d->contentWidget = new QGraphicsWidget(this);
-    d->contentWidget->setMinimumWidth(maximumBookmarkWidth);
-    d->contentWidget->setMaximumWidth(maximumBookmarkWidth);
-    d->bookmarksLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    d->bookmarksLayout->setSpacing(layoutSpacing);
-    d->contentWidget->setLayout(d->bookmarksLayout);
 
     d->scrollArea = new QnGraphicsScrollArea(this);
     d->scrollArea->setContentWidget(d->contentWidget);
@@ -80,30 +74,27 @@ QnBookmarksOverlayWidgetPrivate::QnBookmarksOverlayWidgetPrivate(QnBookmarksOver
     , contentWidget(nullptr)
     , scrollArea(nullptr)
     , mainLayout(nullptr)
-    , bookmarksLayout(nullptr)
 {
-}
-
-void QnBookmarksOverlayWidgetPrivate::clearLayout() {
-    while (bookmarksLayout->count() > 0) {
-        QGraphicsLayoutItem *item = bookmarksLayout->itemAt(0);
-        bookmarksLayout->removeAt(0);
-        delete item;
-    }
 }
 
 void QnBookmarksOverlayWidgetPrivate::setBookmarks(const QnCameraBookmarkList &bookmarks) {
     if (bookmarksList == bookmarks)
         return;
 
+    qDeleteAll(bookmarkItems);
+    bookmarkItems.clear();
+
     bookmarksList = bookmarks;
 
-    clearLayout();
-
+    int height = 0;
     for (const QnCameraBookmark &bookmark: bookmarks) {
-        QnBookmarkItem *bookmarkItem = new QnBookmarkItem(bookmark);
-        bookmarksLayout->addItem(bookmarkItem);
+        QnBookmarkItem *bookmarkItem = new QnBookmarkItem(bookmark, contentWidget);
+        bookmarkItem->setPos(0, height);
+        height += bookmarkItem->size().height() + layoutSpacing;
+        bookmarkItems.append(bookmarkItem);
     }
+
+    contentWidget->resize(maximumBookmarkWidth, std::max(0, height - layoutSpacing));
 
     Q_Q(QnBookmarksOverlayWidget);
     q->update();
