@@ -71,6 +71,13 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 
     if (useMainPool)
     {
+        for (auto &storage : qnBackupStorageMan->getStorages())
+        {
+            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource>(storage);
+            if (fileStorage != nullptr)
+                storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
+        }
+
         QList<QnPlatformMonitor::PartitionSpace> partitions =
             m_monitor->totalPartitionSpaceInfo(
             QnPlatformMonitor::LocalDiskPartition |
