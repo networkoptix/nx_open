@@ -10,6 +10,7 @@ public:
     int contentY;
     qreal contentHeight;
     Qt::Alignment alignment;
+    int lineHeight;
 
     void at_contentWidgetHeightChanged();
     void fitToBounds();
@@ -76,7 +77,7 @@ void QnGraphicsScrollArea::wheelEvent(QGraphicsSceneWheelEvent *event) {
             return;
         }
 
-        int dy = -event->delta() / 120 * 16;
+        int dy = -event->delta() / 120 * d->lineHeight * qApp->wheelScrollLines();
         d->contentY += dy;
         d->fitToBounds();
     }
@@ -90,7 +91,11 @@ QnGraphicsScrollAreaPrivate::QnGraphicsScrollAreaPrivate(QnGraphicsScrollArea *p
     , q_ptr(parent)
     , contentWidget(nullptr)
     , contentY(0)
+    , lineHeight(0)
 {
+    Q_Q(QnGraphicsScrollArea);
+    QFontMetrics fm(q->font());
+    lineHeight = fm.height();
 }
 
 void QnGraphicsScrollAreaPrivate::at_contentWidgetHeightChanged() {
