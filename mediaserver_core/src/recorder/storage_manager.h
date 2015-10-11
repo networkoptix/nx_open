@@ -69,6 +69,7 @@ public:
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
     static QnStorageResourcePtr getStorageByUrl(const QString &storageUrl);
 
+    bool checkIfMyStorage(const QnStorageResourcePtr &storage) const;
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);
     QnStorageResourcePtr storageRoot(int storage_index) const { QnMutexLocker lock( &m_mutexStorages ); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const; 
