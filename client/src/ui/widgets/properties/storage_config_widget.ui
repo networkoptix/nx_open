@@ -252,7 +252,7 @@
         <item>
          <widget class="QPushButton" name="pushButton_5">
           <property name="text">
-           <string>Backup settings</string>
+           <string>Camera settings</string>
           </property>
          </widget>
         </item>
@@ -268,6 +268,23 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>When to backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxBackupType"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonSchedule">
+          <property name="text">
+           <string>Edit Schedule</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

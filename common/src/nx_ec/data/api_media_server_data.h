@@ -91,7 +91,7 @@ namespace ec2
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
 
         // redundant storage settings
-        Qn::BackupTypes     backupType;
+        Qn::BackupType      backupType;
         int                 backupDaysOfTheWeek; // Days of the week mask. See backup::DayOfWeek enum 
         int                 backupStart;         // seconds from 00:00:00. Error if bDOW set and this is not set
         int                 backupDuration;      // duration of synchronization period in seconds. -1 if not set.

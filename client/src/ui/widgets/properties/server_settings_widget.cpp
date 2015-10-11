@@ -218,8 +218,6 @@ void QnServerSettingsWidget::submitToSettings() {
         server->setMaxCameras(ui->maxCamerasSpinBox->value());
         server->setRedundancy(ui->failoverCheckBox->isChecked());
     });
-
-
 }
 
 // -------------------------------------------------------------------------- //

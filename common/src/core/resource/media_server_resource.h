@@ -72,12 +72,13 @@ public:
     void setRedundancy(bool value);
     bool isRedundancy() const;
 
-    Qn::BackupTypes getBackupType() const;
+    Qn::BackupType getBackupType() const;
     int getBackupDOW() const;
     int getBackupStart() const;
     int getBackupDuration() const;
     int getBackupBitrate() const;
 
+    void setBackupType(Qn::BackupType value);
     void setBackupDOW(int value);
     void setBackupStart(int value);
     void setBackupDuration(int value);

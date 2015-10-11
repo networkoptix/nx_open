@@ -13,6 +13,9 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <camera/camera_data_manager.h>
+#include "ui/dialogs/backup_schedule_dialog.h"
+#include "core/resource/media_server_user_attributes.h"
+#include "core/resource_management/resources_changes_manager.h"
 
 namespace {
     //setting free space to zero, since now client does not change this value, so it must keep current value
@@ -43,7 +46,15 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     connect(ui->rebuildStopButtonMain, &QPushButton::clicked, this, &QnStorageConfigWidget::at_rebuildCancel_clicked);
     connect(ui->rebuildStopButtonBackup, &QPushButton::clicked, this, &QnStorageConfigWidget::at_rebuildCancel_clicked);
 
+    connect(ui->pushButtonSchedule, &QPushButton::clicked, this, &QnStorageConfigWidget::at_openBackupSchedule_clicked);
+
     m_backupPool.model->setBackupRole(true);
+
+    ui->comboBoxBackupType->addItem(tr("By schedule"), Qn::Backup_Schedule);
+    ui->comboBoxBackupType->addItem(tr("Realtime mode"), Qn::Backup_RealTime);
+    ui->comboBoxBackupType->addItem(tr("Disable"), Qn::Backup_Disabled);
+
+    m_scheduleDialog = new QnBackupScheduleDialog(this);
 }
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
@@ -85,15 +96,34 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     storagePool->model = new QnStorageListModel();
     tableView->setModel(storagePool->model);
 
-    //connect(signalizer, &QnAbstractEventSignalizer::activated,  this,   &QnStorageConfigWidget::at_storagesTable_contextMenuEvent);
-    //connect(tableWidget,          &QTableWidget::cellChanged, this,   &QnStorageConfigWidget::at_storagesTable_cellChanged);
+    connect(ui->comboBoxBackupType, SIGNAL(currentIndexChanged(int)), this, SLOT(at_backupComboBoxChange(int)));
     connect(tableView,         &QTableView::clicked,               this,   &QnStorageConfigWidget::at_eventsGrid_clicked);
     tableView->setMouseTracking(true);
+}
+
+void QnStorageConfigWidget::at_backupComboBoxChange(int index)
+{
+    ui->pushButtonSchedule->setEnabled(ui->comboBoxBackupType->itemData(index) == Qn::Backup_Schedule);
+    m_serverUserAttrs.backupType = (Qn::BackupType) ui->comboBoxBackupType->itemData(index).toInt();
 }
 
 void QnStorageConfigWidget::updateFromSettings()
 {
     sendStorageSpaceRequest();
+
+    if (!m_server)
+        return;
+
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk(QnMediaServerUserAttributesPool::instance(), m_server->getId());
+        m_serverUserAttrs = *(*lk).data();
+    }
+    for (int i = 0; i < ui->comboBoxBackupType->count(); ++i) {
+        if (ui->comboBoxBackupType->itemData(i) == m_serverUserAttrs.backupType) {
+            ui->comboBoxBackupType->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
@@ -226,7 +256,7 @@ void QnStorageConfigWidget::processStorages(QnStorageResourceList& result, const
     }
 }
 
-void QnStorageConfigWidget::submitToSettings() 
+void QnStorageConfigWidget::submitToSettings()
 {
     if (isReadOnly())
         return;
@@ -255,6 +285,14 @@ void QnStorageConfigWidget::submitToSettings()
 
     if (!storagesToRemove.empty())
         conn->getMediaServerManager()->removeStorages(storagesToRemove, this, []{});
+
+    qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
+        m_server->setBackupType(m_serverUserAttrs.backupType);
+        m_server->setBackupDOW(m_serverUserAttrs.backupDaysOfTheWeek);
+        m_server->setBackupStart(m_serverUserAttrs.backupStart);
+        m_server->setBackupDuration(m_serverUserAttrs.backupDuration);
+        m_server->setBackupBitrate(m_serverUserAttrs.backupBitrate);
+    });
 }
 
 void QnStorageConfigWidget::at_rebuildButton_clicked() 
@@ -300,6 +338,16 @@ void QnStorageConfigWidget::at_rebuildCancel_clicked()
     button->setDisabled(true);
     storagePool.rebuildHandle = m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_Cancel, isMain, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
 
+}
+
+void QnStorageConfigWidget::at_openBackupSchedule_clicked() 
+{
+    if (!m_server)
+        return;
+
+    m_scheduleDialog->updateFromSettings(m_serverUserAttrs);
+    if (m_scheduleDialog->exec())
+        m_scheduleDialog->submitToSettings(m_serverUserAttrs);
 }
 
 void QnStorageConfigWidget::at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle)

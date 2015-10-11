@@ -15,6 +15,9 @@
 
 #include <utils/common/connective.h>
 #include "api/model/rebuild_archive_reply.h"
+#include "core/resource/media_server_user_attributes.h"
+
+class QnBackupScheduleDialog;
 
 namespace Ui {
     class StorageConfigWidget;
@@ -45,9 +48,11 @@ private slots:
     void at_addExtStorage(bool addToMain);
     void at_rebuildButton_clicked();
     void at_rebuildCancel_clicked();
+    void at_openBackupSchedule_clicked();
     void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle);
     void sendNextArchiveRequestForMain();
     void sendNextArchiveRequestForBackup();
+    void at_backupComboBoxChange(int index);
 private:
     Ui::StorageConfigWidget* ui;
     QnMediaServerResourcePtr m_server;
@@ -63,6 +68,8 @@ private:
 
     StoragePool m_mainPool;
     StoragePool m_backupPool;
+    QnBackupScheduleDialog* m_scheduleDialog;
+    QnMediaServerUserAttributes m_serverUserAttrs;
 private:
     void setupGrid(QTableView* tableView, StoragePool* storagePool);
     void processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& newData, bool isBackupPool);

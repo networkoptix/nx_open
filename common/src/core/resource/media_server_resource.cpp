@@ -61,7 +61,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
 }
 
-Qn::BackupTypes QnMediaServerResource::getBackupType() const
+Qn::BackupType QnMediaServerResource::getBackupType() const
 {
     QnMediaServerUserAttributesPool::ScopedLock lk(
         QnMediaServerUserAttributesPool::instance(), 
@@ -402,6 +402,16 @@ int QnMediaServerResource::getBackupBitrate() const
     );
 
     return (*lk)->backupBitrate;
+}
+
+void QnMediaServerResource::setBackupType(Qn::BackupType value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+        );
+
+    (*lk)->backupType = value;
 }
 
 void QnMediaServerResource::setBackupDOW(int value)

@@ -15,7 +15,7 @@ private:
         int start;
         int duration;
         int bitrate;
-        Qn::BackupTypes type;
+        Qn::BackupType type;
     };
 
 public:

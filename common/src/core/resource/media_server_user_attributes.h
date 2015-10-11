@@ -21,11 +21,11 @@ public:
     QString name;
 
     // backup storage settings
-    Qn::BackupTypes backupType;
+    Qn::BackupType backupType;
     int     backupDaysOfTheWeek; // Days of the week mask. -1 if not set
     int     backupStart;         // seconds from 00:00:00. Error if rDOW set and this is not set
     int     backupDuration;      // duration of synchronization period in seconds. -1 if not set.
-    int     backupBitrate;       // bitrate cap in bytes per second. -1 if not capped.
+    int     backupBitrate;       // bitrate cap in bytes per second. Any value <= 0 if not capped.
 
     QnMediaServerUserAttributes();
     void assign(

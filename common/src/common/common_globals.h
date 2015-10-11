@@ -41,7 +41,7 @@ namespace Qn
             CameraCapabilities 
             PtzDataFields PtzCapabilities PtzTraits 
             MotionTypes TimePeriodTypes 
-            ServerFlags BackupTypes CameraBackupTypes CameraStatusFlags IOPortTypes)
+            ServerFlags CameraBackupTypes CameraStatusFlags IOPortTypes)
 public:
 #else
     Q_NAMESPACE
@@ -745,8 +745,6 @@ public:
         Backup_Schedule
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
-    Q_DECLARE_FLAGS(BackupTypes, BackupType)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(BackupTypes)
 
     enum CameraBackupType
     {
@@ -818,7 +816,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::BackupTypes)(Qn::CameraBackupTypes)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupTypes)(Qn::CameraStatusFlags),
     (metatype)(numeric)(lexical)
 )
 
