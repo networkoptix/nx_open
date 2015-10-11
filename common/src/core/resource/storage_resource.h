@@ -61,6 +61,14 @@ public:
     void setBackup(bool value);
     bool isBackup() const;
 
+    void addWrited(qint64 value);
+    qint64 getWrited() const;
+
+    void setWritedCoeff(double value);
+    double getWritedCoeff() const;
+
+    qint64 calcUsageCoeff() const;
+
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -76,7 +84,9 @@ private:
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
-    bool m_isBackup;
+    bool    m_isBackup;
+    qint64  m_writed;
+    double  m_writedCoeff;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);
