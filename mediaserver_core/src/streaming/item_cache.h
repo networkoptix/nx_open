@@ -6,6 +6,7 @@
 #define ITEMCACHE_H
 
 #include <map>
+#include <memory>
 
 #include <QCache>
 
@@ -58,11 +59,11 @@ public:
         \param dataProvider Not owned by cache
     */
     ItemCache(
-        int maxCost = 100,
-        ItemProviderType* const itemProvider = NULL )
+        int maxCost,
+        std::unique_ptr<ItemProviderType> itemProvider )
     :
         m_cache( maxCost ),
-        m_itemProvider( itemProvider ),
+        m_itemProvider( std::move(itemProvider) ),
         m_usedItemsTotalCost( 0 ),
         m_maxCost( maxCost )
     {
@@ -224,7 +225,7 @@ public:
         return true;
     }
 
-    ItemProviderType* itemProvider() const
+    const std::unique_ptr<ItemProviderType>& itemProvider() const
     {
         QnMutexLocker lk( &m_mutex );
         return m_itemProvider;
@@ -258,7 +259,7 @@ private:
 
     QCache<KeyType, CacheItemData> m_cache;
     std::map<KeyType, CacheItemData*> m_usedItems;
-    ItemProviderType* const m_itemProvider;
+    std::unique_ptr<ItemProviderType> m_itemProvider;
     qint64 m_usedItemsTotalCost;
     mutable QnMutex m_mutex;
     const qint64 m_maxCost;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja" sourcelanguage="en">
+<TS version="2.0" language="ja" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -100,7 +100,7 @@
     <message>
         <location/>
         <source>till</source>
-        <translation>迄</translation>
+        <translation>終了</translation>
     </message>
     <message>
         <location/>
@@ -115,7 +115,7 @@
     <message>
         <location/>
         <source>Watching archive</source>
-        <translation>アーカイブウォッチンング</translation>
+        <translation>アーカイブ表示</translation>
     </message>
     <message>
         <location/>
@@ -125,7 +125,7 @@
     <message>
         <location/>
         <source>Watching live</source>
-        <translation>ウォッチングライブ</translation>
+        <translation>ライブ表示</translation>
     </message>
     <message>
         <location/>
@@ -697,27 +697,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Source contains:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>Keywords separated by space</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Caption contains:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Description contains:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</translation>
     </message>
 </context>
 <context>
@@ -2188,7 +2188,7 @@
     <message>
         <location/>
         <source>Forecast for full storage(s) usage</source>
-        <translation>スルストレージ使用予測</translation>
+        <translation>ストレージ使用予測</translation>
     </message>
     <message>
         <location/>
@@ -2400,7 +2400,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>フェイルオーバー優先順位...</translation>
     </message>
 </context>
 <context>

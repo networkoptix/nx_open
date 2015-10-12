@@ -407,6 +407,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         );
         break;
     }
+    case QnBusiness::ServerStartEvent:
     case QnBusiness::ServerFailureEvent: {
         item->addActionButton(
             qnSkin->icon("events/server.png"),
@@ -416,13 +417,11 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         );
         break;
     }
-    case QnBusiness::ServerConflictEvent:
-    case QnBusiness::ServerStartEvent: {
+    case QnBusiness::ServerConflictEvent: {
         item->addActionButton(
             qnSkin->icon("events/server.png"),
-            tr("Server Settings..."),
-            Qn::ServerSettingsAction,
-            QnActionParameters(resource)
+            QString(),
+            Qn::NoAction
         );
         break;
     }

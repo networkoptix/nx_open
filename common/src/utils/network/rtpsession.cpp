@@ -769,7 +769,7 @@ QByteArray RTPSession::calcDefaultNonce() const
 #if 1
 void RTPSession::addAuth( nx_http::Request* const request )
 {
-    QnClientAuthHelper::authenticate(
+    QnClientAuthHelper::>addAuthorizationToRequest(
         m_auth,
         request,
         &m_rtspAuthCtx );   //ignoring result
@@ -1124,7 +1124,9 @@ bool RTPSession::sendSetup()
 void RTPSession::addAdditionAttrs( nx_http::Request* const request )
 {
     for (QMap<QByteArray, QByteArray>::const_iterator i = m_additionAttrs.begin(); i != m_additionAttrs.end(); ++i)
-        request->headers.insert( nx_http::HttpHeader( i.key(), i.value() ) );
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            nx_http::HttpHeader(i.key(), i.value()));
 }
 
 bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray& paramValue )
@@ -1162,7 +1164,9 @@ void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPo
             else
                 rangeVal += "clock";
         }
-        request->headers.insert( nx_http::HttpHeader( "Range", rangeVal ) );
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            nx_http::HttpHeader("Range", rangeVal));
     }
 }
 
@@ -1186,8 +1190,12 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale) ) );
     if( m_numOfPredefinedChannels )
     {
-        request.headers.insert( nx_http::HttpHeader( "x-play-now", "true" ) );
-        request.headers.insert( nx_http::HttpHeader( Qn::GUID_HEADER_NAME, getGuid() ) );
+        nx_http::insertOrReplaceHeader(
+            &request.headers,
+            nx_http::HttpHeader("x-play-now", "true"));
+        nx_http::insertOrReplaceHeader(
+            &request.headers,
+            nx_http::HttpHeader(Qn::GUID_HEADER_NAME, getGuid()));
     }
     return request;
 }

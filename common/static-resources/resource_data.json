@@ -207,7 +207,7 @@
         },
         {
             "keys": [
-                "Honeywell|HVE4"
+                "Honeywell|HVE4", "Hikvision|DS-6704HFI"
             ],
             "forcedOnvifParams": 
             {
