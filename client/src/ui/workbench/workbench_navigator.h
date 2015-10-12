@@ -77,6 +77,8 @@ public:
     QnSearchLineEdit *bookmarksSearchWidget() const;
     void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
 
+    QnSearchQueryStrategy *bookmarksSearchStrategy() const;
+
     QnCameraBookmarkTags bookmarkTags() const;
     void setBookmarkTags(const QnCameraBookmarkTags &tags);
 

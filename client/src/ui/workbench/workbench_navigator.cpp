@@ -80,6 +80,8 @@ namespace {
 
     const int updateBookmarksInterval = 2000;
 
+    enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
+
     QAtomicInt qn_threadedMergeHandle(1);
 }
 
@@ -92,6 +94,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_calendar(NULL),
     m_dayTimeWidget(NULL),
     m_bookmarksSearchWidget(NULL),
+    m_searchQueryStrategy(new QnSearchQueryStrategy(this, kMinimalSymbolsCount, kDelayMs)),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_currentMediaWidget(NULL),
@@ -188,6 +191,17 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     });
     updateCameraHistoryTimer->start();
 
+
+    connect(m_searchQueryStrategy, &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text)
+    {
+        if (!m_bookmarkQuery)
+            return;
+
+        auto filter = m_bookmarkQuery->filter();
+        filter.text = text;
+        m_bookmarkQuery->setFilter(filter);
+        m_bookmarkAggregation.clear();
+    });
 
 
     connect(workbench(), &QnWorkbench::layoutChangeProcessStarted, this, [this] {
@@ -421,17 +435,6 @@ void QnWorkbenchNavigator::initialize() {
         m_searchQueryStrategy->changeQueryForcibly(QString()); 
     });
 
-    connect(m_searchQueryStrategy, &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text)
-    {
-        if (!m_bookmarkQuery)
-            return;
-
-        auto filter = m_bookmarkQuery->filter();
-        filter.text = text;
-        m_bookmarkQuery->setFilter(filter);
-        m_bookmarkAggregation.clear();
-    });
-
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
 
@@ -468,6 +471,7 @@ void QnWorkbenchNavigator::deinitialize() {
         m_bookmarkQuery->setFilter(QnCameraBookmarkSearchFilter());
         m_bookmarkAggregation.clear();
     }
+    m_searchQueryStrategy->changeQueryForcibly(QString());
 
     m_currentWidget = NULL;
     m_currentWidgetFlags = 0;
@@ -1854,7 +1858,7 @@ void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksS
 
     if(m_bookmarksSearchWidget) {
         disconnect(m_bookmarksSearchWidget, nullptr, this, nullptr);
-        disconnect(m_searchQueryStrategy, nullptr, this, nullptr);
+        disconnect(m_bookmarksSearchWidget, nullptr, m_searchQueryStrategy, nullptr);
 
         if(isValid())
             deinitialize();
@@ -1862,15 +1866,16 @@ void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksS
 
     m_bookmarksSearchWidget = bookmarksSearchWidget;
 
-    enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
-    m_searchQueryStrategy = new QnSearchQueryStrategy(m_bookmarksSearchWidget, kMinimalSymbolsCount, kDelayMs);
-
     if(m_bookmarksSearchWidget) {
-        connect(m_bookmarksSearchWidget, &QObject::destroyed, this, [this](){setBookmarksSearchWidget(NULL);});
+        connect(m_bookmarksSearchWidget, &QObject::destroyed, this, [this](){setBookmarksSearchWidget(nullptr);});
 
         if(isValid())
             initialize();
     }
+}
+
+QnSearchQueryStrategy *QnWorkbenchNavigator::bookmarksSearchStrategy() const {
+    return m_searchQueryStrategy;
 }
 
 bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const {
