@@ -1,19 +1,13 @@
-<div class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-if="cancellable"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">{{title}}</h4>
-            </div>
-            <div class="modal-body" ng-if="content" ng-bind-html="content">
-            </div>
-            <div class="modal-body" ng-if="template" ng-template="{{template}}">
-            </div>
-            <div class="modal-footer" ng-if="hasFooter">
-                <button type="button" class="btn btn-default" data-dismiss="modal" ng-if="!cancellable">Cancel</button>
-                <button type="button" class="btn btn-primary" ng-if="!cancellable">Ok</button>
-                <button type="button" class="btn btn-primary" ng-if="cancellable">Close</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()" ng-if="settings.cancellable"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{{settings.title}}</h4>
+</div>
+<div class="modal-body" ng-if="settings.content" ng-bind-html="settings.content">
+</div>
+<ng-include ng-if="settings.template" src="settings.template"></ng-include>
+<div class="modal-footer" ng-if="settings.hasFooter">
+    <button type="button" class="btn btn-default" data-dismiss="modal" ng-if="!settings.cancellable" ng-click="cancel()" >Cancel</button>
+    <button type="button" class="btn btn-primary" ng-if="!settings.cancellable" ng-click="ok()" >Ok</button>
+    <button type="button" class="btn btn-primary" ng-if="settings.cancellable" ng-click="close()" >Close</button>
+</div>
