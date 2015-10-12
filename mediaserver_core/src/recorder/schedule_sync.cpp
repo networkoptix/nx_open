@@ -136,10 +136,7 @@ void QnScheduleSync::synchronize(
         );
     else
         chunk = fromCatalog->chunkAt(
-            fromCatalog->findFileIndex(
-                toCatalog->lastChunkStartTime(),
-                DeviceFileCatalog::OnRecordHole_NextChunk
-            )
+            fromCatalog->findNextFileIndex(toCatalog->lastChunkStartTime())
         );
 
     if (chunk.startTimeMs == -1) // not found
@@ -150,6 +147,9 @@ void QnScheduleSync::synchronize(
         );
         return;
     }
+    
+    if (fromCatalog->isLastChunk(chunk.startTimeMs))
+        return;
 
     while (true)
     {
@@ -186,7 +186,7 @@ void QnScheduleSync::synchronize(
         }
 
         int bitrate = m_schedule.bitrate;
-        if (bitrate == -1 || bitrate == 0) // not capped
+        if (bitrate <= 0) // not capped
         {
             auto data = fromFile->readAll();
             toFile->write(data);
@@ -242,13 +242,10 @@ void QnScheduleSync::synchronize(
 
         // get next chunk
         chunk = fromCatalog->chunkAt(
-            fromCatalog->findFileIndex(
-                chunk.startTimeMs,
-                DeviceFileCatalog::OnRecordHole_NextChunk
-            )
+            fromCatalog->findNextFileIndex(chunk.startTimeMs)
         );
 
-        if (chunk.startTimeMs == -1 || fromCatalog->isLastChunk(chunk.startTimeMs) || needStop())
+        if (chunk.startTimeMs == -1 || fromCatalog->isLastChunk(chunk.startTimeMs) || needStop())  
             break;
     }
 }
@@ -256,16 +253,6 @@ void QnScheduleSync::synchronize(
 template<typename NeedStopCB>
 void QnScheduleSync::synchronize(NeedStopCB needStop)
 {
-    //typedef std::deque<DeviceFileCatalog::Chunk>    ChunkContainerType;
-    //typedef std::list<DeviceFileCatalog::Chunk>     ChunkListType;
-    //typedef ChunkListType::const_iterator           ChunkConstIteratorType;
-    //typedef ChunkListType::reverse_iterator         ChunkReverseIteratorType;
-    //typedef std::vector<ChunkReverseIteratorType>   CRIteratorVectorType;
-    //typedef std::vector<ChunkConstIteratorType>     CCIteratorVectorType;
-
-    //const int CATALOG_QUALITY_COUNT = 2;
-
-
     auto resource = qnResPool->getResourceById(
         qnCommon->moduleGUID()
     );
@@ -273,7 +260,7 @@ void QnScheduleSync::synchronize(NeedStopCB needStop)
     Q_ASSERT(mediaServer);
     
     auto allCameras = qnResPool->getAllCameras(mediaServer);
-    std::vector<QString> visitedCameras(allCameras.size());
+    std::vector<QString> visitedCameras;
     
     for (auto &camera : allCameras)
     {
@@ -286,273 +273,16 @@ void QnScheduleSync::synchronize(NeedStopCB needStop)
             }
         );
         if (visitedIt != visitedCameras.cend())
-            break;
+            continue;
         auto securityCamera = camera.dynamicCast<QnSecurityCamResource>();
         Q_ASSERT(securityCamera);
         visitedCameras.push_back(camera->getUniqueId());
         auto backupType = securityCamera->getBackupType();
-        if (backupType == Qn::CameraBackup_Disabled)
-            break;
-        else if (backupType & Qn::CameraBackup_HighQuality)
+        if (backupType & Qn::CameraBackup_HighQuality)
             synchronize(QnServer::HiQualityCatalog, camera->getUniqueId(), needStop);
-        else if (backupType & Qn::CameraBackup_LowQuality)
+        if (backupType & Qn::CameraBackup_LowQuality)
             synchronize(QnServer::LowQualityCatalog, camera->getUniqueId(), needStop);
     }
-
-    //for (int qualityIndex = 0; 
-    //     qualityIndex < CATALOG_QUALITY_COUNT; 
-    //     ++qualityIndex)
-    //{
-    //    std::vector<QString>    visitedCameras;
-    //    ChunkListType           currentChunks;
-    //    QString                 currentCamera;
-
-    //    auto getUnvisited = 
-    //        [this, &visitedCameras, qualityIndex]
-    //        (QString &currentCamera)
-    //        {
-    //            QnMutexLocker lk(&m_mutexCatalog);
-    //            const FileCatalogMap &currentMap = m_devFileCatalog[qualityIndex];
-    //            
-    //            for (auto it = currentMap.cbegin();
-    //                 it != currentMap.cend();
-    //                 ++it)
-    //            {
-    //                const QString &cameraID = it.key();
-    //                auto visitedIt = std::find(
-    //                    visitedCameras.cbegin(),
-    //                    visitedCameras.cend(),
-    //                    cameraID
-    //                );
-    //                if (visitedIt == visitedCameras.cend())
-    //                {
-    //                    if (it.value()->m_chunks.size() <= 1)
-    //                        continue;
-    //                    currentCatalog.assign(
-    //                        it.value()->m_chunks.cbegin(), 
-    //                        --it.value()->m_chunks.cend() // get all chunks but last (it may be being recorded just now)
-    //                    );
-    //                    currentCamera = cameraID;
-    //                    visitedCameras.push_back(cameraID);
-    //                    return true;
-    //                }
-    //            }
-    //            return false;
-    //        };
-
-    //    auto mergeNewChunks = 
-    //        [this, qualityIndex](const QString &cameraID, const ChunkListType &newChunks)
-    //        {
-    //            QnMutexLocker lk(&m_mutexCatalog);
-    //            FileCatalogMap currentMap = m_devFileCatalog[qualityIndex];
-
-    //            auto cameraCatalogIt = currentMap.find(cameraID);
-    //            if (cameraCatalogIt == currentMap.end())
-    //                return;
-
-    //            ChunkContainerType &catalogChunks = cameraCatalogIt.value()->m_chunks;
-    //            auto startCatalogIt = catalogChunks.begin();
-
-    //            ChunkContainerType mergedChunks;
-    //            auto it = newChunks.cbegin();
-
-    //            while (it != newChunks.cend())
-    //            {
-    //                auto chunkIt = std::find_if(
-    //                    startCatalogIt,
-    //                    catalogChunks.end(),
-    //                    [&it](const DeviceFileCatalog::Chunk &chunk)
-    //                    {
-    //                        return chunk.startTimeMs == it->startTimeMs;
-    //                    }
-    //                );
-
-    //                if (chunkIt == catalogChunks.end())
-    //                {
-    //                    mergedChunks.insert(
-    //                        mergedChunks.end(),
-    //                        startCatalogIt, 
-    //                        chunkIt
-    //                    );
-    //                    break;
-    //                }
-
-    //                auto startTimeMs = chunkIt->startTimeMs;
-    //                auto newChunksRange = aux::equalRangeBy_startTimeMs(
-    //                    it, 
-    //                    newChunks.end(), 
-    //                    startTimeMs
-    //                );
-    //                auto catalogChunksRange = aux::equalRangeBy_startTimeMs(
-    //                    chunkIt, 
-    //                    catalogChunks.end(), 
-    //                    startTimeMs
-    //                );
-
-    //                mergedChunks.insert(
-    //                    mergedChunks.end(),
-    //                    catalogChunksRange.first, 
-    //                    catalogChunksRange.second
-    //                );
-
-    //                while (newChunksRange.first != newChunksRange.second)
-    //                {
-    //                    auto newChunkExistIt = std::find_if(
-    //                        catalogChunksRange.first, 
-    //                        catalogChunksRange.second,
-    //                        [&newChunksRange](const DeviceFileCatalog::Chunk &chunk)
-    //                        {
-    //                            return newChunksRange.first->storageIndex == chunk.storageIndex;
-    //                        }
-    //                    );
-
-    //                    if (newChunkExistIt == catalogChunksRange.second)
-    //                        mergedChunks.insert(mergedChunks.end(), *newChunksRange.first);
-    //                    ++newChunksRange.first;
-    //                }
-    //                
-    //                it = newChunksRange.second;
-    //                startCatalogIt = catalogChunksRange.second;
-    //            }
-    //            mergedChunks.push_back(catalogChunks.back());
-    //            catalogChunks = std::move(mergedChunks);
-    //        };
-
-    //    auto copyChunk =
-    //        [&storage, needStop, &currentChunks, this, qualityIndex, &mergeNewChunks] (
-    //            const CCIteratorVectorType    &currentChunkRange,
-    //            const QString                 &currentCamera
-    //        )
-    //        {
-    //            int currentStorageIndex = getStorageIndex(storage);
-    //            auto chunkOnStorageIt = std::find_if(
-    //                currentChunkRange.cbegin(),
-    //                currentChunkRange.cend(),
-    //                [currentStorageIndex](const ChunkConstIteratorType& c)
-    //                {
-    //                    DeviceFileCatalog::Chunk chunk = *c;
-    //                    return chunk.storageIndex == currentStorageIndex;
-    //                }
-    //            );
-    //            if (chunkOnStorageIt == currentChunkRange.cend())
-    //            {
-    //                // copy from storage to storage
-    //                auto newChunk = *(*currentChunkRange.begin());
-    //                auto fromStorage = storageRoot(newChunk.storageIndex);
-
-    //                {
-    //                    QString fromFileFullName;
-    //                    {
-    //                        QnMutexLocker lk(&m_mutexCatalog);
-    //                        fromFileFullName = m_devFileCatalog[qualityIndex][currentCamera]->fullFileName(newChunk);
-    //                    }
-
-
-    //                    std::unique_ptr<QIODevice> fromFile = std::unique_ptr<QIODevice>(
-    //                        fromStorage->open(
-    //                            fromFileFullName,
-    //                            QIODevice::ReadOnly
-    //                        )
-    //                    );
-    //                    
-    //                    auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
-
-    //                    std::unique_ptr<QIODevice> toFile = std::unique_ptr<QIODevice>(
-    //                        storage->open(
-    //                            storage->getUrl() + relativeFileName,
-    //                            QIODevice::WriteOnly | QIODevice::Append
-    //                        )
-    //                    );
-
-    //                    if (!fromFile || !toFile)
-    //                        return true;
-
-    //                    int bitrate = storage->getRedundantSchedule().bitrate;
-    //                    if (bitrate == -1 || bitrate == 0) // not capped
-    //                    {
-    //                        auto data = fromFile->readAll();
-    //                        toFile->write(data);
-    //                    }
-    //                    else
-    //                    {
-    //                        Q_ASSERT(bitrate > 0);
-    //                        qint64 fileSize = fromFile->size();
-    //                        const qint64 timeToWrite = (fileSize / bitrate) * 1000;
-    //                        
-    //                        const qint64 CHUNK_SIZE = 4096;
-    //                        const qint64 chunksInFile = fileSize / CHUNK_SIZE;
-    //                        const qint64 timeOnChunk = timeToWrite / chunksInFile;
-
-    //                        while (fileSize > 0)
-    //                        {
-    //                            qint64 startTime = qnSyncTime->currentMSecsSinceEpoch();
-    //                            const qint64 writeSize = CHUNK_SIZE < fileSize ? CHUNK_SIZE : fileSize;
-    //                            auto data = fromFile->read(writeSize);
-    //                            if (toFile->write(data) == -1)
-    //                                return true;
-    //                            fileSize -= writeSize;
-    //                            qint64 now = qnSyncTime->currentMSecsSinceEpoch();
-    //                            if (now - startTime < timeOnChunk)
-    //                                std::this_thread::sleep_for(
-    //                                    std::chrono::milliseconds(timeOnChunk - (now - startTime))
-    //                                );
-    //                        }
-    //                    }
-    //                }
-
-    //                newChunk.storageIndex = currentStorageIndex;
-    //                auto forwardIt = *currentChunkRange.cbegin();
-    //                ++forwardIt;
-
-    //                currentChunks.insert(
-    //                    forwardIt,
-    //                    newChunk
-    //                );
- 
-    //                if (needStop())
-    //                {
-    //                    mergeNewChunks(currentCamera, currentChunks);
-    //                    return false;
-    //                }
-    //            }
-    //            return true;
-    //        };
-
-    //    while (getUnvisited(currentCamera, currentChunks))
-    //    {
-    //        if (currentChunks.empty())
-    //            continue;
-
-    //        CCIteratorVectorType currentChunkRange;
-    //        auto reverseChunkIt = currentChunks.cend();
-    //        --reverseChunkIt;
-
-    //        while (true)
-    //        {
-    //            auto currentChunk = *reverseChunkIt;
-
-    //            if (currentChunkRange.empty() || 
-    //                (*currentChunkRange.cbegin())->startTimeMs == currentChunk.startTimeMs)
-    //            {
-    //                currentChunkRange.push_back(reverseChunkIt);
-    //                if (reverseChunkIt != currentChunks.cbegin())
-    //                    --reverseChunkIt;
-    //                else
-    //                {
-    //                    copyChunk(currentChunkRange, currentCamera);
-    //                    break;
-    //                }
-    //            }                
-    //            else if (!currentChunkRange.empty())
-    //            {
-    //                if (!copyChunk(currentChunkRange, currentCamera))
-    //                    return;
-    //                currentChunkRange.clear();
-    //            }
-    //        } // for reverse chunks iterator
-    //        mergeNewChunks(currentCamera, currentChunks);
-    //    } // while getUnvisited() == true
-    //} // for quality index
 }
 
 int QnScheduleSync::stop() 

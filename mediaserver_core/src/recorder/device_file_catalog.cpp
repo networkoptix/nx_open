@@ -723,6 +723,19 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
     return deletedChunk;
 }
 
+int DeviceFileCatalog::findNextFileIndex(qint64 startTimeMs) const
+{
+    QnMutexLocker lock( &m_mutex );
+    if (m_chunks.empty())
+        return -1;
+    ChunkMap::const_iterator itr = qUpperBound(
+        m_chunks.begin(), 
+        m_chunks.end(), 
+        startTimeMs
+    );
+    return itr == m_chunks.end() ? -1 : itr - m_chunks.begin();
+}
+
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const
 {
 /*
