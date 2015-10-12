@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja" sourcelanguage="en">
+<TS version="2.0" language="ja" sourcelanguage="en">
 <context>
     <name>QObject</name>
     <message>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>Media server will be stopped. Continue?</source>
-        <translation>メディアサーバーは低sされます　宜しいですか？</translation>
+        <translation>メディアサーバーは停止されます　宜しいですか？</translation>
     </message>
 </context>
 </TS>
