@@ -5,6 +5,7 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <core/resource_management/resource_pool.h>
 #include "common/common_module.h"
+#include <utils/common/util.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
@@ -165,6 +166,11 @@ void QnScheduleSync::synchronize(
         );
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
         auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
+        auto newStorageUrl = toStorage->getUrl();
+        auto oldSeparator = getPathSeparator(relativeFileName);
+        auto newSeparator = getPathSeparator(newStorageUrl);
+        if (oldSeparator != newSeparator)
+            relativeFileName.replace(oldSeparator, newSeparator);
         auto newFileName = toStorage->getUrl() + relativeFileName;
 
         std::unique_ptr<QIODevice> toFile = std::unique_ptr<QIODevice>(
@@ -180,9 +186,9 @@ void QnScheduleSync::synchronize(
                 lit("[QnScheduleSync::synchronize] file %1 or %2 open error")
                     .arg(fromFileFullName)
                     .arg(newFileName),
-                cl_logDEBUG1
+                cl_logWARNING
             );
-            continue;
+            goto end;
         }
 
         int bitrate = m_schedule.bitrate;
@@ -225,21 +231,39 @@ void QnScheduleSync::synchronize(
         }
 
         // add chunk
-        qnBackupStorageMan->fileStarted(
+        bool result = qnBackupStorageMan->fileStarted(
             chunk.startTimeMs,
             chunk.timeZone,
             newFileName,
             nullptr
         );
 
-        qnBackupStorageMan->fileFinished(
+        if (!result)
+        {
+            NX_LOG(
+                lit("[QnScheduleSync::synchronize] fileStarted() for file %1 failed")
+                    .arg(newFileName),
+                cl_logWARNING
+            );
+            goto end;
+        }
+
+        result = qnBackupStorageMan->fileFinished(
             chunk.durationMs,
             newFileName,
             nullptr,
             chunk.getFileSize()
         );
 
+        if (!result)
+            NX_LOG(
+                lit("[QnScheduleSync::synchronize] fileFinished() for file %1 failed")
+                    .arg(newFileName),
+                cl_logWARNING
+            );
+
         // get next chunk
+    end:
         chunk = fromCatalog->chunkAt(
             fromCatalog->findNextFileIndex(chunk.startTimeMs)
         );
