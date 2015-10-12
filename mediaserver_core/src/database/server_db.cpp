@@ -806,7 +806,7 @@ bool QnServerDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBookm
         checkedBind(":minStartTimeMs", filter.startTimeMs);
         checkedBind(":maxEndTimeMs", filter.endTimeMs);
         //checkedBind(":minDurationMs", filter.minDurationMs);
-        checkedBind(":text", filter.text);
+        checkedBind(":text", filter.text + lit("*")); // The star symbol allows prefix search
 
         if (!query.exec()) {
             qWarning() << Q_FUNC_INFO << query.lastError().text();
