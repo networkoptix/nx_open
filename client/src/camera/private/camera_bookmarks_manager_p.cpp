@@ -309,7 +309,6 @@ void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBook
             QueryInfo &info = m_queries[queryId];
             if (info.requestId == requestId) {
                 updateQueryCache(queryId, bookmarks);
-                Q_ASSERT_X(info.state == QueryInfo::QueryState::Requested, Q_FUNC_INFO, "On state change we should clear request id.");               
                 if (info.state == QueryInfo::QueryState::Requested)
                     info.state = QueryInfo::QueryState::Actual;
 
@@ -348,7 +347,6 @@ void QnCameraBookmarksManagerPrivate::updateQueryAsync(const QUuid &queryId) {
         return;
 
     QueryInfo &info = m_queries[queryId];
-    info.requestId = invalidRequestId; /*< Clean request id to make sure we will not process non-actual results. */
     info.state = QueryInfo::QueryState::Queued;
 }
 
