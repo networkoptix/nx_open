@@ -1750,7 +1750,6 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return; /* Nothing to delete. */
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    Q_ASSERT_X(cameras.size() == resources.size(), Q_FUNC_INFO, "Only cameras must stay here.");
 
     /* Check that we are deleting online auto-found cameras */ 
     QnVirtualCameraResourceList onlineAutoDiscoveredCameras = cameras.filtered([](const QnVirtualCameraResourcePtr &camera){
@@ -1758,7 +1757,6 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             && !camera->isManuallyAdded();
     });
 
-    //TODO: #GDM #tr strings are really untranslatable. Also second and third sentences are always plural.
     QString question;
     /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
     if (resources.size() == onlineAutoDiscoveredCameras.size()) {
