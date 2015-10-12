@@ -15,6 +15,10 @@ namespace rtu
     class ApplyChangesTask;
     class ServersFinder;
 
+    /// @class ChangesManager
+    /// @brief Manages changesets, creates applying task and runs it.
+    /// Also gives access to changeset and stores ChangesProgressModel.
+
     class ChangesManager : public QObject
     {
         Q_OBJECT
