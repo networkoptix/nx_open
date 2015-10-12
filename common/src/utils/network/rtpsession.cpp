@@ -769,7 +769,7 @@ QByteArray RTPSession::calcDefaultNonce() const
 #if 1
 void RTPSession::addAuth( nx_http::Request* const request )
 {
-    QnClientAuthHelper::>addAuthorizationToRequest(
+    QnClientAuthHelper::addAuthorizationToRequest(
         m_auth,
         request,
         &m_rtspAuthCtx );   //ignoring result
