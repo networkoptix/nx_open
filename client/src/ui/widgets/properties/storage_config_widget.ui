@@ -250,7 +250,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QPushButton" name="pushButton_5">
+         <widget class="QPushButton" name="pushButtonCameraSettings">
           <property name="text">
            <string>Camera settings</string>
           </property>
