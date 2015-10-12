@@ -9,7 +9,9 @@
 namespace nx {
 namespace hpm {
 
-MediaserverApiIf::MediaserverApiIf( stun::MessageDispatcher* dispatcher )
+MediaserverApiIf::MediaserverApiIf( CloudDataProviderIf* cloudData,
+                                    stun::MessageDispatcher* dispatcher )
+    : RequestProcessor( cloudData )
 {
     using namespace std::placeholders;
     const auto result =
@@ -88,8 +90,9 @@ void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
 
 // impl
 
-MediaserverApi::MediaserverApi( stun::MessageDispatcher* dispatcher )
-    : MediaserverApiIf( dispatcher )
+MediaserverApi::MediaserverApi( CloudDataProviderIf* cloudData,
+                                stun::MessageDispatcher* dispatcher )
+    : MediaserverApiIf( cloudData, dispatcher )
 {
 }
 

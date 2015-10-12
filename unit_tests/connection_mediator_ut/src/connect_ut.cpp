@@ -13,8 +13,7 @@
 #include <utils/network/http/test_http_server.h>
 #include <utils/network/socket_global.h>
 
-#include <listening_peer_pool.h>
-#include <mediaserver_api.h>
+#include "mediator_mocks.h"
 
 namespace nx {
 namespace hpm {
@@ -25,7 +24,7 @@ class ConnectTest : public testing::Test
 protected:
     ConnectTest()
         : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
-        , listeningPeerPool( &stunMessageDispatcher )
+        , listeningPeerPool( &cloud, &stunMessageDispatcher )
         , server( false, SocketFactory::nttDisabled )
     {
         EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
@@ -35,12 +34,15 @@ protected:
 
     const SocketAddress address;
     stun::MessageDispatcher stunMessageDispatcher;
+
+    CloudDataProviderMock cloud;
     ListeningPeerPool listeningPeerPool;
     MultiAddressServer< stun::SocketServer > server;
 };
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
 static const auto SERVER_ID = QnUuid::createUuid().toSimpleString().toUtf8();
+static const auto AUTH_KEY = QnUuid::createUuid().toSimpleString().toUtf8();
 
 TEST_F( ConnectTest, BindConnect )
 {
@@ -56,9 +58,11 @@ TEST_F( ConnectTest, BindConnect )
                                              stun::cc::methods::bind ) );
         request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
         request.newAttribute< stun::cc::attrs::ServerId >( SERVER_ID );
-        request.newAttribute< stun::cc::attrs::Authorization >( "some_auth_data" );
+        request.newAttribute< stun::cc::attrs::Authorization >( AUTH_KEY );
         request.newAttribute< stun::cc::attrs::PublicEndpointList >(
             std::list< SocketAddress >( 1, testHttpServer.serverAddress() ) );
+
+        cloud.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
         SyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;
         ASSERT_TRUE( msClient.sendRequest( std::move( request ), waiter.pusher() ) );

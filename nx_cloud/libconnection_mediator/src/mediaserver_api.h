@@ -14,7 +14,8 @@ class MediaserverApiIf
         : protected RequestProcessor
 {
 public:
-    MediaserverApiIf( stun::MessageDispatcher* dispatcher );
+    MediaserverApiIf( CloudDataProviderIf* cloudData,
+                      stun::MessageDispatcher* dispatcher );
 
     void ping( const ConnectionSharedPtr& connection, stun::Message message );
 
@@ -28,7 +29,8 @@ class MediaserverApi
         : public MediaserverApiIf
 {
 public:
-    MediaserverApi( stun::MessageDispatcher* dispatcher );
+    MediaserverApi( CloudDataProviderIf* cloudData,
+                    stun::MessageDispatcher* dispatcher );
 
     virtual void pingServer( const SocketAddress& address, const String& expectedId,
                              std::function< void( SocketAddress, bool ) > onPinged ) override;

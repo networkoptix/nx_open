@@ -31,4 +31,14 @@ namespace nx
     {
         return right != left;
     }
+
+    String operator+( const String& left, const std::string& right )
+    {
+        return left + String( right.c_str() );
+    }
+
+    String operator+( const String& left, const QString& right )
+    {
+        return left + right.toUtf8();
+    }
 }

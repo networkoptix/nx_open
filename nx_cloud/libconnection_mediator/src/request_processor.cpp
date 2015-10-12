@@ -3,6 +3,11 @@
 namespace nx {
 namespace hpm {
 
+RequestProcessor::RequestProcessor( CloudDataProviderIf* cloudData )
+    : m_cloudData( cloudData )
+{
+}
+
 RequestProcessor::~RequestProcessor()
 {
 }
@@ -27,6 +32,21 @@ boost::optional< RequestProcessor::MediaserverData >
         return boost::none;
     }
 
+    MediaserverData data = { systemAttr->value, serverAttr->value };
+    const auto system = m_cloudData->getSystem( data.systemId );
+    if( !system )
+    {
+        errorResponse( connection, request.header, stun::cc::error::notFound,
+                       "System could not be found" );
+        return boost::none;
+    }
+    if( !system->mediatorEnabled )
+    {
+        errorResponse( connection, request.header, stun::error::badRequest,
+                       "Mediator is not enabled for this system" );
+        return boost::none;
+    }
+
     const auto authAttr = request.getAttribute< stun::cc::attrs::Authorization >();
     if( !authAttr )
     {
@@ -34,10 +54,14 @@ boost::optional< RequestProcessor::MediaserverData >
                        "Attribute Authorization is required" );
         return boost::none;
     }
+    if( system->authKey != authAttr->value )
+    {
+        errorResponse( connection, request.header, stun::error::unauthtorized,
+                       "Authorization failed" );
+        return boost::none;
 
-    MediaserverData data = { systemAttr->value, serverAttr->value };
+    }
 
-    // TODO: verify paramiters and authorization in CloudDb
     return data;
 }
 

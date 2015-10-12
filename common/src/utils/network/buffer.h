@@ -43,6 +43,9 @@ namespace nx
     bool operator==( const nx::String& left, const std::string& right );
     bool operator!=( const std::string& left, const nx::String& right );
     bool operator!=( const nx::String& left, const std::string& right );
+
+    String operator+( const String& left, const std::string& right );
+    String operator+( const String& left, const QString& right );
 }
 
 #endif  //NX_BUFFER_H

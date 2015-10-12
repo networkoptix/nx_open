@@ -1,18 +1,19 @@
 #include <gtest/gtest.h>
 
-#include <mediaserver_api.h>
-
 #include <common/common_globals.h>
 #include <utils/thread/sync_queue.h>
+
+#include "mediator_mocks.h"
 
 namespace nx {
 namespace hpm {
 namespace test {
 
-TEST( MediaserverApi, Hardcode )
+TEST( MediaserverApi, DISABLED_Hardcode )
 {
     stun::MessageDispatcher dispatcher;
-    MediaserverApi api( &dispatcher );
+    CloudDataProviderMock cloud;
+    MediaserverApi api( &cloud, &dispatcher );
     SyncMultiQueue< SocketAddress, bool > results;
 
     // 1. success

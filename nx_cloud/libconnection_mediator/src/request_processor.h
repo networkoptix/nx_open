@@ -5,6 +5,8 @@
 #include <utils/network/stun/message_dispatcher.h>
 #include <utils/network/stun/cc/custom_stun.h>
 
+#include "cloud_data_provider.h"
+
 namespace nx {
 namespace hpm {
 
@@ -16,8 +18,7 @@ namespace hpm {
 class RequestProcessor
 {
 public:
-    // TODO: provide constructor savid CloudDb connection when we have such
-
+    RequestProcessor( CloudDataProviderIf* cloudData );
     virtual ~RequestProcessor() = 0;
 
     typedef std::shared_ptr< stun::ServerConnection > ConnectionSharedPtr;
@@ -39,6 +40,9 @@ protected:
     static void errorResponse(
             const ConnectionSharedPtr& connection, stun::Header& request,
             int code, String reason );
+
+private:
+    CloudDataProviderIf* m_cloudData;
 };
 
 } // namespace hpm

@@ -43,7 +43,8 @@ int MediatorProcess::executeApplication()
     static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
     static const QLatin1String DEFAULT_STUN_ADDRESS_TO_LISTEN( ":3345" );
     static const QLatin1String DEFAULT_HTTP_ADDRESS_TO_LISTEN( ":3346" );
-
+    static const QLatin1String DEFAULT_CLOUD_USER( "connection_mediator" );
+    static const QLatin1String DEFAULT_CLOUD_PASSWORD( "123456" );
 
     //reading settings
 #ifdef _WIN32
@@ -109,10 +110,14 @@ int MediatorProcess::executeApplication()
         return 1;
     }
 
+    CloudDataProvider cloudDataProvider(
+        m_settings->value("cloudUser", DEFAULT_CLOUD_USER).toString().toStdString(),
+        m_settings->value("cloudPassword", DEFAULT_CLOUD_PASSWORD).toString().toStdString() );
+
     //STUN handlers
     stun::MessageDispatcher stunMessageDispatcher;
-    MediaserverApi mediaserverApi( &stunMessageDispatcher );
-    ListeningPeerPool listeningPeerPool( &stunMessageDispatcher );
+    MediaserverApi mediaserverApi( &cloudDataProvider, &stunMessageDispatcher );
+    ListeningPeerPool listeningPeerPool( &cloudDataProvider, &stunMessageDispatcher );
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset(

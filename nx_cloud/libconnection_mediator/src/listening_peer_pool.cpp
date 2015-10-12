@@ -7,7 +7,9 @@
 namespace nx {
 namespace hpm {
 
-ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher )
+ListeningPeerPool::ListeningPeerPool( CloudDataProviderIf* cloudData,
+                                      stun::MessageDispatcher* dispatcher )
+    : RequestProcessor( cloudData )
 {
     using namespace std::placeholders;
     const auto result =

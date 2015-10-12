@@ -20,7 +20,8 @@ class ListeningPeerPool
         : protected RequestProcessor
 {
 public:
-    ListeningPeerPool( stun::MessageDispatcher* dispatcher );
+    ListeningPeerPool( CloudDataProviderIf* cloudData,
+                       stun::MessageDispatcher* dispatcher );
 
     void bind( const ConnectionSharedPtr& connection, stun::Message message );
     void listen( const ConnectionSharedPtr& connection, stun::Message message );
