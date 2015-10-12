@@ -225,7 +225,6 @@ void QnScheduleSync::synchronize(
         }
 
         // add chunk
-        // TODO: #backup storages #akulikov Deal with null provider
         qnBackupStorageMan->fileStarted(
             chunk.startTimeMs,
             chunk.timeZone,
