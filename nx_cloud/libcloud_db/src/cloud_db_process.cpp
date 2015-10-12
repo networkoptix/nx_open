@@ -63,7 +63,7 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
     m_argc( argc ),
     m_argv( argv ),
     m_terminated( false ),
-    m_timerID( 0 )
+    m_timerID( -1 )
 {
     setServiceDescription(QN_APPLICATION_NAME);
 
@@ -109,7 +109,8 @@ int CloudDBProcess::executeApplication()
         }
     
         EMailManager emailManager( settings );
-    
+        StreeManager streeManager(settings.auth());
+
         //creating data managers
         AccountManager accountManager(
             settings,
@@ -122,8 +123,6 @@ int CloudDBProcess::executeApplication()
         authRestrictionList.allow( PingHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
         authRestrictionList.allow( ActivateAccountHandler::HANDLER_PATH, AuthMethod::noAuth );
-
-        StreeManager streeManager(settings.auth());
 
         AuthenticationManager authenticationManager( 
             accountManager,
@@ -206,7 +205,10 @@ void CloudDBProcess::stop()
 bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
 {
     if (m_timerID != -1)
+    {
         application()->killTimer(m_timerID);
+        m_timerID = -1;
+    }
 
     if (m_terminated)
         application()->quit();

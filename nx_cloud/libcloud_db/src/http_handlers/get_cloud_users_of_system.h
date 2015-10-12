@@ -17,10 +17,9 @@
 namespace nx {
 namespace cdb {
 
-
 class GetCloudUsersOfSystemHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::SystemID, api::SystemSharingList>
+    public AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingList>
 {
 public:
     static const QString HANDLER_PATH;
@@ -29,7 +28,7 @@ public:
         SystemManager* const systemManager,
         const AuthorizationManager& authorizationManager)
     :
-        AbstractFiniteMsgBodyHttpHandler<data::SystemID, api::SystemSharingList>(
+        AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingList>(
             EntityType::system,
             DataActionType::fetch,
             authorizationManager,

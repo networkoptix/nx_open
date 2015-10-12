@@ -13,6 +13,7 @@
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <plugins/videodecoder/stree/resourcenameset.h>
 #include <utils/common/model_functions_fwd.h>
+#include <utils/common/singleton.h>
 
 #include "settings.h"
 
@@ -30,6 +31,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreeOperation)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((StreeOperation), (lexical))
 
 class StreeManager
+:
+    public Singleton<StreeManager>
 {
 public:
     /*!
@@ -42,6 +45,7 @@ public:
         StreeOperation,
         const stree::AbstractResourceReader& input,
         stree::AbstractResourceWriter* const output) const;
+    const stree::ResourceNameSet& rns() const;
 
 private:
     const conf::Auth& m_authSettings;

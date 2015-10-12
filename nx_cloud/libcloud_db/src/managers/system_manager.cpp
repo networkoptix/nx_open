@@ -83,7 +83,7 @@ bool applyFilter(
 
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
-    DataFilter filter,
+    data::DataFilter filter,
     std::function<void(api::ResultCode, data::SystemDataList)> completionHandler )
 {
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
@@ -139,20 +139,31 @@ void SystemManager::shareSystem(
 
 void SystemManager::getCloudUsersOfSystem(
     const AuthorizationInfo& authzInfo,
-    const data::SystemID& systemID,
+    const data::DataFilter& filter,
     std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
 {
     api::SystemSharingList resultData;
 
+    QnUuid accountID;
+    if (!authzInfo.get(attr::accountID, &accountID))
+        return completionHandler(api::ResultCode::notAuthorized, std::move(resultData));
+
+    const auto systemID = filter.get<QnUuid>(attr::systemID);
+
     QnMutexLocker lk(&m_mutex);
-    for (const auto& val: m_accountAccessRoleForSystem)
+    auto it = m_accountAccessRoleForSystem.lower_bound(
+        std::make_pair(accountID, systemID ? systemID.get() : QnUuid()));
+    for (;
+         (it != m_accountAccessRoleForSystem.end()) &&
+             (it->first.first == accountID) &&
+             (systemID ? (it->first.second == systemID.get()) : true);  //filtering by system ID if needed
+         ++it)
     {
-        if (val.first.second != systemID.id)
-            continue;
+        //TODO #ak check account access role
         api::SystemSharing sharing;
-        sharing.accountID = val.first.first;
-        sharing.systemID = val.first.second;
-        sharing.accessRole = val.second;
+        sharing.accountID = it->first.first;
+        sharing.systemID = it->first.second;
+        sharing.accessRole = it->second;
         resultData.sharing.emplace_back(std::move(sharing));
     }
     lk.unlock();
@@ -197,8 +208,8 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     QnSql::bind(*systemData, &insertSystemQuery);
     if (!insertSystemQuery.exec())
     {
-        NX_LOG(lit("Could not insert system %1 into DB. %2").
-            arg(QString::fromStdString(newSystem.name)).arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not insert system %1 into DB. %2").
+            arg(newSystem.name).arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -209,8 +220,8 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     auto result = insertSystemSharingToDB(connection, systemSharing);
     if (result != nx::db::DBResult::ok)
     {
-        NX_LOG(lit("Could not insert system %1 to account %2 binding into DB. %3").
-            arg(QString::fromStdString(newSystem.name)).arg(newSystem.accountID.toString()).
+        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
+            arg(newSystem.name).arg(newSystem.accountID).
             arg(connection->lastError().text()), cl_logDEBUG1);
         return result;
     }
@@ -252,9 +263,9 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
     QnSql::bind(systemSharing, &insertSystemToAccountBinding);
     if (!insertSystemToAccountBinding.exec())
     {
-        NX_LOG(lit("Could not insert system %1 to account %2 binding into DB. %3").
-            arg(systemSharing.systemID.toString()).
-            arg(systemSharing.accountID.toString()).
+        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
+            arg(systemSharing.systemID).
+            arg(systemSharing.accountID).
             arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -288,23 +299,23 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 {
     QSqlQuery removeSystemToAccountBinding(*connection);
     removeSystemToAccountBinding.prepare(
-        "DELETE FROM system_to_account WHERE system_id=:id");
+        "DELETE FROM system_to_account WHERE system_id=:systemID");
     QnSql::bind(systemID, &removeSystemToAccountBinding);
     if (!removeSystemToAccountBinding.exec())
     {
-        NX_LOG(lit("Could not delete system %1 from system_to_account. %2").
-            arg(systemID.id.toString()).arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not delete system %1 from system_to_account. %2").
+            arg(systemID.systemID).arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
     QSqlQuery removeSystem(*connection);
     removeSystem.prepare(
-        "DELETE FROM system WHERE id=:id");
+        "DELETE FROM system WHERE id=:systemID");
     QnSql::bind(systemID, &removeSystem);
     if (!removeSystem.exec())
     {
-        NX_LOG(lit("Could not delete system %1. %2").
-            arg(systemID.id.toString()).arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not delete system %1. %2").
+            arg(systemID.systemID).arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -318,13 +329,13 @@ void SystemManager::systemDeleted(
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        m_cache.erase(systemID.id);
+        m_cache.erase(systemID.systemID);
         QnMutexLocker lk(&m_mutex);
         for (auto it = m_accountAccessRoleForSystem.begin();
              it != m_accountAccessRoleForSystem.end();
              )
         {
-            if (it->first.second == systemID.id)
+            if (it->first.second == systemID.systemID)
                 it = m_accountAccessRoleForSystem.erase(it);
             else
                 ++it;

@@ -123,6 +123,11 @@ namespace stree
         return str;
     }
 
+    bool ResourceContainer::empty() const
+    {
+        return m_mediaStreamPameters.empty();
+    }
+
 
     ////////////////////////////////////////////////////////////
     //// class SingleResourceContainer

@@ -63,6 +63,26 @@ void SystemManager::shareSystem(
         completionHandler);
 }
 
+void SystemManager::getCloudUsersOfSystem(
+    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+{
+    executeRequest(
+        SYSTEM_GET_CLOUD_USERS_PATH,
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
+}
+
+void SystemManager::getCloudUsersOfSystem(
+    const std::string& systemID,
+    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+{
+    executeRequest(
+        SYSTEM_GET_CLOUD_USERS_PATH,
+        api::SystemID(systemID),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
+}
+
 }   //cl
 }   //cdb
 }   //nx

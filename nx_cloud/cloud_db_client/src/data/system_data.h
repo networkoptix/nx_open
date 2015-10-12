@@ -56,12 +56,12 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 class SystemID
 {
 public:
-    QnUuid id;
+    QnUuid systemID;
 
     SystemID() {}
     SystemID(std::string systemIDStr)
     :
-        id(systemIDStr)
+        systemID(systemIDStr)
     {
     }
 };
@@ -69,7 +69,7 @@ public:
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
 void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
 
-#define SystemID_Fields (id)
+#define SystemID_Fields (systemID)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

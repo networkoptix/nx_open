@@ -74,7 +74,7 @@ bool SystemID::getAsVariant(int resID, QVariant* const value) const
     switch (resID)
     {
         case attr::systemID:
-            *value = QVariant::fromValue(id);
+            *value = QVariant::fromValue(systemID);
             return true;
         default:
             return false;

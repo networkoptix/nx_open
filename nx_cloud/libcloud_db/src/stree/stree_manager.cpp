@@ -46,6 +46,11 @@ void StreeManager::search(
     m_stree->get(realInput, output);
 }
 
+const stree::ResourceNameSet& StreeManager::rns() const
+{
+    return m_rns;
+}
+
 void StreeManager::prepareNamespace()
 {
     m_rns.registerResource(attr::operation, "operation", QVariant::String);

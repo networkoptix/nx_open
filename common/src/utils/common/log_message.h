@@ -13,6 +13,8 @@
 #include <QtCore/QString>
 
 
+class QnUuid;
+
 //!Adds some useful overloads to \a QString
 class QnLogMessage
 {
@@ -28,6 +30,7 @@ public:
     QnLogMessage arg(double a, int fieldWidth = 0, char format = 'g', int precision = -1, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(const QByteArray& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(const std::string& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
+    QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
 
     //!Prints integer value
     template<typename T>

@@ -5,6 +5,8 @@
 
 #include "log_message.h"
 
+#include <utils/common/uuid.h>
+
 
 QnLogMessage::QnLogMessage()
 {
@@ -51,6 +53,11 @@ QnLogMessage QnLogMessage::arg(const QByteArray& a, int fieldWidth, QChar fillCh
 QnLogMessage QnLogMessage::arg(const std::string& a, int fieldWidth, QChar fillChar) const
 {
     return m_str.arg(QString::fromStdString(a), fieldWidth, fillChar);
+}
+
+QnLogMessage QnLogMessage::arg(const QnUuid& a, int fieldWidth, QChar fillChar) const
+{
+    return m_str.arg(a.toString(), fieldWidth, fillChar);
 }
 
 QnLogMessage::operator QString() const

@@ -13,6 +13,8 @@
 
 #include <QtCore/QVariant>
 
+#include <utils/common/uuid.h>
+
 #include "resourcenameset.h"
 
 
@@ -41,6 +43,23 @@ namespace stree
                 return false;
             *value = untypedValue.value<T>();
             return true;
+        }
+        template<> bool get<QnUuid>( int resID, QnUuid* const value ) const
+        {
+            QVariant untypedValue;
+            if (!get(resID, &untypedValue))
+                return false;
+            if (untypedValue.canConvert<QnUuid>())
+            {
+                *value = untypedValue.value<QnUuid>();
+                return true;
+            }
+            if (untypedValue.canConvert<QString>())
+            {
+                *value = untypedValue.value<QString>();
+                return true;
+            }
+            return false;
         }
         template<typename T> boost::optional<T> get( int resID ) const
         {
@@ -130,6 +149,7 @@ namespace stree
         virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
 
         QString toString( const stree::ResourceNameSet& rns ) const;
+        bool empty() const;
 
     private:
         std::map<int, QVariant> m_mediaStreamPameters;

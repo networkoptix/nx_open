@@ -78,15 +78,15 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID)
 {
-    if (!urlQuery.hasQueryItem("id"))
+    if (!urlQuery.hasQueryItem("systemID"))
         return false;
-    systemID->id = urlQuery.queryItemValue("id");
+    systemID->systemID = urlQuery.queryItemValue("systemID");
     return true;
 }
 
 void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
 {
-    urlQuery->addQueryItem("id", data.id.toString());
+    urlQuery->addQueryItem("systemID", data.systemID.toString());
 }
 
 

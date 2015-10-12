@@ -17,6 +17,7 @@
 
 #include "access_control/auth_types.h"
 #include "cache.h"
+#include "data/data_filter.h"
 #include "data/system_data.h"
 #include "data_view.h"
 #include "managers_types.h"
@@ -57,7 +58,7 @@ public:
     */
     void getSystems(
         const AuthorizationInfo& authzInfo,
-        DataFilter filter,
+        data::DataFilter filter,
         std::function<void(api::ResultCode, data::SystemDataList)> completionHandler );
     //!Share system with specified account. Operation allowed for system owner and editor_with_sharing only
     void shareSystem(
@@ -67,7 +68,7 @@ public:
     //!Provides list of cloud accounts who have access to this system
     void getCloudUsersOfSystem(
         const AuthorizationInfo& authzInfo,
-        const data::SystemID& systemID,
+        const data::DataFilter& filter,
         std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler);
 
     void addSubscription(
@@ -95,7 +96,7 @@ public:
     //!Create data view restricted by \a authzInfo and \a filter
     DataView<data::SystemData> createView(
         const AuthorizationInfo& authzInfo,
-        DataFilter filter);
+        data::DataFilter filter);
         
 private:
     nx::db::DBManager* const m_dbManager;

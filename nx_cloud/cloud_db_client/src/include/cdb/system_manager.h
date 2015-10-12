@@ -42,11 +42,11 @@ public:
     /*!
         E.g., for system credentials, only one system is returned. 
         For account credentials systems of account are returned.
+        \TODO #ak add filter
         \note Required access role: account, cloud_db module (e.g., connection_mediator)
     */
     virtual void getSystems(
         std::function<void(ResultCode, api::SystemDataList)> completionHandler ) = 0;
-    //TODO #ak get systems by filter
     //!Share system with specified account. Operation allowed for system owner and editor_with_sharing only
     /*!
         \note Required access role: account (owner or editor_with_sharing)
@@ -54,6 +54,16 @@ public:
     virtual void shareSystem(
         SystemSharing sharingData,
         std::function<void(ResultCode)> completionHandler) = 0;
+    //!Returns sharings (account email, access role) for every system of account authorized
+    virtual void getCloudUsersOfSystem(
+        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
+    //!Returns sharings (account email, access role) for the specified system
+    /*!
+        \note \a owner or \a editorWithSharing account credentials MUST be provided
+    */
+    virtual void getCloudUsersOfSystem(
+        const std::string& systemID,
+        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
 };
 
 }   //api
