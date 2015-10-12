@@ -108,6 +108,13 @@ public:
         accessRole(SystemAccessRole::none)
     {
     }
+
+    bool operator<(const SystemSharing& rhs) const
+    {
+        return accountID != rhs.accountID
+            ? accountID < rhs.accountID
+            : systemID < rhs.systemID;
+    }
 };
 
 class SystemSharingList

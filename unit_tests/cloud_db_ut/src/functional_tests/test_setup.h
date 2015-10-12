@@ -62,6 +62,20 @@ protected:
         const QnUuid& systemID,
         const QnUuid& accountID,
         api::SystemAccessRole accessRole);
+    api::ResultCode getSystemSharings(
+        const std::string& email,
+        const std::string& password,
+        std::vector<api::SystemSharing>* const sharings);
+    api::ResultCode getSystemSharings(
+        const std::string& email,
+        const std::string& password,
+        const std::string& systemID,
+        std::vector<api::SystemSharing>* const sharings);
+
+    api::SystemAccessRole accountAccessRoleForSystem(
+        const std::vector<api::SystemSharing>& sharings,
+        const QnUuid& accountID,
+        const QnUuid& systemID) const;
 
 private:
     QString m_tmpDir;

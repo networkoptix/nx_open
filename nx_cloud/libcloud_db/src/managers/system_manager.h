@@ -6,11 +6,18 @@
 #ifndef cloud_db_system_manager_h
 #define cloud_db_system_manager_h
 
+#define BOOST_BIND_NO_PLACEHOLDERS
+
 #include <functional>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/identity.hpp>
+#include <boost/multi_index/member.hpp>
 
 #include <utils/db/db_manager.h>
 #include <utils/thread/mutex.h>
@@ -99,12 +106,25 @@ public:
         data::DataFilter filter);
         
 private:
+    typedef boost::multi_index::multi_index_container<
+        api::SystemSharing,
+        boost::multi_index::indexed_by<
+            boost::multi_index::ordered_unique<
+                boost::multi_index::identity<api::SystemSharing>>,
+            //indexing by account
+            boost::multi_index::ordered_non_unique<boost::multi_index::member<
+                api::SystemSharing, QnUuid, &api::SystemSharing::accountID>>,
+            //indexing by system
+            boost::multi_index::ordered_non_unique<boost::multi_index::member<
+                api::SystemSharing, QnUuid, &api::SystemSharing::systemID>>
+        >
+    > AccountSystemAccessRoleDict;
+
     nx::db::DBManager* const m_dbManager;
     //!map<id, system>
     Cache<QnUuid, data::SystemData> m_cache;
     mutable QnMutex m_mutex;
-    //!map<pair<accountID, systemID>, accessRole>
-    std::map<std::pair<QnUuid, QnUuid>, api::SystemAccessRole> m_accountAccessRoleForSystem;
+    AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
 
     nx::db::DBResult insertSystemToDB(
         QSqlDatabase* const connection,

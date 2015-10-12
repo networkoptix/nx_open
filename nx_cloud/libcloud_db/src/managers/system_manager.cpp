@@ -99,13 +99,12 @@ void SystemManager::getSystems(
     }
     else if (auto accountID = wholeFilterMap.get<QnUuid>(cdb::attr::accountID))
     {
-        //effectively selecting systems with specified account id
         QnMutexLocker lk(&m_mutex);
-        for (auto it = m_accountAccessRoleForSystem.lower_bound(std::make_pair(accountID.get(), QnUuid()));
-             it != m_accountAccessRoleForSystem.end() && it->first.first == accountID.get();
-             ++it)
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<1>();
+        const auto accountSystemsRange = accountIndex.equal_range(accountID.get());
+        for (auto it = accountSystemsRange.first; it != accountSystemsRange.second; ++it)
         {
-            auto system = m_cache.find(it->first.second);
+            auto system = m_cache.find(it->systemID);
             if (system)
                 resultData.systems.push_back(system.get());
         }
@@ -151,20 +150,38 @@ void SystemManager::getCloudUsersOfSystem(
     const auto systemID = filter.get<QnUuid>(attr::systemID);
 
     QnMutexLocker lk(&m_mutex);
-    auto it = m_accountAccessRoleForSystem.lower_bound(
-        std::make_pair(accountID, systemID ? systemID.get() : QnUuid()));
-    for (;
-         (it != m_accountAccessRoleForSystem.end()) &&
-             (it->first.first == accountID) &&
-             (systemID ? (it->first.second == systemID.get()) : true);  //filtering by system ID if needed
-         ++it)
+    if (systemID)
     {
-        //TODO #ak check account access role
-        api::SystemSharing sharing;
-        sharing.accountID = it->first.first;
-        sharing.systemID = it->first.second;
-        sharing.accessRole = it->second;
-        resultData.sharing.emplace_back(std::move(sharing));
+        //selecting all sharings of system id
+        const auto& systemIndex = m_accountAccessRoleForSystem.get<2>();
+        const auto systemSharingsRange = systemIndex.equal_range(systemID.get());
+        for (auto it = systemSharingsRange.first; it != systemSharingsRange.second; ++it)
+            resultData.sharing.push_back(*it);
+    }
+    else
+    {
+        //selecting sharings for every system account has access to
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<1>();
+        const auto accountsSystemsRange = accountIndex.equal_range(accountID);
+        for (auto accountIter = accountsSystemsRange.first;
+             accountIter != accountsSystemsRange.second;
+             ++accountIter)
+        {
+            if (accountIter->accessRole != api::SystemAccessRole::owner &&
+                accountIter->accessRole != api::SystemAccessRole::editorWithSharing)
+            {
+                //no access to system's sharing list is allowed for this account
+                continue;
+            }
+            const auto& systemIndex = m_accountAccessRoleForSystem.get<2>();
+            const auto systemSharingRange = systemIndex.equal_range(accountIter->systemID);
+            for (auto sharingIter = systemSharingRange.first;
+                 sharingIter != systemSharingRange.second;
+                 ++sharingIter)
+            {
+                resultData.sharing.emplace_back(*sharingIter);
+            }
+        }
     }
     lk.unlock();
 
@@ -184,10 +201,14 @@ api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const QnUuid& accountID, const QnUuid& systemID) const
 {
     QnMutexLocker lk(&m_mutex);
-    auto it = m_accountAccessRoleForSystem.find(std::make_pair(accountID, systemID));
-    return it == m_accountAccessRoleForSystem.end()
-        ? api::SystemAccessRole::none
-        : it->second;
+    const auto& accountSystemPairIndex = m_accountAccessRoleForSystem.get<0>();
+    api::SystemSharing toFind;
+    toFind.accountID = accountID;
+    toFind.systemID = systemID;
+    const auto it = accountSystemPairIndex.find(toFind);
+    return it != accountSystemPairIndex.end()
+        ? it->accessRole
+        : api::SystemAccessRole::none;
 }
 
 nx::db::DBResult SystemManager::insertSystemToDB(
@@ -241,9 +262,11 @@ void SystemManager::systemAdded(
         m_cache.insert(systemData.id, systemData);
         //updating "systems by account id" index
         QnMutexLocker lk(&m_mutex);
-        m_accountAccessRoleForSystem.emplace(
-            std::make_pair(systemData.ownerAccountID, systemData.id),
-            api::SystemAccessRole::owner);
+        api::SystemSharing sharing;
+        sharing.accountID = systemData.ownerAccountID;
+        sharing.systemID = systemData.id;
+        sharing.accessRole = api::SystemAccessRole::owner;
+        m_accountAccessRoleForSystem.emplace(std::move(sharing));
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
@@ -282,9 +305,7 @@ void SystemManager::systemSharingAdded(
     {
         //updating "systems by account id" index
         QnMutexLocker lk(&m_mutex);
-        m_accountAccessRoleForSystem.emplace(
-            std::make_pair(systemSharing.accountID, systemSharing.systemID),
-            systemSharing.accessRole);
+        m_accountAccessRoleForSystem.emplace(systemSharing);
     }
 
     completionHandler(
@@ -331,15 +352,8 @@ void SystemManager::systemDeleted(
     {
         m_cache.erase(systemID.systemID);
         QnMutexLocker lk(&m_mutex);
-        for (auto it = m_accountAccessRoleForSystem.begin();
-             it != m_accountAccessRoleForSystem.end();
-             )
-        {
-            if (it->first.second == systemID.systemID)
-                it = m_accountAccessRoleForSystem.erase(it);
-            else
-                ++it;
-        }
+        auto& systemIndex = m_accountAccessRoleForSystem.get<2>();
+        systemIndex.erase(systemID.systemID);
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
@@ -433,12 +447,8 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(QSqlDatabase* connect
 
     std::vector<data::SystemSharing> systemToAccount;
     QnSql::fetch_many(readSystemToAccountQuery, &systemToAccount);
-    for (auto& sharing : systemToAccount)
-    {
-        m_accountAccessRoleForSystem.emplace(
-            std::make_pair(sharing.accountID, sharing.systemID),
-            sharing.accessRole);
-    }
+    for (auto& sharing: systemToAccount)
+        m_accountAccessRoleForSystem.emplace(std::move(sharing));
 
     return db::DBResult::ok;
 }

@@ -27,8 +27,10 @@ template<class KeyType, class CachedType>
 class Cache
 {
 public:
+    typedef typename std::map<KeyType, CachedType>::value_type value_type;
+
     /*!
-    \return false if already exists
+        \return false if already exists
     */
     bool insert(KeyType key, CachedType value)
     {

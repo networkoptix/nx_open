@@ -259,5 +259,69 @@ api::ResultCode CdbFunctionalTest::shareSystem(
     return resCode;
 }
 
+api::ResultCode CdbFunctionalTest::getSystemSharings(
+    const std::string& email,
+    const std::string& password,
+    std::vector<api::SystemSharing>* const sharings)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
+                (std::function<void(api::ResultCode, api::SystemSharingList)>);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    api::SystemSharingList data;
+    std::tie(resCode, data) =
+        makeSyncCall<api::ResultCode, api::SystemSharingList>(
+            std::bind(
+                static_cast<GetCloudUsersOfSystemType>(
+                    &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
+                connection->systemManager(),
+                std::placeholders::_1));
+
+    *sharings = std::move(data.sharing);
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::getSystemSharings(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    std::vector<api::SystemSharing>* const sharings)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
+        (const std::string&, std::function<void(api::ResultCode, api::SystemSharingList)>);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    api::SystemSharingList data;
+    std::tie(resCode, data) =
+        makeSyncCall<api::ResultCode, api::SystemSharingList>(
+            std::bind(
+                static_cast<GetCloudUsersOfSystemType>(
+                    &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
+                connection->systemManager(),
+                systemID,
+                std::placeholders::_1));
+
+    *sharings = std::move(data.sharing);
+    return resCode;
+}
+
+api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
+    const std::vector<api::SystemSharing>& sharings,
+    const QnUuid& accountID,
+    const QnUuid& systemID) const
+{
+    for (const auto& sharing: sharings)
+    {
+        if (sharing.accountID == accountID && sharing.systemID == systemID)
+            return sharing.accessRole;
+    }
+
+    return api::SystemAccessRole::none;
+}
+
 }   //cdb
 }   //nx
