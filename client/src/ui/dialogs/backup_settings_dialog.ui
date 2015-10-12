@@ -26,30 +26,16 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QRadioButton" name="radioButtonNone">
-          <property name="text">
-           <string>None</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonLow">
+         <widget class="QCheckBox" name="checkBoxLQ">
           <property name="text">
            <string>Low Quality</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButtonHigh">
+         <widget class="QCheckBox" name="checkBoxHQ">
           <property name="text">
            <string>High Quality</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonAll">
-          <property name="text">
-           <string>All</string>
           </property>
          </widget>
         </item>

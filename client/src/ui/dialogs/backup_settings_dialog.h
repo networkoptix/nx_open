@@ -19,11 +19,14 @@ public:
 
     void updateFromSettings(const BackupSettingsDataList& value);
     void submitToSettings(BackupSettingsDataList& value);
+private slots:
+    void at_updateModelData();
+    void at_modelDataChanged();
+    void at_headerCheckStateChanged(Qt::CheckState state);
 private:
     void setNearestValue(QComboBox* combobox, int time);
 private:
-    void setBackupQuality(Qn::CameraBackupTypes backupType);
-private:
     QScopedPointer<Ui::BackupSettingsDialog> ui;
     QnBackupSettingsModel* m_model;
+    bool m_updatingModel;
 };
