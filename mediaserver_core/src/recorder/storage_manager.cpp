@@ -621,19 +621,19 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
             if (storage->isFileExists(oldFileName) && !storage->isFileExists(fileName))
                 storage->renameFile(oldFileName, fileName);
 
-            sdb = m_chunksDB[storage->getUrl()] = 
-                QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
+            sdb =  QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
         }
         else
         {
             if (QFile::exists(oldFileName) && !QFile::exists(fileName))
                 QFile::rename(oldFileName, fileName);
-            sdb = m_chunksDB[storage->getUrl()] = 
-                QnStorageDbPtr(new QnStorageDb(QnStorageResourcePtr(), getStorageIndex(storage)));
+            sdb = QnStorageDbPtr(new QnStorageDb(QnStorageResourcePtr(), getStorageIndex(storage)));
         }
-
-        if (!sdb->open(fileName))
-        {
+        
+        if (sdb->open(fileName)) {
+            m_chunksDB[storage->getUrl()] = sdb;
+        }
+        else {
             qWarning()
                 << "can't initialize sqlLite database! Actions log is not created!"
                 << " file open failed: " << fileName;
