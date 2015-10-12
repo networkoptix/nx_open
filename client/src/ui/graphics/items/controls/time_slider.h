@@ -29,6 +29,7 @@ class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 class QnTimePeriodList;
 class QnBookmarksViewer;
+class QnPendingOperation;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
@@ -392,6 +393,7 @@ private:
     QVector<LineData> m_lineData;
     QnCameraBookmarkList m_bookmarks;
     QList<BookmarkCluster> m_mergedBookmarks;
+    QnPendingOperation *m_mergeBookmarksPendingOperation;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
