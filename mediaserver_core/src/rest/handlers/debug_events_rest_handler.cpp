@@ -9,6 +9,8 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <utils/common/synctime.h>
+#include <utils/network/http/httptypes.h>
+
 
 int QnDebugEventsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
     QString action = extractAction(path);
