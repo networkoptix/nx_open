@@ -90,6 +90,7 @@ public:
     void clear();
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
+    int findNextFileIndex(qint64 startTimeMs) const;
     void updateChunkDuration(Chunk& chunk);
     QString fileDir(const Chunk& chunk) const;
     QString fullFileName(const Chunk& chunk) const;

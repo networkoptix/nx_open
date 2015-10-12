@@ -679,6 +679,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         m_storageRoots.insert(storageIndex, storage);
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), 
                 this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
+        getSDB(storage);
     }
     updateStorageStatistics();
 }
@@ -751,10 +752,16 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
     }
     if (storageIndex != -1)
     {
-        QnMutexLocker lock(&m_mutexCatalog);
-        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
-            for (const auto catalog: m_devFileCatalog[i].values())
-                catalog->removeChunks(storageIndex);
+        {
+            QnMutexLocker lock(&m_mutexCatalog);
+            for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
+                for (const auto catalog: m_devFileCatalog[i].values())
+                    catalog->removeChunks(storageIndex);
+            }
+        }
+        {
+            QnMutexLocker lk(&m_sdbMutex);
+            m_chunksDB.remove(storage->getUrl());
         }
     }
 }
