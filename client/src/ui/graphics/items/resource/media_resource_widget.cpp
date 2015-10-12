@@ -39,6 +39,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
+#include <ui/common/search_query_strategy.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/proxy_label.h>
@@ -129,7 +130,7 @@ namespace
 
     const qint64 bookmarksFilterPrecisionMs = 5 * 60 * 1000;
 
-    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs) {
+    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs, const QString &text = QString()) {
         /* Round the current time to reload bookmarks only once a time. */
         qint64 mid = positionMs - (positionMs % bookmarksFilterPrecisionMs);
 
@@ -138,6 +139,8 @@ namespace
 
         /* Seek forward twice as long so when the mid point changes, next period will be preloaded. */
         result.endTimeMs = mid + bookmarksFilterPrecisionMs * 2;
+
+        result.text = text;
 
         return result;
     }
@@ -199,6 +202,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
     connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateBookmarksMode);
     connect(navigator(),                &QnWorkbenchNavigator::positionChanged,         this, &QnMediaResourceWidget::updateBookmarksFilter);
+
+    connect(navigator()->bookmarksSearchStrategy(), &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text){
+        if (!m_bookmarksQuery)
+            return;
+
+        auto filter = m_bookmarksQuery->filter();
+        filter.text = text;
+        m_bookmarksQuery->setFilter(filter);
+    });
 
     {
         /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */
@@ -1561,7 +1573,7 @@ void QnMediaResourceWidget::updateBookmarksFilter() {
     if (!m_bookmarksQuery)
         return;
 
-    m_bookmarksQuery->setFilter(constructBookmarksFilter(getUtcCurrentTimeMs()));
+    m_bookmarksQuery->setFilter(constructBookmarksFilter(getUtcCurrentTimeMs(), navigator()->bookmarksSearchStrategy()->query()));
 }
 
 void QnMediaResourceWidget::updateBookmarksMode() {
