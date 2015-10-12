@@ -1591,7 +1591,7 @@ void QnMediaResourceWidget::updateBookmarks() {
         return;
     }
 
-    m_bookmarksOverlayWidget->setBookmarks(getBookmarksAtPosition(m_bookmarksQuery->executeLocal(), getUtcCurrentTimeMs()));
+    m_bookmarksOverlayWidget->setBookmarks(getBookmarksAtPosition(m_bookmarksQuery->cachedBookmarks(), getUtcCurrentTimeMs()));
 }
 
 void QnMediaResourceWidget::updateBookmarksVisibility() {

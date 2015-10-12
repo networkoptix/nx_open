@@ -44,9 +44,8 @@ public:
     /// @param value            New filter. If it is invalid, the query will become invalid.
     void setFilter(const QnCameraBookmarkSearchFilter &value);
 
-    /// @brief                  Synchronously gathers bookmarks.
-    /// @returns                Locally cached bookmarks, filtered by the query.
-    QnCameraBookmarkList executeLocal() const;
+    /// @brief                  Get locally cached bookmarks.
+    QnCameraBookmarkList cachedBookmarks() const;
 
     /// @brief                  Asynchronously gathers actual bookmarks from the server.
     /// @param callback         Callback for receiving bookmarks data.

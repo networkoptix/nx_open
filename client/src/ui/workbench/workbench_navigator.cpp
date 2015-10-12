@@ -429,6 +429,7 @@ void QnWorkbenchNavigator::initialize() {
         auto filter = m_bookmarkQuery->filter();
         filter.text = text;
         m_bookmarkQuery->setFilter(filter);
+        m_bookmarkAggregation.clear();
     });
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
