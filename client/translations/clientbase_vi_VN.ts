@@ -2009,7 +2009,7 @@
     </message>
     <message>
         <source>Scanning hosts... (%1)</source>
-        <translation>%nquét máy chủ…(%1)</translation>
+        <translation>quét máy chủ…(%1)</translation>
     </message>
     <message>
         <source>Examples:</source>
