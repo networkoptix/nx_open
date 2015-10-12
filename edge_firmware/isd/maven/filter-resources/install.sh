@@ -11,6 +11,7 @@ DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber}$BETA
 update () {
     /etc/init.d/S99$COMPANY_NAME-mediaserver stop
     cp /usr/local/apps/${deb.customization.company.name}/mediaserver/etc/mediaserver.conf /tmp/mediaserver.conf
+    rm -Rf /usr/local/apps/${deb.customization.company.name}/mediaserver/lib
     tar xfv $DISTRIB.tar.gz -C /
     cat /tmp/mediaserver.conf >> /usr/local/apps/${deb.customization.company.name}/mediaserver/etc/mediaserver.conf     
     /etc/init.d/S99$COMPANY_NAME-mediaserver start

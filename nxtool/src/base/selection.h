@@ -11,6 +11,7 @@ namespace rtu
 {
     class ServersSelectionModel;
 
+    /// @brief Represent aggregated values for current selection.
     class Selection : public QObject
     {
         Q_OBJECT
