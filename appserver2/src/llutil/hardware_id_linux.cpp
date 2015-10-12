@@ -203,12 +203,16 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
     char MAC_str[13];
     memset(MAC_str, sizeof(MAC_str), 0);
     mac_eth0( MAC_str, nullptr );
+
+    // Historycally hardware id is mac + '\0'
     QByteArray hardwareId = QByteArray( MAC_str, sizeof(MAC_str) );
     hardwareIds.clear();
+
+    // when copying bytearray to string, trailing '\0' is removed
     hardwareInfo.mac = hardwareId;
 
     for (int i = 0; i < 2 * LATEST_HWID_VERSION; i++) {
-        hardwareIds << hardwareId;
+        hardwareIds << QString::fromLatin1(hardwareId.constData(), hardwareId.size());
     }
 }
 

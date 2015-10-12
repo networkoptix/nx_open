@@ -20,8 +20,6 @@
 
 namespace
 {
-    QElapsedTimer msecsCounter;
-
     enum { kSingleInterfaceChangeCount = 1 };
 
     enum 
@@ -162,7 +160,7 @@ namespace
             , timestamp(QDateTime::currentMSecsSinceEpoch())
         {
             /// Forces send dhcp on every call
-            /// Forces send old ip if new one hasn't been assigned
+            /// Forces send old ip (or mask) if new one hasn't been assigned
             const auto &extraInfo = item->second;
             const auto &interfaces = extraInfo.interfaces;
             for (auto &item: itfUpdateInfo)
@@ -170,7 +168,7 @@ namespace
                 const bool hasMaskChange = (!!item.mask);
                 const bool hasIpChange = (!!item.ip);
                 const bool fixMaskIp = (hasMaskChange != hasIpChange);
-                if (!item.useDHCP || fixMaskIp)
+                if (!item.useDHCP || !(*item.useDHCP) || fixMaskIp)
                 {
                     ///searching the specified in current existing
                     const auto it = std::find_if(interfaces.begin(), interfaces.end()
@@ -181,15 +179,30 @@ namespace
 
                     if (it != interfaces.end())
                     {
-                        if (!item.useDHCP)  /// Force dhcp old value
+                        /// If we turned off dhcp force old values (if new were not presented)
+                        if (item.useDHCP && !(*item.useDHCP))
+                        {
+                            if (!item.ip)
+                               item.ip.reset(new QString(it->ip));
+                            if (!item.mask)
+                                item.mask.reset(new QString(it->mask));
+                        }
+
+                        if (!item.useDHCP)  /// Force dhcp old value anyway
                             item.useDHCP.reset(new bool(it->useDHCP == Qt::Checked));
 
+                        /// We should force old value to ip (or mask) if only mask (or only ip) has changed 
                         if (fixMaskIp)
                         {
-                            if (hasMaskChange)              /// Force old ip usage if mask was changed
-                               item.ip.reset(new QString(it->ip));
-                            else                            /// Force old mask usage if ip was changed
+                            if (hasMaskChange)
+                            {
+                                if (!item.ip)           /// Force old ip usage if mask was changed
+                                    item.ip.reset(new QString(it->ip));
+                            }
+                            else if (!item.mask)        /// Force old mask usage if ip was changed
+                            {
                                 item.mask.reset(new QString(it->mask));
+                            }
                         }
                     }
                     else
@@ -359,6 +372,8 @@ private:
     typedef QVector<RequestData>  RequestContainer;
     typedef std::set<QUuid> UuidsSet;
 
+    QElapsedTimer m_msecsCounter;
+
     const QUuid m_id;
     const ChangesetPointer m_changeset;
     ApplyChangesTaskPtr m_owner;
@@ -387,6 +402,7 @@ rtu::ApplyChangesTask::Impl::Impl(const ChangesetPointer &changeset
     : std::enable_shared_from_this<ApplyChangesTask::Impl>()
     , QObject()
 
+    , m_msecsCounter()
     , m_id(QUuid::createUuid())
     , m_changeset(changeset)
     , m_owner()
@@ -408,6 +424,7 @@ rtu::ApplyChangesTask::Impl::Impl(const ChangesetPointer &changeset
     , m_appliedChangesCount(0)
 
 {
+    m_msecsCounter.start();
 }
 
 rtu::ApplyChangesTask::Impl::~Impl()
@@ -760,7 +777,7 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
 
         const AwaitingOp::WeakPtr weakOp = op;
         const BoolPointer firstRequestProperty(new bool(true));
-        const auto initialTime = msecsCounter.elapsed();
+        const auto initialTime = shared->m_msecsCounter.elapsed();
         const auto discoveredHandler = [weak, weakOp, initialTime, initialRuntimeId
             , pred, firstRequestProperty, falseTimeout, &item] 
             (const BaseServerInfo &info)
@@ -771,9 +788,10 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
             if (!*firstRequestProperty)
                 return;
 
+            const auto shared = weak.lock();
             if (info.runtimeId == initialRuntimeId)
             {
-                if ((msecsCounter.elapsed() - initialTime) > falseTimeout)
+                if ((shared->m_msecsCounter.elapsed() - initialTime) > falseTimeout)
                 {
                     *firstRequestProperty = false;
 
@@ -785,7 +803,6 @@ Request rtu::ApplyChangesTask::Impl::makeActionRequest(ServerInfoCacheItem &item
             {
                 /// Server has restarted, thus we are waiting until it gets in normal (not safe) mode
                 *firstRequestProperty = false;
-                const auto shared = weak.lock();
                 shared->checkReachability(weak, weakOp, item);
             }
         };

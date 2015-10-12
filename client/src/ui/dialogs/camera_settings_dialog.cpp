@@ -8,6 +8,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
 
@@ -77,8 +78,8 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(m_buttonBox);
-    safeModeWatcher->addAutoHiddenWidget(m_okButton);
-    safeModeWatcher->addAutoHiddenWidget(m_applyButton);
+    safeModeWatcher->addControlledWidget(m_okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(m_applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
@@ -87,14 +88,27 @@ QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 void QnCameraSettingsDialog::retranslateUi() {
     auto cameras = m_settingsWidget->cameras();
 
-    //: "Cameras settings" or "Devices settings" or "IO Module Settings", etc
-    setWindowTitle(tr("%1 Settings").arg(getDefaultDevicesName(cameras)));
+    const QString windowTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+        tr("Device Settings"),          tr("Devices Settings"),
+        tr("Camera Settings"),          tr("Cameras Settings"),
+        tr("IO Module Settings"),       tr("IO Modules Settings")
+        ), cameras);
 
-    //: "Cameras Diagnostics" or "Devices Diagnostics" or "IO Module Diagnostics", etc
-    m_diagnoseButton->setText(tr("%1 Diagnostics").arg(getDefaultDevicesName(cameras)));
+    const QString diagnosticsTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+        tr("Device Diagnostics"),       tr("Devices Diagnostics"),
+        tr("Camera Diagnostics"),       tr("Cameras Diagnostics"),
+        tr("IO Module Diagnostics"),    tr("IO Modules Diagnostics")
+        ), cameras);
 
-    //: "Cameras Rules" or "Devices Rules" or "IO Module Rules", etc
-    m_rulesButton->setText(tr("%1 Rules").arg(getDefaultDevicesName(cameras)));
+    const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+        tr("Device Rules"),             tr("Devices Rules"),
+        tr("Camera Rules"),             tr("Cameras Rules"),
+        tr("IO Module Rules"),          tr("IO Modules Rules")
+        ), cameras);
+
+    setWindowTitle(windowTitle);
+    m_diagnoseButton->setText(diagnosticsTitle);
+    m_rulesButton->setText(rulesTitle);
 }
 
 
@@ -132,7 +146,7 @@ void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_okButton->setEnabled(isValidMode);
+    m_okButton->setEnabled(isValidMode && !qnCommon->isReadOnly());
     m_openButton->setVisible(isValidMode);
     m_diagnoseButton->setVisible(isValidMode);
     m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement
@@ -175,13 +189,19 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
         &&  (m_settingsWidget->hasDbChanges());
 
     if (askConfirmation) {
-        auto notSavedCameras = m_settingsWidget->cameras();
+        auto unsavedCameras = m_settingsWidget->cameras();
+
+        const QString askMessage = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+            tr("Apply changes to the following %n devices?",    nullptr, unsavedCameras.size()),
+            tr("Apply changes to the following %n cameras?",    nullptr, unsavedCameras.size()),
+            tr("Apply changes to the following %n IO modules?", nullptr, unsavedCameras.size())
+            ), unsavedCameras);
+
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             this,
-            notSavedCameras,
-            tr("%1 not saved.").arg(getDefaultDevicesName(notSavedCameras)),
-            //: "Apply changes to the following 5 cameras?" or "Apply changes to the following IO module?", etc
-            tr("Apply changes to the following %1?").arg(getNumericDevicesName(notSavedCameras, false)),
+            unsavedCameras,
+            tr("Changes are not saved"),
+            askMessage,
             QDialogButtonBox::Yes | QDialogButtonBox::No
             );
         if(button == QDialogButtonBox::Yes)

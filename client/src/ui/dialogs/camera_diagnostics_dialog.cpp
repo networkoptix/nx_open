@@ -9,6 +9,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <camera/camera_diagnose_tool.h>
 
@@ -103,12 +104,21 @@ void QnCameraDiagnosticsDialog::retranslateUi() {
         return;
     } 
     
-    //: %1 - will be substituted by type of device ("camera", "io module", etc..); %2 - will be substituted by model of device; Example: "Diagnostics for camera X1323"
-    const QString titleLabelText = tr("Diagnostics for %1 %2.");
-    ui->titleLabel->setText(titleLabelText.arg(getDefaultDevicesName(m_resource, false)).arg(getResourceName(m_resource)));
+    ui->titleLabel->setText(QnDeviceDependentStrings::getNameFromSet(
+        QnCameraDeviceStringSet(
+            tr("Diagnostics for device %1"),
+            tr("Diagnostics for camera %1"),
+            tr("Diagnostics for IO module %1")
+        ), m_resource)
+    .arg(getResourceName(m_resource)));
 
-    //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..); Example: "IO Module Diagnostics"
-    setWindowTitle(tr("%1 Diagnostics").arg(getDefaultDevicesName(m_resource)));
+    
+    setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
+        QnCameraDeviceStringSet(
+            tr("Device Diagnostics"),
+            tr("Camera Diagnostics"),
+            tr("IO Module Diagnostics")
+        ) , m_resource));
 }
 
 void QnCameraDiagnosticsDialog::updateOkButtonEnabled() {
@@ -124,11 +134,19 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
-        //: "Confirming camera is accessible." or "Confirming device is accessible."
-        return tr("Confirming %1 is accessible.").arg(getDefaultDevicesName(m_resource, false));
+        return QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Confirming device is accessible."),
+                tr("Confirming camera is accessible."),
+                tr("Confirming IO module is accessible.")
+            ), m_resource);
     case CameraDiagnostics::Step::mediaStreamAvailability:
-        //: "Confirming target camera provides media stream." or "Confirming target device provides media stream."
-        return tr("Confirming target %1 provides media stream.").arg(getDefaultDevicesName(m_resource, false));
+        return QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Confirming target device provides media stream."),
+                tr("Confirming target camera provides media stream."),
+                tr("Confirming target IO module provides media stream.")
+            ), m_resource);
     case CameraDiagnostics::Step::mediaStreamIntegrity: 
         return tr("Evaluating media stream for errors.");
     default:

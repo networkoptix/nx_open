@@ -18,6 +18,7 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -134,8 +135,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
-    safeModeWatcher->addAutoHiddenWidget(m_resetDefaultsButton);
-    safeModeWatcher->addAutoHiddenWidget(ui->buttonBox->button(QDialogButtonBox::Ok));
+    safeModeWatcher->addControlledWidget(m_resetDefaultsButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(ui->buttonBox->button(QDialogButtonBox::Ok), QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog() {
@@ -455,8 +456,10 @@ void QnBusinessRulesDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    const QString deviceName = getDefaultDevicesName(true, false);
-    ui->filterLineEdit->setPlaceholderText(tr("filter by %1...").arg(deviceName));
+    ui->filterLineEdit->setPlaceholderText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("filter by devices..."),
+        tr("filter by cameras...")
+    ));
 }
 
 bool QnBusinessRulesDialog::advancedMode() const {

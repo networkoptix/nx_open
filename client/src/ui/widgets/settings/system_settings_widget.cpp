@@ -4,6 +4,7 @@
 #include <api/global_settings.h>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/general_attribute_pool.h>
@@ -41,8 +42,15 @@ QnSystemSettingsWidget::~QnSystemSettingsWidget() {
 }
 
 void QnSystemSettingsWidget::retranslateUi() {
-    ui->autoDiscoveryCheckBox->setText(tr("Enable %1 and servers auto discovery").arg(getDefaultDevicesName(true, false)));
-    ui->autoSettingsCheckBox->setText(tr("Allow system to optimize %1 settings").arg(getDefaultDevicesName(true, false)));
+    
+    ui->autoDiscoveryCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Enable devices and servers auto discovery"),
+        tr("Enable cameras and servers auto discovery")
+        ));
+    ui->autoSettingsCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Allow system to optimize devices settings"),
+        tr("Allow system to optimize cameras settings")
+        ));
 }
 
 

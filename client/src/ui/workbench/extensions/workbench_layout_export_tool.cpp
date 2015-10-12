@@ -13,6 +13,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
@@ -380,7 +381,13 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
         QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
         Q_ASSERT_X(camRes, Q_FUNC_INFO, "Make sure camera exists");
         //: "Could not export camera AXIS1334"
-        m_errorMessage = tr("Could not export %1 %2.").arg(getDefaultDeviceNameLower(camRes)).arg(getShortResourceName(camRes));
+        m_errorMessage = QnDeviceDependentStrings::getNameFromSet(
+                QnCameraDeviceStringSet(
+                    tr("Could not export device %1."),
+                    tr("Could not export camera %1."),
+                    tr("Could not export IO module %1.")
+                ), camRes
+            ).arg(getShortResourceName(camRes));
         finishExport(false);
     } else {
         exportNextCamera();
