@@ -116,7 +116,8 @@ public:
             return;
         if (m_scanTasks.isEmpty())
             m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, QString(), 0.0));
-
+        if (partialScan)
+            storage->addFlags(Qn::storage_fastscan);
         QMutexLocker lock(&m_mutex);
         m_scanTasks.push(std::move(scanData));
         m_waitCond.wakeAll();
@@ -191,6 +192,7 @@ public:
                         return;
                     ++currentStep;
                 }
+                scanData.storage->removeFlags(Qn::storage_fastscan);
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), 1.0));
             }
             else 
@@ -1048,7 +1050,12 @@ void QnStorageManager::clearSpace()
     clearMaxDaysData();
 
     // 2. free storage space
-    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    QSet<QnStorageResourcePtr> storages;
+    for (const auto& storage: getWritableStorages()) {
+        if (!storage->hasFlags(Qn::storage_fastscan))
+            storages << storage;
+    }
+
     for(const QnStorageResourcePtr& storage: storages)
         clearOldestSpace(storage, true);
     for(const QnStorageResourcePtr& storage: storages)
@@ -1445,7 +1452,12 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QVector<QnStorageResourcePtr> candidates;
 
     // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
-    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    QSet<QnStorageResourcePtr> storages;
+    for (const auto& storage: getWritableStorages()) {
+        if (!storage->hasFlags(Qn::storage_fastscan) || storage->getFreeSpace() > storage->getSpaceLimit())
+            storages << storage;
+    }
+
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr storage = *itr;

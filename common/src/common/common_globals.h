@@ -303,6 +303,8 @@ public:
         search_upd_only = 0x2000000,   /**< Disable to insert new resource during discovery process, allow update only */
         io_module       = 0x4000000,   /**< It's IO module camera (camera subtype) */
 
+        storage_fastscan = 0x8000000,   /**< Fast scan for storage in progress */
+
         local_media = local | media,
         local_layout = local | layout,
 
