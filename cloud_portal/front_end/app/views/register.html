@@ -1,0 +1,57 @@
+<div ng-controller="LoginCtrl">
+
+
+    <div class="jumbotron">
+        <h1><img src="images/promo/main.png"></h1>
+        <h1>NX Connect</h1>
+    </div>
+
+
+    <div class="row" >
+        <form name="registerForm" class="form-horizontal">
+            <div class="form-group">
+                <label for="firstName" class="col-sm-3 control-label">First name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" mg-model="firstName" id="firstName" placeholder="First name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="lastName"  class="col-sm-3 control-label">Last name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" mg-model="lastName" id="lastName" placeholder="Last name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email"  class="col-sm-3 control-label">Email address</label>
+                <div class="col-sm-9">
+                    <input type="email" class="form-control" mg-model="email" id="email" placeholder="Email">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password"  class="col-sm-3 control-label">Password</label>
+                <div class="col-sm-9">
+                    <input type="password" class="form-control" mg-model="password" id="password" placeholder="Password">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <div class="checkbox">
+                        <label ><input type="checkbox" ng-model="subscribe" name="subscribe" id="subscribe" disabled> Subscribe to email newsletters</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <div class="checkbox">
+                        <label ><input type="checkbox" ng-model="agree" name="agree" id="agree" disabled> I agree with <a href="#/eula" onclick="eula()">Terms and Conditions</a></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="button" class="btn btn-default" ng-click="register()">Sign up</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

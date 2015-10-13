@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('dialogs', function ($http, $modal, $q, ipCookie) {
+    .factory('dialogs', function ($http, $modal, $q) {
 
         
 

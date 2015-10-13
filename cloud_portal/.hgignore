@@ -8,3 +8,5 @@ app/bower_components
 
 cloud/.idea
 .DS_Store
+
+.*\.pyc$
