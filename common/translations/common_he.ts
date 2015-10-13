@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="he" sourcelanguage="en">
+<TS version="2.1" language="he" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -62,10 +62,6 @@
     <message>
         <source>Unknown (%1)</source>
         <translation>לא ידוע (%1)</translation>
-    </message>
-    <message>
-        <source>User Defined (%1)</source>
-        <translation>מוגדר על ידי המשתמש(%1)</translation>
     </message>
     <message>
         <source>Motion on Camera</source>
@@ -156,10 +152,6 @@
         <translation>כתובת: %1</translation>
     </message>
     <message>
-        <source>Input Port: %1</source>
-        <translation>כניסת קלט: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>סיבה: %1</translation>
     </message>
@@ -169,6 +161,7 @@
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
+        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
         <translation>שרת ההתנגשות #%1: %2</translation>
     </message>
     <message>
@@ -214,10 +207,6 @@
         <translation>החיבור לשרת אבד.</translation>
     </message>
     <message>
-        <source>Server started after crash.</source>
-        <translation>השרת אותחל לאחר קריסה.</translation>
-    </message>
-    <message>
         <source>I/O error has occurred at %1.</source>
         <translation>שגיאת קלט/פלט אירעה ב%1.</translation>
     </message>
@@ -257,59 +246,131 @@
         </translation>
     </message>
     <message>
-        <source>%1 output</source>
-        <translation>%1 פלט</translation>
+        <source>Device output</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 output for 30 sec</source>
-        <translation>%1 פלט ל30 שניות</translation>
+        <source>Camera output</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 recording</source>
-        <translation>%1 מקליט</translation>
+        <source>Device output for 30 sec</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Input Signal on %1</source>
-        <translation>אות קלט ב%1</translation>
+        <source>Camera output for 30 sec</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 Disconnected</source>
-        <translation>%1 התנתקה</translation>
+        <source>Device recording</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 IP Conflict</source>
-        <translation>%1 התנגשות IP</translation>
+        <source>Camera recording</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Any %1 Issue</source>
-        <translation>כל בעיית %1</translation>
+        <source>Generic Event</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 %2 was disconnected</source>
-        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
-        <translation>%1 %2 התנתקה</translation>
+        <source> (%1)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
-        <translation>התנגשות IP %1 ב%2</translation>
+        <source>Input Signal on Device</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 #%2 MAC: %3</source>
-        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation>%1 #%2 כתובת MAC: %3</translation>
+        <source>Input Signal on Camera</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation>החיבור ל%1 (זרם ראשי) נסגר באופן לא צפוי.</translation>
+        <source>Device Disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation>החיבור ל%1 (זרם משני) נסגר באופן לא צפוי.</translation>
+        <source>Camera Disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording on %1 is disabled: </source>
-        <translation>הקלטה ב%1 כבויה:</translation>
+        <source>Device IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Device Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device IP Conflict at %1</source>
+        <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict at %1</source>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caption: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2 </source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to device was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server restarted unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on devices is disabled:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on cameras is disabled:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on IO modules is disabled:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -355,10 +416,6 @@
         <translation>לא נמצאו קבצי מדיה נתמכים בכתובת %1.</translation>
     </message>
     <message>
-        <source>Not authorised. Url %1.</source>
-        <translation>לא מורשה. כתובת %1.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
         <translation>לא ניתן לפתוח את כתובת המדיה %1. פרוטוקול מדיה שאיננו נתמך %2.</translation>
     </message>
@@ -395,70 +452,132 @@
         <translation>(לא ידוע)</translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network.</source>
-        <translation>וודא שה%1 מחובר לרשת.</translation>
+        <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>וודא שיציאה %2 נגישה (לדוגמה - מתועלת). אנא נסה לאתחל את ה%1, לאחר מכן שחזר את ברירות מחדל היצרן בדף האינטרנט.</translation>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>וודא ש%1 מחובר/ת לרשת. נסה לאתחל את ה%1.</translation>
+        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation>לא ניתן לנתח את תגובת ה%1. כתובת %2, שם בקשה %3.</translation>
+        <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>אנא נסה לאתחל את ה%1,לאחר מכן שחזר את ברירות מחדל היצרן בדף האינטרנט.</translation>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>ראשית, נסה להפעיל את ההקלטה (במידה והיא כבויה), והפחת את מספר הפריימים לשניה בהגדרות ה%1.</translation>
+        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>במידה וזה לא עזר, שחזר לברירות מחדל היצרן בדף הבית של ה%1. במידה והבעיה נמשכת, אנא צור קשר עם התמיכה.</translation>
+        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>בקשת %1 %2 נכשלה עם שגיאה %3.</translation>
+        <source>Could not parse device response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown %1 Issue.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>בעיית %1 שאינה מוגדרת.</translation>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid data was received from the %1: %2.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>מידע שגוי התקבל מה%1: %2.</translation>
+        <source>Could not parse IO module response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>יותר מדי שגיאות מדיה. אנא פתח את חלון שגיאות ה%1 לפרטים נוספים.</translation>
+        <source>Not authorized. Url %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 initialization process in progress.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>תהליך הפעלת ה%1 מתבצע.</translation>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown device issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown camera issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown IO module issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the device %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the IO module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open device issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open camera issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device initialization process in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera initialization process in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module initialization process in progress.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1047,6 +1166,18 @@
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation>הזמנים בשרתים אינם מסונכרנים ולא היה ניתן לזהות זמן משותף באופן אוטומטי.</translation>
+    </message>
+    <message>
+        <source>System is in safe mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The system is running in safe mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any configuration changes except license activation are impossible.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
