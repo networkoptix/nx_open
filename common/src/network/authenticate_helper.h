@@ -88,6 +88,8 @@ public:
     {
     }
 
+    bool isValid() const { return authenticateHeader; }
+
     void clear()
     {
         authenticateHeader.reset();
@@ -124,7 +126,7 @@ public:
         nx_http::Request* const request,
         HttpAuthenticationClientContext* const authenticationCtx );
     //!Same as above, but uses cached authentication info
-    Qn::AuthResult authenticate(
+    Qn::AuthResult addAuthorizationToRequest(
         const QAuthenticator& auth,
         nx_http::Request* const request,
         const HttpAuthenticationClientContext* const authenticationCtx );

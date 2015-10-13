@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="hu" sourcelanguage="en">
+<TS version="2.0" language="hu" sourcelanguage="en">
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
@@ -1289,115 +1289,115 @@
     </message>
     <message>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladatátvétel prioritás...</translation>
     </message>
     <message>
         <source>Move Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök áthelyezése</translation>
     </message>
     <message>
         <source>Move Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák mozgatása</translation>
     </message>
     <message>
         <source>Device Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz diagnosztika...</translation>
     </message>
     <message>
         <source>Camera Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera diagnosztika...</translation>
     </message>
     <message>
         <source>IO Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul diagnosztika...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközlista</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Kameralista</translation>
     </message>
     <message>
         <source>Check Device Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz problémák ellenőrzése...</translation>
     </message>
     <message>
         <source>Check Devices Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök problémáinak ellenőrzése...</translation>
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera problémák ellenőrzése...</translation>
     </message>
     <message>
         <source>Check Cameras Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák problémáinak ellenőrzése...</translation>
     </message>
     <message>
         <source>Check IO Module Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul problémák ellenőrzése...</translation>
     </message>
     <message>
         <source>Check IO Modules Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modulok problámáinak ellenőrzése...</translation>
     </message>
     <message>
         <source>Device Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz szabályok...</translation>
     </message>
     <message>
         <source>Devices Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök szabályai...</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera szabályok...</translation>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák szabályai...</translation>
     </message>
     <message>
         <source>IO Module Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul szabályok...</translation>
     </message>
     <message>
         <source>IO Modules Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modulok szabályai...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz beállítások...</translation>
     </message>
     <message>
         <source>Devices Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök beállításai...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera beállítások...</translation>
     </message>
     <message>
         <source>Cameras Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák beállításai...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul beállítások...</translation>
     </message>
     <message>
         <source>IO Modules Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modulok beállításai...</translation>
     </message>
     <message>
         <source>Devices List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközlista szerver szerint...</translation>
     </message>
     <message>
         <source>Cameras List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera lista szerver szerint...</translation>
     </message>
 </context>
 <context>
@@ -1474,19 +1474,19 @@
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök</translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák</translation>
     </message>
     <message>
         <source>Device actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz műveletek</translation>
     </message>
     <message>
         <source>Camera actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera műveletek</translation>
     </message>
 </context>
 <context>
@@ -1643,35 +1643,35 @@
     </message>
     <message>
         <source>Device updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz frissítve</translation>
     </message>
     <message>
         <source>Camera updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera frissítve</translation>
     </message>
     <message>
         <source>Device added</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz hozzáadva</translation>
     </message>
     <message>
         <source>Camera added</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera hozzáadva</translation>
     </message>
     <message>
         <source>Device removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz eltávolítva</translation>
     </message>
     <message>
         <source>Camera removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera eltávolítva</translation>
     </message>
     <message>
         <source>Device name</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz név</translation>
     </message>
     <message>
         <source>Camera name</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera név</translation>
     </message>
 </context>
 <context>
@@ -1702,31 +1702,31 @@
     <name>QnBusinessResourceValidationStrings</name>
     <message>
         <source>%1 of %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a %n eszközből</translation>
     </message>
     <message>
         <source>%1 of %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a %n kamerából</translation>
     </message>
     <message>
         <source>%1 of %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a %n IO modulból</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Minden eszköz&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Minden kamera&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Válasszon legalább egy eszközt&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Válasszon legalább egy kamerát&gt;</translation>
     </message>
 </context>
 <context>
@@ -1818,23 +1818,23 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Minden eszköz&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Minden kamera&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon legalább egy eszközt</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon legalább egy kamerát</translation>
     </message>
     <message>
         <source>Occurs</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekövetkezik</translation>
     </message>
 </context>
 <context>
@@ -1849,19 +1849,19 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Minden eszköz&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Minden kamera&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Válasszon legalább egy eszközt&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Válasszon legalább egy kamerát&gt;</translation>
     </message>
 </context>
 <context>
@@ -1936,11 +1936,11 @@
     </message>
     <message>
         <source>filter by devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>szűrés eszközök szerint...</translation>
     </message>
     <message>
         <source>filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>szűrés kamerák szerint...</translation>
     </message>
 </context>
 <context>
@@ -2014,7 +2014,7 @@
     </message>
     <message>
         <source>Scanning hosts... (%1)</source>
-        <translation type="unfinished">Hostok keresése... (%1)</translation>
+        <translation>Hostok keresése... (%1)</translation>
     </message>
     <message>
         <source>Finished</source>
@@ -2105,7 +2105,7 @@
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2192,51 +2192,51 @@
     </message>
     <message>
         <source>Diagnostics for device %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 eszköz diagnosztika</translation>
     </message>
     <message>
         <source>Diagnostics for camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 kamera diagnosztika</translation>
     </message>
     <message>
         <source>Diagnostics for IO module %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 IO modul diagnosztika</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz diagnosztika</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera diagnosztika</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul diagnosztika</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz hozzáférésének ellenőrzése.</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera hozzáférésének ellenőrzése.</translation>
     </message>
     <message>
         <source>Confirming IO module is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul hozzáférésének ellenőrzése.</translation>
     </message>
     <message>
         <source>Confirming target device provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Céleszköz biztosította  media adatfolyam  ellenőrzése.</translation>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cél kamera biztosította  media adatfolyam  ellenőrzése.</translation>
     </message>
     <message>
         <source>Confirming target IO module provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cél IO modul biztosította  media adatfolyam  ellenőrzése.</translation>
     </message>
 </context>
 <context>
@@ -2272,40 +2272,40 @@
     <message>
         <source>Devices List for %1</source>
         <extracomment>Devices List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 eszközlista</translation>
     </message>
     <message>
         <source>Cameras List for %1</source>
         <extracomment>Cameras List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 kameralista</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközlista</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Kameralista</translation>
     </message>
     <message>
         <source>%n devices found</source>
-        <translation type="unfinished">%n eszköz megtalálva</translation>
+        <translation>%n eszköz megtalálva</translation>
     </message>
     <message>
         <source>%n cameras found</source>
-        <translation type="unfinished"></translation>
+        <translation>%n kamera megtalálva</translation>
     </message>
     <message>
         <source>%n IO modules found</source>
-        <translation type="unfinished"></translation>
+        <translation>%n IO modul megtalálva</translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiválasztott eszközök exportálása fájlba.</translation>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiválasztott kamerák exportálása fájlba.</translation>
     </message>
 </context>
 <context>
@@ -2412,27 +2412,27 @@
     </message>
     <message>
         <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Figyelem! A magas minimum érték csökkentheti más eszközök rögzítési időtartamát.</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Figyelem! A magas minimum érték csökkentheti más kamerák rögzítési időtartamát.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mozgásra rögzítés ki van kapcsolva vagy nem támogatott néhány kiválasztott kamerán. Kérem menjen a mozgás beállítás oldalra, hogy meggyőződjön, hogy támogatott és engedélyezett.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dupla adatfolyam nem támogatott a kamera által.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dupla adatfolyam és mozgás érzékelés nem elérhető ezen a kamerán.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mozgásra rögzítés ki van kapcsolva. Kérem menjen a mozgás beállítás oldalra, hogybeállítsa a kamera mozgás érzékelési területét és érzékenységét.</translation>
     </message>
 </context>
 <context>
@@ -2463,91 +2463,91 @@
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz beállítások</translation>
     </message>
     <message>
         <source>Devices Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök beállítása</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera beállítások</translation>
     </message>
     <message>
         <source>Cameras Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák beállítása</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul beállítások</translation>
     </message>
     <message>
         <source>IO Modules Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modulok beállítása</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz diagnosztika</translation>
     </message>
     <message>
         <source>Devices Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök diagnosztikája</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera diagnosztika</translation>
     </message>
     <message>
         <source>Cameras Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák diagnosztikája</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul diagnosztika</translation>
     </message>
     <message>
         <source>IO Modules Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modulok diagnosztikája</translation>
     </message>
     <message>
         <source>Device Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz szabályok</translation>
     </message>
     <message>
         <source>Devices Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök szabályai</translation>
     </message>
     <message>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera szabályok</translation>
     </message>
     <message>
         <source>Cameras Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák szabályai</translation>
     </message>
     <message>
         <source>IO Module Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul szabályok</translation>
     </message>
     <message>
         <source>IO Modules Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modulok szabályai</translation>
     </message>
     <message>
         <source>Apply changes to the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>Változások alkalmazása a következő %n eszközre?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>Változások alkalmazása a következő %n kamerára?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>Változások alkalmazása a következő %n IO modulra?</translation>
     </message>
     <message>
         <source>Changes are not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>A változások nincsenek elmentve</translation>
     </message>
 </context>
 <context>
@@ -2558,7 +2558,7 @@
     </message>
     <message>
         <source>No device selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs eszköz kiválasztva.</translation>
     </message>
 </context>
 <context>
@@ -2936,11 +2936,11 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Minden eszköz&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Minden kamera&gt;</translation>
     </message>
 </context>
 <context>
@@ -2994,49 +2994,49 @@
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemzett mozgás típus nem támogatott néhány kamera által.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rögzítés nem engedélyezhető néhány kamera számára.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemzés beállítások nem kompatibilisek néhány eszközzel.</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialog</name>
     <message>
         <source>Failover Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladatátvétel prioritás</translation>
     </message>
     <message>
         <source>Never</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">Soha</translation>
+        <translation>Soha</translation>
     </message>
     <message>
         <source>Low</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">Alacsony</translation>
+        <translation>Alacsony</translation>
     </message>
     <message>
         <source>Medium</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">Közepes</translation>
+        <translation>Közepes</translation>
     </message>
     <message>
         <source>High</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">Magas</translation>
+        <translation>Magas</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
         <source>Set Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Priorítás beállítása:</translation>
     </message>
 </context>
 <context>
@@ -3089,27 +3089,27 @@
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Open Alarm/Event Rules Management...</source>
-        <translation type="unfinished"></translation>
+        <translation>Riasztás/Eseméy/Szabály kezelő megnyitása...</translation>
     </message>
     <message>
         <source>Open Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eseménylista megnyitása...</translation>
     </message>
     <message>
         <source>Open Devices List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközlista megnyitása...</translation>
     </message>
     <message>
         <source>Open Cameras List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera lista megnyitása...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközlista</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Kameralista</translation>
     </message>
 </context>
 <context>
@@ -3320,15 +3320,15 @@
     <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 eszközt nem lehet exportálni.</translation>
     </message>
     <message>
         <source>Could not export camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 kamerát nem lehet exportálni.</translation>
     </message>
     <message>
         <source>Could not export IO module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 IO modult nem lehet exportálni.</translation>
     </message>
 </context>
 <context>
@@ -3715,15 +3715,15 @@
     </message>
     <message>
         <source>Use licenses for selected %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencek használata a kiválasztott %n eszközhöz</translation>
     </message>
     <message>
         <source>Use licenses for selected %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencek használata a kiválasztott %n kamerához</translation>
     </message>
     <message>
         <source>Use licenses for selected %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencek használata a kiválasztott %n IO modulhoz</translation>
     </message>
 </context>
 <context>
@@ -4005,19 +4005,19 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>The discovered system %1 is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>A %1 felderített rendszer biztonságos módban van.</translation>
     </message>
     <message>
         <source>System has an incompatible version.</source>
-        <translation type="unfinished"></translation>
+        <translation>A rendszer nem rendelkezik kompatibilis verzióval.</translation>
     </message>
     <message>
         <source>Operation is not permitted.</source>
-        <translation type="unfinished"></translation>
+        <translation>A művelet nem engedélyezett.</translation>
     </message>
     <message>
         <source>System is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>A rendszer biztonsági módban van.</translation>
     </message>
 </context>
 <context>
@@ -4189,67 +4189,67 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Server Settings...</source>
-        <translation type="unfinished">Szerver beállításaok...</translation>
+        <translation>Szerver beállításaok...</translation>
     </message>
     <message>
         <source>Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencek...</translation>
     </message>
     <message>
         <source>User Settings...</source>
-        <translation type="unfinished">Felhasználó beállítások...</translation>
+        <translation>Felhasználó beállítások...</translation>
     </message>
     <message>
         <source>SMTP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>SMTP beállítások...</translation>
     </message>
     <message>
         <source>Connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Csatlakozás szerverhez...</translation>
     </message>
     <message>
         <source>Time Synchronization...</source>
-        <translation type="unfinished"></translation>
+        <translation>Idő szinkronizáció...</translation>
     </message>
     <message>
         <source>Server settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver beállításaok...</translation>
     </message>
     <message>
         <source>Open Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz megnyitása</translation>
     </message>
     <message>
         <source>Open Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera megnyitása</translation>
     </message>
     <message>
         <source>Open IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul megnyitása</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz beállítások...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera beállítások...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul beállítások...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz weboldal megnyitása...</translation>
     </message>
     <message>
         <source>Open Camera Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera weboldal megnyitása...</translation>
     </message>
     <message>
         <source>Open IO Module Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul weboldal megnyitása...</translation>
     </message>
 </context>
 <context>
@@ -4638,43 +4638,43 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>empty</source>
-        <translation type="unfinished"></translation>
+        <translation>üres</translation>
     </message>
     <message>
         <source>Total %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes %n eszköz</translation>
     </message>
     <message>
         <source>Total %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes %n kamera</translation>
     </message>
     <message>
         <source>Total %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes %n IO modul</translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök nem üres archívummal</translation>
     </message>
     <message>
         <source>Cameras with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák nem üres archívummal</translation>
     </message>
     <message>
         <source>Storage space occupied by devices</source>
-        <translation type="unfinished"></translation>
+        <translation>A tárhely lefoglalva az eszközök által</translation>
     </message>
     <message>
         <source>Storage space occupied by cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>A tárhely lefoglalva az kamerák által</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera</translation>
     </message>
 </context>
 <context>
@@ -4724,11 +4724,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Live Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Élő eszközök</translation>
     </message>
     <message>
         <source>Live Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Élő kamerák</translation>
     </message>
 </context>
 <context>
@@ -4766,11 +4766,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Select Devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök kiválasztása...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák kiválasztása...</translation>
     </message>
 </context>
 <context>
@@ -4885,23 +4885,23 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Server Settings - %1 (readonly)</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver beállítások - %1 (csak olvasható)</translation>
     </message>
     <message>
         <source>Server Settings - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver beáállítások - %1</translation>
     </message>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">Szerver beállítások</translation>
+        <translation>Szerver beállítások</translation>
     </message>
     <message>
         <source>Server not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver nincs mentve</translation>
     </message>
     <message>
         <source>Apply changes to the server %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Változások alkalmazása a szerverre - %1?</translation>
     </message>
 </context>
 <context>
@@ -4968,39 +4968,39 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Server is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver nem elérhető</translation>
     </message>
     <message>
         <source>Enable failover (server will take devices automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladatátvétel engedélyezése (a szerver automatikusan átvesz eszközöket a nem elérhető szerverektől)</translation>
     </message>
     <message>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladatátvétel engedélyezése (a szerver automatikusan átvesz kamerákat a nem elérhető szerverektől)</translation>
     </message>
     <message>
         <source>Max devices on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum eszközök ezen a szerveren:</translation>
     </message>
     <message>
         <source>Max cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum kamerák ezen a szerveren:</translation>
     </message>
     <message>
         <source>This server already has more than max devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a szerver már a maximumnál több eszközt tartalmaz</translation>
     </message>
     <message>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a szerver már a maximumnál több kamerát tartalmaz</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of devices</source>
-        <translation type="unfinished"></translation>
+        <translation>A hibás működés elkerülése végett állítsa be az eszközök maximális számát</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>A hibás működés elkerülése végett állítsa be az kamerák maximális számát</translation>
     </message>
 </context>
 <context>
@@ -5258,7 +5258,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet elindítani a frissítést. Visszaállítás az előző kiadásra tiltott.</translation>
     </message>
 </context>
 <context>
@@ -5324,15 +5324,15 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz beállítások</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera beállítások</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IO modul beállítások</translation>
     </message>
 </context>
 <context>
@@ -5461,15 +5461,15 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Please check authentication information in device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem ellenőrizze a hitelesítési információkat az eszköz beállításokban</translation>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem ellenőrizze a hitelesítési információkat a kamera beállításokban</translation>
     </message>
     <message>
         <source>Please check authentication information in IO module settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérem ellenőrizze a hitelesítési információkat az IO modul beállításokban</translation>
     </message>
 </context>
 <context>
@@ -5561,19 +5561,19 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable devices and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök és szerverek automatikus felderítésének engedélyezése</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák és szerverek automatikus felderítésének engedélyezése</translation>
     </message>
     <message>
         <source>Allow system to optimize devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszköz beállítások optimalizálásának engedélyezése a rendszer számára</translation>
     </message>
     <message>
         <source>Allow system to optimize cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera beállítások optimalizálásának engedélyezése a rendszer számára</translation>
     </message>
 </context>
 <context>
@@ -5849,11 +5849,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Adjust device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközök beállítása</translation>
     </message>
     <message>
         <source>Adjust camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerák beállítása</translation>
     </message>
 </context>
 <context>
@@ -5944,11 +5944,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Can adjust devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállíthatja az eszközöket</translation>
     </message>
     <message>
         <source>Can adjust cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Beállíthatja a kamerákat</translation>
     </message>
 </context>
 <context>
@@ -6203,92 +6203,92 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nem lehet ezt a %n eszközt áthelyezni a %1 szerverre. Szerver nem válaszol.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nem lehet ezt a %n kamerát áthelyezni a %1 szerverre. Szerver nem válaszol.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nem lehet ezt a %n IO modult áthelyezni a %1 szerverre. Szerver nem válaszol.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 szerever nem találja és nem fér hozzá ehhez a %n eszközhöz. Biztos benne, hogy szeretné eltávolítani őket?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 szerever nem találja és nem fér hozzá ehhez a %n kamerához. Biztos benne, hogy szeretné eltávolítani őket?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 szerever nem találja és nem fér hozzá ehhez a %n IO modulhoz. Biztos benne, hogy szeretné eltávolítani őket?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Biztos benne, hogy véglegesen törli ezt a %n fájlt?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Biztos benne, hogy szeretné eltávolítani ezt a %n elemet az elrendezésről?</numerusform>
         </translation>
     </message>
     <message>
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a %n eszköz automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a %n kamera automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
         <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a %n IO modul automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezekből az eszközökből %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezekből az kamerákból %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
         <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ezekből az IO modulokból %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztos benne, hogy törölni szeretné a következő %n eszközt?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztos benne, hogy törölni szeretné a következő %n kamerát?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztos benne, hogy törölni szeretné a következő %n IO modult?</translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Biztos benne, hogy törölni szeretné a következő %n elemet?</numerusform>
         </translation>
     </message>
 </context>
@@ -6734,15 +6734,15 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>All Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Össze eszköz</translation>
     </message>
     <message>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes kamera</translation>
     </message>
     <message>
         <source>All IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Összes IO modul</translation>
     </message>
 </context>
 <context>
@@ -6780,34 +6780,34 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message>
         <source>The system is in Safe Mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>A rendszer biztonsági módban van.</translation>
     </message>
     <message>
         <source>It is not allowed to make any changes except license activation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem engedélyezett, hogy a licenc aktiváláson kívül bármit változtasson.</translation>
     </message>
     <message>
         <source>The following %n items are not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>A következő %n elem nincs elmentve.</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Nem lehet elmenteni a következő %n elemet a szerverre.</numerusform>
         </translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Hiba</translation>
+        <translation>Hiba</translation>
     </message>
     <message>
         <source>The following %n items are not deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>A következő %n elem nem lett törölve.</translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nem lehet törölni a következő %n elemet a szerverről.</numerusform>
         </translation>
     </message>
 </context>
@@ -6815,7 +6815,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
+        <translation>A rendszer biztonsági módban van</translation>
     </message>
 </context>
 <context>
