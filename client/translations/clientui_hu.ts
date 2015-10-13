@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="hu" sourcelanguage="en">
+<TS version="2.0" language="hu" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -95,12 +95,12 @@
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
         <source>From</source>
-        <translation>-tól</translation>
+        <translation>Tól</translation>
     </message>
     <message>
         <location/>
         <source>till</source>
-        <translation>-ig</translation>
+        <translation>ig</translation>
     </message>
     <message>
         <location/>
@@ -274,7 +274,7 @@
     <message>
         <location/>
         <source>&amp;Login:</source>
-        <translation>&amp;Belépés:</translation>
+        <translation>&amp;Felhasználónév:</translation>
     </message>
     <message>
         <location/>
@@ -534,7 +534,7 @@
     <message>
         <location/>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation>&amp;Auto-resetig várakozási ideje (mp):</translation>
+        <translation>&amp;Auto-reset (mp):</translation>
     </message>
 </context>
 <context>
@@ -697,27 +697,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrás tartalma:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>Címszavak szóközzel elválasztva</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Felirat tartalma:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Leírás tartalma:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>A szabály csak olyan általános eseményekkel fog működni, amik minden szűrőnek megfelelnek. Üres mezők nincsenek hatással az eredményre. Minden szűrő megfelel, ha a kulcsszavak valamelyike egyezik.</translation>
     </message>
 </context>
 <context>
@@ -786,7 +786,7 @@
     <message>
         <location/>
         <source>Floor/Table Mount</source>
-        <translation>Paddló/asztali telepítés</translation>
+        <translation>Padló/asztali telepítés</translation>
     </message>
     <message>
         <location/>
@@ -809,7 +809,7 @@
     <message>
         <location/>
         <source>Extra Media Folders</source>
-        <translation>Extra média mappa</translation>
+        <translation>További média mappa</translation>
     </message>
     <message>
         <location/>
@@ -844,7 +844,7 @@
     <message>
         <location/>
         <source>Auto Pause Video</source>
-        <translation>Viseó automatikus megállítása</translation>
+        <translation>Video automatikus megállítása</translation>
     </message>
     <message>
         <location/>
@@ -854,7 +854,7 @@
     <message>
         <location/>
         <source>Run Application when PC Boots:</source>
-        <translation>Alkalpamzás futtatása a PC bootolásakor:</translation>
+        <translation>Alkalmazás futtatása a PC bootolásakor:</translation>
     </message>
     <message>
         <location/>
@@ -917,7 +917,7 @@
     <message>
         <location/>
         <source>Open audit trail log</source>
-        <translation>Audit nyomvonal napló megnyitása</translation>
+        <translation>Audit napló megnyitása</translation>
     </message>
     <message>
         <location/>
@@ -932,7 +932,7 @@
     <message>
         <location/>
         <source>Audit Trail</source>
-        <translation>Audit nyomvonal</translation>
+        <translation>Audit napló</translation>
     </message>
 </context>
 <context>
@@ -945,7 +945,7 @@
     <message>
         <location/>
         <source>Force aspect ratio to:</source>
-        <translation>Képarány erőltetése:</translation>
+        <translation>Képarány kényszerítése:</translation>
     </message>
     <message>
         <location/>
@@ -1135,7 +1135,7 @@
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
         <source>License Details</source>
-        <translation>Licence tulajdonságok</translation>
+        <translation>Licenc tulajdonságok</translation>
     </message>
     <message>
         <location/>
@@ -1145,7 +1145,7 @@
     <message>
         <location/>
         <source>License Type:</source>
-        <translation>Licence típusa:</translation>
+        <translation>Licenc típusa:</translation>
     </message>
     <message>
         <location/>
@@ -1165,7 +1165,7 @@
     <message>
         <location/>
         <source>This license type requires higher software version.</source>
-        <translation>Ehhez a licence típushoz magasabb szoftververzióra van szükség.</translation>
+        <translation>Ehhez a licenc típushoz magasabb szoftververzióra van szükség.</translation>
     </message>
 </context>
 <context>
@@ -1188,7 +1188,7 @@
     <message>
         <location/>
         <source>New License</source>
-        <translation>Új licence</translation>
+        <translation>Új licenc</translation>
     </message>
 </context>
 <context>
@@ -1214,7 +1214,7 @@
     <message>
         <location/>
         <source>License Key:</source>
-        <translation>Licencekulcs:</translation>
+        <translation>Licenckulcs:</translation>
     </message>
     <message>
         <location/>
@@ -1249,7 +1249,7 @@
     <message>
         <location/>
         <source>Activate Free License</source>
-        <translation>Ingyenes licence aktiválása</translation>
+        <translation>Ingyenes licenc aktiválása</translation>
     </message>
     <message>
         <location/>
@@ -1264,7 +1264,7 @@
     <message>
         <location/>
         <source>Select License File...</source>
-        <translation>Váaszzon licenc fájlt...</translation>
+        <translation>Válaszzon licenc fájlt...</translation>
     </message>
 </context>
 <context>
@@ -2401,7 +2401,7 @@ Nem tiltja a régi felvételek törlését a meghajtóról.</translation>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Feladatátvétel prioritás...</translation>
     </message>
 </context>
 <context>
