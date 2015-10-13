@@ -120,6 +120,7 @@ extern "C"
 #include <utils/network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
+#include <utils/network/socket_global.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -311,6 +312,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     initLog(startupParams.logLevel, logFileNameSuffix, startupParams.ec2TranLogLevel);
+
+    // TODO: #mu ON/OFF switch in settings?
+    nx::SocketGlobals::cloudInfo().enableMediator(true);
 
 	// TODO: #Elric why QString???
     if (!startupParams.lightMode.isEmpty() && startupParams.videoWallGuid.isNull()) {

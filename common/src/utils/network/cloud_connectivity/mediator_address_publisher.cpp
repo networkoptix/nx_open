@@ -1,29 +1,31 @@
 #include "mediator_address_publisher.h"
 
-#include "utils/network/stun/cc/custom_stun.h"
-
 #include "common/common_globals.h"
 #include "utils/common/log.h"
 #include "utils/network/socket_global.h"
+#include "utils/network/stun/cc/custom_stun.h"
+
+static const std::chrono::minutes UPDATE_INTERVAL( 1 );
 
 namespace nx {
 namespace cc {
 
 MediatorAddressPublisher::MediatorAddressPublisher( String serverId )
     : m_serverId( std::move( serverId ) )
-    , m_isExternalChanged( false )
-    , m_isExternalUpdateInProgress( false )
+    , isTerminating( false )
 {
     SocketGlobals::cloudInfo().enableMediator();
 }
 
 MediatorAddressPublisher::~MediatorAddressPublisher()
 {
-    std::unique_ptr< stun::AsyncClient > stunClient;
-    {
-        QnMutexLocker lk( &m_mutex );
-        std::swap( m_stunClient, stunClient );
-    }
+    QnMutexLocker lk( &m_mutex );
+    isTerminating = true;
+
+    const auto client = std::move( m_stunClient );
+    const auto guard = std::move( m_timerGuard );
+
+    lk.unlock();
 }
 
 bool MediatorAddressPublisher::Authorization::operator == ( const Authorization& rhs ) const
@@ -34,162 +36,139 @@ bool MediatorAddressPublisher::Authorization::operator == ( const Authorization&
 void MediatorAddressPublisher::authorizationChanged(
         boost::optional< Authorization > authorization )
 {
-    std::unique_ptr< stun::AsyncClient > oldStunClient;
+    QnMutexLocker lk( &m_mutex );
+    bool hadAuthorization = m_stunAuthorization.is_initialized();
+    if( m_stunAuthorization == authorization )
+        return;
+
+    m_stunAuthorization = std::move( authorization );
+    if( hadAuthorization )
     {
-        QnMutexLocker lk( &m_mutex );
-        if( m_authorization == authorization )
-            return;
-
-        m_authorization = std::move( authorization );
-        if( !m_address )
-            return;
-
-        std::swap( oldStunClient, m_stunClient );
+        // updated will be performed by running timer
+        m_pingedAddresses.clear();
+        m_publishedAddresses.clear();
     }
-
-    oldStunClient.reset();
-
+    else
     {
-        QnMutexLocker lk( &m_mutex );
-        m_stunClient = std::make_unique< stun::AsyncClient >( *m_address );
-        m_isExternalChanged = true;
-        m_isExternalUpdateInProgress = false;
-        updateExternalAddresses();
+        pingReportedAddresses();
     }
 }
 
 void MediatorAddressPublisher::updateAddresses( std::list< SocketAddress > addresses )
 {
     QnMutexLocker lk( &m_mutex );
-    for( auto it = m_external.begin(); it != m_external.end(); )
-    {
-        const auto curIt = std::find(addresses.begin(), addresses.end(),  *it );
-        if( curIt != addresses.end() )
-        {
-            // no need to ping this one
-            addresses.erase( curIt );
-            ++it;
-        }
-        else
-        {
-            it = m_external.erase( it );
-            m_isExternalChanged = true;
-        }
-    }
+    if( m_reportedAddresses == addresses )
+        return;
 
-    updateExternalAddresses();
-    checkAddresses( std::move( addresses ) );
+    m_reportedAddresses = std::move( addresses );
+}
+
+void MediatorAddressPublisher::setupUpdateTimer()
+{
+    if( isTerminating )
+        return;
+
+    m_timerGuard = TimerManager::instance()->addTimer(
+        [ this ]( quint64 )
+        {
+            QnMutexLocker lk( &m_mutex );
+            pingReportedAddresses();
+        },
+        UPDATE_INTERVAL );
 }
 
 bool MediatorAddressPublisher::isCloudReady()
 {
-    // TODO #mu should we update address in some point in time?
-    if( !m_stunClient && !m_address )
+    if( !m_stunClient )
     {
         if( const auto address = SocketGlobals::cloudInfo().mediatorAddress() )
-        {
-            m_address = std::move( address );
-            m_stunClient = std::make_unique< stun::AsyncClient >( *m_address );
-        }
+            m_stunClient = std::make_unique< stun::AsyncClient >( *address );
         else
-        {
             NX_LOGX( lit( "Mediator address is not resolved yet" ), cl_logDEBUG1 );
-        }
     }
 
-    return m_stunClient && m_authorization;
+    return m_stunClient && m_stunAuthorization;
 }
 
-void MediatorAddressPublisher::updateExternalAddresses()
+void MediatorAddressPublisher::pingReportedAddresses()
 {
-    if( !isCloudReady() || !m_isExternalChanged || m_isExternalUpdateInProgress )
-        return;
+    if( !isCloudReady() )
+        return setupUpdateTimer();
+
+    if( m_reportedAddresses == m_pingedAddresses )
+        return publishPingedAddresses();
 
     stun::Message request( stun::Header( stun::MessageClass::request,
-                                         stun::cc::methods::bind ) );
-    request.newAttribute< stun::cc::attrs::SystemId >( m_authorization->systemId );
+                                         stun::cc::methods::ping ) );
+    request.newAttribute< stun::cc::attrs::SystemId >( m_stunAuthorization->systemId );
     request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
-    request.newAttribute< stun::cc::attrs::Authorization >( m_authorization->key );
-    request.newAttribute< stun::cc::attrs::PublicEndpointList >(
-        std::list< SocketAddress >( m_external.begin(), m_external.end() ) );
+    request.newAttribute< stun::cc::attrs::Authorization >( m_stunAuthorization->key );
+    request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_reportedAddresses );
 
     const auto ret = m_stunClient->sendRequest(
         std::move( request ),
         [ this ]( SystemError::ErrorCode code, stun::Message response )
     {
         QnMutexLocker lk( &m_mutex );
-        m_isExternalUpdateInProgress = false;
-
         if( const auto error = stun::AsyncClient::hasError( code, response ) )
         {
             NX_LOGX( *error, cl_logERROR );
-            m_isExternalChanged = true;
-        }
-        else
-        {
-            NX_LOGX( lit( "Updated external addresses: %1" )
-                    .arg( containerString( m_external ) ), cl_logDEBUG1 );
-        }
-
-        // just in case if smthing already changed
-        updateExternalAddresses();
-    } );
-
-    if( !ret )
-    {
-        NX_LOGX( lit( "Could not sendRequest" ), cl_logERROR );
-        return;
-    }
-
-    m_isExternalChanged = false;
-    m_isExternalUpdateInProgress = true;
-}
-
-void MediatorAddressPublisher::checkAddresses( const std::list< SocketAddress >& addresses )
-{
-    if( !isCloudReady() )
-        return;
-
-    stun::Message request( stun::Header( stun::MessageClass::request,
-                                         stun::cc::methods::ping ) );
-    request.newAttribute< stun::cc::attrs::SystemId >( m_authorization->systemId );
-    request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
-    request.newAttribute< stun::cc::attrs::Authorization >( m_authorization->key );
-    request.newAttribute< stun::cc::attrs::PublicEndpointList >( addresses );
-
-    const auto ret = m_stunClient->sendRequest(
-        std::move( request ),
-        [ this ]( SystemError::ErrorCode code, stun::Message response )
-    {
-        if( const auto error = stun::AsyncClient::hasError( code, response ) )
-        {
-            NX_LOGX( *error, cl_logERROR );
-            return;
+            return setupUpdateTimer();
         }
 
         const auto eps = response.getAttribute< stun::cc::attrs::PublicEndpointList >();
         if( !eps )
         {
             NX_LOGX( lit( "No PublicEndpointList in response" ), cl_logERROR );
-            return;
+            return setupUpdateTimer();
         }
 
-        QnMutexLocker lk( &m_mutex );
-        const auto size = m_external.size();
-        const auto addresses = eps->get();
+        m_pingedAddresses = eps->get();
+        NX_LOGX( lit( "Pinged addresses: %1" )
+                 .arg( containerString( m_publishedAddresses ) ), cl_logDEBUG1 );
 
-        m_external.insert( addresses.begin(), addresses.end() );
-        m_isExternalChanged = (size < m_external.size());
-
-        NX_LOGX( lit( "Pinged external addresses: %1, was %2, need update: %3" )
-                .arg( containerString( m_external ) )
-                .arg( size ).arg( m_isExternalChanged ), cl_logDEBUG1 );
-
-        updateExternalAddresses();
+        publishPingedAddresses();
     } );
 
-    if (!ret )
-        NX_LOGX( lit( "Could not sendRequest" ), cl_logERROR );
+    if( !ret )
+        setupUpdateTimer();
+}
+
+void MediatorAddressPublisher::publishPingedAddresses()
+{
+    if( !isCloudReady() )
+        return setupUpdateTimer();
+
+    if( m_pingedAddresses == m_publishedAddresses )
+        return setupUpdateTimer();
+
+    stun::Message request( stun::Header( stun::MessageClass::request,
+                                         stun::cc::methods::bind ) );
+    request.newAttribute< stun::cc::attrs::SystemId >( m_stunAuthorization->systemId );
+    request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
+    request.newAttribute< stun::cc::attrs::Authorization >( m_stunAuthorization->key );
+    request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_pingedAddresses );
+
+    const auto ret = m_stunClient->sendRequest(
+        std::move( request ),
+        [ this ]( SystemError::ErrorCode code, stun::Message response )
+    {
+        QnMutexLocker lk( &m_mutex );
+        if( const auto error = stun::AsyncClient::hasError( code, response ) )
+        {
+            NX_LOGX( *error, cl_logERROR );
+            return setupUpdateTimer();
+        }
+
+        m_publishedAddresses = m_pingedAddresses;
+        NX_LOGX( lit( "Published addresses: %1" )
+                 .arg( containerString( m_publishedAddresses ) ), cl_logDEBUG1 );
+
+        setupUpdateTimer();
+    } );
+
+    if( !ret )
+        setupUpdateTimer();
 }
 
 } // namespase cc

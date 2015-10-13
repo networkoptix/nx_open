@@ -43,7 +43,7 @@ private:
     void updateSystemsAsync();
 
     mutable QnMutex m_mutex;
-    std::map< String, cdb::api::SystemData > m_systemCache;
+    std::map< String, System > m_systemCache;
 
     bool m_isTerminated;
     TimerManager::TimerGuard m_timerGuard;

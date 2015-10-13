@@ -44,7 +44,7 @@ namespace stree
             *value = untypedValue.value<T>();
             return true;
         }
-        template<> bool get<QnUuid>( int resID, QnUuid* const value ) const
+        bool get( int resID, QnUuid* const value ) const
         {
             QVariant untypedValue;
             if (!get(resID, &untypedValue))

@@ -2155,7 +2155,7 @@ void MediaServerProcess::run()
             !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
         {
             nx::cc::MediatorAddressPublisher::Authorization auth = {
-                cloudSystemId.toUtf8(), cloudAuthKey.toUtf8()};
+                QnUuid(cloudSystemId).toSimpleString().toUtf8(), cloudAuthKey.toUtf8()};
             m_mediatorAddressPublisher->authorizationChanged(std::move(auth));
             return;
         }

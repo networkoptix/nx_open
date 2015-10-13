@@ -29,6 +29,7 @@ enum class ResultCode
     badUsername,
     badRequest,
     invalidNonce,
+    serviceUnavailable,
     unknownError
 };
 

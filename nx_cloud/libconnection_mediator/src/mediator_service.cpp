@@ -58,11 +58,13 @@ int MediatorProcess::executeApplication()
 
     //parsing command line arguments
     bool showHelp = false;
+    bool runWithoutCloud = false;
     QString logLevel;
 
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), false);
+    commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString(), DEFAULT_LOG_LEVEL);
+    commandLineParser.addParameter(&runWithoutCloud, "--run-without-cloud", NULL, QString(), true);
     commandLineParser.parse(m_argc, m_argv, stderr);
 
     if( showHelp )
@@ -110,14 +112,19 @@ int MediatorProcess::executeApplication()
         return 1;
     }
 
-    CloudDataProvider cloudDataProvider(
-        m_settings->value("cloudUser", DEFAULT_CLOUD_USER).toString().toStdString(),
-        m_settings->value("cloudPassword", DEFAULT_CLOUD_PASSWORD).toString().toStdString() );
+    TimerManager timerManager;
+    std::shared_ptr< CloudDataProvider > cloudDataProvider;
+    if( !runWithoutCloud )
+        cloudDataProvider = std::make_unique< CloudDataProvider >(
+            m_settings->value("cloudUser", DEFAULT_CLOUD_USER).toString().toStdString(),
+            m_settings->value("cloudPassword", DEFAULT_CLOUD_PASSWORD).toString().toStdString() );
+    else
+        NX_LOG( lit( "STUN Server is running without cloud (debug mode)" ), cl_logALWAYS );
 
     //STUN handlers
     stun::MessageDispatcher stunMessageDispatcher;
-    MediaserverApi mediaserverApi( &cloudDataProvider, &stunMessageDispatcher );
-    ListeningPeerPool listeningPeerPool( &cloudDataProvider, &stunMessageDispatcher );
+    MediaserverApi mediaserverApi( cloudDataProvider.get(), &stunMessageDispatcher );
+    ListeningPeerPool listeningPeerPool( cloudDataProvider.get(), &stunMessageDispatcher );
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset(
@@ -132,7 +139,7 @@ int MediatorProcess::executeApplication()
         return 4;
 
     NX_LOG( lit( "STUN Server is listening %1" )
-            .arg( containerString( httpAddrToListenList ) ), cl_logALWAYS );
+            .arg( containerString( stunAddrToListenList ) ), cl_logALWAYS );
 
     //TODO #ak remove qt event loop
     //application's main loop

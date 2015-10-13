@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtCore/QSet>
-#include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/camera_bookmark.h>
 #include <utils/common/id.h>
 
 class QnCameraBookmarkAggregation {

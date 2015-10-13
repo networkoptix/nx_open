@@ -44,7 +44,7 @@ void ListeningPeerPool::bind( const ConnectionSharedPtr& connection,
             else
                 peer->endpoints.clear();
 
-            NX_LOGX( lit("Peer %2/%3 succesfully bound, endpoints=%4")
+            NX_LOGX( lit("Peer %2.%3 succesfully bound, endpoints=%4")
                     .arg( QString::fromUtf8( mediaserver->systemId ) )
                     .arg( QString::fromUtf8( mediaserver->serverId ) )
                     .arg( containerString( peer->endpoints ) ), cl_logDEBUG1 );
@@ -67,7 +67,7 @@ void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
         QnMutexLocker lk( &m_mutex );
         if( const auto peer = m_peers.peer( connection, *mediaserver, &m_mutex ) )
         {
-            NX_LOGX( lit("Peer %1/%2 started to listen")
+            NX_LOGX( lit("Peer %1.%2 started to listen")
                     .arg( QString::fromUtf8( mediaserver->systemId ) )
                     .arg( QString::fromUtf8( mediaserver->serverId ) ),
                     cl_logDEBUG1 );
@@ -97,8 +97,11 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
         return errorResponse( connection, message.header, stun::error::badRequest,
             "Attribute HostName is required" );
 
+    const auto userName = userNameAttr->string();
+    const auto hostName = hostNameAttr->string();
+
     QnMutexLocker lk( &m_mutex );
-    if( const auto peer = m_peers.search( hostNameAttr->value ) )
+    if( const auto peer = m_peers.search( hostName ) )
     {
         stun::Message response( stun::Header(
             stun::MessageClass::successResponse, message.header.method,
@@ -111,16 +114,20 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
             { /* TODO: StunEndpointList */ }
 
         NX_LOGX( lit("Client %1 connects to %2, endpoints=%3")
-                .arg( QString::fromUtf8( userNameAttr->value ) )
-                .arg( QString::fromUtf8( hostNameAttr->value ) )
-                .arg( containerString( peer->endpoints ) ), cl_logDEBUG2 );
+                .arg( QString::fromUtf8( userName ) )
+                .arg( QString::fromUtf8( hostName ) )
+                .arg( containerString( peer->endpoints ) ), cl_logDEBUG1 );
 
         connection->sendMessage( std::move( response ) );
     }
     else
     {
+        NX_LOGX( lit("Client %1 could not find a host %2")
+                .arg( QString::fromUtf8( userName ) )
+                .arg( QString::fromUtf8( hostName ) ), cl_logDEBUG1 );
+
         errorResponse( connection, message.header, stun::cc::error::notFound,
-            "Can not find a server " + hostNameAttr->value );
+            "Can not find a host " + hostName );
     }
 }
 
@@ -154,7 +161,7 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
     {
         connection.lock()->registerCloseHandler( [ = ]()
         {
-            NX_LOGX( lit("Peer %2/%3 has been desconnected")
+            NX_LOGX( lit("Peer %2.%3 has been desconnected")
                     .arg( QString::fromUtf8( systemIt->first ) )
                     .arg( QString::fromUtf8( serverIt->first ) ), cl_logDEBUG2 );
 

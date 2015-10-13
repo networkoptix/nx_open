@@ -1,7 +1,5 @@
 #include "camera_bookmark_aggregation.h"
 
-#include <core/resource/camera_bookmark.h>
-
 QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkList &bookmarkList) {
     setBookmarkList(bookmarkList);
 }

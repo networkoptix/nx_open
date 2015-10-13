@@ -206,6 +206,7 @@ namespace attrs
 
         Unknown( int userType_, nx::Buffer value_ = nx::Buffer() );
         virtual int type() const override { return userType; }
+        nx::String string() const { return nx::String( value.data() ); }
 
     public:
         int userType;

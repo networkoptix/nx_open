@@ -3,7 +3,7 @@
 #include <utils/common/log.h>
 #include <utils/common/log_message.h>
 
-static const std::chrono::seconds UPDATE_INTERVAL( 10 );
+static const std::chrono::minutes UPDATE_INTERVAL( 1 );
 
 namespace nx {
 namespace hpm {
@@ -54,8 +54,17 @@ boost::optional< CloudDataProviderIf::System >
     if( it == m_systemCache.end() )
         return boost::none;
 
-    return System( String( it->second.authKey.c_str() ),
-                   it->second.cloudConnectionSubscriptionStatus );
+    return it->second;
+}
+
+static QString traceSystems( const std::map< String, CloudDataProviderIf::System >& systems )
+{
+    QStringList list;
+    for( const auto sys : systems )
+        list << lm("%1 (%2 %3)").arg( sys.first )
+                                .arg( sys.second.authKey )
+                                .arg( sys.second.mediatorEnabled );
+    return list.join( QLatin1String( ", " ) );
 }
 
 void CloudDataProvider::updateSystemsAsync()
@@ -78,14 +87,18 @@ void CloudDataProvider::updateSystemsAsync()
         }
         else
         {
-            NX_LOGX( lm("There are %1 systems updated")
-                     .arg( systems.systems.size() ), cl_logINFO );
-
             QnMutexLocker lk( &m_mutex );
             m_systemCache.clear();
             for( auto& sys : systems.systems )
-                m_systemCache.emplace( sys.id.toSimpleString().toUtf8(),
-                                       std::move( sys ) );
+                m_systemCache.emplace(
+                    sys.id.toSimpleString().toUtf8(),
+                    System( String( sys.authKey.c_str() ),
+                                    sys.cloudConnectionSubscriptionStatus ) );
+
+            NX_LOGX( lm("There is(are) %1 system(s) updated")
+                     .arg( systems.systems.size() ), cl_logDEBUG1 );
+            NX_LOGX( lm("Updated: %1")
+                     .arg( traceSystems( m_systemCache ) ), cl_logDEBUG2 );
         }
 
         m_timerGuard = TimerManager::instance()->addTimer(

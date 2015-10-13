@@ -39,6 +39,8 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
         case ResultCode::badUsername:
         case ResultCode::badRequest:
             return nx_http::StatusCode::badRequest;
+        case ResultCode::serviceUnavailable:
+            return nx_http::StatusCode::serviceUnavailable;
         case ResultCode::unknownError:
             return nx_http::StatusCode::internalServerError;
     }
@@ -62,6 +64,8 @@ ResultCode httpStatusCodeToResultCode(nx_http::StatusCode::Value statusCode)
             return ResultCode::dbError;
         case nx_http::StatusCode::notImplemented:
             return ResultCode::notImplemented;
+        case nx_http::StatusCode::serviceUnavailable:
+            return ResultCode::serviceUnavailable;
         default:
             return ResultCode::unknownError;
     }
@@ -80,6 +84,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::badUsername, "badUsername")
     (ResultCode::badRequest, "badRequest")
     (ResultCode::invalidNonce, "invalidNonce")
+    (ResultCode::serviceUnavailable, "serviceUnavailable")
     (ResultCode::unknownError, "unknownError")
 );
 

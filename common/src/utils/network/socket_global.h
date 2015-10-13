@@ -31,8 +31,8 @@ private:
 
 private:
     std::shared_ptr< QnLog::Logs > m_log;
-    cc::AddressResolver m_addressResolver;
     aio::AIOService m_aioService;
+    cc::AddressResolver m_addressResolver;
     cc::CloudConnectionInfo m_cloudConnectionInfo;
 };
 

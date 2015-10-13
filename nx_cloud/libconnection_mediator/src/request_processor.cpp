@@ -32,7 +32,10 @@ boost::optional< RequestProcessor::MediaserverData >
         return boost::none;
     }
 
-    MediaserverData data = { systemAttr->value, serverAttr->value };
+    MediaserverData data = { systemAttr->string(), serverAttr->string() };
+    if( !m_cloudData ) // debug mode
+        return data;
+
     const auto system = m_cloudData->getSystem( data.systemId );
     if( !system )
     {
@@ -40,12 +43,12 @@ boost::optional< RequestProcessor::MediaserverData >
                        "System could not be found" );
         return boost::none;
     }
-    if( !system->mediatorEnabled )
-    {
-        errorResponse( connection, request.header, stun::error::badRequest,
-                       "Mediator is not enabled for this system" );
-        return boost::none;
-    }
+//    if( !system->mediatorEnabled )
+//    {
+//        errorResponse( connection, request.header, stun::error::badRequest,
+//                       "Mediator is not enabled for this system" );
+//        return boost::none;
+//    }
 
     const auto authAttr = request.getAttribute< stun::cc::attrs::Authorization >();
     if( !authAttr )
@@ -54,7 +57,7 @@ boost::optional< RequestProcessor::MediaserverData >
                        "Attribute Authorization is required" );
         return boost::none;
     }
-    if( system->authKey != authAttr->value )
+    if( system->authKey != authAttr->string() )
     {
         errorResponse( connection, request.header, stun::error::unauthtorized,
                        "Authorization failed" );

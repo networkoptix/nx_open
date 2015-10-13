@@ -67,7 +67,7 @@ void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
 
             if( auto connection = collector->connection.lock() )
             {
-                NX_LOGX( lit("Peer %1/%2 succesfully pinged %3")
+                NX_LOGX( lit("Peer %1.%2 succesfully pinged %3")
                         .arg( QString::fromUtf8( mediaserver->systemId ) )
                         .arg( QString::fromUtf8( mediaserver->serverId ) )
                         .arg( containerString( collector->endpoints ) ), cl_logDEBUG1 );

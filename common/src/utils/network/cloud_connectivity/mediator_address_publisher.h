@@ -3,6 +3,7 @@
 
 #include "utils/network/stun/async_client.h"
 #include "utils/network/cloud_connectivity/cdb_endpoint_fetcher.h"
+#include "utils/common/timermanager.h"
 
 namespace nx {
 namespace cc {
@@ -25,21 +26,25 @@ public:
     void updateAddresses( std::list< SocketAddress > addresses );
 
 private:
+    void setupUpdateTimer();
     bool isCloudReady();
-    void updateExternalAddresses();
-    void checkAddresses( const std::list< SocketAddress >& addresses );
+
+    void pingReportedAddresses();
+    void publishPingedAddresses();
 
 private:
     const String m_serverId;
 
     QnMutex m_mutex;
-    boost::optional< SocketAddress > m_address;
-    boost::optional< Authorization > m_authorization;
+    TimerManager::TimerGuard m_timerGuard;
+    bool isTerminating;
+
+    boost::optional< Authorization > m_stunAuthorization;
     std::unique_ptr< stun::AsyncClient > m_stunClient;
 
-    std::set< SocketAddress > m_external;
-    bool m_isExternalChanged;
-    bool m_isExternalUpdateInProgress;
+    std::list< SocketAddress > m_reportedAddresses;
+    std::list< SocketAddress > m_pingedAddresses;
+    std::list< SocketAddress > m_publishedAddresses;
 };
 
 } // namespase cc
