@@ -4414,7 +4414,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
-        <translation>Управление PTZ.</translation>
+        <translation>Управление PTZ для камеры %1.</translation>
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
