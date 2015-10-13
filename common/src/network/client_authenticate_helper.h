@@ -11,10 +11,12 @@ public:
     int responseStatusCode;
 
     HttpAuthenticationClientContext()
-        :
+    :
         responseStatusCode( nx_http::StatusCode::ok )
     {
     }
+
+    bool isValid() const { return authenticateHeader; }
 
     void clear()
     {
@@ -42,7 +44,10 @@ public:
         HttpAuthenticationClientContext* const authenticationCtx );
 
     //!Same as above, but uses cached authentication info
-    static Qn::AuthResult authenticate(const QAuthenticator& auth, nx_http::Request* const request, const HttpAuthenticationClientContext* const authenticationCtx);
+    static Qn::AuthResult QnClientAuthHelper::addAuthorizationToRequest(
+        const QAuthenticator& auth,
+        nx_http::Request* const request,
+        const HttpAuthenticationClientContext* const authenticationCtx);
 };
 
 #endif // __QN_CLIENT_AUTH_HELPER__

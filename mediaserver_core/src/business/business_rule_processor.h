@@ -145,8 +145,6 @@ private slots:
 
 
 protected:
-    virtual QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const;
-    
     bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
