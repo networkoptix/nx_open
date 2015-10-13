@@ -59,6 +59,15 @@
                             <set value="editorWithSharing" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
+                    <condition value="/system/get_cloud_users" resName="systemID" matchType="presence">
+                        <sequence value="true">
+                            <set resName="authorized" resValue="false"/>
+                            <condition resName="authAccountRightsOnSystem">
+                                <set value="owner" resName="authorized" resValue="true"/>
+                                <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                            </condition>
+                        </sequence>
+                    </condition>
                     <sequence value="/system/bind">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="accountID" matchType="presence">
