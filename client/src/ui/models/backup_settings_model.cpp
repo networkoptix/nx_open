@@ -113,6 +113,16 @@ QVariant QnBackupSettingsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+void QnBackupSettingsModel::setData(const QModelIndexList &indexList, const QVariant &value, int role)
+{
+    beginResetModel();
+    blockSignals(true);
+    for (const auto& index: indexList)
+        setData(index, value, role);
+    blockSignals(false);
+    endResetModel();
+}
+
 bool QnBackupSettingsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
@@ -158,4 +168,35 @@ QVariant QnBackupSettingsModel::headerData(int section, Qt::Orientation orientat
             return QVariant();
     }
     return QVariant();
+}
+
+void QnBackupSettingsModel::setCheckState(Qt::CheckState state)
+{
+    if (state == Qt::PartiallyChecked)
+        return;
+
+    beginResetModel();
+    for (auto& value: m_data)
+        value.isChecked = state == Qt::Checked ? true : false;
+    endResetModel();
+    //emit dataChanged(index(0,0), index(m_data.size(), ColumnCount), QVector<int>() << Qt::CheckStateRole);
+}
+
+Qt::CheckState QnBackupSettingsModel::checkState() const
+{
+    bool hasChecked = false;
+    bool hasUnchecked = false;
+    for (const auto& value: m_data) {
+        if (value.isChecked)
+            hasChecked = true;
+        else
+            hasUnchecked = true;
+    }
+
+    if (hasChecked && hasUnchecked)
+        return Qt::PartiallyChecked;
+    else if (hasChecked)
+        return Qt::Checked;
+    else
+        return Qt::Unchecked;
 }

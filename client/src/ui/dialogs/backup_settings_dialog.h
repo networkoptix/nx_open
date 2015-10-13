@@ -23,10 +23,16 @@ private slots:
     void at_updateModelData();
     void at_modelDataChanged();
     void at_headerCheckStateChanged(Qt::CheckState state);
+    void at_gridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void at_gridItemPressed(const QModelIndex& index);
 private:
     void setNearestValue(QComboBox* combobox, int time);
+    void updateHeadersCheckState();
 private:
     QScopedPointer<Ui::BackupSettingsDialog> ui;
     QnBackupSettingsModel* m_model;
     bool m_updatingModel;
+    bool m_skipNextPressSignal;
+    QModelIndex m_skipNextSelIndex;
+    QModelIndex m_lastPressIndex;
 };

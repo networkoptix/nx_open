@@ -5,7 +5,8 @@
 QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags ):
     base_type(parent, windowFlags),
     ui(new Ui::BackupSettingsDialog()),
-    m_updatingModel(false)
+    m_updatingModel(false),
+    m_skipNextPressSignal(false)
 {
     ui->setupUi(this);
 
@@ -27,16 +28,83 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget *parent, Qt::WindowFlags 
     connect(ui->checkBoxHQ,  &QRadioButton::clicked, this, &QnBackupSettingsDialog::at_updateModelData);
     connect(m_model, &QAbstractItemModel::dataChanged, this, &QnBackupSettingsDialog::at_modelDataChanged);
     connect(m_model, &QAbstractItemModel::modelReset, this, &QnBackupSettingsDialog::at_modelDataChanged);
+
+    connect(ui->gridCameras->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QnBackupSettingsDialog::at_gridSelectionChanged);
+    connect(ui->gridCameras,         &QTableView::pressed, this, &QnBackupSettingsDialog::at_gridItemPressed); // put selection changed before item pressed
 }
+
+void QnBackupSettingsDialog::at_gridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    QN_UNUSED(selected, deselected);
+
+    QModelIndex mouseIdx = ui->gridCameras->mouseIndex();
+    bool isCheckRow = mouseIdx.isValid() && mouseIdx.column() == 0;
+    if (isCheckRow) {
+        if (mouseIdx.data(Qt::CheckStateRole) == Qt::Unchecked)
+            m_skipNextPressSignal = true;
+    }
+    else {
+        m_model->blockSignals(true);
+        m_model->setCheckState(Qt::Unchecked);
+        m_model->blockSignals(false);
+    }
+
+    QModelIndexList indexes = ui->gridCameras->selectionModel()->selectedRows();
+    if (m_skipNextSelIndex.isValid()) {
+        for (auto itr = indexes.begin(); itr != indexes.end(); ++itr) {
+            if (*itr == m_skipNextSelIndex) {
+                indexes.erase(itr);
+                m_skipNextPressSignal = false;
+                break;
+            }
+        }
+    }
+    m_skipNextSelIndex = QModelIndex();
+    
+    m_updatingModel = true;
+    for (const auto& index: indexes)
+        ui->gridCameras->model()->setData(index, Qt::Checked, Qt::CheckStateRole);
+    m_updatingModel = false;
+    updateHeadersCheckState();
+}
+
+void QnBackupSettingsDialog::at_gridItemPressed(const QModelIndex& index)
+{
+    QnTableView* gridMaster = (QnTableView*) sender();
+
+    if (m_skipNextPressSignal) {
+        m_skipNextPressSignal = false;
+        m_skipNextSelIndex = QModelIndex();
+        return;
+    }
+    m_lastPressIndex = index;
+    if (index.column() != QnBackupSettingsModel::CheckBoxColumn)
+        return;
+
+    m_skipNextSelIndex = index;
+
+    Qt::CheckState checkState = (Qt::CheckState) index.data(Qt::CheckStateRole).toInt();
+    if (checkState == Qt::Checked)
+        checkState = Qt::Unchecked;
+    else
+        checkState = Qt::Checked;
+    ui->gridCameras->model()->setData(index, checkState, Qt::CheckStateRole);
+    updateHeadersCheckState();
+}
+
+void QnBackupSettingsDialog::updateHeadersCheckState()
+{
+    QnCheckBoxedHeaderView* headers = (QnCheckBoxedHeaderView*) ui->gridCameras->horizontalHeader();
+    headers->blockSignals(true);
+    headers->setCheckState(m_model->checkState());
+    headers->blockSignals(false);
+};
 
 void QnBackupSettingsDialog::at_headerCheckStateChanged(Qt::CheckState state)
 {
     if (state == Qt::PartiallyChecked)
         return;
-    auto allData = m_model->modelData();
-    for (auto& value: allData)
-        value.isChecked = state == Qt::Checked ? true : false;
-    m_model->setModelData(allData);
+    m_model->setCheckState(state);
 }
 
 void QnBackupSettingsDialog::at_modelDataChanged()
@@ -54,16 +122,11 @@ void QnBackupSettingsDialog::at_modelDataChanged()
     bool hasDisabled = false;
     bool hasHQ = false;
     bool hasLQ = false;
-    bool hasChecked = false;
-    bool hasUnchecked = false;
 
     for (const auto& value: m_model->modelData()) 
     {
-        if (!value.isChecked) {
-            hasUnchecked = true;
+        if (!value.isChecked)
             continue;
-        }
-        hasChecked = true;
 
         switch(value.backupType) 
         {
@@ -96,12 +159,7 @@ void QnBackupSettingsDialog::at_modelDataChanged()
         ui->checkBoxHQ->setCheckState(Qt::Checked);
 
     auto headers = static_cast<QnCheckBoxedHeaderView*>(ui->gridCameras->horizontalHeader());
-    if (hasChecked && hasUnchecked)
-        headers->setCheckState(Qt::PartiallyChecked);
-    else if (hasChecked)
-        headers->setCheckState(Qt::Checked);
-    else
-        headers->setCheckState(Qt::Unchecked);
+    headers->setCheckState(m_model->checkState());
 
     ui->checkBoxLQ->blockSignals(false);
     ui->checkBoxHQ->blockSignals(false);

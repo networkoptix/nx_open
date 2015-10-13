@@ -135,6 +135,7 @@ void QnStorageConfigWidget::updateFromSettings()
     for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
     {
         BackupSettingsData data;
+        data.isChecked = true;
         data.id = camera->getId();
         data.backupType = camera->getBackupType();
 
