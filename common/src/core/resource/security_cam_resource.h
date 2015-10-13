@@ -126,6 +126,9 @@ public:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
+    //!Returns user-defined camera name (if not empty), default name otherwise
+    QString getUserDefinedName() const;
+
     //!Returns user-defined group name (if not empty) or server-defined group name
     virtual QString getGroupName() const;
     //!Returns server-defined group name

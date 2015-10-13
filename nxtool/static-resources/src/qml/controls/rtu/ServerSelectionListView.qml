@@ -97,6 +97,7 @@ ListView
 
                 loggedIn: model.loggedIn;
                 availableForSelection: model.loggedIn && !model.isBusy;
+                availableByHttp: model.availableByHttp;
                 safeMode: model.safeMode;
                 hasHdd: model.hasHdd;
 

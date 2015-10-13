@@ -704,27 +704,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nguồn chứa:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>Từ khóa ngăn cách bởi không gian</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Chú thích có chứa:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mô tả chứa:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>quy tắc sẽ chỉ làm việc cho các sự kiện chung mà vượt qua tất cả các bộ lọc. Lĩnh vực có sản phẩm nào không ảnh hưởng đến kết quả. Mỗi bộ lọc đi nếu bất kỳ của các từ khóa được khớp lệnh.</translation>
     </message>
 </context>
 <context>
@@ -2407,7 +2407,7 @@ Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Failover ưu tiên ...</translation>
     </message>
 </context>
 <context>

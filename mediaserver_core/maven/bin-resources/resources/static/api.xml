@@ -1422,7 +1422,7 @@
                 </function>
                 <function>
                     <name>gettime</name>
-                    <description>Returns server UTC time, time zone and authentication realm (realm is added for convenience)</description>
+                    <description>Returns server UTC time (in milliseconds), time zone and authentication realm (realm is added for convenience)</description>
                     <method>GET</method>
                     <params/>
                     <result>
