@@ -1701,11 +1701,11 @@
     <name>QnBusinessResourceValidationStrings</name>
     <message>
         <source>%1 of %n devices</source>
-        <translation>1% ของ%n อุปกรณ์</translation>
+        <translation>%1 ของ%n อุปกรณ์</translation>
     </message>
     <message>
         <source>%1 of %n cameras</source>
-        <translation>1% ของ%n กล้อง</translation>
+        <translation>%1 ของ%n กล้อง</translation>
     </message>
     <message>
         <source>%1 of %n IO modules</source>
