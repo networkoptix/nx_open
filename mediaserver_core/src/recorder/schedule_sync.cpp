@@ -262,8 +262,8 @@ void QnScheduleSync::synchronize(
                 cl_logWARNING
             );
 
-        // get next chunk
     end:
+        // get next chunk
         chunk = fromCatalog->chunkAt(
             fromCatalog->findNextFileIndex(chunk.startTimeMs)
         );
