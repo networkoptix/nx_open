@@ -30,8 +30,8 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
     m_reader(reader),
     m_extTimeSrc(NULL),
     m_isVisible(true),
-    m_exportRecorder(0),
-    m_exportReader(0),
+    m_exportRecorder(nullptr),
+    m_exportReader(nullptr),
     m_displayStarted(false)
 {
     if (m_reader) {
@@ -143,7 +143,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         qSwap(startTime, endTime);
 
     QMutexLocker lock(&m_exportMutex);
-    if (m_exportRecorder == 0)
+    if (!m_exportRecorder)
     {
         QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
         m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
@@ -153,7 +153,12 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
             emit exportFinished(InvalidResourceType, fileName);
             return;
         }
-        connect(m_exportReader, SIGNAL(finished()), m_exportReader, SLOT(deleteLater()));
+        connect(m_exportReader, &QnAbstractArchiveReader::finished, this, [this](){
+            QMutexLocker lock(&m_exportMutex);
+            m_exportReader->deleteLater();
+            m_exportReader.clear();
+        });
+
         m_exportReader->setCycleMode(false);
         QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (m_exportReader->getArchiveDelegate());
         if (rtspClient) {
@@ -168,7 +173,15 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
         m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
-        connect(m_exportRecorder, SIGNAL(finished()), m_exportRecorder, SLOT(deleteLater()));
+
+        connect(m_exportRecorder, &QnStreamRecorder::finished, this, [this]() {
+           QMutexLocker lock(&m_exportMutex);
+            if (m_exportReader && m_exportRecorder)
+                m_exportReader->removeDataProcessor(m_exportRecorder);
+            m_exportRecorder->deleteLater();
+            m_exportRecorder.clear();
+        });
+
         if (storage)
             m_exportRecorder->setStorage(storage);
 
@@ -217,8 +230,8 @@ void QnClientVideoCamera::stopExport() {
         m_exportRecorder->pleaseStop();
     }
     QMutexLocker lock(&m_exportMutex);
-    m_exportReader = 0;
-    m_exportRecorder = 0;
+    m_exportReader.clear();
+    m_exportRecorder.clear();
 }
 
 void QnClientVideoCamera::setResource(QnMediaResourcePtr resource)
