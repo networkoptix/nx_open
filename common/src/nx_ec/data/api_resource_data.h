@@ -47,8 +47,9 @@ namespace ec2
     };
 #define ApiResourceStatusData_Fields (id)(status)
 
-    Q_DECLARE_METATYPE(ApiResourceParamData)
-    Q_DECLARE_METATYPE(ApiResourceParamWithRefData)
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::ApiResourceParamData)
+Q_DECLARE_METATYPE(ec2::ApiResourceParamWithRefData)
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__
