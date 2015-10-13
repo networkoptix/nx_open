@@ -24,8 +24,8 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget *parent, Qt::WindowFlags 
 
     connect (headers,           &QnCheckBoxedHeaderView::checkStateChanged, this, &QnBackupSettingsDialog::at_headerCheckStateChanged);
 
-    connect(ui->checkBoxLQ, &QRadioButton::clicked, this, &QnBackupSettingsDialog::at_updateModelData);
-    connect(ui->checkBoxHQ,  &QRadioButton::clicked, this, &QnBackupSettingsDialog::at_updateModelData);
+    connect(ui->checkBoxLQ, &QRadioButton::clicked, this, &QnBackupSettingsDialog::at_labelClicked);
+    connect(ui->checkBoxHQ,  &QRadioButton::clicked, this, &QnBackupSettingsDialog::at_labelClicked);
     connect(m_model, &QAbstractItemModel::dataChanged, this, &QnBackupSettingsDialog::at_modelDataChanged);
     connect(m_model, &QAbstractItemModel::modelReset, this, &QnBackupSettingsDialog::at_modelDataChanged);
 
@@ -65,7 +65,7 @@ void QnBackupSettingsDialog::at_gridSelectionChanged(const QItemSelection &selec
     for (const auto& index: indexes)
         ui->gridCameras->model()->setData(index, Qt::Checked, Qt::CheckStateRole);
     m_updatingModel = false;
-    updateHeadersCheckState();
+    at_modelDataChanged();
 }
 
 void QnBackupSettingsDialog::at_gridItemPressed(const QModelIndex& index)
@@ -89,16 +89,8 @@ void QnBackupSettingsDialog::at_gridItemPressed(const QModelIndex& index)
     else
         checkState = Qt::Checked;
     ui->gridCameras->model()->setData(index, checkState, Qt::CheckStateRole);
-    updateHeadersCheckState();
+    //updateHeadersCheckState();
 }
-
-void QnBackupSettingsDialog::updateHeadersCheckState()
-{
-    QnCheckBoxedHeaderView* headers = (QnCheckBoxedHeaderView*) ui->gridCameras->horizontalHeader();
-    headers->blockSignals(true);
-    headers->setCheckState(m_model->checkState());
-    headers->blockSignals(false);
-};
 
 void QnBackupSettingsDialog::at_headerCheckStateChanged(Qt::CheckState state)
 {
@@ -114,7 +106,8 @@ void QnBackupSettingsDialog::at_modelDataChanged()
 
     ui->checkBoxLQ->blockSignals(true);
     ui->checkBoxHQ->blockSignals(true);
-    ui->gridCameras->horizontalHeader()->blockSignals(true);
+    auto headers = static_cast<QnCheckBoxedHeaderView*>(ui->gridCameras->horizontalHeader());
+    headers->blockSignals(true);
 
     ui->checkBoxLQ->setChecked(Qt::Unchecked);
     ui->checkBoxHQ->setChecked(Qt::Unchecked);
@@ -158,15 +151,17 @@ void QnBackupSettingsDialog::at_modelDataChanged()
     else if (hasHQ)
         ui->checkBoxHQ->setCheckState(Qt::Checked);
 
-    auto headers = static_cast<QnCheckBoxedHeaderView*>(ui->gridCameras->horizontalHeader());
     headers->setCheckState(m_model->checkState());
 
     ui->checkBoxLQ->blockSignals(false);
     ui->checkBoxHQ->blockSignals(false);
-    ui->gridCameras->horizontalHeader()->blockSignals(false);
+    headers->blockSignals(false);
+
+    QSortFilterProxyModel* proxyModel = (QSortFilterProxyModel*) ui->gridCameras->model();
+    proxyModel->invalidate();
 }
 
-void QnBackupSettingsDialog::at_updateModelData()
+void QnBackupSettingsDialog::at_labelClicked()
 {
     if (m_updatingModel)
         return;
@@ -176,9 +171,11 @@ void QnBackupSettingsDialog::at_updateModelData()
     if (checkBox->checkState() == Qt::PartiallyChecked)
         checkBox->setCheckState(Qt::Checked);
 
-    auto modelData = m_model->modelData();
-    for (auto& value: modelData) 
+    QAbstractItemModel* model = ui->gridCameras->model();
+    for (int i = 0; i < model->rowCount(); ++i)
     {
+        QModelIndex index = model->index(i, 0);
+        BackupSettingsData value = model->data(index, Qn::BackupSettingsDataRole).value<BackupSettingsData>();
         if (!value.isChecked)
             continue;
 
@@ -191,10 +188,14 @@ void QnBackupSettingsDialog::at_updateModelData()
             value.backupType |= Qn::CameraBackup_HighQuality;
         else if (ui->checkBoxHQ->checkState() == Qt::Unchecked)
             value.backupType &= ~Qn::CameraBackup_HighQuality;
+        
+        model->setData(index, QVariant::fromValue<BackupSettingsData>(value), Qn::BackupSettingsDataRole);
     }
-    
-    m_model->setModelData(modelData);
     m_updatingModel = false;
+
+    
+    QSortFilterProxyModel* proxyModel = (QSortFilterProxyModel*) ui->gridCameras->model();
+    proxyModel->invalidate();
 }
 
 void QnBackupSettingsDialog::updateFromSettings(const BackupSettingsDataList& values)

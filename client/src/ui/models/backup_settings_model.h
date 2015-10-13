@@ -19,6 +19,7 @@ struct BackupSettingsData
     Qn::CameraBackupTypes backupType;
 };
 typedef QList<BackupSettingsData> BackupSettingsDataList;
+Q_DECLARE_METATYPE(BackupSettingsData)
 
 class QnBackupSettingsModel : public Customized<QAbstractListModel> 
 {
@@ -49,7 +50,6 @@ public:
     void setCheckState(Qt::CheckState state);
     Qt::CheckState checkState() const;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    void setData(const QModelIndexList &indexList, const QVariant &value, int role);
 private:
     QString displayData(const QModelIndex &index) const;
     QVariant fontData(const QModelIndex &index) const;

@@ -132,20 +132,6 @@ void QnStorageConfigWidget::updateFromSettings()
     }
 
     m_cameraBackupSettings.clear();
-    for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
-    {
-        BackupSettingsData data;
-        data.isChecked = true;
-        data.id = camera->getId();
-        data.backupType = camera->getBackupType();
-
-        m_cameraBackupSettings.push_back(std::move(data));
-    }
-    std::sort(m_cameraBackupSettings.begin(), m_cameraBackupSettings.end(),
-              [](const BackupSettingsData& l, const BackupSettingsData& r)
-    {
-        return getResourceName(qnResPool->getResourceById(l.id)) < getResourceName(qnResPool->getResourceById(r.id));
-    });
 }
 
 void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
@@ -405,6 +391,26 @@ void QnStorageConfigWidget::at_openBackupSettings_clicked()
 {
     if (!m_server)
         return;
+
+    // refresh
+    BackupSettingsDataList cameraBackupSettings;
+    for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
+    {
+        BackupSettingsData data;
+        data.isChecked = true;
+        data.id = camera->getId();
+        data.backupType = camera->getBackupType();
+
+        for (const auto& oldSetting: m_cameraBackupSettings) {
+            if (oldSetting.id == data.id) {
+                data = oldSetting;
+                break;
+            }
+        }
+        cameraBackupSettings.push_back(std::move(data));
+    }
+    m_cameraBackupSettings = cameraBackupSettings;
+
 
     m_camerabackupSettingsDialog->updateFromSettings(m_cameraBackupSettings);
     if (m_camerabackupSettingsDialog->exec())

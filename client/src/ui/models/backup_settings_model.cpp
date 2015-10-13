@@ -105,22 +105,14 @@ QVariant QnBackupSettingsModel::data(const QModelIndex &index, int role) const
         return foregroundData(index);
     case Qt::CheckStateRole:
         return checkstateData(index);
+    case Qn::BackupSettingsDataRole:
+        return QVariant::fromValue<BackupSettingsData>(m_data[index.row()]);
     default:
         break;
     }
     return QVariant();
 
     return QVariant();
-}
-
-void QnBackupSettingsModel::setData(const QModelIndexList &indexList, const QVariant &value, int role)
-{
-    beginResetModel();
-    blockSignals(true);
-    for (const auto& index: indexList)
-        setData(index, value, role);
-    blockSignals(false);
-    endResetModel();
 }
 
 bool QnBackupSettingsModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -136,12 +128,22 @@ bool QnBackupSettingsModel::setData(const QModelIndex &index, const QVariant &va
         emit dataChanged(index, index, QVector<int>() << role);
         return true;
     }
+    else if (role == Qn::BackupSettingsDataRole) 
+    {
+        if (!value.canConvert<BackupSettingsData>())
+            return false;
+        BackupSettingsData record = value.value<BackupSettingsData>();
+        data = record;
+        emit dataChanged(index, index, QVector<int>() << role);
+        return true;
+    }
     else {
         return base_type::setData(index, value, role);
     }
 }
 
-Qt::ItemFlags QnBackupSettingsModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QnBackupSettingsModel::flags(const QModelIndex &index) const 
+{
     Qt::ItemFlags flags = Qt::NoItemFlags;
     flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
@@ -175,11 +177,9 @@ void QnBackupSettingsModel::setCheckState(Qt::CheckState state)
     if (state == Qt::PartiallyChecked)
         return;
 
-    beginResetModel();
     for (auto& value: m_data)
         value.isChecked = state == Qt::Checked ? true : false;
-    endResetModel();
-    //emit dataChanged(index(0,0), index(m_data.size(), ColumnCount), QVector<int>() << Qt::CheckStateRole);
+    emit dataChanged(index(0,0), index(m_data.size(), ColumnCount), QVector<int>() << Qt::CheckStateRole);
 }
 
 Qt::CheckState QnBackupSettingsModel::checkState() const

@@ -559,6 +559,7 @@ public:
         LastItemDataRole,
 
         StorageSpaceDataRole,                       /** return StorageSpaceData object at QnStorageConfigWidget */
+        BackupSettingsDataRole,                     /** return BackupSettingsData, used in BackupSettings model */
 
         RoleCount
     };

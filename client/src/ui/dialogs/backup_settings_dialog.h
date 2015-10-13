@@ -20,14 +20,13 @@ public:
     void updateFromSettings(const BackupSettingsDataList& value);
     void submitToSettings(BackupSettingsDataList& value);
 private slots:
-    void at_updateModelData();
+    void at_labelClicked();
     void at_modelDataChanged();
     void at_headerCheckStateChanged(Qt::CheckState state);
     void at_gridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void at_gridItemPressed(const QModelIndex& index);
 private:
     void setNearestValue(QComboBox* combobox, int time);
-    void updateHeadersCheckState();
 private:
     QScopedPointer<Ui::BackupSettingsDialog> ui;
     QnBackupSettingsModel* m_model;
