@@ -18,6 +18,7 @@ Rectangle
     property bool availableForSelection: false;
     property bool safeMode: true;
     property bool hasHdd: false;
+    property bool availableByHttp: false;
 
     property string serverName;
     property string version;
@@ -175,9 +176,12 @@ Rectangle
                         wrapMode: Text.Wrap;
                         caption: serverName;
 
+                        readonly property bool linkAvailable: (addr.length
+                            && rtuContext.isDiscoverableFromCurrentNetwork(addr, "")
+                            && !operationText.visible && thisComponent.availableByHttp);
+
                         readonly property string addr: thisComponent.displayAddress;
-                        hyperlink: (addr.length && rtuContext.isDiscoverableFromCurrentNetwork(addr, "")
-                            && !operationText.visible ? ("http://%1:%2").arg(displayAddress).arg(port) : "");
+                        hyperlink: (linkAvailable ? ("http://%1:%2").arg(displayAddress).arg(port) : "");
 
                         font.pixelSize: Common.SizeManager.fontSizes.base;
                     }

@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>Media server will be stopped. Continue?</source>
-        <translation>メディアサーバーは低sされます　宜しいですか？</translation>
+        <translation>メディアサーバーは停止されます　宜しいですか？</translation>
     </message>
 </context>
 </TS>

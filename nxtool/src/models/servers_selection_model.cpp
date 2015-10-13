@@ -245,6 +245,7 @@ namespace
         , kVersionRoleId
         , kOsRoleId
         , kOperationRoleId
+        , kAvailableByHttp
 
         , kLastCustomRoleId
     };
@@ -274,6 +275,7 @@ namespace
         result.insert(kVersionRoleId, "version");
         result.insert(kOsRoleId, "os");
         result.insert(kOperationRoleId, "operation");
+        result.insert(kAvailableByHttp, "availableByHttp");
         
         return result;
     }();
@@ -552,7 +554,8 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
 
             return QString();
         }
-
+        case kAvailableByHttp:
+            return info.baseInfo().accessibleByHttp;
         case kMacAddressRoleId:
         {
             const bool hasMacAddress = info.hasExtraInfo() && !info.extraInfo().interfaces.empty();

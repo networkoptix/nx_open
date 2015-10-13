@@ -1288,115 +1288,115 @@
     </message>
     <message>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Failover ưu tiên ...</translation>
     </message>
     <message>
         <source>Move Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị di chuyển</translation>
     </message>
     <message>
         <source>Move Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>di chuyển Máy ảnh</translation>
     </message>
     <message>
         <source>Device Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị chẩn đoán ...</translation>
     </message>
     <message>
         <source>Camera Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chẩn đoán máy ảnh ...</translation>
     </message>
     <message>
         <source>IO Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO đun chẩn đoán ...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách các thiết bị</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách máy ảnh</translation>
     </message>
     <message>
         <source>Check Device Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra vấn đề thiết bị ...</translation>
     </message>
     <message>
         <source>Check Devices Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra vấn đề thiết bị ...</translation>
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra vấn đề Camera ...</translation>
     </message>
     <message>
         <source>Check Cameras Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra vấn đề Máy ảnh ...</translation>
     </message>
     <message>
         <source>Check IO Module Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra IO vấn đề mô-đun ...</translation>
     </message>
     <message>
         <source>Check IO Modules Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra IO Modules vấn đề ...</translation>
     </message>
     <message>
         <source>Device Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Quy định thiết bị ...</translation>
     </message>
     <message>
         <source>Devices Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị quy ...</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nội quy Camera ...</translation>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh quy tắc ...</translation>
     </message>
     <message>
         <source>IO Module Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO quy mô-đun ...</translation>
     </message>
     <message>
         <source>IO Modules Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO module quy tắc ...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt thiết bị ...</translation>
     </message>
     <message>
         <source>Devices Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Các thiết bị cài đặt ...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt Camera ...</translation>
     </message>
     <message>
         <source>Cameras Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt máy ảnh ...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO Cài đặt mô-đun ...</translation>
     </message>
     <message>
         <source>IO Modules Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO Cài đặt module ...</translation>
     </message>
     <message>
         <source>Devices List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách các thiết bị của máy chủ ...</translation>
     </message>
     <message>
         <source>Cameras List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh Danh sách bởi máy chủ ...</translation>
     </message>
 </context>
 <context>
@@ -1473,19 +1473,19 @@
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị</translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh</translation>
     </message>
     <message>
         <source>Device actions</source>
-        <translation type="unfinished"></translation>
+        <translation>hành động thiết bị</translation>
     </message>
     <message>
         <source>Camera actions</source>
-        <translation type="unfinished"></translation>
+        <translation>hành động camera</translation>
     </message>
 </context>
 <context>
@@ -1642,35 +1642,35 @@
     </message>
     <message>
         <source>Device updated</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị được cập nhật</translation>
     </message>
     <message>
         <source>Camera updated</source>
-        <translation type="unfinished"></translation>
+        <translation>máy ảnh cập nhật</translation>
     </message>
     <message>
         <source>Device added</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị thêm</translation>
     </message>
     <message>
         <source>Camera added</source>
-        <translation type="unfinished"></translation>
+        <translation>máy ảnh thêm</translation>
     </message>
     <message>
         <source>Device removed</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị loại bỏ</translation>
     </message>
     <message>
         <source>Camera removed</source>
-        <translation type="unfinished"></translation>
+        <translation>máy ảnh loại bỏ</translation>
     </message>
     <message>
         <source>Device name</source>
-        <translation type="unfinished"></translation>
+        <translation>Tên thiết bị</translation>
     </message>
     <message>
         <source>Camera name</source>
-        <translation type="unfinished"></translation>
+        <translation>tên máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -1701,31 +1701,31 @@
     <name>QnBusinessResourceValidationStrings</name>
     <message>
         <source>%1 of %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 of %n thiết bị</translation>
     </message>
     <message>
         <source>%1 of %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 of %n cameras</translation>
     </message>
     <message>
         <source>%1 of %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 of %n IO modules</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bất kỳ thiết bị&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bất kỳ máy ảnh&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Chọn ít nhất một thiết bị&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Chọn ít nhất một máy ảnh&gt;</translation>
     </message>
 </context>
 <context>
@@ -1817,23 +1817,23 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bất kỳ thiết bị&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bất kỳ máy ảnh&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn ít nhất một thiết bị</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn ít nhất một máy ảnh</translation>
     </message>
     <message>
         <source>Occurs</source>
-        <translation type="unfinished"></translation>
+        <translation>xảy ra</translation>
     </message>
 </context>
 <context>
@@ -1848,19 +1848,19 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bất kỳ thiết bị&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bất kỳ máy ảnh&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Chọn ít nhất một thiết bị&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Chọn ít nhất một máy ảnh&gt;</translation>
     </message>
 </context>
 <context>
@@ -1935,11 +1935,11 @@
     </message>
     <message>
         <source>filter by devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>lọc bởi các thiết bị ...</translation>
     </message>
     <message>
         <source>filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>lọc theo máy ảnh ...</translation>
     </message>
 </context>
 <context>
@@ -2009,7 +2009,7 @@
     </message>
     <message>
         <source>Scanning hosts... (%1)</source>
-        <translation type="unfinished">%nquét máy chủ…(%1)</translation>
+        <translation>quét máy chủ…(%1)</translation>
     </message>
     <message>
         <source>Examples:</source>
@@ -2104,7 +2104,7 @@
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Chủ quét ... (%1)</translation>
     </message>
 </context>
 <context>
@@ -2190,51 +2190,51 @@
     </message>
     <message>
         <source>Diagnostics for device %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Chẩn đoán cho thiết bị %1</translation>
     </message>
     <message>
         <source>Diagnostics for camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Chẩn đoán cho máy ảnh %1</translation>
     </message>
     <message>
         <source>Diagnostics for IO module %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Chẩn đoán cho IO module %1</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị chẩn đoán</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Chẩn đoán máy ảnh</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>IO đun chẩn đoán</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị xác nhận có thể truy cập.</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận máy ảnh có thể truy cập.</translation>
     </message>
     <message>
         <source>Confirming IO module is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận IO mô-đun có thể truy cập.</translation>
     </message>
     <message>
         <source>Confirming target device provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận thiết bị mục tiêu cung cấp các dòng phương tiện truyền thông.</translation>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận máy ảnh mục tiêu cung cấp các dòng phương tiện truyền thông.</translation>
     </message>
     <message>
         <source>Confirming target IO module provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Khẳng định mục tiêu IO module cung cấp dòng phương tiện truyền thông.</translation>
     </message>
 </context>
 <context>
@@ -2270,40 +2270,40 @@
     <message>
         <source>Devices List for %1</source>
         <extracomment>Devices List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách các thiết bị cho %1</translation>
     </message>
     <message>
         <source>Cameras List for %1</source>
         <extracomment>Cameras List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh Danh sách cho %1</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách các thiết bị</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách máy ảnh</translation>
     </message>
     <message>
         <source>%n devices found</source>
-        <translation type="unfinished">%n thiết bị được tìm</translation>
+        <translation>%n thiết bị được tìm</translation>
     </message>
     <message>
         <source>%n cameras found</source>
-        <translation type="unfinished"></translation>
+        <translation>%n máy ảnh được tìm thấy</translation>
     </message>
     <message>
         <source>%n IO modules found</source>
-        <translation type="unfinished"></translation>
+        <translation>%n IO module tìm thấy</translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xuất khẩu được lựa chọn các thiết bị vào một tập tin.</translation>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xuất khẩu chọn lọc máy ảnh vào một tập tin.</translation>
     </message>
 </context>
 <context>
@@ -2410,27 +2410,27 @@
     </message>
     <message>
         <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo! Giá trị tối thiểu cao có thể làm giảm khoảng thời gian ghi âm các thiết bị khác.</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo! Giá trị tối thiểu cao có thể làm giảm khoảng thời gian ghi âm các máy ảnh khác.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển động ghi âm bị vô hiệu hóa hoặc không được hỗ trợ bởi một số các máy ảnh được lựa chọn. Xin vui lòng đến trang thiết lập chuyển động để đảm bảo nó được hỗ trợ và kích hoạt.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual-streaming không được hỗ trợ bởi máy ảnh này.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual-Streaming và Motion Detection là không có sẵn cho máy ảnh này.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển động ghi âm bị vô hiệu hóa. Xin vui lòng đến trang thiết lập chuyển động đến khu vực thiết lập chuyển động và độ nhạy của máy ảnh.</translation>
     </message>
 </context>
 <context>
@@ -2461,91 +2461,91 @@
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt thiết bị</translation>
     </message>
     <message>
         <source>Devices Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt thiết bị</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt Camera</translation>
     </message>
     <message>
         <source>Cameras Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt Camera</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IO đun Cài đặt</translation>
     </message>
     <message>
         <source>IO Modules Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IO đun Cài đặt</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị chẩn đoán</translation>
     </message>
     <message>
         <source>Devices Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị chẩn đoán</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Chẩn đoán máy ảnh</translation>
     </message>
     <message>
         <source>Cameras Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Chẩn đoán máy ảnh</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>IO đun chẩn đoán</translation>
     </message>
     <message>
         <source>IO Modules Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>IO đun chẩn đoán</translation>
     </message>
     <message>
         <source>Device Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>quy định thiết bị</translation>
     </message>
     <message>
         <source>Devices Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>quy định thiết bị</translation>
     </message>
     <message>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Nội quy camera</translation>
     </message>
     <message>
         <source>Cameras Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Nội quy camera</translation>
     </message>
     <message>
         <source>IO Module Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO quy mô-đun</translation>
     </message>
     <message>
         <source>IO Modules Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO quy mô-đun</translation>
     </message>
     <message>
         <source>Apply changes to the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>Áp dụng thay đổi cho các thiết bị %n sau đây?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>Áp dụng những thay đổi trong máy ảnh %n sau đây?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>Áp dụng những thay đổi trong %n IO module sau đây?</translation>
     </message>
     <message>
         <source>Changes are not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Thay đổi sẽ không được lưu</translation>
     </message>
 </context>
 <context>
@@ -2556,7 +2556,7 @@
     </message>
     <message>
         <source>No device selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có thiết bị được chọn.</translation>
     </message>
 </context>
 <context>
@@ -2934,11 +2934,11 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bất kỳ thiết bị&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Bất kỳ máy ảnh&gt;</translation>
     </message>
 </context>
 <context>
@@ -2992,49 +2992,49 @@
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Loại lịch trình chuyển động không được hỗ trợ bởi một số máy ảnh.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ghi âm không thể được kích hoạt cho một số máy ảnh.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết lập lịch trình không tương thích với một số thiết bị.</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialog</name>
     <message>
         <source>Failover Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>failover ưu tiên</translation>
     </message>
     <message>
         <source>Never</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">thường xuyên</translation>
+        <translation>thường xuyên</translation>
     </message>
     <message>
         <source>Low</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">thấp</translation>
+        <translation>thấp</translation>
     </message>
     <message>
         <source>Medium</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">trong</translation>
+        <translation>trong</translation>
     </message>
     <message>
         <source>High</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">cao</translation>
+        <translation>cao</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
         <source>Set Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Đặt ưu tiên:</translation>
     </message>
 </context>
 <context>
@@ -3087,27 +3087,27 @@
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Open Alarm/Event Rules Management...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở báo động / quản lý quy tắc sự kiện ...</translation>
     </message>
     <message>
         <source>Open Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở sổ ghi sự kiện ...</translation>
     </message>
     <message>
         <source>Open Devices List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở Danh sách các thiết bị ...</translation>
     </message>
     <message>
         <source>Open Cameras List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở Máy ảnh Danh sách ...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách các thiết bị</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -3318,15 +3318,15 @@
     <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Không thể xuất thiết bị %1.</translation>
     </message>
     <message>
         <source>Could not export camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể xuất camera %1.</translation>
     </message>
     <message>
         <source>Could not export IO module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể xuất IO mô-đun %1.</translation>
     </message>
 </context>
 <context>
@@ -3713,15 +3713,15 @@
     </message>
     <message>
         <source>Use licenses for selected %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Sử dụng giấy phép để lựa chọn %n thiết bị</translation>
     </message>
     <message>
         <source>Use licenses for selected %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Sử dụng giấy phép cho %n máy ảnh được lựa chọn</translation>
     </message>
     <message>
         <source>Use licenses for selected %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Sử dụng giấy phép để lựa chọn %n mô-đun IO</translation>
     </message>
 </context>
 <context>
@@ -4002,19 +4002,19 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>The discovered system %1 is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Việc phát hiện ra hệ thống %1 là ở chế độ an toàn.</translation>
     </message>
     <message>
         <source>System has an incompatible version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống có một phiên bản không tương thích.</translation>
     </message>
     <message>
         <source>Operation is not permitted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoạt động không được phép.</translation>
     </message>
     <message>
         <source>System is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống đang ở chế độ an toàn.</translation>
     </message>
 </context>
 <context>
@@ -4186,67 +4186,67 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Server Settings...</source>
-        <translation type="unfinished">cài đặt máy chủ...</translation>
+        <translation>cài đặt máy chủ...</translation>
     </message>
     <message>
         <source>Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Giấy phép ...</translation>
     </message>
     <message>
         <source>User Settings...</source>
-        <translation type="unfinished">thiết lập người dùng...</translation>
+        <translation>thiết lập người dùng...</translation>
     </message>
     <message>
         <source>SMTP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>SMTP thiết lập ...</translation>
     </message>
     <message>
         <source>Connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Time Synchronization...</source>
-        <translation type="unfinished"></translation>
+        <translation>Đồng bộ thời gian ...</translation>
     </message>
     <message>
         <source>Server settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt máy chủ ...</translation>
     </message>
     <message>
         <source>Open Device</source>
-        <translation type="unfinished"></translation>
+        <translation>mở thiết bị</translation>
     </message>
     <message>
         <source>Open Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>camera mở</translation>
     </message>
     <message>
         <source>Open IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở IO Mô-đun</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt thiết bị ...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt Camera ...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO Cài đặt mô-đun ...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở thiết bị trang web ...</translation>
     </message>
     <message>
         <source>Open Camera Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở trang web camera ...</translation>
     </message>
     <message>
         <source>Open IO Module Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở IO trang web module ...</translation>
     </message>
 </context>
 <context>
@@ -4635,43 +4635,43 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>empty</source>
-        <translation type="unfinished"></translation>
+        <translation>trống</translation>
     </message>
     <message>
         <source>Total %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Tổng cộng %n thiết bị</translation>
     </message>
     <message>
         <source>Total %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Tổng cộng %n máy ảnh</translation>
     </message>
     <message>
         <source>Total %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Tổng %n module IO</translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị với kho lưu trữ không có sản phẩm nào</translation>
     </message>
     <message>
         <source>Cameras with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh với kho lưu trữ không có sản phẩm nào</translation>
     </message>
     <message>
         <source>Storage space occupied by devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Không gian lưu trữ bị chiếm đóng bởi các thiết bị</translation>
     </message>
     <message>
         <source>Storage space occupied by cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Không gian lưu trữ bị chiếm đóng bởi máy ảnh</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -4721,11 +4721,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Live Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị sống</translation>
     </message>
     <message>
         <source>Live Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh sống</translation>
     </message>
 </context>
 <context>
@@ -4763,11 +4763,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Select Devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn thiết bị ...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn Máy ảnh ...</translation>
     </message>
 </context>
 <context>
@@ -4882,23 +4882,23 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Server Settings - %1 (readonly)</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt máy chủ - %1 (chỉ đọc)</translation>
     </message>
     <message>
         <source>Server Settings - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt máy chủ - %1</translation>
     </message>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">cài đặt máy chủ</translation>
+        <translation>cài đặt máy chủ</translation>
     </message>
     <message>
         <source>Server not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ không được lưu</translation>
     </message>
     <message>
         <source>Apply changes to the server %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Áp dụng thay đổi để các máy chủ %1?</translation>
     </message>
 </context>
 <context>
@@ -4965,39 +4965,39 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Server is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>server không chạy</translation>
     </message>
     <message>
         <source>Enable failover (server will take devices automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt tính năng chuyển đổi dự phòng (máy chủ sẽ tự động các thiết bị từ các máy chủ ẩn)</translation>
     </message>
     <message>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt tính năng chuyển đổi dự phòng (máy chủ sẽ đưa máy ảnh tự động từ máy chủ ẩn)</translation>
     </message>
     <message>
         <source>Max devices on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị tối đa trên máy chủ này:</translation>
     </message>
     <message>
         <source>Max cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh tối đa trên máy chủ này:</translation>
     </message>
     <message>
         <source>This server already has more than max devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ này đã có nhiều hơn các thiết bị tối đa</translation>
     </message>
     <message>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ này đã có hơn máy ảnh max</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Để tránh sự cố điều chỉnh số lượng tối đa của thiết bị</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Để tránh sự cố điều chỉnh số lượng tối đa của máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -5255,7 +5255,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể bắt đầu cập nhật. Hạ cấp xuống phiên bản trước đó đều bị cấm.</translation>
     </message>
 </context>
 <context>
@@ -5321,15 +5321,15 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt thiết bị</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt Camera</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IO đun Cài đặt</translation>
     </message>
 </context>
 <context>
@@ -5458,15 +5458,15 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Please check authentication information in device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng kiểm tra thông tin xác thực trong cài đặt thiết bị</translation>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng kiểm tra thông tin xác thực trong cài đặt camera</translation>
     </message>
     <message>
         <source>Please check authentication information in IO module settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng kiểm tra thông tin xác thực trong cài đặt mô-đun IO</translation>
     </message>
 </context>
 <context>
@@ -5558,19 +5558,19 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable devices and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt các thiết bị và máy chủ phát hiện tự động</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt máy ảnh và máy chủ phát hiện tự động</translation>
     </message>
     <message>
         <source>Allow system to optimize devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cho phép hệ thống để tối ưu hóa các thiết bị cài đặt</translation>
     </message>
     <message>
         <source>Allow system to optimize cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cho phép hệ thống để tối ưu hóa các cài đặt máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -5846,11 +5846,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Adjust device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Điều chỉnh cài đặt thiết bị</translation>
     </message>
     <message>
         <source>Adjust camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Điều chỉnh cài đặt camera</translation>
     </message>
 </context>
 <context>
@@ -5941,11 +5941,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Can adjust devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Có thể điều chỉnh các thiết bị cài đặt</translation>
     </message>
     <message>
         <source>Can adjust cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Có thể điều chỉnh các cài đặt máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -6200,92 +6200,92 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không thể di chuyển các thiết bị %n đến máy chủ %1. Server là không phản hồi.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không thể di chuyển những %n máy ảnh đến máy chủ %1. Server là không phản hồi.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không thể di chuyển các phân %n IO cho máy chủ %1. Máy chủ không phản hồi.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Máy chủ %1 là không thể tìm và truy cập các thiết bị %n. Bạn có chắc là bạn muốn di chuyển chúng?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Máy chủ %1 là không thể tìm và truy cập vào các máy ảnh %n. Bạn có chắc là bạn muốn di chuyển chúng?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Máy chủ %1 là không thể tìm và truy cập các module %n IO. Bạn có chắc là bạn muốn di chuyển chúng?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các tập tin%n?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Bạn có chắc là bạn muốn loại bỏ các mục %n từ bố trí?</numerusform>
         </translation>
     </message>
     <message>
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Các thiết bị %n được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
     </message>
     <message>
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Những máy ảnh %n được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
     </message>
     <message>
         <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Những %n IO mô-đun tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
     </message>
     <message>
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n của các thiết bị này được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
     </message>
     <message>
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n của dòng máy ảnh này tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
     </message>
     <message>
         <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n của các mô-đun IO được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có thực sự muốn xóa các thiết bị %n sau đây?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có thực sự muốn xóa %n máy ảnh sau đây?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có thực sự muốn xóa %n module IO sau đây?</translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Bạn có thực sự muốn xóa các mục %n sau đây?</numerusform>
         </translation>
     </message>
 </context>
@@ -6730,15 +6730,15 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>All Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Tất cả thiết bị</translation>
     </message>
     <message>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Tất cả máy ảnh</translation>
     </message>
     <message>
         <source>All IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Tất cả các IO Modules</translation>
     </message>
 </context>
 <context>
@@ -6776,34 +6776,34 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message>
         <source>The system is in Safe Mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống đang ở chế độ an toàn.</translation>
     </message>
     <message>
         <source>It is not allowed to make any changes except license activation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nó không được phép thực hiện bất kỳ thay đổi ngoại trừ kích hoạt giấy phép.</translation>
     </message>
     <message>
         <source>The following %n items are not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Các mục %n sau đây sẽ không được lưu.</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Không thể lưu các mục %n sau để Server.</numerusform>
         </translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <source>The following %n items are not deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Các mục %n sau đây sẽ không bị xóa.</translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không thể xóa các mục %n sau từ Server.</numerusform>
         </translation>
     </message>
 </context>
@@ -6811,7 +6811,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống đang ở chế độ an toàn</translation>
     </message>
 </context>
 <context>

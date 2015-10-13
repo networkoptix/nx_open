@@ -281,7 +281,11 @@ public:
                 p = m_interfaceLoadByMAC.emplace( physicalAddress, NetworkInterfaceStatData() );
             if( p.second )
             {
-                p.first->second.load.interfaceName = QString::fromLocal8Bit( reinterpret_cast<const char*>(ifInfo.bDescr), ifInfo.dwDescrLen );
+                p.first->second.load.interfaceName = ( ifInfo.dwDescrLen == 0 )
+                        ? QString( QLatin1String( "Unnamed" ) )
+                        : QString::fromLocal8Bit( reinterpret_cast<const char*>(ifInfo.bDescr),
+                                                  ifInfo.dwDescrLen - 1 );
+
                 p.first->second.load.macAddress = QnMacAddress( physicalAddress );
                 p.first->second.load.type = QnPlatformMonitor::PhysicalInterface;
                 p.first->second.load.bytesPerSecMax = ifInfo.dwSpeed / CHAR_BIT;

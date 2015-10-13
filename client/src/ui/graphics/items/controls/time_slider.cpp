@@ -37,6 +37,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/pending_operation.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
@@ -195,6 +196,7 @@ namespace {
     const int minBookmarkTextCharsVisible = 6;
     const int bookmarkMergeDistance = 100;
     const int minBookmarksToMerge = 5;
+    const int mergeBookmarksInterval = 2000;
 
 
     bool checkLine(int line) {
@@ -460,6 +462,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_selecting(false),
     m_lineCount(0),
     m_totalLineStretch(0.0),
+    m_mergeBookmarksPendingOperation(new QnPendingOperation([this](){ mergeBookmarks(); }, mergeBookmarksInterval, this)),
     m_msecsPerPixel(1.0),
     m_animationUpdateMSecsPerPixel(1.0),
     m_thumbnailsAspectRatio(-1.0),
@@ -852,11 +855,16 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
                 }
             }
             
+            qint64 oldWindowSize = m_windowEnd - m_windowStart;
+
             m_windowStart = start;
             m_windowEnd = end;
 
             sliderChange(SliderMappingChange);
             emit windowChanged(m_windowStart, m_windowEnd);
+
+            if (oldWindowSize != m_windowEnd - m_windowStart)
+                m_mergeBookmarksPendingOperation->requestOperation();
 
             updateToolTipVisibility();
             updateMSecsPerPixel();
