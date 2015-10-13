@@ -56,7 +56,6 @@ protected:
 
 protected:
     QSqlDatabase m_sdb;
-    //QnDbTransaction m_tran;
     mutable QReadWriteLock m_mutex;
 };
 

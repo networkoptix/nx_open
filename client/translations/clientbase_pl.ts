@@ -1602,7 +1602,7 @@
     <message numerus="yes">
         <source>%n action(s)</source>
         <translation>
-            <numerusform>%1 działania</numerusform>
+            <numerusform>%n działania</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>

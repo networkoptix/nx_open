@@ -21,12 +21,15 @@
 
 namespace {
 
-#ifdef Q_OS_IOS
+#if defined(Q_OS_IOS)
     QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Hls;
     QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
-#else
+#elif defined(Q_OS_ANDROID)
     QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
     QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Webm;
+#else
+    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
+    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #endif
 
     QString protocolName(QnMediaResourceHelper::Protocol protocol) {

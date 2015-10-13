@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 
+class QnContextSettingsPrivate;
 class QnContextSettings : public QObject {
     Q_OBJECT
 
@@ -13,6 +14,7 @@ class QnContextSettings : public QObject {
 
 public:
     explicit QnContextSettings(QObject *parent = 0);
+    ~QnContextSettings();
 
     bool showOfflineCameras() const;
     void setShowOfflineCameras(bool showOfflineCameras);
@@ -33,15 +35,10 @@ signals:
     void hiddenCamerasCollapsedChanged();
 
 private:
-    void at_valueChanged(int valueId);
-
-    void loadSession();
-    void saveSession();
 
 private:
-    QString m_sessionId;
-    QSet<QString> m_hiddenCameras;
-    bool m_hiddenCamerasCollapsed;
+    Q_DECLARE_PRIVATE(QnContextSettings)
+    QScopedPointer<QnContextSettingsPrivate> d_ptr;
 };
 
 #endif // CONTEXT_SETTINGS_H

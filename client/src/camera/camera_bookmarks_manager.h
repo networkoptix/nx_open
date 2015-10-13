@@ -25,12 +25,6 @@ public:
     /// @param callback         Callback for receiving bookmarks data.
     void getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
-    /// @brief                  Synchronously gathers locally cached bookmarks using specified filter.
-    /// @param cameras          Set of target cameras.
-    /// @param filter           Filter parameters.
-    /// @returns                Locally cached bookmarks, filtered by the cameras and filter.
-    QnCameraBookmarkList getLocalBookmarks(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter) const;
-
     /// @brief                  Add the bookmark to the camera.
     /// @param camera           Target camera.
     /// @param bookmark         Target bookmark.
@@ -58,10 +52,9 @@ public:
     QnCameraBookmarksQueryPtr createQuery(const QnVirtualCameraResourceSet &cameras = QnVirtualCameraResourceSet(),
                                           const QnCameraBookmarkSearchFilter &filter = QnCameraBookmarkSearchFilter());
 
-    /// @brief                  Execute search query on local (cached) data.
+    /// @brief                  Get locally chached bookmarks for the given query.
     /// @param query            Target query.
-    /// @returns                Locally cached bookmarks, filtered by the query.
-    QnCameraBookmarkList executeQueryLocal(const QnCameraBookmarksQueryPtr &query) const;
+    QnCameraBookmarkList cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const;
 
     /// @brief                  Asynchronously execute search query on remote (actual) data.
     /// @param query            Target query.

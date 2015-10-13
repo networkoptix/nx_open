@@ -1,12 +1,89 @@
 #include "context_settings.h"
 
 #include "mobile_client/mobile_client_settings.h"
+#include "session_settings.h"
+
+class QnContextSettingsPrivate : public QObject {
+    Q_DECLARE_PUBLIC(QnContextSettings)
+    QnContextSettings *q_ptr;
+
+public:
+    QnContextSettingsPrivate(QnContextSettings *parent);
+
+    void at_valueChanged(int valueId);
+    void at_sessionSettings_valueChanged(int valueId);
+
+    void setSessionId(const QString &id);
+
+    void loadSession();
+    void saveSession();
+
+    QString sessionId;
+    QnSessionSettings *sessionSettings;
+};
+
+
+QnContextSettingsPrivate::QnContextSettingsPrivate(QnContextSettings *parent)
+    : q_ptr(parent)
+    , sessionSettings(nullptr)
+{
+    connect(qnSettings, &QnMobileClientSettings::valueChanged, this, &QnContextSettingsPrivate::at_valueChanged);
+}
+
+void QnContextSettingsPrivate::at_valueChanged(int valueId) {
+    Q_Q(QnContextSettings);
+
+    switch (valueId) {
+    case QnMobileClientSettings::ShowOfflineCameras:
+        q->showOfflineCamerasChanged();
+        break;
+    default:
+        break;
+    }
+}
+
+void QnContextSettingsPrivate::at_sessionSettings_valueChanged(int valueId) {
+    Q_Q(QnContextSettings);
+
+    switch (valueId) {
+    case QnSessionSettings::HiddenCameras:
+        q->hiddenCamerasChanged();
+        break;
+    case QnSessionSettings::HiddenCamerasCollapsed:
+        q->hiddenCamerasCollapsedChanged();
+        break;
+    default:
+        break;
+    }
+}
+
+void QnContextSettingsPrivate::setSessionId(const QString &id) {
+    if (sessionId == id)
+        return;
+
+    sessionId = id;
+
+    if (sessionSettings) {
+        disconnect(sessionSettings, nullptr, this, nullptr);
+        sessionSettings->deleteLater();
+    }
+
+    sessionSettings = new QnSessionSettings(this, id);
+    connect(sessionSettings, &QnSessionSettings::valueChanged, this, &QnContextSettingsPrivate::at_sessionSettings_valueChanged);
+
+    Q_Q(QnContextSettings);
+    q->hiddenCamerasChanged();
+    q->hiddenCamerasCollapsedChanged();
+}
+
 
 QnContextSettings::QnContextSettings(QObject *parent) :
     QObject(parent),
-    m_hiddenCamerasCollapsed(true)
+    d_ptr(new QnContextSettingsPrivate(this))
 {
-    connect(qnSettings, &QnMobileClientSettings::valueChanged, this, &QnContextSettings::at_valueChanged);
+}
+
+QnContextSettings::~QnContextSettings() {
 }
 
 bool QnContextSettings::showOfflineCameras() const {
@@ -18,72 +95,47 @@ void QnContextSettings::setShowOfflineCameras(bool showOfflineCameras) {
 }
 
 QString QnContextSettings::sessionId() const {
-    return m_sessionId;
+    Q_D(const QnContextSettings);
+    return d->sessionId;
 }
 
 void QnContextSettings::setSessionId(const QString &sessionId) {
-    if (m_sessionId == sessionId)
-        return;
-
-    m_sessionId = sessionId;
-    emit sessionIdChanged();
-
-    loadSession();
+    Q_D(QnContextSettings);
+    d->setSessionId(sessionId);
 }
 
 QStringList QnContextSettings::hiddenCameras() const {
-    return m_hiddenCameras.toList();
+    Q_D(const QnContextSettings);
+
+    if (!d->sessionSettings)
+        return QStringList();
+
+    return d->sessionSettings->hiddenCameras().toList();
 }
 
 void QnContextSettings::setHiddenCameras(const QStringList &hiddenCameras) {
-    QSet<QString> hiddenCamerasSet = QSet<QString>::fromList(hiddenCameras);
-    if (m_hiddenCameras == hiddenCamerasSet)
+    Q_D(QnContextSettings);
+
+    if (!d->sessionSettings)
         return;
 
-    m_hiddenCameras = hiddenCamerasSet;
-    emit hiddenCamerasChanged();
-
-    saveSession();
+    d->sessionSettings->setHiddenCameras(QnStringSet::fromList(hiddenCameras));
 }
 
 bool QnContextSettings::hiddenCamerasCollapsed() const {
-    return m_hiddenCamerasCollapsed;
+    Q_D(const QnContextSettings);
+
+    if (!d->sessionSettings)
+        return false;
+
+    return d->sessionSettings->isHiddenCamerasCollapsed();
 }
 
 void QnContextSettings::setHiddenCamerasCollapsed(bool collapsed) {
-    if (m_hiddenCamerasCollapsed == collapsed)
+    Q_D(QnContextSettings);
+
+    if (!d->sessionSettings)
         return;
 
-    m_hiddenCamerasCollapsed = collapsed;
-    emit hiddenCamerasCollapsedChanged();
-
-    saveSession();
-}
-
-void QnContextSettings::at_valueChanged(int valueId) {
-    switch (valueId) {
-    case QnMobileClientSettings::ShowOfflineCameras:
-        emit showOfflineCamerasChanged();
-        break;
-    default:
-        break;
-    }
-}
-
-void QnContextSettings::loadSession() {
-    QVariantMap map = qnSettings->sessionSettings().value(m_sessionId).toMap();
-    setHiddenCameras(map.value(lit("hiddenCameras")).toStringList());
-    setHiddenCamerasCollapsed(map.value(lit("hiddenCamerasCollapsed"), true).toBool());
-}
-
-void QnContextSettings::saveSession() {
-    if (m_sessionId.isEmpty())
-        return;
-
-    QVariantMap sessionSettings = qnSettings->sessionSettings();
-    QVariantMap map = sessionSettings.value(m_sessionId).toMap();
-    map[lit("hiddenCameras")] = hiddenCameras();
-    map[lit("hiddenCamerasCollapsed")] = hiddenCamerasCollapsed();
-    sessionSettings[m_sessionId] = map;
-    qnSettings->setSessionSettings(sessionSettings);
+    d->sessionSettings->setHiddenCamerasCollapsed(collapsed);
 }

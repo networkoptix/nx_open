@@ -25,12 +25,6 @@ public:
     /// @returns                Internal id of the request.
     int getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksInternalCallbackType callback);
 
-    /// @brief                  Synchronously gathers locally cached bookmarks using specified filter.
-    /// @param cameras          Set of target cameras.
-    /// @param filter           Filter parameters.
-    /// @returns                Locally cached bookmarks, filtered by the cameras and filter.
-    QnCameraBookmarkList getLocalBookmarks(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter) const;
-
     /// @brief                  Add the bookmark to the camera.
     /// @param camera           Target camera.
     /// @param bookmark         Target bookmark.
@@ -60,7 +54,7 @@ public:
     /// @brief                  Get search query cached value from local data.
     /// @param query            Target query.
     /// @returns                Locally cached bookmarks, filtered by the query.
-    QnCameraBookmarkList executeQueryLocal(const QnCameraBookmarksQueryPtr &query) const;
+    QnCameraBookmarkList cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const;
 
     /// @brief                  Asynchronously execute search query on remote (actual) data.
     /// @param query            Target query.
@@ -91,17 +85,11 @@ private:
     /// @brief                  Check if queries should be updated and update if needed.
     void checkQueriesUpdate();
 
-    /// @brief                  Update query cached data based on local cache.
-    void updateQueryLocal(const QUuid &queryId);
-
     /// @brief                  Send request to update query with actual data.
     void updateQueryAsync(const QUuid &queryId);
 
     /// @brief                  Update cache with provided value and emit signals if needed.
     void updateQueryCache(const QUuid &queryId, const QnCameraBookmarkList &bookmarks);
-
-    /// @brief                  Force recalculate value based on local data.
-    QnCameraBookmarkList executeQueryInternal(const QnCameraBookmarksQueryPtr &query) const;
 
     void executeCallbackDelayed(BookmarksInternalCallbackType callback);
     void executeCallbackDelayed(BookmarksCallbackType callback);
@@ -148,6 +136,4 @@ private:
 
     /** Cached bookmarks by query. */
     QHash<QUuid, QueryInfo> m_queries;
-
-    QHash<QString, QnCameraBookmarkAggregation> m_bookmarksByCamera;
 };

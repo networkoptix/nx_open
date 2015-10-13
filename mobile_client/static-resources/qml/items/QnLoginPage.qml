@@ -28,6 +28,8 @@ QnPage {
 
     property int _warningAnimationDuration: 500
 
+    objectName: "loginPage"
+
     Connections {
         target: menuBackButton
         onClicked: {
