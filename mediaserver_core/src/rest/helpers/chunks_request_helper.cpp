@@ -11,6 +11,8 @@
 #include <utils/serialization/json_functions.h>
 #include "core/resource_management/resource_pool.h"
 
+#include <vector>
+
 QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
 {
     // TODO: #akulikov #backup storages: Alter this for two storage managers kinds.
@@ -39,10 +41,24 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
                             periods.includeTimePeriod(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs));
                     }
                 }
+                
+                for (const QnVirtualCameraResourcePtr& res: request.resList) {
+                    if (qnBackupStorageMan->getBookmarks(res->getPhysicalId().toUtf8(), bookmarksFilter, bookmarks)) {
+                        for (const QnCameraBookmark &bookmark: bookmarks)
+                            periods.includeTimePeriod(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs));
+                    }
+                }
             } else {
                 //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = qnNormalStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel, request.keepSmallChunks,
-                    QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog, request.limit).simplified();
+                QnStorageManager::getRecordedPeriods(
+                    request.resList, 
+                    request.startTimeMs, 
+                    request.endTimeMs, 
+                    request.detailLevel, 
+                    request.keepSmallChunks,
+                    QList<QnServer::ChunksCatalog>() 
+                        << QnServer::BookmarksCatalog, request.limit
+                ).simplified();
             }
             break;
         }
