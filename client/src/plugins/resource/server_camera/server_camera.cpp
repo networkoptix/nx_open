@@ -25,16 +25,8 @@ QString QnServerCamera::getDriverName() const
 
 
 QString QnServerCamera::getName() const {
-    if( !getId().isNull() )
-    {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-        if( !(*userAttributesLock)->name.isEmpty() )
-            return (*userAttributesLock)->name;
-    }
-
-    return base_type::getName();
+    return getUserDefinedName();
 }
-
 
 void QnServerCamera::setName(const QString& name) {
     if (getId().isNull() )

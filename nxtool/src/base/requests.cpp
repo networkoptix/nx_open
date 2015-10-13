@@ -517,8 +517,8 @@ void rtu::multicastModuleInformation(const QUuid &id
     , const OperationCallback &failedCallback
     , int timeout)
 {
-    static const Constants::AffectedEntities affected = (Constants::kAllEntitiesAffected 
-        & ~Constants::kAllAddressFlagsAffected);
+    static const Constants::AffectedEntities affected = Constants::AffectedEntities(
+            Constants::kAllEntitiesAffected & ~Constants::kAllAddressFlagsAffected);
 
     static const QString kReplyTag = "reply";
     

@@ -30,33 +30,44 @@ int QnDebugEventsRestHandler::testNetworkIssue(const QnRequestParams & params, Q
     if (!cameraId.isEmpty())
         camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(cameraId);
 
+    QString param = params.value("param");
+
     QString id = params.value("id");
     if (id == "noframe") {
+        if (param.isEmpty())
+            param = QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(5000);
+
         QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(), 
             QnBusiness::NetworkNoFrameReason, 
-            QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(5000)
+            param
             ));
         qnBusinessRuleProcessor->processBusinessEvent(networkEvent);
         return nx_http::StatusCode::ok;
     } else
     if (id == "closed") {
+        if (param.isEmpty())
+            param = QnNetworkIssueBusinessEvent::encodePrimaryStream(true);
+
         QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(), 
-            QnBusiness::NetworkConnectionClosedReason, 
-            QnNetworkIssueBusinessEvent::encodePrimaryStream(true)
+            QnBusiness::NetworkConnectionClosedReason,
+            param
             ));
         qnBusinessRuleProcessor->processBusinessEvent(networkEvent);
         return nx_http::StatusCode::ok;
     } else
     if (id == "packetloss") {
+        if (param.isEmpty())
+            param = QnNetworkIssueBusinessEvent::encodePacketLossSequence(1234, 5678);
+
         QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(), 
             QnBusiness::NetworkRtpPacketLossReason, 
-            QnNetworkIssueBusinessEvent::encodePacketLossSequence(1234, 5678)
+            param
             ));
         qnBusinessRuleProcessor->processBusinessEvent(networkEvent);
         return nx_http::StatusCode::ok;
@@ -74,7 +85,7 @@ int QnDebugEventsRestHandler::testCameraDisconnected(const QnRequestParams & par
     if (!cameraId.isEmpty())
         camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(cameraId);
 
-    QnAbstractBusinessEventPtr event(new QnCameraDisconnectedBusinessEvent(camera, qnSyncTime->currentMSecsSinceEpoch()));
+    QnAbstractBusinessEventPtr event(new QnCameraDisconnectedBusinessEvent(camera, qnSyncTime->currentUSecsSinceEpoch()));
 
     qnBusinessRuleProcessor->processBusinessEvent(event);
     return nx_http::StatusCode::ok;

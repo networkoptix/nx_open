@@ -574,6 +574,11 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
+
+    QnBusinessAggregationInfo aggregationInfo = aggregatedData.action
+        ? aggregatedData.action->aggregationInfo()  //adding event source (camera) to the existing aggregation info
+        : QnBusinessAggregationInfo();              //creating new aggregation info
+
     if( !aggregatedData.action )
     {
         aggregatedData.action = QnSendMailBusinessActionPtr( new QnSendMailBusinessAction( *action ) );
@@ -585,8 +590,6 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     ++aggregatedData.eventCount;
 
-    //adding event source (camera) to the aggregation info
-    QnBusinessAggregationInfo aggregationInfo = aggregatedData.action->aggregationInfo();
     aggregationInfo.append( action->getRuntimeParams(), action->aggregationInfo() );
     aggregatedData.action->setAggregationInfo( aggregationInfo );
 
