@@ -377,7 +377,6 @@
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>
                 <module>client.core</module>
-                <module>axclient</module>
                 <module>nxtool</module>
                 <module>client.bin</module>
                 <module>wixsetup</module>
