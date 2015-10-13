@@ -544,7 +544,7 @@ QString QnSecurityCamResource::getUserDefinedName() const {
             return (*userAttributesLock)->name;
     }
 
-    return getName();
+    return QnSecurityCamResource::getName();
 }
 
 
