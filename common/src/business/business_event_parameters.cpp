@@ -17,7 +17,6 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
     QByteArray paramKey(QByteArray::number(eventType));
     switch (eventType) {
         case QnBusiness::ServerFailureEvent:
-        case QnBusiness::NetworkIssueEvent:
         case QnBusiness::StorageFailureEvent:
             paramKey += '_' + QByteArray::number(reasonCode);
             if (reasonCode == QnBusiness::StorageIoErrorReason 
@@ -33,6 +32,11 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
 
         case QnBusiness::CameraDisconnectEvent:
             paramKey += '_' + eventResourceId.toByteArray();
+            break;
+
+        case QnBusiness::NetworkIssueEvent:
+            paramKey += '_' + eventResourceId.toByteArray();
+            paramKey += '_' + QByteArray::number(reasonCode);
             break;
 
         default:
