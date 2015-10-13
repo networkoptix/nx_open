@@ -32,8 +32,8 @@ rtu::AwaitingOp::AwaitingOp(const QUuid &serverId
     , qint64 timeout)
     
     : m_serverId(serverId)
-    , m_timeout(timeout)
     , m_creationTimestamp(timeoutCounter.elapsed())
+    , m_timeout(timeout)
 
     , m_changesCount(changesCount)
     , m_discovered()
