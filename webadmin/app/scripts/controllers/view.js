@@ -750,13 +750,13 @@ angular.module('webadminApp').controller('ViewCtrl',
         var $camerasPanel = $('.cameras-panel');
         var updateHeights = function() {
             var windowHeight = $window.height();
-            var topHeight = $top.height();
+            var topHeight = $top.outerHeight();
 
             var topAlertHeight = 0;
 
             var topAlert = $('td.alert');
             if(topAlert.length){
-                topAlertHeight = topAlert.height();
+                topAlertHeight = topAlert.outerHeight() - 1; // -1 here is a hack.
             }
 
             var viewportHeight = (windowHeight - topHeight - topAlertHeight) + 'px';
