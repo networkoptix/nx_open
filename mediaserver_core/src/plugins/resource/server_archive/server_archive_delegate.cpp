@@ -47,64 +47,79 @@ QnServerArchiveDelegate::~QnServerArchiveDelegate()
 qint64 QnServerArchiveDelegate::startTime() const
 {
     QnMutexLocker lk( &m_mutex );
+    setCatalogs();
+    qint64 ret = INT64_MAX;
 
-    for (int i = 0; i < 2; ++i) // Normal catalogs, then backup
+    for (int i = 0; i < 2; ++i) // normal and backup
     {
-        if (m_catalogHi[i] && m_catalogHi[i]->minTime() != (qint64)AV_NOPTS_VALUE)
-        {
-            if (m_catalogLow[i] && m_catalogLow[i]->minTime() != (qint64)AV_NOPTS_VALUE)
-                return qMin(m_catalogHi[i]->minTime(), m_catalogLow[i]->minTime())*1000;
-            else
-                return m_catalogHi[i]->minTime()*1000;
-        }
-        else if (m_catalogLow[i] && m_catalogLow[i]->minTime() != (qint64)AV_NOPTS_VALUE)
-        {
-            return m_catalogLow[i]->minTime()*1000;
-        }
+        ret = m_catalogHi[i] && 
+              m_catalogHi[i]->minTime() != AV_NOPTS_VALUE && 
+              m_catalogHi[i]->minTime() < ret ?
+                    ret = m_catalogHi[i]->minTime() :
+                    ret;
+
+        ret = m_catalogLow[i] && 
+              m_catalogLow[i]->minTime() != AV_NOPTS_VALUE && 
+              m_catalogLow[i]->minTime() < ret ?
+                    ret = m_catalogLow[i]->minTime() :
+                    ret;
     }
-    return AV_NOPTS_VALUE;
+    return ret == INT64_MAX ? AV_NOPTS_VALUE : ret*1000;
 }
 
 qint64 QnServerArchiveDelegate::endTime() const
 {
     QnMutexLocker lk( &m_mutex );
+    setCatalogs();
+    qint64 ret = 0;
 
-    qint64 timeHi = 
-        m_catalogHi[(int)QnServer::StoragePool::Normal] ? 
-            m_catalogHi[(int)QnServer::StoragePool::Normal]->maxTime() : AV_NOPTS_VALUE;
-
-    qint64 timeLow = 
-        m_catalogLow[(int)QnServer::StoragePool::Normal] ? 
-            m_catalogLow[(int)QnServer::StoragePool::Normal]->maxTime() : AV_NOPTS_VALUE;
-
-    if (timeHi == AV_NOPTS_VALUE || timeLow == AV_NOPTS_VALUE)
+    for (int i = 0; i < 2; ++i)
     {
-        timeHi = 
-            m_catalogHi[(int)QnServer::StoragePool::Backup] ? 
-                m_catalogHi[(int)QnServer::StoragePool::Backup]->maxTime() : AV_NOPTS_VALUE;
+        ret = m_catalogHi[i] && 
+              m_catalogHi[i]->maxTime() != AV_NOPTS_VALUE && 
+              m_catalogHi[i]->maxTime() > ret  ?
+                    ret = m_catalogHi[i]->maxTime() :
+                    ret;
 
-        timeLow = 
-            m_catalogLow[(int)QnServer::StoragePool::Backup] ? 
-                m_catalogLow[(int)QnServer::StoragePool::Backup]->maxTime() : AV_NOPTS_VALUE;
+        ret = m_catalogLow[i] && 
+              m_catalogLow[i]->maxTime() != AV_NOPTS_VALUE && 
+              m_catalogLow[i]->maxTime() > ret ?
+                    ret = m_catalogLow[i]->maxTime() :
+                    ret;
     }
-
-    qint64 rez;
-    if (timeHi != (qint64)AV_NOPTS_VALUE && timeLow != (qint64)AV_NOPTS_VALUE)
-        rez = qMax(timeHi, timeLow);
-    else if (timeHi != (qint64)AV_NOPTS_VALUE)
-        rez = timeHi;
-    else
-        rez = timeLow;
-
-    if (rez != (qint64)AV_NOPTS_VALUE && rez != DATETIME_NOW)
-        rez *= 1000;
-    
-    return rez;
+    return ret == 0 ? AV_NOPTS_VALUE : ret*1000;
 }
 
 bool QnServerArchiveDelegate::isOpened() const
 {
     return m_opened;
+}
+
+void QnServerArchiveDelegate::setCatalogs() const
+{
+    m_catalogHi[(int)QnServer::StoragePool::Normal] = 
+        qnNormalStorageMan->getFileCatalog(
+            m_resource->getUniqueId(), 
+            QnServer::HiQualityCatalog
+        );
+
+    m_catalogHi[(int)QnServer::StoragePool::Backup] = 
+        qnBackupStorageMan->getFileCatalog(
+            m_resource->getUniqueId(), 
+            QnServer::HiQualityCatalog
+        );
+
+    m_catalogLow[(int)QnServer::StoragePool::Normal] = 
+        qnNormalStorageMan->getFileCatalog(
+            m_resource->getUniqueId(), 
+            QnServer::LowQualityCatalog
+        );
+
+    m_catalogLow[(int)QnServer::StoragePool::Backup] = 
+        qnBackupStorageMan->getFileCatalog(
+            m_resource->getUniqueId(), 
+            QnServer::LowQualityCatalog
+        );
 }
 
 bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
@@ -117,27 +132,8 @@ bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     Q_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
-
-
-    m_catalogHi[(int)QnServer::StoragePool::Normal] = qnNormalStorageMan->getFileCatalog(
-        netResource->getUniqueId(), 
-        QnServer::HiQualityCatalog
-    );
-
-    m_catalogHi[(int)QnServer::StoragePool::Backup] = qnBackupStorageMan->getFileCatalog(
-        netResource->getUniqueId(), 
-        QnServer::HiQualityCatalog
-    );
-
-    m_catalogLow[(int)QnServer::StoragePool::Normal] = qnNormalStorageMan->getFileCatalog(
-        netResource->getUniqueId(), 
-        QnServer::LowQualityCatalog
-    );
-
-    m_catalogLow[(int)QnServer::StoragePool::Backup] = qnBackupStorageMan->getFileCatalog(
-        netResource->getUniqueId(), 
-        QnServer::LowQualityCatalog
-    );
+    
+    setCatalogs();
 
     m_currentChunkCatalog[(int)QnServer::StoragePool::Normal] = 
         m_quality == MEDIA_Quality_Low ? 
@@ -158,7 +154,7 @@ void QnServerArchiveDelegate::close()
     QnMutexLocker lk( &m_mutex );
 
     m_currentChunkCatalog[(int)QnServer::StoragePool::Normal].clear();
-    m_currentChunkCatalog[(int)QnServer::StoragePool::Normal].clear();
+    m_currentChunkCatalog[(int)QnServer::StoragePool::Backup].clear();
 
     m_aviDelegate->close();
 
