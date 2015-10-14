@@ -4,7 +4,6 @@
 #include <zlib.h>
 #else
 #include <QtZlib/zlib.h>
-#error "bliat"
 #endif
 
 
