@@ -10,11 +10,11 @@ namespace nx {
 namespace hpm {
 
 //! Mediaserver API communicating interface
-class MediaserverApiIf
+class MediaserverApiBase
         : protected RequestProcessor
 {
 public:
-    MediaserverApiIf( CloudDataProviderIf* cloudData,
+    MediaserverApiBase( CloudDataProviderBase* cloudData,
                       stun::MessageDispatcher* dispatcher );
 
     void ping( const ConnectionSharedPtr& connection, stun::Message message );
@@ -26,10 +26,10 @@ public:
 
 //! Mediaserver API communicating interface over \class nx_http::AsyncHttpClient
 class MediaserverApi
-        : public MediaserverApiIf
+        : public MediaserverApiBase
 {
 public:
-    MediaserverApi( CloudDataProviderIf* cloudData,
+    MediaserverApi( CloudDataProviderBase* cloudData,
                     stun::MessageDispatcher* dispatcher );
 
     virtual void pingServer( const SocketAddress& address, const String& expectedId,

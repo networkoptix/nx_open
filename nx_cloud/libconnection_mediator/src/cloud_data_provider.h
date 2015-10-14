@@ -10,10 +10,10 @@ namespace nx {
 namespace hpm {
 
 //! Cloud DB data interface
-class CloudDataProviderIf
+class CloudDataProviderBase
 {
 public:
-    virtual ~CloudDataProviderIf() = 0;
+    virtual ~CloudDataProviderBase() = 0;
 
     struct System
     {
@@ -28,11 +28,11 @@ public:
 
 // for GMock only
 std::ostream& operator<<( std::ostream& os,
-                          const boost::optional< CloudDataProviderIf::System >& system );
+                          const boost::optional< CloudDataProviderBase::System >& system );
 
 //! Cloud DB data interface over \class nx::cdb::api::ConnectionFactory
 class CloudDataProvider
-    : public CloudDataProviderIf
+    : public CloudDataProviderBase
 {
 public:
     static const TimerDuration DEFAULT_UPDATE_INTERVAL;

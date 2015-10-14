@@ -18,7 +18,7 @@ namespace hpm {
 class RequestProcessor
 {
 public:
-    RequestProcessor( CloudDataProviderIf* cloudData );
+    RequestProcessor( CloudDataProviderBase* cloudData );
     virtual ~RequestProcessor() = 0;
 
     typedef std::shared_ptr< stun::ServerConnection > ConnectionSharedPtr;
@@ -42,7 +42,7 @@ protected:
             int code, String reason );
 
 private:
-    CloudDataProviderIf* m_cloudData;
+    CloudDataProviderBase* m_cloudData;
 };
 
 } // namespace hpm

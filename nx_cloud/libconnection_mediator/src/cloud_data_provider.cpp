@@ -3,17 +3,15 @@
 #include <utils/common/log.h>
 #include <utils/common/log_message.h>
 
-static const std::chrono::minutes UPDATE_INTERVAL( 1 );
-
 namespace nx {
 namespace hpm {
 
-CloudDataProviderIf::~CloudDataProviderIf()
+CloudDataProviderBase::~CloudDataProviderBase()
 {
 }
 
 
-CloudDataProviderIf::System::System( String authKey_, bool mediatorEnabled_ )
+CloudDataProviderBase::System::System( String authKey_, bool mediatorEnabled_ )
     : authKey( authKey_ )
     , mediatorEnabled( mediatorEnabled_ )
 
@@ -21,7 +19,7 @@ CloudDataProviderIf::System::System( String authKey_, bool mediatorEnabled_ )
 }
 
 std::ostream& operator<<( std::ostream& os,
-                          const boost::optional< CloudDataProviderIf::System >& system )
+                          const boost::optional< CloudDataProviderBase::System >& system )
 {
     if( !system )
         return os << "boost::none";
@@ -50,9 +48,14 @@ CloudDataProvider::~CloudDataProvider()
 {
     QnMutexLocker lk( &m_mutex );
     m_isTerminated = true;
+
+    const auto connection = std::move( m_connection );
+    const auto guard = std::move( m_timerGuard );
+
+    lk.unlock();
 }
 
-boost::optional< CloudDataProviderIf::System >
+boost::optional< CloudDataProviderBase::System >
     CloudDataProvider::getSystem( const String& systemId ) const
 {
     QnMutexLocker lk( &m_mutex );
@@ -63,7 +66,7 @@ boost::optional< CloudDataProviderIf::System >
     return it->second;
 }
 
-static QString traceSystems( const std::map< String, CloudDataProviderIf::System >& systems )
+static QString traceSystems( const std::map< String, CloudDataProviderBase::System >& systems )
 {
     QStringList list;
     for( const auto sys : systems )
@@ -75,12 +78,6 @@ static QString traceSystems( const std::map< String, CloudDataProviderIf::System
 
 void CloudDataProvider::updateSystemsAsync()
 {
-    {
-        QnMutexLocker lk( &m_mutex );
-        if( m_isTerminated )
-            return;
-    }
-
     m_connection->systemManager()->getSystems(
                 [ this ]( cdb::api::ResultCode code, cdb::api::SystemDataList systems )
     {
@@ -107,13 +104,10 @@ void CloudDataProvider::updateSystemsAsync()
                      .arg( traceSystems( m_systemCache ) ), cl_logDEBUG2 );
         }
 
-        m_timerGuard = TimerManager::instance()->addTimer(
-            [ this ]( quint64 timerID )
-        {
-            Q_ASSERT_X( timerID == m_timerGuard.get(), Q_FUNC_INFO, "Wrong timer" );
-            updateSystemsAsync();
-        },
-        UPDATE_INTERVAL );
+        QnMutexLocker lk( &m_mutex );
+        if( !m_isTerminated )
+            m_timerGuard = TimerManager::instance()->addTimer(
+                [ this ]( quint64 ) { updateSystemsAsync(); }, m_updateInterval );
     } );
 }
 

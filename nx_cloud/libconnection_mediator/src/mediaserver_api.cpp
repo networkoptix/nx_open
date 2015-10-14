@@ -9,7 +9,7 @@
 namespace nx {
 namespace hpm {
 
-MediaserverApiIf::MediaserverApiIf( CloudDataProviderIf* cloudData,
+MediaserverApiBase::MediaserverApiBase( CloudDataProviderBase* cloudData,
                                     stun::MessageDispatcher* dispatcher )
     : RequestProcessor( cloudData )
 {
@@ -38,7 +38,7 @@ struct PingCollector
     {}
 };
 
-void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
+void MediaserverApiBase::ping( const ConnectionSharedPtr& connection,
                              stun::Message message )
 {
     if( const auto mediaserver = getMediaserverData( connection, message ) )
@@ -90,9 +90,9 @@ void MediaserverApiIf::ping( const ConnectionSharedPtr& connection,
 
 // impl
 
-MediaserverApi::MediaserverApi( CloudDataProviderIf* cloudData,
+MediaserverApi::MediaserverApi( CloudDataProviderBase* cloudData,
                                 stun::MessageDispatcher* dispatcher )
-    : MediaserverApiIf( cloudData, dispatcher )
+    : MediaserverApiBase( cloudData, dispatcher )
 {
 }
 

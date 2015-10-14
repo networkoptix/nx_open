@@ -40,6 +40,10 @@ void MediatorProcess::pleaseStop()
 
 int MediatorProcess::executeApplication()
 {
+    static const QLatin1String CLOUD_USER( "cloudUser" );
+    static const QLatin1String CLOUD_PASSWORD( "cloudPassword" );
+    static const QLatin1String CLOUD_UPDATE_INTERVAL( "cloudUpdateInterval" );
+
     static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
     static const QLatin1String DEFAULT_STUN_ADDRESS_TO_LISTEN( ":3345" );
     static const QLatin1String DEFAULT_HTTP_ADDRESS_TO_LISTEN( ":3346" );
@@ -134,10 +138,10 @@ int MediatorProcess::executeApplication()
     std::shared_ptr< CloudDataProvider > cloudDataProvider;
     if( !runWithoutCloud )
         cloudDataProvider = std::make_unique< CloudDataProvider >(
-            m_settings->value("cloudUser", DEFAULT_CLOUD_USER).toString().toStdString(),
-            m_settings->value("cloudPassword", DEFAULT_CLOUD_PASSWORD).toString().toStdString(),
+            m_settings->value(CLOUD_USER, DEFAULT_CLOUD_USER).toString().toStdString(),
+            m_settings->value(CLOUD_PASSWORD, DEFAULT_CLOUD_PASSWORD).toString().toStdString(),
             parseTimerDuration(
-                m_settings->value("cloudUpdateInterval").toString(),
+                m_settings->value(CLOUD_UPDATE_INTERVAL).toString(),
                 CloudDataProvider::DEFAULT_UPDATE_INTERVAL));
     else
         NX_LOG( lit( "STUN Server is running without cloud (debug mode)" ), cl_logALWAYS );

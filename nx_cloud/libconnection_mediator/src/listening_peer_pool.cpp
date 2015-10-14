@@ -7,7 +7,7 @@
 namespace nx {
 namespace hpm {
 
-ListeningPeerPool::ListeningPeerPool( CloudDataProviderIf* cloudData,
+ListeningPeerPool::ListeningPeerPool( CloudDataProviderBase* cloudData,
                                       stun::MessageDispatcher* dispatcher )
     : RequestProcessor( cloudData )
 {
