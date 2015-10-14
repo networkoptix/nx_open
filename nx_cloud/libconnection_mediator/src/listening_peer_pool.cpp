@@ -122,12 +122,12 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
     }
     else
     {
-        NX_LOGX( lit("Client %1 could not find a host %2")
+        NX_LOGX( lit("Client %1 connects to %2, error: unknown host")
                 .arg( QString::fromUtf8( userName ) )
                 .arg( QString::fromUtf8( hostName ) ), cl_logDEBUG1 );
 
         errorResponse( connection, message.header, stun::cc::error::notFound,
-            "Can not find a host " + hostName );
+            "Unknown host: " + hostName );
     }
 }
 
@@ -163,7 +163,7 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
         {
             NX_LOGX( lit("Peer %2.%3 has been desconnected")
                     .arg( QString::fromUtf8( systemIt->first ) )
-                    .arg( QString::fromUtf8( serverIt->first ) ), cl_logDEBUG2 );
+                    .arg( QString::fromUtf8( serverIt->first ) ), cl_logDEBUG1 );
 
             QnMutexLocker lk( mutex );
             systemIt->second.erase( serverIt );

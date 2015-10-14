@@ -44,6 +44,10 @@ void MediatorAddressPublisher::authorizationChanged(
     if( m_stunAuthorization == authorization )
         return;
 
+    NX_LOGX( lm( "New credentials: %1" ).arg(
+                 authorization.is_initialized() ? authorization->systemId : String("none") ),
+             cl_logDEBUG1 );
+
     m_stunAuthorization = std::move( authorization );
     if( hadAuthorization )
     {
@@ -63,6 +67,7 @@ void MediatorAddressPublisher::updateAddresses( std::list< SocketAddress > addre
     if( m_reportedAddresses == addresses )
         return;
 
+    NX_LOGX( lm( "New addresses: %1" ).container( addresses ), cl_logDEBUG1 );
     m_reportedAddresses = std::move( addresses );
 }
 
@@ -127,8 +132,8 @@ void MediatorAddressPublisher::pingReportedAddresses()
         }
 
         m_pingedAddresses = eps->get();
-        NX_LOGX( lit( "Pinged addresses: %1" )
-                 .arg( containerString( m_publishedAddresses ) ), cl_logDEBUG1 );
+        NX_LOGX( lm( "Pinged addresses: %1" )
+                 .container( m_publishedAddresses ), cl_logDEBUG1 );
 
         publishPingedAddresses();
     } );
@@ -164,8 +169,8 @@ void MediatorAddressPublisher::publishPingedAddresses()
         }
 
         m_publishedAddresses = m_pingedAddresses;
-        NX_LOGX( lit( "Published addresses: %1" )
-                 .arg( containerString( m_publishedAddresses ) ), cl_logDEBUG1 );
+        NX_LOGX( lm( "Published addresses: %1" )
+                 .container( m_publishedAddresses ), cl_logDEBUG1 );
 
         setupUpdateTimer();
     } );

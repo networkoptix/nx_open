@@ -7,7 +7,7 @@
 namespace nx {
 namespace stun {
 
-const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 20000, 20000 };
+const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000 };
 
 AsyncClient::AsyncClient( const SocketAddress& endpoint, bool useSsl, Timeouts timeouts )
     : m_endpoint( endpoint )
@@ -122,7 +122,8 @@ bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
 
             if( !m_connectingSocket->setNonBlockingMode( true ) ||
                 !m_connectingSocket->setSendTimeout( m_timeouts.send ) ||
-                !m_connectingSocket->setRecvTimeout( m_timeouts.recv ) ||
+                // TODO: #mu Use m_timeouts.recv on timer when request is sent
+                !m_connectingSocket->setRecvTimeout( 0 ) ||
                 !m_connectingSocket->connectAsync( m_endpoint,
                                                    std::move(onComplete) ) )
             {

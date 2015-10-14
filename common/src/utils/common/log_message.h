@@ -35,7 +35,7 @@ public:
     //!Prints integer value
     template<typename T>
     QnLogMessage arg(
-        T a,
+        const T& a,
         int fieldWidth = 0,
         int base = 10,
         QChar fillChar = QLatin1Char(' '),
@@ -48,7 +48,7 @@ public:
     //!Prints float value
     template<typename T>
     QnLogMessage arg(
-        T a,
+        const T& a,
         int fieldWidth = 0,
         char format = 'g',
         int precision = -1,
@@ -56,6 +56,12 @@ public:
         typename std::enable_if<std::is_floating_point<T>::value>::type* = 0) const
     {
         return m_str.arg(a, fieldWidth, format, precision, fillChar);
+    }
+
+    template<typename T>
+    QnLogMessage container(const T& a)
+    {
+        return arg(containerString(a, lit(", "), lit(""), lit("") ));
     }
 
     operator QString() const;

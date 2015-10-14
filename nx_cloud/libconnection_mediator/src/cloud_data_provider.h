@@ -2,8 +2,9 @@
 #define CLOUD_DATA_PROVIDER_H
 
 #include <utils/common/timermanager.h>
-
-#include <connection_factory.h>
+#include <utils/network/buffer.h>
+#include <utils/thread/mutex.h>
+#include <cdb/connection.h>
 
 namespace nx {
 namespace hpm {

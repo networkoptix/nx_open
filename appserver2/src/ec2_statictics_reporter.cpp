@@ -217,7 +217,7 @@ namespace ec2
             propertyDictionary->saveParams(m_admin->getId());
         }
 
-        const uint timeCycle = parseDuration(
+        const uint timeCycle = parseTimerDuration(
                     m_admin->getProperty(SR_TIME_CYCLE),
                     std::chrono::seconds(DEFAULT_TIME_CYCLE)).count() / 1000;
         const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
