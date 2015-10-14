@@ -119,3 +119,6 @@ CLOUD_CONNECT = {
     'customization':'default',
     'password_realm':'VMS'
 }
+
+AUTH_USER_MODEL = 'api.Account'
+AUTHENTICATION_BACKENDS = ('api.account.AccountBackend')
