@@ -162,6 +162,7 @@ public:
 
     Qn::CameraBackupTypes getBackupType() const;
     void setBackupType(Qn::CameraBackupTypes value);
+    Qn::CameraBackupTypes getActualBackupType() const;
 
     QString getModel() const;
     void setModel(const QString &model);

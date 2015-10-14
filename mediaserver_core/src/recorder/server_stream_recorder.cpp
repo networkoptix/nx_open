@@ -542,7 +542,7 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
     auto cam = m_device.dynamicCast<QnSecurityCamResource>();
     Q_ASSERT(cam);
 
-    Qn::CameraBackupTypes cameraBackupMode = cam->getBackupType();
+    Qn::CameraBackupTypes cameraBackupMode = cam->getActualBackupType();
     if (m_catalog == QnServer::HiQualityCatalog && !(cameraBackupMode & Qn::CameraBackup_HighQuality) ||
         m_catalog == QnServer::LowQualityCatalog && !(cameraBackupMode & Qn::CameraBackup_LowQuality))
     {

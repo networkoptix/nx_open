@@ -300,7 +300,7 @@ void QnScheduleSync::synchronize(NeedStopCB needStop)
         auto securityCamera = camera.dynamicCast<QnSecurityCamResource>();
         Q_ASSERT(securityCamera);
         visitedCameras.push_back(camera->getUniqueId());
-        auto backupType = securityCamera->getBackupType();
+        auto backupType = securityCamera->getActualBackupType();
         if (backupType & Qn::CameraBackup_HighQuality)
             synchronize(QnServer::HiQualityCatalog, camera->getUniqueId(), needStop);
         if (backupType & Qn::CameraBackup_LowQuality)

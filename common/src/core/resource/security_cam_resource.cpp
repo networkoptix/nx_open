@@ -21,6 +21,7 @@
 #include "api/model/api_ioport_data.h"
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
+#include "media_server_user_attributes.h"
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
@@ -774,6 +775,20 @@ void QnSecurityCamResource::setBackupType(Qn::CameraBackupTypes value)
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     (*userAttributesLock)->backupType = value;
+}
+
+Qn::CameraBackupTypes QnSecurityCamResource::getActualBackupType() const
+{
+    Qn::CameraBackupTypes result = getBackupType();
+    if (result = Qn::CameraBackup_Default) {
+        QnMediaServerUserAttributesPool::ScopedLock lk(
+            QnMediaServerUserAttributesPool::instance(), 
+            getParentId()
+            );
+        result = (*lk)->backupQuality;
+    }
+
+    return result;
 }
 
 void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality) {
