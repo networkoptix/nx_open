@@ -19,6 +19,13 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>localrepository</id>
+            <url>file://${root.dir}</url>
+        </repository>
+    </repositories>    
+    
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <appserver.name>Enterprise Controller</appserver.name>
@@ -377,7 +384,6 @@
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>
                 <module>client.core</module>
-                <module>axclient</module>
                 <module>nxtool</module>
                 <module>client.bin</module>
                 <module>wixsetup</module>

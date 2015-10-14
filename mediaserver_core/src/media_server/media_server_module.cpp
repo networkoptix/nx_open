@@ -15,6 +15,7 @@ QnMediaServerModule::QnMediaServerModule(QObject *parent):
     QObject(parent) 
 {
     Q_INIT_RESOURCE(mediaserver_core);
+    Q_INIT_RESOURCE(mediaserver_core_additional);
     Q_INIT_RESOURCE(appserver2);
 
     QCoreApplication::setOrganizationName(QnAppInfo::organizationName());

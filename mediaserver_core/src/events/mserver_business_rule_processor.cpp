@@ -320,7 +320,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
                 autoResetTimeout );
 }
 
-QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const 
+QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize)
 {
     const QnResourcePtr& cameraRes = qnResPool->getResourceById(id);
     QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize);
@@ -473,7 +473,10 @@ void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggreg
     m_aggregatedEmails.erase( aggregatedActionIter );
 }
 
-QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, QnEmailAttachmentList& attachments, bool useIp)
+QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action, 
+                                                                 const QnBusinessAggregationInfo &aggregationInfo, 
+                                                                 QnEmailAttachmentList& attachments, 
+                                                                 bool useIp)
 {
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
@@ -535,7 +538,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     return contextMap;
 }
 
-QString QnMServerBusinessRuleProcessor::formatEmailList(const QStringList &value) {
+QString QnMServerBusinessRuleProcessor::formatEmailList(const QStringList &value) const
+{
     QString result;
     for (int i = 0; i < value.size(); ++i)
     {
@@ -658,4 +662,4 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         break;
     }
     return detailsMap;
-}
+} 
