@@ -69,12 +69,12 @@ Item {
 
         function animateToBounds() {
             if (contentWidth < minContentWidth && contentHeight < minContentHeight) {
-                animateToSize(minContentWidth, minContentHeight)
+                animateToSize(minContentWidth, minContentHeight, true)
                 return
             }
 
             /* Cannot use returnToBounds for smooth animation due to the mentioned Flickable bug. */
-            animateToSize(contentWidth, contentHeight)
+            animateToSize(contentWidth, contentHeight, true)
             /*
             boundsAnimation.stop()
 
