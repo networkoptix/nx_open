@@ -34,12 +34,17 @@ class CloudDataProvider
     : public CloudDataProviderIf
 {
 public:
-    CloudDataProvider( const std::string& user, const std::string& password );
+    static const TimerDuration DEFAULT_UPDATE_INTERVAL;
+
+    CloudDataProvider( const std::string& user, const std::string& password,
+                       TimerDuration updateInterval = DEFAULT_UPDATE_INTERVAL );
     ~CloudDataProvider();
 
     virtual boost::optional< System > getSystem( const String& systemId ) const override;
 
 private:
+    const TimerDuration m_updateInterval;
+
     void updateSystemsAsync();
 
     mutable QnMutex m_mutex;

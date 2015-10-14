@@ -60,15 +60,33 @@ int MediatorProcess::executeApplication()
     bool showHelp = false;
     bool runWithoutCloud = false;
     QString logLevel;
+    QString configFile;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString(), DEFAULT_LOG_LEVEL);
+    commandLineParser.addParameter(&configFile, "--configFile", NULL, QString(), QString());
     commandLineParser.addParameter(&runWithoutCloud, "--run-without-cloud", NULL, QString(), true);
     commandLineParser.parse(m_argc, m_argv, stderr);
 
     if( showHelp )
         return printHelp();
+
+    if( configFile.isEmpty() )
+    {
+        #ifdef _WIN32
+            m_settings.reset( new QSettings(QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME) );
+        #else
+            const QString configFileName = QString("/opt/%1/%2/etc/%2.conf").arg(VER_LINUX_ORGANIZATION_NAME).arg(VER_PRODUCTNAME_STR);
+            m_settings.reset( new QSettings(configFileName, QSettings::IniFormat) );
+        #endif
+    }
+    else
+    {
+        m_settings.reset( new QSettings(configFile, QSettings::IniFormat) );
+    }
+
+    //reading settings
 
     //logging
     if( logLevel != QString::fromLatin1("none") )
@@ -117,7 +135,10 @@ int MediatorProcess::executeApplication()
     if( !runWithoutCloud )
         cloudDataProvider = std::make_unique< CloudDataProvider >(
             m_settings->value("cloudUser", DEFAULT_CLOUD_USER).toString().toStdString(),
-            m_settings->value("cloudPassword", DEFAULT_CLOUD_PASSWORD).toString().toStdString() );
+            m_settings->value("cloudPassword", DEFAULT_CLOUD_PASSWORD).toString().toStdString(),
+            parseTimerDuration(
+                m_settings->value("cloudUpdateInterval").toString(),
+                CloudDataProvider::DEFAULT_UPDATE_INTERVAL));
     else
         NX_LOG( lit( "STUN Server is running without cloud (debug mode)" ), cl_logALWAYS );
 

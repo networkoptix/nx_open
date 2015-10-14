@@ -11,7 +11,10 @@ namespace cc {
 class MediatorAddressPublisher
 {
 public:
-    MediatorAddressPublisher( String serverId );
+    static const TimerDuration DEFAULT_UPDATE_INTERVAL;
+
+    MediatorAddressPublisher( String serverId,
+                              TimerDuration updateInterval = DEFAULT_UPDATE_INTERVAL );
     ~MediatorAddressPublisher();
 
     struct Authorization
@@ -34,6 +37,7 @@ private:
 
 private:
     const String m_serverId;
+    const TimerDuration m_updateInterval;
 
     QnMutex m_mutex;
     TimerManager::TimerGuard m_timerGuard;

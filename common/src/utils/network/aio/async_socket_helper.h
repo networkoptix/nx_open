@@ -129,10 +129,6 @@ public:
         {
             //checking that socket is not registered in aio
             Q_ASSERT_X(
-                !nx::SocketGlobals::addressResolver().isRequestIdKnown(this),
-                Q_FUNC_INFO,
-                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (1)" );
-            Q_ASSERT_X(
                 !nx::SocketGlobals::aioService().isSocketBeingWatched(this->m_socket),
                 Q_FUNC_INFO,
                 "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)" );

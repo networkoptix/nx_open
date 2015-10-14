@@ -156,7 +156,7 @@ bool TimerManager::modifyTimerDelay(
     return true;
 }
 
-bool TimerManager::modifyTimerDelay(quint64 timerID, std::chrono::milliseconds delay)
+bool TimerManager::modifyTimerDelay(quint64 timerID, TimerDuration delay)
 {
     return modifyTimerDelay(timerID, delay.count());
 }
@@ -322,4 +322,38 @@ bool TimerManager::TimerGuard::operator==( const TimerManager::TimerGuard& right
 bool TimerManager::TimerGuard::operator!=( const TimerManager::TimerGuard& right ) const
 {
     return m_timerID != right.m_timerID;
+}
+
+TimerDuration parseTimerDuration( const QString& duration,
+                                  TimerDuration defaultValue )
+{
+    std::chrono::milliseconds res;
+    bool ok(true);
+    const auto toUInt = [ & ]( int len )
+    {
+        return len ? duration.left( duration.length() - len ).toULongLong( &ok )
+                   : duration.toULongLong( &ok );
+    };
+
+    if ( duration.endsWith( lit("ms"), Qt::CaseInsensitive ) )
+        res = std::chrono::milliseconds( toUInt( 2 ) );
+    else
+    if ( duration.endsWith( lit("s"), Qt::CaseInsensitive ) )
+        res = std::chrono::seconds( toUInt( 1 ) );
+    else
+    if ( duration.endsWith( lit("m"), Qt::CaseInsensitive ) )
+        res = std::chrono::minutes( toUInt( 1 ) );
+    else
+    if ( duration.endsWith( lit("h"), Qt::CaseInsensitive ) )
+        res = std::chrono::hours( toUInt( 1 ) );
+    else
+    if (duration.endsWith(lit("d"), Qt::CaseInsensitive))
+        res = std::chrono::hours( toUInt( 1 ) ) * 24;
+    else
+    if (duration.endsWith(lit("M"), Qt::CaseInsensitive))
+        res = std::chrono::hours( toUInt( 1 ) ) * 24 * 30;
+    else
+        res = std::chrono::seconds( toUInt( 0 ) );
+
+    return ( ok && res.count() ) ? res : defaultValue;
 }

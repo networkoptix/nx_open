@@ -5,13 +5,16 @@
 #include "utils/network/socket_global.h"
 #include "utils/network/stun/cc/custom_stun.h"
 
-static const std::chrono::minutes UPDATE_INTERVAL( 1 );
-
 namespace nx {
 namespace cc {
 
-MediatorAddressPublisher::MediatorAddressPublisher( String serverId )
+const TimerDuration MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL
+    = std::chrono::minutes( 10 );
+
+MediatorAddressPublisher::MediatorAddressPublisher( String serverId,
+                                                    TimerDuration updateInterval )
     : m_serverId( std::move( serverId ) )
+    , m_updateInterval( std::move( updateInterval ) )
     , isTerminating( false )
 {
     SocketGlobals::cloudInfo().enableMediator();
@@ -74,7 +77,7 @@ void MediatorAddressPublisher::setupUpdateTimer()
             QnMutexLocker lk( &m_mutex );
             pingReportedAddresses();
         },
-        UPDATE_INTERVAL );
+        m_updateInterval );
 }
 
 bool MediatorAddressPublisher::isCloudReady()

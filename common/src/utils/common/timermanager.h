@@ -29,6 +29,9 @@ public:
 
 class TimerManagerImpl;
 
+// Chousen to represent the best TimerManager resolution
+typedef std::chrono::milliseconds TimerDuration;
+
 //!Timer events scheduler
 /*!
     Holds internal thread which calls method TimerEventHandler::onTimer
@@ -100,7 +103,7 @@ public:
         const unsigned int delayMillis );
     quint64 addTimer(
         std::function<void(quint64)> taskHandler,
-        std::chrono::milliseconds delay);
+        TimerDuration delay);
     //!Modifies delay on existing timer
     /*!
         If timer is being executed currently, nothing is done.
@@ -134,5 +137,8 @@ protected:
 private:
     TimerManagerImpl* m_impl;
 };
+
+TimerDuration parseTimerDuration( const QString& duration,
+                                  TimerDuration defaultValue = TimerDuration( 0 ) );
 
 #endif //TIMERMANAGER_H

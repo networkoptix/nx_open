@@ -259,6 +259,7 @@ namespace {
     const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
     const QString ADMIN_PSWD_HASH = lit("adminMd5Hash");
     const QString ADMIN_PSWD_DIGEST = lit("adminMd5Digest");
+    const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 };
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -2145,7 +2146,10 @@ void MediaServerProcess::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
    m_mediatorAddressPublisher.reset(new nx::cc::MediatorAddressPublisher(
-        qnCommon->moduleGUID().toSimpleString().toUtf8()));
+        qnCommon->moduleGUID().toSimpleString().toUtf8(),
+        parseTimerDuration(
+            MSSettings::roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
+            nx::cc::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL)));
 
     auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
     {

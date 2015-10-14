@@ -16,7 +16,7 @@ public:
     {
     }
 
-    bool isValid() const { return authenticateHeader; }
+    bool isValid() const { return authenticateHeader.is_initialized(); }
 
     void clear()
     {
@@ -44,7 +44,7 @@ public:
         HttpAuthenticationClientContext* const authenticationCtx );
 
     //!Same as above, but uses cached authentication info
-    static Qn::AuthResult QnClientAuthHelper::addAuthorizationToRequest(
+    static Qn::AuthResult addAuthorizationToRequest(
         const QAuthenticator& auth,
         nx_http::Request* const request,
         const HttpAuthenticationClientContext* const authenticationCtx);

@@ -16,6 +16,7 @@ CloudDataProviderIf::~CloudDataProviderIf()
 CloudDataProviderIf::System::System( String authKey_, bool mediatorEnabled_ )
     : authKey( authKey_ )
     , mediatorEnabled( mediatorEnabled_ )
+
 {
 }
 
@@ -31,9 +32,14 @@ std::ostream& operator<<( std::ostream& os,
 
 // impl
 
+const TimerDuration CloudDataProvider::DEFAULT_UPDATE_INTERVAL
+    = std::chrono::minutes( 5 );
+
 CloudDataProvider::CloudDataProvider( const std::string& user,
-                                    const std::string& password )
-    : m_isTerminated( false )
+                                      const std::string& password,
+                                      TimerDuration updateInterval )
+    : m_updateInterval( std::move( updateInterval ) )
+    , m_isTerminated( false )
     , m_connectionFactory( createConnectionFactory() )
     , m_connection( m_connectionFactory->createConnection( user, password ) )
 {
