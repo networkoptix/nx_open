@@ -389,14 +389,14 @@ RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_proxyPort(0),
     m_responseCode(CODE_OK),
     m_isAudioEnabled(true),
-    m_useDigestAuth(false),
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
     m_tcpSock(std::move(tcpSock)),
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
-    m_userAgent(QByteArray(QN_PRODUCT_NAME_LONG) + QByteArray(" ") + QByteArray(QN_APPLICATION_VERSION))
+    m_userAgent(QByteArray(QN_PRODUCT_NAME_LONG) + QByteArray(" ") + QByteArray(QN_APPLICATION_VERSION)),
+    m_defaultAuthScheme(nx_http::header::AuthScheme::digest)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
@@ -627,7 +627,8 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     m_responseBufferLen = 0;
     m_rtpToTrack.clear();
     m_rtspAuthCtx.clear();
-
+    if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
+        m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
 
 
     //unsigned int port = DEFAULT_RTP_PORT;
@@ -1716,14 +1717,10 @@ void RTPSession::setTCPTimeout(int timeout)
     m_tcpTimeout = timeout;
 }
 
-void RTPSession::setAuth(const QAuthenticator& auth, DefaultAuthScheme defaultAuthScheme)
+void RTPSession::setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme)
 {
     m_auth = auth;
-    if (defaultAuthScheme == authDigest) {
-        m_useDigestAuth = true;
-        m_realm = DEFAULT_REALM;
-        m_nonce = QLatin1String(calcDefaultNonce());
-    }
+    m_defaultAuthScheme = defaultAuthScheme;
 }
 
 QAuthenticator RTPSession::getAuth() const

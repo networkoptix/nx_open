@@ -23,6 +23,7 @@ IMPROVEMENTS (TBC)
     "Info" icon status improvements - saved for layouts, shows camera name only when not active - VMS-307
     Improved Server Settings dialog - VMS-630
     Maximum number of cameras is limited to 12 for Nx1 in failover settings - VMS-682
+    Safe Mode indication for NX1. If NX1 is booted in safe mode, any system changes are not allowed and the corresponding warning is displayed in client
 
 BUG FIXES (TBC)
 
