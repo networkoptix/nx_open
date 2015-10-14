@@ -213,6 +213,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
         m_storages = m_server->getStorages();
         for (const auto& storage: m_storages)
             connect(storage, &QnResource::statusChanged,            this,   &QnStorageConfigWidget::updateRebuildInfo);
+        updateRebuildInfo();
     }
 }
 
@@ -517,5 +518,6 @@ void QnStorageConfigWidget::updateRebuildUi(const QnStorageScanData& reply, bool
     }
 
     stackedWidget->setCurrentIndex(reply.state > Qn::RebuildState_None ? rebuildProgressPageIndex : rebuildPreparePageIndex);
+    stackedWidget->setVisible(reply.state > Qn::RebuildState_None);
 }
 
