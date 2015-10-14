@@ -134,8 +134,14 @@ void QnDualQualityHelper::findDataForTime(
         QnServer::StoragePool::Backup
     );
 
-    bool normalBetter = normalChunk.distanceToTime(time) <= 
-                        backupChunk.distanceToTime(time);
+    qint64 timeDistanceNormal = normalChunk.distanceToTime(time);
+    qint64 timeDistanceBackup = backupChunk.distanceToTime(time);
+    int findEps = (m_quality == MEDIA_Quality_Low) ? FIRST_STREAM_FIND_EPS : 
+                                                     SECOND_STREAM_FIND_EPS; 
+    
+    bool normalBetter = timeDistanceNormal <= timeDistanceBackup ||
+                        ((timeDistanceBackup == 0) && (timeDistanceNormal > findEps)
+                                                   && !preciseFind);
     if (normalBetter) {
         chunk = normalChunk;
         catalog = normalCatalog;
