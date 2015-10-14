@@ -105,7 +105,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
 
 void QnDualQualityHelper::findDataForTime(
     const qint64                    time, 
-    DeviceFileCatalog::Chunk&       chunk, 
+    DeviceFileCatalog::Chunk        &chunk, 
     DeviceFileCatalogPtr            &catalog, 
     DeviceFileCatalog::FindMethod   findMethod, 
     bool                            preciseFind

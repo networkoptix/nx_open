@@ -87,7 +87,8 @@ qint64 QnServerArchiveDelegate::endTime() const
                     ret = m_catalogLow[i]->maxTime() :
                     ret;
     }
-    return ret == 0 ? AV_NOPTS_VALUE : ret*1000;
+    return ret == 0 ? AV_NOPTS_VALUE 
+                    : ret == DATETIME_NOW ? DATETIME_NOW : ret*1000;
 }
 
 bool QnServerArchiveDelegate::isOpened() const
