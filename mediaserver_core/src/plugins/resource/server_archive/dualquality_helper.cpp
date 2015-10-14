@@ -134,8 +134,8 @@ void QnDualQualityHelper::findDataForTime(
         QnServer::StoragePool::Backup
     );
 
-    bool normalBetter = std::abs(normalChunk.startTimeMs - time) <= 
-                        std::abs(backupChunk.startTimeMs - time);
+    bool normalBetter = normalChunk.distanceToTime(time) <= 
+                        backupChunk.distanceToTime(time);
     if (normalBetter) {
         chunk = normalChunk;
         catalog = normalCatalog;
