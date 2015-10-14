@@ -71,6 +71,16 @@ Qn::BackupType QnMediaServerResource::getBackupType() const
     return (*lk)->backupType;
 }
 
+Qn::CameraBackupTypes QnMediaServerResource::getDefaultBackupQuality() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+        );
+
+    return (*lk)->backupQuality;
+}
+
 QnMediaServerResource::~QnMediaServerResource()
 {
     QnMutexLocker lock( &m_mutex );
@@ -412,6 +422,16 @@ void QnMediaServerResource::setBackupType(Qn::BackupType value)
         );
 
     (*lk)->backupType = value;
+}
+
+void QnMediaServerResource::setDefaultBackupQuality(Qn::CameraBackupTypes value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+        );
+
+    (*lk)->backupQuality = value;
 }
 
 void QnMediaServerResource::setBackupDOW(int value)

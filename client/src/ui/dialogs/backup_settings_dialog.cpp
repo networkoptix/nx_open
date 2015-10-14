@@ -201,6 +201,7 @@ void QnBackupSettingsDialog::at_labelClicked()
 void QnBackupSettingsDialog::updateFromSettings(const BackupSettingsDataList& values)
 {
     m_model->setModelData(values);
+    ui->gridCameras->selectAll();
 }
 
 void QnBackupSettingsDialog::submitToSettings(BackupSettingsDataList& value)

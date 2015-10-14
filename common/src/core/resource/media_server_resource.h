@@ -77,12 +77,14 @@ public:
     int getBackupStart() const;
     int getBackupDuration() const;
     int getBackupBitrate() const;
+    Qn::CameraBackupTypes getDefaultBackupQuality() const;
 
     void setBackupType(Qn::BackupType value);
     void setBackupDOW(int value);
     void setBackupStart(int value);
     void setBackupDuration(int value);
     void setBackupBitrate(int value);
+    void setDefaultBackupQuality(Qn::CameraBackupTypes value);
 
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);

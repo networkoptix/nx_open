@@ -83,7 +83,16 @@ namespace ec2
 
     struct ApiMediaServerUserAttributesData: ApiData
     {
-        ApiMediaServerUserAttributesData(): maxCameras(0), allowAutoRedundancy(false) {}
+        ApiMediaServerUserAttributesData(): 
+            maxCameras(0), 
+            allowAutoRedundancy(false),
+            backupType(Qn::Backup_Disabled),
+            backupDaysOfTheWeek(0x7f), // all days of week
+            backupStart(0), // midnight
+            backupDuration(-1), // unlimited duration
+            backupBitrate(-1), // unlimited
+            backupQuality(Qn::Backup_Disabled)
+        {}
 
         QnUuid          serverID;
         QString         serverName;
@@ -96,6 +105,7 @@ namespace ec2
         int                 backupStart;         // seconds from 00:00:00. Error if bDOW set and this is not set
         int                 backupDuration;      // duration of synchronization period in seconds. -1 if not set.
         int                 backupBitrate;       // bitrate cap in bytes per second. -1 if not capped.
+        Qn::CameraBackupTypes backupQuality;     // default value for camera's backup type
     };
 
 #define ApiMediaServerUserAttributesData_Fields_Short   \
@@ -105,7 +115,8 @@ namespace ec2
     (backupDaysOfTheWeek)                               \
     (backupStart)                                       \
     (backupDuration)                                    \
-    (backupBitrate)
+    (backupBitrate)                                     \
+    (backupQuality)
 
 #define ApiMediaServerUserAttributesData_Fields     \
     (serverID)                                      \

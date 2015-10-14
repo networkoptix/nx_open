@@ -39,7 +39,9 @@ int QnBackupSettingsModel::columnCount(const QModelIndex &parent) const {
 
 QString QnBackupSettingsModel::backupTypeToString(Qn::CameraBackupTypes value) const
 {
-    if (value == Qn::CameraBackup_Both)
+    if (value == Qn::CameraBackup_Default)
+        return tr("Default");
+    else if (value == Qn::CameraBackup_Both)
         return tr("All");
     else if (value == Qn::CameraBackup_HighQuality)
         return tr("High");

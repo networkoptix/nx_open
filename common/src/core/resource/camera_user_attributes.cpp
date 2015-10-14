@@ -18,7 +18,7 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     minDays(0),
     maxDays(0),
     failoverPriority(Qn::FP_Medium),
-    backupType(Qn::CameraBackup_Disabled)
+    backupType(Qn::CameraBackup_Default)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         motionRegions << QnMotionRegion();

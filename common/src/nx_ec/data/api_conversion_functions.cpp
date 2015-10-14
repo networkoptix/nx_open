@@ -636,6 +636,7 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.backupStart = src->backupStart;
     dst.backupDuration = src->backupDuration;
     dst.backupBitrate = src->backupBitrate;
+    dst.backupQuality = src->backupQuality;
 }
 
 void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst) {
@@ -648,6 +649,7 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->backupStart = src.backupStart;
     dst->backupDuration = src.backupDuration;
     dst->backupBitrate = src.backupBitrate;
+    dst->backupQuality = src.backupQuality;
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {

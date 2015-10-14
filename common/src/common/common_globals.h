@@ -749,9 +749,10 @@ public:
 
     enum CameraBackupType
     {
-        CameraBackup_Disabled       = 0,
-        CameraBackup_HighQuality    = 1,
-        CameraBackup_LowQuality     = 2,
+        CameraBackup_Default        = 0, // backup type didn't configured so far. Default value will be used
+        CameraBackup_Disabled       = 1,
+        CameraBackup_HighQuality    = 2,
+        CameraBackup_LowQuality     = 4,
         CameraBackup_Both           = CameraBackup_HighQuality | CameraBackup_LowQuality
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupType)

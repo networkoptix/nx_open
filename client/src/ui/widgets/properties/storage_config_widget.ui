@@ -250,6 +250,16 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Default backup quality:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxBackupQuality"/>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButtonCameraSettings">
           <property name="text">
            <string>Camera settings</string>
@@ -303,15 +313,15 @@ It won't deny oldest footage removing from the drive.</string>
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QnTableView</class>
+   <extends>QTableView</extends>
+   <header location="global">ui/widgets/table_view.h</header>
+  </customwidget>
+  <customwidget>
    <class>QnWordWrappedLabel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnTableView</class>
-   <extends>QTableView</extends>
-   <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

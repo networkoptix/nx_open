@@ -59,6 +59,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     ui->comboBoxBackupType->addItem(tr("Realtime mode"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("Disable"), Qn::Backup_Disabled);
 
+    ui->comboBoxBackupQuality->addItem(tr("Don't backup"), Qn::CameraBackup_Disabled);
+    ui->comboBoxBackupQuality->addItem(tr("High quality only"), Qn::CameraBackup_HighQuality);
+    ui->comboBoxBackupQuality->addItem(tr("Low quality only"), Qn::CameraBackup_LowQuality);
+    ui->comboBoxBackupQuality->addItem(tr("All data"), Qn::CameraBackup_Both);
+
     m_scheduleDialog = new QnBackupScheduleDialog(this);
     m_camerabackupSettingsDialog = new QnBackupSettingsDialog(this);
 }
@@ -102,15 +107,21 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     storagePool->model = new QnStorageListModel();
     tableView->setModel(storagePool->model);
 
-    connect(ui->comboBoxBackupType, SIGNAL(currentIndexChanged(int)), this, SLOT(at_backupComboBoxChange(int)));
+    connect(ui->comboBoxBackupType,   SIGNAL(currentIndexChanged(int)), this, SLOT(at_backupTypeComboBoxChange(int)));
+    connect(ui->comboBoxBackupQuality, SIGNAL(currentIndexChanged(int)), this, SLOT(at_backupQualityComboBoxChange(int)));
     connect(tableView,         &QTableView::clicked,               this,   &QnStorageConfigWidget::at_eventsGrid_clicked);
     tableView->setMouseTracking(true);
 }
 
-void QnStorageConfigWidget::at_backupComboBoxChange(int index)
+void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index)
 {
     ui->pushButtonSchedule->setEnabled(ui->comboBoxBackupType->itemData(index) == Qn::Backup_Schedule);
     m_serverUserAttrs.backupType = (Qn::BackupType) ui->comboBoxBackupType->itemData(index).toInt();
+}
+
+void QnStorageConfigWidget::at_backupQualityComboBoxChange(int index)
+{
+    m_serverUserAttrs.backupQuality = (Qn::CameraBackupTypes) ui->comboBoxBackupQuality->itemData(index).toInt();
 }
 
 void QnStorageConfigWidget::updateFromSettings()
@@ -127,6 +138,12 @@ void QnStorageConfigWidget::updateFromSettings()
     for (int i = 0; i < ui->comboBoxBackupType->count(); ++i) {
         if (ui->comboBoxBackupType->itemData(i) == m_serverUserAttrs.backupType) {
             ui->comboBoxBackupType->setCurrentIndex(i);
+            break;
+        }
+    }
+    for (int i = 0; i < ui->comboBoxBackupQuality->count(); ++i) {
+        if (ui->comboBoxBackupQuality->itemData(i) == (int) m_serverUserAttrs.backupQuality) {
+            ui->comboBoxBackupQuality->setCurrentIndex(i);
             break;
         }
     }
