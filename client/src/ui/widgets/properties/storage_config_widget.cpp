@@ -278,7 +278,7 @@ void QnStorageConfigWidget::submitToSettings()
     QSet<QnUuid> newIdList;
     for (const auto& storageData: m_mainPool.model->modelData().storages + m_backupPool.model->modelData().storages)
         newIdList << storageData.storageId;
-    for (const auto& storage: m_storages) {
+    for (const auto& storage: m_server->getStorages()) {
         if (!newIdList.contains(storage->getId()))
             storagesToRemove.push_back(storage->getId());
     }
