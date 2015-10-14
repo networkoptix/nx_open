@@ -51,5 +51,6 @@ ios {
     QMAKE_BUNDLE_DATA += launch_image
 
     QMAKE_IOS_DEPLOYMENT_TARGET = 8.0
-    QMAKE_XCODE_CODE_SIGN_IDENTITY = ${codesign_identity}
+    QMAKE_XCODE_CODE_SIGN_IDENTITY = ${ios.sign.identity}
+    XCODEBUILD_FLAGS = PROVISIONING_PROFILE=${provisioning_profile_id}
 }
