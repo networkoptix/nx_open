@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<TS version="2.0" language="de" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -707,27 +707,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Quelle enthält:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwörter, die durch Leerzeichen getrennt sind</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschriftung enthält:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreibung enthält:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Regel funktioniert nur für generische Ereignisse, welche alle Filter passiert. Leere Felder wirken sich nicht auf das Ergebnis aus. Jeder Filter wird akzeptiert, wenn alle Passwörter übereinstimmen.</translation>
     </message>
 </context>
 <context>
@@ -2411,7 +2411,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Failover Priorität...</translation>
     </message>
 </context>
 <context>
