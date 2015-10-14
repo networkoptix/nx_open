@@ -180,7 +180,12 @@ function backPressed() {
     if (sideNavigation.open) {
         sideNavigation.hide()
         return true
-    } else if (stackView.depth == 1 || stackView.get(stackView.depth - 1).objectName == "newConnectionPage") {
+    } else if (stackView.depth == 2) {
+        // First stack item is always resources page.
+
+        if (stackView.currentItem.objectName == "newConnectionPage")
+            return false
+
         gotoMainScreen()
         return true
     }
