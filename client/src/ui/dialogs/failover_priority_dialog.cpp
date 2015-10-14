@@ -6,6 +6,8 @@
 
 #include <ui/common/palette.h>
 #include <ui/delegates/failover_priority_resource_model_delegate.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/models/resource_pool_model.h>
 
 namespace {
@@ -125,6 +127,7 @@ QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/
         },
         m_customColumnDelegate,
         this));
+    setHelpTopic(this, Qn::ServerSettings_Failover_Help);
 
 
     auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
