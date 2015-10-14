@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="th" sourcelanguage="en">
+<TS version="2.0" language="th" sourcelanguage="en">
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
@@ -1288,115 +1288,115 @@
     </message>
     <message>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>ลำดับความสำคัญล้มเหลว ...</translation>
     </message>
     <message>
         <source>Move Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>ย้ายอุปกรณ์</translation>
     </message>
     <message>
         <source>Move Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>ย้ายกล้อง</translation>
     </message>
     <message>
         <source>Device Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์การตรวจสอบ ...</translation>
     </message>
     <message>
         <source>Camera Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของกล้อง ...</translation>
     </message>
     <message>
         <source>IO Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่ออุปกรณ์</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Check Device Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบปัญหาที่อุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Check Devices Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบปัญหาที่อุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบปัญหาที่กล้อง ...</translation>
     </message>
     <message>
         <source>Check Cameras Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบปัญหาที่กล้อง ...</translation>
     </message>
     <message>
         <source>Check IO Module Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบ IO โมดูล ...</translation>
     </message>
     <message>
         <source>Check IO Modules Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบ IO โมดูล ...</translation>
     </message>
     <message>
         <source>Device Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อกำหนดอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Devices Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อกำหนดอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อกำหนดกล้อง ...</translation>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อกำหนดกล้อง ...</translation>
     </message>
     <message>
         <source>IO Module Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อกำหนด IO ...</translation>
     </message>
     <message>
         <source>IO Modules Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อกำหนด IO ...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Devices Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่ากล้อง ...</translation>
     </message>
     <message>
         <source>Cameras Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่ากล้อง ...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO โมดูลการตั้งค่า ...</translation>
     </message>
     <message>
         <source>IO Modules Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>IO โมดูลการตั้งค่า ...</translation>
     </message>
     <message>
         <source>Devices List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่ออุปกรณ์โดยเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
         <source>Cameras List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่ออุปกรณ์โดยเซิร์ฟเวอร์ ...</translation>
     </message>
 </context>
 <context>
@@ -1473,19 +1473,19 @@
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์</translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง</translation>
     </message>
     <message>
         <source>Device actions</source>
-        <translation type="unfinished"></translation>
+        <translation>การกระทำของอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera actions</source>
-        <translation type="unfinished"></translation>
+        <translation>การกระทำของกล้อง</translation>
     </message>
 </context>
 <context>
@@ -1642,35 +1642,35 @@
     </message>
     <message>
         <source>Device updated</source>
-        <translation type="unfinished"></translation>
+        <translation>การปรับปรุงอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera updated</source>
-        <translation type="unfinished"></translation>
+        <translation>การปรับปรุงกล้อง</translation>
     </message>
     <message>
         <source>Device added</source>
-        <translation type="unfinished"></translation>
+        <translation>เพิ่มอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera added</source>
-        <translation type="unfinished"></translation>
+        <translation>เพิ่มกล้อง</translation>
     </message>
     <message>
         <source>Device removed</source>
-        <translation type="unfinished"></translation>
+        <translation>ลบอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera removed</source>
-        <translation type="unfinished"></translation>
+        <translation>ลบกล้อง</translation>
     </message>
     <message>
         <source>Device name</source>
-        <translation type="unfinished"></translation>
+        <translation>ชื่ออุปกรณ์</translation>
     </message>
     <message>
         <source>Camera name</source>
-        <translation type="unfinished"></translation>
+        <translation>ชื่อกล้อง</translation>
     </message>
 </context>
 <context>
@@ -1701,31 +1701,31 @@
     <name>QnBusinessResourceValidationStrings</name>
     <message>
         <source>%1 of %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ของ%n อุปกรณ์</translation>
     </message>
     <message>
         <source>%1 of %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ของ%n กล้อง</translation>
     </message>
     <message>
         <source>%1 of %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ของ%n โมดูล IO</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;อุปกรณ์ อื่น ๆ&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;กล้อง อื่น ๆ &gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;เลือกอย่างน้อยหนึ่งอุปกรณ์&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;เลือกอย่างน้อยหนึ่งกล้อง&gt;</translation>
     </message>
 </context>
 <context>
@@ -1817,23 +1817,23 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;อุปกรณ์ อื่น ๆ&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;กล้อง อื่น ๆ &gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation>เลือกอุปกรณ์อย่างน้อยหนึ่ง</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>เลือกอย่างน้อยหนึ่งกล้อง</translation>
     </message>
     <message>
         <source>Occurs</source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดขึ้น</translation>
     </message>
 </context>
 <context>
@@ -1848,19 +1848,19 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;อุปกรณ์ อื่น ๆ &gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;กล้อง อื่น ๆ &gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;เลือกอย่างน้อยหนึ่งอุปกรณ์&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;เลือกอย่างน้อยหนึ่งกล้อง&gt;</translation>
     </message>
 </context>
 <context>
@@ -1935,11 +1935,11 @@
     </message>
     <message>
         <source>filter by devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>กรองโดยอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>กรองโดยกล้อง ...</translation>
     </message>
 </context>
 <context>
@@ -2001,7 +2001,7 @@
     </message>
     <message>
         <source>Scanning hosts... (%1)</source>
-        <translation type="unfinished">กำลังสแกนโฮสต์ ... (%1)%n</translation>
+        <translation>กำลังสแกนโฮสต์ ... (%1)</translation>
     </message>
     <message>
         <source>Finished</source>
@@ -2104,7 +2104,7 @@
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>สแกนโฮสต์ ... (%1)</translation>
     </message>
 </context>
 <context>
@@ -2191,51 +2191,51 @@
     </message>
     <message>
         <source>Diagnostics for device %1</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบ อุปกรณ์ %1</translation>
     </message>
     <message>
         <source>Diagnostics for camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบสำหรับกล้อง %1</translation>
     </message>
     <message>
         <source>Diagnostics for IO module %1</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบสำหรับโมดูล IO %1</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของกล้อง</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบ IO โมดูล</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>ยืนยันอุปกรณ์ที่สามารถเข้าถึงได้.</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>ยืนยันกล้องสามารถเข้าถึงได้.</translation>
     </message>
     <message>
         <source>Confirming IO module is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>ยืนยันโมดูล IO ที่สามารถเข้าถึงได้.</translation>
     </message>
     <message>
         <source>Confirming target device provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>ยืนยันอุปกรณ์ที่จัดเตรียมให้ มีเดียสตรีม.</translation>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>ยืนยันอุปกล้องที่จัดเตรียมให้ มีเดียสตรีม.</translation>
     </message>
     <message>
         <source>Confirming target IO module provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>ยืนยันโมดูล IO ที่จัดเตรียมให้ มีเดียสตรีม.</translation>
     </message>
 </context>
 <context>
@@ -2271,40 +2271,40 @@
     <message>
         <source>Devices List for %1</source>
         <extracomment>Devices List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่ออุปกรณ์สำหรับ %1</translation>
     </message>
     <message>
         <source>Cameras List for %1</source>
         <extracomment>Cameras List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่อกล้องสำหรับ %1</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่ออุปกรณ์</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่อกล้อง</translation>
     </message>
     <message>
         <source>%n devices found</source>
-        <translation type="unfinished">%n อุปกรณ์ที่พบ</translation>
+        <translation>%n อุปกรณ์ที่พบ</translation>
     </message>
     <message>
         <source>%n cameras found</source>
-        <translation type="unfinished"></translation>
+        <translation>%n กล้องที่พบ</translation>
     </message>
     <message>
         <source>%n IO modules found</source>
-        <translation type="unfinished"></translation>
+        <translation>%n โมดูล IO ที่พบ</translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>ส่งออกอุปกรณ์ที่เลือกไปยังแฟ้ม.</translation>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>ส่งออกกล้องที่เลือกไปยังแฟ้ม.</translation>
     </message>
 </context>
 <context>
@@ -2411,27 +2411,27 @@
     </message>
     <message>
         <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>คำเตือน! ค่าต่ำสุด สูงสุด สามารถลดอุปกรณ์อื่น ๆ &apos;ระยะเวลาในการบันทึก.</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>คำเตือน! ค่าต่ำสุด สูงสุด สามารถลดกล้องอื่น ๆ &apos;ระยะเวลาในการบันทึก.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>การบันทึกการเคลื่อนไหวมีการยกเลิกหรือไม่ได้รับการสนับสนุนโดยบางส่วนของกล้องที่เลือก โปรดไปที่หน้าการตั้งค่าการเคลื่อนไหวเพื่อให้แน่ใจว่าได้รับการสนับสนุนและเปิดใช้งาน.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>แบบ ดูอัล-สตรีมมิ่งไม่ได้รับการสนับสนุนโดยกล้องนี้.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>แบบ ดูอัลl-สตรีมมิ่งและการตรวจจับการเคลื่อนไหวจะไม่สามารถใช้ได้สำหรับกล้องนี้.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>การบันทึกการเคลื่อนไหวถูกปิดใช้งาน โปรดไปที่หน้าการตั้งค่าการเคลื่อนไหวที่จะติดตั้งในพื้นที่การเคลื่อนไหวของกล้องและความไว.</translation>
     </message>
 </context>
 <context>
@@ -2462,91 +2462,91 @@
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
         <source>Devices Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่ากล้อง</translation>
     </message>
     <message>
         <source>Cameras Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่ากล้อง</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าโมดูล IO</translation>
     </message>
     <message>
         <source>IO Modules Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าโมดูล IO</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของอุปกรณ์</translation>
     </message>
     <message>
         <source>Devices Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของกล้อง</translation>
     </message>
     <message>
         <source>Cameras Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของกล้อง</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของ IO โมดูล</translation>
     </message>
     <message>
         <source>IO Modules Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบของ IO โมดูล</translation>
     </message>
     <message>
         <source>Device Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>กฎระเบียบอุปกรณ์</translation>
     </message>
     <message>
         <source>Devices Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>กฎระเบียบอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>กฎระเบียบกล้อง</translation>
     </message>
     <message>
         <source>Cameras Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>กฎระเบียบกล้อง</translation>
     </message>
     <message>
         <source>IO Module Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>กฎระเบียบ IO โมดูล</translation>
     </message>
     <message>
         <source>IO Modules Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>กฎระเบียบ IO โมดูล</translation>
     </message>
     <message>
         <source>Apply changes to the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>ใช้การเปลี่ยนแปลงกับอุปกรณ์ดังต่อไปนี้ %n?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>ใช้การเปลี่ยนแปลงกล้องต่อไปนี้ %n?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>ใช้การเปลี่ยนแปลงกับโมดูล IO ดังต่อไปนี้ %n?</translation>
     </message>
     <message>
         <source>Changes are not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>การเปลี่ยนแปลงจะไม่ถูกบันทึก</translation>
     </message>
 </context>
 <context>
@@ -2557,7 +2557,7 @@
     </message>
     <message>
         <source>No device selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์ไม่ได้เลือก.</translation>
     </message>
 </context>
 <context>
@@ -2935,11 +2935,11 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;อุปกรณ์อื่น ๆ &gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;กล้อง อื่น ๆ &gt;</translation>
     </message>
 </context>
 <context>
@@ -2993,49 +2993,49 @@
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>ประเภทการเคลื่อนไหวไม่ได้รับการสนับสนุนโดยบางกล้อง.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>การบันทึกไม่สามารถเปิดใช้งานสำหรับบางกล้อง.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าตารางเวลาเข้ากันได้กับอุปกรณ์บางอย่าง.</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialog</name>
     <message>
         <source>Failover Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>ลำดับความสำคัญล้มเหลว</translation>
     </message>
     <message>
         <source>Never</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">ตลอด</translation>
+        <translation>ไม่ต้อง</translation>
     </message>
     <message>
         <source>Low</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">ต่ำ</translation>
+        <translation>ต่ำ</translation>
     </message>
     <message>
         <source>Medium</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">ปานกลาง</translation>
+        <translation>ปานกลาง</translation>
     </message>
     <message>
         <source>High</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">สูง</translation>
+        <translation>สูง</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
         <source>Set Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าลำดับความสำคัญ:</translation>
     </message>
 </context>
 <context>
@@ -3088,27 +3088,27 @@
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Open Alarm/Event Rules Management...</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดปลุก /เหตุการณ์ กฎการบริหารจัดการ ...</translation>
     </message>
     <message>
         <source>Open Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดบันทึกเหตุการณ์ ...</translation>
     </message>
     <message>
         <source>Open Devices List...</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดรายชื่ออุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Open Cameras List...</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดรายชื่อกล้อง ...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่ออุปกรณ์</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>รายชื่อกล้อง</translation>
     </message>
 </context>
 <context>
@@ -3319,15 +3319,15 @@
     <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถส่งออกอุปกรณ์ %1.</translation>
     </message>
     <message>
         <source>Could not export camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถส่งออก กล้อง %1.</translation>
     </message>
     <message>
         <source>Could not export IO module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถส่งออกโมดูล IO %1.</translation>
     </message>
 </context>
 <context>
@@ -3709,20 +3709,20 @@
     <message numerus="yes">
         <source>Use analog licenses to view these %n cameras</source>
         <translation>
-            <numerusform>ใช้ใบอนุญาตแบบอะนาล็อกเพื่อดูกล้องเหล่า%n</numerusform>
+            <numerusform>ใช้ใบอนุญาตแบบอะนาล็อกเพื่อดูกล้องเหล่านี้%n</numerusform>
         </translation>
     </message>
     <message>
         <source>Use licenses for selected %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Use licenses for selected %n cameras</translation>
     </message>
     <message>
         <source>Use licenses for selected %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</translation>
     </message>
     <message>
         <source>Use licenses for selected %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>ใช้ใบอนุญาตสำหรับการเลือกโมดูล IO %n</translation>
     </message>
 </context>
 <context>
@@ -4003,19 +4003,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The discovered system %1 is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบค้นพบ %1 อยู่ในโหมดที่ปลอดภัย.</translation>
     </message>
     <message>
         <source>System has an incompatible version.</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบมีรุ่นที่เข้ากันไม่ได้.</translation>
     </message>
     <message>
         <source>Operation is not permitted.</source>
-        <translation type="unfinished"></translation>
+        <translation>การดำเนินงานไม่ได้รับอนุญาต.</translation>
     </message>
     <message>
         <source>System is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบอยู่ในโหมดที่ปลอดภัย.</translation>
     </message>
 </context>
 <context>
@@ -4187,67 +4187,67 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server Settings...</source>
-        <translation type="unfinished">การตั้งค่าเซิร์ฟเวอร์ ...</translation>
+        <translation>การตั้งค่าเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
         <source>Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>ใบอนุญาต ...</translation>
     </message>
     <message>
         <source>User Settings...</source>
-        <translation type="unfinished">การตั้งค่าผู้ใช้งาน...</translation>
+        <translation>การตั้งค่าผู้ใช้งาน...</translation>
     </message>
     <message>
         <source>SMTP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่า SMTP ...</translation>
     </message>
     <message>
         <source>Connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>เชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
         <source>Time Synchronization...</source>
-        <translation type="unfinished"></translation>
+        <translation>การประสานเวลา ...</translation>
     </message>
     <message>
         <source>Server settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
         <source>Open Device</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดอุปกรณ์</translation>
     </message>
     <message>
         <source>Open Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดกล้อง</translation>
     </message>
     <message>
         <source>Open IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิด IO โมดูล</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่ากล้อง ...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่า IO โมดูล...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดหน้าเว็บของอุปกรณ ...</translation>
     </message>
     <message>
         <source>Open Camera Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดหน้าเว็บกล้อง ...</translation>
     </message>
     <message>
         <source>Open IO Module Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดหน้าเว็บ IO โมดูล ...</translation>
     </message>
 </context>
 <context>
@@ -4636,43 +4636,43 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>empty</source>
-        <translation type="unfinished"></translation>
+        <translation>ว่างเปล่า</translation>
     </message>
     <message>
         <source>Total %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>รวม %n อุปกรณ์</translation>
     </message>
     <message>
         <source>Total %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>รวม %n กล้อง</translation>
     </message>
     <message>
         <source>Total %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>รวม %n โมดูล IO</translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์ที่มีเก็บถาวรไม่ว่างเปล่า</translation>
     </message>
     <message>
         <source>Cameras with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้องที่มีที่เก็บถาวรไม่ว่างเปล่า</translation>
     </message>
     <message>
         <source>Storage space occupied by devices</source>
-        <translation type="unfinished"></translation>
+        <translation>พื้นที่จัดเก็บที่ถูกครอบครองโดยอุปกรณ์</translation>
     </message>
     <message>
         <source>Storage space occupied by cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>พื้นที่จัดเก็บที่ถูกครอบครองโดยกล้อง</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง</translation>
     </message>
 </context>
 <context>
@@ -4722,11 +4722,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Live Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์สด</translation>
     </message>
     <message>
         <source>Live Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้องสด</translation>
     </message>
 </context>
 <context>
@@ -4764,11 +4764,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Select Devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>เลือกอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>เลือกกล้อง ...</translation>
     </message>
 </context>
 <context>
@@ -4883,23 +4883,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server Settings - %1 (readonly)</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าเซิร์ฟเวอร์ - %1 (อ่านได้อย่างเดียว)</translation>
     </message>
     <message>
         <source>Server Settings - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าเซิร์ฟเวอร์ - %1</translation>
     </message>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">การตั้งค่าเซิร์ฟเวอร์</translation>
+        <translation>การตั้งค่าเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Server not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ไม่ได้ถูกบันทึก</translation>
     </message>
     <message>
         <source>Apply changes to the server %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>ใช้การเปลี่ยนแปลงไปยังเซิร์ฟเวอร์ %1 หรือไม่?</translation>
     </message>
 </context>
 <context>
@@ -4966,39 +4966,39 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ไม่พร้อมใช้งาน</translation>
     </message>
     <message>
         <source>Enable failover (server will take devices automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดใช้งานล้มเหลว (เซิร์ฟเวอร์จะใช้อุปกรณ์โดยอัตโนมัติจากเซิร์ฟเวอร์ออฟไลน์)</translation>
     </message>
     <message>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดใช้งานล้มเหลว (เซิร์ฟเวอร์จะใช้กล้องโดยอัตโนมัติจากเซิร์ฟเวอร์ออฟไลน์)</translation>
     </message>
     <message>
         <source>Max devices on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์ทั้งหมดบนเซิร์ฟเวอร์นี้:</translation>
     </message>
     <message>
         <source>Max cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้องทั้งหมดบนเซิร์ฟเวอร์นี้:</translation>
     </message>
     <message>
         <source>This server already has more than max devices</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์นี้มีอุปกรณ์มากกว่าค่าสูงสุด</translation>
     </message>
     <message>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์นี้มีกล้องมากกว่าค่าสูงสุด</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of devices</source>
-        <translation type="unfinished"></translation>
+        <translation>เพื่อหลีกเลี่ยงความผิดปกติของการปรับจำนวนสูงสุดของอุปกรณ์</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>เพื่อหลีกเลี่ยงความผิดปกติของการปรับจำนวนสูงสุดของกล้อง</translation>
     </message>
 </context>
 <context>
@@ -5256,7 +5256,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถที่จะเริ่มต้นการปรับปรุง ปรับคำแนะนำที่จะปล่อยก่อนหน้านี้เป็นสิ่งต้องห้าม.</translation>
     </message>
 </context>
 <context>
@@ -5322,15 +5322,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่ากล้อง</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IO การตั้งค่าโมดูล</translation>
     </message>
 </context>
 <context>
@@ -5459,15 +5459,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please check authentication information in device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาตรวจสอบข้อมูลการตรวจสอบ ในการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาตรวจสอบข้อมูลการตรวจสอบ ในการตั้งค่ากล้อง</translation>
     </message>
     <message>
         <source>Please check authentication information in IO module settings</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาตรวจสอบข้อมูลการตรวจสอบการตั้งค่าใน IO โมดูล</translation>
     </message>
 </context>
 <context>
@@ -5559,19 +5559,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable devices and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดใช้งานอุปกรณ์และเซิร์ฟเวอร์การค้นพบอัตโนมัติ</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดใช้งานกล้องและการค้นพบเซิร์ฟเวอร์อัตโนมัติ</translation>
     </message>
     <message>
         <source>Allow system to optimize devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
         <source>Allow system to optimize cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง</translation>
     </message>
 </context>
 <context>
@@ -5847,11 +5847,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Adjust device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ปรับการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
         <source>Adjust camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ปรับการตั้งค่ากล้อง</translation>
     </message>
 </context>
 <context>
@@ -5942,11 +5942,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Can adjust devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>สามารถปรับการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
         <source>Can adjust cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>สามารถปรับการตั้งค่ากล้อง</translation>
     </message>
 </context>
 <context>
@@ -6201,92 +6201,92 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>ไม่สามารถย้ายอุปกรณ์เหล่านี้ %n ไปยังเซิร์ฟเวอร์ %1 เซิร์ฟเวอร์ไม่ตอบสนอง.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>ไม่สามารถย้ายกล้องเหล่านี้ %n ไปยังเซิร์ฟเวอร์ %1 เซิร์ฟเวอร์ไม่ตอบสนอง.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>ไม่สามารถย้ายโมดูล IOเหล่านี้ %n ไปยังเซิร์ฟเวอร์ %1 เซิร์ฟเวอร์ไม่ตอบสนอง.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>เซิร์ฟเวอร์ %1 ไม่สามารถค้นหาและเข้าถึงอุปกรณ์เหล่านี้ %n คุณแน่ใจหรือว่าต้องการที่จะย้ายพวกเขา?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>เซิร์ฟเวอร์ %1 ไม่สามารถค้นหาและเข้าถึงกล้องเหล่านี้ %n คุณแน่ใจหรือว่าต้องการที่จะย้ายพวกเขา?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>เซิร์ฟเวอร์ %1 ไม่สามารถค้นหาและเข้าถึงโมดูล IOเหล่านี้ %n คุณแน่ใจหรือว่าต้องการที่จะย้ายพวกเขา?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>คุณแน่ใจหรือว่าต้องการที่จะลบไฟล์เหล่านี้ %n?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>คุณแน่ใจหรือว่าต้องการลบรายการเหล่านี้ %n  จากรูปแบบ?</numerusform>
         </translation>
     </message>
     <message>
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์ %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
     </message>
     <message>
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
     </message>
     <message>
         <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>โมดูล IO %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
     </message>
     <message>
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n ของอุปกรณ์เหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
     </message>
     <message>
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n ของกล้องเหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
     </message>
     <message>
         <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n ของโมดูล IO เหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>จริงๆคุณต้องการลบอุปกรณ์ %n ต่อไปนี้หรือไม่?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>จริงๆคุณต้องการลบกล้อง %n ต่อไปนี้หรือไม่?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>จริงๆคุณต้องการลบโมดูล IO %n ต่อไปนี้หรือไม่?</translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>คุณต้องการที่จะลบรายการ %n ต่อไปนี้หรือไม่?</numerusform>
         </translation>
     </message>
 </context>
@@ -6731,15 +6731,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>All Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์ทั้งหมด</translation>
     </message>
     <message>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้องทั้งหมด</translation>
     </message>
     <message>
         <source>All IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>โมดูล IO ทั้งหมด</translation>
     </message>
 </context>
 <context>
@@ -6777,34 +6777,34 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message>
         <source>The system is in Safe Mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบนี้เป็นระบบใน Safe Mode.</translation>
     </message>
     <message>
         <source>It is not allowed to make any changes except license activation.</source>
-        <translation type="unfinished"></translation>
+        <translation>มันไม่ได้รับอนุญาตให้ทำการเปลี่ยนแปลงใด ๆ ยกเว้นใบอนุญาตการเปิดใช้งาน.</translation>
     </message>
     <message>
         <source>The following %n items are not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>รายการต่อไปนี้ %n จะไม่ถูกบันทึก.</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>ไม่สามารถบันทึกรายการต่อไปนี้ %n ไปยังเซิร์ฟเวอร์.</numerusform>
         </translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
         <source>The following %n items are not deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>รายการต่อไปนี้ %n จะไม่ถูกลบ.</translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>ไม่สามารถลบรายการดังต่อไปนี้ %n จากเซิร์ฟเวอร์.</numerusform>
         </translation>
     </message>
 </context>
@@ -6812,7 +6812,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบในเซฟโหมด</translation>
     </message>
 </context>
 <context>
