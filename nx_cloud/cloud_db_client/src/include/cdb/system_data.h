@@ -71,7 +71,7 @@ public:
     SystemData()
     :
         status(ssInvalid),
-        cloudConnectionSubscriptionStatus(false)
+        cloudConnectionSubscriptionStatus(true)
     {
     }
 
