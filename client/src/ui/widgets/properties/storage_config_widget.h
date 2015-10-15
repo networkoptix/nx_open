@@ -17,6 +17,7 @@
 #include "api/model/rebuild_archive_reply.h"
 #include "core/resource/media_server_user_attributes.h"
 #include "ui/models/backup_settings_model.h"
+#include "api/model/backup_status_reply.h"
 
 class QnBackupScheduleDialog;
 class QnBackupSettingsDialog;
@@ -41,9 +42,12 @@ public:
     virtual void submitToSettings() override;
 private:
     void updateRebuildInfo();
+    void updateBackupInfo();
     void at_eventsGrid_clicked(const QModelIndex& index);
     void sendNextArchiveRequest(bool isMain);
     void updateRebuildUi(const QnStorageScanData& reply, bool isMainPool);
+    void updateBackupUi(const QnBackupStatusData& reply);
+    void sendNextBackupStatusRequest();
 private slots:
     void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();
@@ -53,6 +57,7 @@ private slots:
     void at_openBackupSchedule_clicked();
     void at_openBackupSettings_clicked();
     void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle);
+    void at_backupStatusReply(int status, const QnBackupStatusData& reply, int handle);
     void sendNextArchiveRequestForMain();
     void sendNextArchiveRequestForBackup();
     void at_backupTypeComboBoxChange(int index);

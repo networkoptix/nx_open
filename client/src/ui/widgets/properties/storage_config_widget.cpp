@@ -231,6 +231,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
         for (const auto& storage: m_storages)
             connect(storage, &QnResource::statusChanged,            this,   &QnStorageConfigWidget::updateRebuildInfo);
         updateRebuildInfo();
+        updateBackupInfo();
     }
 }
 
@@ -247,6 +248,17 @@ void QnStorageConfigWidget::updateRebuildInfo()
         updateRebuildUi(QnStorageScanData(), true);
         updateRebuildUi(QnStorageScanData(), false);
     }
+}
+
+void QnStorageConfigWidget::updateBackupInfo()
+{
+    if (isReadOnly())
+        return;
+    
+    if (m_server->getStatus() == Qn::Online)
+        sendNextBackupStatusRequest();
+    else
+        updateBackupUi(QnBackupStatusData());
 }
 
 void QnStorageConfigWidget::processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& modifiedData, bool isBackupPool)
@@ -435,6 +447,14 @@ void QnStorageConfigWidget::at_openBackupSettings_clicked()
         m_camerabackupSettingsDialog->submitToSettings(m_cameraBackupSettings);
 }
 
+void QnStorageConfigWidget::at_backupStatusReply(int status, const QnBackupStatusData& reply, int handle)
+{
+    updateBackupUi(reply);
+
+    if (reply.state > Qn::RebuildState_None)
+        QTimer::singleShot(500, this, SLOT(sendNextBackupStatusRequest()));
+}
+
 void QnStorageConfigWidget::at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle)
 {
     Q_UNUSED(status);
@@ -475,6 +495,19 @@ void QnStorageConfigWidget::sendNextArchiveRequest(bool isMain) {
     StoragePool& storagePool = isMain ? m_mainPool : m_backupPool;
     storagePool.rebuildHandle = m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, isMain, 
                                 this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
+}
+
+void QnStorageConfigWidget::sendNextBackupStatusRequest() 
+{
+    if (!m_server)
+        return;
+    
+    m_server->apiConnection()->backupControlActionAsync(BackupAction_ShowProgress, this, SLOT(at_backupStatusReply(int, const QnBackupStatusData &, int)));
+}
+
+void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
+{
+
 }
 
 void QnStorageConfigWidget::updateRebuildUi(const QnStorageScanData& reply, bool isMainPool)

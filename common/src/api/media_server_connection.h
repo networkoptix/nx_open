@@ -34,6 +34,13 @@ enum RebuildAction
     RebuildAction_Cancel
 };
 
+enum BackupAction
+{
+    BackupAction_ShowProgress,
+    BackupAction_Start,
+    BackupAction_Cancel
+};
+
 class QnMediaServerConnection: public QnAbstractConnection {
     Q_OBJECT
     typedef QnAbstractConnection base_type;
@@ -207,6 +214,8 @@ public:
         \returns Request handle. -1 In case of failure to start async request
      */
     int doRebuildArchiveAsync(RebuildAction action, bool isMainPool, QObject *target, const char *slot);
+
+    int backupControlActionAsync(BackupAction action, QObject *target, const char *slot);
 
     int addBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int updateBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);

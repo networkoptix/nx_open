@@ -32,7 +32,7 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
-            StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+            StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
             ServerFlag BackupType CameraBackupType CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
             FailoverPriority)
@@ -156,6 +156,13 @@ public:
         RebuildState_PartialScan = 3
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RebuildState)
+
+    enum BackupState {
+        BackupState_Unknown     = 0,
+        BackupState_None        = 1,
+        BackupState_InProgress  = 2
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupState)
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
@@ -809,7 +816,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupType)
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
+        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
         (Qn::BookmarkSearchStrategy)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)
