@@ -379,9 +379,9 @@ angular.module('webadminApp').controller('ViewCtrl',
                 });
 
                 server.visible = $scope.searchCams === '' ||
-                    camsVisible ||
+                    camsVisible /*||
                     has(server.name, $scope.searchCams) ||
-                    has(server.url, $scope.searchCams);
+                    has(server.url, $scope.searchCams)*/;
             });
         }
 
