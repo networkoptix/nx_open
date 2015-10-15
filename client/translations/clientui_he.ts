@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="he" sourcelanguage="en">
+<TS version="2.0" language="he" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -698,27 +698,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>המקור מכיל:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>מילות מפתח מופרדות ע&quot;י רווח</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>הכתובית מכילה:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>התיאור מכיל:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>החוק יעבוד רק עבור אירועים גנרים שעוברים את כל המסננים. שדות ריקים אינם משפיעים על התוצאה.כל מסנן עובר במידה ויש התאמה לאחת ממילות המפתח.</translation>
     </message>
 </context>
 <context>
@@ -2401,7 +2401,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>קדימות גיבוי...</translation>
     </message>
 </context>
 <context>
