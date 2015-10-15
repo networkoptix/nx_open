@@ -545,9 +545,35 @@ void QnProgressiveDownloadingConsumer::run()
             d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
+        boost::optional<CameraMediaStreams> mediaStreams;
+        if (const auto physicalResource = resource.dynamicCast<QnPhysicalCameraResource>())
+            mediaStreams = physicalResource->mediaStreams();
+
+        QnServer::ChunksCatalog qualityToUse = QnServer::HiQualityCatalog;
+        QnTranscoder::TranscodeMethod transcodeMethod =
+            d->videoCodec == CODEC_ID_H264
+                ? QnTranscoder::TM_DirectStreamCopy
+                : QnTranscoder::TM_FfmpegTranscode;
+        if (static_cast<bool>(mediaStreams) &&
+            transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
+        {
+            for (const auto& streamInfo: mediaStreams->streams)
+            {
+                if (!streamInfo.transcodingRequired
+                    && streamInfo.codec == d->videoCodec
+                    && resolutionStr.isEmpty())
+                {
+                    qualityToUse = streamInfo.encoderIndex == 0
+                        ? QnServer::HiQualityCatalog
+                        : QnServer::LowQualityCatalog;
+                    transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+                }
+            }
+        }
+
         if (d->transcoder.setVideoCodec(
                 d->videoCodec,
-                d->videoCodec == CODEC_ID_H264 ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode,
+                transcodeMethod,
                 quality,
                 videoSize,
                 -1,
@@ -612,7 +638,7 @@ void QnProgressiveDownloadingConsumer::run()
                 sendResponse(CODE_NOT_FOUND, "text/plain");
                 return;
             }
-            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnServer::HiQualityCatalog);
+            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
             dataProvider = liveReader;
             if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);
