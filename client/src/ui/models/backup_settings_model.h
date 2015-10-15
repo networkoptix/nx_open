@@ -54,6 +54,7 @@ private:
     QString displayData(const QModelIndex &index) const;
     QVariant fontData(const QModelIndex &index) const;
     QVariant foregroundData(const QModelIndex &index) const;
+    QVariant decorationData(const QModelIndex &index) const;
     QVariant checkstateData(const QModelIndex &index) const;
     QString backupTypeToString(Qn::CameraBackupTypes value) const;
 private:

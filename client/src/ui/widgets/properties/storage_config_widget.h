@@ -66,7 +66,6 @@ private slots:
     void sendNextArchiveRequestForBackup();
     void sendNextBackupStatusRequest();
     void at_backupTypeComboBoxChange(int index);
-    void at_backupQualityComboBoxChange(int index);
 private:
     Ui::StorageConfigWidget* ui;
     QnMediaServerResourcePtr m_server;

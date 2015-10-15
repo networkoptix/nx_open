@@ -17,8 +17,8 @@ public:
     QnBackupSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnBackupSettingsDialog() {}
 
-    void updateFromSettings(const BackupSettingsDataList& value);
-    void submitToSettings(BackupSettingsDataList& value);
+    void updateFromSettings(const BackupSettingsDataList& value, const QnMediaServerUserAttributes& serverAttrs);
+    void submitToSettings(BackupSettingsDataList& value, QnMediaServerUserAttributes& serverAttrs);
 private slots:
     void at_labelClicked();
     void at_modelDataChanged();

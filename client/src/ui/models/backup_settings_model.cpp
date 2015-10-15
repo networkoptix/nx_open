@@ -3,6 +3,7 @@
 #include "ui/style/resource_icon_cache.h"
 #include "ui/common/ui_resource_name.h"
 #include "core/resource_management/resource_pool.h"
+#include "ui/style/skin.h"
 
 // ------------------ QnStorageListMode --------------------------
 
@@ -59,7 +60,10 @@ QString QnBackupSettingsModel::displayData(const QModelIndex &index) const
     case CheckBoxColumn:
         return QString();
     case CameraNameColumn:
-        return getResourceName(qnResPool->getResourceById(data.id));
+        if (!data.id.isNull())
+            return getResourceName(qnResPool->getResourceById(data.id));
+        else
+            return tr("<New cameras>");
     case BackupTypeColumn:
         return backupTypeToString(data.backupType);
     default:
@@ -71,12 +75,32 @@ QString QnBackupSettingsModel::displayData(const QModelIndex &index) const
 
 QVariant QnBackupSettingsModel::fontData(const QModelIndex &index) const 
 {
+    const BackupSettingsData& data = m_data[index.row()];
+    if (data.id.isNull()) 
+    {
+        QFont boldFont;
+        boldFont.setBold(true);
+        return boldFont;
+    }
     return QVariant();
 }
 
 QVariant QnBackupSettingsModel::foregroundData(const QModelIndex &index) const 
 {
     return QVariant();
+}
+
+QVariant QnBackupSettingsModel::decorationData(const QModelIndex &index) const 
+{
+    const auto data = m_data[index.row()];
+    if (index.column() == CameraNameColumn) {
+        if (data.id.isNull())
+            return qnSkin->icon("item/add.png");
+        else
+            return qnResIconCache->icon(qnResPool->getResourceById(data.id));
+    }
+    else
+        return QVariant();
 }
 
 QVariant QnBackupSettingsModel::checkstateData(const QModelIndex &index) const
@@ -94,10 +118,7 @@ QVariant QnBackupSettingsModel::data(const QModelIndex &index, int role) const
 
     switch(role) {
     case Qt::DecorationRole:
-        if (index.column() == CameraNameColumn)
-            return qnResIconCache->icon(qnResPool->getResourceById(m_data[index.row()].id));
-        else
-            return QVariant();
+        return decorationData(index);
     case Qt::DisplayRole:
     case Qn::DisplayHtmlRole:
         return displayData(index);

@@ -62,11 +62,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     ui->comboBoxBackupType->addItem(tr("Realtime mode"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("Disable"), Qn::Backup_Disabled);
 
-    ui->comboBoxBackupQuality->addItem(tr("Don't backup"), Qn::CameraBackup_Disabled);
-    ui->comboBoxBackupQuality->addItem(tr("High quality only"), Qn::CameraBackup_HighQuality);
-    ui->comboBoxBackupQuality->addItem(tr("Low quality only"), Qn::CameraBackup_LowQuality);
-    ui->comboBoxBackupQuality->addItem(tr("All data"), Qn::CameraBackup_Both);
-
     m_scheduleDialog = new QnBackupScheduleDialog(this);
     m_camerabackupSettingsDialog = new QnBackupSettingsDialog(this);
 }
@@ -111,7 +106,6 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     tableView->setModel(storagePool->model);
 
     connect(ui->comboBoxBackupType,   SIGNAL(currentIndexChanged(int)), this, SLOT(at_backupTypeComboBoxChange(int)));
-    connect(ui->comboBoxBackupQuality, SIGNAL(currentIndexChanged(int)), this, SLOT(at_backupQualityComboBoxChange(int)));
     connect(tableView,         &QTableView::clicked,               this,   &QnStorageConfigWidget::at_eventsGrid_clicked);
     tableView->setMouseTracking(true);
 }
@@ -120,11 +114,6 @@ void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index)
 {
     ui->pushButtonSchedule->setEnabled(ui->comboBoxBackupType->itemData(index) == Qn::Backup_Schedule);
     m_serverUserAttrs.backupType = (Qn::BackupType) ui->comboBoxBackupType->itemData(index).toInt();
-}
-
-void QnStorageConfigWidget::at_backupQualityComboBoxChange(int index)
-{
-    m_serverUserAttrs.backupQuality = (Qn::CameraBackupTypes) ui->comboBoxBackupQuality->itemData(index).toInt();
 }
 
 void QnStorageConfigWidget::updateFromSettings()
@@ -144,13 +133,6 @@ void QnStorageConfigWidget::updateFromSettings()
             break;
         }
     }
-    for (int i = 0; i < ui->comboBoxBackupQuality->count(); ++i) {
-        if (ui->comboBoxBackupQuality->itemData(i) == (int) m_serverUserAttrs.backupQuality) {
-            ui->comboBoxBackupQuality->setCurrentIndex(i);
-            break;
-        }
-    }
-
     m_cameraBackupSettings.clear();
 }
 
@@ -335,11 +317,11 @@ void QnStorageConfigWidget::submitToSettings()
     if (serverUserAttrs != m_serverUserAttrs) 
     {
         qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
-            m_server->setBackupType(m_serverUserAttrs.backupType);
-            m_server->setBackupDOW(m_serverUserAttrs.backupDaysOfTheWeek);
-            m_server->setBackupStart(m_serverUserAttrs.backupStart);
-            m_server->setBackupDuration(m_serverUserAttrs.backupDuration);
-            m_server->setBackupBitrate(m_serverUserAttrs.backupBitrate);
+            server->setBackupType(m_serverUserAttrs.backupType);
+            server->setBackupDOW(m_serverUserAttrs.backupDaysOfTheWeek);
+            server->setBackupStart(m_serverUserAttrs.backupStart);
+            server->setBackupDuration(m_serverUserAttrs.backupDuration);
+            server->setBackupBitrate(m_serverUserAttrs.backupBitrate);
         });
     }
 
@@ -471,13 +453,16 @@ void QnStorageConfigWidget::at_openBackupSettings_clicked()
     m_cameraBackupSettings = cameraBackupSettings;
 
 
-    m_camerabackupSettingsDialog->updateFromSettings(m_cameraBackupSettings);
+    m_camerabackupSettingsDialog->updateFromSettings(m_cameraBackupSettings, m_serverUserAttrs);
     if (m_camerabackupSettingsDialog->exec())
-        m_camerabackupSettingsDialog->submitToSettings(m_cameraBackupSettings);
+        m_camerabackupSettingsDialog->submitToSettings(m_cameraBackupSettings, m_serverUserAttrs);
 }
 
 void QnStorageConfigWidget::at_backupStatusReply(int status, const QnBackupStatusData& reply, int handle)
 {
+    Q_UNUSED(status)
+    Q_UNUSED(handle)
+
     updateBackupUi(reply);
 
     if (reply.state == Qn::BackupState_InProgress)

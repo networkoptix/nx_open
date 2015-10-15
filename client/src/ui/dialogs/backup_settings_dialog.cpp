@@ -2,6 +2,26 @@
 #include "core/resource/media_server_user_attributes.h"
 #include "ui/widgets/views/checkboxed_header_view.h"
 
+class MySortFilterProxyModel : public QSortFilterProxyModel
+{
+    typedef QSortFilterProxyModel base_type;
+public:
+    MySortFilterProxyModel(QObject *parent = 0): QSortFilterProxyModel(parent) {}
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
+    {
+        if (left.isValid() && right.isValid()) {
+            BackupSettingsData l = left.data(Qn::BackupSettingsDataRole).value<BackupSettingsData>();
+            BackupSettingsData r = right.data(Qn::BackupSettingsDataRole).value<BackupSettingsData>();
+            bool leftIsNull = l.id.isNull();
+            bool rightIsNull = r.id.isNull();
+            if (leftIsNull != rightIsNull)
+                return leftIsNull << rightIsNull;
+        }
+        return base_type::lessThan(left, right);
+    }
+};
+
 QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags ):
     base_type(parent, windowFlags),
     ui(new Ui::BackupSettingsDialog()),
@@ -11,7 +31,7 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget *parent, Qt::WindowFlags 
     ui->setupUi(this);
 
     m_model = new QnBackupSettingsModel(this);
-    auto sortModel = new QSortFilterProxyModel(this);
+    auto sortModel = new MySortFilterProxyModel(this);
     sortModel->setSourceModel(m_model);
 
     QnCheckBoxedHeaderView* headers = new QnCheckBoxedHeaderView(QnBackupSettingsModel::CheckBoxColumn, this);
@@ -198,13 +218,34 @@ void QnBackupSettingsDialog::at_labelClicked()
     proxyModel->invalidate();
 }
 
-void QnBackupSettingsDialog::updateFromSettings(const BackupSettingsDataList& values)
+void QnBackupSettingsDialog::updateFromSettings(const BackupSettingsDataList& values, const QnMediaServerUserAttributes& serverAttrs)
 {
-    m_model->setModelData(values);
+    auto modelData = values;
+    for (auto& value: modelData) {
+        if (value.backupType == Qn::CameraBackup_Default)
+            value.backupType = serverAttrs.backupQuality;
+    }
+
+    BackupSettingsData allCameras;
+    allCameras.backupType = serverAttrs.backupQuality;
+    modelData << allCameras;
+
+    m_model->setModelData(modelData);
     ui->gridCameras->selectAll();
 }
 
-void QnBackupSettingsDialog::submitToSettings(BackupSettingsDataList& value)
+void QnBackupSettingsDialog::submitToSettings(BackupSettingsDataList& value, QnMediaServerUserAttributes& serverAttrs)
 {
-    value = m_model->modelData();
+    BackupSettingsDataList modelData = m_model->modelData();
+    for (auto itr = modelData.begin(); itr != modelData.end(); ++itr)
+    {
+        if (itr->id.isNull()) 
+        {
+            serverAttrs.backupQuality = itr->backupType;
+            modelData.erase(itr); // remove footage data
+            break;
+        }
+    }
+
+    value = modelData;
 }
