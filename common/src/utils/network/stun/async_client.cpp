@@ -155,6 +155,12 @@ bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
 void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
                                        SystemError::ErrorCode code )
 {
+    if( m_connectingSocket )
+    {
+        m_connectingSocket->cancelAsyncIO();
+        m_connectingSocket = nullptr;
+    }
+
     if( m_state != State::terminated )
         m_state = State::disconnected;
 
@@ -217,12 +223,7 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
 
     std::swap( connectionHandler, m_connectHandler);
     if( code != SystemError::noError )
-    {
-        closeConnectionImpl( &lock, code );
-        m_connectingSocket->cancelAsyncIO();
-        m_connectingSocket = nullptr;
-        return;
-    }
+        return closeConnectionImpl( &lock, code );
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
     m_baseConnection->setMessageHandler( 

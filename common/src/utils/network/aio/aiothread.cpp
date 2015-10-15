@@ -636,6 +636,7 @@ namespace aio
     template<class SocketType>
     AIOThread<SocketType>::AIOThread( QnMutex* const aioServiceMutex ) //TODO: #ak give up using single aioServiceMutex for all aio threads
     :
+        QnLongRunnable( false ),
         m_impl( new AIOThreadImplType( aioServiceMutex ) )
     {
         setObjectName( lit("AIOThread") );

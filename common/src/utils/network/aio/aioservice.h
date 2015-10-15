@@ -266,7 +266,7 @@ namespace aio
         {
             typedef AIOThread<SocketType> AIOThreadType;
 
-            std::list<AIOThreadType*> aioThreadPool;
+            std::list<std::unique_ptr<AIOThreadType>> aioThreadPool;
             //!map<pair<socket, event_type>, pair<thread, socket timeout>>
             std::map<std::pair<SocketType*, aio::EventType>, std::pair<AIOThreadType*, unsigned int> > sockets;
         };
@@ -288,7 +288,7 @@ namespace aio
                 thread->start();
                 if( !thread->isRunning() )
                     continue;
-                aioCtx->aioThreadPool.push_back(thread.release());
+                aioCtx->aioThreadPool.push_back(std::move(thread));
             }
         }
 
@@ -317,7 +317,7 @@ namespace aio
             {
                 if( threadToUse && threadToUse->socketsHandled() < (*threadIter)->socketsHandled() )
                     continue;
-                threadToUse = *threadIter;
+                threadToUse = threadIter->get();
             }
 
             //assigning thread to socket once and for all

@@ -23,7 +23,7 @@ class QN_EXPORT QnLongRunnable
     Q_OBJECT
 
 public:
-    QnLongRunnable();
+    QnLongRunnable( bool isTrackedByPool = true );
     virtual ~QnLongRunnable();
 
     bool needToStop() const;

@@ -113,18 +113,20 @@ static const size_t DEFAULT_THREAD_STACK_SIZE = 128*1024;
 // -------------------------------------------------------------------------- //
 // QnLongRunnable
 // -------------------------------------------------------------------------- //
-QnLongRunnable::QnLongRunnable(): 
+QnLongRunnable::QnLongRunnable( bool isTrackedByPool ):
     m_needStop(false),
     m_onPause(false),
     m_systemThreadId(0)
 {
     DEBUG_CODE(m_type = NULL);
 
-    if(QnLongRunnablePool *pool = QnLongRunnablePool::instance()) {
-        m_pool = pool->d;
-        m_pool->createdNotify(this);
-    //} else {
-    //    qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+    if(isTrackedByPool) {
+        if(QnLongRunnablePool *pool = QnLongRunnablePool::instance()) {
+            m_pool = pool->d;
+            m_pool->createdNotify(this);
+        //} else {
+        //    qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+        }
     }
 
     connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);

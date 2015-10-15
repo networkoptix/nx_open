@@ -47,13 +47,9 @@ namespace aio
     AIOService::~AIOService()
     {
         m_systemSocketAIO.sockets.clear();
-        for( auto thread : m_systemSocketAIO.aioThreadPool )
-            delete thread;
         m_systemSocketAIO.aioThreadPool.clear();
 
         m_udtSocketAIO.sockets.clear();
-        for( auto thread : m_udtSocketAIO.aioThreadPool )
-            delete thread;
         m_udtSocketAIO.aioThreadPool.clear();
     }
 
