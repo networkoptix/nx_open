@@ -80,6 +80,7 @@ public:
     */
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
+    CameraMediaStreams mediaStreams() const;
 
     /*!
      *  \return \a true if \param bitrateInfo.encoderIndex is not already saved
