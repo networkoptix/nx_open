@@ -78,7 +78,8 @@ QnScheduleSync *QnScheduleSync::instance()
 QnScheduleSync::QnScheduleSync()
     : m_backupSyncOn(false),
       m_syncing(false),
-      m_forced(false)
+      m_forced(false),
+      m_syncTimePoint(0)
 {
     std::call_once(
         QnScheduleSync_flag, 
@@ -95,11 +96,9 @@ QnScheduleSync::~QnScheduleSync()
     stop();
 }
 
-template<typename NeedStopCB>
-void QnScheduleSync::synchronize(
-    QnServer::ChunksCatalog catalog,
+QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
     const QString           &cameraId,
-    NeedStopCB              needStop
+    QnServer::ChunksCatalog catalog
 )
 {
     auto fromCatalog = qnNormalStorageMan->getFileCatalog(
@@ -109,14 +108,79 @@ void QnScheduleSync::synchronize(
     if (!fromCatalog)
     {
         NX_LOG(
+            lit("[QnScheduleSync::getOldestChunk] get fromCatalog failed"),
+            cl_logDEBUG1
+        );
+        return ChunkKey();
+    }
+    
+    auto chunk = fromCatalog->chunkAt(
+        fromCatalog->findNextFileIndex(m_syncTimePoint)
+    );
+    ChunkKey ret = {chunk, cameraId, catalog};
+    return ret;
+}
+
+
+QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk() 
+{
+    ChunkKey ret;
+    auto mediaServer = 
+        qnResPool->getResourceById(qnCommon->moduleGUID())
+            .dynamicCast<QnMediaServerResource>();
+    
+    Q_ASSERT(mediaServer);    
+    int64_t minTime = std::numeric_limits<int64_t>::max();
+
+    for (auto &camera : qnResPool->getAllCameras(mediaServer)) 
+    {
+        auto securityCamera = camera.dynamicCast<QnSecurityCamResource>();
+        Q_ASSERT(securityCamera);
+        
+        auto backupType = securityCamera->getActualBackupType();
+        ChunkKey tmp;
+
+        if (backupType & Qn::CameraBackup_HighQuality)
+            tmp = getOldestChunk(camera->getUniqueId(), QnServer::HiQualityCatalog);
+        if (tmp.chunk.startTimeMs != -1 && tmp.chunk.startTimeMs < minTime)
+        {
+            minTime = tmp.chunk.startTimeMs;
+            ret = tmp;
+        }
+
+        if (backupType & Qn::CameraBackup_LowQuality)
+            tmp = getOldestChunk(camera->getUniqueId(), QnServer::LowQualityCatalog);
+        if (tmp.chunk.startTimeMs != -1 && tmp.chunk.startTimeMs < minTime)
+        {
+            minTime = tmp.chunk.startTimeMs;
+            ret = tmp;
+        }
+    }
+    
+    if (ret.chunk.startTimeMs != -1)
+        m_syncTimePoint = ret.chunk.startTimeMs;
+
+    return ret;
+}
+
+void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
+{
+    auto fromCatalog = qnNormalStorageMan->getFileCatalog(
+        chunkKey.cameraID,
+        chunkKey.catalog
+    );
+    if (!fromCatalog)
+    {
+        NX_LOG(
             lit("[QnScheduleSync::synchronize] get fromCatalog failed"),
             cl_logDEBUG1
         );
         return;
     }
+
     auto toCatalog = qnBackupStorageMan->getFileCatalog(
-        cameraId,
-        catalog
+        chunkKey.cameraID,
+        chunkKey.catalog
     );
     if (!toCatalog)
     {
@@ -127,35 +191,9 @@ void QnScheduleSync::synchronize(
         return;
     }
 
-    DeviceFileCatalog::Chunk chunk;
-    if (toCatalog->isEmpty())
-        chunk = fromCatalog->chunkAt(
-            fromCatalog->findFileIndex(
-                fromCatalog->firstTime(),
-                DeviceFileCatalog::OnRecordHole_PrevChunk
-            )
-        );
-    else
-        chunk = fromCatalog->chunkAt(
-            fromCatalog->findNextFileIndex(toCatalog->lastChunkStartTime())
-        );
-
-    if (chunk.startTimeMs == -1) // not found
+    if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs)
     {
-        NX_LOG(
-            lit("[QnScheduleSync::synchronize] first chunk not found"),
-            cl_logDEBUG1
-        );
-        return;
-    }
-    
-    if (fromCatalog->isLastChunk(chunk.startTimeMs))
-        return;
-
-    while (true)
-    {
-        // copy file
-        QString fromFileFullName = fromCatalog->fullFileName(chunk);            
+        QString fromFileFullName = fromCatalog->fullFileName(chunkKey.chunk);            
         auto fromStorage = qnNormalStorageMan->getStorageByUrl(fromFileFullName);
 
         std::unique_ptr<QIODevice> fromFile = std::unique_ptr<QIODevice>(
@@ -188,7 +226,6 @@ void QnScheduleSync::synchronize(
                     .arg(newFileName),
                 cl_logWARNING
             );
-            goto end;
         }
 
         int bitrate = m_schedule.bitrate;
@@ -230,10 +267,10 @@ void QnScheduleSync::synchronize(
             }
         }
 
-        // add chunk
+        // add chunk to catalog
         bool result = qnBackupStorageMan->fileStarted(
-            chunk.startTimeMs,
-            chunk.timeZone,
+            chunkKey.chunk.startTimeMs,
+            chunkKey.chunk.timeZone,
             newFileName,
             nullptr
         );
@@ -245,14 +282,13 @@ void QnScheduleSync::synchronize(
                     .arg(newFileName),
                 cl_logWARNING
             );
-            goto end;
         }
 
         result = qnBackupStorageMan->fileFinished(
-            chunk.durationMs,
+            chunkKey.chunk.durationMs,
             newFileName,
             nullptr,
-            chunk.getFileSize()
+            chunkKey.chunk.getFileSize()
         );
 
         if (!result)
@@ -261,50 +297,21 @@ void QnScheduleSync::synchronize(
                     .arg(newFileName),
                 cl_logWARNING
             );
-
-    end:
-        // get next chunk
-        chunk = fromCatalog->chunkAt(
-            fromCatalog->findNextFileIndex(chunk.startTimeMs)
-        );
-
-        if (chunk.startTimeMs == -1 || fromCatalog->isLastChunk(chunk.startTimeMs) || needStop())  
-            break;
     }
 }
 
 template<typename NeedStopCB>
 void QnScheduleSync::synchronize(NeedStopCB needStop)
 {
-    auto resource = qnResPool->getResourceById(
-        qnCommon->moduleGUID()
-    );
-    auto mediaServer = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT(mediaServer);
-    
-    auto allCameras = qnResPool->getAllCameras(mediaServer);
-    std::vector<QString> visitedCameras;
-    
-    for (auto &camera : allCameras)
+    ChunkKey chunkKey;
+    while (1)
     {
-        auto visitedIt = std::find_if(
-            visitedCameras.cbegin(),
-            visitedCameras.cend(),
-            [&camera](const QString &cameraId)
-            {
-                return camera->getUniqueId() == cameraId;
-            }
-        );
-        if (visitedIt != visitedCameras.cend())
-            continue;
-        auto securityCamera = camera.dynamicCast<QnSecurityCamResource>();
-        Q_ASSERT(securityCamera);
-        visitedCameras.push_back(camera->getUniqueId());
-        auto backupType = securityCamera->getActualBackupType();
-        if (backupType & Qn::CameraBackup_HighQuality)
-            synchronize(QnServer::HiQualityCatalog, camera->getUniqueId(), needStop);
-        if (backupType & Qn::CameraBackup_LowQuality)
-            synchronize(QnServer::LowQualityCatalog, camera->getUniqueId(), needStop);
+        chunkKey = getOldestChunk();
+        if (chunkKey.chunk.startTimeMs == -1)
+            break;
+        copyChunk(chunkKey);
+        if (needStop())
+            break;
     }
 }
 
@@ -420,6 +427,8 @@ void QnScheduleSync::start()
                 if (isItTimeForSync()) // we are there
                 {
                     m_syncing = true;
+                    m_syncTimePoint = 0;
+
                     synchronize(
                         [this, isItTimeForSync]
                         {
