@@ -159,6 +159,11 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         return;
 
     m_syncPlay->removeArchiveReader(mediaWidget->display()->archiveReader());
+    QnClientVideoCamera *camera = mediaWidget->display()->camera();
+    if (camera) {
+        camera->setExternalTimeSource(nullptr);
+        camera->getCamDisplay()->setExternalTimeSource(nullptr); // TODO: #Elric two setExternalTimeSource calls, WTF?
+    }
 
     m_widgetCount--;
     if(m_widgetCount == 0)
