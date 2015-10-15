@@ -39,6 +39,8 @@ public:
     virtual bool isFlat() const;
 
     virtual QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
+
+    virtual int helpTopicId() const;
 };
 
 template<typename CheckingPolicy>
