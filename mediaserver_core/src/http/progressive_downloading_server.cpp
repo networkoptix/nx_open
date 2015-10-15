@@ -557,11 +557,13 @@ void QnProgressiveDownloadingConsumer::run()
         if (static_cast<bool>(mediaStreams) &&
             transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
         {
+            const auto requestedResolutionStr = lit("%1x%2").arg(videoSize.width()).arg(videoSize.height());
             for (const auto& streamInfo: mediaStreams->streams)
             {
                 if (!streamInfo.transcodingRequired
                     && streamInfo.codec == d->videoCodec
-                    && resolutionStr.isEmpty())
+                    && (resolutionStr.isEmpty() || 
+                        requestedResolutionStr == streamInfo.resolution))
                 {
                     qualityToUse = streamInfo.encoderIndex == 0
                         ? QnServer::HiQualityCatalog
