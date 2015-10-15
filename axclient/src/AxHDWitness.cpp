@@ -16,6 +16,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <utils/common/log.h>
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 static QtMessageHandler defaultMsgHandler = 0;
 
@@ -274,9 +275,11 @@ bool AxHDWitness::doInitialize() {
 }
 
 void AxHDWitness::doFinalize() {
-    QApplication::processEvents();
     m_axClientWindow.reset(nullptr);
     m_axClientModule.reset(nullptr);
+
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( QThread::currentThread(), 3 );
+    waitingForObjectsToBeFreed.join();
 
     qInstallMessageHandler(defaultMsgHandler);
 }

@@ -37,12 +37,17 @@ namespace {
 QnAxClientWindow::QnAxClientWindow(QWidget *parent)
     : base_type(parent)
     , m_parentWidget(parent)
-    , m_mainWindow(nullptr)
     , m_context(nullptr)
+    , m_mainWindow(nullptr)
 {
 }
 
 QnAxClientWindow::~QnAxClientWindow() {
+    /* Main Window must be destroyed before the context. */
+    if (m_mainWindow)
+        m_mainWindow.reset(nullptr);
+    if (m_context)
+        m_context->menu()->trigger(Qn::BeforeExitAction);
 }
 
 void QnAxClientWindow::show() {
@@ -232,6 +237,6 @@ void QnAxClientWindow::createMainWindow() {
     connect(m_context->action(Qn::ExitAction), &QAction::triggered,                         this, &QnAxClientWindow::disconnected);
 
 #ifdef QN_WAIT_FOR_DEBUGGER
- //   QMessageBox::information(m_mainWindow.data(), "Waiting...", "Waiting for debugger to be attached.");
+    QMessageBox::information(m_mainWindow.data(), "Waiting...", "Waiting for debugger to be attached.");
 #endif
 }

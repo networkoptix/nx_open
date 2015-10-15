@@ -73,6 +73,10 @@ namespace {
             return true;
         }
 
+        virtual int helpTopicId() const override {
+            return Qn::ServerSettings_Failover_Help;
+        }
+
         virtual QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const override {
             return m_customColumnDelegate;
         }
