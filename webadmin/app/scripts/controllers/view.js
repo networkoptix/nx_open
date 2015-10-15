@@ -148,7 +148,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 }
 
                 if($scope.activeCamera && window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera)){
-                    if($scope.activeCamera.hasDualStreaming) {
+                    if($scope.activeCamera.hasDualStreaming ) {
                         $scope.availableResolutions = onlyLoResolution;
                     }else {
                         $scope.iOSVideoTooLarge = true;
@@ -461,6 +461,8 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                     var dualStreaming =  _.find(camera.addParams,findDualStreaming) ;
                     camera.hasDualStreaming = dualStreaming?(dualStreaming.value === '1'):false;
+
+                    camera.hasDualStreaming = camera.hasDualStreaming && camera.secondaryStreamQuality != 'SSQualityDontUse';
 
                     if(typeof(camera.visible) === 'undefined'){
                         camera.visible = true;
