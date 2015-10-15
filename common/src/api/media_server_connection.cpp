@@ -724,7 +724,7 @@ int QnMediaServerConnection::backupControlActionAsync(BackupAction action, QObje
         params << QnRequestParam("action",  lit("start"));
     else if (action == BackupAction_Cancel)
         params << QnRequestParam("action",  lit("stop"));
-    return sendAsyncGetRequest(BackupControlObject, params, QN_STRINGIZE_TYPE(QnStorageScanData), target, slot);
+    return sendAsyncGetRequest(BackupControlObject, params, QN_STRINGIZE_TYPE(QnBackupStatusData), target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(bool isMainPool, QObject *target, const char *slot) 

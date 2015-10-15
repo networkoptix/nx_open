@@ -158,9 +158,8 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RebuildState)
 
     enum BackupState {
-        BackupState_Unknown     = 0,
-        BackupState_None        = 1,
-        BackupState_InProgress  = 2
+        BackupState_None        = 0,
+        BackupState_InProgress  = 1
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupState)
 

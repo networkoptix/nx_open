@@ -52,7 +52,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
 
     connect(ui->pushButtonSchedule, &QPushButton::clicked, this, &QnStorageConfigWidget::at_openBackupSchedule_clicked);
     connect(ui->pushButtonCameraSettings, &QPushButton::clicked, this, &QnStorageConfigWidget::at_openBackupSettings_clicked);
-    
+
+    connect(ui->backupStartButton, &QPushButton::clicked, this, &QnStorageConfigWidget::at_backupButton_clicked);
+    connect(ui->backupStopButton, &QPushButton::clicked, this, &QnStorageConfigWidget::at_backupCancel_clicked);
+
     m_backupPool.model->setBackupRole(true);
 
     ui->comboBoxBackupType->addItem(tr("By schedule"), Qn::Backup_Schedule);
@@ -390,6 +393,19 @@ void QnStorageConfigWidget::at_rebuildButton_clicked()
     storagePool.rebuildHandle = m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_Start, isMain, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
 }
 
+void QnStorageConfigWidget::at_backupButton_clicked()
+{
+    if (!m_server)
+        return;
+
+    QPushButton* button = dynamic_cast<QPushButton*>(sender());
+    if (!button)
+        return;
+
+    button->setDisabled(true);
+    m_server->apiConnection()->backupControlActionAsync (BackupAction_Start, this, SLOT(at_backupStatusReply(int, const QnBackupStatusData &, int)));
+}
+
 void QnStorageConfigWidget::at_rebuildCancel_clicked() 
 {
     if (!m_server)
@@ -405,6 +421,19 @@ void QnStorageConfigWidget::at_rebuildCancel_clicked()
     button->setDisabled(true);
     storagePool.rebuildHandle = m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_Cancel, isMain, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
 
+}
+
+void QnStorageConfigWidget::at_backupCancel_clicked() 
+{
+    if (!m_server)
+        return;
+
+    QPushButton* button = dynamic_cast<QPushButton*>(sender());
+    if (!button)
+        return;
+
+    button->setDisabled(true);
+    m_server->apiConnection()->backupControlActionAsync (BackupAction_Cancel, this, SLOT(at_backupStatusReply(int, const QnBackupStatusData &, int)));
 }
 
 void QnStorageConfigWidget::at_openBackupSchedule_clicked() 
@@ -451,7 +480,7 @@ void QnStorageConfigWidget::at_backupStatusReply(int status, const QnBackupStatu
 {
     updateBackupUi(reply);
 
-    if (reply.state > Qn::RebuildState_None)
+    if (reply.state == Qn::BackupState_InProgress)
         QTimer::singleShot(500, this, SLOT(sendNextBackupStatusRequest()));
 }
 
@@ -507,7 +536,24 @@ void QnStorageConfigWidget::sendNextBackupStatusRequest()
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 {
+    QString status;
 
+    if (reply.progress >= 0)
+        ui->progressBarBackup->setValue(reply.progress * 100 + 0.5);
+
+    if (reply.state == Qn::BackupState_None && !ui->backupStartButton->isEnabled())
+    {
+        ui->progressBarBackup->setValue(100); // 100%
+        QMessageBox::information(this,
+            tr("Finished"),
+            tr("Archive backup is completed."));
+    }
+
+    ui->backupStartButton->setEnabled(reply.state == Qn::BackupState_None);
+    ui->backupStopButton->setEnabled(reply.state == Qn::BackupState_InProgress);
+
+    ui->stackedWidgetBackupInfo->setCurrentIndex(reply.state == Qn::BackupState_InProgress ? rebuildProgressPageIndex : rebuildPreparePageIndex);
+    ui->stackedWidgetBackupInfo->setVisible(reply.state == Qn::BackupState_InProgress);
 }
 
 void QnStorageConfigWidget::updateRebuildUi(const QnStorageScanData& reply, bool isMainPool)

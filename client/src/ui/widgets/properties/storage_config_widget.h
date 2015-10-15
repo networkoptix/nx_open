@@ -47,19 +47,24 @@ private:
     void sendNextArchiveRequest(bool isMain);
     void updateRebuildUi(const QnStorageScanData& reply, bool isMainPool);
     void updateBackupUi(const QnBackupStatusData& reply);
-    void sendNextBackupStatusRequest();
 private slots:
     void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();
     void at_addExtStorage(bool addToMain);
+    
     void at_rebuildButton_clicked();
     void at_rebuildCancel_clicked();
+
+    void at_backupButton_clicked();
+    void at_backupCancel_clicked();
+
     void at_openBackupSchedule_clicked();
     void at_openBackupSettings_clicked();
     void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle);
     void at_backupStatusReply(int status, const QnBackupStatusData& reply, int handle);
     void sendNextArchiveRequestForMain();
     void sendNextArchiveRequestForBackup();
+    void sendNextBackupStatusRequest();
     void at_backupTypeComboBoxChange(int index);
     void at_backupQualityComboBoxChange(int index);
 private:

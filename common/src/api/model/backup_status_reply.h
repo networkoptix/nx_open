@@ -7,7 +7,7 @@
 
 struct QnBackupStatusData
 {
-    QnBackupStatusData(): state(Qn::BackupState_Unknown), progress(0.0), backupTimeMs(0) {}
+    QnBackupStatusData(): state(Qn::BackupState_None), progress(0.0), backupTimeMs(0) {}
     QnBackupStatusData(Qn::BackupState state, qreal progress): state(state), progress(progress) {}
 
     Qn::BackupState state;

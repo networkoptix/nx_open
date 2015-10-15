@@ -9,6 +9,8 @@ int QnBackupControlRestHandler::executeGet(const QString &path, const QnRequestP
     
     QString method = params.value("action");
     QnBackupStatusData reply;
+    if (method == "start")
+        reply.state = Qn::BackupState_InProgress;
     
     /*
     reply = QnStorageManager::backupInstance()->backupStatus();
