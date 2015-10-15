@@ -62,12 +62,9 @@ public:
     bool isBackup() const;
 
     void addWrited(qint64 value);
-    qint64 getWrited() const;
-
+    void resetWrited();
     void setWritedCoeff(double value);
-    double getWritedCoeff() const;
-
-    qint64 calcUsageCoeff() const;
+    double calcUsageCoeff() const;
 
 signals:
     /*
@@ -85,7 +82,7 @@ private:
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
     bool    m_isBackup;
-    qint64  m_writed;
+    double  m_writed;
     double  m_writedCoeff;
 };
 

@@ -8,7 +8,7 @@ QnStorageResource::QnStorageResource():
     m_usedForWriting(false),
     m_storageBitrateCoeff(0.0),
     m_isBackup(false),
-    m_writed(0),
+    m_writed(0.0),
     m_writedCoeff(-1.0)
 {
     setStatus(Qn::Offline);
@@ -177,27 +177,22 @@ bool QnStorageResource::isBackup() const
 void QnStorageResource::addWrited(qint64 value)
 {
     QnMutexLocker lk(&m_mutex);
-    m_writed += value;
+    m_writed += static_cast<double>(value) / (1024 * 1024);
 }
 
-qint64 QnStorageResource::getWrited() const
+void QnStorageResource::resetWrited()
 {
     QnMutexLocker lk(&m_mutex);
-    return m_writed;
+    m_writed = 0.0;
 }
 
 void QnStorageResource::setWritedCoeff(double value)
 {
+    QnMutexLocker lk(&m_mutex);
     m_writedCoeff = value;
 }
 
-double QnStorageResource::getWritedCoeff() const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_writedCoeff;
-}
-
-qint64 QnStorageResource::calcUsageCoeff() const
+double QnStorageResource::calcUsageCoeff() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_writed / m_writedCoeff;
