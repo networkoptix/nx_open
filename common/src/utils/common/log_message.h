@@ -12,6 +12,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
+#include <common/common_globals.h>
+
 
 class QnUuid;
 
