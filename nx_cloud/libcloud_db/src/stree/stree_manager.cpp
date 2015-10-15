@@ -46,7 +46,7 @@ void StreeManager::search(
     m_stree->get(realInput, output);
 }
 
-const stree::ResourceNameSet& StreeManager::rns() const
+const stree::ResourceNameSet& StreeManager::resourceNameSet() const
 {
     return m_rns;
 }
@@ -94,7 +94,6 @@ void StreeManager::loadStree() throw(std::runtime_error)
 
     m_stree = xmlHandler.releaseTree();
 }
-
 
 }   //cdb
 }   //nx

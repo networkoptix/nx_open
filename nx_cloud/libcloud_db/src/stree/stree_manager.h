@@ -45,7 +45,7 @@ public:
         StreeOperation,
         const stree::AbstractResourceReader& input,
         stree::AbstractResourceWriter* const output) const;
-    const stree::ResourceNameSet& rns() const;
+    const stree::ResourceNameSet& resourceNameSet() const;
 
 private:
     const conf::Auth& m_authSettings;

@@ -35,7 +35,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter)
     for (const auto& item: queryItems)
     {
         const auto resDescription = 
-            StreeManager::instance()->rns().findResourceByName(item.first);
+            StreeManager::instance()->resourceNameSet().findResourceByName(item.first);
         if (resDescription.id == stree::INVALID_RES_ID)
             continue;
         QVariant val(item.second);
