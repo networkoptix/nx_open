@@ -18,6 +18,7 @@
 #include "api_ioport_data.h"
 #include "audit/audit_record.h"
 #include "licensing/hardware_info.h"
+#include "backup_status_reply.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -32,6 +33,7 @@
     (QnStatisticsReply)\
     (QnTimeReply)\
     (QnStorageScanData)\
+    (QnBackupStatusData)\
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\
