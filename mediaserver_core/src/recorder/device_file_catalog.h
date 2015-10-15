@@ -116,6 +116,9 @@ public:
     QString rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const;
     QString cameraUniqueId() const;
 
+    void setLastSyncTime(int64_t);
+    int64_t getLastSyncTime() const;
+
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
@@ -193,6 +196,7 @@ private:
     qint64 m_recordingChunkTime;
     QnMutex m_IOMutex;
     QnServer::StoragePool m_storagePool;
+    int64_t m_lastSyncTime;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

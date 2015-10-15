@@ -347,6 +347,18 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
     return chunk;
 }
 
+void DeviceFileCatalog::setLastSyncTime(int64_t time)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_lastSyncTime = time;
+}
+
+int64_t DeviceFileCatalog::getLastSyncTime() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_lastSyncTime;
+}
+
 QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
 {
     if (m_storagePool == QnServer::StoragePool::Normal)

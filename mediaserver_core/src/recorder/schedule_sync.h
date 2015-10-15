@@ -18,6 +18,13 @@ private:
         Qn::BackupType type;
     };
 
+    struct ChunkKey 
+    {
+        DeviceFileCatalog::Chunk    chunk;
+        QString                     cameraID;
+        QnServer::ChunksCatalog     catalog;
+    };
+
 public:
     enum code
     {
@@ -42,22 +49,24 @@ private:
     template<typename NeedStopCB>
     void synchronize(NeedStopCB needStop);
 
-    template<typename NeedStopCB>
-    void synchronize(
-        QnServer::ChunksCatalog catalog,
-        const QString           &cameraId,
-        NeedStopCB              needStop
-    );
-
     void start();
     void renewSchedule();
+    void copyChunk(const ChunkKey &chunkKey);
+    
+    ChunkKey getOldestChunk();    
+    ChunkKey getOldestChunk(
+        const QString           &cameraId,
+        QnServer::ChunksCatalog catalog
+    );
+
 
 private:
-    std::atomic<bool>   m_backupSyncOn;
-    std::atomic<bool>   m_syncing;
-    std::atomic<bool>   m_forced;
-    std::future<void>   m_backupFuture;
-    schedule            m_schedule;
+    std::atomic<bool>    m_backupSyncOn;
+    std::atomic<bool>    m_syncing;
+    std::atomic<bool>    m_forced;
+    std::future<void>    m_backupFuture;
+    schedule             m_schedule;
+    std::atomic<int64_t> m_syncTimePoint;
 };
 
 #define qnScheduleSync QnScheduleSync::instance()
