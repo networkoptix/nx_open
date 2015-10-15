@@ -8,19 +8,30 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 
+#include "media_server/settings.h"
+
 
 CloudConnectionManager::CloudConnectionManager()
 :
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
 {
+    const auto cdbEndpoint = MSSettings::roSettings()->value(
+        nx_ms_conf::CDB_ENDPOINT,
+        "").toString();
+    if (!cdbEndpoint.isEmpty())
+    {
+        const auto hostAndPort = cdbEndpoint.split(":");
+        if (hostAndPort.size() == 2)
+        {
+            m_cdbConnectionFactory->setCloudEndpoint(
+                hostAndPort[0].toStdString(),
+                hostAndPort[1].toInt());
+        }
+    }
+
     Qn::directConnect(
         qnResPool, &QnResourcePool::resourceAdded,
-        this, &CloudConnectionManager::atResourceChanged);
-    Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceChanged,
-        this, &CloudConnectionManager::atResourceChanged);
-
-    atResourceChanged(qnResPool->getAdministrator());
+        this, &CloudConnectionManager::atResourceAdded);
 }
 
 CloudConnectionManager::~CloudConnectionManager()
@@ -54,11 +65,23 @@ bool CloudConnectionManager::bindedToCloud(QnMutexLockerBase* const /*lk*/) cons
     return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
 }
 
-void CloudConnectionManager::atResourceChanged(const QnResourcePtr& res)
+void CloudConnectionManager::atResourceAdded(const QnResourcePtr& res)
 {
     auto user = res.dynamicCast<QnUserResource>();
     if (!user || !user->isAdmin())
         return;
+
+    Qn::directConnect(
+        user.data(), &QnResource::propertyChanged,
+        this, &CloudConnectionManager::atAdminPropertyChanged);
+}
+
+void CloudConnectionManager::atAdminPropertyChanged(
+    const QnResourcePtr& res,
+    const QString& /*key*/)
+{
+    auto user = res.dynamicCast<QnUserResource>();
+    assert(user);
 
     const auto cloudSystemID = user->getProperty(Qn::CLOUD_SYSTEM_ID);
     const auto cloudAuthKey = user->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);

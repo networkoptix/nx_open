@@ -46,7 +46,8 @@ private:
     bool bindedToCloud(QnMutexLockerBase* const lk) const;
 
 private slots:
-    void atResourceChanged(const QnResourcePtr& res);
+    void atResourceAdded(const QnResourcePtr& res);
+    void atAdminPropertyChanged(const QnResourcePtr& res, const QString& key);
 };
 
 #endif  //NX_MS_CLOUD_CONNECTION_MANAGER_H
