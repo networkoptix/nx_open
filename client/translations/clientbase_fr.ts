@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr" sourcelanguage="en">
+<TS version="2.0" language="fr" sourcelanguage="en">
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
@@ -672,7 +672,7 @@
     </message>
     <message>
         <source>Maximize Item</source>
-        <translation>Maximiser l&apos;objet</translation>
+        <translation>Maximiser l&apos;élément</translation>
     </message>
     <message>
         <source>Enter</source>
@@ -684,7 +684,7 @@
     </message>
     <message>
         <source>Restore Item</source>
-        <translation>Restaurer l&apos;objet</translation>
+        <translation>Restaurer l&apos;élément</translation>
     </message>
     <message>
         <source>Manage...</source>
@@ -896,7 +896,7 @@
     </message>
     <message>
         <source>Space</source>
-        <translation>Éspace</translation>
+        <translation>Espace</translation>
     </message>
     <message>
         <source>Ctrl+Left</source>
@@ -1281,7 +1281,7 @@
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation>Activer l&apos;objet PTZ</translation>
+        <translation>Activer l&apos;élément PTZ</translation>
     </message>
     <message>
         <source>User Management...</source>
@@ -1297,115 +1297,115 @@
     </message>
     <message>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Priorité Basculement...</translation>
     </message>
     <message>
         <source>Move Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Déplacer Périphériques</translation>
     </message>
     <message>
         <source>Move Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Déplacer Caméras</translation>
     </message>
     <message>
         <source>Device Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Périphériques...</translation>
     </message>
     <message>
         <source>Camera Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Caméra...</translation>
     </message>
     <message>
         <source>IO Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Module IO...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Périphériques</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Caméras</translation>
     </message>
     <message>
         <source>Check Device Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier Problèmes Périphérique...</translation>
     </message>
     <message>
         <source>Check Devices Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier Problèmes Périphériques...</translation>
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier Problèmes Caméra...</translation>
     </message>
     <message>
         <source>Check Cameras Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier Problèmes Caméras...</translation>
     </message>
     <message>
         <source>Check IO Module Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier Problèmes Module IO...</translation>
     </message>
     <message>
         <source>Check IO Modules Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier Problèmes Modules IO...</translation>
     </message>
     <message>
         <source>Device Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Périphérique...</translation>
     </message>
     <message>
         <source>Devices Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Périphériques...</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Caméra...</translation>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Caméras...</translation>
     </message>
     <message>
         <source>IO Module Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Module IO...</translation>
     </message>
     <message>
         <source>IO Modules Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Modules IO...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Périphérique...</translation>
     </message>
     <message>
         <source>Devices Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Périphériques...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Caméra...</translation>
     </message>
     <message>
         <source>Cameras Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Caméras...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Module IO...</translation>
     </message>
     <message>
         <source>IO Modules Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Modules IO...</translation>
     </message>
     <message>
         <source>Devices List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Périphériques par Serveur...</translation>
     </message>
     <message>
         <source>Cameras List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Caméras par Serveur...</translation>
     </message>
 </context>
 <context>
@@ -1482,19 +1482,19 @@
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphériques</translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras</translation>
     </message>
     <message>
         <source>Device actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Actions Périphérique</translation>
     </message>
     <message>
         <source>Camera actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Actions Caméra</translation>
     </message>
 </context>
 <context>
@@ -1652,35 +1652,35 @@
     </message>
     <message>
         <source>Device updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour Périphérique</translation>
     </message>
     <message>
         <source>Camera updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour Caméra</translation>
     </message>
     <message>
         <source>Device added</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphériques Ajouté</translation>
     </message>
     <message>
         <source>Camera added</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméra Ajouté</translation>
     </message>
     <message>
         <source>Device removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique retiré</translation>
     </message>
     <message>
         <source>Camera removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméra retiré</translation>
     </message>
     <message>
         <source>Device name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom Périphérique</translation>
     </message>
     <message>
         <source>Camera name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom caméra</translation>
     </message>
 </context>
 <context>
@@ -1712,31 +1712,31 @@
     <name>QnBusinessResourceValidationStrings</name>
     <message>
         <source>%1 of %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %n périphériques</translation>
     </message>
     <message>
         <source>%1 of %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %n caméras</translation>
     </message>
     <message>
         <source>%1 of %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %n modules IO</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Tout Périphérique&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Toute Caméra&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Sélectionner au moins un périphérique&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Sélectionner au moins une caméra&gt;</translation>
     </message>
 </context>
 <context>
@@ -1834,23 +1834,23 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Tout Périphérique&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Toute Caméra&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Sélectionner au moins un périphérique&gt;</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Sélectionner au moins une caméra&gt;</translation>
     </message>
     <message>
         <source>Occurs</source>
-        <translation type="unfinished"></translation>
+        <translation>Survients</translation>
     </message>
 </context>
 <context>
@@ -1867,19 +1867,19 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Tout Périphérique&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Toute Caméra&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Sélectionner au moins un périphérique&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Sélectionner au moins une caméra&gt;</translation>
     </message>
 </context>
 <context>
@@ -1954,11 +1954,11 @@
     </message>
     <message>
         <source>filter by devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrer par Périphériques...</translation>
     </message>
     <message>
         <source>filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrer par Caméras...</translation>
     </message>
 </context>
 <context>
@@ -2021,8 +2021,7 @@
     </message>
     <message>
         <source>Scanning hosts... (%1)</source>
-        <translatorcomment>False Warning ? or should be (%n) instead.</translatorcomment>
-        <translation type="unfinished">Balayage de l&apos;hôte... (%1)</translation>
+        <translation>Balayage de l&apos;hôte... (%1)</translation>
     </message>
     <message>
         <source>Select target server...</source>
@@ -2128,7 +2127,7 @@
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Balayage de l&apos;hôte... (%1)</translation>
     </message>
 </context>
 <context>
@@ -2215,51 +2214,51 @@
     </message>
     <message>
         <source>Diagnostics for device %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics pour périphérique %1</translation>
     </message>
     <message>
         <source>Diagnostics for camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics pour caméra %1</translation>
     </message>
     <message>
         <source>Diagnostics for IO module %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics pour module IO %1</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Périphérique</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Caméra</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Module IO</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmation que le périphérique est accessible.</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmation que la caméra est accessible.</translation>
     </message>
     <message>
         <source>Confirming IO module is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmation que le module IO est accessible.</translation>
     </message>
     <message>
         <source>Confirming target device provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmation que le périphérique cible fournit un flux média.</translation>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmation que la caméra cible fournit un flux média.</translation>
     </message>
     <message>
         <source>Confirming target IO module provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmation que lemodule IO cible fournit un flux média.</translation>
     </message>
 </context>
 <context>
@@ -2298,40 +2297,40 @@
     <message>
         <source>Devices List for %1</source>
         <extracomment>Devices List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Liste Périphériques pour %1</translation>
     </message>
     <message>
         <source>Cameras List for %1</source>
         <extracomment>Cameras List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Liste Caméras pour %1</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Périphériques</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Caméras</translation>
     </message>
     <message>
         <source>%n devices found</source>
-        <translation type="unfinished">%n périphérique trouvé</translation>
+        <translation>%n périphériques trouvés</translation>
     </message>
     <message>
         <source>%n cameras found</source>
-        <translation type="unfinished"></translation>
+        <translation>%n caméras trouvées</translation>
     </message>
     <message>
         <source>%n IO modules found</source>
-        <translation type="unfinished"></translation>
+        <translation>%n modules IO trouvés</translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter les périhpériques sélectionnés vers un fichier.</translation>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter les caméras sélectionnées vers un fichier.</translation>
     </message>
 </context>
 <context>
@@ -2445,27 +2444,27 @@
     </message>
     <message>
         <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention! Haute valeur minimum pourrait diminuer la durées d&apos;enregistrement des autres périphériques.</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention! Haute valeur minimum pourrait diminuer la durées d&apos;enregistrement des autres caméras.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement sur mouvement est désactivé ou non supporté par certaines des caméras sélectionnées. S.V.P. allez à la page de configuration de mouvement pour s&apos;assurer que c&apos;est supporté et activé.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux double non supporté par cette caméra.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux double et détection de mouvement  non disponible par cette caméra.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement sur mouvement est désactivé. S.V.P. allez à la page de configuration de mouvement pour configurer la zone de mouvement et la sensibilité.</translation>
     </message>
 </context>
 <context>
@@ -2496,102 +2495,102 @@
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Périphérique</translation>
     </message>
     <message>
         <source>Devices Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Périphériques</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Caméra</translation>
     </message>
     <message>
         <source>Cameras Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Caméras</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Module IO</translation>
     </message>
     <message>
         <source>IO Modules Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Modules IO</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Périphérique</translation>
     </message>
     <message>
         <source>Devices Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Périphériques</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Caméra</translation>
     </message>
     <message>
         <source>Cameras Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Caméras</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Module IO</translation>
     </message>
     <message>
         <source>IO Modules Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics Modules IO</translation>
     </message>
     <message>
         <source>Device Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Périphérique</translation>
     </message>
     <message>
         <source>Devices Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Périphériques</translation>
     </message>
     <message>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Caméra</translation>
     </message>
     <message>
         <source>Cameras Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Caméras</translation>
     </message>
     <message>
         <source>IO Module Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Module IO</translation>
     </message>
     <message>
         <source>IO Modules Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles Modules IO</translation>
     </message>
     <message>
         <source>Apply changes to the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les changements sur les %n périphériques suivants?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les changements sur les %n caméras suivantes?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les changements sur les %n modules IO suivants?</translation>
     </message>
     <message>
         <source>Changes are not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Changements non sauvegardés</translation>
     </message>
 </context>
 <context>
     <name>QnCameraSettingsWidget</name>
     <message>
         <source>Cannot edit properties for items of different types.</source>
-        <translation>Ne peut pas éditer les propriétés pour des objets de differents types.</translation>
+        <translation>Ne peut pas éditer les propriétés pour des éléments de differents types.</translation>
     </message>
     <message>
         <source>No device selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun périphérique sélectionné.</translation>
     </message>
 </context>
 <context>
@@ -2971,11 +2970,11 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Tout Périphérique&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Toute Caméra&gt;</translation>
     </message>
 </context>
 <context>
@@ -3029,49 +3028,49 @@
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Type d&apos;horaire mouvement n&apos;est pas supporté par certaines caméras.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement ne peut pas être activé sur certaines caméras.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres d&apos;horaire ne sont pas compatible avec certain périphériques.</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialog</name>
     <message>
         <source>Failover Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Priorité Basculement</translation>
     </message>
     <message>
         <source>Never</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">Jamais</translation>
+        <translation>Jamais</translation>
     </message>
     <message>
         <source>Low</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">Bas</translation>
+        <translation>Bas</translation>
     </message>
     <message>
         <source>Medium</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">Moyen</translation>
+        <translation>Moyen</translation>
     </message>
     <message>
         <source>High</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">Haut</translation>
+        <translation>Haut</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
         <source>Set Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir Priorité:</translation>
     </message>
 </context>
 <context>
@@ -3124,27 +3123,27 @@
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Open Alarm/Event Rules Management...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Règles de Gestion Alarme/Événement...</translation>
     </message>
     <message>
         <source>Open Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Journal d&apos;événement...</translation>
     </message>
     <message>
         <source>Open Devices List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Liste Périphériques...</translation>
     </message>
     <message>
         <source>Open Cameras List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Liste Caméras...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Périphériques</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Caméras</translation>
     </message>
 </context>
 <context>
@@ -3355,15 +3354,15 @@
     <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas exporter le périphérique %1.</translation>
     </message>
     <message>
         <source>Could not export camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas exporter la caméra %1.</translation>
     </message>
     <message>
         <source>Could not export IO module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas exporter le module IO %1.</translation>
     </message>
 </context>
 <context>
@@ -3755,15 +3754,15 @@
     </message>
     <message>
         <source>Use licenses for selected %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser licences pour %n périphériques sélectionnés</translation>
     </message>
     <message>
         <source>Use licenses for selected %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser licences pour %n caméras sélectionnées</translation>
     </message>
     <message>
         <source>Use licenses for selected %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser licences pour %n modules IO sélectionnés</translation>
     </message>
 </context>
 <context>
@@ -4046,19 +4045,19 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>The discovered system %1 is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le système découvert %1 est en mode sans échec.</translation>
     </message>
     <message>
         <source>System has an incompatible version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le Système à une version imcompatible.</translation>
     </message>
     <message>
         <source>Operation is not permitted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Opération non autorisée.</translation>
     </message>
     <message>
         <source>System is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le Système est en mode sans échec.</translation>
     </message>
 </context>
 <context>
@@ -4139,8 +4138,8 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message numerus="yes">
         <source>%n more item(s)</source>
         <translation>
-            <numerusform>%n objet de plus</numerusform>
-            <numerusform>%n objets de plus</numerusform>
+            <numerusform>%n élément de plus</numerusform>
+            <numerusform>%n éléments de plus</numerusform>
         </translation>
     </message>
 </context>
@@ -4237,67 +4236,67 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Server Settings...</source>
-        <translation type="unfinished">Paramètres Serveur...</translation>
+        <translation>Paramètres Serveur...</translation>
     </message>
     <message>
         <source>Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Licences...</translation>
     </message>
     <message>
         <source>User Settings...</source>
-        <translation type="unfinished">Paramètres Usager...</translation>
+        <translation>Paramètres Usager...</translation>
     </message>
     <message>
         <source>SMTP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres SMTP...</translation>
     </message>
     <message>
         <source>Connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion au serveur...</translation>
     </message>
     <message>
         <source>Time Synchronization...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisation de l&apos;Heure...</translation>
     </message>
     <message>
         <source>Server settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Serveur...</translation>
     </message>
     <message>
         <source>Open Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Périphérique</translation>
     </message>
     <message>
         <source>Open Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Caméra</translation>
     </message>
     <message>
         <source>Open IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Module IO</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Périphérique...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Caméra...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Module IO...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Page Web Périphérique...</translation>
     </message>
     <message>
         <source>Open Camera Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Page Web Caméra...</translation>
     </message>
     <message>
         <source>Open IO Module Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Page Web Module IO...</translation>
     </message>
 </context>
 <context>
@@ -4670,7 +4669,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Space</source>
-        <translation>Éspace</translation>
+        <translation>Espace</translation>
     </message>
     <message>
         <source>Calendar Days</source>
@@ -4694,43 +4693,43 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>empty</source>
-        <translation type="unfinished"></translation>
+        <translation>vide</translation>
     </message>
     <message>
         <source>Total %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>%n Périphérique Total</translation>
     </message>
     <message>
         <source>Total %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%n Caméras Totale</translation>
     </message>
     <message>
         <source>Total %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>%n Modules IO Total</translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphériques avec archive non-vide</translation>
     </message>
     <message>
         <source>Cameras with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras avec archive non-vide</translation>
     </message>
     <message>
         <source>Storage space occupied by devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Espace utilisé par périphériques</translation>
     </message>
     <message>
         <source>Storage space occupied by cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Espace utilisé par caméras</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméra</translation>
     </message>
 </context>
 <context>
@@ -4780,11 +4779,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Live Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphériques Direct</translation>
     </message>
     <message>
         <source>Live Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras Direct</translation>
     </message>
 </context>
 <context>
@@ -4814,7 +4813,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation>Sélectionner lUtlisateurs...</translation>
+        <translation>Sélectionner Utlisateurs...</translation>
     </message>
     <message>
         <source>Select Resources...</source>
@@ -4822,11 +4821,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Select Devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner Périphériques...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner Caméras...</translation>
     </message>
 </context>
 <context>
@@ -4942,23 +4941,23 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Server Settings - %1 (readonly)</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Serveur - %1 (Lecteur Seul.)</translation>
     </message>
     <message>
         <source>Server Settings - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Serveur - %1</translation>
     </message>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">Paramètres Serveur</translation>
+        <translation>Paramètres Serveur</translation>
     </message>
     <message>
         <source>Server not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur non-sauvegardé</translation>
     </message>
     <message>
         <source>Apply changes to the server %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer changements sur serveur %1?</translation>
     </message>
 </context>
 <context>
@@ -5025,39 +5024,39 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Server is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur non disponible</translation>
     </message>
     <message>
         <source>Enable failover (server will take devices automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer Basculement (Serveur va automatiquement prendre les périphériques des serveurs hors-ligne)</translation>
     </message>
     <message>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer Basculement (Serveur va automatiquement prendre les caméras des serveurs hors-ligne)</translation>
     </message>
     <message>
         <source>Max devices on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphériques max sur ce serveur:</translation>
     </message>
     <message>
         <source>Max cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras max sur ce serveur:</translation>
     </message>
     <message>
         <source>This server already has more than max devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Le serveur à déjà plus que le max de périphérique</translation>
     </message>
     <message>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Le serveur à déjà plus que le max de caméras</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour éviter tout dysfonctionnement, ajuster le nombre max de périphériques</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour éviter tout dysfonctionnement, ajuster le nombre max de caméras</translation>
     </message>
 </context>
 <context>
@@ -5319,7 +5318,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas commencer la MàJ. Revenir à une version précédente est interdite.</translation>
     </message>
 </context>
 <context>
@@ -5385,15 +5384,15 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Périphérique</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Caméra</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Module IO</translation>
     </message>
 </context>
 <context>
@@ -5522,15 +5521,15 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Please check authentication information in device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. vérifier les informations d&apos;authentification dans les paramètres périphérique</translation>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. vérifier les informations d&apos;authentification dans les paramètres caméra</translation>
     </message>
     <message>
         <source>Please check authentication information in IO module settings</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. vérifier les informations d&apos;authentification dans les paramètres module IO</translation>
     </message>
 </context>
 <context>
@@ -5622,19 +5621,19 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable devices and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer découverte automatique périphériques et serveurs</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer découverte automatique caméras et serveurs</translation>
     </message>
     <message>
         <source>Allow system to optimize devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Laisser le système optimiser les paramètres périphérique</translation>
     </message>
     <message>
         <source>Allow system to optimize cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Laisser le système optimiser les paramètres caméras</translation>
     </message>
 </context>
 <context>
@@ -5914,11 +5913,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Adjust device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajuster paramètres périphérique</translation>
     </message>
     <message>
         <source>Adjust camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajuster paramètres caméra</translation>
     </message>
 </context>
 <context>
@@ -6009,11 +6008,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Can adjust devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Peut ajuster paramètres périphérique</translation>
     </message>
     <message>
         <source>Can adjust cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Peut ajuster paramètres caméra</translation>
     </message>
 </context>
 <context>
@@ -6104,7 +6103,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Remove Items</source>
-        <translation>Supprimer les objets</translation>
+        <translation>Supprimer les éléments</translation>
     </message>
     <message>
         <source>User already exists.</source>
@@ -6124,7 +6123,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Enter new name for the selected item:</source>
-        <translation>Entrer un nouveau nom pour les objets sélectionnés:</translation>
+        <translation>Entrer un nouveau nom pour les éléments sélectionnés:</translation>
     </message>
     <message>
         <source>Delete Resources</source>
@@ -6156,7 +6155,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Cannot add item</source>
-        <translation>Impossible d&apos;ajouter l&apos;objet</translation>
+        <translation>Impossible d&apos;ajouter l&apos;élément</translation>
     </message>
     <message>
         <source>Cannot add a local file to Multi-Video</source>
@@ -6270,101 +6269,101 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ne peut pas déplacer %n périphérique sur le serveur %1. Serveur ne répond pas.</numerusform>
+            <numerusform>Ne peut pas déplacer ces %n périphériques sur le serveur %1. Serveur ne répond pas.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ne peut pas déplacer %n caméras sur le serveur %1. Serveur ne répond pas.</numerusform>
+            <numerusform>Ne peut pas déplacer ces %n caméras sur le serveur %1. Serveur ne répond pas.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ne peut pas déplacer %n modules IO sur le serveur %1. Serveur ne répond pas.</numerusform>
+            <numerusform>Ne peut pas déplacer ces %n modules IO sur le serveur %1. Serveur ne répond pas.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Serveur %1 ne peut pas trouver et accèder %n périphérique. Êtes-vous sûr que vous voulez le déplacer?</numerusform>
+            <numerusform>Serveur %1 ne peut pas trouver et accèder ces %n périphériques. Êtes-vous sûr que vous voulez les déplacers?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Serveur %1 ne peut pas trouver et accèder %n caméra. Êtes-vous sûr que vous voulez le déplacer?</numerusform>
+            <numerusform>Serveur %1 ne peut pas trouver et accèder ces %n caméras. Êtes-vous sûr que vous voulez les déplacers?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Serveur %1 ne peut pas trouver et accèder %n module IO. Êtes-vous sûr que vous voulez le déplacer?</numerusform>
+            <numerusform>Serveur %1 ne peut pas trouver et accèder ces %n modules IO. Êtes-vous sûr que vous voulez les déplacers?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ëtes-vous sûr de vouloir supprimer définitivement %n fichier?</numerusform>
+            <numerusform>Ëtes-vous sûr de vouloir supprimer définitivement %n fichiers?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ëtes-vous sûr de vouloir retirer %n élément de la mise en page?</numerusform>
+            <numerusform>Ëtes-vous sûr de vouloir retirer %n éléments de la mise en page?</numerusform>
         </translation>
     </message>
     <message>
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ces %n périphériques sont auto-découvert. Ils peuvent être auto-découvert après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</translation>
     </message>
     <message>
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ces %n caméras sont auto-découvert. Elles peuvent être auto-découvert après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</translation>
     </message>
     <message>
         <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ces %n modules IO sont auto-découvert. Ils peuvent être auto-découvert après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</translation>
     </message>
     <message>
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n de ces périphériques sont auto-découvert. Ils peuvent être auto-découvert après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</translation>
     </message>
     <message>
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n de ces caméras sont auto-découvert. Elles peuvent être auto-découvert après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</translation>
     </message>
     <message>
         <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n de ces modules IO sont auto-découvert. Ils peuvent être auto-découvert après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>Voulez-vous vraiment  supprimer %n périphériques suivants?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>Voulez-vous vraiment  supprimer %n caméras suivantes?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>Voulez-vous vraiment  supprimer %n modules IO suivants?</translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Voulez-vous vraiment  supprimer %n élément suivant?</numerusform>
+            <numerusform>Voulez-vous vraiment  supprimer %n éléments suivants?</numerusform>
         </translation>
     </message>
 </context>
@@ -6479,8 +6478,8 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
         <translatorcomment>There&apos;s no need for a Singular if you need one items</translatorcomment>
         <translation>
-            <numerusform>Exactement un objet doit être sélectionné pour l&apos;exportation, mais %n objets sont actuellement sélectionnés.</numerusform>
-            <numerusform>Exactement un objet doit être sélectionné pour l&apos;exportation, mais %n objets sont actuellement sélectionnés.</numerusform>
+            <numerusform>Exactement un élément doit être sélectionné pour l&apos;exportation, mais %n éléments sont actuellement sélectionnés.</numerusform>
+            <numerusform>Exactement un élément doit être sélectionné pour l&apos;exportation, mais %n éléments sont actuellement sélectionnés.</numerusform>
         </translation>
     </message>
     <message>
@@ -6816,15 +6815,15 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>All Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout Périphériques</translation>
     </message>
     <message>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes Caméras</translation>
     </message>
     <message>
         <source>All IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout Modules IO</translation>
     </message>
 </context>
 <context>
@@ -6862,36 +6861,36 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message>
         <source>The system is in Safe Mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Système est en mode sans échec.</translation>
     </message>
     <message>
         <source>It is not allowed to make any changes except license activation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il est interdit d&apos;apporter des modifications à l&apos;exception de l&apos;activation de licence.</translation>
     </message>
     <message>
         <source>The following %n items are not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les %n éléments suivants ne sont pas sauvegardé.</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
-            <numerusform>Impossible d&apos;enregistrer %n objet  au serveur.</numerusform>
-            <numerusform>Impossible d&apos;enregistrer les %n objets au serveur.</numerusform>
+        <translation>
+            <numerusform>Impossible d&apos;enregistrer %n élément au serveur.</numerusform>
+            <numerusform>Impossible d&apos;enregistrer les %n éléments au serveur.</numerusform>
         </translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>The following %n items are not deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les %n éléments suivants ne sont pas supprimé.</translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ne peut pas supprimer %n élément du serveur.</numerusform>
+            <numerusform>Ne peut pas supprimer %n éléments du serveur.</numerusform>
         </translation>
     </message>
 </context>
@@ -6899,7 +6898,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Système est en mode sans échec</translation>
     </message>
 </context>
 <context>
@@ -7044,13 +7043,13 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Delete Items</source>
-        <translation>Supprimer Objet</translation>
+        <translation>Supprimer Éléments</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
-            <numerusform>Etes-vous sûr de vouloir supprimer définitivement %n objet?</numerusform>
-            <numerusform>Etes-vous sûr de vouloir supprimer définitivement %n objets?</numerusform>
+            <numerusform>Etes-vous sûr de vouloir supprimer définitivement %n élément?</numerusform>
+            <numerusform>Etes-vous sûr de vouloir supprimer définitivement %n éléments?</numerusform>
         </translation>
     </message>
     <message>
@@ -7115,7 +7114,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation>Il n&apos;y a aucun objet mur vidéo hors ligne lié à ce PC.</translation>
+        <translation>Il n&apos;y a aucun élément mur vidéo hors ligne lié à ce PC.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
@@ -7143,7 +7142,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>%n items</source>
-        <translation>%n Objets</translation>
+        <translation>%n éléments</translation>
     </message>
 </context>
 <context>
