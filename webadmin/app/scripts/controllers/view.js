@@ -756,7 +756,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             var topAlert = $('td.alert');
             if(topAlert.length){
-                topAlertHeight = topAlert.outerHeight() - 1; // -1 here is a hack.
+                topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
             }
 
             var viewportHeight = (windowHeight - topHeight - topAlertHeight) + 'px';
@@ -766,7 +766,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             //One more IE hack.
             if(window.jscd.browser === 'Microsoft Internet Explorer') {
-                var videoWidth = $('header').width() - $('.cameras-panel').outerWidth(true);
+                var videoWidth = $('header').width() - $('.cameras-panel').outerWidth(true) - 1;
                 $('videowindow').parent().css('width', videoWidth + 'px');
             }
         };
