@@ -1804,6 +1804,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         return false;
     DeviceFileCatalog::Chunk chunk(startDateMs, storageIndex, DeviceFileCatalog::Chunk::FILE_INDEX_NONE, -1, (qint16) timeZone);
     catalog->addRecord(chunk);
+    catalog->setLastSyncTime(startDateMs);
     return true;
 }
 
