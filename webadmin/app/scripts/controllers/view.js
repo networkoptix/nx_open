@@ -190,7 +190,9 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
-            $scope.switchPlaying(true);
+            if(API) {
+                $scope.switchPlaying(true);
+            }
         };
         function updateVideoSource(playing) {
             var live = !playing;
@@ -232,7 +234,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(resolutionHls === 'lo' && !$scope.activeCamera.hasDualStreaming ){
                 resolutionHls = 'hi';
             }
-            // TODO: check resolution ?
+
             $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' },

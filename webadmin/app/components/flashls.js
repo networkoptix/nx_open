@@ -216,6 +216,8 @@ var flashlsAPI = new (function(){
     };
 
     this.play = function(offset) {
+
+        this.paused = false;
         if(!this.flashObject){
             return;
         }
@@ -227,11 +229,16 @@ var flashlsAPI = new (function(){
         }
     };
 
+    this.paused = false;
     this.pause = function() {
+        this.paused = true;
+
         this.flashObject.playerPause();
     };
 
     this.resume = function() {
+
+        this.paused = false;
         this.flashObject.playerResume();
     };
 
@@ -240,6 +247,7 @@ var flashlsAPI = new (function(){
     };
 
     this.stop = function() {
+        this.paused = true;
         this.flashObject.playerStop();
     };
 
@@ -481,7 +489,12 @@ flashlsAPI.flashlsEvents = {
             }
         }
         oldSlidingPosition = Math.max(oldSlidingPosition,timemetrics.live_sliding_main + timemetrics.position);
-        flashlsAPI.positionHandler( Math.round(Math.max(oldSlidingPosition, collectedPosition + currentPosition)*1000) );
+        var targetPosition = Math.round(Math.max(oldSlidingPosition, collectedPosition + currentPosition)*1000);
+        if(targetPosition === 0 || flashlsApi.paused){
+            return;
+        }
+
+        flashlsAPI.positionHandler( targetPosition );
 
         //flashlsAPI.positionHandler(Math.round((collectedPosition + currentPosition) * 1000));
     },
