@@ -9,7 +9,7 @@ QnStorageResource::QnStorageResource():
     m_storageBitrateCoeff(0.0),
     m_isBackup(false),
     m_writed(0.0),
-    m_writedCoeff(-1.0)
+    m_writedCoeff(1.0)
 {
     setStatus(Qn::Offline);
 }
