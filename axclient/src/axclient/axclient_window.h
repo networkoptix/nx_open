@@ -50,8 +50,8 @@ private:
 
 private:
     QWidget *m_parentWidget;
-    QScopedPointer<QnMainWindow> m_mainWindow;
     QScopedPointer<QnWorkbenchContext> m_context;
+    QScopedPointer<QnMainWindow> m_mainWindow;
 };
 
 #define qnAxClient QnAxClientWindow::instance()
