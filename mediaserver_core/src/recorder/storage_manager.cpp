@@ -1547,7 +1547,6 @@ void QnStorageManager::updateStorageStatistics()
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider *provider)
 {
     QnStorageResourcePtr result;
-    float minBitrate = (float) INT_MAX;
 
     struct StorageSpaceInfo {
         QnStorageResourcePtr storage;
@@ -1574,7 +1573,9 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     if (!storagesInfo.empty()) {
         size_t lastIndex = 0;
         for (size_t i = 1; i < storagesInfo.size(); ++i) {
-            if (storagesInfo[i].usageCoeff == storagesInfo[0].usageCoeff) {
+            if (std::abs(storagesInfo[i].usageCoeff - storagesInfo[0].usageCoeff) <
+                std::numeric_limits<double>::epsilon()
+                ) {
                 ++lastIndex;
             } else {
                 break;
