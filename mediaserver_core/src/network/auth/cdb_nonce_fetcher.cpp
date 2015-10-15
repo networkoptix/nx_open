@@ -22,7 +22,9 @@ namespace {
 CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultGenerator)
 :
     m_defaultGenerator(std::move(defaultGenerator)),
-    m_bindedToCloud(false)
+    m_bindedToCloud(false),
+    m_randomEngine(m_rd()),
+    m_nonceTrailerRandomGenerator('a', 'z')
 {
     m_monotonicClock.restart();
 
@@ -62,7 +64,7 @@ QByteArray CdbNonceFetcher::generateNonce()
             std::generate(
                 nonceTrailer.data()+sizeof(MAGIC_BYTES),
                 nonceTrailer.data()+nonceTrailer.size(),
-                rand);
+                [&]{return m_nonceTrailerRandomGenerator(m_randomEngine);});
             const auto nonce = m_cdbNonceQueue.back().nonce + nonceTrailer;
             return nonce;
         }

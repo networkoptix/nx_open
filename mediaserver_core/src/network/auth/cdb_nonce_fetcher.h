@@ -10,6 +10,7 @@
 #include <chrono>
 #include <deque>
 #include <memory>
+#include <random>
 
 #include <boost/optional.hpp>
 
@@ -69,6 +70,9 @@ private:
     QElapsedTimer m_monotonicClock;
     std::unique_ptr<nx::cdb::api::Connection> m_connection;
     TimerManager::TimerGuard m_timerID;
+    std::random_device m_rd;
+    std::default_random_engine m_randomEngine;
+    std::uniform_int_distribution<char> m_nonceTrailerRandomGenerator;
 
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);
