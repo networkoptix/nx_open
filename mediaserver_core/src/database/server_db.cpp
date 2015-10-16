@@ -841,6 +841,35 @@ bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const {
     return (execSQLQuery(&query, Q_FUNC_INFO) && query.next());
 }
 
+QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
+    QWriteLocker lock(&m_mutex);
+
+    QString queryStr(lit("SELECT tag as name, count "
+                         "FROM bookmark_tag_counts "
+                         "ORDER BY count DESC "));
+
+    if (limit >= 0)
+        queryStr += lit("LIMIT %1").arg(limit);
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(queryStr);
+
+    QnCameraBookmarkTagList result;
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return result;
+
+    QnSqlIndexMapping mapping = QnSql::mapping<QnCameraBookmarkTag>(query);
+
+    while (query.next()) {
+        result.append(QnCameraBookmarkTag());
+        QnSql::fetch(mapping, query.record(), &result.last());
+    }
+
+    return result;
+}
+
 
 bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
     Q_ASSERT_X(!bookmark.cameraId.isNull(), Q_FUNC_INFO, "Empty bookmark camera id");
