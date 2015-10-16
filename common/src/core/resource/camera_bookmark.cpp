@@ -164,3 +164,4 @@ void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmark_Fields, (optional, true) )
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq), QnCameraBookmarkSearchFilter_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkTag, (sql_record)(json)(eq), QnCameraBookmarkTag_Fields, (optional, true))
