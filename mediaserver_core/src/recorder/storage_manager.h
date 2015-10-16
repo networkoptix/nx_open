@@ -100,7 +100,7 @@ public:
     void deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime);
     void clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk);
 
-    bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
+    bool isWritableStoragesAvailable() const;
 
     static bool isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs);
     static bool isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period);
@@ -200,7 +200,7 @@ private:
     QTimer m_timer;
 
     bool m_warnSended;
-    bool m_isWritableStorageAvail;
+    mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;
     QMap<QnUuid, bool> m_diskFullWarned;
