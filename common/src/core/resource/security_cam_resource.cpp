@@ -537,6 +537,18 @@ void QnSecurityCamResource::recordingEventDetached() {
     m_recActionCnt = qMax(0, m_recActionCnt-1);
 }
 
+QString QnSecurityCamResource::getUserDefinedName() const {
+    if( !getId().isNull() )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if( !(*userAttributesLock)->name.isEmpty() )
+            return (*userAttributesLock)->name;
+    }
+
+    return QnSecurityCamResource::getName();
+}
+
+
 QString QnSecurityCamResource::getGroupName() const {
     if( !getId().isNull() )
     {

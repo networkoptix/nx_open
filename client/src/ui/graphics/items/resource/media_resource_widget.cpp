@@ -39,6 +39,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
+#include <ui/common/search_query_strategy.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/proxy_label.h>
@@ -47,6 +48,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
+#include <ui/graphics/items/overlays/bookmarks_overlay_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/globals.h>
@@ -128,7 +130,7 @@ namespace
 
     const qint64 bookmarksFilterPrecisionMs = 5 * 60 * 1000;
 
-    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs) {
+    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs, const QString &text = QString()) {
         /* Round the current time to reload bookmarks only once a time. */
         qint64 mid = positionMs - (positionMs % bookmarksFilterPrecisionMs);
 
@@ -137,6 +139,8 @@ namespace
 
         /* Seek forward twice as long so when the mid point changes, next period will be preloaded. */
         result.endTimeMs = mid + bookmarksFilterPrecisionMs * 2;
+
+        result.text = text;
 
         return result;
     }
@@ -172,6 +176,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_homePtzController(nullptr)
     , m_dewarpingParams()
     , m_bookmarks()
+    , m_bookmarksOverlayWidget(nullptr)
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
 {
@@ -197,6 +202,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
     connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateBookmarksMode);
     connect(navigator(),                &QnWorkbenchNavigator::positionChanged,         this, &QnMediaResourceWidget::updateBookmarksFilter);
+
+    connect(navigator()->bookmarksSearchStrategy(), &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text){
+        if (!m_bookmarksQuery)
+            return;
+
+        auto filter = m_bookmarksQuery->filter();
+        filter.text = text;
+        m_bookmarksQuery->setFilter(filter);
+    });
 
     {
         /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */
@@ -258,6 +272,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
 
+    if (m_camera) {
+        m_bookmarksOverlayWidget = new QnBookmarksOverlayWidget();
+        addOverlayWidget(m_bookmarksOverlayWidget, Invisible, true, true);
+        updateBookmarksVisibility();
+    }
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module)) 
@@ -1039,6 +1058,9 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
     if(changedFlags & (DisplayMotion | DisplayMotionSensitivity | ControlZoomWindow))
         updateCursor();
 
+    if (changedFlags.testFlag(DisplayInfo))
+        updateBookmarksVisibility();
+
     base_type::optionsChangedNotify(changedFlags);
 }
 
@@ -1551,7 +1573,7 @@ void QnMediaResourceWidget::updateBookmarksFilter() {
     if (!m_bookmarksQuery)
         return;
 
-    m_bookmarksQuery->setFilter(constructBookmarksFilter(getUtcCurrentTimeMs()));
+    m_bookmarksQuery->setFilter(constructBookmarksFilter(getUtcCurrentTimeMs(), navigator()->bookmarksSearchStrategy()->query()));
 }
 
 void QnMediaResourceWidget::updateBookmarksMode() {
@@ -1572,28 +1594,27 @@ void QnMediaResourceWidget::updateBookmarksMode() {
         m_bookmarksQuery.clear();
     }
     updateBookmarks();
+    updateBookmarksVisibility();
 }
 
 void QnMediaResourceWidget::updateBookmarks() {
     if (!m_bookmarksQuery) {
-        setBookmarksLabelText(QString());
+        m_bookmarksOverlayWidget->setBookmarks(QnCameraBookmarkList());
         return;
     }
 
-    auto dt = [](const QnCameraBookmark &b) {
-        static const QString fmt(lit("mm:ss"));
-        return lit("%1 - %2")
-            .arg(QDateTime::fromMSecsSinceEpoch(b.startTimeMs).toString(fmt))
-            .arg(QDateTime::fromMSecsSinceEpoch(b.endTimeMs()).toString(fmt));
-    };
+    m_bookmarksOverlayWidget->setBookmarks(getBookmarksAtPosition(m_bookmarksQuery->cachedBookmarks(), getUtcCurrentTimeMs()));
+}
 
-    static const QString outputTemplate = lit("<b>%1</b><br>%2<br>%3<hr color = \"lightgrey\">");
-
-    QString text;
-    for (const QnCameraBookmark &bookmark: getBookmarksAtPosition(m_bookmarksQuery->executeLocal(), getUtcCurrentTimeMs())) {
-        text += outputTemplate.arg(bookmark.name, bookmark.description, dt(bookmark));
+void QnMediaResourceWidget::updateBookmarksVisibility() {
+    auto visibility = Invisible;
+    if (m_bookmarksQuery) {
+        if (options().testFlag(DisplayInfo))
+            visibility = Visible;
+        else
+            visibility = AutoVisible;
     }
-    setBookmarksLabelText(text);
+    setOverlayWidgetVisibility(m_bookmarksOverlayWidget, visibility);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const {

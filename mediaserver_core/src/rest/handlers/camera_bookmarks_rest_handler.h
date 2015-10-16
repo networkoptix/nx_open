@@ -11,8 +11,7 @@ public:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 
 private:
-    int addCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
-    int updateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
+    int addOrUpdateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
     int deleteCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
 };
 

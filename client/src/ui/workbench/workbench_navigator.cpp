@@ -18,6 +18,7 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/pending_operation.h>
 #include <utils/threaded_chunks_merge_tool.h>
 
 #include <client/client_settings.h>
@@ -77,6 +78,10 @@ namespace {
     /** Size of timeline window near live when there is no recorded periods on cameras. */
     const int timelineWindowNearLive = 10 * 1000;
 
+    const int updateBookmarksInterval = 2000;
+
+    enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
+
     QAtomicInt qn_threadedMergeHandle(1);
 }
 
@@ -89,6 +94,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_calendar(NULL),
     m_dayTimeWidget(NULL),
     m_bookmarksSearchWidget(NULL),
+    m_searchQueryStrategy(new QnSearchQueryStrategy(this, kMinimalSymbolsCount, kDelayMs)),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_currentMediaWidget(NULL),
@@ -112,7 +118,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
     m_bookmarkQuery(nullptr),
-    m_sliderBookmarksRefreshTimer(new QTimer(this)),
+    m_sliderBookmarksRefreshOperation(new QnPendingOperation([this](){ updateSliderBookmarks(); }, updateBookmarksInterval, this)),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0)
 {
@@ -186,6 +192,17 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     updateCameraHistoryTimer->start();
 
 
+    connect(m_searchQueryStrategy, &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text)
+    {
+        if (!m_bookmarkQuery)
+            return;
+
+        auto filter = m_bookmarkQuery->filter();
+        filter.text = text;
+        m_bookmarkQuery->setFilter(filter);
+        m_bookmarkAggregation.clear();
+    });
+
 
     connect(workbench(), &QnWorkbench::layoutChangeProcessStarted, this, [this] {
         m_chunkMergingProcessHandle = qn_threadedMergeHandle.fetchAndAddAcquire(1);
@@ -200,10 +217,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
             QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
     });
-
-    m_sliderBookmarksRefreshTimer->setInterval(2000);
-    m_sliderBookmarksRefreshTimer->setSingleShot(true);
-    connect(m_sliderBookmarksRefreshTimer, &QTimer::timeout, this, &QnWorkbenchNavigator::updateSliderBookmarks);
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -422,16 +435,6 @@ void QnWorkbenchNavigator::initialize() {
         m_searchQueryStrategy->changeQueryForcibly(QString()); 
     });
 
-    connect(m_searchQueryStrategy, &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text)
-    {
-        if (!m_bookmarkQuery)
-            return;
-
-        auto filter = m_bookmarkQuery->filter();
-        filter.text = text;
-        m_bookmarkQuery->setFilter(filter);
-    });
-
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
 
@@ -468,6 +471,7 @@ void QnWorkbenchNavigator::deinitialize() {
         m_bookmarkQuery->setFilter(QnCameraBookmarkSearchFilter());
         m_bookmarkAggregation.clear();
     }
+    m_searchQueryStrategy->changeQueryForcibly(QString());
 
     m_currentWidget = NULL;
     m_currentWidgetFlags = 0;
@@ -1539,11 +1543,9 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
-    if (m_currentWidget && m_timeSlider->timePeriods(CurrentLine, Qn::BookmarksContent).containTime(position)) {
-        QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
-        if (!bookmarks.isEmpty())
-            parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
-    }
+    QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
+    if (!bookmarks.isEmpty())
+        parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
     
 
     QScopedPointer<QMenu> menu(manager->newMenu(
@@ -1718,16 +1720,7 @@ void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked() {
 
 void QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks) {
     m_bookmarkAggregation.mergeBookmarkList(bookmarks);
-
-    if (m_timeSlider->bookmarks().isEmpty()) {
-        m_timeSlider->setBookmarks(m_bookmarkAggregation.bookmarkList());
-        return;
-    }
-
-    if (m_sliderBookmarksRefreshTimer->isActive())
-        return;
-
-    m_sliderBookmarksRefreshTimer->start();
+    m_sliderBookmarksRefreshOperation->requestOperation();
 }
 
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
@@ -1865,7 +1858,7 @@ void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksS
 
     if(m_bookmarksSearchWidget) {
         disconnect(m_bookmarksSearchWidget, nullptr, this, nullptr);
-        disconnect(m_searchQueryStrategy, nullptr, this, nullptr);
+        disconnect(m_bookmarksSearchWidget, nullptr, m_searchQueryStrategy, nullptr);
 
         if(isValid())
             deinitialize();
@@ -1873,15 +1866,16 @@ void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksS
 
     m_bookmarksSearchWidget = bookmarksSearchWidget;
 
-    enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
-    m_searchQueryStrategy = new QnSearchQueryStrategy(m_bookmarksSearchWidget, kMinimalSymbolsCount, kDelayMs);
-
     if(m_bookmarksSearchWidget) {
-        connect(m_bookmarksSearchWidget, &QObject::destroyed, this, [this](){setBookmarksSearchWidget(NULL);});
+        connect(m_bookmarksSearchWidget, &QObject::destroyed, this, [this](){setBookmarksSearchWidget(nullptr);});
 
         if(isValid())
             initialize();
     }
+}
+
+QnSearchQueryStrategy *QnWorkbenchNavigator::bookmarksSearchStrategy() const {
+    return m_searchQueryStrategy;
 }
 
 bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const {

@@ -17,6 +17,7 @@ Window {
 
     property string activeResourceId
 
+    property string currentSystemName
     property string currentHost
     property int currentPort
     property string currentLogin
@@ -29,8 +30,6 @@ Window {
 
     QnToolBar {
         id: toolBar
-
-        z: 5.0
 
         width: mainWindow.width - navigationBarPlaceholder.width
 
@@ -89,7 +88,7 @@ Window {
         activeSessionId: currentSessionId
     }
 
-    StackView {
+    QnMainStackView {
         id: stackView
         anchors.top: toolBar.bottom
         anchors.bottom: navigationBarPlaceholder.top
@@ -178,6 +177,7 @@ Window {
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
+                stackView.setFadeTransition()
                 Main.gotoResources()
             } else if (currentSessionId == "") {
                 loginSessionManager.lastUsedSessionId = ""
@@ -187,14 +187,11 @@ Window {
         }
 
         onConnectionFailed: {
-            if (stackView.depth > 1) /* we are in login page */
-                return
-
             Main.openFailedSession(
                         currentSessionId,
                         currentHost, currentPort,
                         currentLogin, currentPasswrod,
-                        loginSessionManager.lastUsedSessionSystemName(),
+                        currentSystemName,
                         status, statusMessage)
         }
     }
@@ -207,6 +204,7 @@ Window {
     Component.onCompleted: {
         updateNavigationBarPlaceholderSize()
         if (loginSessionManager.lastUsedSessionId) {
+            currentSystemName = loginSessionManager.lastUsedSessionSystemName()
             stackView.push(resourcesPageComponent)
             LoginFunctions.connectToServer(
                         loginSessionManager.lastUsedSessionId,

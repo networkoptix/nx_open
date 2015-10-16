@@ -152,7 +152,6 @@ void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
 
     switch (periodType) {
     case Qn::RecordingContent:
-    case Qn::BookmarksContent:
         loader->load();
         break;
     case Qn::MotionContent:

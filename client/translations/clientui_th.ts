@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="th" sourcelanguage="en">
+<TS version="2.0" language="th" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -697,27 +697,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>มีแหล่งที่มา:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>คำที่คั่นด้วยช่องว่าง</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>คำอธิบายประกอบด้วย:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>รายละเอียดประกอบด้วย:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>กฎข้อที่จะทำงานเฉพาะสำหรับเหตุการณ์ทั่วไปที่ผ่านตัวกรองทั้งหมด ช่องที่ว่างเปล่าไม่ได้ส่งผลกระทบต่อผลที่ตามมา กรองแต่ละคนผ่านไปถ้ามีคำหลักที่จะถูกจับคู่.</translation>
     </message>
 </context>
 <context>
@@ -2401,7 +2401,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>ลำดับความสำคัญล้มเหลว ...</translation>
     </message>
 </context>
 <context>

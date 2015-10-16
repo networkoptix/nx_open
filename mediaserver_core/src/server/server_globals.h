@@ -17,11 +17,9 @@ public:
     Q_NAMESPACE
 #endif
 
-
         enum ChunksCatalog {
             LowQualityCatalog,
             HiQualityCatalog,
-            BookmarksCatalog,
 
             ChunksCatalogCount
     };

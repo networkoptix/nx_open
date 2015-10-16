@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.0" language="es" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -697,27 +697,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>La fuente contiene:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>Palabras clave separadas por espacio</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Título contiene:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Descripción contiene:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Regla funcionará sólo para Eventos genéricos que pasa todos los filtros. Los campos vacíos no afectan en el resultado. Cada filtro pasa si cualquiera de palabra clave coincide.</translation>
     </message>
 </context>
 <context>
@@ -2400,7 +2400,7 @@ No negará de retirar las más antiguas grabaciones de la unidad.</translation>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioridad de Conmutación por error...</translation>
     </message>
 </context>
 <context>

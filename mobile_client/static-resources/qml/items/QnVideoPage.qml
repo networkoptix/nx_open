@@ -12,25 +12,44 @@ import "../controls"
 QnPage {
     id: videoPlayer
 
-    title: mediaPlayer.resourceName
+    title: mainWindow.currentSystemName
 
     property string resourceId
 
-    Connections {
-        target: menuBackButton
-        onClicked: Main.gotoMainScreen()
+    Rectangle {
+        width: mainWindow.width
+        height: mainWindow.height
+        y: -stackView.y
+        color: QnTheme.windowBackground
     }
 
-    QnIconButton {
-        parent: toolBar.contentItem
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: dp(8)
-        icon: "image://icon/more_vert.png"
-        visible: pageStatus == Stack.Active || pageStatus == Stack.Activating
-        onClicked: {
-            cameraMenu.updateGeometry(this)
-            cameraMenu.show()
+    QnToolBar {
+        id: toolBar
+
+        z: 5.0
+
+        anchors.top: undefined
+        anchors.bottom: parent.top
+        backgroundOpacity: 0.0
+
+        title: mediaPlayer.resourceName
+
+        QnMenuBackButton {
+            x: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            progress: 1.0
+            onClicked: Main.gotoMainScreen()
+        }
+
+        QnIconButton {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: dp(8)
+            icon: "image://icon/more_vert.png"
+            onClicked: {
+                cameraMenu.updateGeometry(this)
+                cameraMenu.show()
+            }
         }
     }
 

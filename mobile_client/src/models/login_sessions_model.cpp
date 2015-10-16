@@ -2,8 +2,9 @@
 
 #include <algorithm>
 
-#include "mobile_client/mobile_client_settings.h"
-#include "utils/network/module_finder.h"
+#include <mobile_client/mobile_client_settings.h>
+#include <utils/network/module_finder.h>
+#include <context/session_settings.h>
 
 QnLoginSessionsModel::QnLoginSessionsModel(QObject *parent) :
     QAbstractListModel(parent),
@@ -153,9 +154,12 @@ void QnLoginSessionsModel::deleteSession(const QString &id) {
         } else {
             m_savedSessions.removeAt(i);
         }
+
+        break;
     }
 
     saveToSettings();
+    QFile::remove(QnSessionSettings::settingsFileName(id));
 }
 
 void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {

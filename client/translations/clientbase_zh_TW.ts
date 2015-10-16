@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_TW" sourcelanguage="en_US">
+<TS version="2.1" language="zh_TW" sourcelanguage="en_US">
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
@@ -2005,7 +2005,7 @@
     </message>
     <message>
         <source>Scanning hosts... (%1)</source>
-        <translation>%n 掃描主機…(%1)</translation>
+        <translation>掃描主機…(%1)</translation>
     </message>
     <message>
         <source>Select target server...</source>

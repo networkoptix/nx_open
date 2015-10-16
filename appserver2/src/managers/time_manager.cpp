@@ -34,6 +34,7 @@
 #include "database/db_manager.h"
 #include "ec2_thread_pool.h"
 #include "rest/time_sync_rest_handler.h"
+#include "settings.h"
 
 
 namespace ec2
@@ -209,13 +210,13 @@ namespace ec2
     //!Once per 10 minutes checking if manual time server selection is required
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*MILLIS_PER_SEC;
     //!Accurate time is fetched from internet with this period
-    static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 24*60*60;
+    static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 60*60;
     //!Reporting time synchronization information to other peers once per this period
     static const int TIME_SYNC_SEND_TIMEOUT_SEC = 10*60;
 #endif
     //!If time synchronization with internet failes, period is multiplied on this value, but it cannot exceed \a MAX_PUBLIC_SYNC_TIME_PERIOD_SEC
     static const size_t INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF = 2;
-    static const size_t MAX_INTERNET_SYNC_TIME_PERIOD_SEC = 7*24*60*60;
+    static const size_t MAX_INTERNET_SYNC_TIME_PERIOD_SEC = 60*60;
     //static const size_t INTERNET_TIME_EXPIRATION_PERIOD_SEC = 7*24*60*60;   //one week
     //!Considering internet time equal to local time if difference is no more than this value
     static const qint64 MAX_LOCAL_SYSTEM_TIME_DRIFT_MS = 10*MILLIS_PER_SEC;
@@ -919,7 +920,7 @@ namespace ec2
             //failure
             m_internetTimeSynchronizationPeriod = std::min<>(
                 MIN_INTERNET_SYNC_TIME_PERIOD_SEC + m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
-                MAX_INTERNET_SYNC_TIME_PERIOD_SEC );
+                Settings::instance()->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
 
             addInternetTimeSynchronizationTask();
         }
@@ -941,7 +942,7 @@ namespace ec2
 
                 m_internetSynchronizationFailureCount = 0;
 
-                m_internetTimeSynchronizationPeriod = INTERNET_SYNC_TIME_PERIOD_SEC;
+                m_internetTimeSynchronizationPeriod = Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
 
                 const qint64 curLocalTime = currentMSecsSinceEpoch();
 
@@ -986,7 +987,7 @@ namespace ec2
                 //failure
                 m_internetTimeSynchronizationPeriod = std::min<>(
                     MIN_INTERNET_SYNC_TIME_PERIOD_SEC + m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
-                    MAX_INTERNET_SYNC_TIME_PERIOD_SEC );
+                    Settings::instance()->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
 
                 ++m_internetSynchronizationFailureCount;
                 if( m_internetSynchronizationFailureCount > MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES )

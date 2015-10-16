@@ -128,6 +128,11 @@ QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
     selected = QColor(64, 130, 180, 128);
 }
 
+QnBookmarkColors::QnBookmarkColors() {
+    background = QColor("#b22e6996");
+    text = QColor(Qt::white);
+}
+
 QnLicensesListModelColors::QnLicensesListModelColors() {
     normal = QColor(255, 255, 255, 255);
     warning = QColor(Qt::yellow);

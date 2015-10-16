@@ -22,6 +22,7 @@ extern "C"
 #include "../common/threadqueue.h"
 #include "utils/camera/camera_diagnostics.h"
 #include "network/client_authenticate_helper.h"
+#include "http/httptypes.h"
 
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM
@@ -131,13 +132,6 @@ class RTPSession: public QObject
 {
     Q_OBJECT;
 public:
-    // TODO: #Elric #enum
-    enum DefaultAuthScheme {
-        authNone,
-        authBasic,
-        authDigest // generate nonce as current time in usec
-    };
-
     //typedef QMap<int, QScopedPointer<RTPIODevice> > RtpIoTracks;
 
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
@@ -245,7 +239,7 @@ public:
     * Client will use any AuthScheme corresponding to server requirements (authenticate server request)
     * defaultAuthScheme is used for first client request only
     */
-    void setAuth(const QAuthenticator& auth, DefaultAuthScheme defaultAuthScheme);
+    void setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme);
     QAuthenticator getAuth() const;
 
     void setProxyAddr(const QString& addr, int port);
@@ -341,7 +335,6 @@ private:
     int m_proxyPort;
     int m_responseCode;
     bool m_isAudioEnabled;
-    bool m_useDigestAuth;
     int m_numOfPredefinedChannels;
     unsigned int m_TimeOut;
     // end of initialized fields
@@ -370,9 +363,6 @@ private:
     QString m_contentBase;
     TransportType m_prefferedTransport;
 
-    QString m_realm;
-    QString m_nonce;
-
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QnMutex m_guidMutex;
 
@@ -390,6 +380,7 @@ private:
     std::ofstream m_inStreamFile;
     std::ofstream m_outStreamFile;
 #endif
+    nx_http::header::AuthScheme::Value m_defaultAuthScheme;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

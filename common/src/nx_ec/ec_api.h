@@ -1248,6 +1248,7 @@ namespace ec2
 }
 
 Q_DECLARE_METATYPE(ec2::QnFullResourceData);
+Q_DECLARE_METATYPE(ec2::QnPeerTimeInfo);
 Q_DECLARE_METATYPE(ec2::QnPeerTimeInfoList);
 
 #endif  //EC_API_H

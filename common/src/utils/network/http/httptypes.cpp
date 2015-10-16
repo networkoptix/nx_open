@@ -1039,9 +1039,9 @@ namespace nx_http
 
         const StringType WWWAuthenticate::NAME("WWW-Authenticate");
 
-        WWWAuthenticate::WWWAuthenticate()
+        WWWAuthenticate::WWWAuthenticate(AuthScheme::Value authScheme)
         :
-            authScheme( AuthScheme::none )
+            authScheme( authScheme )
         {
         }
 
