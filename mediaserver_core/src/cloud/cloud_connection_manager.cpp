@@ -32,6 +32,8 @@ CloudConnectionManager::CloudConnectionManager()
     Qn::directConnect(
         qnResPool, &QnResourcePool::resourceAdded,
         this, &CloudConnectionManager::atResourceAdded);
+    if (const auto admin = qnResPool->getAdministrator())
+        atResourceAdded(admin);
 }
 
 CloudConnectionManager::~CloudConnectionManager()
@@ -74,6 +76,7 @@ void CloudConnectionManager::atResourceAdded(const QnResourcePtr& res)
     Qn::directConnect(
         user.data(), &QnResource::propertyChanged,
         this, &CloudConnectionManager::atAdminPropertyChanged);
+    atAdminPropertyChanged(user, QString());
 }
 
 void CloudConnectionManager::atAdminPropertyChanged(

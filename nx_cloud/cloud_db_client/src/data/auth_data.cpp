@@ -7,6 +7,8 @@
 
 #include <utils/common/model_functions.h>
 
+#include "system_data.h"
+
 
 namespace nx {
 namespace cdb {
@@ -39,7 +41,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (NonceData)(AuthRequest)(AuthResponse),
     (json),
     _Fields)
-
 
 }   //api
 }   //cdb

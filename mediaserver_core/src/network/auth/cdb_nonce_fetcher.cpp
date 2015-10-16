@@ -129,6 +129,9 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     if (!m_connection)
     {
         NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb"), cl_logDEBUG1);
+        m_timerID = TimerManager::instance()->addTimer(
+            std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
+            GET_NONCE_RETRY_TIMEOUT);
         return;
     }
 
