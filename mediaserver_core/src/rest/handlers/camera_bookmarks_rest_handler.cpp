@@ -23,7 +23,7 @@ int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnReque
 int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) { 
     Q_UNUSED(params)
 
-        QnCameraBookmark bookmark;
+    QnCameraBookmark bookmark;
     if (!QJson::deserialize(body, &bookmark))
         return nx_http::StatusCode::invalidParameter;
 

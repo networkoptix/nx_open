@@ -1,13 +1,13 @@
 #include "bookmarks_request_helper.h"
 
-#include <api/helpers/bookmark_request_data.h>
+#include <api/helpers/bookmark_requests.h>
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 
 #include <database/server_db.h>
 
-QnCameraBookmarkList QnBookmarksRequestHelper::load(const QnBookmarkRequestData& request)
+QnCameraBookmarkList QnBookmarksRequestHelper::load(const QnGetBookmarksRequestData& request)
 {
     MultiServerCameraBookmarkList multiBookmarks;
     for (const auto &camera: request.cameras) {

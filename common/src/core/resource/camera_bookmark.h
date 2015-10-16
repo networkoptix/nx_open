@@ -38,8 +38,6 @@ struct QnCameraBookmark {
     /** \returns End time in milliseconds since epoch. */
     qint64 endTimeMs() const;
 
-    /** \returns True if bookmark is null, false otherwise. */
-    bool isNull() const;
 
     /** List of tags attached to the bookmark. */
     QnCameraBookmarkTags tags;
@@ -52,6 +50,12 @@ struct QnCameraBookmark {
         startTimeMs(0),
         durationMs(0)
     {}
+
+    /** \returns True if bookmark is null, false otherwise. */
+    bool isNull() const;
+
+    /** \returns True if bookmark is valid, false otherwise. */
+    bool isValid() const;
 
     QString tagsAsString(QChar delimiter = L' ') const;
 

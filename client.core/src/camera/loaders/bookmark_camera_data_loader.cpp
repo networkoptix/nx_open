@@ -1,7 +1,7 @@
 #include "bookmark_camera_data_loader.h"
 
 #include <api/media_server_connection.h>
-#include <api/helpers/bookmark_request_data.h>
+#include <api/helpers/bookmark_requests.h>
 
 #include <common/common_module.h>
 
@@ -81,7 +81,7 @@ void QnBookmarksLoader::sendRequest(const QnTimePeriod &period) {
 
     m_timer.restart();
 
-    QnBookmarkRequestData requestData;
+    QnGetBookmarksRequestData requestData;
     requestData.cameras << m_camera;
     requestData.format = Qn::JsonFormat;
     requestData.filter.startTimeMs = period.startTimeMs;

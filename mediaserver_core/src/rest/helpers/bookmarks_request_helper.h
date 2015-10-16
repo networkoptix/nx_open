@@ -2,11 +2,11 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 
-struct QnBookmarkRequestData;
+struct QnGetBookmarksRequestData;
 
 class QnBookmarksRequestHelper
 {
 public:
-    static QnCameraBookmarkList load(const QnBookmarkRequestData& request);
+    static QnCameraBookmarkList load(const QnGetBookmarksRequestData& request);
 };
 

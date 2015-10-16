@@ -11,7 +11,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include <api/helpers/chunks_request_data.h>
-#include <api/helpers/bookmark_request_data.h>
+#include <api/helpers/bookmark_requests.h>
 
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
@@ -877,6 +877,6 @@ int QnMediaServerConnection::recordedTimePeriods(const QnChunksRequestData &requ
     return sendAsyncGetRequest(ec2RecordedTimePeriodsObject, fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList) ,target, slot);
 }
 
-int QnMediaServerConnection::getBookmarksAsync(const QnBookmarkRequestData &request, QObject *target, const char *slot) {
+int QnMediaServerConnection::getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot) {
     return sendAsyncGetRequest(ec2BookmarksObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
 }

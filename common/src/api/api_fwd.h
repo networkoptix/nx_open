@@ -6,6 +6,8 @@
 #include <QtCore/QMap>
 #include <QVariant>
 
+//TODO: #GDM get rid of this module or rename it to something more sane
+
 class QnUuid;
 
 class QnAppServerConnection;
@@ -14,13 +16,12 @@ typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 class QnMediaServerConnection;
 typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
+struct QnMultiserverRequestData;
 struct QnChunksRequestData;
-struct QnBookmarkRequestData;
+struct QnGetBookmarksRequestData;
+struct QnUpdateBookmarkRequestData;
+struct QnDeleteBookmarkRequestData;
 
-struct MultiServerPeriodData;
-typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
-
-struct QnChunksRequestData;
 struct MultiServerPeriodData;
 typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
 

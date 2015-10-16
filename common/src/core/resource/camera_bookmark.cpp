@@ -118,6 +118,10 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const MultiServerCam
     return result;
 }
 
+bool QnCameraBookmark::isValid() const {
+    return !isNull() && !cameraId.isEmpty();
+}
+
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {
     if (first.startTimeMs == other.startTimeMs)
         return first.guid.toRfc4122() < other.guid.toRfc4122();
