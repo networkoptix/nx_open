@@ -958,7 +958,7 @@ namespace nx_hls
 
     void QnHttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality )
     {
-        static const size_t MIN_PLAYLIST_SIZE_TO_START_STREAMING = 1;
+        static const size_t MIN_PLAYLIST_SIZE_TO_START_STREAMING = 3;
         static const size_t PLAYLIST_CHECK_TIMEOUT_MS = 1000;
 
         if( !session->isLive() )
@@ -972,7 +972,7 @@ namespace nx_hls
         std::vector<nx_hls::AbstractPlaylistManager::ChunkData> chunkList;
         bool isPlaylistClosed = false;
         size_t chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );
-        if( chunksGenerated == 0 )
+        if( chunksGenerated < MIN_PLAYLIST_SIZE_TO_START_STREAMING)
         {
             //no chunks generated, waiting for at least one chunk to be generated
             QElapsedTimer monotonicTimer;
@@ -982,7 +982,10 @@ namespace nx_hls
                 chunkList.clear();
                 chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );
                 if( chunksGenerated >= MIN_PLAYLIST_SIZE_TO_START_STREAMING )
+                {
+                    NX_LOG(lit("HLS cache has been prefilled with %1 chunks").arg(chunksGenerated), cl_logDEBUG2);
                     break;
+                }
                 QThread::msleep( PLAYLIST_CHECK_TIMEOUT_MS );
             }
         }
