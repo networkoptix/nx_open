@@ -222,9 +222,6 @@ namespace ec2
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
-        //getCameraBookmarkTags
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
-
         //getUserList
         ErrorCode doQueryNoLock(const QnUuid& userId, ApiUserDataList& userList);
 
@@ -294,9 +291,6 @@ namespace ec2
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran);
-
-        /* Add or remove camera bookmark tags */
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdDataList>& /*tran*/)
         {
@@ -502,9 +496,6 @@ namespace ec2
 
         ErrorCode saveLicense(const ApiLicenseData& license);
         ErrorCode removeLicense(const ApiLicenseData& license);
-
-        ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
-        ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 

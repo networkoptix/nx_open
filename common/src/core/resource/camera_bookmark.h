@@ -87,6 +87,16 @@ struct QnCameraBookmarkSearchFilter {
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
 
+struct QnCameraBookmarkTag {
+    QString name;
+    int count;
+
+    QnCameraBookmarkTag() :
+        count(0)
+    {}
+};
+#define QnCameraBookmarkTag_Fields (name)(count)
+
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
 bool operator<(qint64 first, const QnCameraBookmark &other);
 bool operator<(const QnCameraBookmark &first, qint64 other);

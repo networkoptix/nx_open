@@ -12,3 +12,6 @@ typedef std::vector<QnCameraBookmarkList> MultiServerCameraBookmarkList;
 struct QnCameraBookmarkSearchFilter;
 
 typedef QSet<QString> QnCameraBookmarkTags;
+
+struct QnCameraBookmarkTag;
+typedef QList<QnCameraBookmarkTag> QnCameraBookmarkTagList;

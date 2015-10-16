@@ -36,16 +36,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(action(Qn::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
 
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTags);
-
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.unite(tags);
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.subtract(tags);
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
 }
 
 void QnWorkbenchBookmarksHandler::updateTags() {
@@ -54,14 +44,8 @@ void QnWorkbenchBookmarksHandler::updateTags() {
         context()->navigator()->setBookmarkTags(m_tags);
         return;
     }
-    
-    connection()->getCameraManager()->getBookmarkTags(this, [this](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTags &tags) {
-        Q_UNUSED(reqID);
-        if (code != ec2::ErrorCode::ok)
-            return;
-        m_tags = tags;
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
+
+    //TODO: #dklychkov #VMS-1132 Implement bookmark tags loading and updating
 }
 
 QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tags() const {
