@@ -193,7 +193,7 @@
     <message>
         <location/>
         <source>at</source>
-        <translation>an</translation>
+        <translation type="unfinished">an</translation>
     </message>
     <message>
         <location/>
@@ -2865,7 +2865,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Note: Schedule is based on server time.</source>
-        <translation>Hinweis: Der Aufnahmezeitplan basiert auf der Serverzeiteinstellung.</translation>
+        <translation type="unfinished">Hinweis: Der Aufnahmezeitplan basiert auf der Serverzeiteinstellung.</translation>
     </message>
 </context>
 </TS>
