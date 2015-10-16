@@ -40,14 +40,22 @@ namespace {
 }
 
 
-QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
-    QnButtonBoxDialog(parent),
-    ui(new Ui::ConnectionTestingDialog),
-    m_timeoutTimer(new QTimer(this))
+QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) 
+    : QnButtonBoxDialog(parent)
+    , ui(new Ui::ConnectionTestingDialog)
+    , m_timeoutTimer(new QTimer(this))
+    , m_connectButton(new QPushButton(tr("Connect"), this))
 {
     ui->setupUi(this);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(false);
+    ui->buttonBox->addButton(m_connectButton, QDialogButtonBox::HelpRole);
+
+    m_connectButton->setVisible(false);    
+    connect(m_connectButton, &QPushButton::clicked, this, [this] {
+        emit connectRequested();
+        accept();
+    });
 
     ui->progressBar->setValue(0);
     ui->progressBar->setMaximum(connectionTimeoutMs / timerIntervalMs);
@@ -57,7 +65,7 @@ QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     m_timeoutTimer->setSingleShot(false);
 }
 
-void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
+void QnConnectionTestingDialog::testConnection(const QUrl &url) {
     setHelpTopic(this, Qn::Login_Help);
 
     QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
@@ -103,6 +111,7 @@ void QnConnectionTestingDialog::updateUi(bool success, const QString &details, i
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(true);
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(false);
+    m_connectButton->setVisible(success);
 }
 
 
