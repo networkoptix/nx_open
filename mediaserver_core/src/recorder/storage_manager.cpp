@@ -1414,6 +1414,12 @@ void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resour
     //TODO: #vasilenko should we delete bookmarks here too?
 }
 
+bool QnStorageManager::isWritableStoragesAvailable() const 
+{ 
+    QnMutexLocker lk(&m_mutexStorages);
+    return m_isWritableStorageAvail; 
+}
+
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
@@ -1441,6 +1447,10 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
                 result << fileStorage;
         }
     }
+    if (!result.empty())
+        m_isWritableStorageAvail = true;
+    else
+        m_isWritableStorageAvail = false;
     return result;
 }
 
