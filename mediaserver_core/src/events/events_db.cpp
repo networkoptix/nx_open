@@ -781,3 +781,14 @@ QnEventsDB::QnDbTransaction* QnEventsDB::getTransaction()
 {
     return &m_tran;
 }
+
+void QnEventsDB::setLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog, qint64 timestampMs)
+{
+    // todo: implement me
+}
+
+qint64 QnEventsDB::getLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog)
+{
+    // todo: implement me
+    return 0;
+}

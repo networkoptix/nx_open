@@ -10,6 +10,7 @@
 #include "api/model/audit/audit_record.h"
 
 #include <utils/common/uuid.h>
+#include "server/server_globals.h"
 
 class QnTimePeriod;
 
@@ -51,6 +52,9 @@ public:
     bool createDatabase();
 
     virtual QnDbTransaction* getTransaction() override;
+
+    void setLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog, qint64 timestampMs);
+    qint64 getLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog);
 protected:
     QnEventsDB();
 
