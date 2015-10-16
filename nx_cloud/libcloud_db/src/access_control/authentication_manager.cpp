@@ -153,7 +153,7 @@ bool AuthenticationManager::findHa1(
     {
         *ha1 = accountData.get().passwordHa1.c_str();
         authProperties->put(
-            cdb::attr::accountID,
+            cdb::attr::authAccountID,
             QVariant::fromValue(accountData.get().id));
     }
     else if (auto systemData = m_systemManager.findSystemByID(QnUuid::fromStringSafe(username)))
@@ -164,7 +164,7 @@ bool AuthenticationManager::findHa1(
             realm(),
             nx::String(systemData.get().authKey.c_str()));
         authProperties->put(
-            cdb::attr::systemID,
+            cdb::attr::authSystemID,
             QVariant::fromValue(QnUuid(systemData.get().id)));
     }
 

@@ -126,8 +126,8 @@ TEST_F(CdbFunctionalTest, systemGetCloudUsers)
     {
         std::vector<api::SystemSharing> sharings;
         ASSERT_EQ(
-            getSystemSharings(account2.email, account2Password, system2.id.toStdString(), &sharings),
-            api::ResultCode::ok);
+            api::ResultCode::ok,
+            getSystemSharings(account2.email, account2Password, system2.id.toStdString(), &sharings));
         ASSERT_EQ(sharings.size(), 2);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.id, system2.id),

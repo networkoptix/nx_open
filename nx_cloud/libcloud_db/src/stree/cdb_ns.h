@@ -12,15 +12,25 @@ namespace attr {
 enum Value
 {
     operation = 1,
+
+    //source data attributes
     accountID,
     systemID,
-    authenticated,
-    authorized,
     ha1,
     userName,
     userPassword,
-    authAccountRightsOnSystem,
     accountStatus,
+    systemAccessRole,
+
+    dataAccountRightsOnSystem,
+
+    //authentication/authorization intermediate attributes
+    authenticated,
+    authorized,
+    authAccountRightsOnSystem,
+    authAccountID,
+    authSystemID,
+
     entity,
     action,
     secureSource,

@@ -35,8 +35,8 @@ bool AuthorizationManager::authorize(
     stree::AbstractResourceWriter* const authzInfo ) const
 {
     //adding authAccountRightsOnSystem if appropriate
-    auto authenticatedAccountID = authenticationProperties.get<QnUuid>(attr::accountID);
-    auto requestedSystemID = dataToAuthorize.get<QnUuid>(attr::systemID);
+    const auto authenticatedAccountID = authenticationProperties.get<QnUuid>(attr::authAccountID);
+    const auto requestedSystemID = dataToAuthorize.get<QnUuid>(attr::systemID);
     stree::ResourceContainer auxSearchAttrs;
     if (authenticatedAccountID)
     {
@@ -54,6 +54,17 @@ bool AuthorizationManager::authorize(
                         authenticatedAccountID.get(),
                         requestedSystemID.get())));
         }
+    }
+
+    const auto requestedAccountID = dataToAuthorize.get<QnUuid>(attr::accountID);
+    if (requestedAccountID && requestedSystemID)
+    {
+        auxSearchAttrs.put(
+            attr::dataAccountRightsOnSystem,
+            QnLexical::serialized(
+                m_systemManager.getAccountRightsForSystem(
+                    requestedAccountID.get(),
+                    requestedSystemID.get())));
     }
 
     //forwarding requestedEntity and requestedAction

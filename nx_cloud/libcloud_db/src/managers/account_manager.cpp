@@ -80,7 +80,7 @@ void AccountManager::getAccount(
     std::function<void(api::ResultCode, data::AccountData)> completionHandler )
 {
     QnUuid accountID;
-    if( !authzInfo.get( attr::accountID, &accountID ) )
+    if( !authzInfo.get( attr::authAccountID, &accountID ) )
     {
         completionHandler(api::ResultCode::forbidden, data::AccountData());
         return;

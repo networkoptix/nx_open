@@ -83,6 +83,17 @@ void SystemManager::getCloudUsersOfSystem(
         std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
 }
 
+void SystemManager::updateSharing(
+    api::SystemSharing sharing,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    executeRequest(
+        SYSTEM_UPDATE_SHARING_PATH,
+        std::move(sharing),
+        completionHandler,
+        completionHandler);
+}
+
 }   //cl
 }   //cdb
 }   //nx

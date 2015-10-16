@@ -46,6 +46,10 @@ public:
     virtual void getCloudUsersOfSystem(
         const std::string& systemID,
         std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) override;
+    //!Implementation of \a SystemManager::updateSharing
+    virtual void updateSharing(
+        api::SystemSharing sharing,
+        std::function<void(api::ResultCode)> completionHandler) override;
 };
 
 }   //cl

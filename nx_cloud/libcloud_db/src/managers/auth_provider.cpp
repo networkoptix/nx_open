@@ -43,7 +43,7 @@ void AuthenticationProvider::getCdbNonce(
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
     QnUuid systemID;
-    if (!authzInfo.get(attr::systemID, &systemID))
+    if (!authzInfo.get(attr::authSystemID, &systemID))
     {
         completionHandler(api::ResultCode::forbidden, api::NonceData());
         return;
@@ -82,7 +82,7 @@ void AuthenticationProvider::getAuthenticationResponse(
     //{random_3_bytes}base64({ timestamp }MD5(systemID:timestamp:secret_key))
 
     QnUuid systemID;
-    if (!authzInfo.get(attr::systemID, &systemID))
+    if (!authzInfo.get(attr::authSystemID, &systemID))
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
     if (authRequest.realm != AuthenticationManager::realm())
         return completionHandler(api::ResultCode::unknownRealm, api::AuthResponse());

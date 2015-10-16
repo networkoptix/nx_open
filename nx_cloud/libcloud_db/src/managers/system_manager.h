@@ -77,6 +77,10 @@ public:
         const AuthorizationInfo& authzInfo,
         const data::DataFilter& filter,
         std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler);
+    void updateSharing(
+        const AuthorizationInfo& authzInfo,
+        data::SystemSharing sharingData,
+        std::function<void(api::ResultCode)> completionHandler);
 
     void addSubscription(
         const AuthorizationInfo& authzInfo,
@@ -150,6 +154,14 @@ private:
     void systemDeleted(
         nx::db::DBResult dbResult,
         data::SystemID systemID,
+        std::function<void(api::ResultCode)> completionHandler);
+
+    nx::db::DBResult updateSharingInDB(
+        QSqlDatabase* const connection,
+        const data::SystemSharing& sharing);
+    void sharingUpdated(
+        nx::db::DBResult dbResult,
+        data::SystemSharing sharing,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult fillCache();

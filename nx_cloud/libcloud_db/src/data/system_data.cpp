@@ -59,6 +59,9 @@ bool SystemSharing::getAsVariant( int resID, QVariant* const value ) const
         case attr::systemID:
             *value = QVariant::fromValue(systemID);
             return true;
+        case attr::systemAccessRole:
+            *value = QVariant(QnLexical::serialized(accessRole));
+            return true;
         default:
             return false;
     }

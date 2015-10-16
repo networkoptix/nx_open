@@ -56,13 +56,20 @@ void StreeManager::prepareNamespace()
     m_rns.registerResource(attr::operation, "operation", QVariant::String);
     m_rns.registerResource(attr::accountID, "accountID", QVariant::String);
     m_rns.registerResource(attr::systemID, "systemID", QVariant::String);
-    m_rns.registerResource(attr::authenticated, "authenticated", QVariant::Bool);
-    m_rns.registerResource(attr::authorized, "authorized", QVariant::Bool);
     m_rns.registerResource(attr::ha1, "ha1", QVariant::String);
     m_rns.registerResource(attr::userName, "user.name", QVariant::String);
     m_rns.registerResource(attr::userPassword, "user.password", QVariant::String);
-    m_rns.registerResource(attr::authAccountRightsOnSystem, "authAccountRightsOnSystem", QVariant::String);
     m_rns.registerResource(attr::accountStatus, "account.status", QVariant::Int);
+    m_rns.registerResource(attr::systemAccessRole, "systemAccessRole", QVariant::String);
+
+    m_rns.registerResource(attr::dataAccountRightsOnSystem, "dataAccountRightsOnSystem", QVariant::String);
+
+    m_rns.registerResource(attr::authenticated, "authenticated", QVariant::Bool);
+    m_rns.registerResource(attr::authorized, "authorized", QVariant::Bool);
+    m_rns.registerResource(attr::authAccountRightsOnSystem, "auth.accountRightsOnSystem", QVariant::String);
+    m_rns.registerResource(attr::authAccountID, "auth.accountID", QVariant::String);
+    m_rns.registerResource(attr::authSystemID, "auth.systemID", QVariant::String);
+
     m_rns.registerResource(attr::entity, "entity", QVariant::String);
     m_rns.registerResource(attr::action, "action", QVariant::String);
     m_rns.registerResource(attr::secureSource, "secureSource", QVariant::Bool);
@@ -90,7 +97,7 @@ void StreeManager::loadStree() throw(std::runtime_error)
     NX_LOG(lit("Parsing stree xml file (%1)").arg(m_authSettings.rulesXmlPath), cl_logDEBUG1);
     if (!reader.parse(&input))
         throw std::runtime_error("Failed to parse stree xml file " +
-            m_authSettings.rulesXmlPath.toStdString() + ": " + xmlFile.errorString().toStdString());
+            m_authSettings.rulesXmlPath.toStdString() + ": " + xmlHandler.errorString().toStdString());
 
     m_stree = xmlHandler.releaseTree();
 }

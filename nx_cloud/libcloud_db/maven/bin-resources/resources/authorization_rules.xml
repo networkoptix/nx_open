@@ -54,41 +54,79 @@
                     </sequence>
                     <sequence value="/system/share">
                         <set resName="authorized" resValue="false"/>
-                        <condition resName="authAccountRightsOnSystem">
+                        <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
                             <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                            <condition value="maintenance" resName="systemAccessRole">
+                                <!-- integrator can share system being monitored to other integrator account -->
+                                <set value="maintenance" resName="authorized" resValue="true"/>
+                            </condition>
                         </condition>
                     </sequence>
                     <condition value="/system/get_cloud_users" resName="systemID" matchType="presence">
                         <sequence value="true">
                             <set resName="authorized" resValue="false"/>
-                            <condition resName="authAccountRightsOnSystem">
+                            <condition resName="auth.accountRightsOnSystem">
                                 <set value="owner" resName="authorized" resValue="true"/>
                                 <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                                <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
+                                <set value="maintenance" resName="authorized" resValue="true"/>
                             </condition>
                         </sequence>
+                        <!-- request is allowed for account only -->
                     </condition>
-                    <sequence value="/system/bind">
+                    <sequence value="/system/update_sharing">
                         <set resName="authorized" resValue="false"/>
-                        <condition resName="accountID" matchType="presence">
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                            <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                            <condition value="maintenance" resName="systemAccessRole">
+                                <!-- integrator can share system being monitored to other integrator account -->
+                                <set value="maintenance" resName="authorized" resValue="true"/>
+                            </condition>
+                        </condition>
+                        <condition resName="systemAccessRole">
+                            <sequence value="none">
+                                <!-- sharing removal... -->
+                                <!-- TODO maintenance sharing can be removed by maintenance only -->
+                                <condition resName="dataAccountRightsOnSystem">
+                                    <set value="maintenance" resName="authorized" resValue="false"/>
+                                </condition>
+                                <condition resName="auth.accountID">
+                                    <sequence value="accountID" valueIsResourceRef="true">
+                                        <!-- any account can remove non-owner sharing to itself -->
+                                        <set resName="authorized" resValue="true"/>
+                                        <condition resName="auth.accountRightsOnSystem">
+                                            <!-- cannot remove owner sharing -->
+                                            <set value="owner" resName="authorized" resValue="false"/>
+                                        </condition>
+                                    </sequence>
+                                </condition>
+                            </sequence>
+                        </condition>
+                    </sequence>
+                    <sequence value="/system/bind">
+                        <!-- check system is already bound -->
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountID" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <sequence value="/system/unbind">
                         <set resName="authorized" resValue="false"/>
-                        <condition resName="authAccountRightsOnSystem">
+                        <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <sequence value="/auth/get_authentication">
                         <set resName="authorized" resValue="false"/>
-                        <condition resName="systemID" matchType="presence">
+                        <condition resName="auth.systemID" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <sequence value="/auth/get_nonce">
                         <set resName="authorized" resValue="false"/>
-                        <condition resName="systemID" matchType="presence">
+                        <condition resName="auth.systemID" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
