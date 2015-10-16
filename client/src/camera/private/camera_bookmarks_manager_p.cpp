@@ -36,13 +36,11 @@ namespace {
 QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo()
     : operation(OperationType::Add)
     , callback()
-    , camera()
 {}
 
-QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(OperationType operation, OperationCallbackType callback, const QnVirtualCameraResourcePtr &camera)
+QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(OperationType operation, OperationCallbackType callback)
     : operation(operation)
     , callback(callback)
-    , camera(camera)
 {}
 
 
@@ -124,41 +122,25 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
     return requestId;
 }
 
-void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server)
-        server = camera->getParentServer();
-
+void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
     //TODO: #GDM #Bookmarks notify queries?
-    //TODO: #GDM #Bookmarks implement distributed call
-    int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(handleBookmarkOperation(int, const QnCameraBookmark &, int)));
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, callback, camera);
+    int handle = qnCommon->currentServer()->apiConnection()->addBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, callback);
 }
 
-void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server)
-        server = camera->getParentServer();
-
+void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
     //TODO: #GDM #Bookmarks notify queries?
-    //TODO: #GDM #Bookmarks implement distributed call
-    int handle = server->apiConnection()->updateBookmarkAsync(camera, bookmark, this, SLOT(handleBookmarkOperation(int, const QnCameraBookmark &, int)));
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, callback, camera);
+    int handle = qnCommon->currentServer()->apiConnection()->updateBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, callback);
 }
 
-void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server)
-        server = camera->getParentServer();
-
+void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback) {
     //TODO: #GDM #Bookmarks notify queries?
-    //TODO: #GDM #Bookmarks implement distributed call
-    int handle = server->apiConnection()->deleteBookmarkAsync(camera, bookmark, this, SLOT(handleBookmarkOperation(int, const QnCameraBookmark &, int)));
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, callback, camera);
+    int handle =  qnCommon->currentServer()->apiConnection()->deleteBookmarkAsync(bookmarkId, this, SLOT(handleBookmarkOperation(int, int)));
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, callback);
 }
 
-void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, const QnCameraBookmark &bookmark, int handle) {
-    Q_UNUSED(bookmark);
+void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, int handle) {
     if (!m_operations.contains(handle))
         return;
     

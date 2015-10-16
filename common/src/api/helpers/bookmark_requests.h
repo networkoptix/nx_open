@@ -22,6 +22,7 @@ struct QnGetBookmarksRequestData: public QnMultiserverRequestData {
 
 struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData {
     QnUpdateBookmarkRequestData();
+    QnUpdateBookmarkRequestData(const QnCameraBookmark &bookmark);
 
     virtual void loadFromParams(const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;
@@ -32,6 +33,7 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData {
 
 struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData {
     QnDeleteBookmarkRequestData();
+    QnDeleteBookmarkRequestData(const QnUuid &bookmarkId);
 
     virtual void loadFromParams(const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;

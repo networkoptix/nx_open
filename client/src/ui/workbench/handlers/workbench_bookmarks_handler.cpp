@@ -103,7 +103,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
-    qnCameraBookmarksManager->addCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->addCameraBookmark(bookmark);
 
     action(Qn::BookmarksModeAction)->setChecked(true);
 }
@@ -132,7 +132,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
-    qnCameraBookmarksManager->updateCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->updateCameraBookmark(bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
@@ -144,14 +144,6 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server || server->getStatus() != Qn::Online) {
-        QMessageBox::warning(mainWindow(),
-            tr("Error"),
-            tr("Bookmarks can only be deleted from an online server.")); //TODO: #Elric ec2 update text if needed
-        return;
-    }
-
     if (QMessageBox::information(mainWindow(),
             tr("Confirm Deletion"),
             tr("Are you sure you want to delete this bookmark %1?").arg(bookmark.name),
@@ -159,7 +151,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
             QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
-    qnCameraBookmarksManager->deleteCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
 }
 
 /*

@@ -26,22 +26,19 @@ public:
     void getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
     /// @brief                  Add the bookmark to the camera.
-    /// @param camera           Target camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
-    void addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.
-    /// @param camera           Target camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
-    void updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Delete the existing bookmark from the camera.
-    /// @param camera           Target camera.
-    /// @param bookmark         Target bookmark.
+    /// @param bookmark         Target bookmark id.
     /// @param callback         Callback with operation result.
-    void deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback = OperationCallbackType());
 
     /* Queries API section */
 

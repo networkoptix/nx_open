@@ -106,6 +106,11 @@ QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData()
     , bookmark()
 {}
 
+QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark &bookmark)
+    : QnMultiserverRequestData()
+    , bookmark(bookmark)
+{}
+
 void QnUpdateBookmarkRequestData::loadFromParams(const QnRequestParamList& params) {
     QnMultiserverRequestData::loadFromParams(params);
     bookmark.guid           = QnLexical::deserialized<QnUuid>(params.value(guidKey));
@@ -145,6 +150,11 @@ bool QnUpdateBookmarkRequestData::isValid() const {
 QnDeleteBookmarkRequestData::QnDeleteBookmarkRequestData()
     : QnMultiserverRequestData()
     , bookmarkId()
+{}
+
+QnDeleteBookmarkRequestData::QnDeleteBookmarkRequestData(const QnUuid &bookmarkId)
+    : QnMultiserverRequestData()
+    , bookmarkId(bookmarkId)
 {}
 
 void QnDeleteBookmarkRequestData::loadFromParams(const QnRequestParamList& params) {

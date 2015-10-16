@@ -204,9 +204,9 @@ public:
      */
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
-    int addBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int updateBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int deleteBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int addBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int updateBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int deleteBookmarkAsync(const QnUuid &bookmarkId, QObject *target, const char *slot);
 
     int installUpdate(const QString &updateId, bool delayed, QObject *target, const char *slot);
     int uploadUpdateChunk(const QString &updateId, const QByteArray &data, qint64 offset, QObject *target, const char *slot);
