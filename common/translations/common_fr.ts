@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr" sourcelanguage="en">
+<TS version="2.0" language="fr" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -247,130 +247,130 @@
     </message>
     <message>
         <source>Generic Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Événement Générique</translation>
     </message>
     <message>
         <source> (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation> (%1)</translation>
     </message>
     <message>
         <source>Caption: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Légende: %1</translation>
     </message>
     <message>
         <source>Input port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Port Entrée: %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>MAC #%1: %2 </translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion à la caméra (flux primaire) a été fermée de façon inattendue.</translation>
     </message>
     <message>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion à la caméra (flux secondaire) a été fermée de façon inattendue.</translation>
     </message>
     <message>
         <source>Server restarted unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur redémarré de façon inattendue.</translation>
     </message>
     <message>
         <source>Device output</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortie Périphérique</translation>
     </message>
     <message>
         <source>Camera output</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortie Caméra</translation>
     </message>
     <message>
         <source>Device output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortie Périphérique pour 30sec</translation>
     </message>
     <message>
         <source>Camera output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortie Caméra pour 30sec</translation>
     </message>
     <message>
         <source>Device recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement Périphérique</translation>
     </message>
     <message>
         <source>Camera recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement Caméra</translation>
     </message>
     <message>
         <source>Input Signal on Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Signal d&apos;entré sur périphérique</translation>
     </message>
     <message>
         <source>Input Signal on Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Signal d&apos;entré sur caméra</translation>
     </message>
     <message>
         <source>Device Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique déconnecté</translation>
     </message>
     <message>
         <source>Camera Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméra déconnectée</translation>
     </message>
     <message>
         <source>Device IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Conflit IP Périphérique</translation>
     </message>
     <message>
         <source>Camera IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Conflit IP Caméra</translation>
     </message>
     <message>
         <source>Any Device Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout problème périphérique</translation>
     </message>
     <message>
         <source>Any Camera Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout problème caméra</translation>
     </message>
     <message>
         <source>Device %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique %1 a été découvert</translation>
     </message>
     <message>
         <source>Camera %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméra %1 a été découverte</translation>
     </message>
     <message>
         <source>IO Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Module IO %1 a été découvert</translation>
     </message>
     <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Conflit IP Périphérique sur %1</translation>
     </message>
     <message>
         <source>Camera IP Conflict at %1</source>
         <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Conflit IP Caméra sur %1</translation>
     </message>
     <message>
         <source>Connection to device was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion au périphérique a été fermé de façon inattendue.</translation>
     </message>
     <message>
         <source>Recording on devices is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement sur périphériques est désactivé:</translation>
     </message>
     <message>
         <source>Recording on cameras is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement sur caméras est désactivé:</translation>
     </message>
     <message>
         <source>Recording on IO modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement sur module IO est désactivé:</translation>
     </message>
 </context>
 <context>
@@ -453,131 +453,131 @@
     </message>
     <message>
         <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. essayer de redémarrer le périphérique, puis restaurer les paramètres par défaut sur la page web.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. essayer de redémarrer la caméra, puis restaurer les paramètres par défaut sur la page web.</translation>
     </message>
     <message>
         <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. essayer de redémarrer le module IO, puis restaurer les paramètres par défaut sur la page web.</translation>
     </message>
     <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Assurez-vous que le périphérique est branché sur le réseau. Essayez de le redémarrer.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Assurez-vous que la caméra est branché sur le réseau. Essayez de la redémarrer.</translation>
     </message>
     <message>
         <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation type="unfinished"></translation>
+        <translation>Assurez-vous que le module IO est branché sur le réseau. Essayez de le redémarrer.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished"></translation>
+        <translation>Assurez-vous que le port %2 est accessible.</translation>
     </message>
     <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;analyser la réponse du périphérique. URL %1, demande nom %2.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;analyser la réponse de caméra. URL %1, demande nom %2.</translation>
     </message>
     <message>
         <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;analyser la réponse du module IO. URL %1, demande nom %2.</translation>
     </message>
     <message>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Non autorisé. URL %1.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Premièrement, essayer d&apos;activer l&apos;enregistrement (s&apos;il est désactivé) et diminuer IPS dans les paramètres du périphérique.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Premièrement, essayer d&apos;activer l&apos;enregistrement (s&apos;il est désactivé) et diminuer IPS dans les paramètres de caméra.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Premièrement, essayer d&apos;activer l&apos;enregistrement (s&apos;il est désactivé) et diminuer IPS dans les paramètres du module IO.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si cela ne vous aide pas, restaurer les paramètres par défaut sur la page web du périphérique.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si cela ne vous aide pas, restaurer les paramètres par défaut sur la page web de caméra.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si cela ne vous aide pas, restaurer les paramètres par défaut sur la page web du module IO.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Requête Périphérique &quot;%1&quot; échec avec erreur &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Requête Caméra &quot;%1&quot; échec avec erreur &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Requête Module IO &quot;%1&quot; échec avec erreur &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown device issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Problème périphérique inconnue.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Problème caméra inconnue.</translation>
     </message>
     <message>
         <source>Unknown IO module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Problème module IO inconnue.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Données invalides reçues depuis le périphérique %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Données invalides reçues depuis la caméra %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the IO module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Données invalides reçues depuis le module IO %1.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trop d&apos;erreurs média. S.V.P. ouvrir le dialogue de problèmes périphérique pour plus de détails.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trop d&apos;erreurs média. S.V.P. ouvrir le dialogue de problèmes caméra pour plus de détails.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trop d&apos;erreurs média. S.V.P. ouvrir le dialogue de problèmes module IO pour plus de détails.</translation>
     </message>
     <message>
         <source>Device initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Processus d&apos;initialisation périphérique en cours.</translation>
     </message>
     <message>
         <source>Camera initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Processus d&apos;initialisation caméra en cours.</translation>
     </message>
     <message>
         <source>IO Module initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Processus d&apos;initialisation module IO en cours.</translation>
     </message>
 </context>
 <context>
@@ -1169,15 +1169,15 @@
     </message>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Système est en mode sans échec</translation>
     </message>
     <message>
         <source>The system is running in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Système fonctionne en mode sans échec.</translation>
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes les modifications de configuration à l&apos;exception de l&apos;activation de licence sont impossibles.</translation>
     </message>
 </context>
 <context>

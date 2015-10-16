@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="th" sourcelanguage="en">
+<TS version="2.0" language="th" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -244,130 +244,130 @@
     </message>
     <message>
         <source>Generic Event</source>
-        <translation type="unfinished"></translation>
+        <translation>เหตุการณ์ทั่วไป</translation>
     </message>
     <message>
         <source> (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation> (%1)</translation>
     </message>
     <message>
         <source>Caption: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>คำอธิบาย:%1</translation>
     </message>
     <message>
         <source>Input port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>พอร์ตอินพุต:%1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>MAC #%1: %2 </translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>การเชื่อมต่อกับกล้อง (กระแสหลัก) ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>การเชื่อมต่อกับกล้อง (กระแสรอง) ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
         <source>Server restarted unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์เริ่มต้นใหม่โดยไม่คาดคิด.</translation>
     </message>
     <message>
         <source>Device output</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์เอาท์พุท</translation>
     </message>
     <message>
         <source>Camera output</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้องเอาท์พุท</translation>
     </message>
     <message>
         <source>Device output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์สำหรับการส่งออก 30 วินาที</translation>
     </message>
     <message>
         <source>Camera output for 30 sec</source>
-        <translation type="unfinished"></translation>
+        <translation>เอาท์พุทกล้องสำหรับ 30 วินาที</translation>
     </message>
     <message>
         <source>Device recording</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์บันทึก</translation>
     </message>
     <message>
         <source>Camera recording</source>
-        <translation type="unfinished"></translation>
+        <translation>การบันทึกกล้อง</translation>
     </message>
     <message>
         <source>Input Signal on Device</source>
-        <translation type="unfinished"></translation>
+        <translation>สัญญาณเข้าบนอุปกรณ์</translation>
     </message>
     <message>
         <source>Input Signal on Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>สัญญาณเข้าบนกล้อง</translation>
     </message>
     <message>
         <source>Device Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์ขาดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Camera Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้องตัดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Device IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์ IP ขัดแย้ง</translation>
     </message>
     <message>
         <source>Camera IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง IP ขัดแย้ง</translation>
     </message>
     <message>
         <source>Any Device Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>ปัญหาอุปกรณ์อื่น ๆ</translation>
     </message>
     <message>
         <source>Any Camera Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>ปัญหากล้องอื่น ๆ</translation>
     </message>
     <message>
         <source>Device %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>อุปกรณ์ %1 ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Camera %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้อง %1 ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>IO Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>IO โมดูล %1 ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ความขัดแย้ง IP อุปกรณ์ที่ %1</translation>
     </message>
     <message>
         <source>Camera IP Conflict at %1</source>
         <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ความขัดแย้ง IP กล้องที่ %1</translation>
     </message>
     <message>
         <source>Connection to device was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>การเชื่อมต่อกับอุปกรณ์ที่ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
         <source>Recording on devices is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>บันทึกบนอุปกรณ์ที่ถูกปิดใช้งาน:</translation>
     </message>
     <message>
         <source>Recording on cameras is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>บันทึกในกล้องถูกปิดใช้งาน:</translation>
     </message>
     <message>
         <source>Recording on IO modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>บันทึกในโมดูล IO ถูกปิดใช้งาน:</translation>
     </message>
 </context>
 <context>
@@ -450,131 +450,131 @@
     </message>
     <message>
         <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดลองที่จะรีบูตเครื่องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดลองที่จะรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดลองที่จะรีบูตโมดูล IO แล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่ามีการเสียบอุปกรณ์เข้าสู่เครือข่าย ลองที่จะรีบูตเครื่องอุปกรณ์.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่ามีการเสียบกล้องเข้าสู่เครือข่าย ลองที่จะรีบูตกล้อง.</translation>
     </message>
     <message>
         <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่ามีการเสียบโมดูล IO เข้าสู่เครือข่าย ลองที่จะรีบูตโมดูล IO.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished"></translation>
+        <translation>ทำให้พอร์ต %2 สามารถเข้าถึงได้ (ตัวอย่างเช่น การส่งต่อ).</translation>
     </message>
     <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถแยกการตอบสนองอุปกรณ์ Url %1 ต้องการชื่อ %2.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถแยกการตอบสนองของกล้อง Url %1 ต้องการชื่อ %2.</translation>
     </message>
     <message>
         <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถแยกการตอบสนองโมดูล IO Url %1 ต้องการชื่อ %2.</translation>
     </message>
     <message>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่ได้รับอนุญาต Url %1.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>ครั้งแรก ลองที่จะเปิดการบันทึกภาพ (ถ้ามันปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่าอุปกรณ์.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>ครั้งแรก ลองที่จะเปิดการบันทึกภาพ (ถ้ามันปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่ากล้อง.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>ครั้งแรก ลองที่จะเปิดการบันทึกภาพ (ถ้ามันปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่าโมดูล IO.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>ถ้ามันช่วยไม่ได้ เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>ถ้ามันช่วยไม่ได้ เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของกล้อง.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>ถ้ามันช่วยไม่ได้ เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของโมดูล IO.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>คำขออุปกรณ์ &quot;%1&quot; ล้มเหลวด้วยข้อผิดพลาด &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>คำขอกล้อง &quot;%1&quot; ล้มเหลวด้วยข้อผิดพลาด &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>คำขอโมดูล IO &quot;%1&quot; ล้มเหลวด้วยข้อผิดพลาด &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown device issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่ระบุปัญหาของอุปกรณ์.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่ระบุปัญหาของกล้อง.</translation>
     </message>
     <message>
         <source>Unknown IO module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่ระบุปัญหาโมดูล IO.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อมูลไม่ถูกต้อง ได้รับจากอุปกรณ์ %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อมูลไม่ถูกต้อง ได้รับจากกล้อง %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the IO module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อมูลไม่ถูกต้อง ได้รับจากโมดูล IO %1.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาดสื่อมากเกินไป กรุณาเปิดประเด็นโต้ตอบอุปกรณ์สำหรับรายละเอียดเพิ่มเติม.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาดสื่อมากเกินไป กรุณาเปิดประเด็นโต้ตอบกล้องสำหรับรายละเอียดเพิ่มเติม.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาดสื่อมากเกินไป กรุณาเปิดประเด็นโต้ตอบโมดูล IO สำหรับรายละเอียดเพิ่มเติม.</translation>
     </message>
     <message>
         <source>Device initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>กระบวนการเริ่มต้นอุปกรณ์อยู่ในความคืบหน้า.</translation>
     </message>
     <message>
         <source>Camera initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>กระบวนการเริ่มต้นกล้องอยู่ในความคืบหน้า.</translation>
     </message>
     <message>
         <source>IO Module initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>กระบวนการเริ่มต้นโมดูล IO อยู่ในความคืบหน้า.</translation>
     </message>
 </context>
 <context>
@@ -1156,15 +1156,15 @@
     </message>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบในเซฟโหมด</translation>
     </message>
     <message>
         <source>The system is running in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบจะทำงานในเซฟโหมด.</translation>
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
-        <translation type="unfinished"></translation>
+        <translation>เปลี่ยนแปลงการกำหนดค่าการเปิดใช้งานยกเว้นใบอนุญาตใด ๆ ที่เป็นไปไม่ได้.</translation>
     </message>
 </context>
 <context>

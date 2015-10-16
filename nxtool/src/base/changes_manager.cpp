@@ -66,8 +66,8 @@ rtu::ChangesManager::ChangesManager(RtuContext *context
 
     , m_context(context)
     , m_selectionModel(selectionModel)
-    , m_changesModel(new ChangesProgressModel(this))
     , m_serversFinder(serversFinder)
+    , m_changesModel(new ChangesProgressModel(this))
     , m_changeset()
 {
 }

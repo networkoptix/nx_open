@@ -13,15 +13,18 @@ namespace ec2 {
 
 namespace params
 {
-    static const QString DB_READ_ONLY( lit("ecDbReadOnly") );
-    static const bool DB_READ_ONLY_DEFAULT = false;
+    static const QString dbReadOnly( lit("ecDbReadOnly") );
+    static const bool dbReadOnlyDefault = false;
+
+    static const QString internetSyncTimePeriodSec(lit("ecInternetSyncTimePeriodSec"));
+    static const QString maxInternetTimeSyncRetryPeriodSec(lit("ecMaxInternetTimeSyncRetryPeriodSec"));
 }
 
 
 bool Settings::dbReadOnly() const
 {
     //if booted from SD card, setting ecDbReadOnly to true by default
-    bool defaultValue = params::DB_READ_ONLY_DEFAULT;
+    bool defaultValue = params::dbReadOnlyDefault;
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     if (QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1")
     {
@@ -29,7 +32,17 @@ bool Settings::dbReadOnly() const
     }
 #endif
 
-    return value<bool>( params::DB_READ_ONLY, defaultValue );
+    return value<bool>( params::dbReadOnly, defaultValue );
+}
+
+size_t Settings::internetSyncTimePeriodSec(size_t defaultValue) const
+{
+    return value<size_t>(params::internetSyncTimePeriodSec, defaultValue);
+}
+
+size_t Settings::maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const
+{
+    return value<size_t>(params::maxInternetTimeSyncRetryPeriodSec, defaultValue);
 }
 
 void Settings::loadParams( std::map<QString, QVariant> confParams )

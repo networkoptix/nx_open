@@ -229,6 +229,8 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *d
         proxy->setSourceModel(m_resourceModel);
         ui->resourcesWidget->setModel(proxy);
         ui->resourcesWidget->setCustomColumnDelegate(m_delegate->customColumnDelegate());
+
+        setHelpTopic(ui->resourcesWidget->treeView(), m_delegate->helpTopicId());
     }
     ui->delegateFrame->setVisible(m_delegate && ui->delegateLayout->count() > 0);
     if (m_delegate && m_delegate->isFlat())
