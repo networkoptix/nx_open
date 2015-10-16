@@ -32,4 +32,6 @@ private:
     static void getBookmarksLocal(MultiServerCameraBookmarkList& outputData, GetBookmarksContext* ctx);
     static void updateBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, UpdateBookmarkContext* ctx);
     static void deleteBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, DeleteBookmarkContext* ctx);
+
+    static void sendAsyncRequest(const QnMediaServerResourcePtr &server, QUrl url, RemoteRequestContext *ctx);
 };

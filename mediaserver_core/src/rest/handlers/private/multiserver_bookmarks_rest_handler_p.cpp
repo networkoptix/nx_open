@@ -187,11 +187,6 @@ bool QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(const QnUpdateBook
 }
 
 void QnMultiserverBookmarksRestHandlerPrivate::updateBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, UpdateBookmarkContext* ctx) {
-    auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
-        ctx->requestsInProgress--;
-        ctx->waitCond.wakeAll();
-    };
-
     QUrl apiUrl(server->getApiUrl());
     apiUrl.setPath(L'/' + urlPath + L'/' + updateOperation);
 
@@ -199,23 +194,7 @@ void QnMultiserverBookmarksRestHandlerPrivate::updateBookmarkRemoteAsync(const Q
     modifiedRequest.isLocal = true;
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
-    nx_http::HttpHeaders headers;
-    QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
-
-    if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-        apiUrl.setUserName(admin->getName());
-        apiUrl.setPassword(QString::fromUtf8(admin->getDigest()));
-    }
-
-    QnMutexLocker lock(&ctx->mutex);
-    if (nx_http::downloadFileAsync(
-        apiUrl,
-        requestCompletionFunc,
-        headers,
-        nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
-    {
-        ctx->requestsInProgress++;
-    }
+    sendAsyncRequest(server, apiUrl, ctx);
 }
 
 bool QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(const QnDeleteBookmarkRequestData &request) {
@@ -239,11 +218,6 @@ bool QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(const QnDeleteBook
 }
 
 void QnMultiserverBookmarksRestHandlerPrivate::deleteBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, DeleteBookmarkContext* ctx) {
-    auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
-        ctx->requestsInProgress--;
-        ctx->waitCond.wakeAll();
-    };
-
     QUrl apiUrl(server->getApiUrl());
     apiUrl.setPath(L'/' + urlPath + L'/' + deleteOperation);
 
@@ -251,17 +225,27 @@ void QnMultiserverBookmarksRestHandlerPrivate::deleteBookmarkRemoteAsync(const Q
     modifiedRequest.isLocal = true;
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
+    sendAsyncRequest(server, apiUrl, ctx);
+}
+
+void QnMultiserverBookmarksRestHandlerPrivate::sendAsyncRequest(const QnMediaServerResourcePtr &server, QUrl url, RemoteRequestContext *ctx) {
+    auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
+        QN_UNUSED(osErrorCode, statusCode, msgBody);
+        ctx->requestsInProgress--;
+        ctx->waitCond.wakeAll();
+    };
+
     nx_http::HttpHeaders headers;
-    QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
+    QnRouter::instance()->updateRequest(url, headers, server->getId());
 
     if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-        apiUrl.setUserName(admin->getName());
-        apiUrl.setPassword(QString::fromUtf8(admin->getDigest()));
+        url.setUserName(admin->getName());
+        url.setPassword(QString::fromUtf8(admin->getDigest()));
     }
 
     QnMutexLocker lock(&ctx->mutex);
     if (nx_http::downloadFileAsync(
-        apiUrl,
+        url,
         requestCompletionFunc,
         headers,
         nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
