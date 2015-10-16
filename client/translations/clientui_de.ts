@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<TS version="2.0" language="de" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -28,7 +28,7 @@
     <message>
         <location/>
         <source>Connected servers</source>
-        <translation>Angeschlossene Server</translation>
+        <translation>Verbundene Server</translation>
     </message>
     <message>
         <location/>
@@ -92,7 +92,7 @@
         <location/>
         <source>Instant</source>
         <translatorcomment>I assume instance is meant =&gt; die Instanz  Pl.: die Instanzen</translatorcomment>
-        <translation>Instanz</translation>
+        <translation>Sofort</translation>
     </message>
 </context>
 <context>
@@ -180,7 +180,7 @@
     <message>
         <location/>
         <source>Audit Trail</source>
-        <translation>Überwachungspfad</translation>
+        <translation>Überwachungsprotokoll</translation>
     </message>
 </context>
 <context>
@@ -193,7 +193,7 @@
     <message>
         <location/>
         <source>at</source>
-        <translation>auf</translation>
+        <translation type="unfinished">an</translation>
     </message>
     <message>
         <location/>
@@ -345,7 +345,7 @@
     <message>
         <location/>
         <source>New Scan...</source>
-        <translation>Scanne erneut...</translation>
+        <translation>Neuer Scan...</translation>
     </message>
     <message>
         <location/>
@@ -568,7 +568,7 @@
     <message>
         <location/>
         <source>Schedule Settings</source>
-        <translation>Aufnahmeplanung</translation>
+        <translation>Zeitplan-Einstellungen</translation>
     </message>
     <message>
         <location/>
@@ -605,7 +605,7 @@
         <location/>
         <source>Motion Recording</source>
         <translatorcomment>It would be greater if this title will be shorter</translatorcomment>
-        <translation>Bewegungssteuerung</translation>
+        <translation>Bewegungsaufnahme</translation>
     </message>
     <message>
         <location/>
@@ -633,7 +633,7 @@
         <location/>
         <source>Copy Schedule...</source>
         <translatorcomment>Additional spaces are required to make place for the long &quot;Motion Recording&quot; caption</translatorcomment>
-        <translation>Planung kopieren...</translation>
+        <translation>Zeitplan kopieren...</translation>
     </message>
     <message>
         <location/>
@@ -653,7 +653,7 @@
     <message>
         <location/>
         <source>Motion + Low-Res </source>
-        <translation>Motion + Low Res</translation>
+        <translation>Bewegung + Low Res</translation>
     </message>
     <message>
         <location/>
@@ -663,12 +663,12 @@
     <message>
         <location/>
         <source>Min. Days</source>
-        <translation>Min Tage</translation>
+        <translation>Min. Tage</translation>
     </message>
     <message>
         <location/>
         <source>Max. Days</source>
-        <translation>Max Tage</translation>
+        <translation>Max. Tage</translation>
     </message>
 </context>
 <context>
@@ -707,27 +707,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Quelle enthält:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwörter, die durch Leerzeichen getrennt sind</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschriftung enthält:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreibung enthält:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Regel funktioniert nur für generische Ereignisse, welche alle Filter passiert. Leere Felder wirken sich nicht auf das Ergebnis aus. Jeder Filter wird akzeptiert, wenn die Passwörter übereinstimmen.</translation>
     </message>
 </context>
 <context>
@@ -917,7 +917,7 @@
     <message>
         <location/>
         <source>&amp;Health Monitoring</source>
-        <translation>&amp;Verfügbarkeitsanalyse</translation>
+        <translation>&amp;Systemüberwachung</translation>
     </message>
     <message>
         <location/>
@@ -942,7 +942,7 @@
     <message>
         <location/>
         <source>Audit Trail</source>
-        <translation>Überwachungspfad</translation>
+        <translation>Überwachungsprotokoll</translation>
     </message>
 </context>
 <context>
@@ -965,7 +965,7 @@
     <message>
         <location/>
         <source>This is a fish-eye lens camera</source>
-        <translation>Dies ist eine Fischaugenobjektiv-Kamera</translation>
+        <translation>Das ist eine Fischaugenobjektiv-Kamera</translation>
     </message>
 </context>
 <context>
@@ -1006,7 +1006,7 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Auswählen…</translation>
+        <translation>Durchsuchen…</translation>
     </message>
     <message>
         <location/>
@@ -1016,7 +1016,7 @@
     <message>
         <location/>
         <source>Clear</source>
-        <translation>Zurücksetzen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location/>
@@ -1145,7 +1145,7 @@
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
         <source>License Details</source>
-        <translation>Lizenz-Übersicht</translation>
+        <translation>Lizenzinformationen</translation>
     </message>
     <message>
         <location/>
@@ -1214,7 +1214,7 @@
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui"/>
         <source>Automatic Activation via Internet</source>
-        <translation>automatische Aktivierung via Internet</translation>
+        <translation>Automatische Aktivierung via Internet</translation>
     </message>
     <message>
         <location/>
@@ -1244,12 +1244,12 @@
     <message>
         <location/>
         <source>Activation Key File:</source>
-        <translation>Aktivierungsschlüssel-Datei:</translation>
+        <translation>Schlüsseldatei:</translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Auswählen…</translation>
+        <translation>Durchsuchen…</translation>
     </message>
     <message>
         <location/>
@@ -1361,7 +1361,7 @@
         <location/>
         <source>Show IP in tree:</source>
         <translatorcomment>What is the tree?</translatorcomment>
-        <translation>IP-Adresse anzeigen:</translation>
+        <translation>IP-Adresse in Objektleiste anzeigen:</translation>
     </message>
     <message>
         <location/>
@@ -1371,7 +1371,7 @@
     <message>
         <location/>
         <source>Tour sequence cycle time:</source>
-        <translation>Zykluszeit bei Kamerafahrt:</translation>
+        <translation>Intervallzeit bei Kameratour:</translation>
     </message>
     <message>
         <location/>
@@ -1436,7 +1436,7 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Auswählen…</translation>
+        <translation>Durchsuchen…</translation>
     </message>
     <message>
         <location/>
@@ -1523,7 +1523,7 @@
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui"/>
         <source>Show all notifications</source>
-        <translation>Alle Nachrichten anzeigen</translation>
+        <translation>Alle Benachrichtigungen anzeigen</translation>
     </message>
     <message>
         <location/>
@@ -1564,7 +1564,7 @@
     <message>
         <location/>
         <source>Start Tour</source>
-        <translation>Kamerafahrt starten</translation>
+        <translation>Tour starten</translation>
     </message>
     <message>
         <location/>
@@ -1594,7 +1594,7 @@
     <message>
         <location/>
         <source>No Tour Selected</source>
-        <translation>Keine Kamerafahrt ausgewählt</translation>
+        <translation>Keine Tour ausgewählt</translation>
     </message>
 </context>
 <context>
@@ -1681,7 +1681,7 @@
     <message>
         <location/>
         <source>List of tags divided by commas or spaces.</source>
-        <translation>Komma oder Leerzeichen getrennte Liste von Tags.</translation>
+        <translation>Liste von Tags, durch Komma oder Leerzeichen getrennte.</translation>
     </message>
 </context>
 <context>
@@ -1733,7 +1733,7 @@
     <message>
         <location/>
         <source>This is a fish-eye lens file</source>
-        <translation>Das ist eine Datei eines Fischaugenobjektivs</translation>
+        <translation>Das ist eine Datei einer Fischaugenobjektivkamera</translation>
     </message>
 </context>
 <context>
@@ -1769,7 +1769,7 @@
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
         <source>Notification Sounds</source>
-        <translation>Benachrichtigungston</translation>
+        <translation>Benachrichtigungstöne</translation>
     </message>
     <message>
         <location/>
@@ -1830,7 +1830,7 @@
     <message>
         <location/>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>Das Entfernen dieser Verbindungsoption kann zu Systemversagen führen.</translation>
+        <translation>Das Entfernen dieser Verbindungsoption kann zu Fehlfunktionen im System führen.</translation>
     </message>
 </context>
 <context>
@@ -1914,7 +1914,7 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Auswählen…</translation>
+        <translation>Durchsuchen…</translation>
     </message>
     <message>
         <location/>
@@ -2067,7 +2067,7 @@
     <message>
         <location/>
         <source>&amp;Browse...</source>
-        <translation>&amp;Auswählen…</translation>
+        <translation>&amp;Durchsuchen…</translation>
     </message>
     <message>
         <location/>
@@ -2112,12 +2112,12 @@
     <message>
         <location/>
         <source>Native</source>
-        <translation>Wie Quelle</translation>
+        <translation>Nativ</translation>
     </message>
     <message>
         <location/>
         <source>Quarter Native</source>
-        <translation>1/4 der Quelle</translation>
+        <translation>1/4 Nativ</translation>
     </message>
     <message>
         <location/>
@@ -2162,12 +2162,12 @@
     <message>
         <location/>
         <source>Audio Grabber</source>
-        <translation>Tonerfassung</translation>
+        <translation>Audio Grabber</translation>
     </message>
     <message>
         <location/>
         <source>Primary Device:</source>
-        <translation>Primäres Tongerät:</translation>
+        <translation>Primäres Gerät:</translation>
     </message>
     <message>
         <location/>
@@ -2177,7 +2177,7 @@
     <message>
         <location/>
         <source>External Device:</source>
-        <translation>Externes Tongerät:</translation>
+        <translation>Externes Gerät:</translation>
     </message>
     <message>
         <location/>
@@ -2284,7 +2284,7 @@
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui"/>
         <source>Speak the following:</source>
-        <translation>Sprachausgabe-Inhalt:</translation>
+        <translation>Sprachausgaben-Inhalt:</translation>
     </message>
     <message>
         <location/>
@@ -2345,7 +2345,7 @@
     <message>
         <location/>
         <source>Failover</source>
-        <translation>Ausfallsicherung</translation>
+        <translation>Failover</translation>
     </message>
     <message>
         <location/>
@@ -2355,7 +2355,7 @@
     <message>
         <location/>
         <source>In Use</source>
-        <translation>Derzeit verwendet</translation>
+        <translation>In Benutzung</translation>
     </message>
     <message>
         <location/>
@@ -2411,7 +2411,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Failover Priorität...</translation>
     </message>
 </context>
 <context>
@@ -2447,7 +2447,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Model:</source>
-        <translation>Model:</translation>
+        <translation>Modell:</translation>
     </message>
     <message>
         <location/>
@@ -2507,7 +2507,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Motion</source>
-        <translation>Motion</translation>
+        <translation>Bewegung</translation>
     </message>
     <message>
         <location/>
@@ -2532,7 +2532,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Expert</source>
-        <translation>Experten</translation>
+        <translation>Erweitert</translation>
     </message>
     <message>
         <location/>
@@ -2547,12 +2547,12 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Motion is not available for this camera.</source>
-        <translation>Motion is für diese Kamera nicht verfügbar.</translation>
+        <translation>Bewegungserkennung ist für diese Kamera nicht verfügbar.</translation>
     </message>
     <message>
         <location/>
         <source>Motion Settings</source>
-        <translation>Motion Einstellungen</translation>
+        <translation>Bewegungseinstellungen</translation>
     </message>
     <message>
         <location/>
@@ -2562,27 +2562,27 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation>Software - Maximale FPS könnten Server verlangsamen</translation>
+        <translation>Software - maximale FPS könnten Server verlangsamen</translation>
     </message>
     <message>
         <location/>
         <source>Motion Mask (0)</source>
-        <translation>Motion-Erkennbereich</translation>
+        <translation>Bewegungserkennbereich</translation>
     </message>
     <message>
         <location/>
         <source>Camera web page:</source>
-        <translation>Motion Webseite der Kamera:</translation>
+        <translation>Webseite der Kamera:</translation>
     </message>
     <message>
         <location/>
         <source>Reset Motion Regions</source>
-        <translation>Motion-Regionen zurücksetzen</translation>
+        <translation>Bewegungsbereiche zurücksetzen</translation>
     </message>
     <message>
         <location/>
         <source>Hardware (camera built-in)</source>
-        <translation>Hardware (Eingebaute Kamera)</translation>
+        <translation>Hardware (Kamera integriert)</translation>
     </message>
     <message>
         <location/>
@@ -2751,7 +2751,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Achtung: Die Einstellungen FPS und Aufnahmequalität funktionieren nicht im Aufnahmeplan!</translation>
+        <translation>Achtung: Die Einstellungen FPS und Aufnahmequalität funktionieren nicht im Aufnahmezeitplan!</translation>
     </message>
     <message>
         <location/>
@@ -2761,7 +2761,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Enable audit trail</source>
-        <translation>Aktiviere Überwachungspfad</translation>
+        <translation>Aktiviere Überwachungsprotokoll</translation>
     </message>
     <message>
         <location/>
@@ -2802,7 +2802,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>C&amp;urrent Password:</source>
-        <translation>akt&amp;uelles Passwort:</translation>
+        <translation>Akt&amp;uelles Passwort:</translation>
     </message>
     <message>
         <location/>
@@ -2845,7 +2845,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
         <source>Schedule Settings</source>
-        <translation>Aufnahmeplanung</translation>
+        <translation>Zeitplan-Einstellungen</translation>
     </message>
     <message>
         <location/>
@@ -2865,7 +2865,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Note: Schedule is based on server time.</source>
-        <translation>Hinweis: Der Aufnahmeplan basiert auf der Serverzeiteinstellung.</translation>
+        <translation type="unfinished">Hinweis: Der Aufnahmezeitplan basiert auf der Serverzeiteinstellung.</translation>
     </message>
 </context>
 </TS>

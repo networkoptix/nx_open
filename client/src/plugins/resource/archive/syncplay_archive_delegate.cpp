@@ -38,12 +38,16 @@ void QnSyncPlayArchiveDelegate::beforeClose()
 
 qint64 QnSyncPlayArchiveDelegate::startTime() const
 {
-    return m_syncWrapper->minTime();
+    if (m_syncWrapper)
+        return m_syncWrapper->minTime();
+    return AV_NOPTS_VALUE;
 }
 
 qint64 QnSyncPlayArchiveDelegate::endTime() const
 {
-    return m_syncWrapper->endTime();
+    if (m_syncWrapper)
+        return m_syncWrapper->endTime();
+    return AV_NOPTS_VALUE;
 }
 
 bool QnSyncPlayArchiveDelegate::isRealTimeSource() const 

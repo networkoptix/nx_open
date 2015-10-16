@@ -23,6 +23,8 @@ class Settings
 {
 public:
     bool dbReadOnly() const;
+    size_t internetSyncTimePeriodSec(size_t defaultValue) const;
+    size_t maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const;
 
     void loadParams( std::map<QString, QVariant> confParams );
 

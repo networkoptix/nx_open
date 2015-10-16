@@ -33,7 +33,7 @@
     </DirectoryRef>
 
     <Feature Id="ProductFeature" Title="ACS_Installer" Level="1">
-      <ComponentGroupRef Id="AxClient23DirComponents"/>
+      <ComponentGroupRef Id="AxClientDirComponents"/>
       <ComponentGroupRef Id="RootComponents" />
       <ComponentGroupRef Id="OemDriverComponents"/>
     </Feature>
@@ -50,8 +50,8 @@
       <Directory Id="ProgramFilesFolder">
         <Directory Id="CompanyDir" Name="${company.name}">
           <Directory Id="INSTALLDIR" Name="${display.product.name}">
-            <Directory Id="AxClientDir" Name="AxClient">
-              <Directory Id="AxClient23Dir" Name="2.3">
+            <Directory Id="AxClientParentDir" Name="AxClient">
+              <Directory Id="AxClientDir" Name="${release.version}">
               </Directory>
             </Directory>
           </Directory>

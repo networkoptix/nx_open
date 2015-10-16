@@ -477,7 +477,7 @@ namespace nx_http
             AuthScheme::Value authScheme;
             QMap<BufferType, BufferType> params;
 
-            WWWAuthenticate();
+            WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
 
             bool parse( const BufferType& str );
         };

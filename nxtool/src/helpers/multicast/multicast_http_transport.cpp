@@ -2,9 +2,14 @@
 
 #include <QNetworkInterface>
 
-#ifdef WIN32
+#if defined(Q_OS_WIN)
     #include <WinSock2.h>
     #include <WS2tcpip.h>
+#elif defined(Q_OS_LINUX)
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <netinet/ip.h>
+    #include <arpa/inet.h>
 #else
     #error Not supported target os
 #endif

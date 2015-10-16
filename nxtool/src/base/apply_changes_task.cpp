@@ -1231,7 +1231,7 @@ void rtu::ApplyChangesTask::Impl::addItfsChangeRequest(ServerInfoCacheItem &item
         const auto op = shared->addAwaitingOp(item.first->id, changesCount
             , kRestartTimeout, beforeDeleteCallback, affected);
 
-        const BoolPointer needRestartProperty(new bool(false));
+        const bool needRestartProperty = false;
         const ItfChangeAwaitngOpDataPtr data(new ItfChangeAwaitngOpData(
             op, &item, initialChanges, needRestartProperty, initRuntimeId));
 
