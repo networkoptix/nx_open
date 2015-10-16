@@ -278,6 +278,13 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     return true;
 }
 
+CameraMediaStreams QnPhysicalCameraResource::mediaStreams() const
+{
+    const QString& mediaStreamsStr = getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
+    CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
+    return supportedMediaStreams;
+}
+
 void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )
 {
     static const char* RTSP_TRANSPORT_NAME = "rtsp";
