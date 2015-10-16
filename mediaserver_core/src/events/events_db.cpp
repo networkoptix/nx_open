@@ -312,7 +312,19 @@ bool QnEventsDB::createDatabase()
             return false;
     }
 
-
+    if (!isObjectExists(lit("table"), lit("last_backup_time"), m_sdb))
+    {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE TABLE \"last_backup_time\" ("
+            "camera_id BLOB(16),"
+            "catalog INTEGER,"
+            "timestamp INTEGER,"
+            "primary key(camera_id, catalog, timestamp))"
+            );
+        if (!ddlQuery.exec())
+            return false;
+    }
     return true;
 }
 
@@ -782,13 +794,35 @@ QnEventsDB::QnDbTransaction* QnEventsDB::getTransaction()
     return &m_tran;
 }
 
-void QnEventsDB::setLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog, qint64 timestampMs)
+bool QnEventsDB::setLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatalog catalog, qint64 timestampMs)
 {
-    // todo: implement me
+    QSqlQuery updQuery(m_sdb);
+    updQuery.prepare("INSERT OR REPLACE INTO last_backup_time (camera_id, catalog, timestamp) \
+                       VALUES (:camera_id, :catalog, :timestamp)");
+    updQuery.addBindValue(QnSql::serialized_field(cameraId));
+    updQuery.addBindValue((int) catalog);
+    updQuery.addBindValue(timestampMs);
+    bool result = updQuery.exec();
+    if (!result)
+        qWarning() << Q_FUNC_INFO << updQuery.lastError().text();
+    return result;
 }
 
-qint64 QnEventsDB::getLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog)
+qint64 QnEventsDB::getLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatalog catalog)
 {
-    // todo: implement me
-    return 0;
+    qint64 result = 0;
+
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT timestamp FROM last_backup_time WHERE camera_id = :camera_id AND catalog = :catalog");
+    query.addBindValue(QnSql::serialized_field(cameraId));
+    query.addBindValue((int) catalog);
+    if (query.exec()) {
+        if (query.next())
+            result = query.value(0).toLongLong();
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    }
+
+    return result;
 }

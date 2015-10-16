@@ -53,7 +53,7 @@ public:
 
     virtual QnDbTransaction* getTransaction() override;
 
-    void setLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog, qint64 timestampMs);
+    bool setLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog, qint64 timestampMs);
     qint64 getLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog);
 protected:
     QnEventsDB();
