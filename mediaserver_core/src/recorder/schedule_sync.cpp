@@ -13,6 +13,7 @@
 #include "schedule_sync.h"
 
 #include <mutex>
+#include <numeric>
 
 namespace aux
 {
@@ -113,11 +114,17 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
         );
         return ChunkKey();
     }
-    
-    auto chunk = fromCatalog->chunkAt(
-        fromCatalog->findNextFileIndex(m_syncTimePoint)
-    );
+    int nextFileIndex = 
+        fromCatalog->findNextFileIndex(m_syncTimePoint);
+    auto chunk = fromCatalog->chunkAt(nextFileIndex);
+    auto catalogSize = fromCatalog->size();
+
     ChunkKey ret = {chunk, cameraId, catalog};
+    {
+        std::lock_guard<std::mutex> lk(m_syncDataMutex);
+        m_syncData[ret] = nextFileIndex == -1 ? 
+                          1.0 : (double)nextFileIndex / catalogSize;
+    }
     return ret;
 }
 
@@ -185,7 +192,7 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
     if (!fromCatalog)
     {
         NX_LOG(
-            lit("[QnScheduleSync::synchronize] get fromCatalog failed"),
+            lit("[QnScheduleSync::copyChunk] get fromCatalog failed"),
             cl_logDEBUG1
         );
         return;
@@ -198,7 +205,7 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
     if (!toCatalog)
     {
         NX_LOG(
-            lit("[QnScheduleSync::synchronize] get toCatalog failed"),
+            lit("[QnScheduleSync::copyChunk] get toCatalog failed"),
             cl_logDEBUG1
         );
         return;
@@ -217,6 +224,14 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
         auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
+        if (!toStorage)
+        {
+            NX_LOG(
+                lit("[QnScheduleSync::copyChunk] toStorage is invalid"),
+                cl_logDEBUG1
+            );
+            return;
+        }
         auto newStorageUrl = toStorage->getUrl();
         auto oldSeparator = getPathSeparator(relativeFileName);
         auto newSeparator = getPathSeparator(newStorageUrl);
@@ -370,6 +385,28 @@ int QnScheduleSync::forceStart()
     return Ok;
 }
 
+QnBackupStatusData QnScheduleSync::getStatus() const
+{
+    QnBackupStatusData ret;
+    ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
+                                        Qn::BackupState_None;
+    ret.backupTimeMs = m_syncTimePoint;
+    {
+        std::lock_guard<std::mutex> lk(m_syncDataMutex);
+        auto syncDataSize = (double)m_syncData.size();
+        ret.progress = std::accumulate(
+            m_syncData.cbegin(),
+            m_syncData.cend(),
+            0.0,
+            [](double ac, const std::map<ChunkKey, double>::value_type &p)
+            {
+                return ac + p.second;
+            }
+        ) / (syncDataSize ? syncDataSize : 1);
+    }
+    return ret;
+}
+
 void QnScheduleSync::renewSchedule()
 {
     auto resource = qnResPool->getResourceById(
@@ -391,7 +428,7 @@ void QnScheduleSync::renewSchedule()
 void QnScheduleSync::start()
 {
     static const auto 
-    REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(10);
+    REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(1);
     m_backupSyncOn         = true;
 
     m_backupFuture = std::async(
@@ -411,10 +448,10 @@ void QnScheduleSync::start()
 
                 auto isItTimeForSync = [this] ()
                 {
-                    if (m_schedule.type != Qn::Backup_Schedule)
-                        return false;
                     if (m_forced)
                         return true;
+                    if (m_schedule.type != Qn::Backup_Schedule)
+                        return false;
 
                     QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
                     const auto curDate = now.date();
@@ -441,6 +478,7 @@ void QnScheduleSync::start()
                 {
                     m_syncing = true;
                     m_syncTimePoint = 0;
+                    m_syncData.clear();
 
                     synchronize(
                         [this, isItTimeForSync]
@@ -460,4 +498,14 @@ void QnScheduleSync::start()
             }
         }
     );
+}
+
+bool operator < (
+    const QnScheduleSync::ChunkKey &key1, 
+    const QnScheduleSync::ChunkKey &key2
+)
+{
+    return key1.cameraID < key2.cameraID ?
+           true : key1.cameraID > key2.cameraID ?
+                  false : key1.catalog < key2.catalog;
 }
