@@ -60,7 +60,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
 
     ui->comboBoxBackupType->addItem(tr("By schedule"), Qn::Backup_Schedule);
     ui->comboBoxBackupType->addItem(tr("Realtime mode"), Qn::Backup_RealTime);
-    ui->comboBoxBackupType->addItem(tr("Disable"), Qn::Backup_Disabled);
+    ui->comboBoxBackupType->addItem(tr("Never"), Qn::Backup_Disabled);
 
     m_scheduleDialog = new QnBackupScheduleDialog(this);
     m_camerabackupSettingsDialog = new QnBackupSettingsDialog(this);

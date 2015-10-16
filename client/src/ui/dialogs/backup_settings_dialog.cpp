@@ -132,41 +132,33 @@ void QnBackupSettingsDialog::at_modelDataChanged()
     ui->checkBoxLQ->setChecked(Qt::Unchecked);
     ui->checkBoxHQ->setChecked(Qt::Unchecked);
     
-    bool hasDisabled = false;
     bool hasHQ = false;
     bool hasLQ = false;
+    bool notHasHQ = false;
+    bool notHasLQ = false;
 
     for (const auto& value: m_model->modelData()) 
     {
         if (!value.isChecked)
             continue;
 
-        switch(value.backupType) 
-        {
-        case Qn::CameraBackup_Disabled:
-            hasDisabled = true;
-            break;
-        case Qn::CameraBackup_LowQuality:
+        if (value.backupType & Qn::CameraBackup_LowQuality)
             hasLQ = true;
-            break;
-        case Qn::CameraBackup_HighQuality:
+        else
+            notHasLQ = true;
+
+        if (value.backupType & Qn::CameraBackup_HighQuality)
             hasHQ = true;
-            break;
-        case Qn::CameraBackup_Both:
-            hasLQ = true;
-            hasHQ = true;
-            break;
-        default:
-            break;
-        }
+        else
+            notHasHQ = true;
     }
 
-    if (hasDisabled && hasLQ)
+    if (hasLQ && notHasLQ)
         ui->checkBoxLQ->setCheckState(Qt::PartiallyChecked);
     else if (hasLQ)
         ui->checkBoxLQ->setCheckState(Qt::Checked);
 
-    if (hasDisabled && hasHQ)
+    if (hasHQ && notHasHQ)
         ui->checkBoxHQ->setCheckState(Qt::PartiallyChecked);
     else if (hasHQ)
         ui->checkBoxHQ->setCheckState(Qt::Checked);

@@ -43,7 +43,7 @@ QString QnBackupSettingsModel::backupTypeToString(Qn::CameraBackupTypes value) c
     if (value == Qn::CameraBackup_Default)
         return tr("Default");
     else if (value == Qn::CameraBackup_Both)
-        return tr("All");
+        return tr("High + Low");
     else if (value == Qn::CameraBackup_HighQuality)
         return tr("High");
     else if (value == Qn::CameraBackup_LowQuality)
