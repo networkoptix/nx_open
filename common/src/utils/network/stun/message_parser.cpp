@@ -230,11 +230,9 @@ Attribute* MessageParser::parseFingerprint() {
 }
 
 Attribute* MessageParser::parseMessageIntegrity() {
-    if( m_attribute.value.size() != MessageIntegrity::SHA1_HASH_SIZE )
+    if( m_attribute.value.size() != MessageIntegrity::SIZE )
         return NULL;
-    std::unique_ptr<MessageIntegrity> attribute( new MessageIntegrity() );
-    qCopy( m_attribute.value.begin() , m_attribute.value.end() , attribute->hmac.begin() );
-    return attribute.release();
+    return new MessageIntegrity( m_attribute.value );
 }
 
 Attribute* MessageParser::parseUnknownAttribute() {
@@ -243,10 +241,12 @@ Attribute* MessageParser::parseUnknownAttribute() {
 
 Attribute* MessageParser::parseValue() {
     switch( m_attribute.type ) {
-        case attrs::xorMappedAddress: return parseXORMappedAddress();
-        case attrs::errorCode:         return parseErrorCode();
-        case attrs::messageIntegrity:  return parseMessageIntegrity();
-        case attrs::fingerPrint:       return parseFingerprint();
+        case attrs::xorMappedAddress:   return parseXORMappedAddress();
+        case attrs::errorCode:          return parseErrorCode();
+        case attrs::messageIntegrity:   return parseMessageIntegrity();
+        case attrs::fingerPrint:        return parseFingerprint();
+        case attrs::userName:           return new UserName( m_attribute.value );
+        case attrs::nonce:              return new Nonce( m_attribute.value );
         default:                        return parseUnknownAttribute();
     }
 }
@@ -408,8 +408,8 @@ int MessageParser::parseAttributeValue( MessageParserBuffer& buffer ) {
     if( ret != SECTION_FINISH ) return ret;
     Attribute* attr = parseValue();
     if( attr == NULL ) return FAILED;
-    m_outputMessage->attributes.emplace( attr->type(), std::unique_ptr<Attribute>(attr) );
-    switch( attr->type() ) {
+    m_outputMessage->attributes.emplace( attr->getType(), std::unique_ptr<Attribute>(attr) );
+    switch( attr->getType() ) {
     case attrs::fingerPrint:
         m_state = END_FINGERPRINT;
         break;

@@ -88,17 +88,17 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
                                  stun::Message message )
 {
     const auto userNameAttr = message.getAttribute< stun::cc::attrs::ClientId >();
-    if( !userNameAttr || userNameAttr->value.isEmpty() )
+    if( !userNameAttr )
         return errorResponse( connection, message.header, stun::error::badRequest,
             "Attribute ClientId is required" );
 
     const auto hostNameAttr = message.getAttribute< stun::cc::attrs::HostName >();
-    if( !hostNameAttr || hostNameAttr->value.isEmpty() )
+    if( !hostNameAttr )
         return errorResponse( connection, message.header, stun::error::badRequest,
             "Attribute HostName is required" );
 
-    const auto userName = userNameAttr->string();
-    const auto hostName = hostNameAttr->string();
+    const auto userName = userNameAttr->getString();
+    const auto hostName = hostNameAttr->getString();
 
     QnMutexLocker lk( &m_mutex );
     if( const auto peer = m_peers.search( hostName ) )

@@ -13,9 +13,9 @@ namespace nx_http
     }
 
     //!Set message to serialize
-    void MessageSerializer::setMessage( Message&& message )
+    void MessageSerializer::setMessage( const Message* message )
     {
-        m_message = std::move(message);
+        m_message = message;
     }
         
     SerializerState::Type MessageSerializer::serialize( nx::Buffer* const buffer, size_t* const bytesWritten )
@@ -23,7 +23,7 @@ namespace nx_http
         //TODO #ak introduce cool implementation (small refactor to HttpMessage::serialize is required)
 
         const auto bufSizeBak = buffer->size();
-        m_message.serialize( buffer );
+        m_message->serialize( buffer );
         *bytesWritten = buffer->size() - bufSizeBak;
         return SerializerState::done;
     }

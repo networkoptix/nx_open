@@ -41,4 +41,24 @@ namespace nx
     {
         return left + right.toUtf8();
     }
+
+    static int stringLength( const QByteArray& array )
+    {
+        int size = array.size();
+        const char* data = array.constData();
+        for( int position = 0; position < size; ++position )
+            if( data[position] == 0)
+                return position;
+        return size;
+    }
+
+    Buffer stringToBuffer( const String& string )
+    {
+        return Buffer( string.constData(), stringLength( string ) + 1 );
+    }
+
+    String bufferToString( const Buffer& buffer )
+    {
+        return String( buffer.constData(), stringLength( buffer ) );
+    }
 }

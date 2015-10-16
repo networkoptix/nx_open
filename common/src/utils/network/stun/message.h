@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <utils/network/buffer.h>
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include <array>
 
@@ -102,21 +102,14 @@ namespace attrs
         unknownReserved     = 0xFFFF,
     };
 
-    class Attribute
+    struct Attribute
     {
-    public:
-        virtual int type() const = 0;
+        virtual int getType() const = 0;
         virtual ~Attribute() {}
     };
 
-    /*!
-        \note All values are decoded
-    */
-    class XorMappedAddress
-    :
-        public Attribute
+    struct XorMappedAddress : Attribute
     {
-    public:
         static const int TYPE = xorMappedAddress;
 
         enum
@@ -138,9 +131,8 @@ namespace attrs
         XorMappedAddress( int port_, uint32_t ipv4_ );
         XorMappedAddress( int port_, Ipv6 ipv6_ );
 
-        virtual int type() const override { return TYPE; }
+        virtual int getType() const override { return TYPE; }
 
-    public:
         int family;
         int port;
         union {
@@ -149,81 +141,86 @@ namespace attrs
         } address;  //!< address in host byte order
     };
 
-    //!ERROR-CODE attribute [rfc5389, 15.6]
-    class ErrorDescription
-    :
-        public Attribute
+    struct BufferedValue
     {
-    public:
+        BufferedValue( nx::Buffer buffer_ = nx::Buffer() );
+        const Buffer& getBuffer() const; //!< Value to serialize
+        String getString() const; //!< Convert to string
+
+    private:
+        Buffer buffer;
+    };
+
+    struct UserName : Attribute, BufferedValue
+    {
+        static const int TYPE = userName;
+
+        UserName( const String& value = String() );
+        virtual int getType() const override { return TYPE; }
+    };
+
+    struct ErrorDescription : Attribute, BufferedValue
+    {
         static const int TYPE = errorCode;
 
-        ErrorDescription( int code_, nx::String phrase = nx::String() );
-        virtual int type() const override { return TYPE; }
+        ErrorDescription( int code_, const nx::String& phrase = nx::String() );
+        virtual int getType() const override { return TYPE; }
 
         inline int getClass() const { return code / 100; }
         inline int getNumber() const { return code % 100; }
+        inline int getCode() const { return code; }
 
-    public:
+    private:
         int code;           //!< This value is full error code
         nx::String reason;  //!< utf8 string, limited to 127 characters
     };
 
-    class FingerPrint
-    :
-        public Attribute
+    struct FingerPrint : Attribute
     {
-    public:
         static const int TYPE = fingerPrint;
 
         FingerPrint( uint32_t crc32_ );
-        virtual int type() const override { return TYPE; }
+        virtual int getType() const override { return TYPE; }
+        uint32_t getCrc32() const { return crc32; }
 
-    public:
+    private:
         uint32_t crc32;
     };
 
 
-    class MessageIntegrity
-    :
-        public Attribute
+    struct MessageIntegrity : Attribute, BufferedValue
     {
-    public:
         static const int TYPE = messageIntegrity;
-        static const int SHA1_HASH_SIZE = 20;
+        static const int SIZE = 20;
 
-        virtual int type() const override { return TYPE; }
-
-    public:
-        std::array<uint8_t, SHA1_HASH_SIZE> hmac; // for me to avoid raw loop when doing copy
+        MessageIntegrity( Buffer hmac = Buffer( SIZE, 0 ) );
+        virtual int getType() const override { return TYPE; }
     };
 
-    class Unknown
-    :
-        public Attribute
+    struct Nonce : Attribute, BufferedValue
     {
-    public:
+        static const int TYPE = nonce;
+
+        Nonce( Buffer nonce = Buffer() );
+        virtual int getType() const override { return TYPE; }
+    };
+
+    struct Unknown : Attribute, BufferedValue
+    {
         static const int TYPE = unknown;
 
-        Unknown( int userType_, nx::Buffer value_ = nx::Buffer() );
-        virtual int type() const override { return userType; }
-        nx::String string() const { return nx::String( value.data() ); }
+        Unknown( int userType_, nx::Buffer value_= nx::Buffer() );
+        virtual int getType() const override { return userType; }
 
-    public:
+    private:
         int userType;
-        nx::Buffer value;
-    };
-
-    class UnknownAttributes
-    {
-    public:
-        std::vector<int> attributeTypes;
     };
 }
 
 class Message
 {
 public:
-    typedef std::unordered_multimap<int, std::unique_ptr<attrs::Attribute> > AttributesMap;
+    typedef std::map<int, std::unique_ptr<attrs::Attribute> > AttributesMap;
 
     Header header;
     AttributesMap attributes;
@@ -241,6 +238,10 @@ public:
     const T* getAttribute( int type = 0, size_t index = 0 ) const;
 
     // TODO: variadic template when possible
+    template< typename T >
+    void newAttribute()
+    { addAttribute( std::make_unique<T>() ); }
+
     template< typename T, typename A1 >
     void newAttribute( A1 a1 )
     { addAttribute( std::make_unique<T>( std::move(a1) ) ); }
@@ -252,6 +253,9 @@ public:
     template< typename T, typename A1, typename A2, typename A3 >
     void newAttribute( A1 a1, A2 a2, A3 a3 )
     { addAttribute( std::make_unique<T>( std::move(a1), std::move(a2), std::move(a3) ) ); }
+
+    void insertIntegrity( const String& userName, const String& key );
+    bool verifyIntegrity( const String& userName, const String& key );
 
 private:
     Message( const Message& );

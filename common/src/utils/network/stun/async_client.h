@@ -37,6 +37,16 @@ public:
     ~AsyncClient();
     Q_DISABLE_COPY( AsyncClient );
 
+
+    //!Sets authorization information.
+    /*!
+        Each set \class Message will be appended by fallow fields automaticly:
+          - \class attrs::UserName as \param userName
+          - \class attrs::Nonce as random number
+          - \class attrs::MessageIntegrity as HMAC-SHA1( \param key, message body )
+    */
+    void setCredentials( String userName, String key );
+
     //!Asynchronously openes connection to the server, specified during initialization
     /*!
         \param connectHandler Will be called once to deliver connection completeness
@@ -92,6 +102,9 @@ private:
     ConnectionHandler m_connectHandler;
     IndicationHandler m_indicationHandler;
     ConnectionHandler m_disconnectHandler;
+
+    struct Credentials { String userName; String key; };
+    boost::optional< Credentials > m_credentials;
 
     std::unique_ptr< AbstractStreamSocket > m_connectingSocket;
     std::list< std::pair< Message, RequestHandler > > m_requestQueue;

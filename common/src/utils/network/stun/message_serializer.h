@@ -23,8 +23,8 @@ namespace stun {
     {
     public:
         //!Set message to serialize
-        void setMessage( Message&& message ) {
-            m_message = std::move(message);
+        void setMessage( const Message* message ) {
+            m_message = message;
             m_initialized = true;
         }
 
@@ -48,8 +48,7 @@ namespace stun {
         nx_api::SerializerState::Type serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attrs::XorMappedAddress& , std::size_t* value );
         nx_api::SerializerState::Type serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& , std::size_t* value );
         nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorDescription& , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* buffer ,const attrs::MessageIntegrity& , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attrs::Unknown& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_Buffer( MessageSerializerBuffer* buffer ,const attrs::BufferedValue& , std::size_t* value );
         // this function will do minimum checking for the message object
         bool checkMessageIntegratiy();
         // This helper function ensure that while we traveling the attributes of a message, the MessageIntegrity and the
@@ -62,7 +61,7 @@ namespace stun {
         }
 
     private:
-        Message m_message;
+        const Message* m_message;
         bool m_initialized;
     };
 
