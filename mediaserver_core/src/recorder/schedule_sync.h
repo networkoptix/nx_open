@@ -4,9 +4,12 @@
 #include <future>
 #include <atomic>
 #include <vector>
+#include <map>
 #include <boost/optional.hpp>
 
 #include <common/common_globals.h>
+#include <api/model/backup_status_reply.h>
+#include <recorder/storage_manager.h>
 
 class QnScheduleSync
 {
@@ -26,6 +29,8 @@ private:
         QString                  cameraID;
         QnServer::ChunksCatalog  catalog;
     };
+    friend bool operator < (const ChunkKey &key1, const ChunkKey &key2);
+    
     typedef std::vector<ChunkKey> ChunkKeyVector;
 
 public:
@@ -46,7 +51,7 @@ public:
     int forceStart(); 
     int stop();
     int interrupt();
-    int state() const;
+    QnBackupStatusData getStatus() const;
 
 private:
     template<typename NeedStopCB>
@@ -55,13 +60,14 @@ private:
     void start();
     void renewSchedule();
     void copyChunk(const ChunkKey &chunkKey);
-    
+
+    int state() const;
+
     boost::optional<ChunkKeyVector> getOldestChunk();    
     ChunkKey getOldestChunk(
         const QString           &cameraId,
         QnServer::ChunksCatalog catalog
     );
-
 
 private:
     std::atomic<bool>    m_backupSyncOn;
@@ -70,6 +76,9 @@ private:
     std::future<void>    m_backupFuture;
     schedule             m_schedule;
     std::atomic<int64_t> m_syncTimePoint;
+
+    std::map<ChunkKey, double> m_syncData;
+    mutable std::mutex         m_syncDataMutex;
 };
 
 #define qnScheduleSync QnScheduleSync::instance()

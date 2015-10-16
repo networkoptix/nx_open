@@ -87,6 +87,7 @@ public:
     QVector<Chunk> deleteRecordsBefore(int idx);
 
     bool isEmpty() const;
+    size_t size() const {return m_chunks.size();}
     void clear();
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
