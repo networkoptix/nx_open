@@ -1289,7 +1289,7 @@
     </message>
     <message>
         <source>Audit Trail...</source>
-        <translation>Überwachungspfad...</translation>
+        <translation>Überwachungsprotokoll...</translation>
     </message>
     <message>
         <source>Add Device(s)...</source>
