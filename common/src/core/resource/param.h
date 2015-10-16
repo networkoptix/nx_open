@@ -63,6 +63,7 @@ namespace Qn
     // Cloud
     static const QString CLOUD_SYSTEM_ID = lit("cloudSystemID");
     static const QString CLOUD_SYSTEM_AUTH_KEY = lit("cloudAuthKey");
+    static const QString CLOUD_ACCOUNT_NAME = lit("cloudAccountName");
 }
 
 #endif // QN_PARAM_H

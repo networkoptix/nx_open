@@ -19,6 +19,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
+#include "client/client_settings.h"
+
 
 QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent /* = NULL*/)
 :
@@ -42,6 +44,18 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent /* = NULL*/)
         qnResPool, &QnResourcePool::resourceChanged,
         this, &QnCloudManagementWidget::onUserChanged);
     //setHelpTopic(this, Qn::Administration_CloudManagement_Help);
+
+    const auto cdbEndpoint = qnSettings->cdbEndpoint();
+    if (!cdbEndpoint.isEmpty())
+    {
+        const auto hostAndPort = cdbEndpoint.split(lit(":"));
+        if (hostAndPort.size() == 2)
+        {
+            m_connectionFactory->setCloudEndpoint(
+                hostAndPort[0].toStdString(),
+                hostAndPort[1].toInt());
+        }
+    }
 
     onUserChanged(qnResPool->getAdministrator());
 }
@@ -69,10 +83,14 @@ void QnCloudManagementWidget::updateView(bool boundToCloud)
     if (m_boundToCloud)
     {
         ui->toggleBindSystemButton->setText(tr("Disconnect system from cloud"));
+        const auto admin = qnResPool->getAdministrator();
+        ui->cloudUserLineEdit->setText(admin->getProperty(Qn::CLOUD_ACCOUNT_NAME));
+        ui->cloudUserLineEdit->setDisabled(true);
     }
     else
     {
         ui->toggleBindSystemButton->setText(tr("Connect system to cloud"));
+        ui->cloudUserLineEdit->setDisabled(false);
     }
 }
 
@@ -179,6 +197,10 @@ void QnCloudManagementWidget::onBindDone(QnBindToCloudResponse response)
         ui->toggleBindSystemButton->setEnabled(true);
         return;
     }
+
+    const auto admin = qnResPool->getAdministrator();
+    admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, ui->cloudUserLineEdit->text());
+    propertyDictionary->saveParamsAsync(admin->getId());
 
     m_mserverReqHandle = response.serverConnection->saveCloudSystemCredentials(
         response.systemData.id.toString(),
