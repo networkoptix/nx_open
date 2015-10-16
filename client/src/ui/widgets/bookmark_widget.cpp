@@ -4,15 +4,14 @@
 #include <core/resource/camera_bookmark.h>
 
 namespace {
-    const int defaultTimeoutIdx = 3;
+    const int defaultTimeoutIdx = 0;
 
     QString tagsAsString(const QnCameraBookmarkTags &tags) {
         return QStringList(tags.toList()).join(lit(", "));
     }
-
 }
 
-QnBookmarkWidget::QnBookmarkWidget(QWidget *parent /*= 0*/):
+QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::BookmarkWidget)
 {
@@ -32,14 +31,10 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent /*= 0*/):
         updateTagsList();
     });
 
-    QDateTime start = QDateTime::fromMSecsSinceEpoch(0);
-    ui->timeoutComboBox->clear();
-    ui->timeoutComboBox->addItem(tr("Do not lock archive"), 0);
-    ui->timeoutComboBox->addItem(tr("1 month"), start.addMonths(1).toMSecsSinceEpoch());
-    ui->timeoutComboBox->addItem(tr("3 month"), start.addMonths(3).toMSecsSinceEpoch());
-    ui->timeoutComboBox->addItem(tr("6 month"), start.addMonths(6).toMSecsSinceEpoch());
-    ui->timeoutComboBox->addItem(tr("year"), start.addYears(1).toMSecsSinceEpoch());
-    ui->timeoutComboBox->setCurrentIndex(defaultTimeoutIdx);
+    // TODO: #3.0 #rvasilenko Remove when bookmark timeout will be implemented.
+    // Then change defaultTimeoutIdx constant value to '3'.
+    ui->timeoutComboBox->hide();
+    ui->timeoutLabel->hide();
 }
 
 QnBookmarkWidget::~QnBookmarkWidget() {}
