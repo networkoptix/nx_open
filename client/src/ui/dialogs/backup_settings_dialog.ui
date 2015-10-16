@@ -77,13 +77,22 @@
       </widget>
      </item>
      <item>
-      <widget class="QnTableView" name="gridCameras">
+      <widget class="QnChackableTableView" name="gridCameras">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectRows</enum>
        </property>
        <property name="sortingEnabled">
         <bool>true</bool>
        </property>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderHighlightSections">
+        <bool>false</bool>
+       </attribute>
       </widget>
      </item>
     </layout>
@@ -102,7 +111,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTableView</class>
+   <class>QnChackableTableView</class>
    <extends>QTableView</extends>
    <header location="global">ui/widgets/table_view.h</header>
   </customwidget>

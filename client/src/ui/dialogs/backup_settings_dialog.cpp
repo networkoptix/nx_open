@@ -2,11 +2,15 @@
 #include "core/resource/media_server_user_attributes.h"
 #include "ui/widgets/views/checkboxed_header_view.h"
 
-class MySortFilterProxyModel : public QSortFilterProxyModel
+namespace {
+    static const int COLUMN_SPACING = 8;
+}
+
+class CustomSortFilterProxyModel : public QSortFilterProxyModel
 {
     typedef QSortFilterProxyModel base_type;
 public:
-    MySortFilterProxyModel(QObject *parent = 0): QSortFilterProxyModel(parent) {}
+    CustomSortFilterProxyModel(QObject *parent = 0): QSortFilterProxyModel(parent) {}
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
     {
@@ -22,16 +26,31 @@ protected:
     }
 };
 
+class QnCustomItemDelegate: public QStyledItemDelegate 
+{
+    typedef QStyledItemDelegate base_type;
+
+public:
+    explicit QnCustomItemDelegate(QObject *parent = NULL): base_type(parent) {}
+
+    virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override
+    {
+        QSize result = base_type::sizeHint(option, index);
+        result.setWidth(result.width() + COLUMN_SPACING);
+        return result;
+    }
+};
+
+
 QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags ):
     base_type(parent, windowFlags),
     ui(new Ui::BackupSettingsDialog()),
-    m_updatingModel(false),
-    m_skipNextPressSignal(false)
+    m_updatingModel(false)
 {
     ui->setupUi(this);
 
     m_model = new QnBackupSettingsModel(this);
-    auto sortModel = new MySortFilterProxyModel(this);
+    auto sortModel = new CustomSortFilterProxyModel(this);
     sortModel->setSourceModel(m_model);
 
     QnCheckBoxedHeaderView* headers = new QnCheckBoxedHeaderView(QnBackupSettingsModel::CheckBoxColumn, this);
@@ -41,6 +60,8 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget *parent, Qt::WindowFlags 
     headers->setStretchLastSection(true);
     ui->gridCameras->setHorizontalHeader(headers);
     ui->gridCameras->setModel(sortModel);
+
+    ui->gridCameras->setItemDelegate(new QnCustomItemDelegate(this));
 
     connect (headers,           &QnCheckBoxedHeaderView::checkStateChanged, this, &QnBackupSettingsDialog::at_headerCheckStateChanged);
 
@@ -60,8 +81,6 @@ void QnBackupSettingsDialog::at_gridSelectionChanged(const QItemSelection &selec
     QModelIndex mouseIdx = ui->gridCameras->mouseIndex();
     bool isCheckRow = mouseIdx.isValid() && mouseIdx.column() == 0;
     if (isCheckRow) {
-        if (mouseIdx.data(Qt::CheckStateRole) == Qt::Unchecked)
-            m_skipNextPressSignal = true;
     }
     else {
         m_model->blockSignals(true);
@@ -70,16 +89,6 @@ void QnBackupSettingsDialog::at_gridSelectionChanged(const QItemSelection &selec
     }
 
     QModelIndexList indexes = ui->gridCameras->selectionModel()->selectedRows();
-    if (m_skipNextSelIndex.isValid()) {
-        for (auto itr = indexes.begin(); itr != indexes.end(); ++itr) {
-            if (*itr == m_skipNextSelIndex) {
-                indexes.erase(itr);
-                m_skipNextPressSignal = false;
-                break;
-            }
-        }
-    }
-    m_skipNextSelIndex = QModelIndex();
     
     m_updatingModel = true;
     for (const auto& index: indexes)
@@ -90,33 +99,16 @@ void QnBackupSettingsDialog::at_gridSelectionChanged(const QItemSelection &selec
 
 void QnBackupSettingsDialog::at_gridItemPressed(const QModelIndex& index)
 {
-    QnTableView* gridMaster = (QnTableView*) sender();
-
-    if (m_skipNextPressSignal) {
-        m_skipNextPressSignal = false;
-        m_skipNextSelIndex = QModelIndex();
-        return;
-    }
-    m_lastPressIndex = index;
-    if (index.column() != QnBackupSettingsModel::CheckBoxColumn)
-        return;
-
-    m_skipNextSelIndex = index;
-
-    Qt::CheckState checkState = (Qt::CheckState) index.data(Qt::CheckStateRole).toInt();
-    if (checkState == Qt::Checked)
-        checkState = Qt::Unchecked;
-    else
-        checkState = Qt::Checked;
-    ui->gridCameras->model()->setData(index, checkState, Qt::CheckStateRole);
-    //updateHeadersCheckState();
 }
 
 void QnBackupSettingsDialog::at_headerCheckStateChanged(Qt::CheckState state)
 {
     if (state == Qt::PartiallyChecked)
         return;
-    m_model->setCheckState(state);
+    if (state == Qt::Checked)
+        ui->gridCameras->selectAll();
+    else
+        ui->gridCameras->selectionModel()->clearSelection();
 }
 
 void QnBackupSettingsDialog::at_modelDataChanged()

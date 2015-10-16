@@ -32,6 +32,4 @@ private:
     QnBackupSettingsModel* m_model;
     bool m_updatingModel;
     bool m_skipNextPressSignal;
-    QModelIndex m_skipNextSelIndex;
-    QModelIndex m_lastPressIndex;
 };

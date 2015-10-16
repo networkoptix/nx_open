@@ -71,3 +71,22 @@ void QnTableView::resetCursor() {
 void QnTableView::leaveEvent(QEvent *) {
     resetCursor();
 }
+
+// ------------------------------------------------QnChackableTableView ---------------------
+
+void QnChackableTableView::mousePressEvent(QMouseEvent *event)
+{
+    if (isEnabled() && this->model()) {
+        QModelIndex index = indexAt(event->pos());
+        if (index.column() == 0) {
+            auto modifiers = event->modifiers();
+            if (!(modifiers & Qt::ShiftModifier))
+                modifiers |= Qt::ControlModifier;
+            QMouseEvent updatedEvent(event->type(), event->localPos(), event->button(), event->buttons(), modifiers);
+            base_type::mousePressEvent(&updatedEvent);
+            return;
+        }
+    }
+    base_type::mousePressEvent(event);
+}
+

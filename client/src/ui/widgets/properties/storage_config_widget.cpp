@@ -27,6 +27,7 @@ namespace {
 
     static const int rebuildProgressPageIndex = 1;
     static const int rebuildPreparePageIndex = 0;
+    static const int COLUMN_SPACING = 8;
 
 } // anonymous namespace
 
@@ -71,6 +72,21 @@ QnStorageConfigWidget::~QnStorageConfigWidget()
 
 }
 
+class QnCustomItemDelegate: public QStyledItemDelegate 
+{
+    typedef QStyledItemDelegate base_type;
+
+public:
+    explicit QnCustomItemDelegate(QObject *parent = NULL): base_type(parent) {}
+
+    virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override
+    {
+        QSize result = base_type::sizeHint(option, index);
+        result.setWidth(result.width() + COLUMN_SPACING);
+        return result;
+    }
+};
+
 void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
 {
     QnStorageListModel* model = addToMain ? m_mainPool.model : m_backupPool.model;
@@ -95,6 +111,7 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     tableView->horizontalHeader()->setSectionsClickable(false);
     tableView->horizontalHeader()->setStretchLastSection(false);
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    tableView->setItemDelegate(new QnCustomItemDelegate(this));
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
 

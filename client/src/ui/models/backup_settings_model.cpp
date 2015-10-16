@@ -165,6 +165,7 @@ bool QnBackupSettingsModel::setData(const QModelIndex &index, const QVariant &va
     }
 }
 
+/*
 Qt::ItemFlags QnBackupSettingsModel::flags(const QModelIndex &index) const 
 {
     Qt::ItemFlags flags = Qt::NoItemFlags;
@@ -175,6 +176,7 @@ Qt::ItemFlags QnBackupSettingsModel::flags(const QModelIndex &index) const
 
     return flags;
 }
+*/
 
 QVariant QnBackupSettingsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
