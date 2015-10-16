@@ -6,6 +6,7 @@
 #include "media_stream_cache_detail.h"
 
 #include <core/datapacket/media_data_packet.h>
+#include <utils/common/log.h>
 
 
 namespace detail
@@ -40,6 +41,8 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.get());
     const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_AVKey);
+    NX_LOG(lit("HLS. MediaStreamCache. got frame %1, is_key_frame=%2").
+        arg(data->timestamp).arg(isKeyFrame), cl_logDEBUG2);
     if( m_packetsByTimestamp.empty() && !isKeyFrame )
         return; //cache data MUST start with key frame
 
