@@ -1477,7 +1477,7 @@ bool QnDbManager::createDatabase()
             return false;
         m_needResyncLicenses = true;
     }
-    if (!execSQLQuery("DELETE FROM vms_license", m_sdb))
+    if (!execSQLQuery("DELETE FROM vms_license", m_sdb, Q_FUNC_INFO))
         return false;
 
 

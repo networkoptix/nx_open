@@ -123,7 +123,7 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandler::loadDataSync(const QnBoo
     return QnCameraBookmark::mergeCameraBookmarks(outputData, request.filter.limit, request.filter.strategy);
 }
 
-int QnMultiserverBookmarksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnMultiserverBookmarksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor *processor)
 {
     Q_UNUSED(path);
 
@@ -132,5 +132,18 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path, const QnR
         return nx_http::StatusCode::badRequest;
     QnCameraBookmarkList outputData = loadDataSync(request);
     QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
+    return nx_http::StatusCode::ok;
+}
+
+int QnMultiserverBookmarksRestHandler::executePost(const QString& path,
+                                                   const QnRequestParamList& params, 
+                                                   const QByteArray& body, 
+                                                   const QByteArray& srcBodyContentType, 
+                                                   QByteArray& result, 
+                                                   QByteArray& resultContentType, 
+                                                   const QnRestConnectionProcessor *processor) 
+{
+    Q_UNUSED(processor)
+
     return nx_http::StatusCode::ok;
 }

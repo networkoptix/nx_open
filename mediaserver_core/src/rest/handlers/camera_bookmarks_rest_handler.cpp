@@ -11,14 +11,36 @@
 int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     QString action = extractAction(path);
-    if (action == "add" || action == "update")
-        return addOrUpdateCameraBookmarkAction(params, body, result);
+    if (action == "add")
+        return addCameraBookmarkAction(params, body, result);
+    if (action == "update")
+        return updateCameraBookmarkAction(params, body, result);
     if (action == "delete")
         return deleteCameraBookmarkAction(params, body, result);
     return nx_http::StatusCode::notFound;
 }
 
-int QnCameraBookmarksRestHandler::addOrUpdateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) { 
+int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) { 
+    Q_UNUSED(params)
+
+        QnCameraBookmark bookmark;
+    if (!QJson::deserialize(body, &bookmark))
+        return nx_http::StatusCode::invalidParameter;
+
+    if (bookmark.cameraId.isEmpty())
+        return nx_http::StatusCode::invalidParameter;
+
+    if (!qnServerDb->addBookmark(bookmark))
+        return nx_http::StatusCode::invalidParameter;
+
+    if (!bookmark.tags.isEmpty())
+        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {});
+
+    result.setReply(bookmark);
+    return nx_http::StatusCode::ok;
+}
+
+int QnCameraBookmarksRestHandler::updateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) { 
     Q_UNUSED(params)
 
     QnCameraBookmark bookmark;
@@ -28,7 +50,7 @@ int QnCameraBookmarksRestHandler::addOrUpdateCameraBookmarkAction(const QnReques
     if (bookmark.cameraId.isEmpty())
         return nx_http::StatusCode::invalidParameter;
 
-    if (!qnServerDb->addOrUpdateCameraBookmark(bookmark))
+    if (!qnServerDb->updateBookmark(bookmark))
         return nx_http::StatusCode::invalidParameter;
 
     if (!bookmark.tags.isEmpty())
@@ -46,7 +68,7 @@ int QnCameraBookmarksRestHandler::deleteCameraBookmarkAction(const QnRequestPara
     if (bookmarkId.isNull())
         return nx_http::StatusCode::invalidParameter;
 
-    if (!qnServerDb->deleteCameraBookmark(bookmarkId))
+    if (!qnServerDb->deleteBookmark(bookmarkId))
         return nx_http::StatusCode::invalidParameter;
 
     return nx_http::StatusCode::ok;
