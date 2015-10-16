@@ -40,6 +40,9 @@ namespace nx_ms_conf
     static const QLatin1String HLS_REMOVED_LIVE_CHUNKS_TO_KEEP( "hlsRemovedChunksToKeep" );
     static const unsigned int DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP = -1;
 
+    static const QLatin1String HLS_PLAYLIST_PRE_FILL_CHUNKS("hlsPlaylistPreFillChunks");
+    static const unsigned int DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS = 2;
+
     //!Write block size. This block is always aligned to file system sector size
     static const QLatin1String IO_BLOCK_SIZE( "ioBlockSize" );
     static const int DEFAULT_IO_BLOCK_SIZE = 4*1024*1024;

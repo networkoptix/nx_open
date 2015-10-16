@@ -63,6 +63,7 @@ namespace nx_hls
         bool m_useChunkedTransfer;
         QString m_currentFileName;
         size_t m_bytesSent;
+        const size_t m_minPlaylistSizeToStartStreaming;
 
         //!Processes \a request, generates and sends (asynchronously) response
         void processRequest( const nx_http::Request& request );
