@@ -345,8 +345,10 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
             sendModuleInformation(moduleInformation, address, true);
         }
-
-        lk.unlock();
+        else
+        {
+            lk.unlock();
+        }
 
         NX_LOGX(lit("New module URL: %1 %2")
                .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
