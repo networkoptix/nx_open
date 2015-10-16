@@ -47,6 +47,8 @@ private:
     void sendNextArchiveRequest(bool isMain);
     void updateRebuildUi(const QnStorageScanData& reply, bool isMainPool);
     void updateBackupUi(const QnBackupStatusData& reply);
+    void updateColumnWidth();
+    int getColWidth(const QAbstractItemModel* model, int col);
 private slots:
     void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();

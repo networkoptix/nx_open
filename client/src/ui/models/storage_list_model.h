@@ -44,7 +44,7 @@ public:
 protected:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 private:
-    QString displayData(const QModelIndex &index) const;
+    QString displayData(const QModelIndex &index, bool forcedText) const;
     QVariant fontData(const QModelIndex &index) const;
     QVariant foregroundData(const QModelIndex &index) const;
     QVariant mouseCursorData(const QModelIndex &index) const;

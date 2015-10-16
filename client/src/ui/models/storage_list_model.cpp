@@ -59,7 +59,7 @@ QString urlPath(const QString& url)
     }
 }
 
-QString QnStorageListModel::displayData(const QModelIndex &index) const
+QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedText) const
 {
     const QnStorageSpaceData& storageData = m_data.storages[index.row()];
     switch (index.column())
@@ -73,7 +73,7 @@ QString QnStorageListModel::displayData(const QModelIndex &index) const
     case TotalSpaceColumn:
         return QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1) + tr("Gb");
     case RemoveActionColumn:
-        return storageData.isExternal ? tr("Remove") : QString();
+        return storageData.isExternal || forcedText ? tr("Remove") : QString();
     case ChangeGroupActionColumn:
         return m_isBackupRole ? tr("Use as main storage") : tr("Use as backup storage");
     default:
@@ -121,7 +121,9 @@ QVariant QnStorageListModel::data(const QModelIndex &index, int role) const
     switch(role) {
     case Qt::DisplayRole:
     case Qn::DisplayHtmlRole:
-        return displayData(index);
+        return displayData(index, false);
+    case Qn::TextWidthDataRole:
+        return displayData(index, true);
     case Qt::FontRole:
         return fontData(index);
     case Qt::ForegroundRole:

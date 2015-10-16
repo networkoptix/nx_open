@@ -28,9 +28,24 @@ namespace {
     static const int rebuildProgressPageIndex = 1;
     static const int rebuildPreparePageIndex = 0;
     static const int COLUMN_SPACING = 8;
+    static const int MIN_COL_WIDTH = 16;
 
 } // anonymous namespace
 
+class QnCustomItemDelegate: public QStyledItemDelegate 
+{
+    typedef QStyledItemDelegate base_type;
+
+public:
+    explicit QnCustomItemDelegate(QObject *parent = NULL): base_type(parent) {}
+
+    virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override
+    {
+        QSize result = base_type::sizeHint(option, index);
+        result.setWidth(result.width() + COLUMN_SPACING);
+        return result;
+    }
+};
 
 QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     base_type(parent),
@@ -72,21 +87,6 @@ QnStorageConfigWidget::~QnStorageConfigWidget()
 
 }
 
-class QnCustomItemDelegate: public QStyledItemDelegate 
-{
-    typedef QStyledItemDelegate base_type;
-
-public:
-    explicit QnCustomItemDelegate(QObject *parent = NULL): base_type(parent) {}
-
-    virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override
-    {
-        QSize result = base_type::sizeHint(option, index);
-        result.setWidth(result.width() + COLUMN_SPACING);
-        return result;
-    }
-};
-
 void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
 {
     QnStorageListModel* model = addToMain ? m_mainPool.model : m_backupPool.model;
@@ -103,6 +103,7 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     item.isExternal = true;
 
     model->addModelData(item);
+    updateColumnWidth();
 }
 
 void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storagePool)
@@ -110,7 +111,7 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     tableView->resizeColumnsToContents();
     tableView->horizontalHeader()->setSectionsClickable(false);
     tableView->horizontalHeader()->setStretchLastSection(false);
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     tableView->setItemDelegate(new QnCustomItemDelegate(this));
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
@@ -130,6 +131,8 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
 void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index)
 {
     ui->pushButtonSchedule->setEnabled(ui->comboBoxBackupType->itemData(index) == Qn::Backup_Schedule);
+    ui->backupStartButton->setEnabled(ui->comboBoxBackupType->itemData(index) == Qn::Backup_Schedule); 
+
     m_serverUserAttrs.backupType = (Qn::BackupType) ui->comboBoxBackupType->itemData(index).toInt();
 }
 
@@ -170,6 +173,7 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
         QnStorageSpaceData record = data.value<QnStorageSpaceData>();
         fromModel->removeRow(index.row());
         toModel->addModelData(record);
+        updateColumnWidth();
     }
     else if (index.column() == QnStorageListModel::RemoveActionColumn)
     {
@@ -181,6 +185,7 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
         QnStorageSpaceData record = data.value<QnStorageSpaceData>();
         if (record.isExternal)
             model->removeRow(index.row());
+        updateColumnWidth();
     }
 }
 
@@ -210,7 +215,32 @@ void QnStorageConfigWidget::at_replyReceived(int status, QnStorageSpaceReply rep
         m_mainPool.model->setModelData(reply);
     else if (handle == m_backupPool.storageSpaceHandle)
         m_backupPool.model->setModelData(reply);
-    
+    updateColumnWidth();
+}
+
+void QnStorageConfigWidget::updateColumnWidth()
+{
+    for (int i = 0; i < QnStorageListModel::ColumnCount; ++i)
+    {
+        int width = qMax(getColWidth(m_mainPool.model, i), getColWidth(m_backupPool.model, i));
+        ui->mainStoragesTable->setColumnWidth(i, width + COLUMN_SPACING);
+        ui->backupStoragesTable->setColumnWidth(i, width + COLUMN_SPACING);
+    }
+}
+
+int QnStorageConfigWidget::getColWidth(const QAbstractItemModel* model, int col)
+{
+    int result = MIN_COL_WIDTH;
+    QFont f = ui->mainStoragesTable->font();
+    QFontMetrics fm(f);
+    for (int i = 0; i < model->rowCount(); ++i)
+    {
+        QModelIndex index = model->index(i, col);
+        int w = fm.width(model->data(index, Qn::TextWidthDataRole).toString());
+        result = qMax(result, w);
+    }
+
+    return result;
 }
 
 void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
@@ -229,6 +259,8 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
     if (m_server) {
         connect(m_server,   &QnMediaServerResource::statusChanged,  this,   &QnStorageConfigWidget::updateRebuildInfo);
         connect(m_server,   &QnMediaServerResource::apiUrlChanged,  this,   &QnStorageConfigWidget::updateRebuildInfo);
+        connect(m_server,   &QnMediaServerResource::statusChanged,  this,   &QnStorageConfigWidget::updateBackupInfo);
+        connect(m_server,   &QnMediaServerResource::apiUrlChanged,  this,   &QnStorageConfigWidget::updateBackupInfo);
         m_storages = m_server->getStorages();
         for (const auto& storage: m_storages)
             connect(storage, &QnResource::statusChanged,            this,   &QnStorageConfigWidget::updateRebuildInfo);
@@ -477,18 +509,16 @@ void QnStorageConfigWidget::at_openBackupSettings_clicked()
 
 void QnStorageConfigWidget::at_backupStatusReply(int status, const QnBackupStatusData& reply, int handle)
 {
-    Q_UNUSED(status)
     Q_UNUSED(handle)
+    if (status == 0)
+        updateBackupUi(reply);
 
-    updateBackupUi(reply);
-
-    if (reply.state == Qn::BackupState_InProgress)
+    if (reply.state == Qn::BackupState_InProgress || status != 0)
         QTimer::singleShot(500, this, SLOT(sendNextBackupStatusRequest()));
 }
 
 void QnStorageConfigWidget::at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle)
 {
-    Q_UNUSED(status);
     bool isMainPool = false;
     if (handle == m_mainPool.rebuildHandle)
         isMainPool = true;
@@ -497,9 +527,10 @@ void QnStorageConfigWidget::at_archiveRebuildReply(int status, const QnStorageSc
     else
         return; // unknown answer
 
-    updateRebuildUi(reply, isMainPool);
+    if (status == 0)
+        updateRebuildUi(reply, isMainPool);
 
-    if (reply.state > Qn::RebuildState_None) {
+    if (reply.state > Qn::RebuildState_None || status != 0) {
         if (isMainPool)
             QTimer::singleShot(500, this, SLOT(sendNextArchiveRequestForMain()));
         else
