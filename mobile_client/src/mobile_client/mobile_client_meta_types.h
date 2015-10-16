@@ -6,6 +6,9 @@
 typedef QHash<QnUuid, qreal> QnAspectRatioHash;
 Q_DECLARE_METATYPE(QnAspectRatioHash)
 
+typedef QSet<QString> QnStringSet;
+Q_DECLARE_METATYPE(QnStringSet)
+
 class QnMobileClientMetaTypes {
 public:
     static void initialize();

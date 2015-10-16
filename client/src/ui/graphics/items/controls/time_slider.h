@@ -29,6 +29,7 @@ class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 class QnTimePeriodList;
 class QnBookmarksViewer;
+class QnPendingOperation;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
@@ -304,7 +305,7 @@ private:
 
     bool scaleWindow(qreal factor, qint64 anchor);
 
-    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QnTimePeriodList &bookmarks, const QRectF &rect);
+    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect);
     void drawTickmarks(QPainter *painter, const QRectF &rect);
     void drawSolidBackground(QPainter *painter, const QRectF &rect);
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
@@ -341,7 +342,6 @@ private:
     Q_SLOT void clearThumbnails();
 
     void mergeBookmarks();
-    void calculateCoveringBookmarks();
 
     void animateStepValues(int deltaMSecs);
     void animateThumbnails(int deltaMSecs);
@@ -392,8 +392,8 @@ private:
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
     QnCameraBookmarkList m_bookmarks;
-    QnCameraBookmarkList m_coveringBookmarks;
     QList<BookmarkCluster> m_mergedBookmarks;
+    QnPendingOperation *m_mergeBookmarksPendingOperation;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;

@@ -13,6 +13,8 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
 
+#include <database/server_db.h>
+
 #include "camera/camera_pool.h"
 #include "decoders/video/ffmpeg.h"
 
@@ -171,7 +173,7 @@ QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
 
 void QnMServerBusinessRuleProcessor::onRemoveResource(const QnResourcePtr &resource)
 {
-    QnEventsDB::instance()->removeLogForRes(resource->getId());
+    qnServerDb->removeLogForRes(resource->getId());
 }
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
@@ -201,7 +203,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
     }
     
     if (result)
-        QnEventsDB::instance()->saveActionToDB(action, res);
+        qnServerDb->saveActionToDB(action, res);
 
     return result;
 }
@@ -267,6 +269,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.guid = QnUuid::createUuid();
     bookmark.startTimeMs = startTime;
     bookmark.durationMs = endTime - startTime;
+    bookmark.cameraId = camera->getUniqueId();
 
     bookmark.name = "Auto-Generated Bookmark";
     bookmark.description = QString("Rule %1\nFrom %2 to %3")
@@ -274,7 +277,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
         .arg(QDateTime::fromMSecsSinceEpoch(startTime).toString())
         .arg(QDateTime::fromMSecsSinceEpoch(endTime).toString());
 
-    return qnStorageMan->addBookmark(camera->getUniqueId().toUtf8(), bookmark, true);
+    return qnServerDb->addOrUpdateCameraBookmark(bookmark);
 }
 
 
@@ -432,6 +435,11 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 
     SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
+
+    QnBusinessAggregationInfo aggregationInfo = aggregatedData.action
+        ? aggregatedData.action->aggregationInfo()  //adding event source (camera) to the existing aggregation info
+        : QnBusinessAggregationInfo();              //creating new aggregation info
+
     if( !aggregatedData.action )
     {
         aggregatedData.action = QnSendMailBusinessActionPtr( new QnSendMailBusinessAction( *action ) );
@@ -443,8 +451,6 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 
     ++aggregatedData.eventCount;
 
-    //adding event source (camera) to the aggregation info
-    QnBusinessAggregationInfo aggregationInfo = aggregatedData.action->aggregationInfo();
     aggregationInfo.append( action->getRuntimeParams(), action->aggregationInfo() );
     aggregatedData.action->setAggregationInfo( aggregationInfo );
 
@@ -606,12 +612,11 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
                            }
 
     case NetworkIssueEvent:
-    {
-        detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
-        detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
-        break;
-    }
-
+        {
+            detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+            detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+            break;
+        }
     case StorageFailureEvent:
     case ServerFailureEvent: 
     case LicenseIssueEvent:
@@ -657,4 +662,4 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         break;
     }
     return detailsMap;
-}
+} 

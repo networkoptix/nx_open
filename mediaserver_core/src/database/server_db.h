@@ -1,15 +1,17 @@
-#ifndef __EVENTS_DB_H_
-#define __EVENTS_DB_H_
+#pragma once
 
 #include <QtSql/QtSql>
 
-#include <core/resource/resource_fwd.h>
+#include <api/model/audit/audit_record.h>
+
 #include <business/business_fwd.h>
 
-#include "utils/db/db_helper.h"
-#include "api/model/audit/audit_record.h"
+#include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
+#include <utils/db/db_helper.h>
 #include <utils/common/uuid.h>
+#include <utils/common/singleton.h>
 
 class QnTimePeriod;
 
@@ -17,9 +19,19 @@ namespace pb {
     class BusinessActionList;
 }
 
-class QnEventsDB: public QnDbHelper
+
+/** Per-server database. Stores event log, audit data and bookmarks. */
+class QnServerDb :
+    public QObject,
+    public QnDbHelper,
+    public Singleton<QnServerDb>
 {
+    Q_OBJECT
 public:
+    QnServerDb();
+
+    virtual QnDbTransaction* getTransaction() override;
+
     void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes);
     bool removeLogForRes(QnUuid resId);
@@ -44,18 +56,17 @@ public:
     int addAuditRecord(const QnAuditRecord& data);
     int updateAuditRecord(int internalId, const QnAuditRecord& data);
 
-    static QnEventsDB* instance();
-    static void init();
-    static void fini();
+    /* Bookmarks API */
 
-    bool createDatabase();
+    bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);    
+    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark);
+    bool removeAllCameraBookmarks(const QString& cameraUniqueId);
+    bool deleteCameraBookmark(const QnUuid &bookmarkId);
 
-    virtual QnDbTransaction* getTransaction() override;
 protected:
-    QnEventsDB();
-
     virtual bool afterInstallUpdate(const QString& updateName) override;
 private:
+    bool createDatabase();
     bool cleanupEvents();
     bool migrateBusinessParams();
     bool cleanupAuditLog();
@@ -69,10 +80,7 @@ private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;
     qint64 m_eventKeepPeriod;
-    static QnEventsDB* m_instance;
     QnDbTransaction m_tran;
 };
 
-#define qnEventsDB QnEventsDB::instance()
-
-#endif // __EVENTS_DB_H_
+#define qnServerDb QnServerDb::instance()

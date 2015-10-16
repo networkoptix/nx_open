@@ -5,6 +5,7 @@
 #include "context/connection_manager.h"
 #include "context/context_settings.h"
 #include "context/login_session_manager.h"
+#include "context/session_settings.h"
 #include "ui/color_theme.h"
 #include "ui/timeline/timeline.h"
 #include "models/camera_list_model.h"
@@ -25,6 +26,8 @@ void QnMobileClientMetaTypes::initialize() {
 void QnMobileClientMetaTypes::registerMetaTypes() {
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
+    qRegisterMetaType<QnStringSet>();
+    qRegisterMetaTypeStreamOperators<QnStringSet>();
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {

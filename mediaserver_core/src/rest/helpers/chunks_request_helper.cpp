@@ -2,14 +2,14 @@
 
 #include <api/helpers/chunks_request_data.h>
 
-#include "recorder/storage_manager.h"
-#include "core/resource/camera_bookmark.h"
 #include <core/resource/camera_resource.h>
-#include <core/resource/camera_bookmark.h>
-#include "motion/motion_helper.h"
+
+#include <motion/motion_helper.h>
+
+#include <recorder/storage_manager.h>
+
 #include <utils/serialization/json.h>
 #include <utils/serialization/json_functions.h>
-#include "core/resource_management/resource_pool.h"
 
 QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
 {
@@ -21,31 +21,6 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
             periods = QnMotionHelper::instance()->matchImage(motionRegions, request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel);
         }
         break;
-    case Qn::BookmarksContent:
-        {
-            QnCameraBookmarkTags tags;
-            if (!request.filter.isEmpty()) {
-                QnCameraBookmarkSearchFilter bookmarksFilter;
-                bookmarksFilter.startTimeMs = request.startTimeMs;
-                bookmarksFilter.endTimeMs = request.endTimeMs;
-                //bookmarksFilter.minDurationMs = request.detailLevel;
-                bookmarksFilter.text = request.filter;
-                QnCameraBookmarkList bookmarks;
-                
-                for (const QnVirtualCameraResourcePtr& res: request.resList) {
-                    if (qnStorageMan->getBookmarks(res->getPhysicalId().toUtf8(), bookmarksFilter, bookmarks)) {
-                        for (const QnCameraBookmark &bookmark: bookmarks)
-                            periods.includeTimePeriod(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs));
-                    }
-                }
-            } else {
-                //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel, request.keepSmallChunks,
-                    QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog,
-                    request.limit).simplified();
-            }
-            break;
-        }
     case Qn::RecordingContent:
     default:
         periods = qnStorageMan->getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel, request.keepSmallChunks,

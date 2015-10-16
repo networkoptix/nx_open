@@ -39,6 +39,7 @@ class QnResourceDisplay;
 class QnSearchLineEdit;
 class QnSearchQueryStrategy;
 class QnThreadedChunksMergeTool;
+class QnPendingOperation;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -75,6 +76,8 @@ public:
 
     QnSearchLineEdit *bookmarksSearchWidget() const;
     void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
+
+    QnSearchQueryStrategy *bookmarksSearchStrategy() const;
 
     QnCameraBookmarkTags bookmarkTags() const;
     void setBookmarkTags(const QnCameraBookmarkTags &tags);
@@ -275,7 +278,7 @@ private:
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
     QnCameraBookmarksQueryPtr m_bookmarkQuery;
     QnCameraBookmarkAggregation m_bookmarkAggregation;
-    QTimer *m_sliderBookmarksRefreshTimer;
+    QnPendingOperation *m_sliderBookmarksRefreshOperation;
 
     QnCameraDataManager* m_cameraDataManager;
 
