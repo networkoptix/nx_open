@@ -49,6 +49,7 @@ private:
     void updateBackupUi(const QnBackupStatusData& reply);
     void updateColumnWidth();
     int getColWidth(const QAbstractItemModel* model, int col);
+    bool hasUnsavedChanges() const;
 private slots:
     void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();
@@ -89,5 +90,5 @@ private:
     BackupSettingsDataList m_cameraBackupSettings;
 private:
     void setupGrid(QTableView* tableView, StoragePool* storagePool);
-    void processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& newData, bool isBackupPool);
+    void processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& newData, bool isBackupPool) const;
 };

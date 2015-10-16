@@ -295,7 +295,7 @@ void QnStorageConfigWidget::updateBackupInfo()
         updateBackupUi(QnBackupStatusData());
 }
 
-void QnStorageConfigWidget::processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& modifiedData, bool isBackupPool)
+void QnStorageConfigWidget::processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& modifiedData, bool isBackupPool) const
 {
     for(const auto& storageData: modifiedData)
     {
@@ -424,6 +424,41 @@ void QnStorageConfigWidget::at_rebuildButton_clicked()
     storagePool.rebuildHandle = m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_Start, isMain, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
 }
 
+bool QnStorageConfigWidget::hasUnsavedChanges() const
+{
+    QnStorageResourceList storagesToUpdate;
+
+    processStorages(storagesToUpdate, m_mainPool.model->modelData().storages, false);
+    processStorages(storagesToUpdate, m_backupPool.model->modelData().storages, true);
+    if (!storagesToUpdate.isEmpty())
+        return true;
+
+    QSet<QnUuid> newIdList;
+    for (const auto& storageData: m_mainPool.model->modelData().storages + m_backupPool.model->modelData().storages)
+        newIdList << storageData.storageId;
+    for (const auto& storage: m_server->getStorages()) {
+        if (!newIdList.contains(storage->getId()))
+            return true;
+    }
+
+    QnMediaServerUserAttributes serverUserAttrs;
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk(QnMediaServerUserAttributesPool::instance(), m_server->getId());
+        serverUserAttrs = *(*lk).data();
+    }
+    if (serverUserAttrs != m_serverUserAttrs)
+        return true;
+
+    for (const auto& camSetting: m_cameraBackupSettings)
+    {
+        auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>(camSetting.id);
+        if (camRes && camSetting.backupType != camRes->getBackupType())
+            return true;
+    }
+
+    return false;
+}
+
 void QnStorageConfigWidget::at_backupButton_clicked()
 {
     if (!m_server)
@@ -432,6 +467,18 @@ void QnStorageConfigWidget::at_backupButton_clicked()
     QPushButton* button = dynamic_cast<QPushButton*>(sender());
     if (!button)
         return;
+
+    if (hasUnsavedChanges())
+    {
+        int dialogResult = QMessageBox::question(
+            this,
+            tr("Confirm save changes"),
+            tr("You have unsaved changes. This action requires to save it. Save changed and continue?"),
+            QMessageBox::Yes | QMessageBox::Cancel);
+        if(dialogResult != QMessageBox::Yes)
+            return;
+        submitToSettings();
+    }
 
     button->setDisabled(true);
     m_server->apiConnection()->backupControlActionAsync (BackupAction_Start, this, SLOT(at_backupStatusReply(int, const QnBackupStatusData &, int)));
@@ -574,19 +621,19 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
     if (reply.progress >= 0)
         ui->progressBarBackup->setValue(reply.progress * 100 + 0.5);
 
-    if (reply.state == Qn::BackupState_None && !ui->backupStartButton->isEnabled())
+    bool showMessage = reply.state == Qn::BackupState_None && !ui->backupStartButton->isEnabled();
+    ui->backupStartButton->setEnabled(reply.state == Qn::BackupState_None);
+    ui->backupStopButton->setEnabled(reply.state == Qn::BackupState_InProgress);
+    ui->stackedWidgetBackupInfo->setCurrentIndex(reply.state == Qn::BackupState_InProgress ? rebuildProgressPageIndex : rebuildPreparePageIndex);
+    ui->stackedWidgetBackupInfo->setVisible(reply.state == Qn::BackupState_InProgress);
+
+    if (showMessage)
     {
         ui->progressBarBackup->setValue(100); // 100%
         QMessageBox::information(this,
             tr("Finished"),
             tr("Archive backup is completed."));
     }
-
-    ui->backupStartButton->setEnabled(reply.state == Qn::BackupState_None);
-    ui->backupStopButton->setEnabled(reply.state == Qn::BackupState_InProgress);
-
-    ui->stackedWidgetBackupInfo->setCurrentIndex(reply.state == Qn::BackupState_InProgress ? rebuildProgressPageIndex : rebuildPreparePageIndex);
-    ui->stackedWidgetBackupInfo->setVisible(reply.state == Qn::BackupState_InProgress);
 }
 
 void QnStorageConfigWidget::updateRebuildUi(const QnStorageScanData& reply, bool isMainPool)
