@@ -3,6 +3,8 @@
 
 #include <future>
 #include <atomic>
+#include <vector>
+#include <boost/optional.hpp>
 
 #include <common/common_globals.h>
 
@@ -20,10 +22,11 @@ private:
 
     struct ChunkKey 
     {
-        DeviceFileCatalog::Chunk    chunk;
-        QString                     cameraID;
-        QnServer::ChunksCatalog     catalog;
+        DeviceFileCatalog::Chunk chunk;
+        QString                  cameraID;
+        QnServer::ChunksCatalog  catalog;
     };
+    typedef std::vector<ChunkKey> ChunkKeyVector;
 
 public:
     enum code
@@ -53,7 +56,7 @@ private:
     void renewSchedule();
     void copyChunk(const ChunkKey &chunkKey);
     
-    ChunkKey getOldestChunk();    
+    boost::optional<ChunkKeyVector> getOldestChunk();    
     ChunkKey getOldestChunk(
         const QString           &cameraId,
         QnServer::ChunksCatalog catalog

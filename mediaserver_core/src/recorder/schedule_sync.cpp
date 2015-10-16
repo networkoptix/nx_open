@@ -122,9 +122,10 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
 }
 
 
-QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk() 
+boost::optional<QnScheduleSync::ChunkKeyVector> 
+QnScheduleSync::getOldestChunk() 
 {
-    ChunkKey ret;
+    ChunkKeyVector ret;
     auto mediaServer = 
         qnResPool->getResourceById(qnCommon->moduleGUID())
             .dynamicCast<QnMediaServerResource>();
@@ -145,7 +146,12 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk()
         if (tmp.chunk.startTimeMs != -1 && tmp.chunk.startTimeMs < minTime)
         {
             minTime = tmp.chunk.startTimeMs;
-            ret = tmp;
+            ret.clear();
+            ret.push_back(tmp);
+        }
+        else if (tmp.chunk.startTimeMs == minTime)
+        {
+            ret.push_back(tmp);
         }
 
         if (backupType & Qn::CameraBackup_LowQuality)
@@ -153,12 +159,19 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk()
         if (tmp.chunk.startTimeMs != -1 && tmp.chunk.startTimeMs < minTime)
         {
             minTime = tmp.chunk.startTimeMs;
-            ret = tmp;
+            ret.clear();
+            ret.push_back(tmp);
+        }
+        else if (tmp.chunk.startTimeMs == minTime)
+        {
+            ret.push_back(tmp);
         }
     }
     
-    if (ret.chunk.startTimeMs != -1)
-        m_syncTimePoint = ret.chunk.startTimeMs;
+    if (!ret.empty())
+        m_syncTimePoint = ret[0].chunk.startTimeMs;
+    else
+        return boost::none;
 
     return ret;
 }
@@ -303,13 +316,13 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 template<typename NeedStopCB>
 void QnScheduleSync::synchronize(NeedStopCB needStop)
 {
-    ChunkKey chunkKey;
     while (1)
     {
-        chunkKey = getOldestChunk();
-        if (chunkKey.chunk.startTimeMs == -1)
+        auto chunkKeyVector = getOldestChunk();
+        if (!chunkKeyVector)
             break;
-        copyChunk(chunkKey);
+        for (const auto &chunkKey : *chunkKeyVector)
+            copyChunk(chunkKey);
         if (needStop())
             break;
     }

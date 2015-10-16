@@ -780,7 +780,7 @@ void QnSecurityCamResource::setBackupType(Qn::CameraBackupTypes value)
 Qn::CameraBackupTypes QnSecurityCamResource::getActualBackupType() const
 {
     Qn::CameraBackupTypes result = getBackupType();
-    if (result = Qn::CameraBackup_Default) {
+    if (result == Qn::CameraBackup_Default) {
         QnMediaServerUserAttributesPool::ScopedLock lk(
             QnMediaServerUserAttributesPool::instance(), 
             getParentId()
