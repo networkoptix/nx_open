@@ -17,8 +17,8 @@ namespace ec2
     };
 #define ApiLockData_Fields (name)(peer)(timestamp)(userData)
 
-    
-    Q_DECLARE_METATYPE(ApiLockData)
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::ApiLockData)
 
 #endif // __EC2_LOCK_DATA_H_
