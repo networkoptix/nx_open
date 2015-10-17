@@ -42,7 +42,7 @@
     </message>
     <message>
         <source>Write to log</source>
-        <translation>In Log-Datei schreiben</translation>
+        <translation>In Log schreiben</translation>
     </message>
     <message>
         <source>Show notification</source>
@@ -82,7 +82,7 @@
     </message>
     <message>
         <source>Server Conflict</source>
-        <translation>Server Konflikt</translation>
+        <translation>Serverkonflikt</translation>
     </message>
     <message>
         <source>Server Started</source>
@@ -90,7 +90,7 @@
     </message>
     <message>
         <source>License Issue</source>
-        <translation>Lizenzierungsproblem</translation>
+        <translation>Lizenzproblem</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
@@ -106,7 +106,7 @@
     </message>
     <message>
         <source>Input on %1</source>
-        <translation>Input auf %1</translation>
+        <translation>Eingabe auf %1</translation>
     </message>
     <message>
         <source>Motion on %1</source>
@@ -126,7 +126,7 @@
     </message>
     <message>
         <source>Server &quot;%1&quot; Conflict</source>
-        <translation>Server Konflikt bei &quot;%1&quot;</translation>
+        <translation>Serverkonflikt bei &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Started</source>
@@ -142,7 +142,7 @@
     </message>
     <message>
         <source>Url: %1</source>
-        <translation>Url: %1</translation>
+        <translation>URL: %1</translation>
     </message>
     <message>
         <source>Reason: %1</source>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="he" sourcelanguage="en">
+<TS version="2.0" language="he" sourcelanguage="en">
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
@@ -1297,115 +1297,116 @@
     </message>
     <message>
         <source>Move Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>הזז התקנים</translation>
     </message>
     <message>
         <source>Move Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>הזז מצלמות
+</translation>
     </message>
     <message>
         <source>Device Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון התקן...</translation>
     </message>
     <message>
         <source>Camera Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון מצלמה...</translation>
     </message>
     <message>
         <source>IO Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון התקן קלט פלט...</translation>
     </message>
     <message>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>קדימות גיבוי בעת כשל...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת התקנים</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת מצלמות</translation>
     </message>
     <message>
         <source>Check Device Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק בעיות התקן...</translation>
     </message>
     <message>
         <source>Check Devices Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק בעיות בהתקנים...</translation>
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק בעיות במצלמה...</translation>
     </message>
     <message>
         <source>Check Cameras Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק בעיות במצלמות...</translation>
     </message>
     <message>
         <source>Check IO Module Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק בעיות בהתקן קלט פלט...</translation>
     </message>
     <message>
         <source>Check IO Modules Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק בעיות בהתקני קלט פלט...</translation>
     </message>
     <message>
         <source>Device Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי התקן...</translation>
     </message>
     <message>
         <source>Devices Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי התקנים...</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי מצלמה...</translation>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי מצלמות...</translation>
     </message>
     <message>
         <source>IO Module Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי התקן קלט פלט...</translation>
     </message>
     <message>
         <source>IO Modules Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי התקני קלט פלט...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקן...</translation>
     </message>
     <message>
         <source>Devices Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקנים...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מצלמה...</translation>
     </message>
     <message>
         <source>Cameras Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מצלמות...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הקדרות התקן קלט פלט...</translation>
     </message>
     <message>
         <source>IO Modules Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקני קלט פלט...</translation>
     </message>
     <message>
         <source>Devices List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת התקנים לפי שרת...</translation>
     </message>
     <message>
         <source>Cameras List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת המצלמות לפי שרת...</translation>
     </message>
 </context>
 <context>
@@ -1482,19 +1483,19 @@
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>התקנים</translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמות</translation>
     </message>
     <message>
         <source>Device actions</source>
-        <translation type="unfinished"></translation>
+        <translation>פעולות התקנים</translation>
     </message>
     <message>
         <source>Camera actions</source>
-        <translation type="unfinished"></translation>
+        <translation>פעולות מצלמה</translation>
     </message>
 </context>
 <context>
@@ -1652,35 +1653,35 @@
     </message>
     <message>
         <source>Device updated</source>
-        <translation type="unfinished"></translation>
+        <translation>התקן עודכן</translation>
     </message>
     <message>
         <source>Camera updated</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמה עודכנה</translation>
     </message>
     <message>
         <source>Device added</source>
-        <translation type="unfinished"></translation>
+        <translation>התקן התווסף</translation>
     </message>
     <message>
         <source>Camera added</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמה התווספה</translation>
     </message>
     <message>
         <source>Device removed</source>
-        <translation type="unfinished"></translation>
+        <translation>התקן הוסר</translation>
     </message>
     <message>
         <source>Camera removed</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמה הוסרה</translation>
     </message>
     <message>
         <source>Device name</source>
-        <translation type="unfinished"></translation>
+        <translation>שם התקן</translation>
     </message>
     <message>
         <source>Camera name</source>
-        <translation type="unfinished"></translation>
+        <translation>שם מצלמה</translation>
     </message>
 </context>
 <context>
@@ -1712,31 +1713,31 @@
     <name>QnBusinessResourceValidationStrings</name>
     <message>
         <source>%1 of %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>התקנים %1 מ %n</translation>
     </message>
     <message>
         <source>%1 of %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמות %1 מ %n</translation>
     </message>
     <message>
         <source>%1 of %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>התקני קלט פלט %1 מ %n</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל התקן&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;בחר לפחות התקן אחד&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;בחר לפחות מצלמה אחת&gt;</translation>
     </message>
 </context>
 <context>
@@ -1833,23 +1834,23 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל התקן&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר לפחות התקן אחד</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר לפחות מצלמה אחת</translation>
     </message>
     <message>
         <source>Occurs</source>
-        <translation type="unfinished">התרחשויות</translation>
+        <translation>התרחשות</translation>
     </message>
 </context>
 <context>
@@ -1864,19 +1865,19 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל התקן&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;בחר לפחות התקן אחד&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;בחר לפחות מצלמה אחת&gt;</translation>
     </message>
 </context>
 <context>
@@ -1951,11 +1952,11 @@
     </message>
     <message>
         <source>filter by devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>סנן לפי התקנים...</translation>
     </message>
     <message>
         <source>filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>סנן לפי מצלמות...</translation>
     </message>
 </context>
 <context>
@@ -2045,7 +2046,7 @@
     </message>
     <message>
         <source>Scanning hosts... (%1)</source>
-        <translation type="unfinished">מחפש שרת... (%1)</translation>
+        <translation>מחפש שרתים... (%1)</translation>
     </message>
     <message>
         <source>Finished</source>
@@ -2123,7 +2124,7 @@
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>מחפש שרת... (%1)</translation>
     </message>
 </context>
 <context>
@@ -2210,51 +2211,51 @@
     </message>
     <message>
         <source>Diagnostics for device %1</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון להתקן %1</translation>
     </message>
     <message>
         <source>Diagnostics for camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון למצלמה %1</translation>
     </message>
     <message>
         <source>Diagnostics for IO module %1</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון להתקן קלט פלט %1</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון התקן</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון מצלמה</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון התקן קלט פלט</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>מוודא שההתקן נגיש.</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>מוודא שהמצלמה נגישה.</translation>
     </message>
     <message>
         <source>Confirming IO module is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>מוודא שהתקן הקלט פלט נגיש.</translation>
     </message>
     <message>
         <source>Confirming target device provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>מוודא שההתקן מספק תזרים מדיה.</translation>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>מוודא שהמצלמה מספקת תזרים מדיה.</translation>
     </message>
     <message>
         <source>Confirming target IO module provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>מוודא שהתקן הקלט פלט מספק תזרים מדיה.</translation>
     </message>
 </context>
 <context>
@@ -2291,40 +2292,40 @@
     <message>
         <source>Devices List for %1</source>
         <extracomment>Devices List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>רשמית התקנים עבור %1</translation>
     </message>
     <message>
         <source>Cameras List for %1</source>
         <extracomment>Cameras List for Server (192.168.0.1)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>רשימת מצלמות עבור %1</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת התקנים</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת מצלמות</translation>
     </message>
     <message>
         <source>%n devices found</source>
-        <translation type="unfinished">נמצא מכשיר %n</translation>
+        <translation>נמצאו %n התקנים</translation>
     </message>
     <message>
         <source>%n cameras found</source>
-        <translation type="unfinished"></translation>
+        <translation>נמצאו %n מצלמות</translation>
     </message>
     <message>
         <source>%n IO modules found</source>
-        <translation type="unfinished"></translation>
+        <translation>נמצאו %n התקני קלט פלט</translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>ייצא את ההתקנים שנבחרו לקובץ.</translation>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>ייצא את המצלמות שנבחרו לקובץ.</translation>
     </message>
 </context>
 <context>
@@ -2402,7 +2403,6 @@
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
         <source>%1 have no output relays</source>
-        <translatorcomment>למה רבים? מה בא במקום שומר המקום?</translatorcomment>
         <translation>
             <numerusform>ל%1 אין יציאות ממסר</numerusform>
             <numerusform>ל%1 אין יציאות ממסר</numerusform>
@@ -2413,7 +2413,6 @@
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
-        <translatorcomment>מה יש בשומר המקום? למה צורת רבים?</translatorcomment>
         <translation>
             <numerusform>ההקלטה כבויה עבור %1</numerusform>
             <numerusform>ההקלטה כבויה עבור %1</numerusform>
@@ -2436,27 +2435,27 @@
     </message>
     <message>
         <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>אזהרה! ערך מינימום גבוה יוריד את משך ההקלטה של ההתקנים האחרים.</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation type="unfinished"></translation>
+        <translation>אזהרה! ערך מינימום גבוה יוריד את משך ההקלטה של המצלמות האחרים.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטה בתנועה מבוטלת או לא נתמכת ע&quot;י חלק מהמצלמות שנבחרו. אנא בדוק את הגדרות ההקלטה בתנועה ווודא שהקלטה בתנועה נתמכת ומאופשרת.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported by this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>תזרים וידאו כפול אינו נתמך במצלמה זו.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>תזרים וידאו כפול וזיהוי תנועה אינם נתמכים במצלמה זו.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>זיהוי תנועה אינו מאופשר. יש להגדיר את זיהוי התנועה והרגישות בהגדרות זיהוי התנועה של המצלמה.</translation>
     </message>
 </context>
 <context>
@@ -2487,91 +2486,91 @@
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקן</translation>
     </message>
     <message>
         <source>Devices Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקנים</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מצלמה</translation>
     </message>
     <message>
         <source>Cameras Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מצלמות</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקן קלט פלט</translation>
     </message>
     <message>
         <source>IO Modules Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקני קלט פלט</translation>
     </message>
     <message>
         <source>Device Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון התקן</translation>
     </message>
     <message>
         <source>Devices Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון התקנים</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון מצלמה</translation>
     </message>
     <message>
         <source>Cameras Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון מצלמות</translation>
     </message>
     <message>
         <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון התקן קלט פלט</translation>
     </message>
     <message>
         <source>IO Modules Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון התקני קלט פלט</translation>
     </message>
     <message>
         <source>Device Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי התקן</translation>
     </message>
     <message>
         <source>Devices Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי התקנים</translation>
     </message>
     <message>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי מצלמה</translation>
     </message>
     <message>
         <source>Cameras Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי מצלמות</translation>
     </message>
     <message>
         <source>IO Module Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי התקן קלט פלט</translation>
     </message>
     <message>
         <source>IO Modules Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי התקני קלט פלט</translation>
     </message>
     <message>
         <source>Apply changes to the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>להחיל שינויים על על %n ההתקנים הבאים?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>להחיל שינויים על על %n המצלמות הבאות?</translation>
     </message>
     <message>
         <source>Apply changes to the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>להחיל שינויים על על %n ההתקני הקלט פלט הבאים?</translation>
     </message>
     <message>
         <source>Changes are not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>השינויים לא נשמרו</translation>
     </message>
 </context>
 <context>
@@ -2582,7 +2581,7 @@
     </message>
     <message>
         <source>No device selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא נבחרו התקנים.</translation>
     </message>
 </context>
 <context>
@@ -2962,11 +2961,11 @@
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל התקן&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
 </context>
 <context>
@@ -3020,49 +3019,49 @@
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>סוג הקלטה בתנועה לפי לוח זמנים לא נתמך בכל המצלמות.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להפעיל הקלטה עבור חלק מהמצלמות.</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות לוח זמנים אינן מתאימות לחלק מההתקנים.</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialog</name>
     <message>
         <source>Failover Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>קדימות גיבוי</translation>
     </message>
     <message>
         <source>Never</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">לעולם לא</translation>
+        <translation>אף פעםלעולם לא</translation>
     </message>
     <message>
         <source>Low</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished"></translation>
+        <translation>נמוך</translation>
     </message>
     <message>
         <source>Medium</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished">בינוני</translation>
+        <translation>בינוניבינוני</translation>
     </message>
     <message>
         <source>High</source>
         <comment>Failover priority</comment>
-        <translation type="unfinished"></translation>
+        <translation>גבוה</translation>
     </message>
 </context>
 <context>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
         <source>Set Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדר קדימות:</translation>
     </message>
 </context>
 <context>
@@ -3115,27 +3114,27 @@
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Open Alarm/Event Rules Management...</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח את ניהול האזעקות/חוקים...</translation>
     </message>
     <message>
         <source>Open Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח את יומן האירועים...</translation>
     </message>
     <message>
         <source>Open Devices List...</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח רשימת התקנים...</translation>
     </message>
     <message>
         <source>Open Cameras List...</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח רשימת המצלמות...</translation>
     </message>
     <message>
         <source>Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת התקנים</translation>
     </message>
     <message>
         <source>Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת מצלמות</translation>
     </message>
 </context>
 <context>
@@ -3346,15 +3345,15 @@
     <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>התקן %1 לא ניתן לייצוא.</translation>
     </message>
     <message>
         <source>Could not export camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמה %1 לא ניתנת לייצוא.</translation>
     </message>
     <message>
         <source>Could not export IO module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>התקן קלט פלט %1 לא ניתן לייצוא.</translation>
     </message>
 </context>
 <context>
@@ -3746,15 +3745,15 @@
     </message>
     <message>
         <source>Use licenses for selected %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>השתמש ברישיונות עבור %n ההתקנים שנבחרו</translation>
     </message>
     <message>
         <source>Use licenses for selected %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>השתמש ברישיונות עבור %n המצלמות שנבחרו</translation>
     </message>
     <message>
         <source>Use licenses for selected %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>השתמש ברישיונות עבור %n התקני קלט פלט שנבחרו</translation>
     </message>
 </context>
 <context>
@@ -4037,19 +4036,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The discovered system %1 is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>המערכת שהתגלתה %1 נמצאת במצב בטוח.</translation>
     </message>
     <message>
         <source>System has an incompatible version.</source>
-        <translation type="unfinished"></translation>
+        <translation>למערכת ישנה גרסה שאינה מתאימה.</translation>
     </message>
     <message>
         <source>Operation is not permitted.</source>
-        <translation type="unfinished"></translation>
+        <translation>הפעולה אינה מורשה.</translation>
     </message>
     <message>
         <source>System is in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>המערכת במצב בטוח.</translation>
     </message>
 </context>
 <context>
@@ -4222,67 +4221,67 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Open Device</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח התקן</translation>
     </message>
     <message>
         <source>Open Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח מצלמה</translation>
     </message>
     <message>
         <source>Open IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח התקן קלט פלט</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקן...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מצלמה...</translation>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקן קלט פלט...</translation>
     </message>
     <message>
         <source>Server Settings...</source>
-        <translation type="unfinished">הגדרות שרת...</translation>
+        <translation>הגדרות שרת...הגדרות שרת...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח התקן בדף אינטרנט...</translation>
     </message>
     <message>
         <source>Open Camera Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח מצלמה בדף אינטרנט...</translation>
     </message>
     <message>
         <source>Open IO Module Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח התקן קלט פלטבדף אינטרנט...</translation>
     </message>
     <message>
         <source>Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>רישיונות...</translation>
     </message>
     <message>
         <source>User Settings...</source>
-        <translation type="unfinished">הגדרות משתמש...</translation>
+        <translation>הגדרות משתמש...</translation>
     </message>
     <message>
         <source>SMTP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות דואר אלקטרוני...</translation>
     </message>
     <message>
         <source>Connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>התחבר לשרת...</translation>
     </message>
     <message>
         <source>Time Synchronization...</source>
-        <translation type="unfinished"></translation>
+        <translation>סנכרון זמן...</translation>
     </message>
     <message>
         <source>Server settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות שרת...</translation>
     </message>
 </context>
 <context>
@@ -4679,43 +4678,43 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Total %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation>סה&quot;כ %n התקנים</translation>
     </message>
     <message>
         <source>Total %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>סה&quot;כ %n מצלמות</translation>
     </message>
     <message>
         <source>Total %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>סה&quot;כ %n התקני קלט פלט</translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>התקנים עם ארכיון שאינו ריק</translation>
     </message>
     <message>
         <source>Cameras with non-empty archive</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמות עם ארכיון שאינו ריק</translation>
     </message>
     <message>
         <source>Storage space occupied by devices</source>
-        <translation type="unfinished"></translation>
+        <translation>מקום איחסון התפוס ע&quot;י התקנים</translation>
     </message>
     <message>
         <source>Storage space occupied by cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>מקום איחסון התפוס ע&quot;י מצלמות</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>התקן</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמה</translation>
     </message>
     <message>
         <source>empty</source>
-        <translation type="unfinished"></translation>
+        <translation>ריק</translation>
     </message>
 </context>
 <context>
@@ -4765,11 +4764,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Live Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>התקנים חיים</translation>
     </message>
     <message>
         <source>Live Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמות חיות</translation>
     </message>
 </context>
 <context>
@@ -4807,11 +4806,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Select Devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר התקנים...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר מצלמות...</translation>
     </message>
 </context>
 <context>
@@ -4927,23 +4926,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server Settings - %1 (readonly)</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות שרת - %1 (לקריאה בלבד)</translation>
     </message>
     <message>
         <source>Server Settings - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות שרת - %1</translation>
     </message>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished">הגדרות שרת</translation>
+        <translation>הגדרות שרת</translation>
     </message>
     <message>
         <source>Server not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>השרת אינו נשמר</translation>
     </message>
     <message>
         <source>Apply changes to the server %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>החל שינויים על השרת %1?</translation>
     </message>
 </context>
 <context>
@@ -5010,39 +5009,39 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Enable failover (server will take devices automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשר גיבוי (השרת יקח התקנים באופן אוטמטי משרתים לא מקוונים)</translation>
     </message>
     <message>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשר גיבוי (השרת יקח מצלמות באופן אוטמטי משרתים לא מקוונים)</translation>
     </message>
     <message>
         <source>Max devices on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>מקסימום התקנים על שרת זה:</translation>
     </message>
     <message>
         <source>Max cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>מקסימום מצלמות על שרת זה:</translation>
     </message>
     <message>
         <source>Server is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>השרת אינו זמין</translation>
     </message>
     <message>
         <source>This server already has more than max devices</source>
-        <translation type="unfinished"></translation>
+        <translation>לשרת שרת זה יש התקנים יותר מהמותר</translation>
     </message>
     <message>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>לשרת שרת זה יש מצלמות יותר מהמותר</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of devices</source>
-        <translation type="unfinished"></translation>
+        <translation>בכדי למנוע תקלה עדכן את המספר המקסימלי של ההתקנים</translation>
     </message>
     <message>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>בכדי למנוע תקלה עדכן את המספר המקסימלי של המצלמות</translation>
     </message>
 </context>
 <context>
@@ -5370,15 +5369,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקן</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מצלמה</translation>
     </message>
     <message>
         <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות התקן קלט פלט</translation>
     </message>
 </context>
 <context>
@@ -5507,15 +5506,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please check authentication information in device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק הגדרות אימות בהגדרות ההתקן</translation>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק הגדרות אימות בהגדרות המצלמה</translation>
     </message>
     <message>
         <source>Please check authentication information in IO module settings</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק הגדרות אימות בהגדרות התקן קלט פלט</translation>
     </message>
 </context>
 <context>
@@ -5607,19 +5606,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnSystemSettingsWidget</name>
     <message>
         <source>Enable devices and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשר גילוי אוטומטי של התקנים ושרתים</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשר גילוי אוטומטי של מצלמות ושרתים</translation>
     </message>
     <message>
         <source>Allow system to optimize devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשר למערכת לשפר את הגדרות ההתקן</translation>
     </message>
     <message>
         <source>Allow system to optimize cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>אפשר למערכת לשפר את הגדרות המצלמה</translation>
     </message>
 </context>
 <context>
@@ -5899,11 +5898,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Adjust device settings</source>
-        <translation type="unfinished"></translation>
+        <translation>עדכן הגדרון התקן</translation>
     </message>
     <message>
         <source>Adjust camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>עדכן הגדרות מצלמה</translation>
     </message>
 </context>
 <context>
@@ -5994,11 +5993,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Can adjust devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation>יכול לערוך הגדרות התקנים</translation>
     </message>
     <message>
         <source>Can adjust cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation>יכול לערוך הגדרות מצלמות</translation>
     </message>
 </context>
 <context>
@@ -6254,101 +6253,101 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>לא ניתן להעביר התקן זה לשרת %1. השרת אינו מגיב.</numerusform>
+            <numerusform>לא ניתן להעביר %n התקנים לשרת %1. השרת אינו מגיב.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>לא ניתן להעביר מצלמה זו לשרת %1. השרת אינו מגיב.</numerusform>
+            <numerusform>לא ניתן להעביר %n מצלמות לשרת %1. השרת אינו מגיב.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>לא ניתן להעביר התקן קלט פלט זה לשרת %1. השרת אינו מגיב.</numerusform>
+            <numerusform>לא ניתן להעביר %n התקני קלט פלט לשרת %1. השרת אינו מגיב.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל התקן זה. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
+            <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל %n התקנים אלו. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל מצלמה זו. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
+            <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל %n מצלמות אלו. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל התקן קלט פלט זה. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
+            <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל %n התקני קלט פלט אלו. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>האם אתה בטוח שברצונך למחוק קובץ זה?</numerusform>
+            <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>האם אתה בטוח שאתה רוצה להסיר את פריט זה מהפריסה?</numerusform>
+            <numerusform>האם אתה בטוח שאתה רוצה להסיר את %n vפריטים האלו מהפריסה?</numerusform>
         </translation>
     </message>
     <message>
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n התקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n מצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
         <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n התקני קלט פלט אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n מהתקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n ממצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
         <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%n מהתקני קלט פלט אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם אתה רוצה למחוק את %n ההתקנים הבאים?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם אתה רוצה למחוק את %n המצלמות הבאות?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם אתה רוצה למחוק את %n התקני קלט פלט הבאים?</translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>האם אתה רוצה למחוק את הפריט הבא?</numerusform>
+            <numerusform>האם אתה רוצה למחוק את %n הפריטים הבאים?</numerusform>
         </translation>
     </message>
 </context>
@@ -6799,15 +6798,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>All Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>כל ההתקנים</translation>
     </message>
     <message>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>כל המצלמות</translation>
     </message>
     <message>
         <source>All IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>כל התקני הקלט פלט</translation>
     </message>
 </context>
 <context>
@@ -6845,36 +6844,36 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message>
         <source>The system is in Safe Mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>המערכת במצב בטוח.</translation>
     </message>
     <message>
         <source>It is not allowed to make any changes except license activation.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן לעשות שינויים כלשהם למעט הפעלת רישיון.</translation>
     </message>
     <message>
         <source>The following %n items are not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>%n הפריטים הבאים לא נשמרו.</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
-            <numerusform>לא ניתן לשמור את הפריט ה%n הבא לשרת.</numerusform>
+        <translation>
+            <numerusform>לא ניתן לשמור את הפריט הבא לשרת.</numerusform>
             <numerusform>לא ניתן לשמור את %n  הפריטים הבאים לשרת.</numerusform>
         </translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">שגיאה</translation>
+        <translation>שגיאה</translation>
     </message>
     <message>
         <source>The following %n items are not deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>%n הפריטים הבאים לא נמחקו.</translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>לא ניתן למחוק את הפריט הבא מהשרת.</numerusform>
+            <numerusform>לא ניתן למחוק את %n הפריטים הבאים מהשרת.</numerusform>
         </translation>
     </message>
 </context>
@@ -6882,7 +6881,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
+        <translation>המערכת במצב בטוח</translation>
     </message>
 </context>
 <context>
