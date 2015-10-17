@@ -138,7 +138,7 @@ PasswordHelper::PasswordHelper()
 
     setPasswordInfo(BASLER_MANUFACTURER, ADMIN1, ADMIN1);
 
-    setPasswordInfo(BOSH_DINION_MANUFACTURER);
+    setPasswordInfo(BOSH_DINION_MANUFACTURER, "service", "service");
 
     setPasswordInfo(BRICKCOM_MANUFACTURER, ADMIN1, ADMIN1);
 
