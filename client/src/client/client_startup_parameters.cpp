@@ -53,12 +53,13 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");
 #endif
 
-    addParserParam(commandLineParser, &result.devModeKey, "--dev-mode-key");
-    addParserParam(commandLineParser, &result.softwareYuv, "--soft-yuv");
-    addParserParam(commandLineParser, &result.forceLocalSettings, "--local-settings");
-    addParserParam(commandLineParser, &result.fullScreenDisabled, "--no-fullscreen");
-    addParserParam(commandLineParser, &result.skipMediaFolderScan, "--skip-media-folder-scan");
-    addParserParam(commandLineParser, &result.engineVersion, "--override-version");
+    addParserParam(commandLineParser, &result.devModeKey,           "--dev-mode-key");
+    addParserParam(commandLineParser, &result.softwareYuv,          "--soft-yuv");
+    addParserParam(commandLineParser, &result.forceLocalSettings,   "--local-settings");
+    addParserParam(commandLineParser, &result.fullScreenDisabled,   "--no-fullscreen");
+    addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
+    addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
+    addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
@@ -94,6 +95,7 @@ QnStartupParameters::QnStartupParameters()
     , softwareYuv(false)
     , forceLocalSettings(false)
     , fullScreenDisabled(kDefaultNoFullScreen)
+    , showFullInfo(false)
 
     , devModeKey()
     , authenticationString()

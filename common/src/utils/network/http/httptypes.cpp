@@ -1024,9 +1024,9 @@ namespace nx_http
         //   WWWAuthenticate
         //////////////////////////////////////////////
 
-        WWWAuthenticate::WWWAuthenticate()
+        WWWAuthenticate::WWWAuthenticate(AuthScheme::Value authScheme)
         :
-            authScheme( AuthScheme::none )
+            authScheme( authScheme )
         {
         }
 

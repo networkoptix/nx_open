@@ -21,8 +21,8 @@ Item {
     signal clicked()
     signal doubleClicked()
 
-    function animateToSize(width, height, forceSize) {
-        flick.animateToSize(width, height, forceSize)
+    function resizeContent(width, height, animate, forceSize) {
+        flick.animateToSize(width, height, animate, forceSize)
     }
 
     QnFlickable {
@@ -69,12 +69,12 @@ Item {
 
         function animateToBounds() {
             if (contentWidth < minContentWidth && contentHeight < minContentHeight) {
-                animateToSize(minContentWidth, minContentHeight)
+                animateToSize(minContentWidth, minContentHeight, true)
                 return
             }
 
             /* Cannot use returnToBounds for smooth animation due to the mentioned Flickable bug. */
-            animateToSize(contentWidth, contentHeight)
+            animateToSize(contentWidth, contentHeight, true)
             /*
             boundsAnimation.stop()
 
@@ -90,7 +90,7 @@ Item {
             */
         }
 
-        function animateToSize(cw, ch, forceSize) {
+        function animateToSize(cw, ch, animate, forceSize) {
             boundsAnimation.stop()
 
             var w = contentWidth
@@ -119,12 +119,21 @@ Item {
             if (y < yMargin)
                 y = -yMargin
 
-            widthAnimation.to = w
-            heightAnimation.to = h
-            xAnimation.to = x
-            yAnimation.to = y
+            if (animate) {
+                widthAnimation.to = w
+                heightAnimation.to = h
+                xAnimation.to = x
+                yAnimation.to = y
 
-            boundsAnimation.start()
+                boundsAnimation.start()
+            } else {
+                contentWidth = w
+                contentHeight = h
+                contentX = x
+                contentY = y
+
+                updateMargins()
+            }
         }
 
         Component.onCompleted: {
