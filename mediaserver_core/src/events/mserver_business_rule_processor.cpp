@@ -451,17 +451,215 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 
     ++aggregatedData.eventCount;
 
+    aggregationInfo.append( action->getRuntimeParams(), action->aggregationInfo() );
+    aggregatedData.action->setAggregationInfo( aggregationInfo );
+
+    return true;
+}
+
+void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggregationKey& aggregationKey )
+{
+    QnMutexLocker lk( &m_mutex );
+
+    auto aggregatedActionIter = m_aggregatedEmails.find(aggregationKey);
+    if( aggregatedActionIter == m_aggregatedEmails.end() )
+        return;
+
+    if( !sendMailInternal( aggregatedActionIter->action, aggregatedActionIter->eventCount ) )
+    {
+        NX_LOG( lit("Failed to send aggregated email"), cl_logDEBUG1 );
+    }
+
+    m_aggregatedEmails.erase( aggregatedActionIter );
+}
+
 QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action, 
                                                                  const QnBusinessAggregationInfo &aggregationInfo, 
                                                                  QnEmailAttachmentList& attachments, 
                                                                  bool useIp)
+{
+    QnBusinessEventParameters params = action->getRuntimeParams();
+    QnBusiness::EventType eventType = params.eventType;
+
+    QVariantHash contextMap;
+
+    contextMap[tpProductName] = QnAppInfo::productNameLong();
+    contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
+    contextMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+    if (eventType == QnBusiness::CameraMotionEvent) {
+        contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
+        contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
+
+        QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
+        if (!screenshotData.isNull()) {
+            QBuffer screenshotStream(&screenshotData);
+            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+        }
+
+    }
+    else if (eventType == QnBusiness::UserDefinedEvent) 
+    {
+        auto metadata = action->getRuntimeParams().metadata;
+        if (!metadata.cameraRefs.empty()) 
+        {
+            QVariantList cameras;
+            int screenshotNum = 1;
+            for (const QnUuid& cameraId: metadata.cameraRefs)
+            {
+                if (QnResourcePtr res = qnResPool->getResourceById(cameraId))
+                {
+                    QVariantMap camera;
+
+                    camera[QLatin1String("name")] = getFullResourceName(res, useIp);
+                    camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
+                    camera[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, true);
+
+                    QByteArray screenshotData = getEventScreenshotEncoded(cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE);
+                    if (!screenshotData.isNull()) {
+                        QBuffer screenshotStream(&screenshotData);
+                        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshotNum.arg(screenshotNum), screenshotStream, lit("image/jpeg"))));
+                        camera[QLatin1String("screenshot")] = lit("cid:") + tpScreenshotNum.arg(screenshotNum++);
+                    }
+
+                    cameras << camera;
+                }
+            }
+            if (!cameras.isEmpty()) 
+            {
+                contextMap[tpHasCameras] = lit("1");
+                contextMap[tpCameras] = cameras;
+            }
+        }
+    }
+
+    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, useIp);
+
+    return contextMap;
+}
+
 QString QnMServerBusinessRuleProcessor::formatEmailList(const QStringList &value) const
 {
+    QString result;
+    for (int i = 0; i < value.size(); ++i)
+    {
+        if (i > 0)
+            result.append(L' ');
+        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
+    }
+    return result;
+}
 
+QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
+                                                                const QnBusinessAggregationInfo& aggregationInfo,
+                                                                bool useIp) 
+{
+    QVariantList result;
+    if (aggregationInfo.isEmpty()) {
+        result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), useIp);
+    }
+
+    for (const QnInfoDetail& detail: aggregationInfo.toList()) {
+        result << eventDetailsMap(action, detail, useIp);
+    }
+    return result;
+}
+
+QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
+    const QnAbstractBusinessActionPtr& action,
+    const QList<QnInfoDetail>& aggregationDetailList,
+    bool useIp )
+{
+    QVariantList result;
+    for (const QnInfoDetail& detail: aggregationDetailList)
+        result << eventDetailsMap(action, detail, useIp);
+    return result;
+}
+
+
+QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
+    const QnAbstractBusinessActionPtr& action,
+    const QnInfoDetail& aggregationData,
+    bool useIp,
+    bool addSubAggregationData )
+{
+    using namespace QnBusiness;
+
+    const QnBusinessEventParameters& params = aggregationData.runtimeParams();
+    const int aggregationCount = aggregationData.count();
+
+    QVariantHash detailsMap;
+
+    if( addSubAggregationData )
+    {
+        const QnBusinessAggregationInfo& subAggregationData = aggregationData.subAggregationData();
+        detailsMap[tpAggregated] = !subAggregationData.isEmpty()
+            ? aggregatedEventDetailsMap(action, subAggregationData, useIp)
+            : (QVariantList() << eventDetailsMap(action, aggregationData, useIp, false));
+    }
+
+    detailsMap[tpTimestamp] = QnBusinessStringsHelper::eventTimestampShort(params, aggregationCount);
+
+    switch (params.eventType) {
+    case CameraDisconnectEvent: {
+        detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+        break;
+                                }
+
+    case CameraInputEvent: {
+        detailsMap[tpInputPort] = params.inputPortId;
+        break;
+                           }
+
+    case NetworkIssueEvent:
         {
             detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;
         }
     case StorageFailureEvent:
+    case ServerFailureEvent: 
+    case LicenseIssueEvent:
+        {
+            detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+            break;
+        }
+    case CameraIpConflictEvent: {
+        detailsMap[lit("cameraConflictAddress")] = params.caption;
+        QVariantList conflicts;
+        int n = 0;
+        foreach (const QString& mac, params.description.split(QnConflictBusinessEvent::Delimiter)) {
+            QVariantHash conflict;
+            conflict[lit("number")] = ++n;
+            conflict[lit("mac")] = mac;
+            conflicts << conflict;
+        }
+        detailsMap[lit("cameraConflicts")] = conflicts;
+
+        break;
+                                }
+    case ServerConflictEvent: {
+        QnCameraConflictList conflicts;
+        conflicts.sourceServer = params.caption;
+        conflicts.decode(params.description);
+
+        QVariantList conflictsList;
+        int n = 0;
+        for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
+            const QString &server = itr.key();
+            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+                QVariantHash conflict;
+                conflict[lit("number")] = ++n;
+                conflict[lit("ip")] = server;
+                conflict[lit("mac")] = camera;
+                conflictsList << conflict;
+            }
+        }
+        detailsMap[lit("msConflicts")] = conflictsList;
+        break;
+                              }
+    default:
+        break;
+    }
+    return detailsMap;
 } 

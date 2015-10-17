@@ -1830,7 +1830,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 // data migration from previous versions
 
 void QnStorageManager::doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage) {
-    for (int i = 0; i < QnServer::ChunkCatalogCount; ++i)
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
         doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i), extraAllowedStorage);
 }
 

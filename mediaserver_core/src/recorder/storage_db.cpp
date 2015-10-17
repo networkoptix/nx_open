@@ -332,3 +332,13 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
     return result;
 }
 
+QnStorageDb::QnDbTransaction* QnStorageDb::getTransaction()
+{
+    if( m_needReopenDB )
+    {
+        if( m_sdb.open() && createDatabase())
+            m_needReopenDB = false;
+    }
+
+    return &m_tran;
+}
