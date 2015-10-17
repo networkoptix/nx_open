@@ -19,10 +19,9 @@ public:
         m_pendingPosition(0)
     {
         Q_ASSERT(m_geometry);
-        m_color[0] = Qt::darkGreen;
-        m_color[1] = Qt::red;
-        m_color[2] = Qt::yellow;
-        m_color[3] = Qt ::transparent;
+        m_color[Qn::RecordingContent] = Qt::darkGreen;
+        m_color[Qn::MotionContent] = Qt::red;
+        m_color[Qn::TimePeriodContentCount] = Qt ::transparent;
     }
 
     std::array<QColor, Qn::TimePeriodContentCount + 1> colors() const;

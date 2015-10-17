@@ -220,6 +220,7 @@ namespace nx_http
             notAcceptable = 406,
             proxyAuthenticationRequired = 407,
             rangeNotSatisfiable = 416,
+            invalidParameter = 451,
             internalServerError = 500,
             notImplemented = 501,
             serviceUnavailable = 503
@@ -474,7 +475,7 @@ namespace nx_http
             AuthScheme::Value authScheme;
             QMap<BufferType, BufferType> params;
 
-            WWWAuthenticate();
+            WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
 
             bool parse( const BufferType& str );
         };

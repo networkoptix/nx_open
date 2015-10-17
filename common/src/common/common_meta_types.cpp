@@ -249,12 +249,17 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
     qRegisterMetaType<ec2::ApiResourceParamDataList>("ApiResourceParamDataList");
-    qRegisterMetaType<ec2::ApiServerFootageDataList>("ec2::ApiServerFootageDataList");
-    qRegisterMetaType<ec2::ApiCameraHistoryData>("ec2::ApiCameraHistoryData");
+
+    qRegisterMetaType<ec2::ApiServerFootageData>("ApiServerFootageData");
+    qRegisterMetaType<ec2::ApiServerFootageDataList>("ApiServerFootageDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryItemData>("ApiCameraHistoryItemData");
+    qRegisterMetaType<ec2::ApiCameraHistoryItemDataList>("ApiCameraHistoryItemDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryData>("ApiCameraHistoryData");
+    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ApiCameraHistoryDataList");
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
 
-    qRegisterMetaType<QnUuid>( "QnUuid" );
-    qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
+    qRegisterMetaType<QnUuid>();
+    qRegisterMetaTypeStreamOperators<QnUuid>();
     qRegisterMetaType<QnRecordingStatsReply>();
     qRegisterMetaType<QnAuditRecordList>();
 

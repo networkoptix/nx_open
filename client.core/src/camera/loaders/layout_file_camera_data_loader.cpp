@@ -86,8 +86,6 @@ int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resol
     switch (m_dataType) {
     case Qn::RecordingContent:
         return sendDataDelayed(m_data);
-    case Qn::BookmarksContent:
-        return sendDataDelayed(QnAbstractCameraDataPtr(new QnTimePeriodCameraData()));
     case Qn::MotionContent:
         {
             QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());

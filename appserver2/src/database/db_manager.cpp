@@ -343,7 +343,6 @@ bool createCorruptedDbBackup(const QString& dbFileName)
 bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 {
     m_resourceFactory = factory;
-    m_dbReadOnly = ec2::Settings::instance()->dbReadOnly();
 
     const QString dbFilePath = dbUrl.toLocalFile();
     const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
@@ -676,6 +675,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     if (!locker.commit())
         return false;
 
+    m_dbReadOnly = ec2::Settings::instance()->dbReadOnly();
     emit initialized();
     m_initialized = true;
 

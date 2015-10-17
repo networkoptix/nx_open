@@ -164,6 +164,15 @@ struct QnResourceWidgetFrameColors {
 #define QnResourceWidgetFrameColors_Fields (normal)(active)(selected)
 
 
+struct QnBookmarkColors {
+    QnBookmarkColors();
+
+    QColor background;
+    QColor text;
+};
+#define QnBookmarkColors_Fields (background)(text)
+
+
 struct QnLicensesListModelColors {
     QnLicensesListModelColors();
 

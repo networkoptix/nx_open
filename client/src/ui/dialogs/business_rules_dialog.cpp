@@ -135,8 +135,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
-    safeModeWatcher->addAutoHiddenWidget(m_resetDefaultsButton);
-    safeModeWatcher->addAutoHiddenWidget(ui->buttonBox->button(QDialogButtonBox::Ok));
+    safeModeWatcher->addControlledWidget(m_resetDefaultsButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(ui->buttonBox->button(QDialogButtonBox::Ok), QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog() {

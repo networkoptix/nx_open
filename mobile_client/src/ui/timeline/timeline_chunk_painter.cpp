@@ -122,22 +122,10 @@ void QnTimelineChunkPainter::addRect(const QRectF &rect, const QColor &color) {
 QColor QnTimelineChunkPainter::currentColor(const std::array<QColor, Qn::TimePeriodContentCount + 1> &colors) const {
     qreal rc = m_weights[Qn::RecordingContent];
     qreal mc = m_weights[Qn::MotionContent];
-    qreal bc = m_weights[Qn::BookmarksContent];
     qreal nc = m_weights[Qn::TimePeriodContentCount];
     qreal sum = m_pendingLength;
 
-    if (!qFuzzyIsNull(bc) && !qFuzzyIsNull(mc)) {
-        qreal localSum = mc + bc;
-        return linearCombine(mc / localSum, colors[Qn::MotionContent], bc / localSum, colors[Qn::BookmarksContent]);
-    }
-
-    if (!qFuzzyIsNull(bc)) {
-        /* Make sure bookmark is noticeable even if there isn't much of it.
-             * Note that these adjustments don't change sum. */
-        rc = rc * (1.0 - lineBarMinNoticeableFraction);
-        bc = sum * lineBarMinNoticeableFraction + bc * (1.0 - lineBarMinNoticeableFraction);
-        nc = nc * (1.0 - lineBarMinNoticeableFraction);
-    } else if (!qFuzzyIsNull(mc)) {
+    if (!qFuzzyIsNull(mc)) {
         /* Make sure motion is noticeable even if there isn't much of it.
              * Note that these adjustments don't change sum. */
         rc = rc * (1.0 - lineBarMinNoticeableFraction);
@@ -150,10 +138,4 @@ QColor QnTimelineChunkPainter::currentColor(const std::array<QColor, Qn::TimePer
         nc = sum * (1.0 - lineBarMinNoticeableFraction);
     }
 
-    return  linearCombine(
-                1.0,
-                linearCombine(rc / sum, colors[Qn::RecordingContent], mc / sum, colors[Qn::MotionContent]),
-                1.0,
-                linearCombine(bc / sum, colors[Qn::BookmarksContent], nc / sum, colors[Qn::TimePeriodContentCount])
-            );
-}
+return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(mc / sum, colors[Qn::MotionContent], nc / sum, colors[Qn::TimePeriodContentCount]));}

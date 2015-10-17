@@ -400,15 +400,6 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(const QnAbstractBusinessAc
     //TODO: #vasilenko implement me
 }
 
-QByteArray QnBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const
-{
-    Q_UNUSED(id);
-    Q_UNUSED(timestampUsec);
-    Q_UNUSED(dstSize);
-
-    return QByteArray();
-}
-
 void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec2::ErrorCode errorCode )
 {
     if (errorCode == ec2::ErrorCode::ok)

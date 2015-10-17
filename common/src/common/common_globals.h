@@ -309,6 +309,8 @@ public:
         io_module                   = 0x4000000,    /**< It's IO module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */ 
 
+        storage_fastscan = 0x8000000,   /**< Fast scan for storage in progress */
+
         local_media = local | media,
         local_layout = local | layout,
 
@@ -417,7 +419,7 @@ public:
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
-        BookmarksContent,
+
         TimePeriodContentCount
     };
 

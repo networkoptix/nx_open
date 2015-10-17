@@ -20,12 +20,8 @@ class StreamingChunkCache
 {
 public:
     StreamingChunkCache();
-    ~StreamingChunkCache();
 
     static StreamingChunkCache* instance();
-
-private:
-    StreamingChunkProvider* m_itemProvider;
 };
 
 #endif  //STREAMING_CHUNK_CACHE_H

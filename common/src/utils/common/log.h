@@ -6,6 +6,8 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 
+#include "log_message.h"
+
 // TODO: #Elric #enum
 enum QnLogLevel {
     cl_logUNKNOWN,

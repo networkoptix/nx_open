@@ -3,7 +3,7 @@
 #include <common/common_module.h>
 #include "utils/network/http/httptypes.h"
 #include "api/model/audit/audit_record.h"
-#include "events/events_db.h"
+#include <database/server_db.h>
 #include "recording/time_period.h"
 #include "rest/server/json_rest_result.h"
 #include "core/resource_management/resource_pool.h"
@@ -33,7 +33,7 @@ int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamL
     }
 
 
-    QnAuditRecordList outputData = qnEventsDB->getAuditData(period, sessionId);
+    QnAuditRecordList outputData = qnServerDb->getAuditData(period, sessionId);
     for(QnAuditRecord& record: outputData)
     {
         if (record.isPlaybackType()) {

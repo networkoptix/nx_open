@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<TS version="2.0" language="ko" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -95,87 +95,87 @@
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>시작</translation>
     </message>
     <message>
         <location/>
         <source>till</source>
-        <translation type="unfinished"></translation>
+        <translation>끝</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished">새로고침</translation>
+        <translation>새로고침</translation>
     </message>
     <message>
         <location/>
         <source>User actions</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 행동</translation>
     </message>
     <message>
         <location/>
         <source>Watching archive</source>
-        <translation type="unfinished"></translation>
+        <translation>저장데이터 보기</translation>
     </message>
     <message>
         <location/>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 백업</translation>
     </message>
     <message>
         <location/>
         <source>Watching live</source>
-        <translation type="unfinished"></translation>
+        <translation>실시간 감시</translation>
     </message>
     <message>
         <location/>
         <source>Login/logout</source>
-        <translation type="unfinished"></translation>
+        <translation>로그인/ 아웃</translation>
     </message>
     <message>
         <location/>
         <source>Event rules</source>
-        <translation type="unfinished"></translation>
+        <translation>이벤트 설정</translation>
     </message>
     <message>
         <location/>
         <source>Server actions</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 동작</translation>
     </message>
     <message>
         <location/>
         <source>E-mail settings</source>
-        <translation type="unfinished"></translation>
+        <translation>이메일 설정</translation>
     </message>
     <message>
         <location/>
         <source>System actions</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 동작</translation>
     </message>
     <message>
         <location/>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>전체 선택</translation>
     </message>
     <message>
         <location/>
         <source>Sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>세션</translation>
     </message>
     <message>
         <location/>
         <source>Details</source>
-        <translation type="unfinished">상세</translation>
+        <translation>상세</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline.  Audit data are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 서버가 offline상태</translation>
     </message>
     <message>
         <location/>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 감사</translation>
     </message>
 </context>
 <context>
@@ -319,42 +319,42 @@
     <message>
         <location/>
         <source>Selected Server:</source>
-        <translation type="unfinished">선택된 서버:</translation>
+        <translation>선택된 서버:</translation>
     </message>
     <message>
         <location/>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished">서브넷 검색 (&amp;u)</translation>
+        <translation>서브넷 검색 (&amp;u)</translation>
     </message>
     <message>
         <location/>
         <source>Brand</source>
-        <translation type="unfinished"></translation>
+        <translation>브랜드</translation>
     </message>
     <message>
         <location/>
         <source>Model</source>
-        <translation type="unfinished">모델</translation>
+        <translation>모델</translation>
     </message>
     <message>
         <location/>
         <source>New Scan...</source>
-        <translation type="unfinished">새로 찾기...</translation>
+        <translation>새로 찾기...</translation>
     </message>
     <message>
         <location/>
         <source>Add device(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>장치 추가</translation>
     </message>
     <message>
         <location/>
         <source>Device Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>장치 주소</translation>
     </message>
     <message>
         <location/>
         <source>Discovered Devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>검색된 장치</translation>
     </message>
 </context>
 <context>
@@ -377,12 +377,12 @@
     <message>
         <location/>
         <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
-        <translation type="unfinished"></translation>
+        <translation>고급설정이 지원되지 않습니다. 카메라 웹 페이지를 통해서 설정을 하십시오.</translation>
     </message>
     <message>
         <location/>
         <source>Note: Any changes made will be applied instantly!</source>
-        <translation type="unfinished"></translation>
+        <translation>주:모든 변경사항은 즉시 적용됩니다.</translation>
     </message>
 </context>
 <context>
@@ -490,22 +490,22 @@
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished"></translation>
+        <translation>주위: 이 옵션 활성화 시  기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다. </translation>
     </message>
     <message>
         <location/>
         <source>Do not use</source>
-        <translation type="unfinished">사용안함</translation>
+        <translation>사용안함</translation>
     </message>
     <message>
         <location/>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>주위: 고해상도 선택시 CPU및 네트워크 부하등의 기타 원인이 될 수 있습니다.</translation>
     </message>
     <message>
         <location/>
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>주위:시스템에 영향이 미치것에 대해 완전히 이해 하지 않은 한 설정을 변경하지 마십시오.</translation>
     </message>
 </context>
 <context>
@@ -628,37 +628,37 @@
     <message>
         <location/>
         <source>Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>녹화 설정</translation>
     </message>
     <message>
         <location/>
         <source>Show Quality on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>화질값 보여주기</translation>
     </message>
     <message>
         <location/>
         <source>Show FPS on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>FPS값 보여주기</translation>
     </message>
     <message>
         <location/>
         <source>Motion + Low-Res </source>
-        <translation type="unfinished"></translation>
+        <translation>모션+저화질 상시녹화</translation>
     </message>
     <message>
         <location/>
         <source>Do Not Record</source>
-        <translation type="unfinished">녹화안함</translation>
+        <translation>녹화안함</translation>
     </message>
     <message>
         <location/>
         <source>Min. Days</source>
-        <translation type="unfinished">최소 저장일:</translation>
+        <translation>최소 저장일:</translation>
     </message>
     <message>
         <location/>
         <source>Max. Days</source>
-        <translation type="unfinished">최대 저장일:</translation>
+        <translation>최대 저장일:</translation>
     </message>
 </context>
 <context>
@@ -697,27 +697,27 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>소스포함</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>공간으로 단어 구분됨</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>주석 포함</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>상세 포함</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for Generic Events that passes all filters. Empty fields don’t affect on the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
+        <translation>상기 롤 적용은 일반 이벤트중 모든 검색 조건을 충족할때 동작합니다. 빈 공간은 결과에 영향을 주지 않습니디. 단어중 하나라도 매치되면 검색 조건 충족 됩니다. </translation>
     </message>
 </context>
 <context>
@@ -758,12 +758,12 @@
     <message>
         <location/>
         <source>Event Log</source>
-        <translation type="unfinished">이벤트 로그</translation>
+        <translation>이벤트 로그</translation>
     </message>
     <message>
         <location/>
         <source>Clear Filter</source>
-        <translation type="unfinished">필터 초기화</translation>
+        <translation>필터 초기화</translation>
     </message>
 </context>
 <context>
@@ -776,22 +776,22 @@
     <message>
         <location/>
         <source>Ceiling Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>천장 설치시</translation>
     </message>
     <message>
         <location/>
         <source>Wall Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>벽 설치시</translation>
     </message>
     <message>
         <location/>
         <source>Floor/Table Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>바닥또는 테이블위에 설치시</translation>
     </message>
     <message>
         <location/>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished">카메라 각도 보정:</translation>
+        <translation>카메라 각도 보정:</translation>
     </message>
 </context>
 <context>
@@ -839,37 +839,37 @@
     <message>
         <location/>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished">오디오 채널 5.1채널에서 2.1채널:</translation>
+        <translation>오디오 채널 5.1채널에서 2.1채널:</translation>
     </message>
     <message>
         <location/>
         <source>Auto Pause Video</source>
-        <translation type="unfinished">자동 정지 설정:</translation>
+        <translation>자동 정지 설정:</translation>
     </message>
     <message>
         <location/>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished">비활성 시간(분)</translation>
+        <translation>비활성 시간(분)</translation>
     </message>
     <message>
         <location/>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished">PC시작 시 자동 실행:</translation>
+        <translation>PC시작 시 자동 실행:</translation>
     </message>
     <message>
         <location/>
         <source>Double Buffering:</source>
-        <translation type="unfinished">추가 버퍼링:</translation>
+        <translation>추가 버퍼링:</translation>
     </message>
     <message>
         <location/>
         <source>Browse Logs</source>
-        <translation type="unfinished">찾기 로그</translation>
+        <translation>찾기 로그</translation>
     </message>
     <message>
         <location/>
         <source>Clear Local Cache</source>
-        <translation type="unfinished">캐쉬 초기화</translation>
+        <translation>캐쉬 초기화</translation>
     </message>
 </context>
 <context>
@@ -917,22 +917,22 @@
     <message>
         <location/>
         <source>Open audit trail log</source>
-        <translation type="unfinished"></translation>
+        <translation>감사 보고 로그 보기</translation>
     </message>
     <message>
         <location/>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>하나의 레이아웃에서 모든 서버 감시</translation>
     </message>
     <message>
         <location/>
         <source>System Backup and Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 백업및 복원</translation>
     </message>
     <message>
         <location/>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>감사 보고</translation>
     </message>
 </context>
 <context>
@@ -940,22 +940,22 @@
     <message>
         <location filename="../src/ui/widgets/properties/image_control_widget.ui"/>
         <source>Image Control</source>
-        <translation type="unfinished">이미지 제어</translation>
+        <translation>이미지 제어</translation>
     </message>
     <message>
         <location/>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished"></translation>
+        <translation>강제 비율제어</translation>
     </message>
     <message>
         <location/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 위치</translation>
     </message>
     <message>
         <location/>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished">어안 렌즈 커메라 사용</translation>
+        <translation>어안 렌즈 커메라 사용</translation>
     </message>
 </context>
 <context>
@@ -973,7 +973,7 @@
     <message>
         <location/>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished">이미지 로딩중...기다려주세요.</translation>
+        <translation>이미지 로딩중...기다려주세요.</translation>
     </message>
 </context>
 <context>
@@ -1041,17 +1041,17 @@
     <message>
         <location/>
         <source>Layout is Locked</source>
-        <translation type="unfinished">레이아웃 잠금</translation>
+        <translation>레이아웃 잠금</translation>
     </message>
     <message>
         <location/>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished">이미지 처리중...기다려주세요.</translation>
+        <translation>이미지 처리중...기다려주세요.</translation>
     </message>
     <message>
         <location/>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished">비율 유지</translation>
+        <translation>비율 유지</translation>
     </message>
 </context>
 <context>
@@ -1059,47 +1059,47 @@
     <message>
         <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
         <source>Server UR&amp;L:</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 주소</translation>
     </message>
     <message>
         <location/>
         <source>ldap(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ad&amp;min DN:</source>
-        <translation type="unfinished"></translation>
+        <translation>관리자 DN</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>비밀번호</translation>
     </message>
     <message>
         <location/>
         <source>Search Base:</source>
-        <translation type="unfinished"></translation>
+        <translation>검색 기본</translation>
     </message>
     <message>
         <location/>
         <source>Search Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>검색조건</translation>
     </message>
     <message>
         <location/>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>추가 조건</translation>
     </message>
     <message>
         <location/>
         <source>Testing...</source>
-        <translation type="unfinished">시험...</translation>
+        <translation>검사중</translation>
     </message>
     <message>
         <location/>
         <source>LDAP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP 설정</translation>
     </message>
 </context>
 <context>
@@ -1107,27 +1107,27 @@
     <message>
         <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP으로 부터 사용자 정보 일기</translation>
     </message>
     <message>
         <location/>
         <source>Select users to import</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 선택</translation>
     </message>
     <message>
         <location/>
         <source>Filter...</source>
-        <translation type="unfinished">필터...</translation>
+        <translation>필터...</translation>
     </message>
     <message>
         <location/>
         <source>Loading...</source>
-        <translation type="unfinished">읽는 중...</translation>
+        <translation>읽는 중...</translation>
     </message>
     <message>
         <location/>
         <source>Connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>접속 에러</translation>
     </message>
 </context>
 <context>
@@ -1165,7 +1165,7 @@
     <message>
         <location/>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>상위버젼 SW가 필요한 라이센스 입니다.</translation>
     </message>
 </context>
 <context>
@@ -1259,12 +1259,12 @@
     <message>
         <location/>
         <source>License Key is Invalid</source>
-        <translation type="unfinished">인증키 오류</translation>
+        <translation>인증키 오류</translation>
     </message>
     <message>
         <location/>
         <source>Select License File...</source>
-        <translation type="unfinished">인증 파일 선택...</translation>
+        <translation>인증 파일 선택...</translation>
     </message>
 </context>
 <context>
@@ -1272,12 +1272,12 @@
     <message>
         <location filename="../src/ui/widgets/licensing/licenses_propose_widget.ui"/>
         <source>Licensing</source>
-        <translation type="unfinished">인증 중</translation>
+        <translation>인증 중</translation>
     </message>
     <message>
         <location/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished">라이센스 추가...</translation>
+        <translation>라이센스 추가...</translation>
     </message>
 </context>
 <context>
@@ -1331,7 +1331,7 @@
     <message>
         <location/>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished">접속 옵션(&amp;C):</translation>
+        <translation>접속 옵션(&amp;C):</translation>
     </message>
 </context>
 <context>
@@ -1434,7 +1434,7 @@
     <message>
         <location/>
         <source>Timeline Mode:</source>
-        <translation type="unfinished">시간 표기 기준:</translation>
+        <translation>시간 표기 기준:</translation>
     </message>
 </context>
 <context>
@@ -1472,7 +1472,7 @@
     <message>
         <location/>
         <source>Enable Audio</source>
-        <translation type="unfinished">오디오 사용</translation>
+        <translation>오디오 사용</translation>
     </message>
 </context>
 <context>
@@ -1503,7 +1503,7 @@
     <message>
         <location/>
         <source>Show to administrators only</source>
-        <translation type="unfinished">관리자에게만 출력</translation>
+        <translation>관리자에게만 출력</translation>
     </message>
 </context>
 <context>
@@ -1582,7 +1582,7 @@
     <message>
         <location/>
         <source>No Tour Selected</source>
-        <translation type="unfinished">투어 선택 안됨</translation>
+        <translation>투어 선택 안됨</translation>
     </message>
 </context>
 <context>
@@ -1600,7 +1600,7 @@
     <message>
         <location/>
         <source>Save Position</source>
-        <translation type="unfinished">위치 저장</translation>
+        <translation>위치 저장</translation>
     </message>
 </context>
 <context>
@@ -1631,12 +1631,12 @@
     <message>
         <location/>
         <source>Install a specific build.</source>
-        <translation type="unfinished">특정 빌드 설치</translation>
+        <translation>특정 빌드 설치</translation>
     </message>
     <message>
         <location/>
         <source>Build Number:</source>
-        <translation type="unfinished">빌드 버젼:</translation>
+        <translation>빌드 버젼:</translation>
     </message>
 </context>
 <context>
@@ -1669,7 +1669,7 @@
     <message>
         <location/>
         <source>List of tags divided by commas or spaces.</source>
-        <translation type="unfinished">쉼표나 태그로 태그의 목록 구분</translation>
+        <translation>쉼표나 태그로 태그의 목록 구분</translation>
     </message>
 </context>
 <context>
@@ -1687,7 +1687,7 @@
     <message>
         <location/>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished">사용자 이름과 비밀번호를 입력하세요...</translation>
+        <translation>사용자 이름과 비밀번호를 입력하세요...</translation>
     </message>
 </context>
 <context>
@@ -1703,7 +1703,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>틀</translation>
     </message>
 </context>
 <context>
@@ -1826,7 +1826,7 @@
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui"/>
         <source>Unknown</source>
-        <translation>알려지지 않음</translation>
+        <translation>알수없음</translation>
     </message>
     <message>
         <location/>
@@ -1871,17 +1871,17 @@
     <message>
         <location/>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished">인터넷을 통해 업데이트를 확인할 수 없습니다.</translation>
+        <translation>인터넷을 통해 업데이트를 확인할 수 없습니다.</translation>
     </message>
     <message>
         <location/>
         <source>Available Update:</source>
-        <translation type="unfinished"></translation>
+        <translation>가능한 업데이트</translation>
     </message>
     <message>
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished">수동 업데이트를 할 경우, 아래 링크를 통해 다운로드 받기:</translation>
+        <translation>수동 업데이트를 할 경우, 아래 링크를 통해 다운로드 받기:</translation>
     </message>
 </context>
 <context>
@@ -1938,42 +1938,42 @@
     <message>
         <location filename="../src/ui/widgets/settings/user_management_widget.ui"/>
         <source>LDAP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP 설정</translation>
     </message>
     <message>
         <location/>
         <source>Filter...</source>
-        <translation type="unfinished">필터...</translation>
+        <translation>필터...</translation>
     </message>
     <message>
         <location/>
         <source>New User...</source>
-        <translation type="unfinished">신규 사용자...</translation>
+        <translation>신규 사용자...</translation>
     </message>
     <message>
         <location/>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP으로 부터 사용자 정보 가져오기</translation>
     </message>
     <message>
         <location/>
         <source>Enable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 활성화</translation>
     </message>
     <message>
         <location/>
         <source>Disable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 비활성화</translation>
     </message>
     <message>
         <location/>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 삭제</translation>
     </message>
     <message>
         <location/>
         <source>Clear Selection</source>
-        <translation type="unfinished">선택항목 초기화</translation>
+        <translation>선택항목 초기화</translation>
     </message>
 </context>
 <context>
@@ -1986,12 +1986,12 @@
     <message>
         <location/>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished">윈도우 시작 시 비디오 월 실행</translation>
+        <translation>윈도우 시작 시 비디오 월 실행</translation>
     </message>
     <message>
         <location/>
         <source>Place shortcut on desktop.</source>
-        <translation type="unfinished"></translation>
+        <translation>바탕화면에 바로가기 만들기</translation>
     </message>
 </context>
 <context>
@@ -2004,7 +2004,7 @@
     <message>
         <location/>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished">연결을 복원하는 동안 잠시 기다려주세요...</translation>
+        <translation>연결을 복원하는 동안 잠시 기다려주세요...</translation>
     </message>
 </context>
 <context>
@@ -2032,12 +2032,12 @@
     <message>
         <location/>
         <source>Pre-Recording:</source>
-        <translation type="unfinished">사전녹화:</translation>
+        <translation>사전녹화:</translation>
     </message>
     <message>
         <location/>
         <source>Post-Recording:</source>
-        <translation type="unfinished">사후 녹화:</translation>
+        <translation>사후 녹화:</translation>
     </message>
 </context>
 <context>
@@ -2170,7 +2170,7 @@
     <message>
         <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>최상 화질및 해상도는 강력한 PC사용시에만 추천합니다.</translation>
     </message>
 </context>
 <context>
@@ -2178,62 +2178,62 @@
     <message>
         <location filename="../src/ui/widgets/properties/recording_statistics_widget.ui"/>
         <source>Refresh</source>
-        <translation type="unfinished">새로고침</translation>
+        <translation>새로고침</translation>
     </message>
     <message>
         <location/>
         <source>10 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Forecast for full storage(s) usage</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 녹화 장치 에 대한 녹화 기간 예상</translation>
     </message>
     <message>
         <location/>
         <source>0 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Additional storage:</source>
-        <translation type="unfinished"></translation>
+        <translation>추가 장치</translation>
     </message>
     <message>
         <location/>
         <source>1000 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>100 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Tb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>1 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Current usage</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 사용상태</translation>
     </message>
     <message>
         <location/>
         <source>Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>예상치</translation>
     </message>
     <message>
         <location/>
         <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버가 Offline상태여서 통계 불가합니다.</translation>
     </message>
 </context>
 <context>
@@ -2308,98 +2308,98 @@
     <message>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
         <source>Name:</source>
-        <translation type="unfinished">이름:</translation>
+        <translation>이름:</translation>
     </message>
     <message>
         <location/>
         <source>IP Address:</source>
-        <translation type="unfinished">IP 주소:</translation>
+        <translation>IP 주소:</translation>
     </message>
     <message>
         <location/>
         <source>Ping</source>
-        <translation type="unfinished">핑</translation>
+        <translation>핑</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">포트:</translation>
+        <translation>포트:</translation>
     </message>
     <message>
         <location/>
         <source>9000</source>
-        <translation type="unfinished">9000</translation>
+        <translation>9000</translation>
     </message>
     <message>
         <location/>
         <source>Failover</source>
-        <translation type="unfinished">장애 조치(이중화)</translation>
+        <translation>장애 조치(이중화)</translation>
     </message>
     <message>
         <location/>
         <source>Storages</source>
-        <translation type="unfinished">저장기</translation>
+        <translation>저장기</translation>
     </message>
     <message>
         <location/>
         <source>In Use</source>
-        <translation type="unfinished">사용자</translation>
+        <translation>사용자</translation>
     </message>
     <message>
         <location/>
         <source>Protocol</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Path</source>
-        <translation type="unfinished">패치</translation>
+        <translation>위치</translation>
     </message>
     <message>
         <location/>
         <source>Capacity</source>
-        <translation type="unfinished">용량</translation>
+        <translation>용량</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished">로그인</translation>
+        <translation>로그인</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">비밀번호</translation>
+        <translation>비밀번호</translation>
     </message>
     <message>
         <location/>
         <source>Space</source>
-        <translation type="unfinished">여유공간</translation>
+        <translation>여유공간</translation>
     </message>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택하지 않은 장치에 다른 문제가 발생하지 않으나, 녹화는 멈춤, 예전 데이터 삭제시 거부 하지 않게 됩니다.</translation>
     </message>
     <message>
         <location/>
         <source>Rebuild archive index</source>
-        <translation type="unfinished">인덱스 보관소 재정비</translation>
+        <translation>인덱스 보관소 재정비</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>시작</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">취소</translation>
+        <translation>취소</translation>
     </message>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>이중화 우선순위</translation>
     </message>
 </context>
 <context>
@@ -2407,17 +2407,17 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/dialogs/sign_dialog.ui"/>
         <source>Watermark Check</source>
-        <translation type="unfinished">변조 확인</translation>
+        <translation>변조 확인</translation>
     </message>
     <message>
         <location/>
         <source>Checked File:</source>
-        <translation type="unfinished">확인 파일:</translation>
+        <translation>확인 파일:</translation>
     </message>
     <message>
         <location/>
         <source>Check Result:</source>
-        <translation type="unfinished">확인 결과:</translation>
+        <translation>확인 결과:</translation>
     </message>
 </context>
 <context>
@@ -2525,57 +2525,57 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>IO ports</source>
-        <translation type="unfinished"></translation>
+        <translation>IO포트</translation>
     </message>
     <message>
         <location/>
         <source>Enable Audio</source>
-        <translation type="unfinished">오디오 사용</translation>
+        <translation>오디오 사용</translation>
     </message>
     <message>
         <location/>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished">이 카메라에서 움직임 감지를 사용할 수 없습니다</translation>
+        <translation>이 카메라에서 움직임 감지를 사용할 수 없습니다</translation>
     </message>
     <message>
         <location/>
         <source>Motion Settings</source>
-        <translation type="unfinished">움직임 설정</translation>
+        <translation>움직임 설정</translation>
     </message>
     <message>
         <location/>
         <source>Motion Detection</source>
-        <translation type="unfinished">움직임 감지:</translation>
+        <translation>움직임 감지:</translation>
     </message>
     <message>
         <location/>
         <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation type="unfinished"></translation>
+        <translation>소프트웨어-최대 FPS가 약간 감소 할수 있습니다.</translation>
     </message>
     <message>
         <location/>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished">움직임 감지 마스크 (0)</translation>
+        <translation>움직임 감지 마스크 (0)</translation>
     </message>
     <message>
         <location/>
         <source>Camera web page:</source>
-        <translation type="unfinished">카메라 모션 웹 페이지:</translation>
+        <translation>카메라 모션 웹 페이지:</translation>
     </message>
     <message>
         <location/>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished">움직임 감지 범위 초기화</translation>
+        <translation>움직임 감지 범위 초기화</translation>
     </message>
     <message>
         <location/>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished">하드웨어 (카메라 포함)</translation>
+        <translation>하드웨어 (카메라 포함)</translation>
     </message>
     <message>
         <location/>
         <source>Fisheye</source>
-        <translation type="unfinished"></translation>
+        <translation>어안렌즈</translation>
     </message>
 </context>
 <context>
@@ -2683,22 +2683,22 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">간단한 설명이 필요할 경우 여기에 기입...</translation>
+        <translation>간단한 설명이 필요할 경우 여기에 기입...</translation>
     </message>
     <message>
         <location/>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">신뢰할 수 없는 연결</translation>
+        <translation>신뢰할 수 없는 연결</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">TLS를 이용한 보안 연결</translation>
+        <translation>TLS를 이용한 보안 연결</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">SSL을 이용한 보안 연결</translation>
+        <translation>SSL을 이용한 보안 연결</translation>
     </message>
 </context>
 <context>
@@ -2739,22 +2739,22 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
+        <translation>주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
     </message>
     <message>
         <location/>
         <source>(recommended)</source>
-        <translation type="unfinished">(추천)</translation>
+        <translation>(추천)</translation>
     </message>
     <message>
         <location/>
         <source>Enable audit trail</source>
-        <translation type="unfinished"></translation>
+        <translation>검사 보고 설정</translation>
     </message>
     <message>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation type="unfinished"></translation>
+        <translation>개발자에게 장애 문제 자동 보고</translation>
     </message>
 </context>
 <context>
@@ -2767,12 +2767,12 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Current System Time:</source>
-        <translation type="unfinished">현재 시스템 시간:</translation>
+        <translation>현재 시스템 시간:</translation>
     </message>
     <message>
         <location/>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>인터넷이 연결되어 있지 않은 경우 서버중 한개를 선택하여 시간 동기화 서버로 사용가능합니다.서버를 선택하세요</translation>
     </message>
 </context>
 <context>
@@ -2820,12 +2820,12 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>E&amp;mail:</source>
-        <translation type="unfinished">&amp;이메일:</translation>
+        <translation>&amp;이메일:</translation>
     </message>
     <message>
         <location/>
         <source>Enabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>활성화</translation>
     </message>
 </context>
 <context>
@@ -2848,12 +2848,12 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>녹화 설정</translation>
     </message>
     <message>
         <location/>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished">참고: 일정 설정은 서버시간을 기준으로 함</translation>
+        <translation>참고: 일정 설정은 서버시간을 기준으로 함</translation>
     </message>
 </context>
 </TS>

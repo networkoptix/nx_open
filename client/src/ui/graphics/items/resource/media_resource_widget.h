@@ -26,6 +26,7 @@ class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
+class QnBookmarksOverlayWidget;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -202,6 +203,7 @@ private:
     void updateBookmarksMode();
     void updateBookmarksFilter();
     void updateBookmarks();
+    void updateBookmarksVisibility();
 
     qint64 getDisplayTimeMs() const;
     qint64 getUtcCurrentTimeMs() const;
@@ -263,6 +265,7 @@ private:
 
     QnCameraBookmarkList m_bookmarks;
     QnCameraBookmarksQueryPtr m_bookmarksQuery;
+    QnBookmarksOverlayWidget *m_bookmarksOverlayWidget;
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;

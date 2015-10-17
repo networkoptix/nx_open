@@ -3,7 +3,6 @@
 
 #include <business/business_rule_processor.h>
 #include <business/actions/recording_business_action.h>
-#include "events_db.h"
 
 #include <core/resource/resource_fwd.h>
 
@@ -24,9 +23,6 @@ public:
     * How long to keep event log in usecs
     */
     void setEventLogPeriod(qint64 periodUsec);
-
-protected:
-    QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const override;
 
 protected slots:
     virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res) override;
@@ -86,11 +82,18 @@ private:
     QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
 private:
     bool sendMail(const QnSendMailBusinessActionPtr& action );
-    QVariantHash eventDescriptionMap(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, QnEmailAttachmentList& attachments, bool useIp);
     void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
     bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
     void sendEmailAsync(const ec2::ApiEmailData& data);
-    QString formatEmailList(const QStringList& value);
+    QString formatEmailList(const QStringList& value) const;
+
+    static QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize);
+
+    static QVariantHash eventDescriptionMap(
+        const QnAbstractBusinessActionPtr& action, 
+        const QnBusinessAggregationInfo &aggregationInfo, 
+        QnEmailAttachmentList& attachments, 
+        bool useIp);
 
     static QVariantHash eventDetailsMap(
         const QnAbstractBusinessActionPtr& action,

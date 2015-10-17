@@ -78,7 +78,7 @@ bool StreamingChunk::openForModification()
 
 #ifdef DUMP_CHUNK_TO_FILE
     m_dumpFile.open(
-        filePathBase.arg( ++fileNumber ).toStdString(),
+        filePathBase.arg( fileNumber++, 2, 10, QChar(L'0') ).toStdString(),
         std::ios_base::binary | std::ios_base::out );
 #endif
 

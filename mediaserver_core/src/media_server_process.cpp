@@ -7,6 +7,9 @@
 #include <signal.h>
 #ifdef __linux__
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 
 #include <qtsinglecoreapplication.h>
@@ -141,6 +144,9 @@
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
+#ifdef _DEBUG
+#include <rest/handlers/debug_events_rest_handler.h>
+#endif
 
 #include <rtsp/rtsp_connection.h>
 
@@ -1383,6 +1389,10 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
 
+#ifdef _DEBUG
+    QnRestProcessorPool::instance()->registerHandler("api/debugEvent", new QnDebugEventsRestHandler());
+#endif
+
     m_universalTcpListener = new QnUniversalTcpListener(
         QHostAddress::Any,
         rtspPort,
@@ -1519,7 +1529,6 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("/proxy/*/hls/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
-    QnEventsDB::init();
 
     QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
 
@@ -1594,16 +1603,15 @@ void MediaServerProcess::run()
 #ifdef __arm__
     serverFlags |= Qn::SF_ArmServer;
 
-    auto partitions = qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-        QnPlatformMonitor::LocalDiskPartition);
-    for (const auto& partition: partitions)
-    {
-        if (partition.devName.startsWith(lit("/dev/sd")))
-        {
-            serverFlags |= Qn::SF_Has_HDD;
-            break;
-        }
-    }
+    struct stat st;
+    memset(&st, 0, sizeof(st));
+    const bool hddPresent = 
+        ::stat("/dev/sda", &st) == 0 ||
+        ::stat("/dev/sdb", &st) == 0 ||
+        ::stat("/dev/sdc", &st) == 0 ||
+        ::stat("/dev/sdd", &st) == 0;
+    if (hddPresent)
+        serverFlags |= Qn::SF_Has_HDD;
 #else
     serverFlags |= Qn::SF_Has_HDD;
 #endif
@@ -2299,9 +2307,6 @@ void MediaServerProcess::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
     
-    // destroy events db
-    QnEventsDB::fini();
-
     mserverResourceDiscoveryManager.reset();
 
     av_lockmgr_register(NULL);
@@ -2417,11 +2422,6 @@ protected:
     virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
-
-        QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
-        QCoreApplication::setApplicationName(lit(QN_APPLICATION_NAME));
-        if (QCoreApplication::applicationVersion().isEmpty())
-            QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
         if (application->isRunning())
         {
@@ -2651,7 +2651,9 @@ int MediaServerProcess::main(int argc, char* argv[])
     QString rwConfigFilePath;
     bool showVersion = false;
     bool showHelp = false;
+#ifdef __linux__
     bool disableCrashHandler = false;
+#endif
     QString engineVersion;
 
     QnCommandLineParser commandLineParser;

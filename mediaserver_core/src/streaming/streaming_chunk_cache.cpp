@@ -15,15 +15,8 @@ StreamingChunkCache::StreamingChunkCache()
 :
     ItemCache<StreamingChunkCacheKey, StreamingChunkPtr, StreamingChunkProvider>(
         MSSettings::roSettings()->value( nx_ms_conf::HLS_CHUNK_CACHE_SIZE_SEC, nx_ms_conf::DEFAULT_MAX_CACHE_COST_SEC).toUInt(),
-        new StreamingChunkProvider() ),
-    m_itemProvider( itemProvider() )
+        std::unique_ptr<StreamingChunkProvider>(new StreamingChunkProvider()) )
 {
-}
-
-StreamingChunkCache::~StreamingChunkCache()
-{
-    delete m_itemProvider;
-    m_itemProvider = NULL;
 }
 
 StreamingChunkCache* StreamingChunkCache::instance()

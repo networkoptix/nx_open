@@ -264,8 +264,8 @@ begin
     previousClientVersion := GetInstalledProductVersion(installer, previousClientProductCode);
 
     // If not installed -> previousServerVersion and previousServerProductCode are '', same for client
-    InstallServer := ((previousServerVersion <= version) AND (previousServerProductCode <> '{#ServerMsiProductCode}'));
-    InstallClient := ((previousClientVersion <= version) AND (previousClientProductCode <> '{#ClientMsiProductCode}'));
+    InstallServer := ((VersionAsNumber(previousServerVersion) <= VersionAsNumber(version)) AND (previousServerProductCode <> '{#ServerMsiProductCode}'));
+    InstallClient := ((VersionAsNumber(previousClientVersion) <= VersionAsNumber(version)) AND (previousClientProductCode <> '{#ClientMsiProductCode}'));
 
     if (NOT InstallServer AND NOT InstallClient) then
     begin

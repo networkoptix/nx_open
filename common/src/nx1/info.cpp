@@ -1,6 +1,6 @@
 #include "info.h"
 
-#ifdef __linux__
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #include <unistd.h>
 #include <sys/stat.h>
 #endif
@@ -45,7 +45,7 @@ QString Nx1::getSerial()
 
 bool Nx1::isBootedFromSD()
 {
-#ifdef __linux__
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
         std::list<PartitionInfo> partitionInfoList;
         if (readPartitions(&partitionInfoList) != SystemError::noError)
             return true;

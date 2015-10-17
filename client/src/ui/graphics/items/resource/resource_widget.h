@@ -434,8 +434,6 @@ private:
         GraphicsLabel *infoNameLabel;
         GraphicsLabel *infoTimeLabel;
 
-        QnProxyLabel * bookmarksLabel;
-
         OverlayWidgets();
     };
     

@@ -83,7 +83,7 @@ QByteArray createUserPasswordDigest(
     const QString& realm )
 {
     QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(QString(lit("%1:%2:%3")).arg(userName, realm, password).toLatin1());
+    md5.addData(QString(lit("%1:%2:%3")).arg(userName.toLower(), realm, password).toLatin1());
     return md5.result().toHex();
 }
 
@@ -111,6 +111,7 @@ QByteArray createHttpQueryAuthParam(
 
     //calculating auth digest
     md5Hash.reset();
+    md5Hash.addData( digest );
     md5Hash.addData( ":" );
     md5Hash.addData( nonce );
     md5Hash.addData( ":" );

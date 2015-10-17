@@ -343,6 +343,8 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     , dateTime(calcDateTime(model->selectedServers()))
     , timeZonesModel(new TimeZonesModel(model->selectedServers(), rtu::helpers::qml_objects_parent()))
 
+    , safeMode(calcSafeMode(model->selectedServers()))
+
     , sysCommands(calcFlags<rtu::Constants::SystemCommands>(
         model->selectedServers(), rtu::Constants::SystemCommand::AllCommands
         , [](const ServerInfo &info) 
@@ -350,8 +352,6 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
             return (info.hasExtraInfo() ? info.extraInfo().sysCommands
                 : rtu::Constants::SystemCommand::NoCommands);
         }))
-
-    , safeMode(calcSafeMode(model->selectedServers()))
 {
 }
 
