@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <ui/help/help_topics.h>
 #include <ui/models/resource_pool_model.h>
 
 
@@ -41,5 +42,9 @@ QnResourcePoolModelCustomColumnDelegate* QnResourceSelectionDialogDelegate::cust
 
 bool QnResourceSelectionDialogDelegate::isFlat() const {
     return false;
+}
+
+int QnResourceSelectionDialogDelegate::helpTopicId() const {
+    return Qn::Forced_Empty_Help;
 }
 

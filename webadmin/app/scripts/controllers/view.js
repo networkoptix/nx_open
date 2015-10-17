@@ -148,7 +148,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 }
 
                 if($scope.activeCamera && window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera)){
-                    if($scope.activeCamera.hasDualStreaming) {
+                    if($scope.activeCamera.hasDualStreaming ) {
                         $scope.availableResolutions = onlyLoResolution;
                     }else {
                         $scope.iOSVideoTooLarge = true;
@@ -190,7 +190,9 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
-            $scope.switchPlaying(true);
+            if(API) {
+                $scope.switchPlaying(true);
+            }
         };
         function updateVideoSource(playing) {
             var live = !playing;
@@ -232,7 +234,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(resolutionHls === 'lo' && !$scope.activeCamera.hasDualStreaming ){
                 resolutionHls = 'hi';
             }
-            // TODO: check resolution ?
+
             $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' },
@@ -379,9 +381,9 @@ angular.module('webadminApp').controller('ViewCtrl',
                 });
 
                 server.visible = $scope.searchCams === '' ||
-                    camsVisible ||
+                    camsVisible /*||
                     has(server.name, $scope.searchCams) ||
-                    has(server.url, $scope.searchCams);
+                    has(server.url, $scope.searchCams)*/;
             });
         }
 
@@ -461,6 +463,8 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                     var dualStreaming =  _.find(camera.addParams,findDualStreaming) ;
                     camera.hasDualStreaming = dualStreaming?(dualStreaming.value === '1'):false;
+
+                    camera.hasDualStreaming = camera.hasDualStreaming && camera.secondaryStreamQuality != 'SSQualityDontUse';
 
                     if(typeof(camera.visible) === 'undefined'){
                         camera.visible = true;
@@ -756,7 +760,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             var topAlert = $('td.alert');
             if(topAlert.length){
-                topAlertHeight = topAlert.outerHeight() - 1; // -1 here is a hack.
+                topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
             }
 
             var viewportHeight = (windowHeight - topHeight - topAlertHeight) + 'px';
@@ -766,7 +770,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             //One more IE hack.
             if(window.jscd.browser === 'Microsoft Internet Explorer') {
-                var videoWidth = $('header').width() - $('.cameras-panel').outerWidth(true);
+                var videoWidth = $('header').width() - $('.cameras-panel').outerWidth(true) - 1;
                 $('videowindow').parent().css('width', videoWidth + 'px');
             }
         };

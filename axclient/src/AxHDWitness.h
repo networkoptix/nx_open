@@ -1,5 +1,4 @@
-#ifndef CLIENT_AXHDWITNESS_H_
-#define CLIENT_AXHDWITNESS_H_
+#pragma once
 
 #include "version.h"
 
@@ -19,6 +18,8 @@ class QnModuleFinder;
 class QnRouter;
 class QnGlobalModuleFinder;
 class QnServerInterfaceWatcher;
+class QnAxClientModule;
+class QnAxClientWindow;
 
 class AxHDWitness : public QWidget
 {
@@ -65,10 +66,6 @@ public slots:
     QString resourceListXml();
 
 signals:
-//     void started();
-//     void paused();
-//     void speedChanged(double speed);
-
     void connectionProcessed(int status, const QString &message);
 
 protected:
@@ -77,24 +74,9 @@ protected:
 private:
     bool doInitialize();
     void doFinalize();
-    void createMainWindow();
 
 private:
     bool m_isInitialized;
-
-    QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;
-
-    QScopedPointer<QnWorkbenchContext> m_context;
-    QScopedPointer<QnSkin> skin;
-    QScopedPointer<QnCustomizer> customizer;
-    QScopedPointer<QnClientModule> m_clientModule;
-
-    QScopedPointer<QnModuleFinder> m_moduleFinder;
-    QScopedPointer<QnRouter> m_router;
-    QScopedPointer<QnServerInterfaceWatcher> m_serverInterfaceWatcher;
-
-
-    QnMainWindow *m_mainWindow;
+    QScopedPointer<QnAxClientModule> m_axClientModule;
+    QScopedPointer<QnAxClientWindow> m_axClientWindow;
 };
-
-#endif // CLIENT_AXHDWITNESS_H_
