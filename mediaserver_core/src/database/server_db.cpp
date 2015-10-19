@@ -250,6 +250,8 @@ void QnServerDb::setEventLogPeriod(qint64 periodUsec)
 
 bool QnServerDb::createDatabase()
 {
+    QnDbTransactionLocker tran(getTransaction());
+
     QSqlQuery versionQuery(m_sdb);
     versionQuery.prepare("SELECT sql from sqlite_master where name = 'runtime_actions'");
     if (versionQuery.exec() && versionQuery.next())
@@ -318,6 +320,10 @@ bool QnServerDb::createDatabase()
             return false;
     }
 
+    if( !tran.commit() ) {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        return false;
+    }
 
     return true;
 }
