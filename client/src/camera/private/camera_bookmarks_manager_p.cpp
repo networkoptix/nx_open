@@ -127,8 +127,12 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
 
     QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(bookmark.cameraId);
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server || server->getStatus() != Qn::Online)
+    if (!server || server->getStatus() != Qn::Online) {
+        executeDelayed([this, callback]{
+            callback(false);
+        });
         return;
+    }
 
     int handle = server->apiConnection()->addBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, callback);
