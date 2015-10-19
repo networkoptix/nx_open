@@ -7,10 +7,14 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
+#include <api/api_fwd.h>
+#include <api/helpers/request_helpers_fwd.h>
+
+
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 
-#include <api/api_fwd.h>
+
 #include <core/ptz/ptz_fwd.h>
 #include <utils/common/ldap_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -217,9 +221,9 @@ public:
 
     int backupControlActionAsync(BackupAction action, QObject *target, const char *slot);
 
-    int addBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int updateBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int deleteBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int addBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int updateBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int deleteBookmarkAsync(const QnUuid &bookmarkId, QObject *target, const char *slot);
 
     int installUpdate(const QString &updateId, bool delayed, QObject *target, const char *slot);
     int uploadUpdateChunk(const QString &updateId, const QByteArray &data, qint64 offset, QObject *target, const char *slot);
@@ -242,7 +246,9 @@ public:
     int cameraHistory(const QnChunksRequestData &request, QObject *target, const char *slot);
 
     int recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot);
-    int getBookmarksAsync(const QnBookmarkRequestData &request, QObject *target, const char *slot);
+    int getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot);
+    int getBookmarkTagsAsync(const QnGetBookmarkTagsRequestData &request, QObject *target, const char *slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
     virtual bool isReady() const override;

@@ -167,9 +167,6 @@ static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
         case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (serializedTransaction, serializationSupport, transaction, function, fastFunction);
-        case ApiCommand::addCameraBookmarkTags:
-        case ApiCommand::removeCameraBookmarkTags:
-            return handleTransactionParams<ApiCameraBookmarkTagDataList>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
         case ApiCommand::moduleInfo:            return handleTransactionParams<ApiModuleData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::moduleInfoList:        return handleTransactionParams<ApiModuleDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);

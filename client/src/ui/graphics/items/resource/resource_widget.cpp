@@ -139,6 +139,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
     m_overlayWidgets(),
+    m_mainHeaderIsTooSmall(false),
+    m_infoHeaderIsTooSmall(false),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
     m_statusOverlay(Qn::EmptyOverlay),
@@ -220,12 +222,17 @@ void QnResourceWidget::addInfoOverlay() {
     overlayLayout->addStretch();
     overlayLayout->addItem(footerWidget);
 
-    m_overlayWidgets.infoOverlay = new QnViewportBoundWidget(this);
-    m_overlayWidgets.infoOverlay->setLayout(overlayLayout);
-    m_overlayWidgets.infoOverlay->setAcceptedMouseButtons(0);
+    QnViewportBoundWidget *infoOverlay = new QnViewportBoundWidget(this);
+    infoOverlay->setLayout(overlayLayout);
+    infoOverlay->setAcceptedMouseButtons(0);
+    m_overlayWidgets.infoOverlay = infoOverlay;
 
     addOverlayWidget(m_overlayWidgets.infoOverlay, UserVisible, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, false, false);
+
+    connect(infoOverlay, &QnViewportBoundWidget::scaleUpdated, this, [this, titleWidget](QGraphicsView *view){
+        updateHeaderIsTooSmallFlag(titleWidget, view, &m_infoHeaderIsTooSmall);
+    });
 }
 
 void QnResourceWidget::addMainOverlay() {
@@ -259,9 +266,14 @@ void QnResourceWidget::addMainOverlay() {
     overlayLayout->addStretch();
     overlayLayout->addItem(footerWidget);
 
-    m_overlayWidgets.mainOverlay = new QnViewportBoundWidget(this);
-    m_overlayWidgets.mainOverlay->setLayout(overlayLayout);
-    m_overlayWidgets.mainOverlay->setAcceptedMouseButtons(0);
+    QnViewportBoundWidget *mainOverlay = new QnViewportBoundWidget(this);
+    mainOverlay->setLayout(overlayLayout);
+    mainOverlay->setAcceptedMouseButtons(0);
+    m_overlayWidgets.mainOverlay = mainOverlay;
+
+    connect(mainOverlay, &QnViewportBoundWidget::scaleUpdated, this, [this, headerWidget](QGraphicsView *view){
+        updateHeaderIsTooSmallFlag(headerWidget, view, &m_mainHeaderIsTooSmall);
+    });
 
     OverlayVisibility visibility = options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
         ? OverlayVisibility::Invisible
@@ -766,11 +778,19 @@ void QnResourceWidget::updateHud(bool animate) {
 
     m_buttonBar->setVisible(buttonsVisible);
 
-    bool infoVisible = options().testFlag(QnResourceWidget::InfoOverlaysForbidden) || qnRuntime->showFullInfo()
+    bool infoVisible = m_infoHeaderIsTooSmall || options().testFlag(QnResourceWidget::InfoOverlaysForbidden) || qnRuntime->showFullInfo()
         ? false
         : detailsVisible && !m_mouseInWidget;
 
-    bool mainVisible = qnRuntime->showFullInfo() && (detailsVisible || m_mouseInWidget);
+    OverlayVisibility mainInfoVisibility = Invisible;
+
+    if (!options().testFlag(QnResourceWidget::InfoOverlaysForbidden) && !m_mainHeaderIsTooSmall) {
+        mainInfoVisibility = qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible
+                                                       : OverlayVisibility::AutoVisible;
+    }
+    setOverlayWidgetVisibility(m_overlayWidgets.mainOverlay, mainInfoVisibility);
+
+    bool mainVisible = !m_mainHeaderIsTooSmall && qnRuntime->showFullInfo() && (detailsVisible || m_mouseInWidget);
     if (qnRuntime->showFullInfo())
         setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, mainVisible, animate);
     else
@@ -951,4 +971,23 @@ void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
 
     item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(checkedButtons()));
     update();
+}
+
+void QnResourceWidget::updateHeaderIsTooSmallFlag(GraphicsWidget *widget, QGraphicsView *view, bool *targetFlag) {
+    if (!view)
+        return;
+
+    enum { minimalHeaderHeight = 8 };
+
+    qreal sceneScale = widget->sceneTransform().m11();
+    qreal viewportScale = view->transform().m11();
+    qreal headerHeight = widget->size().height() * sceneScale * viewportScale;
+    bool headerIsTooSmall = headerHeight < minimalHeaderHeight;
+
+    if (headerIsTooSmall == *targetFlag)
+        return;
+
+    *targetFlag = headerIsTooSmall;
+
+    updateHud();
 }

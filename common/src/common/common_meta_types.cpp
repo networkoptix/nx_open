@@ -132,6 +132,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnCameraBookmark>();
     qRegisterMetaType<QnCameraBookmarkList>();
     qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
+    qRegisterMetaType<QnCameraBookmarkTag>();
+    qRegisterMetaType<QnCameraBookmarkTagList>();
 
     qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();

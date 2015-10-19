@@ -300,6 +300,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             comboBox->addItem(tr("Bottom Left Corner (requires transcoding)"), Qn::BottomLeftCorner);
             comboBox->addItem(tr("Bottom Right Corner (requires transcoding)"), Qn::BottomRightCorner);
 
+            bool isPanoramic = widget->resource()->getVideoLayout(0)->channelCount() > 1;
+            if (isPanoramic)
+                comboBox->setCurrentIndex(comboBox->count() - 1); /* Bottom right, as on layout */
+
             dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
             doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();

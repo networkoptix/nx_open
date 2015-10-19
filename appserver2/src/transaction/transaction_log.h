@@ -22,7 +22,6 @@
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_module_data.h"
-#include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_routing_data.h"
 #include "nx_ec/data/api_system_name_data.h"
 #include "nx_ec/data/api_runtime_data.h"
@@ -141,7 +140,6 @@ namespace ec2
 
         int getLatestSequence(const QnTranStateKey& key) const;
         QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
-        QnUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const;
         QnUuid makeHash(const QString &extraData, const ApiDiscoveryData &data) const;
 
          /**
@@ -168,7 +166,6 @@ namespace ec2
         QnUuid transactionHash(const ApiStoredFilePath& params) const             { return makeHash(params.path.toUtf8()); }
         QnUuid transactionHash(const ApiLicenseData& params) const                { return makeHash(params.key, "ApiLicense"); }    //TODO
         QnUuid transactionHash(const ApiResetBusinessRuleData& /*tran*/) const    { return makeHash("reset_brule", ADD_HASH_DATA); }
-        QnUuid transactionHash(const ApiCameraBookmarkTagDataList& params) const  { return makeHash("add_bookmark_tags", params); } // todo: #GDM it's invalid pattern! need refactor
         QnUuid transactionHash(const ApiDiscoveryData &params) const              { return makeHash("discovery_data", params); }
         
         QnUuid transactionHash(const ApiIdDataList& /*tran*/) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }

@@ -80,7 +80,6 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     : QWidget(parent)
     , m_lineEdit(new QLineEdit(this))
     , m_closeButton(createCloseButton(this))
-    , m_occurencesLabel(new QLabel(this))
     , m_searchButton(new QnSearchButton(this))
 
     , m_foundItems(0)
@@ -108,10 +107,6 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     connect(m_lineEdit, &QLineEdit::textChanged, this, &QnSearchLineEdit::textChanged);
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
 
-    m_occurencesLabel->setText(getBookmarksCountText(m_foundItems, m_overallItems));
-    m_occurencesLabel->setAutoFillBackground(true);
-    setPaletteColor(m_occurencesLabel, QPalette::Base, QColor(50, 127, 50));
-
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
 }
@@ -138,13 +133,8 @@ void QnSearchLineEdit::updateGeometries() {
     // right edge
     m_closeButton->setGeometry(width - (buttonSize + closeButtonSize) / 2
         , rect.y() + (buttonSize - closeButtonSize) / 2 + 1, closeButtonSize, closeButtonSize);
-    const int labelWidth = m_occurencesLabel->sizeHint().width();
-    const int labelOffset = 2;
 
-    m_occurencesLabel->setGeometry(width - buttonSize - labelWidth, labelOffset, labelWidth, height - labelOffset*2);
-
-    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, m_occurencesLabel->x() - buttonSize, height);
-    
+    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, m_closeButton->x() - buttonSize, height);
 }
 
 void QnSearchLineEdit::initStyleOption(QStyleOptionFrameV2 *option) const
@@ -168,18 +158,6 @@ QSize QnSearchLineEdit::sizeHint() const {
     QSize size = m_lineEdit->sizeHint();
     m_lineEdit->setFrame(false);
     return size;
-}
-
-void QnSearchLineEdit::updateFoundItemsCount(int count)
-{
-    m_foundItems = count;
-    m_occurencesLabel->setText(getBookmarksCountText(m_foundItems, m_overallItems));
-}
-
-void QnSearchLineEdit::updateOverallItemsCount(int count)
-{
-    m_overallItems = count;
-    m_occurencesLabel->setText(getBookmarksCountText(m_foundItems, m_overallItems));
 }
 
 void QnSearchLineEdit::focusInEvent(QFocusEvent *event) 

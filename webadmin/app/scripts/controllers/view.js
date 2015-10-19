@@ -141,20 +141,36 @@ angular.module('webadminApp').controller('ViewCtrl',
             }else{
                 $scope.iOSVideoTooLarge = false;
 
-                if(!$scope.activeCamera || $scope.activeCamera.hasDualStreaming ) {
-                    $scope.availableResolutions = nativeResolutions;
-                }else{
-                    $scope.availableResolutions = onlyHiResolution;
-                }
+                //1. collect resolutions with hls
 
-                if($scope.activeCamera && window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera)){
-                    if($scope.activeCamera.hasDualStreaming ) {
-                        $scope.availableResolutions = onlyLoResolution;
-                    }else {
-                        $scope.iOSVideoTooLarge = true;
+
+                var streams = ['Auto'];
+                if($scope.activeCamera) {
+                    var availableFormats = _.filter($scope.activeCamera.mediaStreams, function (stream) {
+                        return stream.transports.indexOf('hls') > 0;
+                    });
+
+
+                    for (var i = 0; i < availableFormats.length; i++) {
+                        if (availableFormats[i].encoderIndex == 0) {
+                            if (!( window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera) )) {
+                                streams.push('hi');
+                            }
+                        }
+                        if (availableFormats[i].encoderIndex == 1) {
+                            streams.push('lo');
+                        }
                     }
                 }
+                $scope.availableResolutions = streams;
 
+                if($scope.activeCamera && streams.length === 1 ){
+                    if(window.jscd.os === 'iOS' ){
+                        $scope.iOSVideoTooLarge = true;
+                    }else {
+                        console.error("no suitable streams from this camera");
+                    }
+                }
             }
 
             if($scope.availableResolutions.indexOf($scope.activeResolution)<0){
@@ -195,6 +211,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
         function updateVideoSource(playing) {
+            updateAvailableResolutions();
             var live = !playing;
 
             $scope.positionSelected = !!playing;
@@ -231,7 +248,8 @@ angular.module('webadminApp').controller('ViewCtrl',
             var resolution = $scope.activeResolution;
             var resolutionHls = resolution === 'Auto'?'lo':resolution;
 
-            if(resolutionHls === 'lo' && !$scope.activeCamera.hasDualStreaming ){
+            // Fix here!
+            if(resolutionHls === 'lo' && $scope.availableResolutions.indexOf('lo')<0){
                 resolutionHls = 'hi';
             }
 
@@ -428,10 +446,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                 var findMediaStream = function(param){
                     return param.name === 'mediaStreams';
                 };
-
-                var findDualStreaming = function(param){
-                    return param.name === 'hasDualStreaming';
-                };
                 
                 function cameraFilter(camera){
                     // Filter desktop cameras here
@@ -459,12 +473,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                     var mediaStreams = _.find(camera.addParams,findMediaStream);
                     camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
-
-
-                    var dualStreaming =  _.find(camera.addParams,findDualStreaming) ;
-                    camera.hasDualStreaming = dualStreaming?(dualStreaming.value === '1'):false;
-
-                    camera.hasDualStreaming = camera.hasDualStreaming && camera.secondaryStreamQuality != 'SSQualityDontUse';
 
                     if(typeof(camera.visible) === 'undefined'){
                         camera.visible = true;

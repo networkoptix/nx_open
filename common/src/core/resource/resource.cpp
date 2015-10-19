@@ -859,25 +859,31 @@ QnInitResPool* QnResource::initAsyncPoolInstance()
 
 #ifdef ENABLE_DATA_PROVIDERS
 Q_GLOBAL_STATIC(QnResourceCommandProcessor, QnResourceCommandProcessor_instance)
+static bool qnResourceCommandProcessorInitialized = false;
 
 void QnResource::startCommandProc()
 {
     QnResourceCommandProcessor_instance()->start();
+    qnResourceCommandProcessorInitialized = true;
 }
 
 void QnResource::stopCommandProc()
 {
-    QnResourceCommandProcessor_instance()->stop();
+    if (qnResourceCommandProcessorInitialized)
+        QnResourceCommandProcessor_instance()->stop();
 }
 
-void QnResource::addCommandToProc(const QnResourceCommandPtr& command)
-{
-    QnResourceCommandProcessor_instance()->putData(command);
+void QnResource::addCommandToProc(const QnResourceCommandPtr& command) {
+    Q_ASSERT_X(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
+    if (qnResourceCommandProcessorInitialized)
+        QnResourceCommandProcessor_instance()->putData(command);
 }
 
-int QnResource::commandProcQueueSize()
-{
-    return QnResourceCommandProcessor_instance()->queueSize();
+int QnResource::commandProcQueueSize() {
+    Q_ASSERT_X(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
+    if (qnResourceCommandProcessorInitialized)
+        return QnResourceCommandProcessor_instance()->queueSize();
+    return 0;
 }
 #endif // ENABLE_DATA_PROVIDERS
 

@@ -21,10 +21,6 @@ signals:
     void enterKeyPressed();
     void enabledChanged();
 
-public slots:
-    void updateFoundItemsCount(int count);
-    void updateOverallItemsCount(int count);
-
 protected:
     void focusInEvent(QFocusEvent *event) override;
     void focusOutEvent(QFocusEvent *event) override;
@@ -41,7 +37,6 @@ protected:
 
     QLineEdit* m_lineEdit;
     QAbstractButton *m_closeButton;
-    QLabel *m_occurencesLabel;
     QAbstractButton *m_searchButton;
 
     int m_foundItems;

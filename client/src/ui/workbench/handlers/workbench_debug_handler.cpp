@@ -176,7 +176,7 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
                     bookmark.timeout = startDt.addMonths(6).toMSecsSinceEpoch() - start;
                     qDebug() << "adding bookmark " << counter << QDateTime::fromMSecsSinceEpoch(start);
 
-                    qnCameraBookmarksManager->addCameraBookmark(camera, bookmark, [this, start](bool success) {
+                    qnCameraBookmarksManager->addCameraBookmark(bookmark, [this, start](bool success) {
                         qDebug() << "bookmark added " << success << QDateTime::fromMSecsSinceEpoch(start);
                     });
 
