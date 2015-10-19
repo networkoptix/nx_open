@@ -211,6 +211,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
         function updateVideoSource(playing) {
+            updateAvailableResolutions();
             var live = !playing;
 
             $scope.positionSelected = !!playing;
@@ -248,7 +249,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             var resolutionHls = resolution === 'Auto'?'lo':resolution;
 
             // Fix here!
-            if(resolutionHls === 'lo' && !$scope.availableResolutions.indexOf('lo')>0){
+            if(resolutionHls === 'lo' && $scope.availableResolutions.indexOf('lo')<0){
                 resolutionHls = 'hi';
             }
 

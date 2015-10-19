@@ -113,7 +113,8 @@ var flashlsAPI = new (function(){
             allowScriptAccess:'always',
             bgcolor: '#1C2327',
             allowFullScreen:false,
-            FlashVars:'callback=flashlsCallback'
+            FlashVars:'callback=flashlsCallback',
+            wmode:'transparent'
         },
         attributes:{ // https://code.google.com/p/swfobject/wiki/documentation - see section 'How can you configure your Flash content?
             id:'flashvideowindow',
@@ -401,6 +402,8 @@ flashlsAPI.flashlsEvents = {
         flashlsAPI.positionHandler(null);
     },
     error: function(code, url, message) {
+
+        flashlsAPI.errorHandler({message:message,code:code,url:url});
         console.error('flashls error, code:'+ code + ' url:' + url + ' message:' + message);
     },
     manifest: function(duration, levels, loadmetrics) {
