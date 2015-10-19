@@ -2005,6 +2005,7 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged()
 {
     const QRectF paintGeometry = m_calendarItem->paintGeometry();
     m_calendarPinButton->setPos(paintGeometry.topRight() + m_calendarPinOffset);
+    m_calendarPinButton->setVisible(!paintGeometry.isEmpty());
 
     if(m_inCalendarGeometryUpdate)
         return;
