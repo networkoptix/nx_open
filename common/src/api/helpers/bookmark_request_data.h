@@ -2,6 +2,7 @@
 
 #include <QUrlQuery>
 
+#include <api/helpers/request_helpers_fwd.h>
 #include <api/helpers/multiserver_request_data.h>
 
 #include <core/resource/camera_bookmark.h>
@@ -18,6 +19,19 @@ struct QnGetBookmarksRequestData: public QnMultiserverRequestData {
     QnCameraBookmarkSearchFilter filter;
     Qn::SerializationFormat format;
     QnVirtualCameraResourceList cameras;
+};
+
+struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData {
+    QnGetBookmarkTagsRequestData(int limit = QnGetBookmarkTagsRequestData::unlimited());
+
+    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual QnRequestParamList toParams() const override;
+    virtual bool isValid() const override;
+
+    static int unlimited();
+
+    Qn::SerializationFormat format;
+    int limit;
 };
 
 struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData {

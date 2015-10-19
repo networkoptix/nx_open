@@ -421,7 +421,7 @@ bool QnServerDb::cleanupEvents()
     return rez;
 }
 
-bool QnServerDb::migrateBusinessParams() {
+bool QnServerDb::migrateBusinessParamsUnderTransaction() {
     struct RowParams {
         QByteArray actionParams;
         QByteArray runtimeParams;
@@ -468,8 +468,6 @@ bool QnServerDb::migrateBusinessParams() {
     
 
     {  
-        QnDbTransactionLocker tran(getTransaction());
-
         QSqlQuery query(m_sdb);
         query.prepare("UPDATE runtime_actions SET action_params = :action, runtime_params = :runtime WHERE rowid = :rowid");
         for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
@@ -479,11 +477,36 @@ bool QnServerDb::migrateBusinessParams() {
             if (!execSQLQuery(&query, Q_FUNC_INFO))
                 return false;
         }
-
-        return tran.commit();
     }
+
+    return true;
 }
 
+bool QnServerDb::createBookmarkTagTriggersUnderTransaction() {
+    {
+        QString queryStr = 
+            "CREATE TRIGGER increment_bookmark_tag_counter AFTER INSERT ON bookmark_tags "
+            "BEGIN "
+                "INSERT OR IGNORE INTO bookmark_tag_counts (tag, count) VALUES (NEW.name, 0); "
+                "UPDATE bookmark_tag_counts SET count = count + 1 WHERE tag = NEW.name; "
+            "END; ";
+        if (!execSQLQuery(queryStr, m_sdb, Q_FUNC_INFO))
+            return false;
+    }
+
+    {
+        QString queryStr = 
+            "CREATE TRIGGER decrement_bookmark_tag_counter AFTER DELETE ON bookmark_tags "
+            "BEGIN "
+                "UPDATE bookmark_tag_counts SET count = count - 1 WHERE tag = OLD.name; "
+                "DELETE FROM bookmark_tag_counts WHERE tag = OLD.name AND count <= 0; "
+            "END; ";
+        if (!execSQLQuery(queryStr, m_sdb, Q_FUNC_INFO))
+            return false;
+    }
+
+    return true;
+}
 
 bool QnServerDb::cleanupAuditLog()
 {
@@ -728,9 +751,11 @@ void QnServerDb::getAndSerializeActions(
 
 bool QnServerDb::afterInstallUpdate(const QString& updateName) {
 
-    if (updateName == lit(":/mserver_updates/01_business_params.sql")) {
-        migrateBusinessParams();
-    }
+    if (updateName.endsWith(lit("/01_business_params.sql")))
+        return migrateBusinessParamsUnderTransaction();   
+    
+    if (updateName.endsWith(lit("/03_add_bookmark_tag_counts_and_rename_tables.sql")))
+        return createBookmarkTagTriggersUnderTransaction();   
 
     return true;
 }
@@ -776,8 +801,8 @@ bool QnServerDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBookm
                      book.timeout as timeout, \
                      book.unique_id as cameraId, \
                      tag.name as tagName \
-                     FROM storage_bookmark book \
-                     LEFT JOIN storage_bookmark_tag tag \
+                     FROM bookmarks book \
+                     LEFT JOIN bookmark_tags tag \
                      ON book.guid = tag.bookmark_guid " 
                      + filterStr +
                      " ORDER BY startTimeMs ASC, guid");
@@ -842,9 +867,38 @@ bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const {
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare("SELECT guid from storage_bookmark where guid = ?");
+    query.prepare("SELECT guid from bookmarks where guid = ?");
     query.bindValue(0, bookmarkId.toRfc4122());
     return (execSQLQuery(&query, Q_FUNC_INFO) && query.next());
+}
+
+QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
+    QWriteLocker lock(&m_mutex);
+
+    QString queryStr("SELECT tag as name, count " 
+                     "FROM bookmark_tag_counts " 
+                     "ORDER BY count DESC ");
+
+    if (limit > 0 && limit < std::numeric_limits<int>().max())
+        queryStr += lit("LIMIT %1").arg(limit);
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(queryStr);
+
+    QnCameraBookmarkTagList result;
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return result;
+
+    QnSqlIndexMapping mapping = QnSql::mapping<QnCameraBookmarkTag>(query);
+
+    while (query.next()) {
+        result.append(QnCameraBookmarkTag());
+        QnSql::fetch(mapping, query.record(), &result.last());
+    }
+
+    return result;
 }
 
 
@@ -856,7 +910,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
     int docId = 0;
     {
         QSqlQuery insQuery(m_sdb);
-        insQuery.prepare("INSERT OR REPLACE INTO storage_bookmark ( \
+        insQuery.prepare("INSERT OR REPLACE INTO bookmarks ( \
                          guid, unique_id, start_time, duration, \
                          name, description, timeout \
                          ) VALUES ( \
@@ -872,7 +926,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
 
     {
         QSqlQuery cleanTagQuery(m_sdb);
-        cleanTagQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid = ?");
+        cleanTagQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid = ?");
         cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
         if (!execSQLQuery(&cleanTagQuery, Q_FUNC_INFO))
             return false;
@@ -880,7 +934,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
 
     {
         QSqlQuery tagQuery(m_sdb);
-        tagQuery.prepare("INSERT INTO storage_bookmark_tag ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
+        tagQuery.prepare("INSERT INTO bookmark_tags ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
         tagQuery.bindValue(":bookmark_guid", bookmark.guid.toRfc4122());
         for (const QString tag: bookmark.tags) {
             tagQuery.bindValue(":name", tag);
@@ -908,7 +962,7 @@ bool QnServerDb::deleteAllBookmarksForCamera(const QString& cameraUniqueId) {
 
     {
         QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid IN (SELECT guid from storage_bookmark WHERE unique_id = :id)");
+        delQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid IN (SELECT guid from bookmarks WHERE unique_id = :id)");
         delQuery.bindValue(":id", cameraUniqueId);
         if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
             return false;
@@ -916,13 +970,13 @@ bool QnServerDb::deleteAllBookmarksForCamera(const QString& cameraUniqueId) {
 
     {
         QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM storage_bookmark WHERE unique_id = :id");
+        delQuery.prepare("DELETE FROM bookmarks WHERE unique_id = :id");
         delQuery.bindValue(":id", cameraUniqueId);
         if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
             return false;
     }
 
-    if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM storage_bookmark)", m_sdb, Q_FUNC_INFO))
+    if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM bookmarks)", m_sdb, Q_FUNC_INFO))
         return false;
 
     return tran.commit();
@@ -936,7 +990,7 @@ bool QnServerDb::deleteBookmark(const QnUuid &bookmarkId) {
 
     {
         QSqlQuery cleanTagQuery(m_sdb);
-        cleanTagQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid = ?");
+        cleanTagQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid = ?");
         cleanTagQuery.addBindValue(bookmarkId.toRfc4122());
         if (!execSQLQuery(&cleanTagQuery, Q_FUNC_INFO))
             return false;
@@ -944,13 +998,13 @@ bool QnServerDb::deleteBookmark(const QnUuid &bookmarkId) {
 
     {
         QSqlQuery cleanQuery(m_sdb);
-        cleanQuery.prepare("DELETE FROM storage_bookmark WHERE guid = ?");
+        cleanQuery.prepare("DELETE FROM bookmarks WHERE guid = ?");
         cleanQuery.addBindValue(bookmarkId.toRfc4122());
         if (!execSQLQuery(&cleanQuery, Q_FUNC_INFO))
             return false;
     }
 
-    if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM storage_bookmark)", m_sdb, Q_FUNC_INFO))
+    if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM bookmarks)", m_sdb, Q_FUNC_INFO))
         return false;
 
     return tran.commit();

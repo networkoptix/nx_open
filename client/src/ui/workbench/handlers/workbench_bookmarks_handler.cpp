@@ -25,6 +25,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include "core/resource/camera_history.h"
 
 QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NULL */):
@@ -34,38 +35,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(action(Qn::AddCameraBookmarkAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
     connect(action(Qn::EditCameraBookmarkAction),   &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
     connect(action(Qn::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
-
-    connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTags);
-
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.unite(tags);
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.subtract(tags);
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-}
-
-void QnWorkbenchBookmarksHandler::updateTags() {
-    if (!context()->user()) {
-        m_tags.clear();
-        context()->navigator()->setBookmarkTags(m_tags);
-        return;
-    }
-    
-    connection()->getCameraManager()->getBookmarkTags(this, [this](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTags &tags) {
-        Q_UNUSED(reqID);
-        if (code != ec2::ErrorCode::ok)
-            return;
-        m_tags = tags;
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-}
-
-QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tags() const {
-    return m_tags;
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
@@ -97,7 +66,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     bookmark.cameraId = camera->getUniqueId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
-    dialog->setTags(m_tags);
+    dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
@@ -126,7 +95,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
     }
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
-    dialog->setTags(m_tags);
+    dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;

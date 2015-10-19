@@ -79,9 +79,6 @@ public:
 
     QnSearchQueryStrategy *bookmarksSearchStrategy() const;
 
-    QnCameraBookmarkTags bookmarkTags() const;
-    void setBookmarkTags(const QnCameraBookmarkTags &tags);
-
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
     bool isLiveSupported() const;
@@ -225,6 +222,7 @@ private:
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
     void updateSliderBookmarks();
+    void updateBookmarkTags();
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
@@ -274,7 +272,6 @@ private:
    
     QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
-    QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
     QnCameraBookmarksQueryPtr m_bookmarkQuery;
     QnCameraBookmarkAggregation m_bookmarkAggregation;

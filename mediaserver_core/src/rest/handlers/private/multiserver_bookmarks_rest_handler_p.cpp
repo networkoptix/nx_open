@@ -1,7 +1,7 @@
 #include "multiserver_bookmarks_rest_handler_p.h"
 
 #include <api/helpers/multiserver_request_data.h>
-#include <api/helpers/bookmark_requests.h>
+#include <api/helpers/bookmark_request_data.h>
 
 #include <common/common_module.h>
 
@@ -20,74 +20,46 @@
 #include <utils/thread/wait_condition.h>
 
 namespace {
-    const QString addOperation = lit("add");
-    const QString updateOperation = lit("update");
-    const QString deleteOperation = lit("delete");
+    static std::array<QString, static_cast<int>(QnBookmarkOperation::Count)>  operations =
+    {
+        QString(),
+        "tags",
+        "add",
+        "update",
+        "delete",
+    };
+
+    QUrl getApiUrl(const QnMediaServerResourcePtr &server, QnBookmarkOperation operation) {
+        QUrl apiUrl(server->getApiUrl());
+        apiUrl.setPath(L'/' + QnMultiserverBookmarksRestHandlerPrivate::urlPath + L'/' + operations[static_cast<int>(operation)]);
+
+        if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
+            apiUrl.setUserName(admin->getName());
+            apiUrl.setPassword(QString::fromUtf8(admin->getDigest()));
+        }
+
+        return apiUrl;
+    }
+
 }
-
-struct QnMultiserverBookmarksRestHandlerPrivate::RemoteRequestContext {
-
-    RemoteRequestContext()
-        : requestsInProgress(0) 
-    {}
-
-    QnMutex mutex;
-    QnWaitCondition waitCond;
-    int requestsInProgress;
-};
-
-struct QnMultiserverBookmarksRestHandlerPrivate::GetBookmarksContext: public RemoteRequestContext {
-    GetBookmarksContext(const QnGetBookmarksRequestData& request)
-        : RemoteRequestContext()
-        , request(request)
-    {}
-
-    const QnGetBookmarksRequestData request;
-
-};
-
-struct QnMultiserverBookmarksRestHandlerPrivate::UpdateBookmarkContext: public RemoteRequestContext {
-    UpdateBookmarkContext(const QnUpdateBookmarkRequestData &request)
-        : RemoteRequestContext()
-        , request(request)
-    {}
-    
-    const QnUpdateBookmarkRequestData request;
-};
-
-struct QnMultiserverBookmarksRestHandlerPrivate::DeleteBookmarkContext: public RemoteRequestContext {
-    DeleteBookmarkContext(const QnDeleteBookmarkRequestData &request)
-        : RemoteRequestContext()
-        , request(request)
-    {}
-
-    const QnDeleteBookmarkRequestData request;
-};
 
 QString QnMultiserverBookmarksRestHandlerPrivate::urlPath;
 
-//TODO: #GDM #Bookmarks refactor
 QnBookmarkOperation QnMultiserverBookmarksRestHandlerPrivate::getOperation(const QString &path) {
-    if (path == addOperation)
-        return QnBookmarkOperation::Add;
-
-    if (path == updateOperation)
-        return QnBookmarkOperation::Update;
-
-    if (path == deleteOperation)
-        return QnBookmarkOperation::Delete;
-
-    return QnBookmarkOperation::Get;
+    auto iter = std::find(operations.cbegin(), operations.cend(), path);
+    if (iter == operations.cend())
+        return QnBookmarkOperation::Get;
+    return static_cast<QnBookmarkOperation>(std::distance(operations.cbegin(), iter));
 }
 
-void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksRemoteAsync(MultiServerCameraBookmarkList& outputData, const QnMediaServerResourcePtr &server, GetBookmarksContext* ctx)
+void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksRemoteAsync(QnMultiServerCameraBookmarkList& outputData, const QnMediaServerResourcePtr &server, QnGetBookmarksRequestContext* ctx)
 {
     auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
     {
-        MultiServerCameraBookmarkList remoteData;
+        QnMultiServerCameraBookmarkList remoteData;
         bool success = false;
         if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
-            remoteData = QJson::deserialized(msgBody, MultiServerCameraBookmarkList(), &success);
+            remoteData = QJson::deserialized(msgBody, QnMultiServerCameraBookmarkList(), &success);
 
         QnMutexLocker lock(&ctx->mutex);
         if (success && !remoteData.empty())
@@ -96,8 +68,7 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksRemoteAsync(MultiServ
         ctx->waitCond.wakeAll();
     };
 
-    QUrl apiUrl(server->getApiUrl());
-    apiUrl.setPath(L'/' + urlPath + L'/');
+    QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Get));
 
     QnGetBookmarksRequestData modifiedRequest = ctx->request;
     modifiedRequest.isLocal = true;
@@ -105,11 +76,6 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksRemoteAsync(MultiServ
 
     nx_http::HttpHeaders headers;
     QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
-
-    if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-        apiUrl.setUserName(admin->getName());
-        apiUrl.setPassword(QString::fromUtf8(admin->getDigest()));
-    }
 
     QnMutexLocker lock(&ctx->mutex);
     if (nx_http::downloadFileAsync(
@@ -122,23 +88,67 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksRemoteAsync(MultiServ
     }
 }
 
-void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksLocal(MultiServerCameraBookmarkList& outputData, GetBookmarksContext* ctx) {
-    auto bookmarks = QnBookmarksRequestHelper::load(ctx->request);
+void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksLocal(QnMultiServerCameraBookmarkList& outputData, QnGetBookmarksRequestContext* ctx) {
+    auto bookmarks = QnBookmarksRequestHelper::loadBookmarks(ctx->request);
     if (!bookmarks.empty()) {
         QnMutexLocker lock(&ctx->mutex);
         outputData.push_back(std::move(bookmarks));
     }
 }
 
-void QnMultiserverBookmarksRestHandlerPrivate::waitForDone(RemoteRequestContext* ctx) {
+void QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTagsRemoteAsync(QnMultiServerCameraBookmarkTagList& outputData, const QnMediaServerResourcePtr &server, QnGetBookmarkTagsRequestContext* ctx) {
+    auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+    {
+        QnMultiServerCameraBookmarkTagList remoteData;
+        bool success = false;
+        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
+            remoteData = QJson::deserialized(msgBody, QnMultiServerCameraBookmarkTagList(), &success);
+
+        QnMutexLocker lock(&ctx->mutex);
+        if (success && !remoteData.empty())
+            outputData.push_back(std::move(remoteData.front()));
+        ctx->requestsInProgress--;
+        ctx->waitCond.wakeAll();
+    };
+
+    QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::GetTags));
+
+    QnGetBookmarkTagsRequestData modifiedRequest = ctx->request;
+    modifiedRequest.isLocal = true;
+    apiUrl.setQuery(modifiedRequest.toUrlQuery());
+
+    nx_http::HttpHeaders headers;
+    QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
+
+    QnMutexLocker lock(&ctx->mutex);
+    if (nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc,
+        headers,
+        nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
+    {
+        ctx->requestsInProgress++;
+    }
+}
+
+void QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTagsLocal(QnMultiServerCameraBookmarkTagList& outputData, QnGetBookmarkTagsRequestContext* ctx) {
+    auto tags = QnBookmarksRequestHelper::loadTags(ctx->request);
+    if (!tags.empty()) {
+        QnMutexLocker lock(&ctx->mutex);
+        outputData.push_back(std::move(tags));
+    }
+}
+
+
+void QnMultiserverBookmarksRestHandlerPrivate::waitForDone(QnMultiserverRequestContext* ctx) {
     QnMutexLocker lock(&ctx->mutex);
     while (ctx->requestsInProgress > 0)
         ctx->waitCond.wait(&ctx->mutex);
 }
 
 QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(const QnGetBookmarksRequestData& request) {
-    GetBookmarksContext ctx(request);
-    MultiServerCameraBookmarkList outputData;
+    QnGetBookmarksRequestContext ctx(request);
+    QnMultiServerCameraBookmarkList outputData;
     if (request.isLocal)
     {
         getBookmarksLocal(outputData, &ctx);
@@ -161,13 +171,36 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(cons
     return QnCameraBookmark::mergeCameraBookmarks(outputData, request.filter.limit, request.filter.strategy);
 }
 
+
+QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(const QnGetBookmarkTagsRequestData& request) {
+    QnGetBookmarkTagsRequestContext ctx(request);
+    QnMultiServerCameraBookmarkTagList outputData;
+    if (request.isLocal)
+    {
+        getBookmarkTagsLocal(outputData, &ctx);
+    }
+    else 
+    {
+        for (const auto& server: qnResPool->getAllServers()) 
+        {
+            if (server->getId() == qnCommon->moduleGUID())
+                getBookmarkTagsLocal(outputData, &ctx);
+            else
+                getBookmarkTagsRemoteAsync(outputData, server, &ctx);
+        }
+        waitForDone(&ctx);
+    }
+    return QnCameraBookmarkTag::mergeCameraBookmarkTags(outputData, request.limit);
+}
+
+
 bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(const QnUpdateBookmarkRequestData &request) {
     /* This request always executed locally. */
     return qnServerDb->addBookmark(request.bookmark);
 }
 
 bool QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(const QnUpdateBookmarkRequestData &request) {
-    UpdateBookmarkContext ctx(request);
+    QnUpdateBookmarkRequestContext ctx(request);
     if (request.isLocal)
     {
         qnServerDb->updateBookmark(request.bookmark);
@@ -186,9 +219,8 @@ bool QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(const QnUpdateBook
     return true;
 }
 
-void QnMultiserverBookmarksRestHandlerPrivate::updateBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, UpdateBookmarkContext* ctx) {
-    QUrl apiUrl(server->getApiUrl());
-    apiUrl.setPath(L'/' + urlPath + L'/' + updateOperation);
+void QnMultiserverBookmarksRestHandlerPrivate::updateBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, QnUpdateBookmarkRequestContext* ctx) {
+    QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Update));
 
     QnMultiserverRequestData modifiedRequest = ctx->request;
     modifiedRequest.isLocal = true;
@@ -198,7 +230,7 @@ void QnMultiserverBookmarksRestHandlerPrivate::updateBookmarkRemoteAsync(const Q
 }
 
 bool QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(const QnDeleteBookmarkRequestData &request) {
-    DeleteBookmarkContext ctx(request);
+    QnDeleteBookmarkRequestContext ctx(request);
     if (request.isLocal)
     {
         qnServerDb->deleteBookmark(request.bookmarkId);
@@ -217,9 +249,8 @@ bool QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(const QnDeleteBook
     return true;
 }
 
-void QnMultiserverBookmarksRestHandlerPrivate::deleteBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, DeleteBookmarkContext* ctx) {
-    QUrl apiUrl(server->getApiUrl());
-    apiUrl.setPath(L'/' + urlPath + L'/' + deleteOperation);
+void QnMultiserverBookmarksRestHandlerPrivate::deleteBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, QnDeleteBookmarkRequestContext* ctx) {
+    QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Delete));
 
     QnMultiserverRequestData modifiedRequest = ctx->request;
     modifiedRequest.isLocal = true;
@@ -228,7 +259,7 @@ void QnMultiserverBookmarksRestHandlerPrivate::deleteBookmarkRemoteAsync(const Q
     sendAsyncRequest(server, apiUrl, ctx);
 }
 
-void QnMultiserverBookmarksRestHandlerPrivate::sendAsyncRequest(const QnMediaServerResourcePtr &server, QUrl url, RemoteRequestContext *ctx) {
+void QnMultiserverBookmarksRestHandlerPrivate::sendAsyncRequest(const QnMediaServerResourcePtr &server, QUrl url, QnMultiserverRequestContext *ctx) {
     auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
         QN_UNUSED(osErrorCode, statusCode, msgBody);
         ctx->requestsInProgress--;
@@ -237,11 +268,6 @@ void QnMultiserverBookmarksRestHandlerPrivate::sendAsyncRequest(const QnMediaSer
 
     nx_http::HttpHeaders headers;
     QnRouter::instance()->updateRequest(url, headers, server->getId());
-
-    if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-        url.setUserName(admin->getName());
-        url.setPassword(QString::fromUtf8(admin->getDigest()));
-    }
 
     QnMutexLocker lock(&ctx->mutex);
     if (nx_http::downloadFileAsync(
@@ -253,5 +279,4 @@ void QnMultiserverBookmarksRestHandlerPrivate::sendAsyncRequest(const QnMediaSer
         ctx->requestsInProgress++;
     }
 }
-
 

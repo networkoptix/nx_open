@@ -17,12 +17,12 @@ QString QnCameraBookmark::tagsAsString(QChar delimiter) const {
 }
 
 //TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
-QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const MultiServerCameraBookmarkList &source, int limit, Qn::BookmarkSearchStrategy strategy) {
+QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source, int limit, Qn::BookmarkSearchStrategy strategy) {
     Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit must be correct");
     if (limit <= 0)
         return QnCameraBookmarkList();
 
-    MultiServerCameraBookmarkList nonEmptyLists;
+    QnMultiServerCameraBookmarkList nonEmptyLists;
     for (const auto &list: source)
         if (!list.isEmpty())
             nonEmptyLists.push_back(list);
@@ -118,6 +118,44 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const MultiServerCam
     return result;
 }
 
+QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit) {
+    Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit must be correct");
+    if (limit <= 0)
+        return QnCameraBookmarkTagList();
+
+    QnMultiServerCameraBookmarkTagList nonEmptyLists;
+    for (const auto &list: source)
+        if (!list.isEmpty())
+            nonEmptyLists.push_back(list);
+
+    if (nonEmptyLists.empty())
+        return QnCameraBookmarkTagList();
+
+    if(nonEmptyLists.size() == 1) {
+        QnCameraBookmarkTagList result = nonEmptyLists.front();
+        if (result.size() > limit)
+            result.resize(limit);
+        return result;
+    }
+
+    QnCameraBookmarkTagList result;
+    int maxSize = 0;
+    for (const auto &list: nonEmptyLists)
+        maxSize += list.size();
+    result.reserve(maxSize);
+
+    //TODO: #dklychkov merge duplicates , sort and cut by limit    
+    for (const QnCameraBookmarkTagList &source: nonEmptyLists) {
+        for (const auto &tag: source)
+            result.push_back(tag);
+    }
+
+    if (result.size() > limit)
+        result.resize(limit);
+    return result;
+}
+
+
 bool QnCameraBookmark::isValid() const {
     return !isNull() && !cameraId.isEmpty();
 }
@@ -162,5 +200,7 @@ bool QnCameraBookmarkSearchFilter::isValid() const {
 void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/) {return ;}
 void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmark_Fields, (optional, true) )
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq), QnCameraBookmarkSearchFilter_Fields, (optional, true) )
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark,      (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmark_Fields,    (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkTag,   (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmarkTag_Fields, (optional, true))

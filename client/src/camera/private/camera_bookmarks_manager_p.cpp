@@ -1,6 +1,6 @@
 #include "camera_bookmarks_manager_p.h"
 
-#include <api/helpers/bookmark_requests.h>
+#include <api/helpers/bookmark_request_data.h>
 
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
@@ -113,7 +113,6 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
 
     QnGetBookmarksRequestData requestData;
     requestData.cameras = cameras.toList();
-    requestData.format = Qn::JsonFormat;
     requestData.filter = filter;
 
     int requestId = connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));

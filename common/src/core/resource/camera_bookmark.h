@@ -59,7 +59,7 @@ struct QnCameraBookmark {
 
     QString tagsAsString(QChar delimiter = L' ') const;
 
-    static QnCameraBookmarkList mergeCameraBookmarks(const MultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
+    static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
 
@@ -87,6 +87,18 @@ struct QnCameraBookmarkSearchFilter {
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
 
+struct QnCameraBookmarkTag {
+    QString name;
+    int count;
+
+    QnCameraBookmarkTag() :
+        count(0)
+    {}
+
+    static QnCameraBookmarkTagList mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit = std::numeric_limits<int>().max());
+};
+#define QnCameraBookmarkTag_Fields (name)(count)
+
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
 bool operator<(qint64 first, const QnCameraBookmark &other);
 bool operator<(const QnCameraBookmark &first, qint64 other);
@@ -97,8 +109,11 @@ Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
 Q_DECLARE_METATYPE(QnCameraBookmarkList)
 Q_DECLARE_METATYPE(QnCameraBookmarkTags)
+Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
+
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkTag, (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
 
 #endif //QN_CAMERA_BOOKMARK_H

@@ -11,7 +11,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include <api/helpers/chunks_request_data.h>
-#include <api/helpers/bookmark_requests.h>
+#include <api/helpers/bookmark_request_data.h>
 
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
@@ -103,6 +103,7 @@ namespace {
         (ec2BookmarkAddObject,     "ec2/bookmarks/add")
         (ec2BookmarkUpdateObject,  "ec2/bookmarks/update")
         (ec2BookmarkDeleteObject,  "ec2/bookmarks/delete")
+        (ec2BookmarkTagsObject,    "ec2/bookmarks/tags")
         (MergeLdapUsersObject,     "mergeLdapUsers")
     );
 #if 0
@@ -278,6 +279,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case ec2BookmarksObject:
         processFusionReply<QnCameraBookmarkList>(this, response, handle);
+        break;
+    case ec2BookmarkTagsObject:
+        processFusionReply<QnCameraBookmarkTagList>(this, response, handle);
         break;
     case TestLdapSettingsObject:
         processJsonReply<QnLdapUsers>(this, response, handle);
@@ -864,4 +868,9 @@ int QnMediaServerConnection::deleteBookmarkAsync(const QnUuid &bookmarkId, QObje
 
 int QnMediaServerConnection::getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot) {
     return sendAsyncGetRequest(ec2BookmarksObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
+}
+
+int QnMediaServerConnection::getBookmarkTagsAsync(const QnGetBookmarkTagsRequestData &request, QObject *target, const char *slot) {
+    return sendAsyncGetRequest(ec2BookmarkTagsObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkTagList), target, slot);
+
 }

@@ -1,6 +1,6 @@
 #include "multiserver_bookmarks_rest_handler.h"
 
-#include <api/helpers/bookmark_requests.h>
+#include <api/helpers/bookmark_request_data.h>
  
 #include <core/resource/camera_bookmark.h>
  
@@ -26,7 +26,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
     case QnBookmarkOperation::Add:
     case QnBookmarkOperation::Update:
         {
-            QnUpdateBookmarkRequestData request = QnMultiserverRequestData::fromParams<QnUpdateBookmarkRequestData>(params);
+            auto request = QnMultiserverRequestData::fromParams<QnUpdateBookmarkRequestData>(params);
             if (!request.isValid())
                 return nx_http::StatusCode::badRequest;
             
@@ -41,7 +41,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
 
     case QnBookmarkOperation::Delete:
         {
-            QnDeleteBookmarkRequestData request = QnDeleteBookmarkRequestData::fromParams<QnDeleteBookmarkRequestData>(params);
+            auto request = QnDeleteBookmarkRequestData::fromParams<QnDeleteBookmarkRequestData>(params);
             if (!request.isValid())
                 return nx_http::StatusCode::badRequest;
 
@@ -49,13 +49,22 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::internalServerError;
         }
+    case QnBookmarkOperation::GetTags:
+        {
+            auto request = QnGetBookmarkTagsRequestData::fromParams<QnGetBookmarkTagsRequestData>(params);
+            if (!request.isValid())
+                return nx_http::StatusCode::badRequest;
+            QnCameraBookmarkTagList outputData = QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(request);
+            QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType, request.format);
+            return nx_http::StatusCode::ok;
+        }
     default:
         {
             QnGetBookmarksRequestData request = QnMultiserverRequestData::fromParams<QnGetBookmarksRequestData>(params);
             if (!request.isValid())
                 return nx_http::StatusCode::badRequest;
             QnCameraBookmarkList outputData = QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(request);
-            QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
+            QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType, request.format);
             return nx_http::StatusCode::ok;
         }
     }

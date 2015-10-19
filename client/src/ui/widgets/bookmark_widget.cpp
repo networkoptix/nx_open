@@ -39,11 +39,11 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
 
 QnBookmarkWidget::~QnBookmarkWidget() {}
 
-QnCameraBookmarkTags QnBookmarkWidget::tags() const {
+const QnCameraBookmarkTagList &QnBookmarkWidget::tags() const {
     return m_allTags;
 }
 
-void QnBookmarkWidget::setTags(const QnCameraBookmarkTags &tags) {
+void QnBookmarkWidget::setTags(const QnCameraBookmarkTagList &tags) {
     m_allTags = tags;
     updateTagsList();
 }
@@ -82,11 +82,11 @@ void QnBookmarkWidget::updateTagsList() {
     QString usedTag = lit("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"color:#009933\">%1</font><\a><span style=\"text-decoration:none;\"> </span>");
 
     QString tags;
-    foreach(const QString &tag, m_allTags) {
-        if (m_selectedTags.contains(tag)) {
-            tags.append(usedTag.arg(tag));
+    foreach(const QnCameraBookmarkTag &tag, m_allTags) {
+        if (m_selectedTags.contains(tag.name)) {
+            tags.append(usedTag.arg(tag.name));
         } else {
-            tags.append(unusedTag.arg(tag));
+            tags.append(unusedTag.arg(tag.name));
         }
     }
 

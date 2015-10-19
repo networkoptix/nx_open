@@ -33,9 +33,6 @@ int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams 
     if (!qnServerDb->addBookmark(bookmark))
         return nx_http::StatusCode::invalidParameter;
 
-    if (!bookmark.tags.isEmpty())
-        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {});
-
     result.setReply(bookmark);
     return nx_http::StatusCode::ok;
 }
@@ -52,9 +49,6 @@ int QnCameraBookmarksRestHandler::updateCameraBookmarkAction(const QnRequestPara
 
     if (!qnServerDb->updateBookmark(bookmark))
         return nx_http::StatusCode::invalidParameter;
-
-    if (!bookmark.tags.isEmpty())
-        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {});
 
     result.setReply(bookmark);
     return nx_http::StatusCode::ok;

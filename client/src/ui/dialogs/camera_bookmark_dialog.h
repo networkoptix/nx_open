@@ -20,14 +20,13 @@ public:
     explicit QnCameraBookmarkDialog(QWidget *parent = 0);
     ~QnCameraBookmarkDialog();
 
-    QnCameraBookmarkTags tags() const;
-    void setTags(const QnCameraBookmarkTags &tags);
+    const QnCameraBookmarkTagList &tags() const;
+    void setTags(const QnCameraBookmarkTagList &tags);
 
     void loadData(const QnCameraBookmark &bookmark);
     void submitData(QnCameraBookmark &bookmark) const;
 private:
     QScopedPointer<Ui::QnCameraBookmarkDialog> ui;
-
 };
 
 #endif // ADD_CAMERA_BOOKMARK_DIALOG_H

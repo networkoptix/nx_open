@@ -60,6 +60,7 @@ public:
 
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);    
     bool containsBookmark(const QnUuid &bookmarkId) const;
+    QnCameraBookmarkTagList getBookmarkTags(int limit = std::numeric_limits<int>().max());
 
     bool addBookmark(const QnCameraBookmark &bookmark);
     bool updateBookmark(const QnCameraBookmark &bookmark);
@@ -73,7 +74,8 @@ protected:
 private:
     bool createDatabase();
     bool cleanupEvents();
-    bool migrateBusinessParams();
+    bool migrateBusinessParamsUnderTransaction();
+    bool createBookmarkTagTriggersUnderTransaction();
     bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
