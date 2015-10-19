@@ -266,6 +266,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
+
     QnClientModule client(startupParams);
 
     /// TODO: #ynikitenkov move other initialization to QnClientModule constructor
@@ -297,7 +298,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     QString logFileNameSuffix;
-    if (!startupParams.videoWallGuid.isNull()) {
+    if (!startupParams.customUri.isNull()) {
+        startupParams.allowMultipleClientInstances = true;
+
+
+    } else if (!startupParams.videoWallGuid.isNull()) {
         qnRuntime->setVideoWallMode(true);
         startupParams.allowMultipleClientInstances= true;
         startupParams.fullScreenDisabled = true;
@@ -568,15 +573,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->start();
 
 
-    /* If no input files were supplied --- open connection settings dialog. */
-
-    /*
+    if (!startupParams.customUri.isEmpty()) {
+        /* Set authentication parameters from uri. */
+        QUrl appServerUrl = QUrl::fromUserInput(startupParams.customUri);
+        context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+    } 
+    /* If no input files were supplied --- open connection settings dialog.   
      * Do not try to connect in the following cases:
      * * we were not connected and clicked "Open in new window"
      * * we have opened exported exe-file
      * Otherwise we should try to connect or show Login Dialog.
      */
-    if (startupParams.instantDrop.isEmpty() && !haveInputFiles) {
+    else if (startupParams.instantDrop.isEmpty() && !haveInputFiles) {
         /* Set authentication parameters from command line. */
         QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString);
         if (!startupParams.videoWallGuid.isNull()) {
