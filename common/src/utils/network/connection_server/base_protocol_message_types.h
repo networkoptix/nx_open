@@ -66,7 +66,7 @@ namespace nx_api
     {
     public:
         //!Set message to serialize
-        void setMessage( Message&& message );
+        void setMessage( Message& message );
 
         SerializerState::Type serialize( nx::Buffer* const buffer, size_t* bytesWritten );
     };

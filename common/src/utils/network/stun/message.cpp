@@ -4,6 +4,11 @@
 ***********************************************************/
 
 #include "message.h"
+#include "message_serializer.h"
+
+#include <QCryptographicHash>
+
+static const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 
 namespace nx {
 namespace stun {
@@ -30,9 +35,9 @@ Header::Header( MessageClass messageClass_ , int method_,
 {
 }
 
-Buffer Header::makeTransactionId()
+static Buffer randomBuffer( int size )
 {
-    Buffer id( TRANSACTION_ID_SIZE, 0 );
+    Buffer id( size, 0 );
     const auto step = sizeof( int );
     const auto last = id.size() - step;
 
@@ -40,6 +45,11 @@ Buffer Header::makeTransactionId()
         *reinterpret_cast< int* >( p ) = qrand();
 
     return id;
+}
+
+Buffer Header::makeTransactionId()
+{
+    return randomBuffer( TRANSACTION_ID_SIZE );
 }
 
 namespace attrs
@@ -64,9 +74,29 @@ namespace attrs
         address.ipv6 = ipv6_;
     }
 
-    ErrorDescription::ErrorDescription( int code_, nx::String phrase )
-        : code( code_ )
-        , reason( phrase )
+    BufferedValue::BufferedValue( nx::Buffer buffer_ )
+        : buffer( std::move( buffer_ ) )
+    {
+    }
+
+    const Buffer& BufferedValue::getBuffer() const
+    {
+        return buffer;
+    }
+
+    String BufferedValue::getString() const
+    {
+        return bufferToString( buffer );
+    }
+
+    UserName::UserName( const String& value )
+        : BufferedValue( stringToBuffer( value ) )
+    {
+    }
+
+    ErrorDescription::ErrorDescription( int code_, const nx::String& phrase )
+        : BufferedValue( bufferToString( phrase ) )
+        , code( code_ )
     {
     }
 
@@ -75,11 +105,87 @@ namespace attrs
     {
     }
 
-    Unknown::Unknown( int userType_, nx::Buffer value_ )
-        : userType( userType_ )
-        , value( std::move( value_ ) )
+
+    MessageIntegrity::MessageIntegrity( nx::Buffer hmac )
+        : BufferedValue( std::move( hmac ) )
     {
     }
+
+    Nonce::Nonce( Buffer nonce )
+        : BufferedValue( std::move( nonce ) )
+    {
+    }
+
+    Unknown::Unknown( int userType_, nx::Buffer value )
+        : BufferedValue( std::move( value ) )
+        , userType( userType_ )
+    {
+    }
+}
+
+// provided by http://wiki.qt.io/HMAC-SHA1
+static String hmacSha1( String key, const String& baseString )
+{
+    int blockSize = 64;
+    if (key.length() > blockSize)
+        key = QCryptographicHash::hash(key, QCryptographicHash::Sha1);
+
+    QByteArray innerPadding(blockSize, char(0x36));
+    QByteArray outerPadding(blockSize, char(0x5c));
+
+    for (int i = 0; i < key.length(); i++) {
+        innerPadding[i] = innerPadding[i] ^ key.at(i);
+        outerPadding[i] = outerPadding[i] ^ key.at(i);
+    }
+
+    QByteArray total = outerPadding;
+    QByteArray part = innerPadding;
+    part.append(baseString);
+    total.append(QCryptographicHash::hash(part, QCryptographicHash::Sha1));
+    return QCryptographicHash::hash(total, QCryptographicHash::Sha1);
+}
+
+static String hmacSha1( const String& key, const Message* message )
+{
+    Buffer buffer;
+    buffer.reserve( DEFAULT_BUFFER_SIZE );
+
+    size_t bytes;
+    MessageSerializer serializer;
+    serializer.setMessage( message );
+    Q_ASSERT( serializer.serialize( &buffer, &bytes )
+              == nx_api::SerializerState::done );
+
+    return hmacSha1( key, buffer );
+}
+
+void Message::insertIntegrity( const String& userName, const String& key )
+{
+    newAttribute< attrs::UserName >( userName );
+    newAttribute< attrs::Nonce >( randomBuffer( 10 ).toHex() );
+    newAttribute< attrs::MessageIntegrity >( nx::Buffer(
+        attrs::MessageIntegrity::SIZE, 0 ) );
+
+    const auto hmac = hmacSha1( key, this );
+    Q_ASSERT( hmac.size() == attrs::MessageIntegrity::SIZE );
+    newAttribute< attrs::MessageIntegrity >( hmac );
+}
+
+bool Message::verifyIntegrity( const String& userName, const String& key )
+{
+    const auto userNameAttr = getAttribute< attrs::UserName >();
+    if( !userNameAttr || userNameAttr->getString() != userName )
+        return false;
+
+    const auto miAttr = getAttribute< attrs::MessageIntegrity >();
+    if( !miAttr )
+        return false;
+
+    Buffer messageHmac = miAttr->getBuffer();
+    newAttribute< attrs::MessageIntegrity >();
+
+    Buffer realHmac = hmacSha1( key, this );
+    return messageHmac == realHmac;
 }
 
 Message::Message( Header header_, AttributesMap attributes_ )
@@ -104,8 +210,7 @@ Message& Message::operator = ( Message&& message )
 
 void Message::addAttribute( std::unique_ptr<attrs::Attribute>&& attribute )
 {
-    attributes.insert( AttributesMap::value_type(
-            attribute->type(), std::move( attribute ) ) );
+    attributes[ attribute->getType() ] = std::move( attribute );
 }
 
 void Message::clear()

@@ -286,8 +286,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnRuntime->setDevMode(true);
     }
 
-    if (startupParams.softwareYuv)
-        qnRuntime->setSoftwareYuv(true);
+    qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
+    qnRuntime->setShowFullInfo(startupParams.showFullInfo);
 
     if (!startupParams.engineVersion.isEmpty()) {
         QnSoftwareVersion version(startupParams.engineVersion);

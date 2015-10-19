@@ -31,6 +31,14 @@ AsyncClient::~AsyncClient()
     m_baseConnection.reset();
 }
 
+
+void AsyncClient::setCredentials( String userName, String key )
+{
+    QnMutexLocker lock( &m_mutex );
+    Credentials credentials = { userName, key };
+    m_credentials = std::move( credentials );
+}
+
 bool AsyncClient::openConnection( ConnectionHandler connectHandler,
                                   IndicationHandler indicationHandler,
                                   ConnectionHandler disconnectHandler )
@@ -100,7 +108,7 @@ boost::optional< QString >
     {
         if( const auto err = message.getAttribute< attrs::ErrorDescription >() )
             return lit( "STUN error %1: %2" )
-                .arg( err->code ).arg( QString::fromUtf8( err->reason ) );
+                .arg( err->getCode() ).arg( QString::fromUtf8( err->getString() ) );
         else
             return lit( "STUN error without ErrorDescription" );
     }
@@ -185,6 +193,8 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
         auto handler = std::move( m_requestQueue.front().second );
         auto transactionId = request.header.transactionId;
         m_requestQueue.pop_front();
+        if( m_credentials )
+            request.insertIntegrity( m_credentials->userName, m_credentials->key );
 
         m_baseConnection->sendMessage(
             std::move( request ),

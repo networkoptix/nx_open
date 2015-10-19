@@ -51,11 +51,11 @@ static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
 TEST_F( StunCustomTest, Ping )
 {
     AsyncClient client( address );
+    client.setCredentials( SERVER_ID, AUTH_KEY );
 
     stun::Message request( Header( MessageClass::request, stun::cc::methods::ping ) );
     request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
     request.newAttribute< stun::cc::attrs::ServerId >( SERVER_ID );
-    request.newAttribute< stun::cc::attrs::Authorization >( AUTH_KEY );
 
     std::list< SocketAddress > allEndpoints;
     allEndpoints.push_back( GOOD_ADDRESS );
@@ -86,11 +86,11 @@ TEST_F( StunCustomTest, Ping )
 TEST_F( StunCustomTest, BindConnect )
 {
     AsyncClient msClient( address );
+    msClient.setCredentials( SERVER_ID, AUTH_KEY );
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::bind ) );
         request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
         request.newAttribute< stun::cc::attrs::ServerId >( SERVER_ID );
-        request.newAttribute< stun::cc::attrs::Authorization >( AUTH_KEY );
         request.newAttribute< stun::cc::attrs::PublicEndpointList >(
                     std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
 
@@ -135,7 +135,7 @@ TEST_F( StunCustomTest, BindConnect )
 
         const auto err = result.second.getAttribute< stun::attrs::ErrorDescription >();
         ASSERT_NE( err, nullptr );
-        ASSERT_EQ( err->code, stun::cc::error::notFound );
+        ASSERT_EQ( err->getCode(), stun::cc::error::notFound );
     }
 }
 

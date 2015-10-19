@@ -20,28 +20,33 @@ QnZoomableFlickable {
     VideoOutput {
         id: video
 
-        width: zf.contentWidth
-        height: zf.contentHeight
+        width: contentWidth
+        height: contentHeight
 
         onSourceRectChanged: {
             var w = sourceRect.width
             var h = sourceRect.height
 
-            if (w < 0 || h < 0)
+            if (w <= 0 || h <= 0)
                 return
 
             var scale = Math.min(zf.width / w, zf.height / h)
             w *= scale
             h *= scale
 
-            animateToSize(w, h, true)
+            var animate = contentWidth > 0 && contentHeight > 0
+
+            resizeContent(w, h, animate, true)
         }
     }
 
-    onWidthChanged: zf.fitToBounds()
-    onHeightChanged: zf.fitToBounds()
+    onWidthChanged: fitToBounds()
+    onHeightChanged: fitToBounds()
 
     function fitToBounds() {
-        animateToSize(zf.width, zf.height)
+        if (video.sourceRect.width <= 0 || video.sourceRect.height <= 0 || width == 0 || height == 0)
+            return
+
+        resizeContent(width, height)
     }
 }

@@ -28,6 +28,9 @@ public:
         /** ActiveX library mode - client is embedded to another window. */
         ACTIVE_X_MODE,
 
+        /** Always display full info on cameras. */
+        SHOW_FULL_INFO,
+
         VARIABLE_COUNT
     };
 
@@ -42,6 +45,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        -1)
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
         QN_DECLARE_RW_PROPERTY(bool,                        isActiveXMode,          setActiveXMode,             ACTIVE_X_MODE,              false)
+        QN_DECLARE_RW_PROPERTY(bool,                        showFullInfo,           setShowFullInfo,            SHOW_FULL_INFO,             false)
     QN_END_PROPERTY_STORAGE()
     
 };

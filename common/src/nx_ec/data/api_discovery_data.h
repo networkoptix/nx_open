@@ -21,7 +21,8 @@ namespace ec2 {
 #define ApiDiscoverPeerData_Fields (url)
 
 
-    Q_DECLARE_METATYPE(ApiDiscoveryData);
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::ApiDiscoveryData);
 
 #endif // API_DISCOVERY_DATA_H

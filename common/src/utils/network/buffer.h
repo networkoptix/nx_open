@@ -46,6 +46,12 @@ namespace nx
 
     String operator+( const String& left, const std::string& right );
     String operator+( const String& left, const QString& right );
+
+    /** Converts zero terminated string into buffer including single 0 byte */
+    Buffer stringToBuffer( const String& string );
+
+    /** Extracts zero terminated string from Buffer without trailing 0 bytes if any */
+    String bufferToString( const Buffer& buffer );
 }
 
 #endif  //NX_BUFFER_H

@@ -42,14 +42,6 @@ protected:
         server.reset();
     }
 
-    void injectIndication( Header indication )
-    {
-        server->foreachConnection( [ & ]( ServerConnection* connection  )
-        {
-            connection->sendMessage( Message( indication ) );
-        } );
-    }
-
     const SocketAddress address;
     AsyncClient client;
     std::unique_ptr< SocketServer > server;
@@ -137,33 +129,9 @@ TEST_F( StunClientServerTest, RequestResponse )
 
         const auto error = response.getAttribute< stun::attrs::ErrorDescription >();
         ASSERT_NE( error, nullptr );
-        ASSERT_EQ( error->code, 404 );
-        ASSERT_EQ( error->reason, String( "Method is not supported" ).append( (char)0 ) );
+        ASSERT_EQ( error->getCode(), 404 );
+        ASSERT_EQ( error->getString(), String( "Method is not supported" ) );
     }
-}
-
-TEST_F( StunClientServerTest, Indication )
-{
-    SyncQueue< SystemError::ErrorCode > connected;
-    SyncQueue< SystemError::ErrorCode > disconnected;
-    SyncQueue< Message > indicated;
-
-    startServer();
-    ASSERT_TRUE( client.openConnection(
-        connected.pusher(), indicated.pusher(), disconnected.pusher() ) );
-    ASSERT_EQ( connected.pop(), SystemError::noError );
-
-    injectIndication( Header( MessageClass::indication, 0x777 ) );
-    const auto indication = indicated.pop();
-    EXPECT_EQ( indication.header.messageClass, MessageClass::indication );
-    EXPECT_EQ( indication.header.method, 0x777 );
-
-    stopServer();
-    ASSERT_EQ( disconnected.pop(), SystemError::connectionReset );
-
-    EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( indicated.isEmpty() );
-    EXPECT_TRUE( disconnected.isEmpty() );
 }
 
 } // namespace test

@@ -6,19 +6,28 @@ namespace stun {
 namespace cc {
 namespace attrs {
 
-PublicEndpointList::PublicEndpointList( const std::list< SocketAddress >& endpoints )
-    : stun::attrs::Unknown( TYPE )
+StringAttribute::StringAttribute( int userType, const String& value )
+    : stun::attrs::Unknown( userType, stringToBuffer( value ) )
 {
-    // TODO: use binary serialization instead
+}
+
+static String endpointsToString( const std::list< SocketAddress >& endpoints )
+{
     QStringList list;
     for( const auto& ep : endpoints )
         list << ep.toString();
 
-    value = list.join( lit(",") ).toUtf8();
+    return list.join( lit(",") ).toUtf8();
+}
+
+PublicEndpointList::PublicEndpointList( const std::list< SocketAddress >& endpoints )
+    : StringAttribute( TYPE, endpointsToString( endpoints ) )
+{
 }
 
 std::list< SocketAddress > PublicEndpointList::get() const
 {
+    const auto value = getString();
     if( value.isEmpty() )
         return std::list< SocketAddress >();
 

@@ -244,10 +244,10 @@ namespace nx_api
         std::deque<SendTask> m_sendQueue;
         bool* m_connectionFreedFlag;
 
-        void sendMessageInternal( MessageType&& msg )
+        void sendMessageInternal( const MessageType& msg )
         {
             //serializing message
-            m_serializer.setMessage( std::move(msg) );
+            m_serializer.setMessage( &msg );
             m_serializerState = SerializerState::needMoreBufferSpace;
             readyToSendData();
         }
@@ -274,7 +274,7 @@ namespace nx_api
             task.asyncSendIssued = true;
             if( task.msg )
             {
-                sendMessageInternal( std::move( task.msg.get() ) );
+                sendMessageInternal( task.msg.get() );
             }
             else if( task.buf )
             {

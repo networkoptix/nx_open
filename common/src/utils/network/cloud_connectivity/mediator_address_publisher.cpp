@@ -40,7 +40,6 @@ void MediatorAddressPublisher::authorizationChanged(
         boost::optional< Authorization > authorization )
 {
     QnMutexLocker lk( &m_mutex );
-    bool hadAuthorization = m_stunAuthorization.is_initialized();
     if( m_stunAuthorization == authorization )
         return;
 
@@ -49,11 +48,21 @@ void MediatorAddressPublisher::authorizationChanged(
              cl_logDEBUG1 );
 
     m_stunAuthorization = std::move( authorization );
-    if( hadAuthorization )
+    if( m_stunClient )
     {
         // updated will be performed by running timer
         m_pingedAddresses.clear();
         m_publishedAddresses.clear();
+
+        if( m_stunAuthorization )
+        {
+            m_stunClient->setCredentials( m_stunAuthorization->systemId,
+                                          m_stunAuthorization->key );
+            return;
+        }
+
+        const auto stunClient = std::move( m_stunClient );
+        lk.unlock();
     }
     else
     {
@@ -89,10 +98,21 @@ bool MediatorAddressPublisher::isCloudReady()
 {
     if( !m_stunClient )
     {
-        if( const auto address = SocketGlobals::cloudInfo().mediatorAddress() )
-            m_stunClient = std::make_unique< stun::AsyncClient >( *address );
-        else
+        const auto address = SocketGlobals::cloudInfo().mediatorAddress();
+        if( !address )
+        {
             NX_LOGX( lit( "Mediator address is not resolved yet" ), cl_logDEBUG1 );
+            return false;
+        }
+        if( !m_stunAuthorization )
+        {
+            NX_LOGX( lit( "No authorization info yet" ), cl_logDEBUG1 );
+            return false;
+        }
+
+        m_stunClient = std::make_unique< stun::AsyncClient >( *address );
+        m_stunClient->setCredentials( m_stunAuthorization->systemId,
+                                      m_stunAuthorization->key );
     }
 
     return m_stunClient && m_stunAuthorization;
@@ -110,7 +130,6 @@ void MediatorAddressPublisher::pingReportedAddresses()
                                          stun::cc::methods::ping ) );
     request.newAttribute< stun::cc::attrs::SystemId >( m_stunAuthorization->systemId );
     request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
-    request.newAttribute< stun::cc::attrs::Authorization >( m_stunAuthorization->key );
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_reportedAddresses );
 
     const auto ret = m_stunClient->sendRequest(
@@ -154,7 +173,6 @@ void MediatorAddressPublisher::publishPingedAddresses()
                                          stun::cc::methods::bind ) );
     request.newAttribute< stun::cc::attrs::SystemId >( m_stunAuthorization->systemId );
     request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
-    request.newAttribute< stun::cc::attrs::Authorization >( m_stunAuthorization->key );
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_pingedAddresses );
 
     const auto ret = m_stunClient->sendRequest(

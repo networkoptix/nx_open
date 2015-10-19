@@ -43,13 +43,6 @@ public:
         m_connections.erase( connection );
     }
 
-    void foreachConnection( std::function< void( ConnectionType* ) > action )
-    {
-        std::unique_lock<std::mutex> lk( m_mutex );
-        for( auto& connection : m_connections )
-            action( connection.first ); //TODO #ak it is not safe to call external method with mutex locked
-    }
-
 protected:
     std::mutex m_mutex;
     //TODO #ak this map types seems strange. Replace with std::set?

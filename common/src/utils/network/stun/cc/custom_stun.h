@@ -57,43 +57,40 @@ namespace attrs
         authorization,
     };
 
-    struct SystemId : stun::attrs::Unknown
+    struct StringAttribute : stun::attrs::Unknown
+    {
+        StringAttribute( int userType, const String& value = String() );
+    };
+
+    struct SystemId : StringAttribute
     {
         static const int TYPE = systemId;
-        SystemId( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
+        SystemId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct ServerId : stun::attrs::Unknown
+    struct ServerId : StringAttribute
     {
         static const int TYPE = serverId;
-        ServerId( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
+        ServerId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct ClientId : stun::attrs::Unknown
+    struct ClientId : StringAttribute
     {
         static const int TYPE = clientId;
-        ClientId( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
+        ClientId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct HostName : stun::attrs::Unknown
+    struct HostName : StringAttribute
     {
         static const int TYPE = hostName;
-        HostName( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
+        HostName( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct PublicEndpointList : stun::attrs::Unknown
+    struct PublicEndpointList : StringAttribute
     {
         static const int TYPE = publicEndpointList;
         PublicEndpointList( const std::list< SocketAddress >& endpoints );
         std::list< SocketAddress > get() const;
-    };
-
-    struct Authorization : stun::attrs::Unknown
-    {
-        static const int TYPE = authorization;
-        Authorization( nx::String value ) : stun::attrs::Unknown( TYPE, value ) {}
-
-        // TODO: introduce some way of parsing value
     };
 }
 

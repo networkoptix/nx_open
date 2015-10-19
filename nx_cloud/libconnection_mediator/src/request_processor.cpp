@@ -1,5 +1,7 @@
 #include "request_processor.h"
 
+#include <utils/common/log.h>
+
 namespace nx {
 namespace hpm {
 
@@ -32,7 +34,7 @@ boost::optional< RequestProcessor::MediaserverData >
         return boost::none;
     }
 
-    MediaserverData data = { systemAttr->string(), serverAttr->string() };
+    MediaserverData data = { systemAttr->getString(), serverAttr->getString() };
     if( !m_cloudData ) // debug mode
         return data;
 
@@ -50,19 +52,11 @@ boost::optional< RequestProcessor::MediaserverData >
 //        return boost::none;
 //    }
 
-    const auto authAttr = request.getAttribute< stun::cc::attrs::Authorization >();
-    if( !authAttr )
+    if( request.verifyIntegrity( data.systemId, system->authKey ) )
     {
-        errorResponse( connection, request.header, stun::error::badRequest,
-                       "Attribute Authorization is required" );
+        NX_LOGX( lm( "Ignore request from %1 with wrong message integrity" )
+                 .arg( data.systemId ), cl_logWARNING );
         return boost::none;
-    }
-    if( system->authKey != authAttr->string() )
-    {
-        errorResponse( connection, request.header, stun::error::unauthtorized,
-                       "Authorization failed" );
-        return boost::none;
-
     }
 
     return data;

@@ -116,20 +116,20 @@ void* MessageSerializer::MessageSerializerBuffer::WriteBytes( const char* bytes 
 nx_api::SerializerState::Type MessageSerializer::serializeHeaderInitial( MessageSerializerBuffer* buffer ) {
     std::bitset<16> initial(0);
     // 1. Setting the method bits.
-    initial[0] = m_message.header.method & (1<<0);
-    initial[1] = m_message.header.method & (1<<1);
-    initial[2] = m_message.header.method & (1<<2);
-    initial[3] = m_message.header.method & (1<<3);
-    initial[5] = m_message.header.method & (1<<4); // skip the 5th bit
-    initial[6] = m_message.header.method & (1<<5);
-    initial[7] = m_message.header.method & (1<<6);
-    initial[9] = m_message.header.method & (1<<7); // skip the 9th bit
-    initial[10]= m_message.header.method & (1<<8);
-    initial[11]= m_message.header.method & (1<<9);
-    initial[12]= m_message.header.method & (1<<10);
-    initial[13]= m_message.header.method & (1<<11);
+    initial[0] = m_message->header.method & (1<<0);
+    initial[1] = m_message->header.method & (1<<1);
+    initial[2] = m_message->header.method & (1<<2);
+    initial[3] = m_message->header.method & (1<<3);
+    initial[5] = m_message->header.method & (1<<4); // skip the 5th bit
+    initial[6] = m_message->header.method & (1<<5);
+    initial[7] = m_message->header.method & (1<<6);
+    initial[9] = m_message->header.method & (1<<7); // skip the 9th bit
+    initial[10]= m_message->header.method & (1<<8);
+    initial[11]= m_message->header.method & (1<<9);
+    initial[12]= m_message->header.method & (1<<10);
+    initial[13]= m_message->header.method & (1<<11);
     // 2. Setting the class bits
-    int message_class = static_cast<int>(m_message.header.messageClass);
+    int message_class = static_cast<int>(m_message->header.messageClass);
     initial[4] = message_class & (1<<0);
     initial[8] = message_class & (1<<1);
     // 3. write to the buffer
@@ -153,8 +153,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeMagicCookieAndTransact
         return nx_api::SerializerState::needMoreBufferSpace;
     }
     // Transaction ID
-    if( buffer->WriteBytes( m_message.header.transactionId.data(),
-                            m_message.header.transactionId.size() ) == NULL ) {
+    if( buffer->WriteBytes( m_message->header.transactionId.data(),
+                            m_message->header.transactionId.size() ) == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
     return nx_api::SerializerState::done;
@@ -171,7 +171,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSeriali
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer , const attrs::Attribute* attribute  , std::uint16_t** value_pos ) {
-    if( buffer->WriteUint16(static_cast<std::uint16_t>(attribute->type())) == NULL ) {
+    if( buffer->WriteUint16(static_cast<std::uint16_t>(attribute->getType())) == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
 
@@ -186,7 +186,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::size_t* value ) {
-    switch( attribute->type() ) {
+    switch( attribute->getType() ) {
     case attrs::errorCode:
         return serializeAttributeValue_ErrorCode( buffer , *static_cast<const ErrorDescription*>(attribute) ,value);
     case attrs::fingerPrint:
@@ -194,10 +194,14 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( Messag
     case attrs::xorMappedAddress:
         return serializeAttributeValue_XORMappedAddress( buffer , *static_cast<const XorMappedAddress*>(attribute) ,value);
     case attrs::messageIntegrity:
-        return serializeAttributeValue_MessageIntegrity( buffer , *static_cast<const MessageIntegrity*>(attribute) ,value);
+        return serializeAttributeValue_Buffer( buffer , *static_cast<const MessageIntegrity*>(attribute) ,value);
+    case attrs::userName:
+        return serializeAttributeValue_Buffer( buffer , *static_cast<const UserName*>(attribute) ,value);
+    case attrs::nonce:
+        return serializeAttributeValue_Buffer( buffer , *static_cast<const Nonce*>(attribute) ,value);
     default:
-        if( attribute->type() > attrs::unknown )
-            return serializeAttributeValue_UnknownAttribute( buffer , *static_cast<const Unknown*>(attribute) ,value);
+        if( attribute->getType() > attrs::unknown )
+            return serializeAttributeValue_Buffer( buffer , *static_cast<const Unknown*>(attribute) ,value);
         Q_ASSERT(0);
         return nx_api::SerializerState::done;
     }
@@ -221,8 +225,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
         xor_addr[1] = attribute.address.ipv6.array[1] ^ MAGIC_COOKIE_HIGH;
         // XOR for the transaction id
         for( std::size_t i = 2 ; i < 8 ; ++i ) {
-            const auto tid = m_message.header.transactionId.data() + (i-2) * 2;
-            xor_addr[i] = *reinterpret_cast< std::uint16_t* >( tid ) ^
+            const auto tid = m_message->header.transactionId.data() + (i-2) * 2;
+            xor_addr[i] = *reinterpret_cast< const std::uint16_t* >( tid ) ^
                           attribute.address.ipv6.array[i];
         }
 
@@ -260,21 +264,15 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerp
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* ,const attrs::MessageIntegrity& , std::size_t* ) {
-    Q_ASSERT(0);
-    // Needs username/password to implement this , I don't know how to do it now :(
-    return nx_api::SerializerState::done;
-}
-
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attrs::Unknown& attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Buffer( MessageSerializerBuffer* buffer ,const attrs::BufferedValue& attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
-    if( buffer->WriteBytes( attribute.value.constData() , attribute.value.size() ) == NULL ) 
+    if( buffer->WriteBytes( attribute.getBuffer().constData() , attribute.getBuffer().size() ) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace ;
     // The size of the STUN attributes should be the size before padding bytes
     *value = buffer->position()-cur_pos;
     // Padding the UnknownAttributes to the boundary of 4
-    std::size_t padding_size = calculatePaddingSize(attribute.value.size());
-    for( std::size_t i = attribute.value.size() ; i < padding_size ; ++i ) {
+    std::size_t padding_size = calculatePaddingSize(attribute.getBuffer().size());
+    for( std::size_t i = attribute.getBuffer().size() ; i < padding_size ; ++i ) {
         if( buffer->WriteByte(0) == NULL )
             return nx_api::SerializerState::needMoreBufferSpace;
     }
@@ -283,19 +281,16 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Unknown
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorDescription&  attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
-    std::uint32_t error_header = attribute.code % 100;
-    // We don't use attribute->_class value since we can get what we want from code
-    // but we check the validation here for the attribute->_class value
-    error_header |= (attribute.code / 100)<<8;
+    std::uint32_t error_header = (attribute.getClass() << 8) | attribute.getNumber();
     if( buffer->WriteUint32(error_header) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
-    if( attribute.reason.size() == 0 ) {
+    if( attribute.getBuffer().size() == 0 ) {
         // This is an empty reason phase 
         *value = buffer->position() - cur_pos;
         return nx_api::SerializerState::done;
     }
     // UTF8 string 
-    nx::Buffer utf8_bytes = attribute.reason;
+    nx::Buffer utf8_bytes = attribute.getBuffer();
     if( buffer->WriteBytes( utf8_bytes.constData() , utf8_bytes.size() ) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
     *value = buffer->position() - cur_pos;
@@ -309,20 +304,20 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCo
 }
 
 bool MessageSerializer::travelAllAttributes( const std::function<bool(const attrs::Attribute*)>& callback ) {
-    auto message_integrity = m_message.attributes.find(attrs::messageIntegrity);
-    auto fingerprint = m_message.attributes.find(attrs::fingerPrint);
+    auto message_integrity = m_message->attributes.find(attrs::messageIntegrity);
+    auto fingerprint = m_message->attributes.find(attrs::fingerPrint);
 
-    for( auto ib = m_message.attributes.cbegin() ; ib != m_message.attributes.cend() ; ++ib ) {
+    for( auto ib = m_message->attributes.cbegin() ; ib != m_message->attributes.cend() ; ++ib ) {
         if( ib != message_integrity && ib != fingerprint ) {
             if(!callback(ib->second.get())) 
                 return false;
         }
     }
-    if( message_integrity != m_message.attributes.cend() ) {
+    if( message_integrity != m_message->attributes.cend() ) {
         if( !callback(message_integrity->second.get()) )
             return false;
     }
-    if( fingerprint != m_message.attributes.cend() ) {
+    if( fingerprint != m_message->attributes.cend() ) {
         if( !callback(fingerprint->second.get()) )
             return false;
     }
@@ -353,22 +348,23 @@ bool MessageSerializer::checkMessageIntegratiy() {
     // testing is based on the RFC. 
     // 1. Header
     // Checking the method and it only has 12 bits in the message
-    if( m_message.header.method <0 || m_message.header.method >= 1<<12 ) {
+    if( m_message->header.method <0 || m_message->header.method >= 1<<12 ) {
         return false;
     }
-    // 2. Checking the attributes 
-    auto ib = m_message.attributes.find(attrs::fingerPrint);
-    if( ib != m_message.attributes.end() && ++ib != m_message.attributes.end() ) {
-        return false;
-    }
-    ib = m_message.attributes.find(attrs::messageIntegrity);
-    if( ib != m_message.attributes.end() && ++ib != m_message.attributes.end() ) {
-        return false;
-    }
+    // 2. Checking the attributes
+    // NOTE: the position in the map is not valid for this king of verification
+    //auto ib = m_message->attributes.find(attrs::fingerPrint);
+    //if( ib != m_message->attributes.end() && ++ib != m_message->attributes.end() ) {
+    //    return false;
+    //}
+    //ib = m_message->attributes.find(attrs::messageIntegrity);
+    //if( ib != m_message->attributes.end() && ++ib != m_message->attributes.end() ) {
+    //    return false;
+    //}
     // 3. Checking the validation for specific attributes
     // ErrorCode message
-    ib = m_message.attributes.find(attrs::errorCode);
-    if( ib !=  m_message.attributes.end() ) {
+    const auto ib = m_message->attributes.find(attrs::errorCode);
+    if( ib !=  m_message->attributes.end() ) {
         // Checking the error code message
         ErrorDescription* error_code = static_cast<ErrorDescription*>(
             ib->second.get());
@@ -377,7 +373,7 @@ bool MessageSerializer::checkMessageIntegratiy() {
         if( error_code->getNumber() < 0 || error_code->getNumber() >= 99 )
             return false;
         // RFC: The reason phrase string will at most be 127 characters
-        if( error_code->reason.size() > 127 )
+        if( error_code->getBuffer().size() > 127 )
             return false;
     }
     return true;
