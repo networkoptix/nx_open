@@ -1042,3 +1042,37 @@ qint64 QnServerDb::getLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCat
 
     return result;
 }
+
+bool QnServerDb::deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete) 
+{
+    QnDbTransactionLocker tran(getTransaction());
+
+    for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
+    {
+        const QString& cameraUniqueId = itr.key();
+        qint64 timestampMs = itr.value();
+
+        {
+            QSqlQuery delQuery(m_sdb);
+            delQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid IN (SELECT guid from bookmarks WHERE unique_id = :id AND start_time < :timestamp)");
+            delQuery.bindValue(":id", cameraUniqueId);
+            delQuery.bindValue(":timestamp", timestampMs);
+            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                return false;
+        }
+
+        {
+            QSqlQuery delQuery(m_sdb);
+            delQuery.prepare("DELETE FROM bookmarks WHERE unique_id = :id AND start_time < :timestamp");
+            delQuery.bindValue(":id", cameraUniqueId);
+            delQuery.bindValue(":timestamp", timestampMs);
+            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                return false;
+        }
+
+        if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM bookmarks)", m_sdb, Q_FUNC_INFO))
+            return false;
+
+    }
+    return tran.commit();
+}

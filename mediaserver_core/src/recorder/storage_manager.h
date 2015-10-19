@@ -165,6 +165,7 @@ private:
     void clearUnusedMotion();
     //void clearCameraHistory();
     //void minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QString, qint64>& minTimes);
+    void updateRecordedMonths(UsedMonthsMap& usedMonths);
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
@@ -178,7 +179,9 @@ private:
 
     // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalizePeriodMs
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
-
+    void clearBookmarks();
+    bool getMinTimes(QMap<QString, qint64>& lastTime);
+    void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
 private:
     const QnServer::StoragePool   m_role;
     StorageMap              m_storageRoots;
@@ -218,7 +221,9 @@ private:
     mutable QnMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
+    QElapsedTimer m_clearBookmarksTimer;
     QElapsedTimer m_removeEmtyDirTimer;
+    QMap<QString, qint64> m_lastCatalogTimes;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

@@ -38,14 +38,18 @@
 #include <algorithm>
 #include <vector>
 #include <random>
+#include "database/server_db.h"
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
-static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
-static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
-static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
-static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
+namespace {
+    static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
+    static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
+    static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 3600;
+    static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
+    static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
+}
 
 class ArchiveScanPosition
 {
@@ -288,7 +292,8 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
     m_clearMotionTimer.restart();
-    m_removeEmtyDirTimer.restart();
+    m_clearBookmarksTimer.restart();
+    m_removeEmtyDirTimer.invalidate();
 
     //startRedundantSyncWatchdog();
 }
@@ -1148,7 +1153,7 @@ void QnStorageManager::clearSpace()
         clearOldestSpace(storage, false);
 
     // 3. Remove empty dirs
-    if (m_removeEmtyDirTimer.elapsed() > EMPTY_DIRS_CLEANUP_INTERVAL)
+    if (!m_removeEmtyDirTimer.isValid() || m_removeEmtyDirTimer.elapsed() > EMPTY_DIRS_CLEANUP_INTERVAL)
     {
         m_removeEmtyDirTimer.restart();
         for (const QnStorageResourcePtr &storage : storages)
@@ -1163,6 +1168,11 @@ void QnStorageManager::clearSpace()
                 sdb->afterDelete();
         }
     }
+
+    if (m_role != QnServer::StoragePool::Normal)
+        return;
+    
+    // 5. Cleanup motion
 
     bool readyToDeleteMotion = (m_archiveRebuildInfo.state == Qn::RebuildState_None); // do not delete motion while rebuilding in progress (just in case, unnecessary)
     for(const QnStorageResourcePtr& storage: getAllStorages()) {
@@ -1181,6 +1191,77 @@ void QnStorageManager::clearSpace()
     }
     else {
         m_clearMotionTimer.restart();
+    }
+
+    // 6. Cleanup bookmarks
+    if (m_clearBookmarksTimer.elapsed() > BOOKMARK_CLEANUP_INTERVAL) {
+        m_clearBookmarksTimer.restart();
+        clearBookmarks();
+    }
+}
+
+void QnStorageManager::clearBookmarks()
+{
+    QMap<QString, qint64> minTimes; // key - unique id, value - timestamp to delete
+    if (!qnNormalStorageMan->getMinTimes(minTimes))
+        return;
+    if (!qnBackupStorageMan->getMinTimes(minTimes))
+        return;
+
+    QMap<QString, qint64> dataToDelete;
+    for (auto itr = minTimes.begin(); itr != minTimes.end(); ++itr)
+    {
+        const QString& uniqueId = itr.key();
+        const qint64 timestampMs = itr.value();
+
+        auto itrPrev = m_lastCatalogTimes.find(uniqueId);
+        if (itrPrev != m_lastCatalogTimes.end() && itrPrev.value() != timestampMs)
+            dataToDelete.insert(uniqueId, timestampMs);
+        m_lastCatalogTimes[uniqueId] = timestampMs;
+    }
+    
+    if (!dataToDelete.isEmpty())
+        qnServerDb->deleteBookmarksToTime(dataToDelete);
+
+    m_lastCatalogTimes = minTimes;
+}
+
+bool QnStorageManager::getMinTimes(QMap<QString, qint64>& lastTime)
+{
+    QnStorageManager::StorageMap storageRoots = getAllStorages();
+    qint64 bigStorageThreshold = 0;
+    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    {
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
+        if (!fileStorage)
+            continue;
+        if (fileStorage->getStatus() == Qn::Offline) 
+            return false; // do not cleanup bookmarks until all storages are online
+        if (fileStorage->hasFlags(Qn::storage_fastscan)) 
+            return false; // do not cleanup bookmarks until all data loaded
+    }
+
+    QnMutexLocker lock(&m_mutexCatalog);
+    processCatalogForMinTime(lastTime, m_devFileCatalog[QnServer::LowQualityCatalog]);
+    processCatalogForMinTime(lastTime, m_devFileCatalog[QnServer::HiQualityCatalog]);
+
+    return true;
+}
+
+void QnStorageManager::processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap)
+{
+    for (FileCatalogMap::const_iterator itr = catalogMap.constBegin(); itr != catalogMap.constEnd(); ++itr)
+    {
+        const QString& uniqueId = itr.key();
+        DeviceFileCatalogPtr curCatalog = itr.value();
+        qint64 firstTime = curCatalog->firstTime();
+        if (firstTime == AV_NOPTS_VALUE)
+            firstTime = DATETIME_NOW;
+        auto itrLastTime = lastTime.find(uniqueId);
+        if (itrLastTime == lastTime.end())
+            lastTime.insert(uniqueId, firstTime);
+        else
+            itrLastTime.value() = qMin(itrLastTime.value(), firstTime);
     }
 }
 
@@ -1254,15 +1335,20 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
 
 void QnStorageManager::clearUnusedMotion()
 {
-    QnMutexLocker lock( &m_mutexCatalog );
-
     UsedMonthsMap usedMonths;
 
-    updateRecordedMonths(m_devFileCatalog[QnServer::HiQualityCatalog], usedMonths);
-    updateRecordedMonths(m_devFileCatalog[QnServer::LowQualityCatalog], usedMonths);
+    qnNormalStorageMan->updateRecordedMonths(usedMonths);
+    qnBackupStorageMan->updateRecordedMonths(usedMonths);
 
     for( const QString& dir: QDir(QnMotionHelper::getBaseDir()).entryList(QDir::Dirs | QDir::NoDotAndDotDot))
         QnMotionHelper::instance()->deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
+}
+
+void QnStorageManager::updateRecordedMonths(UsedMonthsMap& usedMonths)
+{
+    QnMutexLocker lock( &m_mutexCatalog );
+    updateRecordedMonths(m_devFileCatalog[QnServer::HiQualityCatalog], usedMonths);
+    updateRecordedMonths(m_devFileCatalog[QnServer::LowQualityCatalog], usedMonths);
 }
 
 /*
