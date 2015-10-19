@@ -17,7 +17,7 @@ QnWorkbenchBookmarkTagsWatcher::QnWorkbenchBookmarkTagsWatcher(QObject *parent)
     m_refreshTimer->setInterval(TagsRefreshInterval);
     connect(m_refreshTimer, &QTimer::timeout, this, &QnWorkbenchBookmarkTagsWatcher::refresh);
 
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
             this, &QnWorkbenchBookmarkTagsWatcher::at_messageProcessor_connectionOpened);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
             this, &QnWorkbenchBookmarkTagsWatcher::at_messageProcessor_connectionClosed);
