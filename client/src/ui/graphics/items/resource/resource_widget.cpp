@@ -9,6 +9,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -264,7 +265,7 @@ void QnResourceWidget::addMainOverlay() {
 
     OverlayVisibility visibility = options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
         ? OverlayVisibility::Invisible
-        : OverlayVisibility::AutoVisible;
+        : qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible : OverlayVisibility::AutoVisible;
 
     addOverlayWidget(m_overlayWidgets.mainOverlay, visibility, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, false, false);
@@ -765,10 +766,15 @@ void QnResourceWidget::updateHud(bool animate) {
 
     m_buttonBar->setVisible(buttonsVisible);
 
-    bool visible = options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
+    bool infoVisible = options().testFlag(QnResourceWidget::InfoOverlaysForbidden) || qnRuntime->showFullInfo()
         ? false
         : detailsVisible && !m_mouseInWidget;
-    setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, visible, animate);
+
+    bool mainVisible = qnRuntime->showFullInfo() && (detailsVisible || m_mouseInWidget);
+    if (qnRuntime->showFullInfo())
+        setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, mainVisible, animate);
+    else
+        setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, infoVisible, animate);
 }
 
 bool QnResourceWidget::isHovered() const {
@@ -920,7 +926,9 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags){
     if (changedFlags.testFlag(InfoOverlaysForbidden)) {
         bool forbidden = options().testFlag(InfoOverlaysForbidden);
 
-        OverlayVisibility mainVisibility = forbidden ? OverlayVisibility::Invisible : OverlayVisibility::AutoVisible;
+        OverlayVisibility mainVisibility = forbidden 
+            ? OverlayVisibility::Invisible 
+            : qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible : OverlayVisibility::AutoVisible;
         setOverlayWidgetVisibility(m_overlayWidgets.mainOverlay, mainVisibility);
         updateHud(false);
     }

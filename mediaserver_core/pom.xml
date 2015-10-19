@@ -51,7 +51,7 @@
             <version>${project.version}</version>
             <type>zip</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nx_sdk/nx_sdk/${customization}-archive.zip</systemPath>            
+            <systemPath>${root.dir}/nx_sdk/nx_sdk/vms-archive.zip</systemPath>            
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -59,7 +59,7 @@
             <version>${project.version}</version>
             <type>zip</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nx_storage_sdk/nx_storage_sdk/${customization}-archive.zip</systemPath>
+            <systemPath>${root.dir}/nx_storage_sdk/nx_storage_sdk/vms-archive.zip</systemPath>
         </dependency>
 
         <dependency>

@@ -19,7 +19,7 @@
 
     <build>
         <directory>nx_storage_sdk</directory>
-        <finalName>${deb.customization.company.name}</finalName>
+        <finalName>vms</finalName>
         <plugins>    
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -49,13 +49,13 @@
                         </goals>
                         <configuration>
                             <failOnError>false</failOnError>
-                            <target>							
+                            <target>                            
                                 <chmod file="${project.basedir}/build_sdk.sh" perm="755"/>
                                 <!-- script.extension is set in base pom.xml in profiles: Windows - "bat", Unix - "sh" -->
-			        <exec dir="${project.basedir}" executable="${project.basedir}/build_sdk.${script.extension}" failifexecutionfails="true" />                                        
+                    <exec dir="${project.basedir}" executable="${project.basedir}/build_sdk.${script.extension}" failifexecutionfails="true" />                                        
                             </target>
                         </configuration>
-                    </execution>					
+                    </execution>                    
                 </executions>
             </plugin>
 <!--
@@ -93,8 +93,8 @@
                             </descriptors>
                         </configuration>
                     </execution>
-                </executions>				
-            </plugin> 		
+                </executions>               
+            </plugin>       
         </plugins>    
     </build>
 </project>
