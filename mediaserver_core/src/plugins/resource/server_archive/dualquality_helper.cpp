@@ -140,7 +140,7 @@ void QnDualQualityHelper::findDataForTime(
                                                      SECOND_STREAM_FIND_EPS; 
     
     bool normalBetter = timeDistanceNormal <= timeDistanceBackup ||
-                        ((timeDistanceBackup == 0) && (timeDistanceNormal > findEps)
+                        ((timeDistanceBackup == 0) && (timeDistanceNormal < findEps)
                                                    && !preciseFind);
     if (normalBetter) {
         chunk = normalChunk;
