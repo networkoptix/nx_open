@@ -1024,7 +1024,7 @@ bool QnServerDb::setLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatal
     return result;
 }
 
-qint64 QnServerDb::getLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatalog catalog)
+qint64 QnServerDb::getLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatalog catalog) const
 {
     qint64 result = 0;
 
