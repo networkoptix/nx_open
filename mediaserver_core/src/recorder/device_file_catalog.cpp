@@ -21,6 +21,7 @@
 #include <QtCore/QDebug>
 #include "recording_manager.h"
 #include <media_server/serverutil.h>
+#include <database/server_db.h>
 
 #include "utils/common/synctime.h"
 
@@ -86,7 +87,8 @@ DeviceFileCatalog::DeviceFileCatalog(
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
     m_recordingChunkTime(-1),
-    m_storagePool(storagePool)
+    m_storagePool(storagePool),
+    m_lastSyncTime(0)
 {
 }
 
@@ -354,11 +356,25 @@ void DeviceFileCatalog::setLastSyncTime(int64_t time)
 {
     QnMutexLocker lk(&m_mutex);
     m_lastSyncTime = time;
+    qnServerDb->setLastBackupTime(
+        qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(), 
+        m_catalog,
+        m_lastSyncTime
+    );
 }
 
 int64_t DeviceFileCatalog::getLastSyncTime() const
 {
     QnMutexLocker lk(&m_mutex);
+    if (m_lastSyncTime == 0)
+    {
+        m_lastSyncTime = qnServerDb->getLastBackupTime(
+            qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(), 
+            m_catalog
+        );
+        if (m_lastSyncTime == 0)
+            m_lastSyncTime = 1;
+    }
     return m_lastSyncTime;
 }
 

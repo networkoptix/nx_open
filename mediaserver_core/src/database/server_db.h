@@ -64,7 +64,7 @@ public:
     bool removeAllCameraBookmarks(const QString& cameraUniqueId);
     bool deleteCameraBookmark(const QnUuid &bookmarkId);
     bool setLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog, qint64 timestampMs);
-    qint64 getLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog);
+    qint64 getLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog) const;
 
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;

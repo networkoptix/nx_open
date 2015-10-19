@@ -197,7 +197,7 @@ private:
     qint64 m_recordingChunkTime;
     QnMutex m_IOMutex;
     QnServer::StoragePool m_storagePool;
-    int64_t m_lastSyncTime;
+    mutable int64_t m_lastSyncTime;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;
