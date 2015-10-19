@@ -26,7 +26,6 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_camera_history_data.h"
-#include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_client_info_data.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
@@ -1477,7 +1476,7 @@ bool QnDbManager::createDatabase()
             return false;
         m_needResyncLicenses = true;
     }
-    if (!execSQLQuery("DELETE FROM vms_license", m_sdb))
+    if (!execSQLQuery("DELETE FROM vms_license", m_sdb, Q_FUNC_INFO))
         return false;
 
 
@@ -3344,19 +3343,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags) {
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT name FROM vms_camera_bookmark_tag");
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    QnSql::fetch_many(query, &tags);
-
-    return ErrorCode::ok;
-}
-
 //getUsers
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& userList)
 {
@@ -3809,52 +3795,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     }
 
     return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
-
-    std::function<ec2::ErrorCode (const ApiCameraBookmarkTagData &)> processTag;
-
-    switch (tran.command) {
-    case ApiCommand::addCameraBookmarkTags:
-        processTag = [this](const ApiCameraBookmarkTagData &tag) {return addCameraBookmarkTag(tag);};
-        break;
-    case ApiCommand::removeCameraBookmarkTags:
-        processTag = [this](const ApiCameraBookmarkTagData &tag) {return removeCameraBookmarkTag(tag);};
-        break;
-    default:
-        assert(false); //should never get here
-        break;
-    }
-
-    for (const ApiCameraBookmarkTagData &tag: tran.params) {
-        ErrorCode result = processTag(tag);
-        if (result != ErrorCode::ok)
-            return result;
-    }
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag) {
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_camera_bookmark_tag (name) VALUES (:name)");
-    QnSql::bind(tag, &insQuery);
-    if (insQuery.exec())
-        return ErrorCode::ok;
-
-    qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-    return ErrorCode::dbError;
-}
-
-ErrorCode QnDbManager::removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag) {
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_camera_bookmark_tag WHERE name=:name");
-    QnSql::bind(tag, &delQuery);
-    if (delQuery.exec())
-        return ErrorCode::ok;
-
-    qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-    return ErrorCode::dbError;
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)

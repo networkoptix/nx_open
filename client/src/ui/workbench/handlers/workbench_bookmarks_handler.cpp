@@ -25,6 +25,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include "core/resource/camera_history.h"
 
 QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NULL */):
@@ -34,38 +35,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(action(Qn::AddCameraBookmarkAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
     connect(action(Qn::EditCameraBookmarkAction),   &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
     connect(action(Qn::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
-
-    connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTags);
-
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.unite(tags);
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.subtract(tags);
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-}
-
-void QnWorkbenchBookmarksHandler::updateTags() {
-    if (!context()->user()) {
-        m_tags.clear();
-        context()->navigator()->setBookmarkTags(m_tags);
-        return;
-    }
-    
-    connection()->getCameraManager()->getBookmarkTags(this, [this](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTags &tags) {
-        Q_UNUSED(reqID);
-        if (code != ec2::ErrorCode::ok)
-            return;
-        m_tags = tags;
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-}
-
-QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tags() const {
-    return m_tags;
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
@@ -97,13 +66,13 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     bookmark.cameraId = camera->getUniqueId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
-    dialog->setTags(m_tags);
+    dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
     dialog->submitData(bookmark);
 
-    qnCameraBookmarksManager->addCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->addCameraBookmark(bookmark);
 
     action(Qn::BookmarksModeAction)->setChecked(true);
 }
@@ -126,13 +95,13 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
     }
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
-    dialog->setTags(m_tags);
+    dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
     dialog->submitData(bookmark);
 
-    qnCameraBookmarksManager->updateCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->updateCameraBookmark(bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
@@ -144,14 +113,6 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server || server->getStatus() != Qn::Online) {
-        QMessageBox::warning(mainWindow(),
-            tr("Error"),
-            tr("Bookmarks can only be deleted from an online server.")); //TODO: #Elric ec2 update text if needed
-        return;
-    }
-
     if (QMessageBox::information(mainWindow(),
             tr("Confirm Deletion"),
             tr("Are you sure you want to delete this bookmark %1?").arg(bookmark.name),
@@ -159,7 +120,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
             QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
-    qnCameraBookmarksManager->deleteCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
 }
 
 /*

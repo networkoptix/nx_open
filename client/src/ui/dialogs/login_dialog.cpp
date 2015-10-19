@@ -427,15 +427,23 @@ void QnLoginDialog::at_testButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid Paramaters"), tr("The information you have entered is not valid."));
+        QMessageBox::warning(this, tr("Invalid Parameters"), tr("The information you have entered is not valid."));
         return;
     }
 
+    bool connectRequested = false;
+
     QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
-    dialog->testEnterpriseController(url);
+    connect(dialog.data(), &QnConnectionTestingDialog::connectRequested, this, [&connectRequested] {
+        connectRequested = true;
+    });
+
+    dialog->testConnection(url);
     dialog->exec();
 
     updateFocus();
+    if (connectRequested)
+        accept();   
 }
 
 void QnLoginDialog::at_saveButton_clicked() {

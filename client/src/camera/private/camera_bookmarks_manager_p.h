@@ -26,22 +26,19 @@ public:
     int getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksInternalCallbackType callback);
 
     /// @brief                  Add the bookmark to the camera.
-    /// @param camera           Target camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
-    void addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.
-    /// @param camera           Target camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
-    void updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Delete the existing bookmark from the camera.
-    /// @param camera           Target camera.
-    /// @param bookmark         Target bookmark.
+    /// @param bookmarkId       Target bookmark id.
     /// @param callback         Callback with operation result.
-    void deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback = OperationCallbackType());
 
     /* Queries API section */
 
@@ -64,7 +61,7 @@ private slots:
 
     void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int requestId);
 
-    void handleBookmarkOperation(int status, const QnCameraBookmark &bookmark, int handle);
+    void handleBookmarkOperation(int status, int handle);
 private:
     /// @brief                  Register bookmarks search query to auto-update it if needed.
     /// @param query            Target query.
@@ -108,10 +105,9 @@ private:
 
         OperationType operation;
         OperationCallbackType callback;
-        QnVirtualCameraResourcePtr camera;
 
         OperationInfo();
-        OperationInfo(OperationType operation, OperationCallbackType callback, const QnVirtualCameraResourcePtr &camera);
+        OperationInfo(OperationType operation, OperationCallbackType callback);
     };
 
     QMap<int, OperationInfo> m_operations;

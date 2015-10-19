@@ -277,7 +277,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
         .arg(QDateTime::fromMSecsSinceEpoch(startTime).toString())
         .arg(QDateTime::fromMSecsSinceEpoch(endTime).toString());
 
-    return qnServerDb->addOrUpdateCameraBookmark(bookmark);
+    return qnServerDb->addBookmark(bookmark);
 }
 
 

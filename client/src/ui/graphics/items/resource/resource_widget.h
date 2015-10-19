@@ -372,6 +372,8 @@ private:
 
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
 
+    void updateHeaderIsTooSmallFlag(GraphicsWidget *widget, QGraphicsView *view, bool *targetFlag);
+
 private:
     friend class QnWorkbenchDisplay;
 
@@ -438,6 +440,11 @@ private:
     };
     
     OverlayWidgets m_overlayWidgets;
+
+    /** Main widget header is too small and thus should be hidden. */
+    bool m_mainHeaderIsTooSmall;
+    /** Short info widget header is too small and thus should be hidden. */
+    bool m_infoHeaderIsTooSmall;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
