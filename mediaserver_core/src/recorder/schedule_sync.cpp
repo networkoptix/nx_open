@@ -428,7 +428,7 @@ void QnScheduleSync::renewSchedule()
 void QnScheduleSync::start()
 {
     static const auto 
-    REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(1);
+    REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
     m_backupSyncOn         = true;
 
     m_backupFuture = std::async(
