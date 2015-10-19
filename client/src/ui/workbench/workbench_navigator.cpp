@@ -58,6 +58,7 @@ extern "C"
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
+#include "watchers/workbench_bookmark_tags_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -217,6 +218,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
             QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
     });
+
+    connect(context()->instance<QnWorkbenchBookmarkTagsWatcher>(), &QnWorkbenchBookmarkTagsWatcher::tagsChanged,
+            this, &QnWorkbenchNavigator::updateBookmarkTags);
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -444,6 +448,7 @@ void QnWorkbenchNavigator::initialize() {
     updateCalendar();
     updateScrollBarFromSlider();
     updateTimeSliderWindowSizePolicy();
+    updateBookmarkTags();
 } 
 
 void QnWorkbenchNavigator::deinitialize() {
@@ -1908,19 +1913,15 @@ void QnWorkbenchNavigator::updateSliderBookmarks() {
 
 /* Bookmark methods. */
 
-QnCameraBookmarkTags QnWorkbenchNavigator::bookmarkTags() const {
-    return m_bookmarkTags;
-}
-
-void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
-    if (m_bookmarkTags == tags)
-        return;
-    m_bookmarkTags = tags;
-
+void QnWorkbenchNavigator::updateBookmarkTags() {
     if (!isValid())
         return;
 
-    QCompleter *completer = new QCompleter(QStringList(m_bookmarkTags.toList()));
+    QStringList tagNames;
+    for (const QnCameraBookmarkTag &tag: context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags())
+        tagNames.append(tag.name);
+
+    QCompleter *completer = new QCompleter(tagNames);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setCompletionMode(QCompleter::InlineCompletion);
 
