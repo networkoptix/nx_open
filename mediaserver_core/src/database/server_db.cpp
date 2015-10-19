@@ -421,7 +421,7 @@ bool QnServerDb::cleanupEvents()
     return rez;
 }
 
-bool QnServerDb::migrateBusinessParams() {
+bool QnServerDb::migrateBusinessParamsUnderTransaction() {
     struct RowParams {
         QByteArray actionParams;
         QByteArray runtimeParams;
@@ -468,8 +468,6 @@ bool QnServerDb::migrateBusinessParams() {
     
 
     {  
-        QnDbTransactionLocker tran(getTransaction());
-
         QSqlQuery query(m_sdb);
         query.prepare("UPDATE runtime_actions SET action_params = :action, runtime_params = :runtime WHERE rowid = :rowid");
         for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
@@ -479,11 +477,36 @@ bool QnServerDb::migrateBusinessParams() {
             if (!execSQLQuery(&query, Q_FUNC_INFO))
                 return false;
         }
-
-        return tran.commit();
     }
+
+    return true;
 }
 
+bool QnServerDb::createBookmarkTagTriggersUnderTransaction() {
+    {
+        QString queryStr = 
+            "CREATE TRIGGER increment_bookmark_tag_counter AFTER INSERT ON bookmark_tags"
+                "BEGIN"
+                    "INSERT OR IGNORE INTO bookmark_tag_counts (tag, count) VALUES (NEW.name, 0);"
+                    "UPDATE bookmark_tag_counts SET count = count + 1 WHERE tag = NEW.name;"
+                "END;";
+        if (!execSQLQuery(queryStr, m_sdb, Q_FUNC_INFO))
+            return false;
+    }
+
+    {
+        QString queryStr = 
+            "CREATE TRIGGER decrement_bookmark_tag_counter AFTER DELETE ON bookmark_tags"
+                "BEGIN"
+                    "UPDATE bookmark_tag_counts SET count = count - 1 WHERE tag = OLD.name;"
+                    "DELETE FROM bookmark_tag_counts WHERE tag = OLD.name AND count <= 0;"
+                "END;";
+        if (!execSQLQuery(queryStr, m_sdb, Q_FUNC_INFO))
+            return false;
+    }
+
+    return true;
+}
 
 bool QnServerDb::cleanupAuditLog()
 {
@@ -728,9 +751,11 @@ void QnServerDb::getAndSerializeActions(
 
 bool QnServerDb::afterInstallUpdate(const QString& updateName) {
 
-    if (updateName == lit(":/mserver_updates/01_business_params.sql")) {
-        migrateBusinessParams();
-    }
+    if (updateName.endsWith(lit("/01_business_params.sql")))
+        return migrateBusinessParamsUnderTransaction();   
+    
+    if (updateName.endsWith(lit("/03_add_bookmark_tag_counts_and_rename_tables.sql")))
+        return createBookmarkTagTriggersUnderTransaction();   
 
     return true;
 }

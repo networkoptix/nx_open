@@ -74,7 +74,8 @@ protected:
 private:
     bool createDatabase();
     bool cleanupEvents();
-    bool migrateBusinessParams();
+    bool migrateBusinessParamsUnderTransaction();
+    bool createBookmarkTagTriggersUnderTransaction();
     bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
