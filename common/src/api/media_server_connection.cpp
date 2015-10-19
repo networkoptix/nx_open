@@ -280,6 +280,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case ec2BookmarksObject:
         processFusionReply<QnCameraBookmarkList>(this, response, handle);
         break;
+    case ec2BookmarkTagsObject:
+        processFusionReply<QnCameraBookmarkTagList>(this, response, handle);
+        break;
     case TestLdapSettingsObject:
         processJsonReply<QnLdapUsers>(this, response, handle);
         break;

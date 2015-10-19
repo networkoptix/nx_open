@@ -57,6 +57,7 @@ signals:
     void finished(int status, const QnPtzAuxilaryTraitList &reply, int handle, const QString &errorString);
     void finished(int status, const QnPtzData &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraBookmarkList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnCameraBookmarkTagList &reply, int handle, const QString &errorString);
     void finished(int status, const QnConfigureReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnUploadUpdateReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
