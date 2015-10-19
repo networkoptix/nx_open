@@ -60,7 +60,7 @@ public:
 
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);    
     bool containsBookmark(const QnUuid &bookmarkId) const;
-    QnCameraBookmarkTagList getBookmarkTags(int limit = -1);
+    QnCameraBookmarkTagList getBookmarkTags(int limit = std::numeric_limits<int>().max());
 
     bool addBookmark(const QnCameraBookmark &bookmark);
     bool updateBookmark(const QnCameraBookmark &bookmark);

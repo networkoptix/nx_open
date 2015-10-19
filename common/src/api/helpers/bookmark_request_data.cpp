@@ -1,4 +1,4 @@
-#include "bookmark_requests.h"
+#include "bookmark_request_data.h"
 
 #include <common/common_globals.h>
 
@@ -38,7 +38,11 @@ namespace {
 QnGetBookmarksRequestData::QnGetBookmarksRequestData()
     : QnMultiserverRequestData()
     , filter()
+#ifdef _DEBUG
     , format(Qn::JsonFormat)
+#else
+    , format(Qn::UbjsonFormat)
+#endif
     , cameras()
 {
 
@@ -97,6 +101,38 @@ bool QnGetBookmarksRequestData::isValid() const {
         && filter.endTimeMs > filter.startTimeMs 
         && format != Qn::UnsupportedFormat;
 }
+
+/************************************************************************/
+/* QnGetBookmarkTagsRequestData                                         */
+/************************************************************************/
+
+QnGetBookmarkTagsRequestData::QnGetBookmarkTagsRequestData(int limit)
+    : QnMultiserverRequestData()
+    , limit(limit)
+    , format(Qn::JsonFormat)
+{}
+
+int QnGetBookmarkTagsRequestData::unlimited() {
+    return std::numeric_limits<int>().max();
+}
+
+void QnGetBookmarkTagsRequestData::loadFromParams(const QnRequestParamList& params) {
+    QnMultiserverRequestData::loadFromParams(params);
+    limit = QnLexical::deserialized<int>(params.value(limitKey), unlimited());
+    QnLexical::deserialize(params.value(formatKey), &format);
+}
+
+QnRequestParamList QnGetBookmarkTagsRequestData::toParams() const {
+    QnRequestParamList result = QnMultiserverRequestData::toParams();
+    result.insert(limitKey,     QnLexical::serialized(limit));
+    result.insert(formatKey,    QnLexical::serialized(format));
+    return result;
+}
+
+bool QnGetBookmarkTagsRequestData::isValid() const {
+    return limit >= 0;
+}
+
 
 /************************************************************************/
 /* QnUpdateBookmarkRequestData                                          */

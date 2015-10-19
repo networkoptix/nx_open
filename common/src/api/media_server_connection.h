@@ -7,10 +7,14 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
+#include <api/api_fwd.h>
+#include <api/helpers/request_helpers_fwd.h>
+
+
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 
-#include <api/api_fwd.h>
+
 #include <core/ptz/ptz_fwd.h>
 #include <utils/common/ldap_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -230,7 +234,7 @@ public:
 
     int recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot);
     int getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot);
-    int getBookmarkTagsAsync(int limit, QObject *target, const char * slot);
+    int getBookmarkTagsAsync(const QnGetBookmarkTagsRequestData &request, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

@@ -16,12 +16,6 @@ typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 class QnMediaServerConnection;
 typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
-struct QnMultiserverRequestData;
-struct QnChunksRequestData;
-struct QnGetBookmarksRequestData;
-struct QnUpdateBookmarkRequestData;
-struct QnDeleteBookmarkRequestData;
-
 struct MultiServerPeriodData;
 typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
 

@@ -1,9 +1,12 @@
 #include "workbench_bookmark_tags_watcher.h"
 
+#include <api/media_server_connection.h>
+#include <api/helpers/bookmark_request_data.h>
+
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <client/client_message_processor.h>
-#include <api/media_server_connection.h>
+
 
 QnWorkbenchBookmarkTagsWatcher::QnWorkbenchBookmarkTagsWatcher(QObject *parent)
     : QObject(parent)
@@ -31,8 +34,8 @@ void QnWorkbenchBookmarkTagsWatcher::refresh() {
 
     enum { TagsLimit = 20 };
 
-    server->apiConnection()->getBookmarkTagsAsync(
-                TagsLimit, this, SLOT(at_connection_gotBookmarkTags(int,QnCameraBookmarkTagList,int)));
+    server->apiConnection()->getBookmarkTagsAsync(QnGetBookmarkTagsRequestData(TagsLimit),
+                this, SLOT(at_connection_gotBookmarkTags(int,QnCameraBookmarkTagList,int)));
 }
 
 void QnWorkbenchBookmarkTagsWatcher::at_connection_gotBookmarkTags(

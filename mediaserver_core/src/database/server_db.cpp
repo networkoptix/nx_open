@@ -844,11 +844,11 @@ bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const {
 QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
     QWriteLocker lock(&m_mutex);
 
-    QString queryStr(lit("SELECT tag as name, count "
-                         "FROM bookmark_tag_counts "
-                         "ORDER BY count DESC "));
+    QString queryStr("SELECT tag as name, count " 
+                     "FROM bookmark_tag_counts " 
+                     "ORDER BY count DESC ");
 
-    if (limit >= 0)
+    if (limit > 0 && limit < std::numeric_limits<int>().max())
         queryStr += lit("LIMIT %1").arg(limit);
 
     QSqlQuery query(m_sdb);
