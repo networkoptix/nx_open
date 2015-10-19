@@ -15,6 +15,9 @@ public:
 
     QVariant inputMethodQuery(Qt::InputMethodQuery property) const;
 
+    bool isCloseButtonVisible() const;
+    void setCloseButtonVisible(bool visible);
+
 signals:
     void textChanged(const QString &text);
     void escKeyPressed();
@@ -38,9 +41,7 @@ protected:
     QLineEdit* m_lineEdit;
     QAbstractButton *m_closeButton;
     QAbstractButton *m_searchButton;
-
-    int m_foundItems;
-    int m_overallItems;
+    bool m_closeButtonVisible;
 };
 
 #endif // SEARCH_LINE_EDIT_H

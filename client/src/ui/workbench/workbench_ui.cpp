@@ -2610,7 +2610,7 @@ void QnWorkbenchUi::createSearchWidget() {
     QnSearchLineEdit *searchLine = new QnSearchLineEdit();
     searchLine->setAttribute(Qt::WA_TranslucentBackground);
     searchLine->resize(250, 21);
-    connect(searchLine, &QnSearchLineEdit::escKeyPressed, this, [this]() { setSearchOpened(false, true); } );
+    searchLine->setCloseButtonVisible(false);
 
     navigator()->setBookmarksSearchWidget(searchLine);
 
