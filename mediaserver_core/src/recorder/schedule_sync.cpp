@@ -150,28 +150,34 @@ QnScheduleSync::getOldestChunk()
 
         if (backupType & Qn::CameraBackup_HighQuality)
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::HiQualityCatalog);
-        if (tmp.chunk.startTimeMs != -1 && tmp.chunk.startTimeMs < minTime)
+        if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
         {
-            minTime = tmp.chunk.startTimeMs;
-            ret.clear();
-            ret.push_back(tmp);
-        }
-        else if (tmp.chunk.startTimeMs == minTime)
-        {
-            ret.push_back(tmp);
+            if (tmp.chunk.startTimeMs < minTime)
+            {
+                minTime = tmp.chunk.startTimeMs;
+                ret.clear();
+                ret.push_back(tmp);
+            }
+            else if (tmp.chunk.startTimeMs == minTime)
+            {
+                ret.push_back(tmp);
+            }
         }
 
         if (backupType & Qn::CameraBackup_LowQuality)
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::LowQualityCatalog);
-        if (tmp.chunk.startTimeMs != -1 && tmp.chunk.startTimeMs < minTime)
+        if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
         {
-            minTime = tmp.chunk.startTimeMs;
-            ret.clear();
-            ret.push_back(tmp);
-        }
-        else if (tmp.chunk.startTimeMs == minTime)
-        {
-            ret.push_back(tmp);
+            if (tmp.chunk.startTimeMs < minTime)
+            {
+                minTime = tmp.chunk.startTimeMs;
+                ret.clear();
+                ret.push_back(tmp);
+            }
+            else if (tmp.chunk.startTimeMs == minTime)
+            {
+                ret.push_back(tmp);
+            }
         }
     }
     
