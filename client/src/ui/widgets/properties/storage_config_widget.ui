@@ -57,14 +57,14 @@
         <item>
          <widget class="QPushButton" name="addExtStorageToMainBtn">
           <property name="text">
-           <string>Add externalStorage</string>
+           <string>Add External Storage</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="rebuildMainBtn">
           <property name="text">
-           <string>Rebuild Archive index</string>
+           <string>Rebuild Archive Index</string>
           </property>
          </widget>
         </item>
@@ -167,21 +167,21 @@
         <item>
          <widget class="QPushButton" name="addExtStorageToBackupBtn">
           <property name="text">
-           <string>Add externalStorage</string>
+           <string>Add External Storage</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="rebuildBackupBtn">
           <property name="text">
-           <string>Rebuild Archive index</string>
+           <string>Rebuild Archive Index</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="backupStartButton">
           <property name="text">
-           <string>Start backup now</string>
+           <string>Start Backup Now</string>
           </property>
          </widget>
         </item>
