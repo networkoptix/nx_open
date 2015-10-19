@@ -230,6 +230,8 @@ public:
 
     int recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot);
     int getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot);
+    int getBookmarkTagsAsync(int limit, QObject *target, const char * slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
     virtual bool isReady() const override;

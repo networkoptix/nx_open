@@ -103,6 +103,7 @@ namespace {
         (ec2BookmarkAddObject,     "ec2/bookmarks/add")
         (ec2BookmarkUpdateObject,  "ec2/bookmarks/update")
         (ec2BookmarkDeleteObject,  "ec2/bookmarks/delete")
+        (ec2BookmarkTagsObject,    "ec2/bookmarks/tags")
         (MergeLdapUsersObject,     "mergeLdapUsers")
     );
 #if 0
@@ -864,4 +865,10 @@ int QnMediaServerConnection::deleteBookmarkAsync(const QnUuid &bookmarkId, QObje
 
 int QnMediaServerConnection::getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot) {
     return sendAsyncGetRequest(ec2BookmarksObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
+}
+
+int QnMediaServerConnection::getBookmarkTagsAsync(int limit, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("limit", limit);
+    return sendAsyncGetRequest(ec2BookmarkTagsObject, params, QN_STRINGIZE_TYPE(QnCameraBookmarkTagList), target, slot);
 }
