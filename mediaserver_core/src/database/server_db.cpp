@@ -483,6 +483,10 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction() {
 }
 
 bool QnServerDb::createBookmarkTagTriggersUnderTransaction() {
+    /* DO NOT TRY to move this code to sql scripts.
+       It uses semicolons inside SQL queries,
+       thus these queries cannot be read by our primitive lexical sql script parser. */
+
     {
         QString queryStr = 
             "CREATE TRIGGER increment_bookmark_tag_counter AFTER INSERT ON bookmark_tags "

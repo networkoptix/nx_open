@@ -256,7 +256,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     addAction(action(Qn::ToggleMuteAction));
     addAction(action(Qn::ToggleSyncAction));
     addAction(action(Qn::ToggleCalendarAction));
-    addAction(action(Qn::ToggleBookmarksSearchAction));
 
     connect(action(Qn::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
     connect(action(Qn::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));

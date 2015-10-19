@@ -68,12 +68,6 @@ namespace {
 
         return result;
     }
-
-    QString getBookmarksCountText(int found
-        , int overall)
-    {
-        return QString(lit("%1/%2")).arg(QString::number(found), QString::number(overall));
-    }
 }
 
 QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
@@ -81,10 +75,7 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     , m_lineEdit(new QLineEdit(this))
     , m_closeButton(createCloseButton(this))
     , m_searchButton(new QnSearchButton(this))
-
-    , m_foundItems(0)
-    , m_overallItems(0)
-
+    , m_closeButtonVisible(true)
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -125,16 +116,23 @@ void QnSearchLineEdit::updateGeometries() {
     const int height = rect.height();
     const int width = rect.width();
     const int buttonSize = height;
+    int editWidth = rect.width();
     
     const int closeButtonSize = height * 3 / 4;
     // left edge
     m_searchButton->setGeometry(rect.x(), rect.y(), buttonSize, buttonSize);
+    editWidth -= buttonSize;
 
     // right edge
-    m_closeButton->setGeometry(width - (buttonSize + closeButtonSize) / 2
-        , rect.y() + (buttonSize - closeButtonSize) / 2 + 1, closeButtonSize, closeButtonSize);
+    if (m_closeButtonVisible) {
+        m_closeButton->setGeometry(
+                    width - (buttonSize + closeButtonSize) / 2,
+                    rect.y() + (buttonSize - closeButtonSize) / 2 + 1,
+                    closeButtonSize, closeButtonSize);
+        editWidth -= closeButtonSize;
+    }
 
-    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, m_closeButton->x() - buttonSize, height);
+    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, editWidth, height);
 }
 
 void QnSearchLineEdit::initStyleOption(QStyleOptionFrameV2 *option) const
@@ -192,7 +190,7 @@ void QnSearchLineEdit::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::EnabledChange)
     {
-        m_closeButton->setVisible(isEnabled()); /// To update close button state when hiding/showing
+        m_closeButton->setVisible(m_closeButtonVisible && isEnabled()); /// To update close button state when hiding/showing
         emit enabledChanged();
     }
 }
@@ -224,6 +222,18 @@ void QnSearchLineEdit::paintEvent(QPaintEvent *event) {
 
 QVariant QnSearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const {
     return m_lineEdit->inputMethodQuery(property);
+}
+
+bool QnSearchLineEdit::isCloseButtonVisible() const {
+    return m_closeButtonVisible;
+}
+
+void QnSearchLineEdit::setCloseButtonVisible(bool visible) {
+    if (m_closeButtonVisible == visible)
+        return;
+
+    m_closeButtonVisible = visible;
+    m_closeButton->setVisible(visible && isEnabled());
 }
 
 void QnSearchLineEdit::inputMethodEvent(QInputMethodEvent *e) {

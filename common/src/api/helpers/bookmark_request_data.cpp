@@ -108,8 +108,8 @@ bool QnGetBookmarksRequestData::isValid() const {
 
 QnGetBookmarkTagsRequestData::QnGetBookmarkTagsRequestData(int limit)
     : QnMultiserverRequestData()
-    , limit(limit)
     , format(Qn::JsonFormat)
+    , limit(limit)
 {}
 
 int QnGetBookmarkTagsRequestData::unlimited() {

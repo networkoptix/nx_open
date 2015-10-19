@@ -36,4 +36,7 @@ struct QnStartupParameters
     QnUuid videoWallItemGuid;
     QString engineVersion;
     QString dynamicCustomizationPath;
+
+    /** Uri when the client was launched as uri handler. */
+    QString customUri;
 };

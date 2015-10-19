@@ -1840,13 +1840,6 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Enable Background Animation")).
         checked(true).
         autoRepeat(false);
-
-    factory(Qn::ToggleBookmarksSearchAction).
-        flags(Qn::GlobalHotkey).
-        text(tr("Show Search Panel")).
-        toggledText(tr("Hide Search Panel")).
-        shortcut(tr("Ctrl+F")).
-        autoRepeat(false);
 }
 
 QnActionManager::~QnActionManager() {
