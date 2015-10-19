@@ -30,7 +30,6 @@ StreeManager::StreeManager(const conf::Auth& authSettings) throw(std::runtime_er
 :
     m_authSettings(authSettings)
 {
-    prepareNamespace();
     loadStree();
 }
 
@@ -48,41 +47,12 @@ void StreeManager::search(
 
 const stree::ResourceNameSet& StreeManager::resourceNameSet() const
 {
-    return m_rns;
-}
-
-void StreeManager::prepareNamespace()
-{
-    m_rns.registerResource(attr::operation, "operation", QVariant::String);
-    m_rns.registerResource(attr::accountID, "accountID", QVariant::String);
-    m_rns.registerResource(attr::systemID, "systemID", QVariant::String);
-    m_rns.registerResource(attr::ha1, "ha1", QVariant::String);
-    m_rns.registerResource(attr::userName, "user.name", QVariant::String);
-    m_rns.registerResource(attr::userPassword, "user.password", QVariant::String);
-    m_rns.registerResource(attr::accountStatus, "account.status", QVariant::Int);
-    m_rns.registerResource(attr::systemAccessRole, "systemAccessRole", QVariant::String);
-
-    m_rns.registerResource(attr::dataAccountRightsOnSystem, "dataAccountRightsOnSystem", QVariant::String);
-
-    m_rns.registerResource(attr::authenticated, "authenticated", QVariant::Bool);
-    m_rns.registerResource(attr::authorized, "authorized", QVariant::Bool);
-    m_rns.registerResource(attr::authAccountRightsOnSystem, "auth.accountRightsOnSystem", QVariant::String);
-    m_rns.registerResource(attr::authAccountID, "auth.accountID", QVariant::String);
-    m_rns.registerResource(attr::authSystemID, "auth.systemID", QVariant::String);
-
-    m_rns.registerResource(attr::entity, "entity", QVariant::String);
-    m_rns.registerResource(attr::action, "action", QVariant::String);
-    m_rns.registerResource(attr::secureSource, "secureSource", QVariant::Bool);
-
-    m_rns.registerResource(attr::socketIntfIP, "socket.intf.ip", QVariant::String);
-    m_rns.registerResource(attr::socketRemoteIP, "socket.remoteIP", QVariant::String);
-
-    m_rns.registerResource(attr::requestPath, "request.path", QVariant::String);
+    return m_attrNameSet;
 }
 
 void StreeManager::loadStree() throw(std::runtime_error)
 {
-    stree::SaxHandler xmlHandler(m_rns);
+    stree::SaxHandler xmlHandler(m_attrNameSet);
 
     QXmlSimpleReader reader;
     reader.setContentHandler(&xmlHandler);

@@ -172,8 +172,10 @@ void SystemManager::getCloudUsersOfSystem(
              ++accountIter)
         {
             if (accountIter->accessRole != api::SystemAccessRole::owner &&
-                accountIter->accessRole != api::SystemAccessRole::editorWithSharing)
+                accountIter->accessRole != api::SystemAccessRole::editorWithSharing &&
+                accountIter->accessRole != api::SystemAccessRole::maintenance)
             {
+                //TODO #ak this condition copies condition from authorization tree
                 //no access to system's sharing list is allowed for this account
                 continue;
             }
@@ -190,9 +192,7 @@ void SystemManager::getCloudUsersOfSystem(
     lk.unlock();
 
     completionHandler(
-        resultData.sharing.empty()
-            ? api::ResultCode::notFound
-            : api::ResultCode::ok,
+        api::ResultCode::ok,
         std::move(resultData));
 }
 

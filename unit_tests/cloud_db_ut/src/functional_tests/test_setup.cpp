@@ -31,31 +31,33 @@ CdbFunctionalTest::CdbFunctionalTest()
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
     m_port = (std::rand() % 10000) + 50000;
+    //m_port = 54526;
     m_tmpDir = QDir::homePath() + "/cdb_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
     auto b = std::back_inserter(m_args);
     *b = strdup("/path/to/bin");
     *b = strdup("-e");
-    *b = strdup("-listenOn"); *b = strdup(lit("0.0.0.0:%1").arg(m_port).toLatin1().constData());
+    *b = strdup("-listenOn"); *b = strdup(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
+    *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
     *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
     *b = strdup("-db/driverName"); *b = strdup("QSQLITE");
     *b = strdup("-db/name"); *b = strdup(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
 
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
     
-    std::promise<void> cdbInstantiatedPromise;
-    auto cdbInstantiatedfuture = cdbInstantiatedPromise.get_future();
+    std::promise<void> cdbInstantiatedCreatedPromise;
+    auto cdbInstantiatedCreatedFuture = cdbInstantiatedCreatedPromise.get_future();
 
     m_cdbProcessFuture = std::async(
         std::launch::async,
-        [this, &cdbInstantiatedPromise](){
+        [this, &cdbInstantiatedCreatedPromise]()->int {
             m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcess>(
                 static_cast<int>(m_args.size()), m_args.data());
-            cdbInstantiatedPromise.set_value();
-            m_cdbInstance->exec();
+            cdbInstantiatedCreatedPromise.set_value();
+            return m_cdbInstance->exec();
         });
-    cdbInstantiatedfuture.wait();
+    cdbInstantiatedCreatedFuture.wait();
 }
 
 CdbFunctionalTest::~CdbFunctionalTest()
@@ -75,6 +77,10 @@ void CdbFunctionalTest::waitUntilStarted()
     for (;;)
     {
         ASSERT_TRUE(std::chrono::steady_clock::now() < endClock);
+
+        ASSERT_NE(
+            std::future_status::ready,
+            m_cdbProcessFuture.wait_for(std::chrono::seconds(0)));
 
         auto connection = m_connectionFactory->createConnection("", "");
         api::ResultCode result = api::ResultCode::ok;
@@ -252,6 +258,32 @@ api::ResultCode CdbFunctionalTest::shareSystem(
         makeSyncCall<api::ResultCode>(
             std::bind(
                 &nx::cdb::api::SystemManager::shareSystem,
+                connection->systemManager(),
+                std::move(systemSharing),
+                std::placeholders::_1));
+
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::updateSystemSharing(
+    const std::string& email,
+    const std::string& password,
+    const QnUuid& systemID,
+    const QnUuid& accountID,
+    api::SystemAccessRole newAccessRole)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    api::SystemSharing systemSharing;
+    systemSharing.accountID = accountID;
+    systemSharing.systemID = systemID;
+    systemSharing.accessRole = newAccessRole;
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::updateSharing,
                 connection->systemManager(),
                 std::move(systemSharing),
                 std::placeholders::_1));

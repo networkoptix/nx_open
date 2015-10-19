@@ -34,6 +34,8 @@ bool AuthorizationManager::authorize(
     DataActionType requestedAction,
     stree::AbstractResourceWriter* const authzInfo ) const
 {
+    //adding helper attributes
+
     //adding authAccountRightsOnSystem if appropriate
     const auto authenticatedAccountID = authenticationProperties.get<QnUuid>(attr::authAccountID);
     const auto requestedSystemID = dataToAuthorize.get<QnUuid>(attr::systemID);
@@ -65,6 +67,15 @@ bool AuthorizationManager::authorize(
                 m_systemManager.getAccountRightsForSystem(
                     requestedAccountID.get(),
                     requestedSystemID.get())));
+    }
+
+
+    if (authenticatedAccountID && requestedAccountID &&
+        authenticatedAccountID.get() == requestedAccountID.get())
+    {
+        auxSearchAttrs.put(
+            attr::authSelfAccountAccessRequested,
+            true);
     }
 
     //forwarding requestedEntity and requestedAction

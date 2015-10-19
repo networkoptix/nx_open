@@ -115,6 +115,12 @@ public:
             ? accountID < rhs.accountID
             : systemID < rhs.systemID;
     }
+    bool operator==(const SystemSharing& rhs) const
+    {
+        return accountID == rhs.accountID
+            && systemID == rhs.systemID
+            && accessRole == rhs.accessRole;
+    }
 };
 
 class SystemSharingList

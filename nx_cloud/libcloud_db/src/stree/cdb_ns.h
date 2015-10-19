@@ -3,6 +3,11 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifndef NX_CDB_ATTR_NS_H
+#define NX_CDB_ATTR_NS_H
+
+#include <plugins/videodecoder/stree/resourcenameset.h>
+
 
 namespace nx {
 namespace cdb {
@@ -30,6 +35,8 @@ enum Value
     authAccountRightsOnSystem,
     authAccountID,
     authSystemID,
+    //!Operation data contains accountID equal to the one been authenticated
+    authSelfAccountAccessRequested,
 
     entity,
     action,
@@ -42,5 +49,16 @@ enum Value
 };
 }
 
+//!Contains description of stree attributes used by cloud_db
+class CdbAttrNameSet
+:
+    public stree::ResourceNameSet
+{
+public:
+    CdbAttrNameSet();
+};
+
 }   //cdb
 }   //nx
+
+#endif  //NX_CDB_ATTR_NS_H

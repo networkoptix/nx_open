@@ -62,6 +62,12 @@ protected:
         const QnUuid& systemID,
         const QnUuid& accountID,
         api::SystemAccessRole accessRole);
+    api::ResultCode updateSystemSharing(
+        const std::string& email,
+        const std::string& password,
+        const QnUuid& systemID,
+        const QnUuid& accountID,
+        api::SystemAccessRole newAccessRole);
     api::ResultCode getSystemSharings(
         const std::string& email,
         const std::string& password,
