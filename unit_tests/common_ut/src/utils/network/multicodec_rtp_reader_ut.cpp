@@ -99,7 +99,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
     RTPSession rtspSession;
-    rtspSession.setAuth( auth, RTPSession::authBasic );
+    //rtspSession.setAuth( auth, RTPSession::authBasic );
 
     rtspSession.setTransport( "tcp" );
     ASSERT_TRUE( rtspSession.open( rtspUrl ).errorCode == 0 );
@@ -128,7 +128,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
     RTPSession rtspSession;
-    rtspSession.setAuth( auth, RTPSession::authBasic );
+    //rtspSession.setAuth( auth, RTPSession::authBasic );
 
     rtspSession.setTransport( "tcp" );
     ASSERT_TRUE( rtspSession.open( rtspUrl ).errorCode == 0 );
@@ -234,7 +234,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
     RTPSession rtspSession;
-    rtspSession.setAuth( auth, RTPSession::authBasic );
+    //rtspSession.setAuth( auth, RTPSession::authBasic );
 
     rtspSession.setTransport( "tcp" );
     ASSERT_TRUE( rtspSession.open( rtspUrl ).errorCode == 0 );
@@ -426,7 +426,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP7 )
     for( auto& rtspSession: rtspSessions )
     {
         rtspSession.reset( new RTPSession() );
-        rtspSession->setAuth( auth, RTPSession::authBasic );
+        //rtspSession->setAuth( auth, RTPSession::authBasic );
         rtspSession->setTransport( "tcp" );
         ASSERT_TRUE( rtspSession->open( rtspUrl ).errorCode == 0 );
         rtspSession->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
@@ -474,7 +474,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
     for( auto& rtspSession: rtspSessions )
     {
         rtspSession.reset( new RTPSession() );
-        rtspSession->setAuth( auth, RTPSession::authBasic );
+        //rtspSession->setAuth( auth, RTPSession::authBasic );
         rtspSession->setTransport( "tcp" );
         ASSERT_TRUE( rtspSession->open( rtspUrl ).errorCode == 0 );
         rtspSession->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );

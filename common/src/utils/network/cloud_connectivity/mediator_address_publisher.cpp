@@ -140,6 +140,7 @@ void MediatorAddressPublisher::pingReportedAddresses()
         if( const auto error = stun::AsyncClient::hasError( code, response ) )
         {
             NX_LOGX( *error, cl_logERROR );
+            m_pingedAddresses.clear();
             return setupUpdateTimer();
         }
 
@@ -147,6 +148,7 @@ void MediatorAddressPublisher::pingReportedAddresses()
         if( !eps )
         {
             NX_LOGX( lit( "No PublicEndpointList in response" ), cl_logERROR );
+            m_pingedAddresses.clear();
             return setupUpdateTimer();
         }
 
@@ -164,9 +166,6 @@ void MediatorAddressPublisher::pingReportedAddresses()
 void MediatorAddressPublisher::publishPingedAddresses()
 {
     if( !isCloudReady() )
-        return setupUpdateTimer();
-
-    if( m_pingedAddresses == m_publishedAddresses )
         return setupUpdateTimer();
 
     stun::Message request( stun::Header( stun::MessageClass::request,

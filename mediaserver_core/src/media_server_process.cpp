@@ -2202,13 +2202,9 @@ void MediaServerProcess::run()
         updateCloudProperties(adminUser);
     }
 
-    connect(qnResPool, &QnResourcePool::resourceChanged,
-            [ = ](const QnResourcePtr& resource)
-    {
-        if (const auto user = resource.dynamicCast<QnUserResource>())
-            if (user->isAdmin())
-                updateCloudProperties(user);
-    });
+    connect(&cloudConnectionManager,
+            &CloudConnectionManager::cloudBindingStatusChanged,
+            [=](bool) { updateCloudProperties(qnResPool->getAdministrator()); });
 
     QnStorageResourceList storages = m_mediaServer->getStorages();
     QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);

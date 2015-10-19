@@ -347,11 +347,8 @@ TimerDuration parseTimerDuration( const QString& duration,
     if ( duration.endsWith( lit("h"), Qt::CaseInsensitive ) )
         res = std::chrono::hours( toUInt( 1 ) );
     else
-    if (duration.endsWith(lit("d"), Qt::CaseInsensitive))
+    if ( duration.endsWith( lit("d"), Qt::CaseInsensitive ) )
         res = std::chrono::hours( toUInt( 1 ) ) * 24;
-    else
-    if (duration.endsWith(lit("M"), Qt::CaseInsensitive))
-        res = std::chrono::hours( toUInt( 1 ) ) * 24 * 30;
     else
         res = std::chrono::seconds( toUInt( 0 ) );
 
