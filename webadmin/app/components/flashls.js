@@ -91,6 +91,7 @@ var JSLoaderPlaylist = {
 
 var collectedPosition = 0;
 var oldPosition = 0;
+var oldSlidingPosition = 0;
 var flashlsAPI = new (function(){
 
     //We use swfobject to embed player. see https://code.google.com/p/swfobject/wiki/documentation
@@ -112,8 +113,8 @@ var flashlsAPI = new (function(){
             allowScriptAccess:'always',
             bgcolor: '#1C2327',
             allowFullScreen:false,
-            wmode:'window',
-            FlashVars:'callback=flashlsCallback'
+            FlashVars:'callback=flashlsCallback',
+            wmode:'transparent'
         },
         attributes:{ // https://code.google.com/p/swfobject/wiki/documentation - see section 'How can you configure your Flash content?
             id:'flashvideowindow',
@@ -204,6 +205,7 @@ var flashlsAPI = new (function(){
         }
         collectedPosition = 0;
         oldPosition = 0;
+        oldSlidingPosition = 0;
 
         //console.log('load video',url);
         try {
@@ -215,6 +217,8 @@ var flashlsAPI = new (function(){
     };
 
     this.play = function(offset) {
+
+        this.paused = false;
         if(!this.flashObject){
             return;
         }
@@ -226,11 +230,16 @@ var flashlsAPI = new (function(){
         }
     };
 
+    this.paused = false;
     this.pause = function() {
+        this.paused = true;
+
         this.flashObject.playerPause();
     };
 
     this.resume = function() {
+
+        this.paused = false;
         this.flashObject.playerResume();
     };
 
@@ -239,6 +248,7 @@ var flashlsAPI = new (function(){
     };
 
     this.stop = function() {
+        this.paused = true;
         this.flashObject.playerStop();
     };
 
@@ -392,6 +402,8 @@ flashlsAPI.flashlsEvents = {
         flashlsAPI.positionHandler(null);
     },
     error: function(code, url, message) {
+
+        flashlsAPI.errorHandler({message:message,code:code,url:url});
         console.error('flashls error, code:'+ code + ' url:' + url + ' message:' + message);
     },
     manifest: function(duration, levels, loadmetrics) {
@@ -452,12 +464,42 @@ flashlsAPI.flashlsEvents = {
     position: function(timemetrics) {
         var currentPosition = Math.max(0,timemetrics.position);
 
+
         if(currentPosition < oldPosition){
             collectedPosition += oldPosition;
         }
         oldPosition = currentPosition;
 
-        flashlsAPI.positionHandler(Math.round((collectedPosition + currentPosition) * 1000));
+        /*console.log("position changed",
+            Math.round((collectedPosition + currentPosition) * 1000),
+            Math.round((timemetrics.live_sliding_main + timemetrics.position)*1000),
+            Math.round(Math.max(timemetrics.live_sliding_main + timemetrics.position,collectedPosition + currentPosition)*1000),
+
+
+            Math.round(timemetrics.position*1000),
+            Math.round(timemetrics.backbuffer*1000),
+            Math.round(timemetrics.buffer*1000),
+            Math.round(timemetrics.duration*1000),
+            Math.round(timemetrics.live_sliding_main*1000)
+        );*/
+
+
+
+
+        if(Config && Config.allowDebugMode && Config.debug.video) {
+            if(oldSlidingPosition > timemetrics.live_sliding_main + timemetrics.position){
+                console.log("jump back:",oldSlidingPosition , timemetrics.live_sliding_main + timemetrics.position);
+            }
+        }
+        oldSlidingPosition = Math.max(oldSlidingPosition,timemetrics.live_sliding_main + timemetrics.position);
+        var targetPosition = Math.round(Math.max(oldSlidingPosition, collectedPosition + currentPosition)*1000);
+        if(targetPosition === 0 || flashlsApi.paused){
+            return;
+        }
+
+        flashlsAPI.positionHandler( targetPosition );
+
+        //flashlsAPI.positionHandler(Math.round((collectedPosition + currentPosition) * 1000));
     },
     state: function(newState) {
         var event = {time : new Date() - jsLoadDate, type : newState.toLowerCase(), name : ''};

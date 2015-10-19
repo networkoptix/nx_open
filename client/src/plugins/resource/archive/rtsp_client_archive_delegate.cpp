@@ -836,7 +836,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);
-    session->setAuth(auth, RTPSession::authDigest);
+    session->setAuth(auth, nx_http::header::AuthScheme::digest);
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());

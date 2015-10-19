@@ -4,7 +4,7 @@
 #include <memory>
 #include <functional>
 
-#include <Quuid>
+#include <QUuid>
 #include <QObject>
 
 #include <base/types.h>

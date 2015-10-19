@@ -159,6 +159,13 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         return;
 
     m_syncPlay->removeArchiveReader(mediaWidget->display()->archiveReader());
+    /* //Unsafe in the common scenario: closing camera on the scene while we are in archive. CamDisplay does not use mutexes to guard external time source.
+    QnClientVideoCamera *camera = mediaWidget->display()->camera();
+    if (camera) {
+        camera->setExternalTimeSource(nullptr);
+        camera->getCamDisplay()->setExternalTimeSource(nullptr); // TODO: #Elric two setExternalTimeSource calls, WTF?
+    }
+    */
 
     m_widgetCount--;
     if(m_widgetCount == 0)

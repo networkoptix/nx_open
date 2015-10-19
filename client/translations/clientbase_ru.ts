@@ -3068,17 +3068,17 @@
     <message>
         <source>Low</source>
         <comment>Failover priority</comment>
-        <translation>Низкое</translation>
+        <translation>Низкий</translation>
     </message>
     <message>
         <source>Medium</source>
         <comment>Failover priority</comment>
-        <translation>Среднее</translation>
+        <translation>Средний</translation>
     </message>
     <message>
         <source>High</source>
         <comment>Failover priority</comment>
-        <translation>Высокое</translation>
+        <translation>Высокий</translation>
     </message>
 </context>
 <context>
