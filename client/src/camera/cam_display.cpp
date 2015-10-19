@@ -530,7 +530,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 sleepTimer.start();
                 while (!m_afterJump && !m_buffering && !needToStop() && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
                 {
-                    qint64 ct = m_extTimeSrc->getCurrentTime();
+                    qint64 ct = m_extTimeSrc ? m_extTimeSrc->getCurrentTime() : displayedTime;
                     qint64 newDisplayedTime = getCurrentTime();
                     if (newDisplayedTime != displayedTime) {
                         // new VideoStreamDisplay update time async! So, currentTime possible may be changed during waiting (it is was not possible before v1.5)
@@ -566,7 +566,10 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 else 
                     realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
                 */
-                realSleepTime = speedSign * (displayedTime - m_extTimeSrc->expectedTime());
+                if (m_extTimeSrc)
+                    realSleepTime = speedSign * (displayedTime - m_extTimeSrc->expectedTime());
+                else
+                    realSleepTime = AV_NOPTS_VALUE;
                 //qDebug() << "sleepTimer=" << sleepTimer.elapsed() << "extSleep=" << realSleepTime;
             }
         }

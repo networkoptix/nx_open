@@ -255,9 +255,10 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiCameraHistoryItemDataList>("ApiCameraHistoryItemDataList");
     qRegisterMetaType<ec2::ApiCameraHistoryData>("ApiCameraHistoryData");
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ApiCameraHistoryDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
 
-    qRegisterMetaType<QnUuid>( "QnUuid" );
-    qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
+    qRegisterMetaType<QnUuid>();
+    qRegisterMetaTypeStreamOperators<QnUuid>();
     qRegisterMetaType<QnRecordingStatsReply>();
     qRegisterMetaType<QnAuditRecordList>();
 

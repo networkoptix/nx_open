@@ -303,7 +303,6 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
-                <module>common_libs/nxemail</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -345,6 +344,7 @@
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
+                <module>common_libs/nxemail</module>
                 <!--<module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
             </modules>

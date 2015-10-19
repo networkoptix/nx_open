@@ -24,9 +24,9 @@ namespace ec2
     };
 #define ApiPeerAliveData_Fields (peer)(isAlive)(persistentState)(runtimeState)
 
-    Q_DECLARE_METATYPE(ApiPeerAliveData);
 } // namespace ec2
 
+Q_DECLARE_METATYPE(ec2::ApiPeerAliveData);
 
 
 #endif // __SERVER_ALIVE_DATA_H_

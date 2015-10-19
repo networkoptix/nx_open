@@ -56,6 +56,8 @@ FocusScope {
             showAnimation.start()
         else
             popup.shown()
+
+        forceActiveFocus()
     }
 
     function hide() {
