@@ -5,6 +5,8 @@
 
 #include <client/client_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
@@ -73,6 +75,32 @@ qint64 QnWorkbenchServerTimeWatcher::displayOffset(const QnMediaResourcePtr &res
          ? 0
          : localOffset(resource, 0);
 }
+
+
+QDateTime QnWorkbenchServerTimeWatcher::serverTime(const QnMediaServerResourcePtr &server, qint64 msecsSinceEpoch) const {
+    qint64 utcOffsetMs = utcOffset(server);
+
+    QDateTime result;
+    if (utcOffsetMs != Qn::InvalidUtcOffset) {
+        result.setTimeSpec(Qt::OffsetFromUTC);
+        result.setUtcOffset(utcOffsetMs / 1000);
+        result.setMSecsSinceEpoch(msecsSinceEpoch);
+    } else {
+        result.setTimeSpec(Qt::UTC);
+        result.setMSecsSinceEpoch(msecsSinceEpoch);
+    }
+
+    return result;
+}
+
+
+QDateTime QnWorkbenchServerTimeWatcher::displayTime(qint64 msecsSinceEpoch) const {
+    if (qnSettings->timeMode() == Qn::ClientTimeMode)
+        return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch);
+
+    return serverTime(qnCommon->currentServer(), msecsSinceEpoch);
+}
+
 
 qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resource, qint64 defaultValue) const {
     qint64 utcOffsetMs = utcOffset(resource, Qn::InvalidUtcOffset);

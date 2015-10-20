@@ -23,6 +23,8 @@ public:
    
     qint64 displayOffset(const QnMediaResourcePtr &resource) const;
 
+    QDateTime serverTime(const QnMediaServerResourcePtr &server, qint64 msecsSinceEpoch) const;
+    QDateTime displayTime(qint64 msecsSinceEpoch) const;
 signals:
     void displayOffsetsChanged();
 

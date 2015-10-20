@@ -206,24 +206,13 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
                   return tr("Synchronizing...");
 
               qint64 mSecsSinceEpoch = currentTime + item.offset;
-              QDateTime time;
               if (sameTimezone()) {
+                  QDateTime time;
                   time.setTimeSpec(Qt::LocalTime);
                   time.setMSecsSinceEpoch(mSecsSinceEpoch);
                   return time.toString(lit("yyyy-MM-dd HH:mm:ss"));
               } else {
-                  qint64 utcOffset = server 
-                      ? context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(server)
-                      : Qn::InvalidUtcOffset;
-
-                  if (utcOffset != Qn::InvalidUtcOffset) {
-                      time.setTimeSpec(Qt::OffsetFromUTC);
-                      time.setUtcOffset(utcOffset / 1000);
-                      time.setMSecsSinceEpoch(mSecsSinceEpoch);
-                  } else {
-                      time.setTimeSpec(Qt::UTC);
-                      time.setMSecsSinceEpoch(mSecsSinceEpoch);
-                  }
+                  QDateTime time = context()->instance<QnWorkbenchServerTimeWatcher>()->serverTime(server, mSecsSinceEpoch);
                   return time.toString(lit("yyyy-MM-dd HH:mm:ss t"));
               } 
           }
