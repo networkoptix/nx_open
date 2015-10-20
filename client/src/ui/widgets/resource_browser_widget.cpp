@@ -761,6 +761,8 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
         /* View re-creates selection model for each model that is supplied to it, 
          * so we have to re-connect each time the model changes. */
         connect(ui->searchTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()), Qt::UniqueConnection);
+
+        ui->filterLineEdit->setFocus();
     }
 
     emit currentTabChanged();
