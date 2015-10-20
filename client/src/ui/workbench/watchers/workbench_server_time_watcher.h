@@ -18,12 +18,21 @@ public:
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
 
+    /** Current utc offset on the given server. Depends on server local timezone. */
     qint64 utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
+
+    /** Utc offset for the given resource. Supports cameras (current parent server offset is used)
+     *  and exported files (offset is stored inside).
+     */
     qint64 utcOffset(const QnMediaResourcePtr &resource, qint64 defaultValue = Qn::InvalidUtcOffset) const;
    
+    /** Offset value, used in gui elements. Depends on user time mode settings. */
     qint64 displayOffset(const QnMediaResourcePtr &resource) const;
 
+    /** Current time on the given server. Really, sync time is used, but with correct utc offset. */
     QDateTime serverTime(const QnMediaServerResourcePtr &server, qint64 msecsSinceEpoch) const;
+
+    /** Time value, than takes into account user time mode settings. */
     QDateTime displayTime(qint64 msecsSinceEpoch) const;
 signals:
     void displayOffsetsChanged();
