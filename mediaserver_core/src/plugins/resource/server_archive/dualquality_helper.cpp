@@ -55,20 +55,15 @@ void QnDualQualityHelper::findDataForTimeHelper(
 
     chunk = catalog->chunkAt(catalog->findFileIndex(time, findMethod));
 
-    qint64 timeDistance = chunk.distanceToTime(time);
-
-    if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && chunk.endTimeMs() <= time)
-        timeDistance = INT64_MAX; // actually chunk not found
+    qint64 timeDistance = calcDistanceHelper(chunk, time, findMethod);
     if (timeDistance > 0)
     {
         // chunk not found. check in alternate quality
         DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_Low ? m_catalogHi[index] : m_catalogLow[index]);
         DeviceFileCatalog::Chunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
-        qint64 timeDistanceAlt = altChunk.distanceToTime(time);
-        if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs() <= time)
-            timeDistanceAlt = INT64_MAX; // actually chunk not found
-
+        qint64 timeDistanceAlt = calcDistanceHelper(altChunk, time, findMethod);
         int findEps = m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : SECOND_STREAM_FIND_EPS;
+
         if (timeDistance - timeDistanceAlt > findEps || (timeDistance > timeDistanceAlt && usePreciseFind))
         {
             if (timeDistanceAlt == 0)
@@ -103,6 +98,21 @@ void QnDualQualityHelper::findDataForTimeHelper(
     }
 }
 
+int64_t QnDualQualityHelper::calcDistanceHelper(
+    const DeviceFileCatalog::Chunk  &chunk,
+    const int64_t                   time,
+    DeviceFileCatalog::FindMethod   findMethod
+)
+{
+    qint64 timeDistance = chunk.distanceToTime(time);
+    if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && 
+        chunk.endTimeMs() <= time)
+    {
+        timeDistance = INT64_MAX; // actually chunk not found
+    }
+    return timeDistance;
+}
+
 void QnDualQualityHelper::findDataForTime(
     const qint64                    time, 
     DeviceFileCatalog::Chunk        &chunk, 
@@ -134,8 +144,16 @@ void QnDualQualityHelper::findDataForTime(
         QnServer::StoragePool::Backup
     );
 
-    qint64 timeDistanceNormal = normalChunk.distanceToTime(time);
-    qint64 timeDistanceBackup = backupChunk.distanceToTime(time);
+    qint64 timeDistanceNormal = calcDistanceHelper(
+        normalChunk, 
+        time, 
+        findMethod
+    );    
+    qint64 timeDistanceBackup = calcDistanceHelper(
+        backupChunk,
+        time,
+        findMethod
+    );
     int findEps = (m_quality == MEDIA_Quality_Low) ? FIRST_STREAM_FIND_EPS : 
                                                      SECOND_STREAM_FIND_EPS; 
     

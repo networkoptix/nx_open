@@ -35,6 +35,12 @@ private:
         QnServer::StoragePool           storageManager
     );
 
+    static int64_t calcDistanceHelper(
+        const DeviceFileCatalog::Chunk  &chunk,
+        const int64_t                   time,
+        DeviceFileCatalog::FindMethod   findMethod
+    );
+
 private:
     DeviceFileCatalogPtr m_catalogHi[2];
     DeviceFileCatalogPtr m_catalogLow[2];
