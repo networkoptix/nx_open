@@ -439,8 +439,7 @@ void QnWorkbenchNavigator::initialize() {
         m_searchQueryStrategy->changeQueryForcibly(QString()); 
     });
 
-    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
-    connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
+    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged,  this, &QnWorkbenchNavigator::updateLocalOffset);
 
     connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),    SIGNAL(stateChanged(bool)), this,   SLOT(setAutoPaused(bool)));
 
@@ -1007,9 +1006,10 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 }
 
 void QnWorkbenchNavigator::updateLocalOffset() {
-    qint64 localOffset = 0;
-    if(qnSettings->timeMode() == Qn::ServerTimeMode && m_currentMediaWidget && (m_currentWidgetFlags & WidgetUsesUTC))
-        localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_currentMediaWidget->resource(), 0);
+    qint64 localOffset = m_currentMediaWidget
+        ? context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_currentMediaWidget->resource())
+        : 0;
+
     if (m_timeSlider)
         m_timeSlider->setLocalOffset(localOffset);
     if (m_calendar)

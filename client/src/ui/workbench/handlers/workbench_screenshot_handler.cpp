@@ -56,9 +56,9 @@ namespace {
 }
 
 QnScreenshotParameters::QnScreenshotParameters():
-    timestampMsec(0),
+    utcTimestampMsec(0),
     isUtc(false),
-    adjustedTimeMsec(0),
+    displayTimeMsec(0),
     filename(),
     timestampPosition(Qn::BottomRightCorner),
     itemDewarpingParams(),
@@ -70,10 +70,10 @@ QnScreenshotParameters::QnScreenshotParameters():
 {}
 
 QString QnScreenshotParameters::timeString() const {
-    if (timestampMsec == latestScreenshotTime)
+    if (utcTimestampMsec == latestScreenshotTime)
         return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
 
-    qint64 timeMSecs = adjustedTimeMsec;
+    qint64 timeMSecs = displayTimeMsec;
     if (isUtc)
         return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
     return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
@@ -189,10 +189,7 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
     if (!adjust)
         return timeMSec;
 
-    bool isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-    qint64 localOffset = 0;
-    if(qnSettings->timeMode() == Qn::ServerTimeMode && isUtc)
-        localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
+    qint64 localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
 
     timeMSec += localOffset;
     return timeMSec;
@@ -277,9 +274,9 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     QnScreenshotParameters parameters;
     {       
-        parameters.timestampMsec = screenshotTimeMSec(widget);
+        parameters.utcTimestampMsec = screenshotTimeMSec(widget);
         parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-        parameters.adjustedTimeMsec = screenshotTimeMSec(widget, true);
+        parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
         Key timeKey(keyStack, lit("_") + parameters.timeString());
        
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -349,9 +346,9 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QnScreenshotParameters parameters;
-    parameters.timestampMsec = screenshotTimeMSec(widget);
+    parameters.utcTimestampMsec = screenshotTimeMSec(widget);
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-    parameters.adjustedTimeMsec = screenshotTimeMSec(widget, true);
+    parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
     parameters.filename = filename;
     parameters.timestampPosition = qnSettings->timestampCorner();
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -486,9 +483,10 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QImage result = image;
 
     if (!result.isNull()) {
-        qint64 timeMsec = parameters.timestampMsec == latestScreenshotTime 
+        //TODO: #GDM looks like total mess
+        qint64 timeMsec = parameters.utcTimestampMsec == latestScreenshotTime 
             ? QDateTime::currentMSecsSinceEpoch()
-            : parameters.adjustedTimeMsec;
+            : parameters.displayTimeMsec;
 
         QnImageFilterHelper transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
@@ -501,7 +499,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
         if (!filters.isEmpty()) {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
-            frame->pts = parameters.timestampMsec * 1000;
+            //TODO: #GDM how is this supposed to work with latestScreenshotTime?
+            frame->pts = parameters.utcTimestampMsec * 1000;
             for(auto filter: filters)
                 frame = filter->updateImage(frame);
             result = frame->toImage();
@@ -516,7 +515,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot."),
-            tr("An error occured while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
+            tr("An error occurred while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
         );
         return;
     }
@@ -595,7 +594,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.rotationAngle = 0;
     } else {
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        imageProvider = new QnSingleThumbnailLoader(camera, camera->getParentResource().dynamicCast<QnMediaServerResource>(), localParameters.timestampMsec, 0);
+        imageProvider = new QnSingleThumbnailLoader(camera, camera->getParentResource().dynamicCast<QnMediaServerResource>(), localParameters.utcTimestampMsec, 0);
     }
 
     QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);

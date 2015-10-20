@@ -135,12 +135,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
             textRoles);
     });
 
-    connect(qnSyncTime, &QnSyncTime::timeChanged, this, [this]{
-        updateColumn(Columns::TimeColumn);
-        updateColumn(Columns::OffsetColumn);
-    });
-
-    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, [this]{
+    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this, [this]{
         m_sameTimezoneValid = false;
         updateColumn(Columns::TimeColumn);
         updateColumn(Columns::OffsetColumn);
