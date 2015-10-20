@@ -84,15 +84,17 @@ void AsyncClient::closeConnection( BaseConnectionType* connection )
     Q_ASSERT( !m_baseConnection || connection == m_baseConnection.get() );
 
     ConnectionHandler disconnectHandler;
+    SystemError::ErrorCode errorCode;
     {
         QnMutexLocker lock( &m_mutex );
         std::swap( disconnectHandler, m_disconnectHandler );
 
-        closeConnectionImpl( &lock, SystemError::getLastOSErrorCode() );
+        errorCode = SystemError::getLastOSErrorCode();
+        closeConnectionImpl( &lock, errorCode );
     }
 
     if( disconnectHandler )
-        disconnectHandler( SystemError::connectionReset );
+        disconnectHandler( errorCode );
 
     m_baseConnection = nullptr;
 }
