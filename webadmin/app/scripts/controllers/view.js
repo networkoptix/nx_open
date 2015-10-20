@@ -688,7 +688,12 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.$watch('searchCams',searchCams);
 
-        $scope.$watch('activeCamera.status',function(status){
+        $scope.$watch('activeCamera.status',function(status,oldStatus){
+
+            if(typeof(oldStatus) == "undefined"){
+                return;
+            }
+
             if((!$scope.positionProvider || $scope.positionProvider.liveMode) && !(status === 'Offline' || status === 'Unauthorized')){
                 updateVideoSource();
             }
