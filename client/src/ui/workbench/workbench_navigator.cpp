@@ -221,6 +221,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     connect(context()->instance<QnWorkbenchBookmarkTagsWatcher>(), &QnWorkbenchBookmarkTagsWatcher::tagsChanged,
             this, &QnWorkbenchNavigator::updateBookmarkTags);
+
+    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this, [this](const QnUuid &bookmarkId){
+        m_bookmarkAggregation.removeBookmark(bookmarkId);
+        updateSliderBookmarks();
+    });
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {

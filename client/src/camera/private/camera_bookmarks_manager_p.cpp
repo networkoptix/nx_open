@@ -7,7 +7,6 @@
 
 #include <common/common_module.h>
 
-#include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
@@ -28,6 +27,32 @@ namespace {
 
     /** Reserved value for invalid requests. */
     const int invalidRequestId = 0;
+
+    const int pendingDiscardTimeout = updateLiveBookmarksTimeoutMs;
+}
+
+namespace {
+    QnCameraBookmarkList::iterator findBookmark(QnCameraBookmarkList &list, const QnUuid &bookmarkId) {
+        return std::find_if(list.begin(), list.end(), [&bookmarkId](const QnCameraBookmark &bookmark){
+            return bookmark.guid == bookmarkId;
+        });
+    }
+
+    bool checkBookmarkForQuery(const QnCameraBookmarksQueryPtr &query, const QnCameraBookmark &bookmark) {
+        if (!query->cameras().isEmpty()) {
+            bool match = false;
+            for (const QnVirtualCameraResourcePtr &camera: query->cameras()) {
+                if (bookmark.cameraId == camera->getUniqueId()) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match)
+                return false;
+        }
+
+        return query->filter().checkBookmark(bookmark);
+    }
 }
 
 
@@ -39,9 +64,13 @@ QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo()
     , callback()
 {}
 
-QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(OperationType operation, OperationCallbackType callback)
+QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(
+        OperationType operation,
+        const QnUuid &bookmarkId,
+        OperationCallbackType callback)
     : operation(operation)
     , callback(callback)
+    , bookmarkId(bookmarkId)
 {}
 
 
@@ -68,6 +97,24 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQue
 
 
 /************************************************************************/
+/* PendingInfo                                                          */
+/************************************************************************/
+QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const QnCameraBookmark &bookmark, Type type)
+    : bookmark(bookmark)
+    , type(type)
+{
+    discardTimer.invalidate();
+}
+
+QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const QnUuid &bookmarkId, Type type)
+    : type(type)
+{
+    bookmark.guid = bookmarkId;
+    discardTimer.invalidate();
+}
+
+
+/************************************************************************/
 /* QnCameraBookmarksManagerPrivate                                      */
 /************************************************************************/
 QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent)
@@ -90,6 +137,7 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmar
     QTimer* timer = new QTimer(this);
     timer->setInterval(queriesCheckTimoutMs);
     timer->setSingleShot(false);
+    connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
     connect(timer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
     timer->start();
 }
@@ -123,8 +171,6 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
 }
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    //TODO: #GDM #Bookmarks notify queries?
-
     QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(bookmark.cameraId);
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
@@ -135,19 +181,23 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
     }
 
     int handle = server->apiConnection()->addBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, callback);
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Add, bookmark.guid, callback);
+
+    addUpdatePendingBookmark(bookmark);
 }
 
 void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    //TODO: #GDM #Bookmarks notify queries?
     int handle = qnCommon->currentServer()->apiConnection()->updateBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, callback);
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, bookmark.guid, callback);
+
+    addUpdatePendingBookmark(bookmark);
 }
 
 void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback) {
-    //TODO: #GDM #Bookmarks notify queries?
     int handle =  qnCommon->currentServer()->apiConnection()->deleteBookmarkAsync(bookmarkId, this, SLOT(handleBookmarkOperation(int, int)));
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, callback);
+    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, bookmarkId, callback);
+
+    addRemovePendingBookmark(bookmarkId);
 }
 
 void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, int handle) {
@@ -157,6 +207,10 @@ void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, int ha
     auto operationInfo = m_operations.take(handle);
     if (operationInfo.callback)
         operationInfo.callback(status == 0);
+
+    auto it = m_pendingBookmarks.find(operationInfo.bookmarkId);
+    if (it != m_pendingBookmarks.end())
+        it->discardTimer.start();
 }
 
 
@@ -170,6 +224,7 @@ void QnCameraBookmarksManagerPrivate::handleDataLoaded(int status, const QnCamer
 
 void QnCameraBookmarksManagerPrivate::clearCache() {
     m_requests.clear();
+    m_pendingBookmarks.clear();
 
     for (auto queryId: m_queries.keys()) {
         updateQueryCache(queryId, QnCameraBookmarkList());
@@ -268,10 +323,15 @@ void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBook
     info.state = QueryInfo::QueryState::Requested;
     info.requestTimer.restart(); 
     info.requestId = getBookmarksAsync(query->cameras(), query->filter(), 
-        [this, queryId, callback](bool success, const QnCameraBookmarkList &bookmarks, int requestId) {      
+        [this, queryId, callback](bool success, QnCameraBookmarkList bookmarks, int requestId) {
         if (success && m_queries.contains(queryId) && requestId != invalidRequestId) {
             QueryInfo &info = m_queries[queryId];
             if (info.requestId == requestId) {
+                const QnCameraBookmarksQueryPtr &query = info.queryRef.toStrongRef();
+                if (!query)
+                    return;
+
+                mergeWithPendingBookmarks(query, bookmarks);
                 updateQueryCache(queryId, bookmarks);
                 if (info.state == QueryInfo::QueryState::Requested)
                     info.state = QueryInfo::QueryState::Actual;
@@ -334,4 +394,77 @@ void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksCallbackTy
     executeDelayed([this, callback]{
         callback(false, QnCameraBookmarkList());
     });
+}
+
+void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBookmark &bookmark) {
+    m_pendingBookmarks.insert(bookmark.guid, PendingInfo(bookmark, PendingInfo::AddBookmark));
+
+    for (QueryInfo &info: m_queries) {
+        QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+        Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+        if (!query)
+            continue;
+
+        if (!checkBookmarkForQuery(query, bookmark))
+            continue;
+
+        auto it = findBookmark(info.bookmarksCache, bookmark.guid);
+        if (it != info.bookmarksCache.end())
+            info.bookmarksCache.erase(it);
+
+        it = std::lower_bound(info.bookmarksCache.begin(), info.bookmarksCache.end(), bookmark);
+        info.bookmarksCache.insert(it, bookmark);
+
+        emit query->bookmarksChanged(info.bookmarksCache);
+    }
+}
+
+void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const QnUuid &bookmarkId) {
+    m_pendingBookmarks.insert(bookmarkId, PendingInfo(bookmarkId, PendingInfo::RemoveBookmark));
+
+    for (QueryInfo &info: m_queries) {
+        QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+        Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+        if (!query)
+            continue;
+
+        auto it = findBookmark(info.bookmarksCache, bookmarkId);
+        if (it == info.bookmarksCache.end())
+            continue;
+
+        info.bookmarksCache.erase(it);
+
+        emit query->bookmarksChanged(info.bookmarksCache);
+    }
+}
+
+void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(const QnCameraBookmarksQueryPtr query, QnCameraBookmarkList &bookmarks) {
+    for (const PendingInfo &info: m_pendingBookmarks) {
+        if (info.type == PendingInfo::RemoveBookmark) {
+            auto it = findBookmark(bookmarks, info.bookmark.guid);
+            if (it == bookmarks.end())
+                continue;
+
+            bookmarks.erase(it);
+        } else {
+            if (!checkBookmarkForQuery(query, info.bookmark))
+                continue;
+
+            auto it = findBookmark(bookmarks, info.bookmark.guid);
+            if (it != bookmarks.end())
+                bookmarks.erase(it);
+
+            it = std::lower_bound(bookmarks.begin(), bookmarks.end(), info.bookmark);
+            bookmarks.insert(it, info.bookmark);
+        }
+    }
+}
+
+void QnCameraBookmarksManagerPrivate::checkPendingBookmarks() {
+    for (auto it = m_pendingBookmarks.begin(); it != m_pendingBookmarks.end(); /* no inc */) {
+        if (it->discardTimer.isValid() && it->discardTimer.hasExpired(pendingDiscardTimeout))
+            it = m_pendingBookmarks.erase(it);
+        else
+            ++it;
+    }
 }

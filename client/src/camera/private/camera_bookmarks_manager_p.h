@@ -4,6 +4,7 @@
 
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <camera/camera_bookmark_aggregation.h>
+#include <core/resource/camera_bookmark.h>
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
 
@@ -90,6 +91,22 @@ private:
 
     void executeCallbackDelayed(BookmarksInternalCallbackType callback);
     void executeCallbackDelayed(BookmarksCallbackType callback);
+
+    /** @brief                  Add the added or updated bookmark to the pending bookmarks list.
+     *  Pending bookmark is the bookmark that was created, modified or deleted on the client
+     *  but these changes haven't been reflected to queries caches.
+     *  Pending bookmarks live inside the bookmarks manager for some time to let the queries gather actual information.
+     */
+    void addUpdatePendingBookmark(const QnCameraBookmark &bookmark);
+    /// @brief                  Add removed bookmark to the pending bookmarks list.
+    void addRemovePendingBookmark(const QnUuid &bookmarkId);
+    /// @brief                  Merge the pending bookmarks with the given bookmarks list.
+    /// @param query            The query for with merge operation is performed. The query specifies filters and cameras list.
+    void mergeWithPendingBookmarks(const QnCameraBookmarksQueryPtr query, QnCameraBookmarkList &bookmarks);
+
+    /// @brief                  Find and discard timed-out pending bookmars.
+    void checkPendingBookmarks();
+
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
@@ -105,9 +122,10 @@ private:
 
         OperationType operation;
         OperationCallbackType callback;
+        QnUuid bookmarkId;
 
         OperationInfo();
-        OperationInfo(OperationType operation, OperationCallbackType callback);
+        OperationInfo(OperationType operation, const QnUuid &bookmarkId, OperationCallbackType callback);
     };
 
     QMap<int, OperationInfo> m_operations;
@@ -132,4 +150,21 @@ private:
 
     /** Cached bookmarks by query. */
     QHash<QUuid, QueryInfo> m_queries;
+
+    struct PendingInfo {
+        QnCameraBookmark bookmark;
+        QElapsedTimer discardTimer;
+
+        enum Type {
+            AddBookmark,
+            RemoveBookmark
+        };
+
+        Type type;
+
+        PendingInfo(const QnCameraBookmark &bookmark, Type type);
+        PendingInfo(const QnUuid &bookmarkId, Type type);
+    };
+
+    QHash<QnUuid, PendingInfo> m_pendingBookmarks;
 };
