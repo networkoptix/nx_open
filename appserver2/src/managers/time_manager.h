@@ -302,6 +302,7 @@ namespace ec2
             const nx_http::HttpHeaders& headers);
         void forgetSynchronizedTimeNonSafe(QMutexLocker* const /*lock*/);
         void checkSystemTimeForChange();
+        void handleLocalTimePriorityKeyChange(QMutexLocker* const lk);
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );
