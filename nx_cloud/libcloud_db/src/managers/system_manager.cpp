@@ -9,6 +9,7 @@
 
 #include <utils/common/log.h>
 #include <utils/common/sync_call.h>
+#include <utils/serialization/lexical.h>
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
@@ -34,7 +35,7 @@ void SystemManager::bindSystemToAccount(
     std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
     QnUuid accountID;
-    if (!authzInfo.get(cdb::attr::accountID, &accountID))
+    if (!authzInfo.get(cdb::attr::authAccountID, &accountID))
     {
         completionHandler(api::ResultCode::notAuthorized, data::SystemData());
         return;
@@ -89,7 +90,10 @@ void SystemManager::getSystems(
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     data::SystemDataList resultData;
-    if (auto systemID = wholeFilterMap.get(cdb::attr::systemID))
+    auto systemID = wholeFilterMap.get(cdb::attr::authSystemID);
+    if (!systemID)
+        systemID = wholeFilterMap.get(cdb::attr::systemID);
+    if (systemID)
     {
         //selecting system by id
         auto system = m_cache.find(systemID.get().value<QnUuid>());
@@ -97,7 +101,7 @@ void SystemManager::getSystems(
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
     }
-    else if (auto accountID = wholeFilterMap.get<QnUuid>(cdb::attr::accountID))
+    else if (auto accountID = wholeFilterMap.get<QnUuid>(cdb::attr::authAccountID))
     {
         QnMutexLocker lk(&m_mutex);
         const auto& accountIndex = m_accountAccessRoleForSystem.get<1>();
@@ -144,7 +148,7 @@ void SystemManager::getCloudUsersOfSystem(
     api::SystemSharingList resultData;
 
     QnUuid accountID;
-    if (!authzInfo.get(attr::accountID, &accountID))
+    if (!authzInfo.get(attr::authAccountID, &accountID))
         return completionHandler(api::ResultCode::notAuthorized, std::move(resultData));
 
     const auto systemID = filter.get<QnUuid>(attr::systemID);
@@ -168,8 +172,10 @@ void SystemManager::getCloudUsersOfSystem(
              ++accountIter)
         {
             if (accountIter->accessRole != api::SystemAccessRole::owner &&
-                accountIter->accessRole != api::SystemAccessRole::editorWithSharing)
+                accountIter->accessRole != api::SystemAccessRole::editorWithSharing &&
+                accountIter->accessRole != api::SystemAccessRole::maintenance)
             {
+                //TODO #ak this condition copies condition from authorization tree
                 //no access to system's sharing list is allowed for this account
                 continue;
             }
@@ -186,10 +192,20 @@ void SystemManager::getCloudUsersOfSystem(
     lk.unlock();
 
     completionHandler(
-        resultData.sharing.empty()
-            ? api::ResultCode::notFound
-            : api::ResultCode::ok,
+        api::ResultCode::ok,
         std::move(resultData));
+}
+
+void SystemManager::updateSharing(
+    const AuthorizationInfo& /*authzInfo*/,
+    data::SystemSharing sharing,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<data::SystemSharing>(
+        std::bind(&SystemManager::updateSharingInDB, this, _1, _2),
+        std::move(sharing),
+        std::bind(&SystemManager::sharingUpdated, this, _1, _2, std::move(completionHandler)));
 }
 
 boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const
@@ -355,6 +371,55 @@ void SystemManager::systemDeleted(
         auto& systemIndex = m_accountAccessRoleForSystem.get<2>();
         systemIndex.erase(systemID.systemID);
     }
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError);
+}
+
+nx::db::DBResult SystemManager::updateSharingInDB(
+    QSqlDatabase* const connection,
+    const data::SystemSharing& sharing)
+{
+    QSqlQuery updateRemoveSharingQuery(*connection);
+    if (sharing.accessRole == api::SystemAccessRole::none)
+        updateRemoveSharingQuery.prepare(
+            "DELETE FROM system_to_account "
+            "  WHERE account_id=:accountID AND system_id=:systemID");
+    else
+        updateRemoveSharingQuery.prepare(
+            "INSERT OR REPLACE INTO system_to_account( account_id, system_id, access_role_id ) "
+            " VALUES( :accountID, :systemID, :accessRole )");
+    QnSql::bind(sharing, &updateRemoveSharingQuery);
+    if (!updateRemoveSharingQuery.exec())
+    {
+        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4").
+            arg(sharing.systemID).arg(sharing.accountID).arg(QnLexical::serialized(sharing.accessRole)).
+            arg(connection->lastError().text()), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+void SystemManager::sharingUpdated(
+    nx::db::DBResult dbResult,
+    data::SystemSharing sharing,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        //updating "systems by account id" index
+        QnMutexLocker lk(&m_mutex);
+        auto& accountSystemPairIndex = m_accountAccessRoleForSystem.get<0>();
+        accountSystemPairIndex.erase(sharing);
+        if (sharing.accessRole != api::SystemAccessRole::none)
+        {
+            //inserting modified version
+            accountSystemPairIndex.emplace(sharing);
+        }
+    }
+
     completionHandler(
         dbResult == nx::db::DBResult::ok
         ? api::ResultCode::ok

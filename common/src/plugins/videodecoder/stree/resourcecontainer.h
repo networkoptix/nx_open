@@ -64,7 +64,7 @@ namespace stree
         template<typename T> boost::optional<T> get( int resID ) const
         {
             T val;
-            if( !get<T>( resID, &val ) )
+            if( !get( resID, &val ) )
                 return boost::none;
             return val;
         }

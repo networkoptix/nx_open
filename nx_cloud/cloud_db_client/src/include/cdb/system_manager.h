@@ -64,6 +64,10 @@ public:
     virtual void getCloudUsersOfSystem(
         const std::string& systemID,
         std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
+    //!Changes access role for system or remove sharing if \a sharing.accessRole is \a api::SystemAccessRole::none
+    virtual void updateSharing(
+        api::SystemSharing sharing,
+        std::function<void(ResultCode)> completionHandler) = 0;
 };
 
 }   //api

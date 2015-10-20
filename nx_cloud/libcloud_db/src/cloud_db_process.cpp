@@ -37,6 +37,7 @@
 #include "http_handlers/ping.h"
 #include "http_handlers/unbind_system_handler.h"
 #include "http_handlers/share_system_handler.h"
+#include "http_handlers/update_system_sharing_handler.h"
 #include "managers/account_manager.h"
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
@@ -291,6 +292,12 @@ void CloudDBProcess::registerApiHandlers(
         [systemManager, &authorizationManager]() -> std::unique_ptr<ShareSystemHttpHandler> {
             return std::make_unique<ShareSystemHttpHandler>(systemManager, authorizationManager);
         } );
+
+    msgDispatcher->registerRequestProcessor<UpdateSystemSharingHandler>(
+        UpdateSystemSharingHandler::HANDLER_PATH,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<UpdateSystemSharingHandler> {
+            return std::make_unique<UpdateSystemSharingHandler>(systemManager, authorizationManager);
+        });
 
     msgDispatcher->registerRequestProcessor<GetCloudUsersOfSystemHandler>(
         GetCloudUsersOfSystemHandler::HANDLER_PATH,

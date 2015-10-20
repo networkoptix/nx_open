@@ -13,8 +13,6 @@
 
 int main( int argc, char **argv )
 {
-    QnLog::initLog("DEBUG2");
-
     ::testing::InitGoogleTest(&argc, argv);
     const int result = RUN_ALL_TESTS();
     return result;

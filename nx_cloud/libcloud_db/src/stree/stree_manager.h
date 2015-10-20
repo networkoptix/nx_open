@@ -15,6 +15,7 @@
 #include <utils/common/model_functions_fwd.h>
 #include <utils/common/singleton.h>
 
+#include "cdb_ns.h"
 #include "settings.h"
 
 
@@ -50,9 +51,8 @@ public:
 private:
     const conf::Auth& m_authSettings;
     std::unique_ptr<stree::AbstractNode> m_stree;
-    stree::ResourceNameSet m_rns;
+    CdbAttrNameSet m_attrNameSet;
 
-    void prepareNamespace();
     void loadStree() throw(std::runtime_error);
 };
 
