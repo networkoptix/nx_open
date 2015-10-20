@@ -31,7 +31,7 @@
         <div class="webclient-panel-border"></div>
             <span class="webclient-button caption-row"
                   ng-class="{disabled: playbackNotSupported || !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)}"
-                    ng-click="playPause()">
+                    ng-click="(playbackNotSupported || !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)) || playPause()">
                 <span class="glyphicon glyphicon-play"
                         ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>
