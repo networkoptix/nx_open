@@ -10,6 +10,8 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <utils/network/http/auth_tools.h>
+
 #include "test_setup.h"
 #include "version.h"
 
@@ -136,6 +138,39 @@ TEST_F(CdbFunctionalTest, generalTest)
 TEST_F(CdbFunctionalTest, badAccountRegistration)
 {
     //TODO #ak register account with improper arguments
+}
+
+TEST_F(CdbFunctionalTest, requestQueryDecode)
+{
+    //waiting for cloud_db initialization
+    waitUntilStarted();
+
+    api::ResultCode result = api::ResultCode::ok;
+
+    std::string account1Password = "12352";
+    api::AccountData account1;
+    account1.email = "test%40yandex.ru";
+    account1.fullName = "Test Test";
+    account1.passwordHa1 = nx_http::calcHa1(
+        "test@yandex.ru",
+        moduleInfo().realm.c_str(),
+        account1Password.c_str());
+
+    api::AccountActivationCode activationCode;
+    result = addAccount(&account1, &account1Password, &activationCode);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_TRUE(!activationCode.code.empty());
+
+    result = getAccount(account1.email, account1Password, &account1);
+    ASSERT_EQ(result, api::ResultCode::notAuthorized);  //test%40yandex.ru MUST be unknown email
+
+    account1.email = "test@yandex.ru";
+    result = getAccount(account1.email, account1Password, &account1);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.statusCode, api::AccountStatus::awaitingActivation);
+    ASSERT_EQ(account1.email, "test@yandex.ru");
 }
 
 }   //cdb
