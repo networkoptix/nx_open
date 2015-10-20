@@ -99,7 +99,7 @@ protected:
         {
             case Qn::UrlQueryFormat:
                 return loadFromUrlQuery(
-                    QUrlQuery( data ),
+                    QUrlQuery(QUrl::fromPercentEncoding(data)),
                     target );
                 return true;
 

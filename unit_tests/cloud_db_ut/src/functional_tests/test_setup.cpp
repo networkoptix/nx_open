@@ -110,19 +110,29 @@ api::ResultCode CdbFunctionalTest::addAccount(
     api::AccountActivationCode* const activationCode)
 {
     std::ostringstream ss;
-    ss << "test_" << rand() << "@networkoptix.com";
-    accountData->email = ss.str();
+    if (accountData->email.empty())
+    {
+        ss << "test_" << rand() << "@networkoptix.com";
+        accountData->email = ss.str();
+    }
 
-    ss = std::ostringstream();
-    ss << rand();
-    *password = ss.str();
+    if (password->empty())
+    {
+        ss = std::ostringstream();
+        ss << rand();
+        *password = ss.str();
+    }
 
-    accountData->fullName = "Test Test";
-    accountData->passwordHa1 = nx_http::calcHa1(
-        accountData->email.c_str(),
-        moduleInfo().realm.c_str(),
-        password->c_str());
-    accountData->customization = QN_CUSTOMIZATION_NAME;
+    if (accountData->fullName.empty())
+        accountData->fullName = "Test Test";
+    if (accountData->passwordHa1.empty())
+        accountData->passwordHa1 = nx_http::calcHa1(
+            QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
+            //accountData->email.c_str(),
+            moduleInfo().realm.c_str(),
+            password->c_str());
+    if (accountData->customization.empty())
+        accountData->customization = QN_CUSTOMIZATION_NAME;
 
     auto connection = connectionFactory()->createConnection("", "");
 
