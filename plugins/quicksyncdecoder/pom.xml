@@ -21,7 +21,8 @@
 	<name>HD Witness Intel Quick Sync decoder plugin</name>	
 
 	<properties>
-		<product.title>${quicksyncdecoder.name}</product.title>	
+		<guid>${quicksyncdecoder.guid}</guid>
+        <product.title>${quicksyncdecoder.name}</product.title>	
 		<!--Global libs-->
 		<qt.libs>core gui network opengl xml multimedia concurrent</qt.libs>
 		<global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lprotobuf</global.libs>
