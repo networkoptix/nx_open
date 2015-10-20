@@ -84,6 +84,18 @@ QnPage {
         }
     }
 
+    Rectangle {
+        id: navigationBarTint
+
+        color: QnTheme.navigationPanelBackground
+        width: navigationBarPlaceholder.realWidth
+        height: video.height
+        anchors.left: parent.right
+        anchors.top: video.top
+
+        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+    }
+
     QnMediaPlayer {
         id: mediaPlayer
         resourceId: videoPlayer.resourceId
@@ -105,6 +117,7 @@ QnPage {
     function hideUi() {
         videoNavigation.opacity = 0.0
         toolBar.opacity = 0.0
+        navigationBarTint.opacity = 0.0
         if (Main.isMobile())
             enterFullscreen()
     }
@@ -113,6 +126,7 @@ QnPage {
         exitFullscreen()
         videoNavigation.opacity = 1.0
         toolBar.opacity = 1.0
+        navigationBarTint.opacity = 1.0
     }
 
     focus: true
