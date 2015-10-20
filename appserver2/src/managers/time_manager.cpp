@@ -1207,7 +1207,7 @@ namespace ec2
             SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS);
     }
 
-    void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QMutexLocker* const /*lk*/)
+    void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerBase* const /*lk*/)
     {
         if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
             Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
