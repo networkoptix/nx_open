@@ -137,7 +137,19 @@ TEST_F(CdbFunctionalTest, generalTest)
 
 TEST_F(CdbFunctionalTest, badAccountRegistration)
 {
-    //TODO #ak register account with improper arguments
+    waitUntilStarted();
+
+    api::ResultCode result = api::ResultCode::ok;
+
+    api::AccountData account1;
+    std::string account1Password;
+    result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(result, api::ResultCode::ok);
+
+    //trying to add account with same email once again
+    result = addActivatedAccount(&account1, &account1Password);
+    //TODO #ak error code must be alreadyExists
+    ASSERT_EQ(result, api::ResultCode::forbidden);
 }
 
 TEST_F(CdbFunctionalTest, requestQueryDecode)

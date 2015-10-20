@@ -50,6 +50,16 @@ void AccountManager::addAccount(
     data::AccountData accountData,
     std::function<void(api::ResultCode, data::AccountActivationCode)> completionHandler )
 {
+    if (const auto existingAccount = m_cache.find(accountData.email))
+    {
+        NX_LOG(lm("Failed to add account with already used email %1").
+            arg(accountData.email), cl_logDEBUG1);
+        return completionHandler(
+            api::ResultCode::alreadyExists,
+            data::AccountActivationCode());
+    }
+
+
     accountData.id = QnUuid::createUuid();
 
     //fetching request source

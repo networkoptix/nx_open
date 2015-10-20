@@ -66,6 +66,8 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
             account2.email,
             api::SystemAccessRole::editorWithSharing));
 
+    restart();
+
     //checking account1 system list
     {
         std::vector<api::SystemData> systems;
@@ -211,6 +213,8 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             accountAccessRoleForSystem(sharings, account2.email, system1.id));
     }
 
+    restart();
+
     //account1: trying to modify (change access rights) sharing to account2 (failure)
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -278,6 +282,28 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             system1.id,
             account2.email,
             api::SystemAccessRole::none));
+
+    //checking system list for both accounts
+    {
+        std::vector<api::SystemSharing> sharings;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystemSharings(account1.email, account1Password, &sharings));
+        ASSERT_EQ(sharings.size(), 1);
+        ASSERT_EQ(
+            api::SystemAccessRole::owner,
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
+    }
+
+    {
+        std::vector<api::SystemSharing> sharings;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystemSharings(account2.email, account2Password, &sharings));
+        ASSERT_EQ(sharings.size(), 0);
+    }
+
+    restart();
 
     //checking system list for both accounts
     {

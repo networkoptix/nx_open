@@ -109,7 +109,7 @@ int CloudDBProcess::executeApplication()
             return 2;
         }
     
-        EMailManager emailManager( settings );
+        EMailManager emailManager(settings);
         StreeManager streeManager(settings.auth());
 
         //creating data managers

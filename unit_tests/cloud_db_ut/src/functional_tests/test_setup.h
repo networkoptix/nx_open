@@ -26,10 +26,15 @@ class CdbFunctionalTest
     public ::testing::Test
 {
 public:
+    //!Calls \a start
     CdbFunctionalTest();
     ~CdbFunctionalTest();
 
+    void start();
     void waitUntilStarted();
+    void stop();
+    //!restarts process
+    void restart();
 
 protected:
     nx::cdb::api::ConnectionFactory* connectionFactory();

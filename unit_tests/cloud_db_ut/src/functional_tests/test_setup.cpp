@@ -46,6 +46,18 @@ CdbFunctionalTest::CdbFunctionalTest()
 
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
     
+    start();
+}
+
+CdbFunctionalTest::~CdbFunctionalTest()
+{
+    stop();
+
+    QDir(m_tmpDir).removeRecursively();
+}
+
+void CdbFunctionalTest::start()
+{
     std::promise<void> cdbInstantiatedCreatedPromise;
     auto cdbInstantiatedCreatedFuture = cdbInstantiatedCreatedPromise.get_future();
 
@@ -58,15 +70,6 @@ CdbFunctionalTest::CdbFunctionalTest()
             return m_cdbInstance->exec();
         });
     cdbInstantiatedCreatedFuture.wait();
-}
-
-CdbFunctionalTest::~CdbFunctionalTest()
-{
-    m_cdbInstance->pleaseStop();
-    m_cdbProcessFuture.wait();
-    m_cdbInstance.reset();
-
-    QDir(m_tmpDir).removeRecursively();
 }
 
 void CdbFunctionalTest::waitUntilStarted()
@@ -92,6 +95,20 @@ void CdbFunctionalTest::waitUntilStarted()
         if (result == api::ResultCode::ok)
             break;
     }
+}
+
+void CdbFunctionalTest::stop()
+{
+    m_cdbInstance->pleaseStop();
+    m_cdbProcessFuture.wait();
+    m_cdbInstance.reset();
+}
+
+void CdbFunctionalTest::restart()
+{
+    stop();
+    start();
+    waitUntilStarted();
 }
 
 nx::cdb::api::ConnectionFactory* CdbFunctionalTest::connectionFactory()
