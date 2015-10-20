@@ -53,7 +53,7 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
             account1.email,
             account1Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::viewer));
 
     //sharing system2 with account2 as editorWithSharing
@@ -63,7 +63,7 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
             account1.email,
             account1Password,
             system2.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::editorWithSharing));
 
     //checking account1 system list
@@ -93,16 +93,16 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
             api::ResultCode::ok);
         ASSERT_EQ(sharings.size(), 4);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account1.id, system1.id),
+            accountAccessRoleForSystem(sharings, account1.email, system1.id),
             api::SystemAccessRole::owner);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account1.id, system2.id),
+            accountAccessRoleForSystem(sharings, account1.email, system2.id),
             api::SystemAccessRole::owner);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account2.id, system1.id),
+            accountAccessRoleForSystem(sharings, account2.email, system1.id),
             api::SystemAccessRole::viewer);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account2.id, system2.id),
+            accountAccessRoleForSystem(sharings, account2.email, system2.id),
             api::SystemAccessRole::editorWithSharing);
     }
 
@@ -114,13 +114,13 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
             api::ResultCode::ok);
         ASSERT_EQ(sharings.size(), 3);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account1.id, system2.id),
+            accountAccessRoleForSystem(sharings, account1.email, system2.id),
             api::SystemAccessRole::owner);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account2.id, system2.id),
+            accountAccessRoleForSystem(sharings, account2.email, system2.id),
             api::SystemAccessRole::editorWithSharing);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account2.id, system3.id),
+            accountAccessRoleForSystem(sharings, account2.email, system3.id),
             api::SystemAccessRole::owner);
     }
 
@@ -140,10 +140,10 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
             getSystemSharings(account2.email, account2Password, system2.id.toStdString(), &sharings));
         ASSERT_EQ(sharings.size(), 2);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account1.id, system2.id),
+            accountAccessRoleForSystem(sharings, account1.email, system2.id),
             api::SystemAccessRole::owner);
         ASSERT_EQ(
-            accountAccessRoleForSystem(sharings, account2.id, system2.id),
+            accountAccessRoleForSystem(sharings, account2.email, system2.id),
             api::SystemAccessRole::editorWithSharing);
     }
 }
@@ -179,7 +179,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account1.email,
             account1Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::maintenance));
 
     //checking system list for both accounts
@@ -191,10 +191,10 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
         ASSERT_EQ(sharings.size(), 2);
         ASSERT_EQ(
             api::SystemAccessRole::owner,
-            accountAccessRoleForSystem(sharings, account1.id, system1.id));
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
         ASSERT_EQ(
             api::SystemAccessRole::maintenance,
-            accountAccessRoleForSystem(sharings, account2.id, system1.id));
+            accountAccessRoleForSystem(sharings, account2.email, system1.id));
     }
 
     {
@@ -205,10 +205,10 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
         ASSERT_EQ(sharings.size(), 2);
         ASSERT_EQ(
             api::SystemAccessRole::owner,
-            accountAccessRoleForSystem(sharings, account1.id, system1.id));
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
         ASSERT_EQ(
             api::SystemAccessRole::maintenance,
-            accountAccessRoleForSystem(sharings, account2.id, system1.id));
+            accountAccessRoleForSystem(sharings, account2.email, system1.id));
     }
 
     //account1: trying to modify (change access rights) sharing to account2 (failure)
@@ -218,7 +218,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account1.email,
             account1Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::viewer));
 
     //account1: trying to remove sharing to account2 (failure)
@@ -228,7 +228,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account1.email,
             account1Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::none));
 
     //account2: trying to modify sharing to account2 (failure)
@@ -238,7 +238,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account2.email,
             account2Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::viewer));
 
     //account2: trying to remove "owner" sharing to account1 (failure)
@@ -248,7 +248,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account2.email,
             account2Password,
             system1.id,
-            account1.id,
+            account1.email,
             api::SystemAccessRole::none));
     //account2: trying to alter "owner" sharing to account1 (failure)
     ASSERT_EQ(
@@ -257,7 +257,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account2.email,
             account2Password,
             system1.id,
-            account1.id,
+            account1.email,
             api::SystemAccessRole::viewer));
     //account1: trying to remove "owner" sharing to itself (failure)
     ASSERT_EQ(
@@ -266,7 +266,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account2.email,
             account2Password,
             system1.id,
-            account1.id,
+            account1.email,
             api::SystemAccessRole::none));
 
     //account2: trying to remove sharing to account2 (success)
@@ -276,7 +276,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account2.email,
             account2Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::none));
 
     //checking system list for both accounts
@@ -288,7 +288,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
         ASSERT_EQ(sharings.size(), 1);
         ASSERT_EQ(
             api::SystemAccessRole::owner,
-            accountAccessRoleForSystem(sharings, account1.id, system1.id));
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
     }
 
     {
@@ -306,7 +306,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account1.email,
             account1Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::maintenance));
 
     //adding another maintenance
@@ -323,7 +323,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account2.email,
             account2Password,
             system1.id,
-            account3.id,
+            account3.email,
             api::SystemAccessRole::maintenance));
 
     //checking system list for both accounts
@@ -335,13 +335,13 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
         ASSERT_EQ(ownerSharings.size(), 3);
         ASSERT_EQ(
             api::SystemAccessRole::owner,
-            accountAccessRoleForSystem(ownerSharings, account1.id, system1.id));
+            accountAccessRoleForSystem(ownerSharings, account1.email, system1.id));
         ASSERT_EQ(
             api::SystemAccessRole::maintenance,
-            accountAccessRoleForSystem(ownerSharings, account2.id, system1.id));
+            accountAccessRoleForSystem(ownerSharings, account2.email, system1.id));
         ASSERT_EQ(
             api::SystemAccessRole::maintenance,
-            accountAccessRoleForSystem(ownerSharings, account3.id, system1.id));
+            accountAccessRoleForSystem(ownerSharings, account3.email, system1.id));
     }
 
     {
@@ -380,7 +380,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
                 account2.email,
                 account2Password,
                 system1.id,
-                account4.id,
+                account4.email,
                 role));
     }
 
@@ -391,7 +391,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account2.email,
             account2Password,
             system1.id,
-            account3.id,
+            account3.email,
             api::SystemAccessRole::editorWithSharing));
 
     //account2: removing sharing to account3 (success)
@@ -401,7 +401,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
             account2.email,
             account2Password,
             system1.id,
-            account3.id,
+            account3.email,
             api::SystemAccessRole::none));
 
     //checking system list for both accounts
@@ -413,10 +413,10 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
         ASSERT_EQ(ownerSharings.size(), 2);
         ASSERT_EQ(
             api::SystemAccessRole::owner,
-            accountAccessRoleForSystem(ownerSharings, account1.id, system1.id));
+            accountAccessRoleForSystem(ownerSharings, account1.email, system1.id));
         ASSERT_EQ(
             api::SystemAccessRole::maintenance,
-            accountAccessRoleForSystem(ownerSharings, account2.id, system1.id));
+            accountAccessRoleForSystem(ownerSharings, account2.email, system1.id));
     }
 
     {
@@ -467,7 +467,7 @@ TEST_F(CdbFunctionalTest, systemSharing_owner)
             account1.email,
             account1Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::editorWithSharing));
 
     //trying to update "owner" sharing
@@ -477,7 +477,7 @@ TEST_F(CdbFunctionalTest, systemSharing_owner)
             account1.email,
             account1Password,
             system1.id,
-            account1.id,
+            account1.email,
             api::SystemAccessRole::viewer));
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -485,7 +485,7 @@ TEST_F(CdbFunctionalTest, systemSharing_owner)
             account2.email,
             account2Password,
             system1.id,
-            account1.id,
+            account1.email,
             api::SystemAccessRole::viewer));
 
     //trying to remove "owner" sharing
@@ -495,7 +495,7 @@ TEST_F(CdbFunctionalTest, systemSharing_owner)
             account1.email,
             account1Password,
             system1.id,
-            account1.id,
+            account1.email,
             api::SystemAccessRole::none));
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -503,7 +503,7 @@ TEST_F(CdbFunctionalTest, systemSharing_owner)
             account2.email,
             account2Password,
             system1.id,
-            account1.id,
+            account1.email,
             api::SystemAccessRole::none));
 
     //checking system list for account 1
@@ -515,10 +515,10 @@ TEST_F(CdbFunctionalTest, systemSharing_owner)
         ASSERT_EQ(sharings.size(), 2);
         ASSERT_EQ(
             api::SystemAccessRole::owner,
-            accountAccessRoleForSystem(sharings, account1.id, system1.id));
+            accountAccessRoleForSystem(sharings, account1.email, system1.id));
         ASSERT_EQ(
             api::SystemAccessRole::editorWithSharing,
-            accountAccessRoleForSystem(sharings, account2.id, system1.id));
+            accountAccessRoleForSystem(sharings, account2.email, system1.id));
     }
 }
 

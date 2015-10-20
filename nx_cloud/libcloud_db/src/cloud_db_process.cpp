@@ -116,9 +116,11 @@ int CloudDBProcess::executeApplication()
         AccountManager accountManager(
             settings,
             &dbManager,
-            &emailManager );
+            &emailManager);
     
-        SystemManager systemManager( &dbManager );
+        SystemManager systemManager(
+            accountManager,
+            &dbManager);
     
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow( PingHandler::HANDLER_PATH, AuthMethod::noAuth );

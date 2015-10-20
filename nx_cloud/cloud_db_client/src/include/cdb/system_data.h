@@ -99,7 +99,7 @@ public:
 class SystemSharing
 {
 public:
-    QnUuid accountID;
+    std::string accountEmail;
     QnUuid systemID;
     SystemAccessRole accessRole;
 
@@ -111,13 +111,13 @@ public:
 
     bool operator<(const SystemSharing& rhs) const
     {
-        return accountID != rhs.accountID
-            ? accountID < rhs.accountID
+        return accountEmail != rhs.accountEmail
+            ? accountEmail < rhs.accountEmail
             : systemID < rhs.systemID;
     }
     bool operator==(const SystemSharing& rhs) const
     {
-        return accountID == rhs.accountID
+        return accountEmail == rhs.accountEmail
             && systemID == rhs.systemID
             && accessRole == rhs.accessRole;
     }

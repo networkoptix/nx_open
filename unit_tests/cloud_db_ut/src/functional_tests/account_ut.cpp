@@ -101,7 +101,7 @@ TEST_F(CdbFunctionalTest, generalTest)
             account1.email,
             account1Password,
             system1.id,
-            account2.id,
+            account2.email,
             api::SystemAccessRole::editor);
         ASSERT_EQ(result, api::ResultCode::ok);
     }
@@ -127,7 +127,7 @@ TEST_F(CdbFunctionalTest, generalTest)
             account2.email,
             account2Password,
             system1.id,
-            account3.id,
+            account3.email,
             api::SystemAccessRole::editor);
         ASSERT_EQ(result, api::ResultCode::forbidden);
     }

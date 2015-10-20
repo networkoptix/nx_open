@@ -33,6 +33,8 @@
 namespace nx {
 namespace cdb {
 
+class AccountManager;
+
 /*!
     Provides methods for manipulating system data on persisent storage.
     Calls \a DBManager instance to perform DB manipulation. SQL requests are written in this class
@@ -45,7 +47,9 @@ public:
         Fills internal cache
         \throw std::runtime_error In case of failure to pre-fill data cache
     */
-    SystemManager(nx::db::DBManager* const dbManager) throw(std::runtime_error);
+    SystemManager(
+        const AccountManager& accountManager,
+        nx::db::DBManager* const dbManager) throw(std::runtime_error);
 
     //!Binds system to an account associated with \a authzInfo
     void bindSystemToAccount(
@@ -98,11 +102,11 @@ public:
     boost::optional<data::SystemData> findSystemByID(const QnUuid& id) const;
     /*!
         \return \a api::SystemAccessRole::none is returned if\n
-        - \a accountID has no rights for \a systemID
-        - \a accountID or \a systemID is unknown
+        - \a accountEmail has no rights for \a systemID
+        - \a accountEmail or \a systemID is unknown
     */
     api::SystemAccessRole getAccountRightsForSystem(
-        const QnUuid& accountID, const QnUuid& systemID) const;
+        const std::string& accountEmail, const QnUuid& systemID) const;
 
     //!Create data view restricted by \a authzInfo and \a filter
     DataView<data::SystemData> createView(
@@ -110,6 +114,9 @@ public:
         data::DataFilter filter);
         
 private:
+    static const int INDEX_BY_ACCOUNT_EMAIL = 1;
+    static const int INDEX_BY_SYSTEM_ID = 2;
+
     typedef boost::multi_index::multi_index_container<
         api::SystemSharing,
         boost::multi_index::indexed_by<
@@ -117,13 +124,14 @@ private:
                 boost::multi_index::identity<api::SystemSharing>>,
             //indexing by account
             boost::multi_index::ordered_non_unique<boost::multi_index::member<
-                api::SystemSharing, QnUuid, &api::SystemSharing::accountID>>,
+                api::SystemSharing, std::string, &api::SystemSharing::accountEmail>>,
             //indexing by system
             boost::multi_index::ordered_non_unique<boost::multi_index::member<
                 api::SystemSharing, QnUuid, &api::SystemSharing::systemID>>
         >
     > AccountSystemAccessRoleDict;
 
+    const AccountManager& m_accountManager;
     nx::db::DBManager* const m_dbManager;
     //!map<id, system>
     Cache<QnUuid, data::SystemData> m_cache;
@@ -132,11 +140,11 @@ private:
 
     nx::db::DBResult insertSystemToDB(
         QSqlDatabase* const connection,
-        const data::SystemRegistrationDataWithAccountID& newSystem,
+        const data::SystemRegistrationDataWithAccount& newSystem,
         data::SystemData* const systemData);
     void systemAdded(
         nx::db::DBResult dbResult,
-        data::SystemRegistrationDataWithAccountID systemRegistrationData,
+        data::SystemRegistrationDataWithAccount systemRegistrationData,
         data::SystemData systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 

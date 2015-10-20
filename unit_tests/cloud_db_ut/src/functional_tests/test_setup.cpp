@@ -243,13 +243,13 @@ api::ResultCode CdbFunctionalTest::shareSystem(
     const std::string& email,
     const std::string& password,
     const QnUuid& systemID,
-    const QnUuid& accountID,
+    const std::string& accountEmail,
     api::SystemAccessRole accessRole)
 {
     auto connection = connectionFactory()->createConnection(email, password);
 
     api::SystemSharing systemSharing;
-    systemSharing.accountID = accountID;
+    systemSharing.accountEmail = accountEmail;
     systemSharing.systemID = systemID;
     systemSharing.accessRole = accessRole;
 
@@ -269,13 +269,13 @@ api::ResultCode CdbFunctionalTest::updateSystemSharing(
     const std::string& email,
     const std::string& password,
     const QnUuid& systemID,
-    const QnUuid& accountID,
+    const std::string& accountEmail,
     api::SystemAccessRole newAccessRole)
 {
     auto connection = connectionFactory()->createConnection(email, password);
 
     api::SystemSharing systemSharing;
-    systemSharing.accountID = accountID;
+    systemSharing.accountEmail = accountEmail;
     systemSharing.systemID = systemID;
     systemSharing.accessRole = newAccessRole;
 
@@ -343,12 +343,12 @@ api::ResultCode CdbFunctionalTest::getSystemSharings(
 
 api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
     const std::vector<api::SystemSharing>& sharings,
-    const QnUuid& accountID,
+    const std::string& accountEmail,
     const QnUuid& systemID) const
 {
     for (const auto& sharing: sharings)
     {
-        if (sharing.accountID == accountID && sharing.systemID == systemID)
+        if (sharing.accountEmail == accountEmail && sharing.systemID == systemID)
             return sharing.accessRole;
     }
 

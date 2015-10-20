@@ -38,6 +38,7 @@ class AuthRequest
 public:
     //!Nonce, reported by \a AuthProvider::getCdbNonce
     std::string nonce;
+    //!Username (account email), provided by user
     std::string username;
     //!Realm, we are requesting user digest for
     std::string realm;

@@ -28,7 +28,7 @@ namespace nx
             - concatenation O(1) complexity. This implies readiness for readv and writev system calls
             - buffer should implicit sharing but still minimize atomic operations where they not required
 
-        Currently, using QByteArray, but fully new implementation will be provided in 2.4
+        Currently, using QByteArray, but fully new implementation will be provided one day...
     */
     typedef QByteArray Buffer;
 

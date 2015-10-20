@@ -59,15 +59,15 @@ public:
         const AuthorizationInfo& authzInfo,
         std::function<void(api::ResultCode, data::AccountData)> completionHandler );
 
-    boost::optional<data::AccountData> findAccountByID(const QnUuid& id) const;
     boost::optional<data::AccountData> findAccountByUserName(
-        const nx::String& userName) const;
+        const std::string& userName) const;
     
 private:
     const conf::Settings& m_settings;
     nx::db::DBManager* const m_dbManager;
     EMailManager* const m_emailManager;
-    Cache<QnUuid, data::AccountData> m_cache;
+    //!map<email, account>
+    Cache<std::string, data::AccountData> m_cache;
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts( QSqlDatabase* connection, int* const dummy );
@@ -88,11 +88,11 @@ private:
     nx::db::DBResult verifyAccount(
         QSqlDatabase* const tran,
         const data::AccountActivationCode& verificationCode,
-        QnUuid* const accountID );
+        std::string* const accountEmail);
     void accountVerified(
         nx::db::DBResult resultCode,
         data::AccountActivationCode verificationCode,
-        const QnUuid accountID,
+        const std::string accountEmail,
         std::function<void(api::ResultCode)> completionHandler );
 };
 

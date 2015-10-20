@@ -69,7 +69,7 @@ void AccountManager::activate(
     std::function<void(api::ResultCode)> completionHandler )
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountActivationCode, QnUuid>(
+    m_dbManager->executeUpdate<data::AccountActivationCode, std::string>(
         std::bind( &AccountManager::verifyAccount, this, _1, _2, _3 ),
         std::move( emailVerificationCode ),
         std::bind( &AccountManager::accountVerified, this, _1, _2, _3, std::move( completionHandler ) ) );
@@ -79,14 +79,14 @@ void AccountManager::getAccount(
     const AuthorizationInfo& authzInfo,
     std::function<void(api::ResultCode, data::AccountData)> completionHandler )
 {
-    QnUuid accountID;
-    if( !authzInfo.get( attr::authAccountID, &accountID ) )
+    QString accountEmail;
+    if (!authzInfo.get( attr::authAccountEmail, &accountEmail))
     {
         completionHandler(api::ResultCode::forbidden, data::AccountData());
         return;
     }
 
-    if( auto accountData = m_cache.find( accountID ) )
+    if (auto accountData = m_cache.find(accountEmail.toStdString()))
     {
         accountData.get().passwordHa1.clear();
         completionHandler(api::ResultCode::ok, std::move(accountData.get()));
@@ -97,17 +97,12 @@ void AccountManager::getAccount(
     completionHandler(api::ResultCode::notFound, data::AccountData());
 }
 
-boost::optional<data::AccountData> AccountManager::findAccountByID(const QnUuid& id) const
-{
-    return m_cache.find(id);
-}
-
 boost::optional<data::AccountData> AccountManager::findAccountByUserName(
-    const nx::String& userName ) const
+    const std::string& userName ) const
 {
     //TODO #ak improve search
     return m_cache.findIf(
-        [&]( const std::pair<const QnUuid, data::AccountData>& val ) {
+        [&]( const std::pair<const std::string, data::AccountData>& val ) {
             return val.second.email == userName;
         } );
 }
@@ -149,8 +144,8 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
 
     for( auto& account: accounts )
     {
-        auto idCopy = account.id;
-        if( !m_cache.insert( std::move(idCopy), std::move(account) ) )
+        auto emailCopy = account.email;
+        if( !m_cache.insert( std::move(emailCopy), std::move(account) ) )
         {
             assert( false );
         }
@@ -231,7 +226,7 @@ void AccountManager::accountAdded(
     if( resultCode == db::DBResult::ok )
     {
         //updating cache
-        m_cache.insert( accountData.id, std::move(accountData) );
+        m_cache.insert( accountData.email, std::move(accountData) );
     }
 
     //adding activation code only in response to portal
@@ -247,11 +242,13 @@ void AccountManager::accountAdded(
 nx::db::DBResult AccountManager::verifyAccount(
     QSqlDatabase* const connection,
     const data::AccountActivationCode& verificationCode,
-    QnUuid* const resultAccountID )
+    std::string* const resultAccountEmail )
 {
     QSqlQuery getAccountByVerificationCode( *connection );
     getAccountByVerificationCode.prepare(
-        "SELECT account_id FROM email_verification WHERE verification_code LIKE :code" );
+        "SELECT a.email "
+        "FROM email_verification ev, account a "
+        "WHERE ev.account_id = a.id AND ev.verification_code LIKE :code" );
     QnSql::bind( verificationCode, &getAccountByVerificationCode );
     if( !getAccountByVerificationCode.exec() )
         return db::DBResult::ioError;
@@ -261,7 +258,8 @@ nx::db::DBResult AccountManager::verifyAccount(
             arg( QString::fromStdString(verificationCode.code) ), cl_logDEBUG1 );
         return db::DBResult::notFound;
     }
-    QnUuid accountID = QnSql::deserialized_field<QnUuid>( getAccountByVerificationCode.value( 0 ) );
+    const std::string accountEmail = QnSql::deserialized_field<QString>(
+        getAccountByVerificationCode.value(0)).toStdString();
 
     QSqlQuery removeVerificationCode( *connection );
     removeVerificationCode.prepare( 
@@ -277,18 +275,18 @@ nx::db::DBResult AccountManager::verifyAccount(
 
     QSqlQuery updateAccountStatus( *connection );
     updateAccountStatus.prepare( 
-        "UPDATE account SET status_code = ? WHERE id = ?" );
+        "UPDATE account SET status_code = ? WHERE email = ?" );
     updateAccountStatus.bindValue( 0, static_cast<int>(api::AccountStatus::activated) );
-    updateAccountStatus.bindValue( 1, QnSql::serialized_field(accountID) );
+    updateAccountStatus.bindValue( 1, QnSql::serialized_field(accountEmail) );
     if( !updateAccountStatus.exec() )
     {
-        NX_LOG( lit( "Failed to update account %1 status. %2" ).
-            arg( accountID.toString() ).arg( connection->lastError().text() ),
-            cl_logDEBUG1 );
+        NX_LOG(lm("Failed to update account %1 status. %2").
+            arg(accountEmail).arg(connection->lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
-    *resultAccountID = std::move( accountID );
+    *resultAccountEmail = std::move(accountEmail);
 
     return db::DBResult::ok;
 }
@@ -296,13 +294,13 @@ nx::db::DBResult AccountManager::verifyAccount(
 void AccountManager::accountVerified(
     nx::db::DBResult resultCode,
     data::AccountActivationCode /*verificationCode*/,
-    const QnUuid accountID,
+    const std::string accountEmail,
     std::function<void(api::ResultCode)> completionHandler )
 {
     if( resultCode == db::DBResult::ok )
     {
         m_cache.atomicUpdate(
-            accountID, 
+            accountEmail,
             []( api::AccountData& account ){ account.statusCode = api::AccountStatus::activated; } );
     }
 
