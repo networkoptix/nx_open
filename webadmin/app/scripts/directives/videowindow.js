@@ -92,6 +92,10 @@ angular.module('webadminApp')
                     var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
                     var weHaveRtsp = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['rtsp'];});
 
+                    if(weHaveHls && canPlayNatively("hls")){
+                        return "native-hls";
+                    }
+
                     // Test native support. Native is always better choice
                     if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
                         if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.osVersion >= 10) {
@@ -101,10 +105,6 @@ angular.module('webadminApp')
                         }else{
                             return "webm";
                         }
-                    }
-
-                    if(weHaveHls && canPlayNatively("hls")){
-                        return "native-hls";
                     }
 
                     // Hardcode native support
