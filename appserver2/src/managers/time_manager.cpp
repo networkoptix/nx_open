@@ -20,6 +20,8 @@
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 #include <transaction/transaction_message_bus.h>
 
@@ -371,6 +373,29 @@ namespace ec2
         return getSyncTimeNonSafe();
     }
 
+    ApiTimeData TimeSynchronizationManager::getTimeInfo() const
+    {
+        QMutexLocker lk(&m_mutex);
+        ApiTimeData result;
+        result.value = getSyncTimeNonSafe();
+        result.isPrimaryTimeServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
+        if (m_resCtx.pool)
+        {
+            const auto allServers = m_resCtx.pool->getResources<QnMediaServerResource>();
+            for (const auto& server: allServers)
+            {
+                const auto guidStr = server->getId().toByteArray();
+                if (m_usedTimeSyncInfo.timePriorityKey.seed ==
+                    crc32(0, (const Bytef*)guidStr.constData(), guidStr.size()))
+                {
+                    result.primaryTimeServerGuid = server->getId();
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     void TimeSynchronizationManager::primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran )
     {
         quint64 localTimePriorityBak = 0;
@@ -581,6 +606,12 @@ namespace ec2
             rttMillis );
         if (m_localTimePriorityKey.toUInt64() != localTimePriorityBak)
             handleLocalTimePriorityKeyChange(&lk);
+    }
+
+    void TimeSynchronizationManager::setContext(const ResourceContext& resCtx)
+    {
+        QMutexLocker lk(&m_mutex);
+        m_resCtx = resCtx;
     }
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(

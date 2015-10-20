@@ -56,6 +56,8 @@
 
 namespace ec2
 {
+    struct ResourceContext;
+
     /*!
         \note \a sequence has less priority than \a TimeSynchronizationManager::peerIsServer and \a TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
     */
@@ -139,6 +141,7 @@ namespace ec2
         
         //!Returns synchronized time (millis from epoch, UTC)
         qint64 getSyncTime() const;
+        ApiTimeData getTimeInfo() const;
         //!Called when primary time server has been changed by user
         void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
         void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
@@ -157,6 +160,7 @@ namespace ec2
             const QnUuid& peerID,
             const nx_http::StringType& serializedTimeSync,
             AbstractStreamSocket* sock );
+        void setContext(const ResourceContext& resCtx);
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
@@ -254,6 +258,7 @@ namespace ec2
         bool m_timeSynchronized;
         int m_internetSynchronizationFailureCount;
         std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
+        ResourceContext m_resCtx;
 
         /*!
             \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal

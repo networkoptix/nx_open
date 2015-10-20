@@ -316,6 +316,7 @@ namespace ec2
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
     {
         m_resCtx = resCtx;
+        m_timeSynchronizationManager->setContext(m_resCtx);
     }
 
     void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )

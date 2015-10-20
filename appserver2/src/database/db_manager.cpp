@@ -3577,7 +3577,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamW
 // getCurrentTime
 ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
 {
-    currentTime.value = TimeSynchronizationManager::instance()->getSyncTime();
+    currentTime = TimeSynchronizationManager::instance()->getTimeInfo();
     return ErrorCode::ok;
 }
 
