@@ -15,59 +15,6 @@
 #include <mutex>
 #include <numeric>
 
-namespace aux
-{
-    template<typename Cont>
-    typename Cont::const_iterator 
-    constIteratorFromReverse(typename Cont::reverse_iterator it)
-    {
-        return (it+1).base();
-    }
-
-#define DEFINE_EQUAL_RANGE_BY_MEMBER(memberName) \
-    template< \
-        typename ForwardIt, \
-        typename T, \
-        typename CheckMember = decltype( \
-                     std::declval<typename std::iterator_traits<ForwardIt>::value_type>().memberName, void() \
-                 ), \
-        typename CheckMemberType = typename std::enable_if< \
-                                        std::is_same< \
-                                            typename std::remove_reference<T>::type, \
-                                            typename std::remove_reference< \
-                                                decltype(std::declval<typename std::iterator_traits<ForwardIt>::value_type>().memberName) \
-                                            >::type \
-                                        >::value>::type \
-    > \
-    struct equalRangeByHelper \
-    { \
-        std::pair<ForwardIt, ForwardIt> operator ()(ForwardIt begin , ForwardIt end, T&& value) \
-        { \
-            std::pair<ForwardIt, ForwardIt> result = std::make_pair(end, end); \
-            while (begin != end) \
-            { \
-                if (result.first == end && begin->memberName == value) \
-                    result.first = begin; \
-                if (result.first != end && begin->memberName != value) \
-                { \
-                    result.second = begin; \
-                    break; \
-                } \
-                ++begin; \
-            } \
-            return result; \
-        } \
-    }; \
-     \
-    template<typename ForwardIt, typename T> \
-    std::pair<ForwardIt, ForwardIt> equalRangeBy_##memberName(ForwardIt begin , ForwardIt end, T&& value) \
-    { \
-        return equalRangeByHelper<ForwardIt, T>()(begin, end, std::forward<T>(value)); \
-    }
-
-    DEFINE_EQUAL_RANGE_BY_MEMBER(startTimeMs)
-}
-
 static std::once_flag QnScheduleSync_flag;
 static QnScheduleSync *QnScheduleSync_instance = nullptr;
 
@@ -484,8 +431,6 @@ void QnScheduleSync::start()
                 {
                     m_syncing = true;
                     m_syncTimePoint = 0;
-                    m_syncData.clear();
-
                     synchronize(
                         [this, isItTimeForSync]
                         {
@@ -498,6 +443,7 @@ void QnScheduleSync::start()
                             return false;
                         }
                     );
+                    m_syncData.clear();
                     m_forced  = false;
                     m_syncing = false;
                 }
