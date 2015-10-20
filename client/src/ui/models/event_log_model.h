@@ -10,8 +10,10 @@
 #include <business/business_fwd.h>
 #include <business/business_action_parameters.h>
 
+#include <ui/workbench/workbench_context_aware.h>
 
-class QnEventLogModel: public QAbstractItemModel {
+
+class QnEventLogModel: public QAbstractItemModel, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef QAbstractItemModel base_type;
 
@@ -61,7 +63,7 @@ private:
 
     static QVariant iconData(const Column& column, const QnBusinessActionData &action);
     static QVariant mouseCursorData(const Column& column, const QnBusinessActionData &action);
-    static QString textData(const Column& column, const QnBusinessActionData &action);
+    QString textData(const Column& column, const QnBusinessActionData &action) const;
     static int helpTopicIdData(const Column& column, const QnBusinessActionData &action);
 
     static QString motionUrl(Column column, const QnBusinessActionData& action);
@@ -76,7 +78,7 @@ private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QFont m_linkFont;
-    DataIndex* m_index;
+    QScopedPointer<DataIndex> m_index;
     static QHash<QnUuid, QnResourcePtr> m_resourcesHash;
 };
 

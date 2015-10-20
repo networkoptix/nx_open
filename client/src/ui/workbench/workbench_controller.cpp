@@ -1187,7 +1187,12 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem
     if(widget == NULL)
         return;
 
-    widget->item()->setRotation(0);
+    int rotation = 0;
+    if (widget->resource() && widget->resource()->hasProperty(QnMediaResource::rotationKey())) {
+        rotation = widget->resource()->getProperty(QnMediaResource::rotationKey()).toInt();        
+    }
+
+    widget->item()->setRotation(rotation);
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {

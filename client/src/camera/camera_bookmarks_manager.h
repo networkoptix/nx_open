@@ -57,6 +57,18 @@ public:
     /// @param query            Target query.
     /// @param callback         Callback for receiving bookmarks data.
     void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
+
+signals:
+    /* TODO: #dklychkov #2.6 #bookmarks Implement notification transactions bor bookmarks which will call these signals. */
+    // So far these signals are emited when the user does something locally.
+    /// @brief                  This signal is emitted when new bookmark was added.
+    void bookmarkAdded(const QnCameraBookmark &bookmark);
+    /// @brief                  This signal is emitted when the bookmark was updated.
+    void bookmarkUpdated(const QnCameraBookmark &bookmark);
+    /// @brief                  This signal is emitted when the bookmark was removed.
+    /// @param                  The removed bookmark GUID.
+    void bookmarkRemoved(const QnUuid &bookmarkId);
+
 protected:
     Q_DECLARE_PRIVATE(QnCameraBookmarksManager);
 

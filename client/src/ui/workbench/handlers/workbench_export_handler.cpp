@@ -255,16 +255,12 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QRectF zoomRect = itemData.zoomRect;
     qreal customAr = widget->resource()->customAspectRatio();
 
-    int timeOffset = 0;
-    if (qnSettings->timeMode() == Qn::ServerTimeMode) {
-        // time difference between client and server
-        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
-    }
+    int timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
 
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
     QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
             ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs + timeOffset).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs + timeOffset).toString(lit("hh_mm_ss"));
+            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
     while (true) {

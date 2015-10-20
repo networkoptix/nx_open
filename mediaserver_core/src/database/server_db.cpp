@@ -225,10 +225,9 @@ QnServerDb::QnServerDb():
     m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
     m_tran(m_sdb, m_mutex)
 {
-    const QString dbName = closeDirPath(MSSettings::roSettings()->value( "eventsDBFilePath", getDataDirectory()).toString())
+    const QString fileName = closeDirPath(MSSettings::roSettings()->value( "eventsDBFilePath", getDataDirectory()).toString())
         + QString(lit("mserver.sqlite"));
-    m_sdb = QSqlDatabase::addDatabase("QSQLITE");
-    m_sdb.setDatabaseName(dbName);
+    addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())
     {
         if (!createDatabase()) // create tables is DB is empty

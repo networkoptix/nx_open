@@ -90,10 +90,13 @@ Window {
 
     QnMainStackView {
         id: stackView
+
         anchors.top: toolBar.bottom
-        anchors.bottom: navigationBarPlaceholder.top
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: navigationBarPlaceholder.realHeight
         anchors.left: parent.left
-        anchors.right: navigationBarPlaceholder.left
+        anchors.right: parent.right
+        anchors.rightMargin: navigationBarPlaceholder.realWidth
 
         onCurrentItemChanged: {
             if (currentItem) {
@@ -105,11 +108,11 @@ Window {
 
     Item {
         id: overlayBound
-        anchors.top: parent.top
+
+        anchors.fill: parent
         anchors.topMargin: toolBar.statusBarHeight
-        anchors.bottom: navigationBarPlaceholder.top
-        anchors.left: parent.left
-        anchors.right: navigationBarPlaceholder.left
+        anchors.bottomMargin: navigationBarPlaceholder.realHeight
+        anchors.rightMargin: navigationBarPlaceholder.realWidth
 
         z: 10.0
 
@@ -223,9 +226,9 @@ Window {
 
         if (isPhone && Screen.primaryOrientation == Qt.LandscapeOrientation) {
             navigationBarPlaceholder.realWidth = navBarSize
-            navigationBarPlaceholder.realHeight = 1
+            navigationBarPlaceholder.realHeight = 0
         } else {
-            navigationBarPlaceholder.realWidth = 1
+            navigationBarPlaceholder.realWidth = 0
             navigationBarPlaceholder.realHeight = navBarSize
         }
     }

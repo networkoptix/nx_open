@@ -308,30 +308,15 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
         role = QnStreamRecorder::Role_FileExportWithEmptyContext;
     QnLayoutItemData itemData = m_layout->getItem(resource->toResource()->getId());
 
-    int timeOffset = 0;
-    if(qnSettings->timeMode() == Qn::ServerTimeMode) {
-        // time difference between client and server
-        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
-    }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
     
-    QnImageFilterHelper imageParameters;
-   // imageParameters.setSrcRect(itemData.zoomRect);
-   // imageParameters.setContrastParams(itemData.contrastParams);
-   // imageParameters.setDewarpingParams(resource->getDewarpingParams(), itemData.dewarpingParams);
-   // imageParameters.setRotation(itemData.rotation);
-   // imageParameters.setCustomAR(resource->customAspectRatio());
-   // imageParameters.setTimeCorner(Qn::NoCorner, timeOffset, 0);
-   // imageParameters.setVideoLayout(resource->getVideoLayout());
-
     m_currentCamera->exportMediaPeriodToFile(m_period,
                                     uniqId,
                                     lit("mkv"),
                                     m_storage,
                                     role,
                                     serverTimeZone,
-                                    imageParameters
-
+                                    QnImageFilterHelper()
                                     );
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_targetFilename).fileName()));

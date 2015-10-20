@@ -441,12 +441,8 @@ namespace ec2
                 m_localTimePriorityKey.flags &= ~peerTimeSetByUser;
             }
             newLocalTimePriority = m_localTimePriorityKey.toUInt64();
-            if( newLocalTimePriority != localTimePriorityBak && QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
-                Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
-                    &QnDbManager::saveMiscParam,
-                    QnDbManager::instance(),
-                    TIME_PRIORITY_KEY_PARAM_NAME,
-                    QByteArray::number(newLocalTimePriority) ) ) );
+            if (newLocalTimePriority != localTimePriorityBak)
+                handleLocalTimePriorityKeyChange(&lk);
         }
 
         /* Can cause signal, going out of mutex locker. */
@@ -575,6 +571,7 @@ namespace ec2
         }
 
         QnMutexLocker lk( &m_mutex );
+        const auto localTimePriorityBak = m_localTimePriorityKey.toUInt64();
         remotePeerTimeSyncUpdate(
             &lk,
             peerID,
@@ -582,6 +579,8 @@ namespace ec2
             remotePeerTimeSyncInfo.syncTime + rttMillis / 2,
             remotePeerTimeSyncInfo.timePriorityKey,
             rttMillis );
+        if (m_localTimePriorityKey.toUInt64() != localTimePriorityBak)
+            handleLocalTimePriorityKeyChange(&lk);
     }
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
@@ -628,7 +627,13 @@ namespace ec2
             remotePeerSyncTime,
             remotePeerTimePriorityKey ); 
         if( needAdjustClockDueToLargeDrift )
+        {
+            const auto isTimeSynchronizedByThisServer = 
+                m_localTimePriorityKey.seed == m_usedTimeSyncInfo.timePriorityKey.seed;
             ++m_usedTimeSyncInfo.timePriorityKey.sequence;   //for case if synchronizing because of time drift
+            if (isTimeSynchronizedByThisServer)
+                m_localTimePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence;
+        }
         const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed() - m_usedTimeSyncInfo.monotonicClockValue;
         //saving synchronized time to DB
         m_timeSynchronized = true;
@@ -997,12 +1002,8 @@ namespace ec2
             addInternetTimeSynchronizationTask();
 
             newLocalTimePriority = m_localTimePriorityKey.toUInt64();
-            if( newLocalTimePriority != localTimePriorityBak && QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
-                Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
-                    &QnDbManager::saveMiscParam,
-                    QnDbManager::instance(),
-                    TIME_PRIORITY_KEY_PARAM_NAME,
-                    QByteArray::number(newLocalTimePriority) ) ) );
+            if (newLocalTimePriority != localTimePriorityBak)
+                handleLocalTimePriorityKeyChange(&lk);
         }
 
         /* Can cause signal, going out of mutex locker. */
@@ -1164,7 +1165,7 @@ namespace ec2
         }
     }
 
-    void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QnMutexLockerBase* const /*lock*/ )
+    void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QnMutexLockerBase* const lock )
     {
         m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
         m_systemTimeByPeer.clear();
@@ -1175,6 +1176,7 @@ namespace ec2
             m_monotonicClock.elapsed(),
             currentMSecsSinceEpoch(),
             m_localTimePriorityKey);
+        handleLocalTimePriorityKeyChange(lock);
     }
 
     void TimeSynchronizationManager::checkSystemTimeForChange()
@@ -1186,27 +1188,16 @@ namespace ec2
         }
 
         const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
-        const auto curMonotonicClock = m_monotonicClock.elapsed();
-        if (m_prevSysTime)
+        if (qAbs(getSyncTime() - curSysTime) > SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS)
         {
-            const auto timeDiff = 
-                curMonotonicClock - m_prevMonotonicClock.get() -
-                abs(curSysTime - m_prevSysTime.get());
-
-            if (abs(timeDiff) > SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS)
+            //local OS time has been changed. If system time is set 
+            //by local host time then updating system time
+            if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
+                !(m_localTimePriorityKey.flags & peerTimeSynchronizedWithInternetServer))
             {
-                //local OS time has been changed. If system time is set 
-                    //by local host time then updating system time
-                if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
-                    !(m_localTimePriorityKey.flags & peerTimeSynchronizedWithInternetServer))
-                {
-                    forceTimeResync();
-                }
+                forceTimeResync();
             }
         }
-        
-        m_prevSysTime = curSysTime;
-        m_prevMonotonicClock = curMonotonicClock;
 
         QnMutexLocker lk(&m_mutex);
         if (m_terminated)
@@ -1214,5 +1205,15 @@ namespace ec2
         m_checkSystemTimeTaskID = TimerManager::instance()->addTimer(
             std::bind(&TimeSynchronizationManager::checkSystemTimeForChange, this),
             SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS);
+    }
+
+    void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerBase* const /*lk*/)
+    {
+        if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+            Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
+                &QnDbManager::saveMiscParam,
+                QnDbManager::instance(),
+                TIME_PRIORITY_KEY_PARAM_NAME,
+                QByteArray::number(m_localTimePriorityKey.toUInt64()))));
     }
 }

@@ -241,7 +241,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(Qn::BookmarksModeAction),                    &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_bookmarksModeAction_triggered);
+    connect(action(Qn::BookmarksModeAction),                    &QAction::toggled,      this,   &QnWorkbenchActionHandler::at_bookmarksModeAction_triggered);
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));

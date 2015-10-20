@@ -42,9 +42,10 @@
 #include <ui/common/palette.h>
 #include "ui/style/globals.h"
 #include <ui/widgets/views/checkboxed_header_view.h>
-#include "ui/workbench/workbench_context_aware.h"
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include "ui/workbench/extensions/workbench_stream_synchronizer.h"
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 
 namespace {
@@ -63,6 +64,13 @@ namespace {
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
+
+QnAuditItemDelegate::QnAuditItemDelegate(QObject *parent) 
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
+    , m_defaultSectionHeight(0)
+    , m_widthHint(-1)
+{}
 
 void QnAuditItemDelegate::setDefaultSectionHeight(int value) 
 { 
@@ -104,9 +112,9 @@ QSize QnAuditItemDelegate::defaultSizeHint(const QStyleOptionViewItem & option, 
 QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     static const QDateTime dateTimePattern = QDateTime::fromString(lit("2015-12-12T23:59:59"), Qt::ISODate);
-    static const QString dateTimeStr = dateTimePattern.toString(Qt::DefaultLocaleShortDate);
-    static const QString timeStr = dateTimePattern.time().toString(Qt::DefaultLocaleShortDate);
-    static const QString dateStr = dateTimePattern.date().toString(Qt::DefaultLocaleShortDate);
+    static const QString dateTimeStr = dateTimePattern.toString(Qt::SystemLocaleShortDate);
+    static const QString timeStr = dateTimePattern.time().toString(Qt::SystemLocaleShortDate);
+    static const QString dateStr = dateTimePattern.date().toString(Qt::SystemLocaleShortDate);
 
     QSize result;
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
@@ -198,9 +206,9 @@ void QnAuditItemDelegate::paintRichDateTime(QPainter * painter, const QStyleOpti
 {
     if (dateTimeSecs == 0)
         return;
-    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeSecs * 1000ll);
-    QString dateStr = dateTime.date().toString(Qt::DefaultLocaleShortDate) + QString(lit(" "));
-    QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);
+    QDateTime dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(dateTimeSecs * 1000ll);
+    QString dateStr = dateTime.date().toString(Qt::SystemLocaleShortDate) + L' ';
+    QString timeStr = dateTime.time().toString(Qt::SystemLocaleShortDate);
     
     QFontMetrics fm(option.font);
     int timeXOffset = fm.size(0, dateStr).width();
@@ -331,13 +339,13 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
     }
 
 
-    auto filter = [&keywords, &disabledTypes] (const QnAuditRecord& record) 
+    auto filter = [&keywords, &disabledTypes, this] (const QnAuditRecord& record) 
     {
         if (disabledTypes & record.eventType)
             return false;
 
         bool matched = true;
-        QString wholeText = QnAuditLogModel::makeSearchPattern(&record);
+        QString wholeText = m_camerasModel->makeSearchPattern(&record);
         for (const auto& keyword: keywords) {
             if (!wholeText.contains(keyword, Qt::CaseInsensitive)) {
                 matched = false;
