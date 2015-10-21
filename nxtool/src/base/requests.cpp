@@ -199,7 +199,9 @@ namespace /// Parsers stuff
         if (!object.contains(kErrorTag))
             return false;
 
-        return (object.value(kErrorTag).toInt() != 0);
+        /// in response int is string! - for example: error: "3"
+        const int code = object.value(kErrorTag).toString().toInt();    
+        return (code != 0);
     }
   
     typedef std::function<bool (const QJsonObject &object
@@ -345,7 +347,7 @@ namespace /// Parsers stuff
 
             const QJsonObject object = QJsonDocument::fromJson(data.data()).object();
             const auto code = (isErrorReply(object) 
-                ? rtu::RequestError::kInternalAppError : rtu::RequestError::kSuccess);
+                ? rtu::RequestError::kInvalidParam : rtu::RequestError::kSuccess);
             const bool restart = needRestart(object);
             callback(code, affected, restart);
         };
@@ -362,7 +364,7 @@ namespace /// Parsers stuff
 
             const QJsonObject object = QJsonDocument::fromJson(data.data()).object();
             const auto code = (isErrorReply(object) 
-                ? rtu::RequestError::kInternalAppError : rtu::RequestError::kSuccess);
+                ? rtu::RequestError::kInvalidParam : rtu::RequestError::kSuccess);
 
             callback(code, affected);
         };
