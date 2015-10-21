@@ -271,8 +271,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
-    m_firstStorageTestDone(false),
-    m_writeInfoFileOn(true)
+    m_firstStorageTestDone(false)
 {
     Q_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
@@ -299,8 +298,6 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
-
-    startWriteCameraInfoFiles();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -1131,6 +1128,8 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 
 void QnStorageManager::clearSpace()
 {
+    writeCameraInfoFiles();
+
     testOfflineStorages();
     {
         QnMutexLocker lock( &m_sdbMutex );
@@ -1556,68 +1555,61 @@ void QnStorageManager::testStoragesDone()
         rebuildCatalogAsync(); // continue to rebuild
 }
 
-void QnStorageManager::startWriteCameraInfoFiles()
+void QnStorageManager::writeCameraInfoFiles()
 {
-    m_writeInfoFilesFuture = std::async(
-        std::launch::async,
-        [this]
+    for (auto &storage : getWritableStorages())
+    {
+        auto storageUrl = storage->getUrl();
+        auto separator  = getPathSeparator(storageUrl);
+
+        std::array<QString, 2> paths = {
+            closeDirPath(storageUrl) + 
+            DeviceFileCatalog::prefixByCatalog(
+                QnServer::ChunksCatalog::HiQualityCatalog
+            ) + separator
+            ,
+            closeDirPath(storageUrl) + 
+            DeviceFileCatalog::prefixByCatalog(
+                QnServer::ChunksCatalog::LowQualityCatalog
+            ) + separator
+        };
+
+        for (int i = 0; i < 2; ++i) 
         {
-            std::this_thread::sleep_for(WRITE_INFO_FILES_INTERVAL);
-            if (!m_writeInfoFileOn)
-                return;
-
-            for (auto &storage : getWritableStorages())
+            for (auto it = m_devFileCatalog[i].cbegin(); 
+                 it != m_devFileCatalog[i].cend(); 
+                 ++it)
             {
-                auto storageUrl = storage->getUrl();
-                auto separator  = getPathSeparator(storageUrl);
+                const auto cameraName = it.key();
+                auto resource = qnResPool->getResourceByUniqueId(
+                    cameraName
+                );
+                if (!resource)
+                    continue;
+                auto camResource = resource.dynamicCast<QnSecurityCamResource>();
+                if (!camResource || camResource->cameraInfoSavedToDisk())
+                    continue;
 
-                std::array<QString, 2> paths = {
-                    closeDirPath(storageUrl) + 
-                    DeviceFileCatalog::prefixByCatalog(
-                        QnServer::ChunksCatalog::HiQualityCatalog
-                    ) + separator
-                    ,
-                    closeDirPath(storageUrl) + 
-                    DeviceFileCatalog::prefixByCatalog(
-                        QnServer::ChunksCatalog::LowQualityCatalog
-                    ) + separator
-                };
-
-                for (auto it = paths.cbegin(); it != paths.cend(); ++it) 
-                {
-                    for (const auto &entry : storage->getFileList(*it))
-                    {
-                        auto resource = qnResPool->getResourceByUniqueId(
-                            entry.fileName()
-                        );
-                        if (!resource)
-                            continue;
-                        auto camResource = resource.dynamicCast<QnSecurityCamResource>();
-                        if (!camResource)
-                            continue;
-                        auto outFile = std::unique_ptr<QIODevice>(
-                            storage->open(
-                                closeDirPath(entry.absoluteFilePath()) + lit("info.txt"),
-                                QIODevice::WriteOnly
-                            )
-                        );
-                        if (!outFile)
-                            continue;
+                auto path = paths[i] + cameraName + separator + lit("info.txt");
+                auto outFile = std::unique_ptr<QIODevice>(
+                    storage->open(path, QIODevice::WriteOnly)
+                );
+                if (!outFile)
+                    continue;
                         
-                        outFile->write(
-                            static_cast<std::stringstream&>(
-                                std::stringstream() 
-                                  << "cameraName="  << camResource->getUserDefinedName().toLatin1().constData() << std::endl
-                                  << "cameraModel=" << camResource->getModel().toLatin1().constData()           << std::endl
-                                  << "groupID="     << camResource->getGroupId().toLatin1().constData()         << std::endl
-                                  << "groupName="   << camResource->getGroupName().toLatin1().constData()       << std::endl
-                            ).str().c_str()
-                        );                            
-                    }
-                } // for paths
-            } // for storages
-        } // lambda
-    ); // async
+                outFile->write(
+                    static_cast<std::stringstream&>(
+                        std::stringstream() 
+                            << "cameraName="  << camResource->getUserDefinedName().toLatin1().constData() << std::endl
+                            << "cameraModel=" << camResource->getModel().toLatin1().constData()           << std::endl
+                            << "groupID="     << camResource->getGroupId().toLatin1().constData()         << std::endl
+                            << "groupName="   << camResource->getGroupName().toLatin1().constData()       << std::endl
+                    ).str().c_str()
+                ); 
+                camResource->setCameraInfoSavedToDisk();
+            } // for catalogs
+        } // for qualities
+    } // for storages
 }
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
@@ -1660,8 +1652,6 @@ void QnStorageManager::stopAsyncTasks()
         m_rebuildArchiveThread = 0;
     }
     qnScheduleSync->stop();
-    m_writeInfoFileOn = false;
-    m_writeInfoFilesFuture.wait();
 }
 
 void QnStorageManager::updateStorageStatistics()
