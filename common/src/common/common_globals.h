@@ -40,7 +40,7 @@ namespace Qn
             CameraCapabilities 
             PtzDataFields PtzCapabilities PtzTraits 
             MotionTypes TimePeriodTypes 
-            ServerFlags CameraStatusFlags IOPortTypes)
+            ServerFlags TimeFlags CameraStatusFlags IOPortTypes)
 public:
 #else
     Q_NAMESPACE
@@ -353,6 +353,22 @@ public:
 
     Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
+
+
+    enum TimeFlag
+    {
+        TF_none = 0x0,
+        TF_peerIsNotEdgeServer = 0x0001,
+        TF_peerHasMonotonicClock = 0x0002,
+        TF_peerTimeSetByUser = 0x0004,
+        TF_peerTimeSynchronizedWithInternetServer = 0x0008,
+        TF_peerIsServer = 0x1000
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TimeFlag)
+
+    Q_DECLARE_FLAGS(TimeFlags, TimeFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TimeFlags)
+
 
     enum IOPortType {
         PT_Unknown  = 0x0,
@@ -789,7 +805,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::TimeFlags)(Qn::CameraStatusFlags),
     (metatype)(numeric)(lexical)
 )
 
