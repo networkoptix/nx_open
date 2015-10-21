@@ -1,25 +1,35 @@
 
 from django.utils import timezone
-from django.db import models
+
+from django import db
+import logging
+import models
+logger = logging.getLogger('django')
+
+from api.controllers.cloud_api import account
 
 class AccountBackend(object):
     def authenticate(self, username=None, password=None):
-        checkUser = True # call cloud here
+
+        logger.debug("authentificate " + username)
+
+        checkUser = account.get(username, password)
+        logger.debug(checkUser)
 
         if checkUser:
-            return User.objects.get(username=username)
+            return models.Account.objects.get(email=username)
         return None
 
     def get_user(self, user_id):
         try:
-            return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
+            return models.Account.objects.get(pk=user_id)
+        except models.Account.DoesNotExist:
             return None
 
-class AccountManager(models.Manager):
+class AccountManager(db.models.Manager):
 
     """Custom manager for Account."""
-    def _create_user(self, email, **extra_fields):
+    def _create_user(self, email, password, **extra_fields):
         """Create and save an Account with the given email and password.
         :param str email: user email
         :param str password: user password
@@ -36,6 +46,9 @@ class AccountManager(models.Manager):
         last_name = extra_fields.pop("last_name", True)
         created_date = now
 
+        if account.register(email, password, first_name, last_name) == None :
+            return None
+
         user = self.model(email=email,
                           first_name=first_name,
                           last_name=last_name,
@@ -44,8 +57,8 @@ class AccountManager(models.Manager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, **extra_fields):
-        return self._create_user(email, **extra_fields)
+    def create_user(self, email, password, **extra_fields):
+        return self._create_user(email, password, **extra_fields)
 
-    def create_superuser(self, email, **extra_fields):
-        return self._create_user(email, **extra_fields)
+    def create_superuser(self, email, password, **extra_fields):
+        return self._create_user(email, password, **extra_fields)

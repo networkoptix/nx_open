@@ -38,11 +38,13 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'api',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -82,7 +84,8 @@ DATABASES = {
         'NAME': 'nx_cloud',
         'USER': 'root',
         'PASSWORD': '', #'KME2m9TjsvDugs',
-        'HOST': 'localhost'
+        'HOST': '127.0.0.1',
+        'PORT': '3306'
     }
 }
 
@@ -101,24 +104,55 @@ USE_L10N = True
 USE_TZ = True
 
 
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+            },
+        },
+    'loggers': {
+        'django': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console']
+            },
+        }
+    }
+
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
 
+
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    'DEFAULT_PERMISSION_CLASSES': (
+       'rest_framework.permissions.AllowAny',
+    )
 }
 
 CLOUD_CONNECT = {
-    'url': 'http://10.0.2.106:3346',
+    'url': 'http://10.0.3.41:3346',
     'customization':'default',
     'password_realm':'VMS'
 }
 
 AUTH_USER_MODEL = 'api.Account'
-AUTHENTICATION_BACKENDS = ('api.account.AccountBackend')
+AUTHENTICATION_BACKENDS = ('api.account.AccountBackend',)
+
+
+CORS_ORIGIN_ALLOW_ALL = True #Change this value on production!
+CORS_ALLOW_CREDENTIALS = True

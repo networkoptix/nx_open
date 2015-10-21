@@ -2,9 +2,17 @@ __author__ = 'noptix'
 
 from requests.auth import HTTPDigestAuth
 from hashlib import md5
+from  cloud import settings
+import logging
+import requests
+import django
+
+logger = logging.getLogger('django')
 
 class account(object):
-    def register(email,password,firstName, lastName):
+
+    @staticmethod
+    def register(email, password, first_name, last_name):
         '''
             <function>
                 <name>register</name>
@@ -39,17 +47,34 @@ class account(object):
         '''
 
 
-        customization = CLOUD_CONNECT['customization']
-        realm = CLOUD_CONNECT['password_realm']
-        api_url = CLOUD_CONNECT['url']
+        customization = settings.CLOUD_CONNECT['customization']
+        realm = settings.CLOUD_CONNECT['password_realm']
+        api_url = settings.CLOUD_CONNECT['url']
 
-        passwordString = '%:%:%'%(username,realm,password)
+        passwordString = '%s:%s:%s' % (email, realm, password)
         passwordHA1 = md5(passwordString).hexdigest()
-        fullName = '% %'%(firstName,lastName)
 
-        #
-        request = '%/register?email=%&passwordHA1=%&fullName=%&customization=%' % (api_url,email,passwordHA1,fullName,customization)
+
+        full_name = '%s %s' % (first_name, last_name)
+
+
+        request = '%s/account/register?%s' % (api_url, django.utils.http.urlencode({
+            'email':email,
+            'passwordHa1':passwordHA1,
+            'fullName':full_name,
+            'customization':customization
+        }))
+
+
         response = requests.get(request)
+
+        logger.debug({"passwordString":passwordString,"passwordHA1":passwordHA1})
+        logger.debug(request)
+        logger.debug(response.status_code)
+        logger.debug(response.text)
+        logger.debug('------------------------------------------------------------')
+
+
         if response.status_code != 200:
             return None
 
@@ -57,43 +82,17 @@ class account(object):
         # REMOVE quotes here, or unJSON
         return code
 
-    def activate(code):
-        '''
-            <function>
-                <name>activate</name>
-                <description></description>
-                <method>GET</method>
-                <params>
-                    <param>
-                        <name>code</name>
-                        <description>Activation code provided by register method</description>
-                        <optional>false</optional>
-                    </param>
-                </params>
-                <result>
-                    <caption>Account data JSON</caption>
-                </result>
-            </function>
-        '''
-        return None
 
-    def get(code):
-
-
-        # url = 'http://httpbin.org/digest-auth/auth/user/pass'
-
+    @staticmethod
+    def get(email=None, password=None):
         # TODO: create wrappers
-        result = requests.get(CLOUD_CONNECT['url'], auth=HTTPDigestAuth(email, password))
+        request = settings.CLOUD_CONNECT['url'] + "/account/get"
 
-        '''
-            <function>
-                <name>get</name>
-                <description>Get account information. Server determines account to return by provided credentials (email/password)</description>
-                <method>GET</method>
-                <result>
-                    <caption>Account data JSON</caption>
-                </result>
-            </function>
-        '''
+        response = requests.get(request, auth=HTTPDigestAuth(email, password))
 
-        return None;
+        logger.debug(request)
+        logger.debug(response.status_code)
+        logger.debug(response.text)
+        logger.debug('------------------------------------------------------------')
+
+        return response.json()

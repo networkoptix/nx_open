@@ -9,8 +9,9 @@ class Account(models.Model):
     first_name = models.CharField(max_length = 255)
     last_name = models.CharField(max_length = 255)
     created_date = models.DateField()
-    activated_date = models.DateField()
-    last_login = models.DateField()
+    activated_date = models.DateField(null=True, blank=True)
+    last_login = models.DateField(null=True, blank=True)
+    subscribe = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']

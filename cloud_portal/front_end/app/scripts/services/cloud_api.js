@@ -4,11 +4,29 @@ angular.module('cloudApp')
     .factory('cloudApi', function ($http, $q) {
 
         var apiBase = Config.apiBase;
+        var accountCache = null;
         return {
-            account:function(firstName,lastName,subscribe){
-                if(!data) {
-                    return $http.get(apiBase + '/account');
+            account:function(){
+                var defer = $q.defer();
+                if(!accountCache){
+                    $http.get(apiBase + '/account').then(function(response){
+                        accountCache = response.data;
+                        console.log("account",accountCache);
+                        defer.resolve(accountCache);
+                    },function(error){
+                        console.error(error);
+
+                        accountCache = null;
+                        defer.resolve(null);
+                        return null
+                    })
+                }else{
+                    defer.resolve(accountCache);
                 }
+                return defer.promise;
+            },
+
+            accountPost:function(firstName,lastName,subscribe){
                 return $http.post(apiBase + '/account',{
                     firstName:firstName,
                     lastName:lastName,

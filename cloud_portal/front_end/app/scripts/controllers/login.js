@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('LoginCtrl', function ($scope,cloudApi) {
+    .controller('LoginCtrl', function ($scope, cloudApi, $location) {
 
         function reloadPage(){
             document.location.reload();
@@ -22,9 +22,9 @@ angular.module('cloudApp')
         $scope.lastName = '';
         $scope.register = function(){
             cloudApi.
-                login($scope.email,$scope.password,$scope.firstName,$scope.lastName,$scope.subscribe).
+                register($scope.email,$scope.password,$scope.firstName,$scope.lastName,$scope.subscribe).
                 then(function(result){
-                    alert("registered. check email to activate your account");
+                    $location.path('/register/success');
                 },errorHandler);
         };
     });
