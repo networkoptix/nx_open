@@ -662,9 +662,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
             m_chunksDB[storage->getUrl()] = sdb;
         }
         else {
-            qWarning()
-                << "can't initialize sqlLite database! Actions log is not created!"
-                << " file open failed: " << fileName;
+            qWarning()  << "can't initialize sqlLite database! File open failed: " << fileName;
             return QnStorageDbPtr();
         }
     }
