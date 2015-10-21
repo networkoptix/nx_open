@@ -42,6 +42,8 @@ private:
     bool lockFile(const QString &filename);
     void unlockFile(const QString &filename);
 
+    bool isBinaryExportSupported() const;
+
 private slots:
     void at_exportTimeSelectionAction_triggered();
 
