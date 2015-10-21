@@ -228,6 +228,7 @@ angular.module('webadminApp')
                     scope.native = true;
                     scope.flashls = false;
 
+                    var autoshow = null;
                     nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
@@ -235,6 +236,16 @@ angular.module('webadminApp')
                             $timeout(function () {
                                 scope.loading = !!format;
                             });
+
+                            if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hach for android bug. remove it later
+                                if(autoshow){
+                                    $timeout.cancel(autoshow);
+                                }
+                                autoshow = $timeout(function () {
+                                    scope.loading = false;
+                                    autoshow = null;
+                                },20000);
+                            }
 
                             scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
