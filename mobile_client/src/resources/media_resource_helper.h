@@ -78,6 +78,7 @@ private:
     int m_nativeStreamIndex;
     QMap<int, QString> m_nativeResolutions;
     bool m_transcodingSupported;
+    Protocol m_nativeProtocol;
 };
 
 #endif // MEDIA_RESOURCE_HELPER_H

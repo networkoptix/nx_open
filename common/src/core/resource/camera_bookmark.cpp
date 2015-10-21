@@ -197,6 +197,40 @@ bool QnCameraBookmarkSearchFilter::isValid() const {
     return startTimeMs <= endTimeMs && limit > 0;
 }
 
+bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmark) const {
+    if (bookmark.startTimeMs >= endTimeMs || bookmark.endTimeMs() <= startTimeMs)
+        return false;
+
+    if (text.isEmpty())
+        return true;
+
+    for (const QString &word: text.split(QRegExp(lit("[\\W]")), QString::SkipEmptyParts)) {
+        bool tagFound = false;
+
+        for (const QString &tag: bookmark.tags) {
+            if (tag.startsWith(word, Qt::CaseInsensitive)) {
+                tagFound = true;
+                break;
+            }
+        }
+
+        if (tagFound)
+            continue;
+
+        QRegExp wordRegExp(lit("\\b%1").arg(word), Qt::CaseInsensitive);
+
+        if (wordRegExp.indexIn(bookmark.name) != -1 ||
+            wordRegExp.indexIn(bookmark.description) != -1)
+        {
+            continue;
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
 void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/) {return ;}
 void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
 

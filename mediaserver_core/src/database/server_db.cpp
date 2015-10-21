@@ -225,10 +225,9 @@ QnServerDb::QnServerDb():
     m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
     m_tran(m_sdb, m_mutex)
 {
-    const QString dbName = closeDirPath(MSSettings::roSettings()->value( "eventsDBFilePath", getDataDirectory()).toString())
+    const QString fileName = closeDirPath(MSSettings::roSettings()->value( "eventsDBFilePath", getDataDirectory()).toString())
         + QString(lit("mserver.sqlite"));
-    m_sdb = QSqlDatabase::addDatabase("QSQLITE");
-    m_sdb.setDatabaseName(dbName);
+    addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())
     {
         if (!createDatabase()) // create tables is DB is empty
@@ -483,6 +482,10 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction() {
 }
 
 bool QnServerDb::createBookmarkTagTriggersUnderTransaction() {
+    /* DO NOT TRY to move this code to sql scripts.
+       It uses semicolons inside SQL queries,
+       thus these queries cannot be read by our primitive lexical sql script parser. */
+
     {
         QString queryStr = 
             "CREATE TRIGGER increment_bookmark_tag_counter AFTER INSERT ON bookmark_tags "

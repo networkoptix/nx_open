@@ -176,8 +176,7 @@ bool QnStorageDb::open(const QString& fileName)
 {
     // TODO: #akulikov If storage is DBReady, DB should work via Storage::IODevice.
     //       But this change requires DB implementation to be able to work via IODevice, and this is not the case right now.
-    m_sdb = QSqlDatabase::addDatabase("QSQLITE", QString("QnStorageManager_%1").arg(fileName));
-    m_sdb.setDatabaseName(fileName);
+    addDatabase(fileName, QString("QnStorageManager_%1").arg(fileName));
     return m_sdb.open() && createDatabase();
 }
 

@@ -1,6 +1,8 @@
 #include "db_helper.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QFileInfo>
+
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QFile>
@@ -165,6 +167,10 @@ bool QnDbHelper::isObjectExists(const QString& objectType, const QString& object
 
 void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
 {
+    QFileInfo dirInfo(fileName);    
+    if (!QDir().mkpath(dirInfo.absoluteDir().path()))
+        qWarning() << "can't create folder for sqlLite database!\n" << fileName;
+
     m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
     m_sdb.setDatabaseName(fileName);
 }

@@ -346,9 +346,8 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     const QString dbFilePath = dbUrl.toLocalFile();
     const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
 
-    m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
     QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
-    m_sdb.setDatabaseName( dbFileName);
+    addDatabase(dbFileName, "QnDbManager");
 
     QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
     bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");

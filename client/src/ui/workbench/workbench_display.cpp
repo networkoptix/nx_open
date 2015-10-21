@@ -1765,9 +1765,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->setOverlayVisible(true, false);
             widget->setInfoVisible(true, false);
 
-            qint64 displayTime = time;
-            if(qnSettings->timeMode() == Qn::ServerTimeMode)
-                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
+            qint64 displayTime = time + context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
             QString timeString = (widget->resource()->toResource()->flags() & Qn::utc) 

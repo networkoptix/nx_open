@@ -30,6 +30,8 @@ QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &
     if (!url.isValid())
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
+    if (via)
+        *via = qnCommon->currentServer();
     return QNetworkProxy(QNetworkProxy::HttpProxy, url.host(), url.port(), url.userName(), url.password());
 }
 

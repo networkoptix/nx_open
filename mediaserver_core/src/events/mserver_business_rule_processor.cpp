@@ -270,12 +270,9 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.startTimeMs = startTime;
     bookmark.durationMs = endTime - startTime;
     bookmark.cameraId = camera->getUniqueId();
-
-    bookmark.name = "Auto-Generated Bookmark";
-    bookmark.description = QString("Rule %1\nFrom %2 to %3")
-        .arg(ruleId.toString())
-        .arg(QDateTime::fromMSecsSinceEpoch(startTime).toString())
-        .arg(QDateTime::fromMSecsSinceEpoch(endTime).toString());
+    bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
+    bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
+    bookmark.tags = action->getParams().tags.split(QRegExp(lit("[ ,]")), QString::SkipEmptyParts).toSet();
 
     return qnServerDb->addBookmark(bookmark);
 }

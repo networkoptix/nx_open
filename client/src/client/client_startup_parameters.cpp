@@ -1,6 +1,7 @@
 
 #include "client_startup_parameters.h"
 
+#include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 
 namespace
@@ -71,6 +72,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     /* Runtime settings */
     addParserParam(commandLineParser, &result.versionMismatchCheckDisabled, "--no-version-mismatch-check");
 
+    /* Custom uri handling */
+    addParserParam(commandLineParser, &result.customUri, lit("%1://").arg(QnAppInfo::applicationUriProtocol()).toUtf8().constData());
+
     QString strVideoWallGuid;
     QString strVideoWallItemGuid;
     addParserParam(commandLineParser, &strVideoWallGuid, "--videowall");
@@ -80,7 +84,8 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
     result.videoWallGuid = QnUuid(strVideoWallGuid);
-    result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
+    result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);    
+
     return result;
 }
 

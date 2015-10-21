@@ -31,17 +31,23 @@ void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmar
     Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
     Q_D(QnCameraBookmarksManager);
     d->addCameraBookmark(bookmark, callback);
+
+    emit bookmarkAdded(bookmark);
 }
 
 void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
     Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
     Q_D(QnCameraBookmarksManager);
     d->updateCameraBookmark(bookmark, callback);
+
+    emit bookmarkUpdated(bookmark);
 }
 
 void QnCameraBookmarksManager::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback) {
     Q_D(QnCameraBookmarksManager);
     d->deleteCameraBookmark(bookmarkId, callback);
+
+    emit bookmarkRemoved(bookmarkId);
 }
 
 QnCameraBookmarkList QnCameraBookmarksManager::cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const {
