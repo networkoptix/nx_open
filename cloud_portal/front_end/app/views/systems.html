@@ -1,0 +1,10 @@
+<hr>
+<div ng-repeat="system in systems" class="col-xs-12	col-sm-6 col-lg-4">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h3>{{system.name}}</h3>
+            <span class="label label-success">{{system.status}}</span><br>
+            <button class="btn btn-default" ng-click="open(system)">Open in Nx Witness</button>
+        </div>
+    </div>
+</div>

@@ -51,6 +51,8 @@ angular.module('cloudApp')
                     subscribe:subscribe
                 });
             },
+
+
             activate:function(){
                 throw "not implemented";
                 return $http.get(apiBase + '/account/activate');
@@ -62,6 +64,11 @@ angular.module('cloudApp')
             changePassword:function(){
                 throw "not implemented";
                 return $http.get(apiBase + '/account/changePassword');
+            },
+
+
+            systems:function(){
+                return $http.get(apiBase + '/systems');
             }
         }
 

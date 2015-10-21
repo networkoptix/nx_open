@@ -36,6 +36,7 @@ def login(request):
 
     if user is not None:
         django.contrib.auth.login(request, user)
+        request.session['password'] = request.data['password'] # TODO: This is awful security hole! But I can't remove it now, because I need password for future requests
     else:
         return Response(False, status=401)
 

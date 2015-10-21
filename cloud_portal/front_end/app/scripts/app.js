@@ -21,6 +21,10 @@ angular.module('cloudApp', [
             templateUrl: 'views/register_success.html',
             controller: 'LoginCtrl'
         })
+        .when('/systems', {
+            templateUrl: 'views/systems.html',
+            controller: 'SystemsCtrl'
+        })
         .otherwise({
             templateUrl: 'views/startPage.html',
             controller: 'StartPageCtrl'

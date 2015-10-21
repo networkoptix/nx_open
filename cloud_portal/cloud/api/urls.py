@@ -1,7 +1,7 @@
 __author__ = 'noptix'
 
 from django.conf.urls import url
-from api.methods import account
+from api.methods import account, systems
 
 urlpatterns = [
     url(r'^account$',                   account.index),
@@ -10,5 +10,8 @@ urlpatterns = [
     url(r'^account/register',           account.register),
     url(r'^account/activate',           account.activate),
     url(r'^account/restorePassword',    account.restorePassword),
-    url(r'^account/changePassword',     account.changePassword)
+    url(r'^account/changePassword',     account.changePassword),
+
+
+    url(r'^systems$',                   systems.list)
 ]

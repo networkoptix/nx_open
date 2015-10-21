@@ -9,6 +9,22 @@ import django
 
 logger = logging.getLogger('django')
 
+class system(object):
+    @staticmethod
+    def list(email, password):
+         # TODO: create wrappers
+        request = settings.CLOUD_CONNECT['url'] + "/system/get"
+
+        response = requests.get(request, auth=HTTPDigestAuth(email, password))
+
+        logger.debug(request)
+        logger.debug(response.status_code)
+        logger.debug(response.text)
+        logger.debug('------------------------------------------------------------')
+
+        return response.json()
+
+
 class account(object):
 
     @staticmethod

@@ -1,5 +1,6 @@
 'use strict';
 
 var Config = {
-    apiBase: '/api'
+    apiBase: '/api',
+    clientProtocol: 'vms://'
 };
