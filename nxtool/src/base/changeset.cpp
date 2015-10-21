@@ -112,13 +112,13 @@ QString rtu::Changeset::getMinimizedProgressText() const
 void rtu::Changeset::addSystemChange(const QString &systemName)
 {
     preparePropChangesData();
-    m_systemName.reset(new QString(systemName));
+    m_systemName.reset(new QString(systemName.trimmed()));
 }
         
 void rtu::Changeset::addPasswordChange(const QString &password)
 {
     preparePropChangesData();
-    m_password.reset(new QString(password));
+    m_password.reset(new QString(password.trimmed()));
 }
         
 void rtu::Changeset::addPortChange(int port)

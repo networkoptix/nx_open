@@ -6,7 +6,6 @@
 #include <version.h>
 
 #include <helpers/http_client.h>
-#include <helpers/json_reply_helper.h>
 #include <helpers/multicast/multicast_http_client.h>
 
 namespace
@@ -205,14 +204,7 @@ QnMulticast::ResponseCallback rtu::RestClient::Impl::makeCallbackForMulticast(co
             emit m_owner->accessMethodChanged(request.target->id, false);
         }
 
-        int jsonError;
-
         if (requestError == rtu::RequestError::kSuccess)
-        {
-            jsonError = rtu::helpers::getJsonReplyError(response.messageBody);
-        }
-
-        if (requestError == rtu::RequestError::kSuccess && !jsonError)
         {
             if (request.replyCallback)
                 request.replyCallback(response.messageBody);
