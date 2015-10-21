@@ -50,6 +50,7 @@ namespace rtu
         , kRequestTimeout
         , kUnauthorized
         , kInternalAppError
+        , kInvalidParam
         , kUnspecified
     };
 

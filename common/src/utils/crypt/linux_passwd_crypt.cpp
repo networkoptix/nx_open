@@ -31,7 +31,7 @@ QByteArray generateSalt( int length )
     QByteArray salt;
     salt.resize( length );
     for( int i = 0; i < length; ++i )
-        salt[i] = BASE64[rand() % (sizeof(BASE64)/sizeof(*BASE64))];
+        salt[i] = BASE64[rand() % (sizeof(BASE64)/sizeof(*BASE64) - 1)];
 
     return salt;
 }
