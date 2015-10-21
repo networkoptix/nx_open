@@ -141,8 +141,6 @@ void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHist
                     return (receivedServers.contains(server->getId()));
             });
 
-            //TODO: #GDM history_refactor remove when debugging will be finished.
-            Q_ASSERT_X(isResultValid, Q_FUNC_INFO, "Normally, we shouldn't get here. It is possible, but not in the local network.");
             if (isResultValid)
                 m_historyValidCameras.insert(detail.cameraId);
 

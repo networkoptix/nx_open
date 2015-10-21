@@ -1598,6 +1598,9 @@ void QnMediaResourceWidget::updateBookmarksMode() {
 }
 
 void QnMediaResourceWidget::updateBookmarks() {
+    if (!m_bookmarksOverlayWidget)
+        return;
+
     if (!m_bookmarksQuery) {
         m_bookmarksOverlayWidget->setBookmarks(QnCameraBookmarkList());
         return;
@@ -1607,6 +1610,9 @@ void QnMediaResourceWidget::updateBookmarks() {
 }
 
 void QnMediaResourceWidget::updateBookmarksVisibility() {
+    if (!m_bookmarksOverlayWidget)
+        return;
+
     auto visibility = Invisible;
     if (m_bookmarksQuery) {
         if (options().testFlag(DisplayInfo))
