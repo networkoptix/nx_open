@@ -183,12 +183,12 @@ private:
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
     
-    void startWriteCameraInfoFiles();
+    void writeCameraInfoFiles();
 
 private:
-    const QnServer::StoragePool   m_role;
-    StorageMap              m_storageRoots;
-    FileCatalogMap          m_devFileCatalog[QnServer::ChunksCatalogCount];
+    const QnServer::StoragePool m_role;
+    StorageMap                  m_storageRoots;
+    FileCatalogMap              m_devFileCatalog[QnServer::ChunksCatalogCount];
 
     mutable QnMutex m_mutexStorages;
     mutable QnMutex m_mutexCatalog;
@@ -227,8 +227,6 @@ private:
     QElapsedTimer m_clearBookmarksTimer;
     QElapsedTimer m_removeEmtyDirTimer;
     QMap<QString, qint64> m_lastCatalogTimes;
-    std::future<void> m_writeInfoFilesFuture;
-    std::atomic<bool> m_writeInfoFileOn;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
