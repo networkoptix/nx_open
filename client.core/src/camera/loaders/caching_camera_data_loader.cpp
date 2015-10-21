@@ -174,7 +174,9 @@ void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
 // -------------------------------------------------------------------------- //
 void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &data, qint64 startTimeMs, Qn::TimePeriodContent dataType) {
     auto timePeriodType = (dataType);
-    m_cameraChunks[timePeriodType] = data->dataSource();
+    m_cameraChunks[timePeriodType] = data 
+        ? data->dataSource()
+        : QnTimePeriodList();
     emit periodsChanged(timePeriodType, startTimeMs);
 
 }
