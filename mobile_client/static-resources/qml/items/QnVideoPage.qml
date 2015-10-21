@@ -15,6 +15,7 @@ QnPage {
     title: mainWindow.currentSystemName
 
     property string resourceId
+    property string initialScreenshot
 
     Rectangle {
         width: mainWindow.width
@@ -75,6 +76,8 @@ QnPage {
         anchors.rightMargin: -navigationBarPlaceholder.realWidth
 
         source: mediaPlayer.mediaPlayer
+        screenshotSource: initialResourceScreenshot
+        screenshotAspectRatio: mediaPlayer.resourceHelper.aspectRatio
 
         onClicked: {
             if (videoNavigation.visible)
@@ -99,6 +102,11 @@ QnPage {
     QnMediaPlayer {
         id: mediaPlayer
         resourceId: videoPlayer.resourceId
+
+        onPlayingChanged: {
+            if (playing)
+                video.screenshotSource = ""
+        }
     }
 
     QnVideoNavigation {

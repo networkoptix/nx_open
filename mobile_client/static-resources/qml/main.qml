@@ -16,6 +16,7 @@ Window {
     visible: true
 
     property string activeResourceId
+    property string initialResourceScreenshot
 
     property string currentSystemName
     property string currentHost
@@ -162,6 +163,7 @@ Window {
         QnVideoPage {
             id: videoPlayerContent
             resourceId: activeResourceId
+            initialScreenshot: initialResourceScreenshot
         }
     }
 
