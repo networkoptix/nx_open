@@ -17,7 +17,7 @@ angular.module('webadminApp')
                 //scope.$watch('[' + attrs.ngData + ',' + attrs.ngParam + ']', function (newVal) {
                     $_current.html(''); // destroy object
 
-                    var content = '<param name="wmode" value="transparent"/> ';
+                    var content = '';
                     var paramsplain ='';
                     _.forEach(scope.ngParam, function (value, name) {
                         content += '<param name="' + name + '" value="' + value + '">';
@@ -25,7 +25,7 @@ angular.module('webadminApp')
                     });
 
                     content +=
-                        '<embed  width="100%" height="100%" wmode="transparent" ' +
+                        '<embed  width="100%" height="100%" ' +
                         'id="' + scope.ngName +
                         '" name="' + scope.ngName +
                         '" src="' + scope.ngSource +

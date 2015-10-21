@@ -6,6 +6,7 @@
 #include "media_stream_cache_detail.h"
 
 #include <core/datapacket/media_data_packet.h>
+#include <utils/common/log.h>
 
 
 namespace detail
@@ -16,7 +17,6 @@ MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
     m_cacheSizeMillis( cacheSizeMillis ),
     m_mutex( QMutex::Recursive ),   //TODO #ak get rid of Recursive mutex
     m_prevPacketSrcTimestamp( -1 ),
-    m_currentPacketTimestamp( 0 ),
     m_cacheSizeInBytes( 0 ),
     m_prevGivenEventReceiverID( 0 )
 {
@@ -40,25 +40,17 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.get());
     const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_AVKey);
+    NX_LOG(lit("HLS. MediaStreamCache. got frame %1, is_key_frame=%2").
+        arg(data->timestamp).arg(isKeyFrame), cl_logDEBUG2);
     if( m_packetsByTimestamp.empty() && !isKeyFrame )
         return; //cache data MUST start with key frame
 
-    //calculating timestamp, because we cannot rely on data->timestamp, since it may contain discontinuity in case of reconnect to camera
     if( m_prevPacketSrcTimestamp == -1 )
-    {
         m_prevPacketSrcTimestamp = data->timestamp;
-        m_currentPacketTimestamp = data->timestamp;
-    }
 
     if( qAbs(data->timestamp - m_prevPacketSrcTimestamp) > MAX_ALLOWED_TIMESTAMP_DIFF )
     {
-        //timestamp discontinuity
-        m_prevPacketSrcTimestamp = data->timestamp;
-    }
-
-    if( data->timestamp > m_prevPacketSrcTimestamp )
-    {
-        m_currentPacketTimestamp += data->timestamp - m_prevPacketSrcTimestamp;
+        //TODO #ak timestamp discontinuity
         m_prevPacketSrcTimestamp = data->timestamp;
     }
 
@@ -69,14 +61,16 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
         rIt != m_packetsByTimestamp.rend();
         ++rIt )
     {
-        if( rIt->timestamp <= m_currentPacketTimestamp )
+        if (rIt->timestamp <= data->timestamp)
         {
             posToInsert = rIt.base();
             break;
         }
     }
 
-    m_packetsByTimestamp.insert( posToInsert, MediaPacketContext( m_currentPacketTimestamp, data, isKeyFrame ) );
+    m_packetsByTimestamp.insert(
+        posToInsert,
+        MediaPacketContext(data->timestamp, data, isKeyFrame));
     if( mediaPacket )
         m_cacheSizeInBytes += mediaPacket->dataSize();
 
@@ -101,7 +95,7 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 #endif
 
     for( auto eventReceiver: m_eventReceivers )
-        eventReceiver.second( m_currentPacketTimestamp );
+        eventReceiver.second(data->timestamp);
     const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
     if( maxTimestamp - m_packetsByTimestamp.front().timestamp > m_cacheSizeMillis*USEC_PER_MS )
     {
@@ -148,7 +142,6 @@ void MediaStreamCache::clear()
     QMutexLocker lk( &m_mutex );
 
     m_prevPacketSrcTimestamp = -1;
-    m_currentPacketTimestamp = 0;
     m_cacheSizeInBytes = 0;
     m_packetsByTimestamp.clear();
 }

@@ -6,6 +6,7 @@
 
 #include <QtCore/QMutexLocker>
 
+#include <utils/common/log.h>
 #include <utils/common/synctime.h>
 #include <utils/media/media_stream_cache.h>
 
@@ -111,6 +112,8 @@ namespace nx_hls
     {
         QMutexLocker lk( &m_mutex );
 
+        NX_LOG(lit("HLSLivePlaylistManager. got key frame %1").arg(currentPacketTimestampUSec), cl_logDEBUG2);
+
         if( m_currentChunk.mediaSequence > 0 )
         {
             m_currentChunk.duration = currentPacketTimestampUSec - m_currentChunk.startTimestamp;
@@ -126,6 +129,8 @@ namespace nx_hls
                 if( chunkIter == m_chunks.end() )
                 {
                     m_chunks.push_back( m_currentChunk );
+                    NX_LOG(lit("HLSLivePlaylistManager. Added chunk (%1:%2). Total chunks %3").
+                        arg(m_chunks.back().startTimestamp).arg(m_chunks.back().duration).arg(m_chunks.size()), cl_logDEBUG2);
                 }
                 else
                 {
@@ -171,6 +176,9 @@ namespace nx_hls
                         keepChunkDataTillTimestamp ) );
 
                     m_totalPlaylistDuration -= m_chunks.front().duration;
+
+                    NX_LOG(lit("HLSLivePlaylistManager. Removing chunk (%1:%2). Total chunks left %3").
+                        arg(m_chunks.front().startTimestamp).arg(m_chunks.front().duration).arg(m_chunks.size()), cl_logDEBUG2);
                     m_chunks.pop_front();
                 }
 

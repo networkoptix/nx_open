@@ -1025,7 +1025,7 @@
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation>Jelölés tgörlése</translation>
+        <translation>Jelölés törlése</translation>
     </message>
     <message>
         <source>Zoom to Selection</source>
