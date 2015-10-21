@@ -49,9 +49,6 @@
                             <optional>false</optional>
                         </param>
                     </params>
-                    <result>
-                        <caption>Account data JSON</caption>
-                    </result>
                 </function>
                 <function>
                     <name>get</name>
