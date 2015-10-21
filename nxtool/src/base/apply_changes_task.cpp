@@ -1411,6 +1411,8 @@ bool rtu::ApplyChangesTask::Impl::addSummaryItem(const ServerInfoCacheItem &item
             return tr("Unauthorized");
         case RequestError::kInternalAppError:
             return tr("Internal error");
+        case RequestError::kInvalidParam:
+            return tr("Invalid parameter");
         default:
             return tr("Unknown error");
         }
