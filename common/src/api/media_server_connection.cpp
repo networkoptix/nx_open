@@ -31,6 +31,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
 #include <utils/common/model_functions.h>
+#include <utils/network/http/httptypes.h>
 
 #include <api/app_server_connection.h>
 #include <event_log/events_serializer.h>

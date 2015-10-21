@@ -1,5 +1,4 @@
 #include "storage_list_model.h"
-#include <ui/workbench/workbench_access_controller.h>
 
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
@@ -71,11 +70,20 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     case TypeColumn:
         return storageData.storageType;
     case TotalSpaceColumn:
-        return QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1) + tr("Gb");
+        return storageData.totalSpace > 0
+            ? tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1))
+            : tr("Invalid storage");
     case RemoveActionColumn:
-        return storageData.isExternal || forcedText ? tr("Remove") : QString();
+        return storageData.isExternal || forcedText 
+            ? tr("Remove") 
+            : QString();
+
     case ChangeGroupActionColumn:
-        return m_isBackupRole ? tr("Use as main storage") : tr("Use as backup storage");
+        return m_isBackupRole 
+            ? tr("Use as main storage") 
+            : m_data.storages.size() > 1
+            ? tr("Use as backup storage")
+            : QString();
     default:
         break;
     }
@@ -101,7 +109,8 @@ QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const
 QVariant QnStorageListModel::mouseCursorData(const QModelIndex &index) const
 {
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
-        return QVariant::fromValue<int>(Qt::PointingHandCursor);
+        if (!index.data(Qt::DisplayRole).toString().isEmpty())
+            return QVariant::fromValue<int>(Qt::PointingHandCursor);
     return QVariant();
 }
 

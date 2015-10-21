@@ -19,9 +19,6 @@
 #include "ui/models/backup_settings_model.h"
 #include "api/model/backup_status_reply.h"
 
-class QnBackupScheduleDialog;
-class QnBackupSettingsDialog;
-
 namespace Ui {
     class StorageConfigWidget;
 }
@@ -50,23 +47,23 @@ private:
     void updateColumnWidth();
     int getColWidth(const QAbstractItemModel* model, int col);
     bool hasUnsavedChanges() const;
+
+    void startRebuid(bool isMain);
+    void cancelRebuild(bool isMain);
+
+    void startBackup();
+    void cancelBackup();
+
 private slots:
     void at_replyReceived(int status, QnStorageSpaceReply reply, int);
     void sendStorageSpaceRequest();
     void at_addExtStorage(bool addToMain);
     
-    void at_rebuildButton_clicked();
-    void at_rebuildCancel_clicked();
-
-    void at_backupButton_clicked();
-    void at_backupCancel_clicked();
-
     void at_openBackupSchedule_clicked();
     void at_openBackupSettings_clicked();
     void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle);
     void at_backupStatusReply(int status, const QnBackupStatusData& reply, int handle);
-    void sendNextArchiveRequestForMain();
-    void sendNextArchiveRequestForBackup();
+    
     void sendNextBackupStatusRequest();
     void at_backupTypeComboBoxChange(int index);
 private:
@@ -75,17 +72,15 @@ private:
     QnStorageResourceList m_storages;
     struct StoragePool
     {
-        StoragePool(): storageSpaceHandle(-1), model(0) {}
+        StoragePool();
         int storageSpaceHandle;
         int rebuildHandle;
-        QnStorageListModel* model;
+        QScopedPointer<QnStorageListModel> model;
         QnStorageScanData prevRebuildState;
     };
 
     StoragePool m_mainPool;
     StoragePool m_backupPool;
-    QnBackupScheduleDialog* m_scheduleDialog;
-    QnBackupSettingsDialog* m_camerabackupSettingsDialog;
     QnMediaServerUserAttributes m_serverUserAttrs;
     BackupSettingsDataList m_cameraBackupSettings;
 private:

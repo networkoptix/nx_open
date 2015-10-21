@@ -33,6 +33,7 @@ extern "C"
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/storage_resource.h>
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>

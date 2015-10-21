@@ -7,23 +7,16 @@
     <x>0</x>
     <y>0</y>
     <width>769</width>
-    <height>648</height>
+    <height>503</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
-      <string/>
+      <string>Main storages</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Main storages</string>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
@@ -62,7 +55,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="rebuildMainBtn">
+         <widget class="QPushButton" name="rebuildMainButton">
           <property name="text">
            <string>Rebuild Archive Index</string>
           </property>
@@ -84,50 +77,17 @@
        </layout>
       </item>
       <item>
-       <widget class="QStackedWidget" name="stackedWidgetMain">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="rebuildPreparePage">
-         <layout class="QHBoxLayout" name="horizontalLayout_4"/>
-        </widget>
-        <widget class="QWidget" name="rebuildProgressPage">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QnWordWrappedLabel" name="rebuildStatusLabelMain" native="true"/>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QProgressBar" name="rebuildProgressBarMain">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="rebuildStopButtonMain">
-              <property name="text">
-               <string>Cancel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </widget>
+       <widget class="QnStorageRebuildWidget" name="rebuildMainWidget" native="true"/>
       </item>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Redundant (Backup) storages</string>
-        </property>
-       </widget>
-      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Redundant (Backup) storages</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
        <widget class="QnTableView" name="backupStoragesTable">
         <property name="autoFillBackground">
@@ -172,16 +132,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="rebuildBackupBtn">
+         <widget class="QPushButton" name="rebuildBackupButton">
           <property name="text">
            <string>Rebuild Archive Index</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="backupStartButton">
-          <property name="text">
-           <string>Start Backup Now</string>
           </property>
          </widget>
         </item>
@@ -201,147 +154,119 @@
        </layout>
       </item>
       <item>
-       <widget class="QStackedWidget" name="stackedWidgetBackup">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="rebuildPreparePage">
-         <layout class="QHBoxLayout" name="horizontalLayout_4"/>
-        </widget>
-        <widget class="QWidget" name="rebuildProgressPage">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QnWordWrappedLabel" name="rebuildStatusLabelBackup" native="true"/>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QProgressBar" name="rebuildProgressBarBackup">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="rebuildStopButtonBackup">
-              <property name="text">
-               <string>Cancel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-      </item>
-      <item>
-       <widget class="QStackedWidget" name="stackedWidgetBackupInfo">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="rebuildPreparePage">
-         <layout class="QHBoxLayout" name="horizontalLayout_4"/>
-        </widget>
-        <widget class="QWidget" name="rebuildProgressPage">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QnWordWrappedLabel" name="rebuildStatusLabelBackup" native="true"/>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Backup progress</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QProgressBar" name="progressBarBackup">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="backupStopButton">
-              <property name="text">
-               <string>Cancel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>24</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QPushButton" name="pushButtonCameraSettings">
-          <property name="text">
-           <string>Cameras to backup</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>When to backup</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBoxBackupType"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButtonSchedule">
-          <property name="text">
-           <string>Edit Schedule</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QnStorageRebuildWidget" name="rebuildBackupWidget" native="true"/>
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidgetBackupInfo">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="backupPreparePage">
+      <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+     </widget>
+     <widget class="QWidget" name="backupProgressPage">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QnWordWrappedLabel" name="rebuildStatusLabelBackup" native="true"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Backup progress</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QProgressBar" name="progressBarBackup">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="backupStopButton">
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>24</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QPushButton" name="pushButtonCameraSettings">
+       <property name="text">
+        <string>Cameras to backup</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>When to backup</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBoxBackupType"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonSchedule">
+       <property name="text">
+        <string>Edit Schedule</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="backupStartButton">
+       <property name="text">
+        <string>Start Backup Now</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QLabel" name="storagesWarningLabel">
@@ -363,6 +288,12 @@ It won't deny oldest footage removing from the drive.</string>
    <class>QnWordWrappedLabel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnStorageRebuildWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/storage_rebuild_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
