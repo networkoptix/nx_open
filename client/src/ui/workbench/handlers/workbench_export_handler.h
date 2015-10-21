@@ -23,9 +23,7 @@ public:
 
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, const QnLayoutResourcePtr &layout, Qn::LayoutExportMode mode);
 private:
-#ifdef Q_OS_WIN
     QString binaryFilterName() const;
-#endif
 
     bool validateItemTypes(const QnLayoutResourcePtr &layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(const QnLayoutResourcePtr &existingLayout);
