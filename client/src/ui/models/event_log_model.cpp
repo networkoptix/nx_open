@@ -435,7 +435,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
                 result = tr("Motion video");
         }
         else {
-            result = QnBusinessStringsHelper::eventDetails(action.eventParams, 1, lit("\n"));
+            result = QnBusinessStringsHelper::eventDetails(action.eventParams, lit("\n"));
         }
 
         if (!QnBusiness::hasToggleState(eventType)) {

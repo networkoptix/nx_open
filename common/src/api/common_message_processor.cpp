@@ -291,7 +291,7 @@ void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
 }
 
 void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
-    m_rules[businessRule->id()] = businessRule;
+    m_rules.insert(businessRule->id(), businessRule);
     emit businessRuleChanged(businessRule);
 }
 

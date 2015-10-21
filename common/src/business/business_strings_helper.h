@@ -41,7 +41,7 @@ public:
                                     bool useHtml);
 
     static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
-    static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
+    static QString eventDetails(const QnBusinessEventParameters &params, const QString& delimiter);
     static QString renderEventDetailsText(QVariantHash contextMap);
 
     //TODO: #vasilenko isPublic field is not used, why?
