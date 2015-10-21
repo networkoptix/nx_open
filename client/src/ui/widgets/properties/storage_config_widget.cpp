@@ -1,28 +1,32 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
+#include <api/app_server_connection.h>
+#include <api/media_server_connection.h>
 #include <api/model/storage_space_reply.h>
+
+#include <camera/camera_data_manager.h>
+
 #include <core/resource/client_storage_resource.h>
-#include <ui/dialogs/storage_url_dialog.h>
-#include <ui/widgets/storage_space_slider.h>
-#include <ui/style/warning_style.h>
-#include "utils/common/event_processors.h"
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include "ui/models/storage_list_model.h"
-#include "api/app_server_connection.h"
-#include "api/media_server_connection.h"
+#include <core/resource/media_server_user_attributes.h>
+#include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <ui/common/ui_resource_name.h>
+#include <ui/dialogs/storage_url_dialog.h>
+#include <ui/dialogs/backup_schedule_dialog.h>
+#include <ui/dialogs/backup_settings_dialog.h>
+#include <ui/models/storage_list_model.h>
+#include <ui/style/warning_style.h>
+#include <ui/widgets/storage_space_slider.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <camera/camera_data_manager.h>
-#include "ui/dialogs/backup_schedule_dialog.h"
-#include "ui/dialogs/backup_settings_dialog.h"
-#include "core/resource/media_server_user_attributes.h"
-#include "core/resource_management/resources_changes_manager.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/camera_resource.h"
-#include "ui/common/ui_resource_name.h"
 
 #include <utils/common/delayed.h>
+#include <utils/common/event_processors.h>
+
 
 namespace {
     //setting free space to zero, since now client does not change this value, so it must keep current value
@@ -94,9 +98,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
 }
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
-{
-
-}
+{}
 
 void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
 {
@@ -130,7 +132,7 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
     tableView->resizeColumnsToContents();
     tableView->horizontalHeader()->setSectionsClickable(false);
     tableView->horizontalHeader()->setStretchLastSection(false);
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     tableView->horizontalHeader()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Stretch);
 
     connect(ui->comboBoxBackupType,   SIGNAL(currentIndexChanged(int)), this, SLOT(at_backupTypeComboBoxChange(int)));
@@ -233,10 +235,13 @@ void QnStorageConfigWidget::at_replyReceived(int status, QnStorageSpaceReply rep
     updateColumnWidth();
 }
 
-void QnStorageConfigWidget::updateColumnWidth()
-{
-    for (int i = 0; i < QnStorageListModel::ColumnCount; ++i)
-    {
+void QnStorageConfigWidget::updateColumnWidth() {
+    for (int i = 0; i < QnStorageListModel::ColumnCount; ++i) {
+
+        /* Stretch url column */
+        if (i == QnStorageListModel::UrlColumn)
+            continue;
+
         int width = qMax(getColWidth(m_mainPool.model.data(), i), getColWidth(m_backupPool.model.data(), i));
         ui->mainStoragesTable->setColumnWidth(i, width + COLUMN_SPACING);
         ui->backupStoragesTable->setColumnWidth(i, width + COLUMN_SPACING);

@@ -24,6 +24,7 @@
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>
 #include <api/model/upload_update_reply.h>
+#include <api/model/backup_status_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource_fwd.h>
@@ -189,6 +190,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnStorageScanData>();
+    qRegisterMetaType<QnBackupStatusData>();
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();

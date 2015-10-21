@@ -29,14 +29,14 @@ private:
 };
 
 /*
-* This class extend QTableView for better checkboxes behavoiur. If user presses to 'check' column, selection will keep all checked rows
+* This class extend QTableView for better checkboxes behavior. If user presses to 'check' column, selection will keep all checked rows
 */
 
-class QnChackableTableView : public QnTableView
+class QnCheckableTableView : public QnTableView
 {
     typedef QnTableView base_type;
 public:
-    explicit QnChackableTableView(QWidget *parent = 0): QnTableView(parent) {}
+    explicit QnCheckableTableView(QWidget *parent = 0): QnTableView(parent) {}
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
 };
