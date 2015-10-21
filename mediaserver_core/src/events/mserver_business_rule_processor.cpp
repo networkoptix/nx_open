@@ -272,7 +272,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.cameraId = camera->getUniqueId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
-    bookmark.tags = action->getParams().tags.split(L' ', QString::SkipEmptyParts).toSet();
+    bookmark.tags = action->getParams().tags.split(QRegExp(lit("[ ,]")), QString::SkipEmptyParts).toSet();
 
     return qnServerDb->addBookmark(bookmark);
 }

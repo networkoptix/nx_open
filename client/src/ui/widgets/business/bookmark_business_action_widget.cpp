@@ -5,15 +5,6 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
-namespace {
-    QString validateTags(const QString &source) {
-        return QStringList(
-            source.split(QRegExp(lit("[ ,]")), QString::SkipEmptyParts).toSet().toList()
-            ).join(L' ');
-    }
-
-}
-
 QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::BookmarkBusinessActionWidget)
@@ -38,7 +29,7 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged( QnBusinessRuleViewMod
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->tagsLineEdit->setText(validateTags(model->actionParams().tags));
+        ui->tagsLineEdit->setText(model->actionParams().tags);
 }
 
 void QnBookmarkBusinessActionWidget::paramsChanged() {
@@ -48,6 +39,6 @@ void QnBookmarkBusinessActionWidget::paramsChanged() {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     QnBusinessActionParameters params = model()->actionParams();
-    params.tags = validateTags(ui->tagsLineEdit->text());
+    params.tags = ui->tagsLineEdit->text();
     model()->setActionParams(params);
 }
