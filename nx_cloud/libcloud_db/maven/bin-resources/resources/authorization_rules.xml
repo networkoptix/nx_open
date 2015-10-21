@@ -122,7 +122,7 @@
                     <sequence value="/system/bind">
                         <!-- check system is already bound -->
                         <set resName="authorized" resValue="false"/>
-                        <condition resName="auth.accountID" matchType="presence">
+                        <condition resName="auth.accountEmail" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>

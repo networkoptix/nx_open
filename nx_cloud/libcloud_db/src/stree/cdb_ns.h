@@ -20,6 +20,7 @@ enum Value
 
     //source data attributes
     accountID,
+    accountEmail,
     systemID,
     ha1,
     userName,
@@ -33,7 +34,7 @@ enum Value
     authenticated,
     authorized,
     authAccountRightsOnSystem,
-    authAccountID,
+    authAccountEmail,
     authSystemID,
     //!Operation data contains accountID equal to the one been authenticated
     authSelfAccountAccessRequested,

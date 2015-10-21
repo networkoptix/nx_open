@@ -61,6 +61,18 @@ namespace stree
             }
             return false;
         }
+        bool get(int resID, std::string* const value) const
+        {
+            QVariant untypedValue;
+            if (!get(resID, &untypedValue))
+                return false;
+            if (untypedValue.canConvert<QString>())
+            {
+                *value = untypedValue.toString().toStdString();
+                return true;
+            }
+            return false;
+        }
         template<typename T> boost::optional<T> get( int resID ) const
         {
             T val;

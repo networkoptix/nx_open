@@ -41,14 +41,14 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
-class SystemRegistrationDataWithAccountID
+class SystemRegistrationDataWithAccount
 :
     public SystemRegistrationData
 {
 public:
-    QnUuid accountID;
+    std::string accountEmail;
 
-    SystemRegistrationDataWithAccountID(SystemRegistrationData&& right)
+    SystemRegistrationDataWithAccount(SystemRegistrationData&& right)
     :
         SystemRegistrationData(std::move(right))
     {

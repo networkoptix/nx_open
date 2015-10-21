@@ -37,13 +37,14 @@ bool AuthorizationManager::authorize(
     //adding helper attributes
 
     //adding authAccountRightsOnSystem if appropriate
-    const auto authenticatedAccountID = authenticationProperties.get<QnUuid>(attr::authAccountID);
+    const auto authenticatedAccountEmail = 
+        authenticationProperties.get<std::string>(attr::authAccountEmail);
     const auto requestedSystemID = dataToAuthorize.get<QnUuid>(attr::systemID);
     stree::ResourceContainer auxSearchAttrs;
-    if (authenticatedAccountID)
+    if (authenticatedAccountEmail)
     {
         //adding account status
-        if (auto account = m_accountManager.findAccountByID(authenticatedAccountID.get()))
+        if (auto account = m_accountManager.findAccountByUserName(authenticatedAccountEmail.get()))
             auxSearchAttrs.put(attr::accountStatus, static_cast<int>(account->statusCode));
 
         if (requestedSystemID)
@@ -53,25 +54,24 @@ bool AuthorizationManager::authorize(
                 attr::authAccountRightsOnSystem,
                 QnLexical::serialized(
                     m_systemManager.getAccountRightsForSystem(
-                        authenticatedAccountID.get(),
+                        authenticatedAccountEmail.get(),
                         requestedSystemID.get())));
         }
     }
 
-    const auto requestedAccountID = dataToAuthorize.get<QnUuid>(attr::accountID);
-    if (requestedAccountID && requestedSystemID)
+    const auto requestedAccountEmail = dataToAuthorize.get<std::string>(attr::accountEmail);
+    if (requestedAccountEmail && requestedSystemID)
     {
         auxSearchAttrs.put(
             attr::dataAccountRightsOnSystem,
             QnLexical::serialized(
                 m_systemManager.getAccountRightsForSystem(
-                    requestedAccountID.get(),
+                    requestedAccountEmail.get(),
                     requestedSystemID.get())));
     }
 
-
-    if (authenticatedAccountID && requestedAccountID &&
-        authenticatedAccountID.get() == requestedAccountID.get())
+    if (authenticatedAccountEmail && requestedAccountEmail &&
+        authenticatedAccountEmail.get() == requestedAccountEmail.get())
     {
         auxSearchAttrs.put(
             attr::authSelfAccountAccessRequested,

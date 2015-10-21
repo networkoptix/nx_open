@@ -53,8 +53,8 @@ bool SystemSharing::getAsVariant( int resID, QVariant* const value ) const
 {
     switch (resID)
     {
-        case attr::accountID:
-            *value = QVariant::fromValue(accountID);
+        case attr::accountEmail:
+            *value = QString::fromStdString(accountEmail);
             return true;
         case attr::systemID:
             *value = QVariant::fromValue(systemID);

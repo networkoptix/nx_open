@@ -53,11 +53,11 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing)
 {
-    if (!urlQuery.hasQueryItem("systemID") || !urlQuery.hasQueryItem("accountID"))
+    if (!urlQuery.hasQueryItem("systemID") || !urlQuery.hasQueryItem("accountEmail"))
         return false;
 
     systemSharing->systemID = QnUuid::fromStringSafe(urlQuery.queryItemValue("systemID"));
-    systemSharing->accountID = QnUuid::fromStringSafe(urlQuery.queryItemValue("accountID"));
+    systemSharing->accountEmail = urlQuery.queryItemValue("accountEmail").toStdString();
     bool success = false;
     systemSharing->accessRole = QnLexical::deserialized<api::SystemAccessRole>(
         urlQuery.queryItemValue("accessRole"), api::SystemAccessRole::none, &success);
@@ -67,7 +67,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
 void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem("systemID", data.systemID.toString());
-    urlQuery->addQueryItem("accountID", data.accountID.toString());
+    urlQuery->addQueryItem("accountEmail", QString::fromStdString(data.accountEmail));
     urlQuery->addQueryItem("accessRole", QnLexical::serialized(data.accessRole));
 }
 

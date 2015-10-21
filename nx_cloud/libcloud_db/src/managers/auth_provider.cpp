@@ -111,7 +111,7 @@ void AuthenticationProvider::getAuthenticationResponse(
     if (account->statusCode != api::AccountStatus::activated)
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
 
-    const auto systemAccessRole = m_systemManager.getAccountRightsForSystem(account->id, systemID);
+    const auto systemAccessRole = m_systemManager.getAccountRightsForSystem(account->email, systemID);
     if (systemAccessRole == api::SystemAccessRole::none)
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
 

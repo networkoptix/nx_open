@@ -109,16 +109,18 @@ int CloudDBProcess::executeApplication()
             return 2;
         }
     
-        EMailManager emailManager( settings );
+        EMailManager emailManager(settings);
         StreeManager streeManager(settings.auth());
 
         //creating data managers
         AccountManager accountManager(
             settings,
             &dbManager,
-            &emailManager );
+            &emailManager);
     
-        SystemManager systemManager( &dbManager );
+        SystemManager systemManager(
+            accountManager,
+            &dbManager);
     
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow( PingHandler::HANDLER_PATH, AuthMethod::noAuth );

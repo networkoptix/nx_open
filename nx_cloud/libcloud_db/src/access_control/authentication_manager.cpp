@@ -149,12 +149,13 @@ bool AuthenticationManager::findHa1(
         return true;
     }
 
-    if (auto accountData = m_accountManager.findAccountByUserName(username))
+    if (auto accountData = m_accountManager.findAccountByUserName(
+            std::string(username.constData(), username.size())))
     {
         *ha1 = accountData.get().passwordHa1.c_str();
         authProperties->put(
-            cdb::attr::authAccountID,
-            QVariant::fromValue(accountData.get().id));
+            cdb::attr::authAccountEmail,
+            QString::fromStdString(accountData.get().email));
     }
     else if (auto systemData = m_systemManager.findSystemByID(QnUuid::fromStringSafe(username)))
     {

@@ -13,6 +13,7 @@
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
+#include "account_manager.h"
 #include "access_control/authorization_manager.h"
 #include "stree/cdb_ns.h"
 
@@ -20,8 +21,11 @@
 namespace nx {
 namespace cdb {
 
-SystemManager::SystemManager(nx::db::DBManager* const dbManager) throw(std::runtime_error)
+SystemManager::SystemManager(
+    const AccountManager& accountManager,
+    nx::db::DBManager* const dbManager) throw(std::runtime_error)
 :
+    m_accountManager(accountManager),
     m_dbManager(dbManager)
 {
     //pre-filling cache
@@ -34,21 +38,21 @@ void SystemManager::bindSystemToAccount(
     data::SystemRegistrationData registrationData,
     std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
-    QnUuid accountID;
-    if (!authzInfo.get(cdb::attr::authAccountID, &accountID))
+    QString accountEmail;
+    if (!authzInfo.get(cdb::attr::authAccountEmail, &accountEmail))
     {
         completionHandler(api::ResultCode::notAuthorized, data::SystemData());
         return;
     }
 
-    data::SystemRegistrationDataWithAccountID registrationDataWithAccountID(
+    data::SystemRegistrationDataWithAccount registrationDataWithAccount(
         std::move(registrationData));
-    registrationDataWithAccountID.accountID = std::move(accountID);
+    registrationDataWithAccount.accountEmail = accountEmail.toStdString();
 
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemRegistrationDataWithAccountID, data::SystemData>(
+    m_dbManager->executeUpdate<data::SystemRegistrationDataWithAccount, data::SystemData>(
         std::bind(&SystemManager::insertSystemToDB, this, _1, _2, _3),
-        std::move(registrationDataWithAccountID),
+        std::move(registrationDataWithAccount),
         std::bind(&SystemManager::systemAdded, this, _1, _2, _3, std::move(completionHandler)));
 }
 
@@ -101,11 +105,11 @@ void SystemManager::getSystems(
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
     }
-    else if (auto accountID = wholeFilterMap.get<QnUuid>(cdb::attr::authAccountID))
+    else if (auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail))
     {
         QnMutexLocker lk(&m_mutex);
-        const auto& accountIndex = m_accountAccessRoleForSystem.get<1>();
-        const auto accountSystemsRange = accountIndex.equal_range(accountID.get());
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<INDEX_BY_ACCOUNT_EMAIL>();
+        const auto accountSystemsRange = accountIndex.equal_range(accountEmail.get());
         for (auto it = accountSystemsRange.first; it != accountSystemsRange.second; ++it)
         {
             auto system = m_cache.find(it->systemID);
@@ -147,17 +151,19 @@ void SystemManager::getCloudUsersOfSystem(
 {
     api::SystemSharingList resultData;
 
-    QnUuid accountID;
-    if (!authzInfo.get(attr::authAccountID, &accountID))
+    std::string accountEmail;
+    if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
         return completionHandler(api::ResultCode::notAuthorized, std::move(resultData));
 
-    const auto systemID = filter.get<QnUuid>(attr::systemID);
+    auto systemID = filter.get<QnUuid>(attr::authSystemID);
+    if (!systemID)
+        systemID = filter.get<QnUuid>(attr::systemID);
 
     QnMutexLocker lk(&m_mutex);
     if (systemID)
     {
         //selecting all sharings of system id
-        const auto& systemIndex = m_accountAccessRoleForSystem.get<2>();
+        const auto& systemIndex = m_accountAccessRoleForSystem.get<INDEX_BY_SYSTEM_ID>();
         const auto systemSharingsRange = systemIndex.equal_range(systemID.get());
         for (auto it = systemSharingsRange.first; it != systemSharingsRange.second; ++it)
             resultData.sharing.push_back(*it);
@@ -165,8 +171,8 @@ void SystemManager::getCloudUsersOfSystem(
     else
     {
         //selecting sharings for every system account has access to
-        const auto& accountIndex = m_accountAccessRoleForSystem.get<1>();
-        const auto accountsSystemsRange = accountIndex.equal_range(accountID);
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<INDEX_BY_ACCOUNT_EMAIL>();
+        const auto accountsSystemsRange = accountIndex.equal_range(accountEmail);
         for (auto accountIter = accountsSystemsRange.first;
              accountIter != accountsSystemsRange.second;
              ++accountIter)
@@ -179,7 +185,7 @@ void SystemManager::getCloudUsersOfSystem(
                 //no access to system's sharing list is allowed for this account
                 continue;
             }
-            const auto& systemIndex = m_accountAccessRoleForSystem.get<2>();
+            const auto& systemIndex = m_accountAccessRoleForSystem.get<INDEX_BY_SYSTEM_ID>();
             const auto systemSharingRange = systemIndex.equal_range(accountIter->systemID);
             for (auto sharingIter = systemSharingRange.first;
                  sharingIter != systemSharingRange.second;
@@ -214,12 +220,13 @@ boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id
 }
 
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
-    const QnUuid& accountID, const QnUuid& systemID) const
+    const std::string& accountEmail,
+    const QnUuid& systemID) const
 {
     QnMutexLocker lk(&m_mutex);
     const auto& accountSystemPairIndex = m_accountAccessRoleForSystem.get<0>();
     api::SystemSharing toFind;
-    toFind.accountID = accountID;
+    toFind.accountEmail = accountEmail;
     toFind.systemID = systemID;
     const auto it = accountSystemPairIndex.find(toFind);
     return it != accountSystemPairIndex.end()
@@ -229,9 +236,17 @@ api::SystemAccessRole SystemManager::getAccountRightsForSystem(
 
 nx::db::DBResult SystemManager::insertSystemToDB(
     QSqlDatabase* const connection,
-    const data::SystemRegistrationDataWithAccountID& newSystem,
+    const data::SystemRegistrationDataWithAccount& newSystem,
     data::SystemData* const systemData)
 {
+    const auto account = m_accountManager.findAccountByUserName(newSystem.accountEmail);
+    if (!account)
+    {
+        NX_LOG(lm("Failed to add system %1 to account %2. Account not found").
+            arg(newSystem.name).arg(newSystem.accountEmail), cl_logDEBUG1);
+        return db::DBResult::notFound;
+    }
+
     QSqlQuery insertSystemQuery(*connection);
     insertSystemQuery.prepare(
         "INSERT INTO system( id, name, customization, auth_key, owner_account_id, status_code ) "
@@ -240,7 +255,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     systemData->name = newSystem.name;
     systemData->customization = newSystem.customization;
     systemData->authKey = QnUuid::createUuid().toStdString();
-    systemData->ownerAccountID = newSystem.accountID;
+    systemData->ownerAccountID = account->id;
     systemData->status = api::SystemStatus::ssNotActivated;
     QnSql::bind(*systemData, &insertSystemQuery);
     if (!insertSystemQuery.exec())
@@ -251,14 +266,14 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     }
 
     data::SystemSharing systemSharing;
-    systemSharing.accountID = newSystem.accountID;
+    systemSharing.accountEmail = newSystem.accountEmail;
     systemSharing.systemID = systemData->id;
     systemSharing.accessRole = api::SystemAccessRole::owner;
     auto result = insertSystemSharingToDB(connection, systemSharing);
     if (result != nx::db::DBResult::ok)
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
-            arg(newSystem.name).arg(newSystem.accountID).
+            arg(newSystem.name).arg(newSystem.accountEmail).
             arg(connection->lastError().text()), cl_logDEBUG1);
         return result;
     }
@@ -268,7 +283,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 
 void SystemManager::systemAdded(
     nx::db::DBResult dbResult,
-    data::SystemRegistrationDataWithAccountID /*systemRegistrationData*/,
+    data::SystemRegistrationDataWithAccount systemRegistrationData,
     data::SystemData systemData,
     std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
@@ -279,7 +294,7 @@ void SystemManager::systemAdded(
         //updating "systems by account id" index
         QnMutexLocker lk(&m_mutex);
         api::SystemSharing sharing;
-        sharing.accountID = systemData.ownerAccountID;
+        sharing.accountEmail = systemRegistrationData.accountEmail;
         sharing.systemID = systemData.id;
         sharing.accessRole = api::SystemAccessRole::owner;
         m_accountAccessRoleForSystem.emplace(std::move(sharing));
@@ -295,16 +310,28 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
     QSqlDatabase* const connection,
     const data::SystemSharing& systemSharing)
 {
+    const auto account = m_accountManager.findAccountByUserName(systemSharing.accountEmail);
+    if (!account)
+    {
+        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. Account not found").
+            arg(systemSharing.systemID).
+            arg(systemSharing.accountEmail), cl_logDEBUG1);
+        return db::DBResult::notFound;
+    }
+
     QSqlQuery insertSystemToAccountBinding(*connection);
     insertSystemToAccountBinding.prepare(
         "INSERT INTO system_to_account( account_id, system_id, access_role_id ) "
         " VALUES( :accountID, :systemID, :accessRole )");
     QnSql::bind(systemSharing, &insertSystemToAccountBinding);
+    insertSystemToAccountBinding.bindValue(
+        ":accountID",
+        QnSql::serialized_field(account->id));
     if (!insertSystemToAccountBinding.exec())
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
             arg(systemSharing.systemID).
-            arg(systemSharing.accountID).
+            arg(systemSharing.accountEmail).
             arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -381,6 +408,14 @@ nx::db::DBResult SystemManager::updateSharingInDB(
     QSqlDatabase* const connection,
     const data::SystemSharing& sharing)
 {
+    const auto account = m_accountManager.findAccountByUserName(sharing.accountEmail);
+    if (!account)
+    {
+        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2. Account not found").
+            arg(sharing.systemID).arg(sharing.accountEmail), cl_logDEBUG1);
+        return db::DBResult::notFound;
+    }
+
     QSqlQuery updateRemoveSharingQuery(*connection);
     if (sharing.accessRole == api::SystemAccessRole::none)
         updateRemoveSharingQuery.prepare(
@@ -391,10 +426,14 @@ nx::db::DBResult SystemManager::updateSharingInDB(
             "INSERT OR REPLACE INTO system_to_account( account_id, system_id, access_role_id ) "
             " VALUES( :accountID, :systemID, :accessRole )");
     QnSql::bind(sharing, &updateRemoveSharingQuery);
+    updateRemoveSharingQuery.bindValue(
+        ":accountID",
+        QnSql::serialized_field(account->id));
     if (!updateRemoveSharingQuery.exec())
     {
         NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4").
-            arg(sharing.systemID).arg(sharing.accountID).arg(QnLexical::serialized(sharing.accessRole)).
+            arg(sharing.systemID).arg(sharing.accountEmail).
+            arg(QnLexical::serialized(sharing.accessRole)).
             arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -501,8 +540,11 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(QSqlDatabase* connect
 {
     QSqlQuery readSystemToAccountQuery(*connection);
     readSystemToAccountQuery.prepare(
-        "SELECT account_id as accountID, system_id as systemID, access_role_id as accessRole "
-        "FROM system_to_account");
+        "SELECT a.email as accountEmail, "
+               "sa.system_id as systemID, "
+               "sa.access_role_id as accessRole "
+        "FROM system_to_account sa, account a "
+        "WHERE sa.account_id = a.id");
     if (!readSystemToAccountQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
@@ -517,7 +559,6 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(QSqlDatabase* connect
 
     return db::DBResult::ok;
 }
-
 
 }   //cdb
 }   //nx
