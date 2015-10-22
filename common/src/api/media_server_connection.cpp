@@ -717,24 +717,18 @@ int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
     return sendAsyncGetRequest(CameraDiagnosticsObject, params, QN_STRINGIZE_TYPE(QnCameraDiagnosticsReply), target, slot);
 }
 
-int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, bool isMainPool, QObject *target, const char *slot)
+int QnMediaServerConnection::doRebuildArchiveAsync(Qn::RebuildAction action, bool isMainPool, QObject *target, const char *slot)
 {
     QnRequestParamList params;
-    if (action == RebuildAction_Start)
-        params << QnRequestParam("action",  lit("start"));
-    else if (action == RebuildAction_Cancel)
-        params << QnRequestParam("action",  lit("stop"));
+    params << QnRequestParam("action",  QnLexical::serialized(action));
     params << QnRequestParam("mainPool", isMainPool);
     return sendAsyncGetRequest(RebuildArchiveObject, params, QN_STRINGIZE_TYPE(QnStorageScanData), target, slot);
 }
 
-int QnMediaServerConnection::backupControlActionAsync(BackupAction action, QObject *target, const char *slot)
+int QnMediaServerConnection::backupControlActionAsync(Qn::BackupAction action, QObject *target, const char *slot)
 {
     QnRequestParamList params;
-    if (action == BackupAction_Start)
-        params << QnRequestParam("action",  lit("start"));
-    else if (action == BackupAction_Cancel)
-        params << QnRequestParam("action",  lit("stop"));
+    params << QnRequestParam("action",  QnLexical::serialized(action));
     return sendAsyncGetRequest(BackupControlObject, params, QN_STRINGIZE_TYPE(QnBackupStatusData), target, slot);
 }
 

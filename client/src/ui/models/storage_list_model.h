@@ -29,9 +29,9 @@ public:
     QnStorageListModel(QObject *parent = 0);
     ~QnStorageListModel();
 
-    void setModelData(const QnStorageSpaceReply& data);
-    void addModelData(const QnStorageSpaceData& data);
-    QnStorageSpaceReply modelData() const;
+    void setStorages(const QnStorageSpaceDataList& storages);
+    void addStorage(const QnStorageSpaceData& data);
+    QnStorageSpaceDataList storages() const;
 
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
@@ -50,7 +50,7 @@ private:
     QVariant mouseCursorData(const QModelIndex &index) const;
     QVariant checkstateData(const QModelIndex &index) const;
 private:
-    QnStorageSpaceReply m_data;
+    QnStorageSpaceDataList m_storages;
     bool m_isBackupRole;
     QBrush m_linkBrush;
     QFont m_linkFont;

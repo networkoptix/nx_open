@@ -16,7 +16,7 @@ struct QnBackupStatusData
 };
 #define QnBackupStatusData_Fields (state)(progress)(backupTimeMs)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBackupStatusData, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnBackupStatusData, (json)(metatype)(eq))
 
 
 

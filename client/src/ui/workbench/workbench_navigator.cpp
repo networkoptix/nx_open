@@ -43,6 +43,8 @@ extern "C"
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
 
+#include <server/server_storage_manager.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -130,6 +132,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     m_cameraDataManager = context()->instance<QnCameraDataManager>();
     connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this, &QnWorkbenchNavigator::updateLoaderPeriods);
+    
+    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished, m_cameraDataManager, &QnCameraDataManager::clearCache);
 
     //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.

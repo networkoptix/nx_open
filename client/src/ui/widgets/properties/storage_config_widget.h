@@ -5,13 +5,13 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
 
-#include <api/model/recording_stats_reply.h>
-#include <api/model/storage_space_reply.h>
+#include <api/model/api_model_fwd.h>
 
 #include <core/resource/resource_fwd.h>
 
+#include <server/server_storage_manager_fwd.h>
+
 #include <ui/widgets/settings/abstract_preferences_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
 #include "api/model/rebuild_archive_reply.h"
@@ -24,7 +24,7 @@ namespace Ui {
 }
 
 class QnStorageListModel;
-class QnStorageConfigWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware 
+class QnStorageConfigWidget: public Connective<QnAbstractPreferencesWidget>
 {
     Q_OBJECT
 
@@ -38,12 +38,15 @@ public:
     void setServer(const QnMediaServerResourcePtr &server);
     virtual void submitToSettings() override;
 private:
+    void updateStoragesInfo();
     void updateRebuildInfo();
     void updateBackupInfo();
     void at_eventsGrid_clicked(const QModelIndex& index);
-    void sendNextArchiveRequest(bool isMain);
-    void updateRebuildUi(const QnStorageScanData& reply, bool isMainPool);
+
+    void updateStoragesUi(QnServerStoragesPool pool, const QnStorageSpaceDataList &storages);
+    void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply);
+
     void updateColumnWidth();
     int getColWidth(const QAbstractItemModel* model, int col);
     bool hasUnsavedChanges() const;
@@ -55,16 +58,20 @@ private:
     void cancelBackup();
 
 private slots:
-    void at_replyReceived(int status, QnStorageSpaceReply reply, int);
-    void sendStorageSpaceRequest();
+    
+    void at_serverStorageSpaceChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageSpaceDataList &storages);
+    void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
+    void at_serverBackupStatusChanged(const QnMediaServerResourcePtr &server, const QnBackupStatusData &status);
+    
+    void at_serverRebuildArchiveFinished(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool);
+    void at_serverBackupFinished(const QnMediaServerResourcePtr &server);
+
     void at_addExtStorage(bool addToMain);
     
     void at_openBackupSchedule_clicked();
     void at_openBackupSettings_clicked();
-    void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle);
-    void at_backupStatusReply(int status, const QnBackupStatusData& reply, int handle);
     
-    void sendNextBackupStatusRequest();
+    
     void at_backupTypeComboBoxChange(int index);
 private:
     Ui::StorageConfigWidget* ui;
@@ -73,8 +80,6 @@ private:
     struct StoragePool
     {
         StoragePool();
-        int storageSpaceHandle;
-        int rebuildHandle;
         QScopedPointer<QnStorageListModel> model;
         QnStorageScanData prevRebuildState;
     };
