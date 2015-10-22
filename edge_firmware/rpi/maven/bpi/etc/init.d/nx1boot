@@ -46,50 +46,35 @@ export HDDNX1=
 setup_hdd_environment() {
     if [ -f /tmp/hdd_native ]; then rm /tmp/hdd_native; fi
     if [ -f /tmp/archive ]; then rm /tmp/archive; fi
-    if [ "$BOOTDEVICE" = "mmc" ]; then
-        if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then
-            mkdir -p $MNTDATAHDDPART
-            mkdir -p $MNTBOOTHDDPART
-            mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
-            mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
-            HDDMAC=`cat $MNTBOOTHDDPART/var/tmp/mac`
-            echo "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >&2 >/dev/kmsg
-            echo `date` "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >> $NX1LOG
-            echo "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >&2 >/dev/kmsg
-            echo `date` "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >> $NX1LOG
-            if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ] && [ "$HDDMAC" = "$MAC" ]; then HDDNX1=true; else HDDNX1=false; fi
-            ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
-            ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
-            if [[ ! -z "$ARCHIVE_FILES" ]] && [[ ! -z "$ARCHIVE_DB" ]]; then ARCHIVE=true; else ARCHIVE=false; fi
-            echo "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >&2 >/dev/kmsg
-            echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >> $NX1LOG
-            for p in $( lsof $MNTBOOTHDDPART | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
-            sleep 2
-            umount $BOOTHDDPART
-            for p in $( lsof $MNTDATAHDDPART | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
-            sleep 2
-            umount $DATAHDDPART
-            rm -Rf $MNTBOOTHDDPART
-        else
-            HDDNX1=false
-            ARCHIVE=false
-        fi
-        echo $HDDNX1 > /tmp/hdd_native
-        echo $ARCHIVE > /tmp/archive
-    else
-        HDDMAC=`cat /var/tmp/mac`
-
+    if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then
         mkdir -p $MNTDATAHDDPART
+        mkdir -p $MNTBOOTHDDPART
         mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
+        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
+        HDDMAC=`cat $MNTBOOTHDDPART/var/tmp/mac`
+        echo "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >> $NX1LOG
+        echo "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >&2 >/dev/kmsg
+        echo `date` "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >> $NX1LOG
+        if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ] && [ "$HDDMAC" = "$MAC" ]; then HDDNX1=true; else HDDNX1=false; fi
         ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
         ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
         if [[ ! -z "$ARCHIVE_FILES" ]] && [[ ! -z "$ARCHIVE_DB" ]]; then ARCHIVE=true; else ARCHIVE=false; fi
         echo "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >&2 >/dev/kmsg
         echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >> $NX1LOG
+        for p in $( lsof $MNTBOOTHDDPART | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
+        sleep 2
+        umount $BOOTHDDPART
         for p in $( lsof $MNTDATAHDDPART | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $DATAHDDPART
+        rm -Rf $MNTBOOTHDDPART
+    else
+        HDDNX1=false
+        ARCHIVE=false
     fi
+    echo $HDDNX1 > /tmp/hdd_native
+    echo $ARCHIVE > /tmp/archive
 }
 
 read_hdd_environment() {
