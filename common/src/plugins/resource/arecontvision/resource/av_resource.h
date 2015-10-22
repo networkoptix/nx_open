@@ -59,6 +59,12 @@ public:
     int totalMdZones() const;
     bool isH264() const;
     int getZoneSite() const;
+
+    static QnPlAreconVisionResource* createResourceByName(const QString &name);
+    static QnPlAreconVisionResource* createResourceByTypeId(QnUuid rt);
+
+    static bool isPanoramic(QnResourceTypePtr resType);
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -69,11 +75,8 @@ protected:
     virtual bool setParamPhysical(const QString &param, const QVariant &val) override;
 
     virtual void setMotionMaskPhysical(int channel) override;
-public:
-    static QnPlAreconVisionResource* createResourceByName(const QString &name);
-    static QnPlAreconVisionResource* createResourceByTypeId(QnUuid rt);
 
-    static bool isPanoramic(QnResourceTypePtr resType);
+    virtual bool isRTSPSupported() const;
 
 protected:
     QString m_description;

@@ -474,6 +474,11 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
+bool QnPlAreconVisionResource::isRTSPSupported() const
+{
+    return getHostAddress() == lit("172.16.1.196");
+}
+
 bool QnPlAreconVisionResource::isAbstractResource() const
 {
     QnUuid baseTypeId = qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract"));
