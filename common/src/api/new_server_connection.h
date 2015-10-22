@@ -7,6 +7,11 @@
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
 
+/*
+* New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
+* It class can be used either for client and server side.
+*/
+
 class QnNewMediaServerConnection
 {
 public:
