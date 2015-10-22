@@ -241,6 +241,11 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     return m_restConnection;
 }
 
+QnNewMediaServerConnection QnMediaServerResource::newApiConnection()
+{
+    return QnNewMediaServerConnection(getId());
+}
+
 QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourceTypeId, const QnResourceParams& /*params*/)
 {
     Q_UNUSED(resourceTypeId)

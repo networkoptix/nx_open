@@ -14,6 +14,7 @@
 #include <core/resource/resource_factory.h>
 #include <core/resource/storage_resource.h>
 #include "utils/network/http/asynchttpclient.h"
+#include "api/new_server_connection.h"
 
 
 class QnMediaServerResource : public QnResource
@@ -49,6 +50,7 @@ public:
     quint16 getPort() const;
 
     QnMediaServerConnectionPtr apiConnection();
+    QnNewMediaServerConnection newApiConnection();
 
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
