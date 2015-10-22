@@ -58,6 +58,7 @@
 #include <ui/workbench/watchers/workbench_server_address_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
 #include <ui/workbench/watchers/workbench_server_safemode_watcher.h>
+#include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_controller.h>
@@ -259,6 +260,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchServerAddressWatcher>();
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
+    context->instance<QnWorkbenchBookmarkTagsWatcher>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);

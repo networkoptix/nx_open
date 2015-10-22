@@ -456,27 +456,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetCameraUserAttributesHandler>( std::bind(fn, this, cameraId, std::placeholders::_1), cameraAttrsList );
         }
 
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int addBookmarkTags( const QnCameraBookmarkTags &tags, TargetType* target, HandlerType handler ) {
-            return addBookmarkTags(tags, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnCameraBookmarkTags& usage)
-        */
-        template<class TargetType, class HandlerType> int getBookmarkTags( TargetType* target, HandlerType handler ) {
-            return getBookmarkTags( std::static_pointer_cast<impl::GetCameraBookmarkTagsHandler>(std::make_shared<impl::CustomGetCameraBookmarkTagsHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int removeBookmarkTags( const QnCameraBookmarkTags &tags, TargetType* target, HandlerType handler ) {
-            return removeBookmarkTags(tags, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
     signals:
         void cameraAddedOrUpdated( QnVirtualCameraResourcePtr camera );
         void cameraHistoryChanged( ApiServerFootageData cameraHistory );
@@ -484,9 +463,6 @@ namespace ec2
 
         void userAttributesChanged( QnCameraUserAttributesPtr attributes );
         void userAttributesRemoved( QnUuid id );
-
-        void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
-        void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
 
     protected:
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) = 0;
@@ -497,10 +473,6 @@ namespace ec2
         virtual int saveUserAttributes( const QnCameraUserAttributesList& cameras, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getUserAttributes( const QnUuid& cameraId, impl::GetCameraUserAttributesHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
-        
-        virtual int addBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
-        virtual int getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler) = 0;
-        virtual int removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
     };
 
 

@@ -3,15 +3,18 @@
 
 #include <QtCore/QAbstractListModel>
 
-#include <utils/common/id.h>
+#include <api/model/audit/audit_record.h>
+
+#include <client/client_color_types.h>
 
 #include <core/resource/resource_fwd.h>
 
-#include "api/model/audit/audit_record.h"
-#include "client/client_color_types.h"
 #include <ui/customization/customized.h>
+#include <ui/workbench/workbench_context_aware.h>
 
-class QnAuditLogModel: public Customized<QAbstractListModel>
+#include <utils/common/id.h>
+
+class QnAuditLogModel: public Customized<QAbstractListModel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QnAuditLogColors colors READ colors WRITE setColors)
@@ -76,7 +79,7 @@ public:
     void setCheckState(Qt::CheckState state);
     Qt::CheckState checkState() const;
 
-    static QString makeSearchPattern(const QnAuditRecord* record);
+    QString makeSearchPattern(const QnAuditRecord* record) const;
 
     void setHeaderHeight(int value);
 
@@ -94,19 +97,19 @@ private:
 
     static QString getResourceNameById(const QnUuid &id);
     QString htmlData(const Column& column,const QnAuditRecord* data, int row, bool hovered) const;
-    static QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true);
+    QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true) const;
     static QString formatDuration(int durationSecs);
-    static QString eventDescriptionText(const QnAuditRecord* data);
+    QString eventDescriptionText(const QnAuditRecord* data) const;
     QVariant colorForType(Qn::AuditRecordType actionType) const;
     static QString buttonNameForEvent(Qn::AuditRecordType eventType);
-    static QString textData(const Column& column,const QnAuditRecord* action);
+    QString textData(const Column& column,const QnAuditRecord* action) const;
     bool skipDate(const QnAuditRecord *record, int row) const;
     
     int minWidthForColumn(const Column &column) const;
     QSize sectionSizeFromContents(int logicalIndex) const;
     static QString getResourcesString(const std::vector<QnUuid>& resources);
     static QnVirtualCameraResourceList getCameras(const std::vector<QnUuid>& resources);
-    static QString searchData(const Column& column, const QnAuditRecord* data);
+    QString searchData(const Column& column, const QnAuditRecord* data) const;
     QString descriptionTooltip(const QnAuditRecord *record) const;
     bool isDetailDataSupported(const QnAuditRecord *record) const;
 protected:

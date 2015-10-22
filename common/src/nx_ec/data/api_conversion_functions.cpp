@@ -26,7 +26,6 @@
 #include "api_camera_data.h"
 #include "api_camera_attributes_data.h"
 #include "api_camera_data_ex.h"
-#include "api_camera_bookmark_data.h"
 #include "api_camera_history_data.h"
 #include "api_email_data.h"
 #include "api_full_info_data.h"
@@ -953,17 +952,6 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
         data.params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
         ++iter;
     }
-}
-
-void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags) {
-    for (const ApiCameraBookmarkTagData &tag: data)
-        tags << tag.name;
-}
-
-void fromResourceToApi(const QnCameraBookmarkTags &tags, ApiCameraBookmarkTagDataList &data) {
-    data.reserve(data.size() + tags.size());
-    for (const QString &tag: tags)
-        data.push_back(ApiCameraBookmarkTagData(tag));
 }
 
 

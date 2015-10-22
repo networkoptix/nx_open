@@ -21,7 +21,7 @@
     <name>HD Witness Common Lib</name>
 
     <properties>
-        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
+        <guid>${common.guid}</guid>
         <!--Global libs-->
         <template>lib</template>
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>

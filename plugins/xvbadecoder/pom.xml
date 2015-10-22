@@ -21,6 +21,7 @@
     <name>HD Witness AMD XvBA decoder plugin</name>	
 
     <properties>
+        <guid>${xvbadecoder.guid}</guid>
         <product.title>${xvbadecoder.name}</product.title>	
         <!--Global libs-->
         <global.libs>-lcommon</global.libs>

@@ -99,10 +99,6 @@ namespace ec2 {
     void fromApiToResource(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message);
     void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data);
 
-    void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags);
-    void fromResourceToApi(const QnCameraBookmarkTags &tags, ApiCameraBookmarkTagDataList &data);
-    
-
 } // namespace ec2
 
 #endif // QN_API_CONVERSION_FUNCTIONS_H

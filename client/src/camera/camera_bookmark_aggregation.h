@@ -10,6 +10,7 @@ public:
 
     void addBookmark(const QnCameraBookmark &bookmark);
     void mergeBookmarkList(const QnCameraBookmarkList &bookmarkList);
+    bool removeBookmark(const QnUuid &bookmarkId);
 
     void setBookmarkList(const QnCameraBookmarkList &bookmarkList);
     const QnCameraBookmarkList &bookmarkList() const;

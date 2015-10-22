@@ -41,13 +41,14 @@ public:
     QnDbHelper();
     virtual ~QnDbHelper();
 
-    static bool execSQLQuery(const QString& query, QSqlDatabase& database);
+    static bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details);
     /*!
         \param scriptData SQL commands separated with ;
     */
     static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
     //!Reads file \a fileName and calls \a QnDbHelper::execSQLScript
     static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
+    bool execSQLQuery(QSqlQuery *query, const char* details) const;
     virtual QnDbTransaction* getTransaction() = 0;
     //const QnDbTransaction* getTransaction() const;
 

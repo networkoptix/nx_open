@@ -47,6 +47,7 @@ rtu::InterfaceInfo::InterfaceInfo(const QString &initName
 rtu::BaseServerInfo::BaseServerInfo()
     : id()
     , runtimeId()
+    , customization()
 
     , safeMode(false)
     , version()

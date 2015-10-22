@@ -42,6 +42,10 @@ QString QnAppInfo::applicationCompiler() {
     return QStringLiteral("${additional.compiler}");
 }
 
+QString QnAppInfo::applicationUriProtocol() {
+    return QStringLiteral("${uri.protocol}");
+}
+
 QString QnAppInfo::engineVersion() {
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
 }

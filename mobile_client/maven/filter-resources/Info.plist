@@ -6,14 +6,12 @@
 	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleGetInfoString</key>
-	<string>Created by Qt/QMake</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
 	<string>mobile_client</string>
 	<key>CFBundleIdentifier</key>
-	<string>${namespace.major}.${namespace.minor}.${namespace.additional}2</string>
+	<string>${ios.new_bundle_identifier}</string>
 	<key>CFBundleDisplayName</key>
 	<string>${display.product.name}</string>
 	<key>CFBundleName</key>
@@ -21,7 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>${project.version.name}</string>
 	<key>CFBundleVersion</key>
-	<string>${project.version.name}.${project.version.code}</string>
+	<string>${project.version.code}</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

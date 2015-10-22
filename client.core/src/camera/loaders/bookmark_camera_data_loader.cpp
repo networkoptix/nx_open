@@ -81,9 +81,8 @@ void QnBookmarksLoader::sendRequest(const QnTimePeriod &period) {
 
     m_timer.restart();
 
-    QnBookmarkRequestData requestData;
+    QnGetBookmarksRequestData requestData;
     requestData.cameras << m_camera;
-    requestData.format = Qn::JsonFormat;
     requestData.filter.startTimeMs = period.startTimeMs;
     requestData.filter.endTimeMs = period.isInfinite()
         ? DATETIME_NOW
@@ -107,7 +106,7 @@ void QnBookmarksLoader::handleDataLoaded(int status, const QnCameraBookmarkList 
     if (m_loadedData.isEmpty()) {
         m_loadedData = data;
     } else {
-        MultiServerCameraBookmarkList mergeSource;
+        QnMultiServerCameraBookmarkList mergeSource;
         mergeSource.push_back(m_loadedData);
         mergeSource.push_back(data);
         m_loadedData = QnCameraBookmark::mergeCameraBookmarks(mergeSource);

@@ -10,7 +10,7 @@ nxtool_msi_folder = 'bin'
 
 server_msi_name = '${finalName}-server-only.msi'
 client_msi_name = '${finalName}-client-only.msi'
-nxtool_msi_name = '${finalName}-nxtool.msi'
+nxtool_msi_name = '${finalName}-servertool.msi'
 
 commands = [\
 'candle -dinstalltype="client-only" -dDbSync22SourceDir="${DbSync22Dir}" -dClientHelpSourceDir="${ClientHelpSourceDir}" -dClientVoxSourceDir="${ClientVoxSourceDir}" -dClientBgSourceDir="${ClientBgSourceDir}" -arch ${arch} -out obj\\${build.configuration}-client-only\\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -ext wixext\WixSystemToolsExtension.dll Associations.wxs MyExitDialog.wxs PasswordShouldMatchDlg.wxs UpgradeDlg.wxs EmptyPasswordDlg.wxs AllFieldsAreMandatoryDlg.wxs InstallTypeDlg.wxs PortDuplicateDlg.wxs PortIsBusyDlg.wxs InvalidPasswordDlg.wxs MediaServerDlg.wxs ClientDlg.wxs SelectionWarning.wxs Product-client-only.wxs ClientHelp.wxs ClientVox.wxs ClientBg.wxs Client.wxs Server.wxs traytool.wxs DbSync22Files.wxs',\
@@ -68,5 +68,5 @@ if os.path.exists(join(bin_source_dir, 'applauncher.exe')):
     
 if os.path.exists(join(bin_source_dir, '${product.name}.exe')):
     os.unlink(join(bin_source_dir, '${product.name}.exe'))          
-if os.path.exists(join(bin_source_dir, 'clientexe.exe')):
-    shutil.copy2(join(bin_source_dir, 'clientexe.exe'), join(bin_source_dir, '${product.name}.exe'))
+if os.path.exists(join(bin_source_dir, 'client.bin.exe')):
+    shutil.copy2(join(bin_source_dir, 'client.bin.exe'), join(bin_source_dir, '${product.name}.exe'))

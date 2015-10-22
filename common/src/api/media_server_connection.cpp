@@ -87,9 +87,6 @@ namespace {
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
         (GetSystemNameObject,      "getSystemName")
         (RebuildArchiveObject,     "rebuildArchive")
-        (BookmarkAddObject,        "cameraBookmarks/add")
-        (BookmarkUpdateObject,     "cameraBookmarks/update")
-        (BookmarkDeleteObject,     "cameraBookmarks/delete")
         (InstallUpdateObject,      "installUpdate")
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
@@ -102,7 +99,11 @@ namespace {
         (ModulesInformationObject, "moduleInformation")
         (ec2CameraHistoryObject,   "ec2/cameraHistory")
         (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
-        (ec2BookmarksObject,        "ec2/bookmarks")
+        (ec2BookmarksObject,       "ec2/bookmarks")
+        (ec2BookmarkAddObject,     "ec2/bookmarks/add")
+        (ec2BookmarkUpdateObject,  "ec2/bookmarks/update")
+        (ec2BookmarkDeleteObject,  "ec2/bookmarks/delete")
+        (ec2BookmarkTagsObject,    "ec2/bookmarks/tags")
         (MergeLdapUsersObject,     "mergeLdapUsers")
         (SaveCloudSystemCredentialsObject,  "saveCloudSystemCredentials")
     );
@@ -242,10 +243,10 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnStorageScanData>(this, response, handle);
         break;
     }
-    case BookmarkAddObject: 
-    case BookmarkUpdateObject: 
-    case BookmarkDeleteObject:
-        processJsonReply<QnCameraBookmark>(this, response, handle);
+    case ec2BookmarkAddObject: 
+    case ec2BookmarkUpdateObject: 
+    case ec2BookmarkDeleteObject:
+        emitFinished(this, response.status, handle);
         break;
     case InstallUpdateObject:
         processJsonReply<QnUploadUpdateReply>(this, response, handle);
@@ -279,6 +280,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case ec2BookmarksObject:
         processFusionReply<QnCameraBookmarkList>(this, response, handle);
+        break;
+    case ec2BookmarkTagsObject:
+        processFusionReply<QnCameraBookmarkTagList>(this, response, handle);
         break;
     case TestLdapSettingsObject:
         processJsonReply<QnLdapUsers>(this, response, handle);
@@ -760,36 +764,6 @@ int QnMediaServerConnection::getEventLogAsync(
     return sendAsyncGetRequest(EventLogObject, params, QN_STRINGIZE_TYPE(QnBusinessActionDataListPtr), target, slot);
 }
 
-int QnMediaServerConnection::addBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
-    QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
-
-    QnRequestParamList params;
-    params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
-
-    return sendAsyncPostRequest(BookmarkAddObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
-}
-
-int QnMediaServerConnection::updateBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
-    QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
-
-    QnRequestParamList params;
-    params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
-
-    return sendAsyncPostRequest(BookmarkUpdateObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
-}
-
-int QnMediaServerConnection::deleteBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
-    QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
-
-    QnRequestParamList params;
-    params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
-
-    return sendAsyncPostRequest(BookmarkDeleteObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
-}
-
 int QnMediaServerConnection::installUpdate(const QString &updateId, bool delayed, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("updateId", updateId);
@@ -881,8 +855,27 @@ int QnMediaServerConnection::recordedTimePeriods(const QnChunksRequestData &requ
     return sendAsyncGetRequest(ec2RecordedTimePeriodsObject, fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList) ,target, slot);
 }
 
-int QnMediaServerConnection::getBookmarksAsync(const QnBookmarkRequestData &request, QObject *target, const char *slot) {
+int QnMediaServerConnection::addBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
+    QnUpdateBookmarkRequestData request(bookmark);
+    return sendAsyncGetRequest(ec2BookmarkAddObject, request.toParams(), nullptr ,target, slot);   
+}
+
+int QnMediaServerConnection::updateBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
+    QnUpdateBookmarkRequestData request(bookmark);
+    return sendAsyncGetRequest(ec2BookmarkUpdateObject, request.toParams(), nullptr ,target, slot);
+}
+
+int QnMediaServerConnection::deleteBookmarkAsync(const QnUuid &bookmarkId, QObject *target, const char *slot) {
+    QnDeleteBookmarkRequestData request(bookmarkId);
+    return sendAsyncGetRequest(ec2BookmarkDeleteObject, request.toParams(), nullptr ,target, slot);   
+}
+
+int QnMediaServerConnection::getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot) {
     return sendAsyncGetRequest(ec2BookmarksObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
+}
+
+int QnMediaServerConnection::getBookmarkTagsAsync(const QnGetBookmarkTagsRequestData &request, QObject *target, const char *slot) {
+    return sendAsyncGetRequest(ec2BookmarkTagsObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkTagList), target, slot);
 }
 
 int QnMediaServerConnection::saveCloudSystemCredentials(
@@ -897,3 +890,4 @@ int QnMediaServerConnection::saveCloudSystemCredentials(
 
     return sendAsyncGetRequest(SaveCloudSystemCredentialsObject, params, NULL, target, slot);
 }
+

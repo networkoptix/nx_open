@@ -54,9 +54,6 @@ signals:
 
     void videowallControlMessageReceived(const QnVideoWallControlMessage &message);
 
-    void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
-    void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
-
     void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
     void remotePeerFound(const ec2::ApiPeerAliveData &data);
     void remotePeerLost(const ec2::ApiPeerAliveData &data);

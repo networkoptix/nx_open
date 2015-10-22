@@ -16,6 +16,7 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
     Q_PROPERTY(Protocol protocol READ protocol NOTIFY protocolChanged)
+    Q_PROPERTY(qreal aspectRatio READ aspectRatio NOTIFY aspectRatioChanged)
 
     Q_ENUMS(Protocol)
 
@@ -49,6 +50,8 @@ public:
 
     Protocol protocol() const;
 
+    qreal aspectRatio() const;
+
 signals:
     void resourceIdChanged();
     void mediaUrlChanged();
@@ -57,6 +60,7 @@ signals:
     void resolutionChanged();
     void screenSizeChanged();
     void protocolChanged();
+    void aspectRatioChanged();
 
 private:
     void at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -78,6 +82,7 @@ private:
     int m_nativeStreamIndex;
     QMap<int, QString> m_nativeResolutions;
     bool m_transcodingSupported;
+    Protocol m_nativeProtocol;
 };
 
 #endif // MEDIA_RESOURCE_HELPER_H

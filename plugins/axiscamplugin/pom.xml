@@ -21,7 +21,8 @@
     <name>HD Witness AXIS camera integration plugin</name>	
 
     <properties>
-        <product.title>${axiscamplugin.name}</product.title>	
+        <guid>${axiscamplugin.guid}</guid>
+        <product.title>${axiscamplugin.name}</product.title>
         <!--Global libs-->
         <qt.libs>core network</qt.libs>
         <global.libs/>

@@ -34,6 +34,7 @@
     </dependencies>
 
     <properties>
+        <guid>${client.core.guid}</guid>
         <product.title>${client.name} Core</product.title>
         <product.display.title>${client.display.name} Core</product.display.title>
         <!--Global libs-->

@@ -21,7 +21,7 @@
     <name>HD Witness Media Server Core</name>
 
     <properties>
-        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
+        <guid>${mediaserver_core.guid}</guid>
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>

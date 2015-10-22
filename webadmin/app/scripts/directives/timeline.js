@@ -1281,9 +1281,10 @@ angular.module('webadminApp')
 
                 };
 
+                var dragged = false;
                 scope.draginit = function(event){
                     updateMouseCoordinate(event);
-
+                    dragged = false;
                     if(mouseOverLeftScrollButton){
                         scope.startScroll(true);
                         return;
@@ -1306,10 +1307,16 @@ angular.module('webadminApp')
 
                     if(catchScrollBar) {
                         var moveScroll = mouseInScrollbar - catchScrollBar;
+                        if(moveScroll !== 0 ){
+                            dragged = true;
+                        }
                         scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
                     }
                     if(catchTimeline) {
                         var moveScroll = catchTimeline - mouseInTimeline;
+                        if(moveScroll !== 0 ){
+                            dragged = true;
+                        }
                         catchTimeline = mouseInTimeline;
                         scope.scaleManager.scrollByPixels(moveScroll);
                     }
@@ -1317,9 +1324,14 @@ angular.module('webadminApp')
                 scope.drastart = function(event){
                 };
                 scope.dragend = function(event){
+
                     catchScrollBar = false;
                     catchTimeline = false;
                     scope.scaleManager.releaseWatching();
+
+                    if(!dragged){
+                        return;
+                    }
 
                     preventClick = true;
                     setTimeout(function(){

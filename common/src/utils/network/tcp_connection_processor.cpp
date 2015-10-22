@@ -512,6 +512,12 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         result.userName = lit("Video wall");
 
     result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull())
+        result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull()) {
+        QUrlQuery query(d->request.requestLine.url.query());
+        result.id = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
+    }
     if (result.id.isNull()) {
         QByteArray nonce = d->request.getCookieValue("auth");
         if (!nonce.isEmpty()) {
@@ -519,12 +525,6 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
             md5Hash.addData( nonce );
             result.id = QnUuid::fromRfc4122(md5Hash.result());
         }
-    }
-    if (result.id.isNull())
-        result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-    if (result.id.isNull()) {
-        QUrlQuery query(d->request.requestLine.url.query());
-        result.id = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     }
     if (result.id.isNull())
         result.id = QnUuid::createUuid();

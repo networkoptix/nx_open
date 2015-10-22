@@ -76,6 +76,23 @@
                             <encoding>UTF-8</encoding>
                         </configuration>            
                     </execution>
+                    <execution>
+                        <id>generate-solution</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>maven/solution</directory>
+                                    <filtering>true</filtering>
+                                </resource>                                                           
+                            </resources>              
+                            <encoding>UTF-8</encoding>
+                        </configuration>            
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -311,10 +328,17 @@
                                             <token>CustomBuild</token>
                                             <value>None</value>
                                         </replacement>
+                                        
+                                        <!-- Replacing GUIDs to predefined ones -->
+                                        <replacement>
+                                            <xpath>//Project/PropertyGroup</xpath>
+                                            <token><![CDATA[<ProjectGuid>\{(.*)}]]></token>
+                                            <value><![CDATA[<ProjectGuid>${guid}]]></value>
+                                        </replacement>
 
                                         <!-- Disabling moc preprocessor steps, since we do it with jom -->
                                         <replacement>
-                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.h')]</xpath>
+                                            <xpath>//Project/PropertyGroup/CustomBuild[contains(@Include,'.h')]</xpath>
                                             <token><![CDATA[</CustomBuild>]]></token>
                                             <value><![CDATA[
       <ExcludedFromBuild>true</ExcludedFromBuild>

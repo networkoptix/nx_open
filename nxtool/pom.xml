@@ -23,6 +23,7 @@
         </dependency>
     </dependencies>   
     <properties>
+        <guid>${nxtool.guid}</guid>
         <product.title>${nxtool.name}</product.title>  
         <product.display.title>${nxtool.display.name}</product.display.title>
         <template>app</template>

@@ -13,6 +13,7 @@
 #include <recording/time_period_list.h>
 
 #include <utils/common/warnings.h>
+#include <utils/common/synctime.h>
 
 //#define QN_FLAT_CAMERA_DATA_LOADER_DEBUG
 
@@ -56,6 +57,11 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
             startTimeMs = last.startTimeMs;
         else
             startTimeMs = last.endTimeMs() - minOverlapDuration;
+
+        /* If system time were changed back, we may have periods in the future, so currently recorded chunks will not be loaded. */
+        qint64 currentSystemTime = qnSyncTime->currentMSecsSinceEpoch();
+        if (currentSystemTime < startTimeMs) 
+            startTimeMs = currentSystemTime - minOverlapDuration;
     }
 
 #ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG

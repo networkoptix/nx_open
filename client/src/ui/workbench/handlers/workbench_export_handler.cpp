@@ -88,15 +88,17 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
     connect(action(Qn::ExportLayoutAction),        &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
 }
 
-#ifdef Q_OS_WIN
 QString QnWorkbenchExportHandler::binaryFilterName() const {
-#ifdef Q_OS_WIN64
-    return tr("Executable %1 Media File (x64) (*.exe)").arg(QnAppInfo::organizationName());
-#else
-    return tr("Executable %1 Media File (x86) (*.exe)").arg(QnAppInfo::organizationName());
+#ifdef Q_OS_WIN
+    #ifdef Q_OS_WIN64
+        return tr("Executable %1 Media File (x64) (*.exe)").arg(QnAppInfo::organizationName());
+    #else
+        return tr("Executable %1 Media File (x86) (*.exe)").arg(QnAppInfo::organizationName());
+    #endif
 #endif
+    return QString();
 }
-#endif
+
 
 bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
     if (m_filesIsUse.contains(filename)) {
@@ -126,6 +128,15 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
 void QnWorkbenchExportHandler::unlockFile(const QString &filename) {
     m_filesIsUse.remove(filename);
 }
+
+bool QnWorkbenchExportHandler::isBinaryExportSupported() const {
+#ifdef Q_OS_WIN
+    return !qnRuntime->isActiveXMode();
+#else
+    return false;
+#endif
+}
+
 
 bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
                                                      const QnTimePeriod &exportPeriod,
@@ -237,34 +248,27 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             + filterSeparator
             + mkvFileFilter;
 
-#ifdef Q_OS_WIN
-    if (!qnRuntime->isActiveXMode())
-        allowedFormatFilter += 
-            filterSeparator
-            + binaryFilterName();
-#endif
+    if (isBinaryExportSupported())
+        allowedFormatFilter += filterSeparator + binaryFilterName();
 
     QnLayoutItemData itemData = widget->item()->data();
 
     QString fileName;
     QString selectedExtension;
     QString selectedFilter;
+    bool binaryExport = false;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
     int rotation = itemData.rotation;
     QRectF zoomRect = itemData.zoomRect;
     qreal customAr = widget->resource()->customAspectRatio();
 
-    int timeOffset = 0;
-    if (qnSettings->timeMode() == Qn::ServerTimeMode) {
-        // time difference between client and server
-        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
-    }
+    int timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
 
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
     QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
             ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs + timeOffset).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs + timeOffset).toString(lit("hh_mm_ss"));
+            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
     while (true) {
@@ -284,11 +288,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         setHelpTopic(dialog.data(), Qn::Exporting_Help);
 
-        QnAbstractWidgetControlDelegate* delegate = NULL;
-#ifdef Q_OS_WIN
-        if (!qnRuntime->isActiveXMode())
-            delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
-#endif
+        QnAbstractWidgetControlDelegate* delegate = isBinaryExportSupported()
+            ? new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this)
+            : nullptr;
+
         QComboBox* comboBox = 0;
         bool doTranscode = false;
         const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
@@ -299,6 +302,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             comboBox->addItem(tr("Top Right Corner (requires transcoding)"), Qn::TopRightCorner);
             comboBox->addItem(tr("Bottom Left Corner (requires transcoding)"), Qn::BottomLeftCorner);
             comboBox->addItem(tr("Bottom Right Corner (requires transcoding)"), Qn::BottomRightCorner);
+
+            bool isPanoramic = widget->resource()->getVideoLayout(0)->channelCount() > 1;
+            if (isPanoramic)
+                comboBox->setCurrentIndex(comboBox->count() - 1); /* Bottom right, as on layout */
 
             dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
@@ -322,8 +329,17 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         if (fileName.isEmpty())
             return;
 
+        binaryExport = isBinaryExportSupported()
+            ? selectedFilter.contains(binaryFilterName())
+            : false;
+        
         if (comboBox)
             timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
+
+        if (binaryExport) {
+            doTranscode = false;
+            timestampPos = Qn::NoCorner;
+        }
 
         if (!doTranscode) {
             contrastParams.enabled = false;
@@ -403,10 +419,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
-#ifdef Q_OS_WIN
-    if (!qnRuntime->isActiveXMode()
-        && selectedFilter.contains(binaryFilterName()))
-    {
+
+    if (binaryExport) {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
             existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
@@ -420,7 +434,6 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         saveLayoutToLocalFile(newLayout, period, fileName, Qn::LayoutExport, false, true);
         return;
     }
-#endif
 
     QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
     exportProgressDialog->setWindowTitle(tr("Exporting Video"));
@@ -565,13 +578,8 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     bool readOnly = false;
 
     QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(QnAppInfo::organizationName());
-
-#ifdef Q_OS_WIN
-    if (!qnRuntime->isActiveXMode())
-        mediaFileFilter +=
-            filterSeparator
-            + binaryFilterName();
-#endif
+    if (isBinaryExportSupported())
+        mediaFileFilter += filterSeparator + binaryFilterName();
 
     while (true) {
         /* Check if we were disconnected (server shut down) while the dialog was open. 

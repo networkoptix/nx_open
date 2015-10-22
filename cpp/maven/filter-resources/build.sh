@@ -26,8 +26,11 @@ fi
 export LD_LIBRARY_PATH=${libdir}/lib/${build.configuration}:${qt.dir}/lib
 export DYLD_LIBRARY_PATH=${libdir}/lib/${build.configuration}
 export DYLD_FRAMEWORK_PATH=${qt.dir}/lib
-export ANDROID_SDK_ROOT=${android.sdk}
-export ANDROID_NDK_ROOT=${android.ndk}
+
+if [ "${platform}" == "android" ]; then
+    export ANDROID_SDK_ROOT=${android.sdk}
+    export ANDROID_NDK_ROOT=${android.ndk}
+fi
 
 case `uname -s` in
     "Linux")

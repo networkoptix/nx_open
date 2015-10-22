@@ -54,7 +54,8 @@
                                     <includes>
                                         <include>donotrebuild</include>
                                     </includes>
-                                </fileset>                                
+
+                                </fileset>                                                                  
                             </filesets>
                             <skip>${clean-skip}</skip>							
                         </configuration>            

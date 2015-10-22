@@ -40,6 +40,23 @@ void QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &
         addBookmark(bookmark);
 }
 
+bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId) {
+    if (!m_bookmarkIds.remove(bookmarkId))
+        return false;
+
+    auto it = std::find_if(m_bookmarkList.begin(), m_bookmarkList.end(), [&bookmarkId](const QnCameraBookmark &bookmark){
+        return bookmark.guid == bookmarkId;
+    });
+
+    Q_ASSERT_X(it != m_bookmarkList.end(), Q_FUNC_INFO, "Bookmark should be present in both id set and list");
+    if (it == m_bookmarkList.end())
+        return false;
+
+    m_bookmarkList.erase(it);
+
+    return true;
+}
+
 void QnCameraBookmarkAggregation::setBookmarkList(const QnCameraBookmarkList &bookmarkList) {
     m_bookmarkList = bookmarkList;
     m_bookmarkIds.clear();

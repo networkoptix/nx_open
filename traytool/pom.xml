@@ -32,6 +32,7 @@
     </dependencies>		
 
     <properties>
+        <guid>${traytool.guid}</guid>
         <product.title>${traytool.name}</product.title>
         <product.display.title>${traytool.display.name}</product.display.title>
         <template>app</template>

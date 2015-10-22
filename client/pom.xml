@@ -50,6 +50,7 @@
     </dependencies>
 
     <properties>
+        <guid>${client.guid}</guid>
         <product.title>${client.name}</product.title>
         <product.display.title>${client.display.name}</product.display.title>
         <template>lib</template>
