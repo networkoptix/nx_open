@@ -15,6 +15,7 @@ QnPage {
     title: mainWindow.currentSystemName
 
     property string resourceId
+    property string initialScreenshot
 
     Rectangle {
         width: mainWindow.width
@@ -66,6 +67,19 @@ QnPage {
         onQualityPicked: mediaPlayer.resourceHelper.resolution = resolution
     }
 
+    QnActiveCameraThumbnailLoader {
+        id: thumbnailLoader
+        resourceId: videoPlayer.resourceId
+        Component.onCompleted: initialize(parent)
+    }
+
+    Binding {
+        target: thumbnailLoader
+        property: "position"
+        value: videoNavigation.timelinePosition
+        when: videoNavigation.timelineDragging && !mediaPlayer.atLive
+    }
+
     QnScalableVideo {
         id: video
 
@@ -75,12 +89,18 @@ QnPage {
         anchors.rightMargin: -navigationBarPlaceholder.realWidth
 
         source: mediaPlayer.mediaPlayer
+        screenshotSource: initialResourceScreenshot
+        screenshotAspectRatio: mediaPlayer.resourceHelper.aspectRatio
 
         onClicked: {
             if (videoNavigation.visible)
                 hideUi()
             else
                 showUi()
+        }
+
+        function bindScreenshotSource() {
+            screenshotSource = Qt.binding(function(){ return thumbnailLoader.thumbnailUrl })
         }
     }
 
@@ -99,6 +119,16 @@ QnPage {
     QnMediaPlayer {
         id: mediaPlayer
         resourceId: videoPlayer.resourceId
+
+        onPlayingChanged: {
+            if (playing)
+                video.screenshotSource = ""
+        }
+
+        onTimelinePositionRequest: {
+            video.bindScreenshotSource()
+            thumbnailLoader.forceLoadThumbnail(mediaPlayer.position)
+        }
     }
 
     QnVideoNavigation {
@@ -108,6 +138,11 @@ QnPage {
         visible: opacity > 0
         opacity: 1.0
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+
+        onTimelineDraggingChanged: {
+            if (timelineDragging)
+                video.bindScreenshotSource()
+        }
     }
 
     Component.onCompleted: {

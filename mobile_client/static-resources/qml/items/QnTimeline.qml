@@ -15,7 +15,7 @@ Item {
     property alias chunkProvider: timeline.chunkProvider
     property alias startBound: timeline.startBound
     property alias autoPlay: timeline.autoPlay
-    readonly property bool dragging: mouseArea.pressed || pinchArea.pinch.active
+    readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving
     readonly property var timelineView: timeline
 
@@ -44,6 +44,7 @@ Item {
         anchors.fill: parent
 
         property bool moving: false
+        property bool dragging: false
 
         textColor: QnTheme.timelineText
         chunkColor: QnTheme.timelineChunk
@@ -68,12 +69,14 @@ Item {
 
         onPinchStarted: {
             timeline.moving = true
+            timeline.dragging = true
             timeline.startPinch(pinch.center.x, pinch.scale)
         }
         onPinchUpdated: {
             timeline.updatePinch(pinch.center.x, pinch.scale)
         }
         onPinchFinished: {
+            timeline.dragging = false
             timeline.finishPinch(pinch.center.x, pinch.scale)
             root.dragFinished()
         }
@@ -94,6 +97,7 @@ Item {
                 if (pressX != -1 && Math.abs(pressX - mouseX) > drag.threshold) {
                     preventStealing = true
                     timeline.moving = true
+                    timeline.dragging = true
                     timeline.startDrag(pressX)
                     pressX = -1
                 }
@@ -103,6 +107,7 @@ Item {
                 preventStealing = false
                 pressX = -1
                 timeline.finishDrag(mouse.x)
+                timeline.dragging = false
 
                 if (timeline.moving)
                     root.dragFinished()
