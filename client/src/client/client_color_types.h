@@ -101,8 +101,9 @@ struct QnIoModuleColors {
     QnIoModuleColors();
 
     QColor idLabel;
+    QColor buttonBackground;
 };
-#define QnIoModuleColors_Fields (idLabel)
+#define QnIoModuleColors_Fields (idLabel)(buttonBackground)
 
 
 struct QnScheduleGridColors {

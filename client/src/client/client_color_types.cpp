@@ -88,6 +88,7 @@ QnStatisticsColors::QnStatisticsColors() {
 
 QnIoModuleColors::QnIoModuleColors() {
     idLabel = QColor(0x57, 0x57, 0x57);
+    buttonBackground = QColor("#1c1c1c");
 }
 
 QnScheduleGridColors::QnScheduleGridColors() {

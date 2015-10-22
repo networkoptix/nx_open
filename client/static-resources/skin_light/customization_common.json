@@ -253,7 +253,8 @@
             }
         },
         "colors": {
-            "idLabel": "#575757"
+            "idLabel": "#575757",
+            "buttonBackground": "#cccccc"
         }
     },
 
