@@ -105,13 +105,13 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
-bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details) const {
+bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details) {
     QSqlQuery query(database);
     query.prepare(queryStr);
     return execSQLQuery(&query, details);
 }
 
-bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) const {
+bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) {
     if (!query->exec()) {
         qWarning() << details << query->lastError().text();
         return false;
@@ -119,7 +119,7 @@ bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) const {
     return true;
 }
 
-bool QnDbHelper::execSQLScript(const QByteArray& scriptData, QSqlDatabase& database) const
+bool QnDbHelper::execSQLScript(const QByteArray& scriptData, QSqlDatabase& database)
 {
     QList<QByteArray> commands = quotedSplit(scriptData);
 #ifdef DB_DEBUG

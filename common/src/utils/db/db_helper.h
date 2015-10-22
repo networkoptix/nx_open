@@ -41,6 +41,12 @@ public:
     QnDbHelper();
     virtual ~QnDbHelper();
 
+    virtual QnDbTransaction* getTransaction() = 0;
+
+    bool applyUpdates(const QString &dirName);
+    virtual bool beforeInstallUpdate(const QString& updateName);
+    virtual bool afterInstallUpdate(const QString& updateName);
+
     static bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details);
     /*!
         \param scriptData SQL commands separated with ;
@@ -48,13 +54,7 @@ public:
     static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
     //!Reads file \a fileName and calls \a QnDbHelper::execSQLScript
     static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
-    bool execSQLQuery(QSqlQuery *query, const char* details) const;
-    virtual QnDbTransaction* getTransaction() = 0;
-    //const QnDbTransaction* getTransaction() const;
-
-    bool applyUpdates(const QString &dirName);
-    virtual bool beforeInstallUpdate(const QString& updateName);
-    virtual bool afterInstallUpdate(const QString& updateName);
+    static bool execSQLQuery(QSqlQuery *query, const char* details);
 
 protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
