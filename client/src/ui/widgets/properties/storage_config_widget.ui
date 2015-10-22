@@ -14,7 +14,7 @@
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
-      <string>Main storages</string>
+      <string>Main Storages</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -85,7 +85,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Redundant (Backup) storages</string>
+      <string>Redundant (Backup) Storages</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
@@ -225,7 +225,7 @@
      <item>
       <widget class="QPushButton" name="pushButtonCameraSettings">
        <property name="text">
-        <string>Cameras to backup</string>
+        <string>Cameras to Backup...</string>
        </property>
       </widget>
      </item>
@@ -245,7 +245,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>When to backup</string>
+        <string>When to Backup</string>
        </property>
       </widget>
      </item>
@@ -255,7 +255,7 @@
      <item>
       <widget class="QPushButton" name="pushButtonSchedule">
        <property name="text">
-        <string>Edit Schedule</string>
+        <string>Schedule...</string>
        </property>
       </widget>
      </item>

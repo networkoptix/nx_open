@@ -74,20 +74,23 @@ private slots:
     
     void at_backupTypeComboBoxChange(int index);
 private:
-    Ui::StorageConfigWidget* ui;
+    QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;
     QnStorageResourceList m_storages;
     struct StoragePool
     {
         StoragePool();
         QScopedPointer<QnStorageListModel> model;
-        QnStorageScanData prevRebuildState;
+        bool rebuildCancelled;
+        bool hasStorageChanges;
     };
 
     StoragePool m_mainPool;
     StoragePool m_backupPool;
     QnMediaServerUserAttributes m_serverUserAttrs;
     BackupSettingsDataList m_cameraBackupSettings;
+
+    bool m_backupCancelled;
 private:
     void setupGrid(QTableView* tableView, StoragePool* storagePool);
     void processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& newData, bool isBackupPool) const;

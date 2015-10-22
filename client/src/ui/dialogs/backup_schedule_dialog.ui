@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>322</width>
-    <height>231</height>
+    <height>247</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Add External Storage...</string>
+   <string>Backup Schedule...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -118,7 +118,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Start at</string>
+            <string>Start at:</string>
            </property>
           </widget>
          </item>
@@ -148,7 +148,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Continue to</string>
+            <string>Continue to:</string>
            </property>
           </widget>
          </item>
@@ -178,7 +178,7 @@
          <item row="0" column="0" colspan="2">
           <widget class="QLabel" name="label_4">
            <property name="text">
-            <string>Limit backup bandwidth</string>
+            <string>Limit Bandwidth:</string>
            </property>
           </widget>
          </item>
