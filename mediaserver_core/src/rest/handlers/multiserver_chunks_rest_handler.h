@@ -4,6 +4,8 @@
 #include <core/resource/resource_fwd.h>
 #include <rest/server/fusion_rest_handler.h>
 
+#include <api/helpers/request_helpers_fwd.h>
+
 class QnMultiserverChunksRestHandler: public QnFusionRestHandler
 {
 public:

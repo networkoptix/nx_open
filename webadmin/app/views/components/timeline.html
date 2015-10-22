@@ -30,8 +30,8 @@
         </div><div class="text-center" >
         <div class="webclient-panel-border"></div>
             <span class="webclient-button caption-row"
-                  ng-class="{disabled: !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)}"
-                    ng-click="playPause()">
+                  ng-class="{disabled: playbackNotSupported || !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)}"
+                    ng-click="(playbackNotSupported || !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)) || playPause()">
                 <span class="glyphicon glyphicon-play"
                         ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>

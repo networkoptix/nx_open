@@ -159,8 +159,10 @@ function gotoMainScreen() {
         gotoNewSession()
 }
 
-function openMediaResource(uuid, xHint, yHint) {
+function openMediaResource(uuid, xHint, yHint, initialScreenshot) {
     mainWindow.activeResourceId = uuid
+    mainWindow.initialResourceScreenshot = initialScreenshot
+
     sideNavigation.hide()
     sideNavigation.enabled = false
 

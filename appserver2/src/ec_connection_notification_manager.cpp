@@ -258,10 +258,6 @@ namespace ec2
         m_updatesManager->triggerNotification(tran);
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran ) {
-        m_cameraManager->triggerNotification(tran);
-    }
-
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeData>& /*tran*/ ) {
         //#ak no notification needed in this case
     }

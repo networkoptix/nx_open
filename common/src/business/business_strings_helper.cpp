@@ -207,13 +207,12 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
 }
 
 QString QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) {
-    return eventTimestamp(params, aggregationCount) + delimiter + eventDetails(params, aggregationCount, delimiter);
+    return eventTimestamp(params, aggregationCount) + delimiter + eventDetails(params, delimiter);
 }
 
-QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) {
+QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, const QString& delimiter) {
     using namespace QnBusiness;
 
-    Q_UNUSED(aggregationCount)
     QString result;
 
     switch (params.eventType) {

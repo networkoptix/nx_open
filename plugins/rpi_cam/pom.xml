@@ -21,7 +21,8 @@
     <name>HD Witness Raspberry Pi Camera Plugin</name>
 
 	<properties>
-		<product.title>${project.name}</product.title>
+		<guid>${rpi_cam.guid}</guid>
+        <product.title>${project.name}</product.title>
 		<!--Global libs-->
 		<qt.libs>core</qt.libs>
 		<global.libs>-lcommon -lopenmaxil -lvcos -lbcm_host</global.libs>

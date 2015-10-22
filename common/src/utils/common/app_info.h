@@ -16,6 +16,8 @@ struct QnAppInfo {
     static QString applicationPlatformModification();
     static QString applicationCompiler();
 
+    static QString applicationUriProtocol();
+
     static QString engineVersion();
     static QString ffmpegVersion();
     static QString sigarVersion();

@@ -62,13 +62,22 @@ namespace {
         return protocol == nativeStreamProtocol ? position * 1000 : position;
     }
 
+    QSize sizeFromResolutionString(const QString &resolution) {
+        int pos = resolution.indexOf(QLatin1Char('x'), 0, Qt::CaseInsensitive);
+        if (pos == -1)
+            return QSize();
+
+        return QSize(resolution.left(pos).toInt(), resolution.mid(pos + 1).toInt());
+    }
+
 } // anonymous namespace
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     QObject(parent),
     m_position(-1),
     m_nativeStreamIndex(1),
-    m_transcodingSupported(true)
+    m_transcodingSupported(true),
+    m_nativeProtocol(nativeStreamProtocol)
 {
     setStardardResolutions();
 }
@@ -93,6 +102,8 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
 
     if (resource) {
         m_resource = resource;
+
+        m_nativeProtocol = nativeStreamProtocol;
 
         connect(m_resource.data(), &QnResource::propertyChanged, this, &QnMediaResourceHelper::at_resourcePropertyChanged);
         connect(m_resource.data(), &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
@@ -148,7 +159,7 @@ void QnMediaResourceHelper::updateUrl() {
 
     QUrlQuery query;
 
-    Protocol protocol = m_transcodingSupported ? transcodingProtocol : nativeStreamProtocol;
+    Protocol protocol = m_transcodingSupported ? transcodingProtocol : m_nativeProtocol;
     QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user();
 
     url.setScheme(protocolScheme(protocol));
@@ -168,6 +179,9 @@ void QnMediaResourceHelper::updateUrl() {
             url.setPath(lit("/media/%1.%2").arg(camera->getUniqueId()).arg(protocolName(protocol)));
             query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
             query.addQueryItem(lit("rt"), lit("true"));
+        } else if (protocol == Mjpeg) {
+            url.setPath(lit("/media/%1.%2").arg(camera->getUniqueId()).arg(protocolName(protocol)));
+            query.addQueryItem(lit("resolution"), m_nativeResolutions[m_nativeStreamIndex]);
         } else {
             url.setPath(lit("/%1").arg(camera->getUniqueId()));
             query.addQueryItem(lit("stream"), QString::number(m_nativeStreamIndex));
@@ -288,7 +302,30 @@ QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const {
     if (m_transcodingSupported)
         return transcodingProtocol;
     else
-        return nativeStreamProtocol;
+        return m_nativeProtocol;
+}
+
+qreal QnMediaResourceHelper::aspectRatio() const {
+    if (m_nativeResolutions.isEmpty())
+        return 0;
+
+    QString resolution;
+
+    if (m_nativeResolutions.size() == 1) {
+        resolution = m_nativeResolutions.first();
+    } else {
+        if (m_transcodingSupported) {
+            resolution = m_nativeResolutions.first();
+        } else {
+            resolution = m_nativeResolutions[m_nativeStreamIndex];
+        }
+    }
+
+    QSize size = sizeFromResolutionString(resolution);
+    if (size.isEmpty())
+        return 0;
+
+    return qreal(size.width()) / size.height();
 }
 
 void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key) {
@@ -303,6 +340,9 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
 
     m_nativeResolutions.clear();
     bool transcodingSupported = false;
+    bool nativeSupported = false;
+    bool mjpegSupported = false;
+
     for (const CameraMediaStreamInfo &info: supportedStreams.streams) {
         if (info.transcodingRequired)
             transcodingSupported = true;
@@ -310,7 +350,13 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
         if (info.transcodingRequired || info.resolution == CameraMediaStreamInfo::anyResolution)
             continue;
 
-        if (std::find(info.transports.begin(), info.transports.end(), protocolName(nativeStreamProtocol)) != info.transports.end()) {
+        bool hasNative = std::find(info.transports.begin(), info.transports.end(), protocolName(nativeStreamProtocol)) != info.transports.end();
+        bool hasMjpeg = std::find(info.transports.begin(), info.transports.end(), lit("mjpeg")) != info.transports.end();
+
+        nativeSupported |= hasNative;
+        mjpegSupported |= hasMjpeg;
+
+        if (hasNative || hasMjpeg) {
             if (nativeStreamIndex(info.resolution) != -1)
                 continue;
             m_nativeResolutions.insert(info.encoderIndex, info.resolution);
@@ -319,14 +365,21 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
     if (m_nativeResolutions.size() < 2 && !m_nativeResolutions.isEmpty()) /* primary and secondary streams */
         m_nativeStreamIndex = m_nativeResolutions.firstKey();
 
+    if (mjpegSupported && !nativeSupported)
+        m_nativeProtocol = Mjpeg;
+    else
+        m_nativeProtocol = nativeStreamProtocol;
+
     if (m_transcodingSupported != transcodingSupported) {
         m_transcodingSupported = transcodingSupported;
         emit resolutionsChanged();
+        emit aspectRatioChanged();
         emit resolutionChanged();
         emit protocolChanged();
     } else if (!m_transcodingSupported) {
         emit resolutionsChanged();
         emit resolutionChanged();
+        emit aspectRatioChanged();
     }
 
     updateUrl();

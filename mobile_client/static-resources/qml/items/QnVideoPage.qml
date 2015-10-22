@@ -15,6 +15,7 @@ QnPage {
     title: mainWindow.currentSystemName
 
     property string resourceId
+    property string initialScreenshot
 
     Rectangle {
         width: mainWindow.width
@@ -66,6 +67,19 @@ QnPage {
         onQualityPicked: mediaPlayer.resourceHelper.resolution = resolution
     }
 
+    QnActiveCameraThumbnailLoader {
+        id: thumbnailLoader
+        resourceId: videoPlayer.resourceId
+        Component.onCompleted: initialize(parent)
+    }
+
+    Binding {
+        target: thumbnailLoader
+        property: "position"
+        value: videoNavigation.timelinePosition
+        when: videoNavigation.timelineDragging && !mediaPlayer.atLive
+    }
+
     QnScalableVideo {
         id: video
 
@@ -75,6 +89,8 @@ QnPage {
         anchors.rightMargin: -navigationBarPlaceholder.realWidth
 
         source: mediaPlayer.mediaPlayer
+        screenshotSource: initialResourceScreenshot
+        screenshotAspectRatio: mediaPlayer.resourceHelper.aspectRatio
 
         onClicked: {
             if (videoNavigation.visible)
@@ -82,11 +98,37 @@ QnPage {
             else
                 showUi()
         }
+
+        function bindScreenshotSource() {
+            screenshotSource = Qt.binding(function(){ return thumbnailLoader.thumbnailUrl })
+        }
+    }
+
+    Rectangle {
+        id: navigationBarTint
+
+        color: QnTheme.navigationPanelBackground
+        width: navigationBarPlaceholder.realWidth
+        height: video.height
+        anchors.left: parent.right
+        anchors.top: video.top
+
+        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
     }
 
     QnMediaPlayer {
         id: mediaPlayer
         resourceId: videoPlayer.resourceId
+
+        onPlayingChanged: {
+            if (playing)
+                video.screenshotSource = ""
+        }
+
+        onTimelinePositionRequest: {
+            video.bindScreenshotSource()
+            thumbnailLoader.forceLoadThumbnail(mediaPlayer.position)
+        }
     }
 
     QnVideoNavigation {
@@ -96,6 +138,11 @@ QnPage {
         visible: opacity > 0
         opacity: 1.0
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+
+        onTimelineDraggingChanged: {
+            if (timelineDragging)
+                video.bindScreenshotSource()
+        }
     }
 
     Component.onCompleted: {
@@ -105,6 +152,7 @@ QnPage {
     function hideUi() {
         videoNavigation.opacity = 0.0
         toolBar.opacity = 0.0
+        navigationBarTint.opacity = 0.0
         if (Main.isMobile())
             enterFullscreen()
     }
@@ -113,6 +161,7 @@ QnPage {
         exitFullscreen()
         videoNavigation.opacity = 1.0
         toolBar.opacity = 1.0
+        navigationBarTint.opacity = 1.0
     }
 
     focus: true

@@ -10,11 +10,11 @@ QnCameraBookmarkDialog::QnCameraBookmarkDialog(QWidget *parent) :
 
 QnCameraBookmarkDialog::~QnCameraBookmarkDialog() {}
 
-QnCameraBookmarkTags QnCameraBookmarkDialog::tags() const {
+const QnCameraBookmarkTagList &QnCameraBookmarkDialog::tags() const {
     return ui->bookmarkWidget->tags();
 }
 
-void QnCameraBookmarkDialog::setTags(const QnCameraBookmarkTags &tags) {
+void QnCameraBookmarkDialog::setTags(const QnCameraBookmarkTagList &tags) {
     ui->bookmarkWidget->setTags(tags);
 }
 

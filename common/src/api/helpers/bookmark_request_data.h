@@ -2,21 +2,57 @@
 
 #include <QUrlQuery>
 
+#include <api/helpers/request_helpers_fwd.h>
+#include <api/helpers/multiserver_request_data.h>
+
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 
-struct QnBookmarkRequestData
-{
-    QnBookmarkRequestData();
+struct QnGetBookmarksRequestData: public QnMultiserverRequestData {
+    QnGetBookmarksRequestData();
 
-    static QnBookmarkRequestData fromParams(const QnRequestParamList& params);
-    QnRequestParamList toParams() const;
-    QUrlQuery toUrlQuery() const;
-    bool isValid() const;
+    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual QnRequestParamList toParams() const override;
+    virtual bool isValid() const override;
 
     QnCameraBookmarkSearchFilter filter;
     Qn::SerializationFormat format;
     QnVirtualCameraResourceList cameras;
-    bool isLocal;   
+};
+
+struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData {
+    QnGetBookmarkTagsRequestData(int limit = QnGetBookmarkTagsRequestData::unlimited());
+
+    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual QnRequestParamList toParams() const override;
+    virtual bool isValid() const override;
+
+    static int unlimited();
+
+    Qn::SerializationFormat format;
+    int limit;
+};
+
+struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData {
+    QnUpdateBookmarkRequestData();
+    QnUpdateBookmarkRequestData(const QnCameraBookmark &bookmark);
+
+    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual QnRequestParamList toParams() const override;
+    virtual bool isValid() const override;
+
+    QnCameraBookmark bookmark;
+};
+
+struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData {
+    QnDeleteBookmarkRequestData();
+    QnDeleteBookmarkRequestData(const QnUuid &bookmarkId);
+
+    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual QnRequestParamList toParams() const override;
+    virtual bool isValid() const override;
+
+    QnUuid bookmarkId;
+
 };
