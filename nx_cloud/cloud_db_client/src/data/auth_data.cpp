@@ -6,6 +6,7 @@
 #include "auth_data.h"
 
 #include <utils/common/model_functions.h>
+#include <utils/preprocessor/field_name.h>
 
 #include "system_data.h"
 
@@ -14,26 +15,36 @@ namespace nx {
 namespace cdb {
 namespace api {
 
+MAKE_FIELD_NAME_STR_CONST(AuthRequest, nonce)
+MAKE_FIELD_NAME_STR_CONST(AuthRequest, username)
+MAKE_FIELD_NAME_STR_CONST(AuthRequest, realm)
+
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AuthRequest* const authRequest)
 {
-    if (!urlQuery.hasQueryItem("nonce") ||
-        !urlQuery.hasQueryItem("username") ||
-        !urlQuery.hasQueryItem("realm"))
+    if (!urlQuery.hasQueryItem(AuthRequest_nonce_field) ||
+        !urlQuery.hasQueryItem(AuthRequest_username_field) ||
+        !urlQuery.hasQueryItem(AuthRequest_realm_field))
     {
         return false;
     }
 
-    authRequest->nonce = urlQuery.queryItemValue("nonce").toStdString();
-    authRequest->username = urlQuery.queryItemValue("username").toStdString();
-    authRequest->realm = urlQuery.queryItemValue("realm").toStdString();
+    authRequest->nonce = urlQuery.queryItemValue(AuthRequest_nonce_field).toStdString();
+    authRequest->username = urlQuery.queryItemValue(AuthRequest_username_field).toStdString();
+    authRequest->realm = urlQuery.queryItemValue(AuthRequest_realm_field).toStdString();
     return true;
 }
 
 void serializeToUrlQuery(const AuthRequest& authRequest, QUrlQuery* const urlQuery)
 {
-    urlQuery->addQueryItem("nonce", QString::fromStdString(authRequest.nonce));
-    urlQuery->addQueryItem("username", QString::fromStdString(authRequest.username));
-    urlQuery->addQueryItem("realm", QString::fromStdString(authRequest.realm));
+    urlQuery->addQueryItem(
+        AuthRequest_nonce_field,
+        QString::fromStdString(authRequest.nonce));
+    urlQuery->addQueryItem(
+        AuthRequest_username_field,
+        QString::fromStdString(authRequest.username));
+    urlQuery->addQueryItem(
+        AuthRequest_realm_field,
+        QString::fromStdString(authRequest.realm));
 }
 
 
