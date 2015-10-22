@@ -17,9 +17,9 @@ export CUSTOMIZATION=${deb.customization.company.name}
 export CHECKBOOTHDDPART=
 export CHECKDATAHDDPART=
 export DISK=`fdisk -l | grep "Disk" | grep "dev/sd" | awk '{print substr ($2, 0, length($2))}'`
-if [ ! -z $DISK ]; then 
+if [ ! -z $DISK ]; then
     export CHECKBOOTHDDPART=`fdisk -l | grep "$DISK"1 | awk '{print $1}'`
-    export CHECKDATAHDDPART=`fdisk -l | grep "$DISK"2 | awk '{print $1}'`    
+    export CHECKDATAHDDPART=`fdisk -l | grep "$DISK"2 | awk '{print $1}'`
 fi
 
 if [[ ! -z $( cat /proc/cmdline | grep mmc ) ]]; then export BOOTDEVICE=mmc; else export BOOTDEVICE=ata; fi
@@ -46,35 +46,50 @@ export HDDNX1=
 setup_hdd_environment() {
     if [ -f /tmp/hdd_native ]; then rm /tmp/hdd_native; fi
     if [ -f /tmp/archive ]; then rm /tmp/archive; fi
-    if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then 
+    if [ "$BOOTDEVICE" = "mmc" ]; then
+        if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then
+            mkdir -p $MNTDATAHDDPART
+            mkdir -p $MNTBOOTHDDPART
+            mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
+            mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
+            HDDMAC=`cat $MNTBOOTHDDPART/var/tmp/mac`
+            echo "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >&2 >/dev/kmsg
+            echo `date` "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >> $NX1LOG
+            echo "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >&2 >/dev/kmsg
+            echo `date` "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >> $NX1LOG
+            if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ] && [ "$HDDMAC" = "$MAC" ]; then HDDNX1=true; else HDDNX1=false; fi
+            ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
+            ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
+            if [[ ! -z "$ARCHIVE_FILES" ]] && [[ ! -z "$ARCHIVE_DB" ]]; then ARCHIVE=true; else ARCHIVE=false; fi
+            echo "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >&2 >/dev/kmsg
+            echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >> $NX1LOG
+            for p in $( lsof $MNTBOOTHDDPART | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
+            sleep 2
+            umount $BOOTHDDPART
+            for p in $( lsof $MNTDATAHDDPART | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
+            sleep 2
+            umount $DATAHDDPART
+            rm -Rf $MNTBOOTHDDPART
+        else
+            HDDNX1=false
+            ARCHIVE=false
+        fi
+        echo $HDDNX1 > /tmp/hdd_native
+        echo $ARCHIVE > /tmp/archive
+    else
+        HDDMAC=`cat /var/tmp/mac`
+
         mkdir -p $MNTDATAHDDPART
-        mkdir -p $MNTBOOTHDDPART
         mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
-        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
-        HDDMAC=`cat $MNTBOOTHDDPART/var/tmp/mac`
-        echo "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ ACTUAL MAC:"$MAC" ++++++++++++++" >> $NX1LOG      
-        echo "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ HARD DRIVE IS BOUND TO MAC:"$HDDMAC" ++++++++++++++" >> $NX1LOG    
-        if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ] && [ "$HDDMAC" = "$MAC" ]; then HDDNX1=true; else HDDNX1=false; fi
         ARCHIVE_FILES=`ls $MNTDATAHDDPART/*Media/ | grep quality`
         ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep ".sqlite"`
         if [[ ! -z "$ARCHIVE_FILES" ]] && [[ ! -z "$ARCHIVE_DB" ]]; then ARCHIVE=true; else ARCHIVE=false; fi
         echo "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >> $NX1LOG       
-        for p in $( lsof $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
-        sleep 2
-        umount $BOOTHDDPART
-        for p in $( lsof $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
+        echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >> $NX1LOG
+        for p in $( lsof $MNTDATAHDDPART | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $DATAHDDPART
-        rm -Rf $MNTBOOTHDDPART
-    else 
-        HDDNX1=false
-        ARCHIVE=false
     fi
-    echo $HDDNX1 > /tmp/hdd_native
-    echo $ARCHIVE > /tmp/archive
 }
 
 read_hdd_environment() {
@@ -105,7 +120,7 @@ get_serial_number() {
     SERIAL=$(/tmp/fw_printenv serial | sed 's/serial=//')
     echo $SERIAL > /tmp/serial
     echo "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >&2 >/dev/kmsg
-    echo `date` "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >> $NX1LOG         
+    echo `date` "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >> $NX1LOG
     rm /tmp/fw_printenv
     umount $BOOTPART
     rm -Rf $MNTBOOTPART
@@ -125,7 +140,7 @@ ethtweak () {
     if [ -z "$ETH" ]; then
         echo "++++++++++++++ NETWORK INTERFACE ERROR. REBOOTING TO FIX ++++++++++++++" >&2 >/dev/kmsg
         echo `date` "++++++++++++++ NETWORK INTERFACE ERROR. REBOOTING TO FIX ++++++++++++++" >> $NX1LOG
-        rm /etc/udev/rules.d/70-persistent-net.rules    
+        rm /etc/udev/rules.d/70-persistent-net.rules
         reboot
     fi
 }
@@ -139,10 +154,10 @@ hddboot_indicator_create() {
 }
 
 reboot_from_hdd () {
-    if [ -z $DISK ]; then 
+    if [ -z $DISK ]; then
         echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
         echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
-        exit 1 
+        exit 1
     else
         echo "++++++++++++++ REBOOTING FROM HDD... ++++++++++++++" >&2 >/dev/kmsg
         echo `date` "++++++++++++++ REBOOTING FROM HDD... ++++++++++++++" >> $NX1LOG
@@ -162,12 +177,12 @@ reboot_from_sd () {
 }
 
 system_restore () {
-    if [ -z $DISK ]; then 
+    if [ -z $DISK ]; then
         echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
         echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
         exit 0
     fi
-    
+
     if [ "$BOOTDEVICE" = "ata" ]; then
         rm /restored
         fsck.ext4 $DATAPART -fy
@@ -177,15 +192,15 @@ system_restore () {
         umount $BOOTPART
         rm -Rf $MNTBOOTPART
         echo "++++++++++++++ REBOOTING TO SD CARD FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
-        echo `date` "++++++++++++++ REBOOTING TO SD CARD FOR RESTORE ++++++++++++++" >> $NX1LOG           
+        echo `date` "++++++++++++++ REBOOTING TO SD CARD FOR RESTORE ++++++++++++++" >> $NX1LOG
         reboot_from_sd
         exit 0
-    fi    
+    fi
 
-    if [ "$BOOTDEVICE" = "mmc" ] && [ ! -f /restore ]; then 
+    if [ "$BOOTDEVICE" = "mmc" ] && [ ! -f /restore ]; then
         mkdir -p $MNTBOOTHDDPART
         mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
-        rm $MNTBOOTHDDPART/restored         
+        rm $MNTBOOTHDDPART/restored
         umount $BOOTHDDPART
         rm -Rf $MNTBOOTHDDPART
         echo "++++++++++++++ REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
@@ -195,19 +210,19 @@ system_restore () {
         shutdown -rF now
         exit 0
     fi
-    
+
     if [ -f /restore ]; then
         stop_server
         read_hdd_environment
-        /etc/init.d/nx1led restore         
+        /etc/init.d/nx1led restore
         rm /etc/udev/rules.d/70-persistent-net.rules
-        for p in $( lsof $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
+        for p in $( lsof $MNTBOOTHDDPART | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $BOOTHDDPART
-        for p in $( lsof $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
+        for p in $( lsof $MNTDATAHDDPART | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
-        umount $DATAHDDPART    
-        if [ "$ARCHIVE" = "false" ]; then 
+        umount $DATAHDDPART
+        if [ "$ARCHIVE" = "false" ]; then
             echo "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >&2 >/dev/kmsg
             echo `date` "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >> $NX1LOG
             dd if=/dev/zero of=$DISK bs=512 count=1 conv=notrunc
@@ -215,7 +230,7 @@ system_restore () {
             #for v_partition in $(parted -s $DISK print|awk '/^ / {print $1}')
             #do
             #   parted -s $DISK rm ${v_partition}
-            #done            
+            #done
             (echo y) | parted -a optimal $DISK mklabel msdos
             #(echo w) | fdisk $DISK
             #parted -a optimal $DISK mkpart primary ext4 0G 8G
@@ -228,21 +243,21 @@ system_restore () {
             mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
             MOUNTDATA=`df -h | grep "$DATAHDDPART"`
             sleep 2
-            if [ -z "$MOUNTDATA" ]; then 
+            if [ -z "$MOUNTDATA" ]; then
                 echo "++++++++++++++ CANNOT MOUNT FILESYSTEM "$DATAHDDPART" - REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
-                echo `date` "++++++++++++++ CANNOT MOUNT FILESYSTEM "$DATAHDDPART" - REBOOTING FOR RESTORE  ++++++++++++++" >> $NX1LOG        
+                echo `date` "++++++++++++++ CANNOT MOUNT FILESYSTEM "$DATAHDDPART" - REBOOTING FOR RESTORE  ++++++++++++++" >> $NX1LOG
                 touch /restore
                 hddboot_indicator_create
                 shutdown -rF now
                 exit 0
             fi
-            for p in $( lsof $MNTDATAHDDPART | awk {'print $2'} ); do print $p; done            
+            for p in $( lsof $MNTDATAHDDPART | grep $MNTDATAHDDPART | awk {'print $2'} ); do print $p; done
             sleep 2
             umount $DATAHDDPART
-        else    
+        else
             echo "++++++++++++++ ARCHIVE FOUND ON HDD. RESTORING ONLY SYSTEM PARTITION... ++++++++++++++" >&2 >/dev/kmsg
             echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD. RESTORING ONLY SYSTEM PARTITION... ++++++++++++++" >> $NX1LOG
-        fi 
+        fi
         echo "++++++++++++++ RESTORING SYSTEM PARTITION... ++++++++++++++"  >&2 >/dev/kmsg
         echo `date` "++++++++++++++ RESTORING SYSTEM PARTITION... ++++++++++++++" >> $NX1LOG
         mkfs.ext4 $BOOTHDDPART
@@ -250,17 +265,17 @@ system_restore () {
         mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
         MOUNTBOOT=`df -h | grep "$BOOTHDDPART"`
         sleep 2
-        if [ -z "$MOUNTBOOT" ]; then 
+        if [ -z "$MOUNTBOOT" ]; then
             echo "++++++++++++++ CANNOT MOUNT FILESYSTEM "$BOOTHDDPART" - REBOOTING FOR RESTORE ++++++++++++++" >&2 >/dev/kmsg
-            echo `date` "++++++++++++++ CANNOT MOUNT FILESYSTEM "$BOOTHDDPART" - REBOOTING FOR RESTORE  ++++++++++++++" >> $NX1LOG        
+            echo `date` "++++++++++++++ CANNOT MOUNT FILESYSTEM "$BOOTHDDPART" - REBOOTING FOR RESTORE  ++++++++++++++" >> $NX1LOG
             touch /restore
             hddboot_indicator_create
             shutdown -rF now
             exit 0
-        fi        
+        fi
         for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
-        umount $BOOTHDDPART        
+        umount $BOOTHDDPART
         dd if=$DATAPART of=$BOOTHDDPART bs=4096 conv=notrunc,noerror,sync
         #rsync -arx --progress  --delete / $MNTBOOTHDDPART --exclude 'mnt' >&2 >/dev/kmsg
         sync
@@ -268,7 +283,7 @@ system_restore () {
         mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
         rm -Rf $MNTBOOTHDDPART/mnt
         mkdir $MNTBOOTHDDPART/mnt
-        mv -f $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var/scripts $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/ 
+        mv -f $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var/scripts $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/
         rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/var
         rm -Rf $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
         mkdir -p $MNTBOOTHDDPART/opt/$CUSTOMIZATION/mediaserver/etc/
@@ -281,10 +296,10 @@ system_restore () {
             cp -f /var/tmp/interfaces $MNTBOOTHDDPART/etc/network
         else
             cp -f /root/tools/network/interfaces $MNTBOOTHDDPART/etc/network
-        fi    
+        fi
         delete_saved_ipconfig
         rm /var/tmp/interfaces
-        rm /var/tmp/keep_ip         
+        rm /var/tmp/keep_ip
         rm $MNTBOOTHDDPART/restore
         touch $MNTBOOTHDDPART/restored
         if [ ! -f $MNTBOOTHDDPART/var/tmp/mac ]; then echo $MAC > $MNTBOOTHDDPART/var/tmp/mac; fi
@@ -293,7 +308,7 @@ system_restore () {
         /etc/init.d/nx1led stop
         shutdown -rF now
         exit 0
-    fi    
+    fi
 }
 
 check_statistics_warning() {
@@ -306,50 +321,50 @@ save_ipconfig() {
     echo "++++++++++++++ SAVING IP CONFIG... ++++++++++++++" >&2 >/dev/kmsg
     if [ "$BOOTDEVICE" = "mmc" ]; then
         mkdir -p $MNTBOOTHDDPART
-        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART  
-        if [ -f $MNTBOOTHDDPART/etc/network/interfaces ]; then 
+        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
+        if [ -f $MNTBOOTHDDPART/etc/network/interfaces ]; then
             cp -f $MNTBOOTHDDPART/etc/network/interfaces /var/tmp
         else
             cp -f /etc/network/interfaces /var/tmp
         fi
         touch /var/tmp/keep_ip
-        umount $BOOTHDDPART    
+        umount $BOOTHDDPART
     fi
     if [ "$BOOTDEVICE" = "ata" ]; then
         mkdir -p $MNTDATAPART
-        mount -t ext4 $DATAPART $MNTDATAPART 
+        mount -t ext4 $DATAPART $MNTDATAPART
         cp -f /etc/network/interfaces $MNTDATAPART/var/tmp
         touch $MNTDATAPART/var/tmp/keep_ip
         umount $DATAPART
-        rm -Rf $MNTDATAPART  
-    fi    
+        rm -Rf $MNTDATAPART
+    fi
 }
 
 delete_saved_ipconfig() {
     if [ "$BOOTDEVICE" = "mmc" ]; then
         rm /var/tmp/interfaces
-        rm /var/tmp/keep_ip   
+        rm /var/tmp/keep_ip
     fi
     if [ "$BOOTDEVICE" = "ata" ]; then
         mkdir -p $MNTDATAPART
-        mount -t ext4 $DATAPART $MNTDATAPART 
+        mount -t ext4 $DATAPART $MNTDATAPART
         rm $MNTDATAPART/var/tmp/interfaces
         rm $MNTDATAPART/var/tmp/keep_ip
         umount $DATAPART
-        rm -Rf $MNTDATAPART  
-    fi    
+        rm -Rf $MNTDATAPART
+    fi
 }
 
 upgrade() {
     if [ "$BOOTDEVICE" = "ata" ]; then
-        if [ ! -f /var/tmp/mac ]; then echo $MAC > /var/tmp/mac; fi    
+        if [ ! -f /var/tmp/mac ]; then echo $MAC > /var/tmp/mac; fi
     else
         mkdir -p $MNTBOOTHDDPART
-        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART  
-        if [ ! -f $MNTBOOTHDDPART/var/tmp/mac ]; then echo $MAC > $MNTBOOTHDDPART/var/tmp/mac; fi                
-        umount $BOOTHDDPART 
-        rm -Rf $MNTBOOTHDDPART         
-    fi    
+        mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
+        if [ ! -f $MNTBOOTHDDPART/var/tmp/mac ]; then echo $MAC > $MNTBOOTHDDPART/var/tmp/mac; fi
+        umount $BOOTHDDPART
+        rm -Rf $MNTBOOTHDDPART
+    fi
     get_serial_number
     chown root:root /etc/crontab
     chmod 600 /etc/crontab
@@ -366,13 +381,13 @@ default_sequence () {
     check_statistics_warning
     if [[ -z $(cat /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf | grep systemName) ]]; then echo "systemName=__auto__system_"$MAC >> /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf; else echo true; fi
     if [[ -z $(cat /root/tools/nx/mediaserver.conf | grep systemName) ]]; then echo "systemName=__auto__system_"$MAC >> /root/tools/nx/mediaserver.conf; else echo true; fi
-    if [ "$BOOTDEVICE" = "mmc" ]; then    
-        if [ -z $DISK ]; then 
+    if [ "$BOOTDEVICE" = "mmc" ]; then
+        if [ -z $DISK ]; then
             echo "++++++++++++++ NO HDD FOUND ++++++++++++++" >&2 >/dev/kmsg
             echo `date` "++++++++++++++ NO HDD FOUND ++++++++++++++" >> $NX1LOG
             hddboot_indicator_create
         else
-            if [ "$HDDNX1" = "false" ]; then 
+            if [ "$HDDNX1" = "false" ]; then
                 echo "++++++++++++++ FOREIGN HDD FOUND. LAUNCHING SYSTEM RESTORE... ++++++++++++++" >&2 >/dev/kmsg
                 echo `date` "++++++++++++++ FOREIGN HDD FOUND. LAUNCHING SYSTEM RESTORE... ++++++++++++++" >> $NX1LOG
                 system_restore
@@ -380,7 +395,7 @@ default_sequence () {
                 echo "++++++++++++++ NX1 HDD FOUND. NEXT TIME WILL TRY TO BOOT ONE MORE TIME... ++++++++++++++" >&2 >/dev/kmsg
                 echo `date` "++++++++++++++ NX1 HDD FOUND. NEXT TIME WILL TRY TO BOOT ONE MORE TIME... ++++++++++++++" >> $NX1LOG
                 hddboot_indicator_flush
-            fi    
+            fi
         fi
         /etc/init.d/nx1led boot_sd
     fi
@@ -389,7 +404,7 @@ default_sequence () {
         echo `date` "++++++++++++++ MOUNTING DATA HDD PARTITION... ++++++++++++++" >> $NX1LOG
         mount -t ext4 $DATAHDDPART $MNTDATAHDDPART
         /etc/init.d/nx1led boot_hdd
-    fi  
+    fi
     start_server
 }
 
@@ -400,21 +415,21 @@ case "$1" in
     exit 0
     ;;
   restart|reload|force-reload)
-    echo "Error: argument '$1' not supported" >&2    
+    echo "Error: argument '$1' not supported" >&2
     exit 3
     ;;
   stop)
     # No-op
     ;;
   reboot)
-    shutdown -rF now 
-    ;;     
+    shutdown -rF now
+    ;;
   boot_sd)
-    reboot_from_sd 
-    ;;    
+    reboot_from_sd
+    ;;
   boot_hdd)
     reboot_from_hdd
-    ;;        
+    ;;
   restore)
     delete_saved_ipconfig
     system_restore
@@ -422,10 +437,10 @@ case "$1" in
   restore_keep_ip)
     save_ipconfig
     system_restore
-    ;;   
+    ;;
   upgrade)
     upgrade
-    ;;      
+    ;;
   *)
     echo "Usage: nx1boot [start|stop|reboot|boot_sd|boot_hdd|restore|restore_keep_ip|upgrade]" >&2
     exit 3
