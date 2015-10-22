@@ -45,6 +45,7 @@ namespace
     const QString kLocalTimeFlagTag = "local";
     const QString kSafeModeTag = "ecDbReadOnly";
     const QString kSysInfoTag = "systemInformation";
+    const QString kCustomizationTag = "customization";
 
     QUrl makeUrl(const QString &host
         , const int port
@@ -72,7 +73,8 @@ namespace
             , info.extraInfo().password, command);
     }
     
-    QString convertCapsToReadable(const QString &caps)
+    QString convertCapsToReadable(const QString &customization
+        , const QString &caps)
     {
         static const auto kWindowsTag = QStringLiteral("windows");
         static const auto kLinuxTag = QStringLiteral("linux");
@@ -96,7 +98,11 @@ namespace
             else
             {
                 if (caps.contains("bpi"))
-                    return QStringLiteral("Nx1");
+                {
+                    static const auto vista = QStringLiteral("vista");
+                    return (customization.contains(vista) ?
+                        QStringLiteral("Q") : QStringLiteral("Nx1"));
+                }
                 else if (caps.contains("rpi"))
                     return QStringLiteral("Raspberry Pi");
                 else if (caps.contains("isd"))
@@ -131,16 +137,19 @@ namespace
         result.insert(kVersionTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.version = rtu::VersionHolder(object.value(kVersionTag).toString()); });
         result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.safeMode = object.value(kSafeModeTag).toBool(); });
+            { info.safeMode = object.value(kSafeModeTag).toBool(); });        
+        result.insert(kCustomizationTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.customization = object.value(kCustomizationTag).toString(); });
 
         result.insert(kSysInfoTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
         {
             const auto val = object.value(kSysInfoTag);
             const auto sysInfo = val.toObject();
-            QString systemCaps;
+
+            /// We use info.os to temporary store OS caps.
             if (sysInfo.isEmpty())
             {
-                systemCaps = val.toString();
+                info.os = val.toString();
             }
             else
             {
@@ -155,10 +164,8 @@ namespace
                 const QString arch = (sysInfo.keys().contains(kArchKey) 
                     ? sysInfo.value(kArchKey).toString() : QString());
 
-                systemCaps = QStringLiteral("%1 %2 %3").arg(platform, arch, modification);
+                info.os = QStringLiteral("%1 %2 %3").arg(platform, arch, modification);
             }
-
-            info.os = convertCapsToReadable(systemCaps);
         });
 
         const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info, const QString &tagName)
@@ -508,6 +515,9 @@ bool rtu::parseModuleInformationReply(const QJsonObject &reply
     else
         baseInfo.safeMode = true;   /// for debug!
     */
+
+    /// Before conversion baseInfo.os contains OS caps but not finalizaed OS/Type name
+    baseInfo.os = convertCapsToReadable(baseInfo.customization, baseInfo.os);
 
     return true;
 }
