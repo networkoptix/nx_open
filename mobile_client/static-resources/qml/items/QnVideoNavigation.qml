@@ -13,6 +13,7 @@ Item {
     property var mediaPlayer
 
     readonly property bool timelineDragging: timeline.dragging
+    readonly property bool timelineMoving: timeline.moving
     readonly property real timelinePosition: timeline.position
 
     width: parent.width

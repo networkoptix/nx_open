@@ -76,6 +76,17 @@ QUrl QnActiveCameraThumbnailLoader::thumbnailUrl() const {
     return QUrl(lit("image://%1/%2").arg(lit("active")).arg(thumbnailId()));
 }
 
+void QnActiveCameraThumbnailLoader::forceLoadThumbnail(qint64 position) {
+    Q_D(QnActiveCameraThumbnailLoader);
+    bool isPositionChanged = d->position != position;
+
+    d->position = position;
+    d->refresh(true);
+
+    if (isPositionChanged)
+        emit positionChanged();
+}
+
 void QnActiveCameraThumbnailLoader::initialize(QObject *item) {
     Q_D(QnActiveCameraThumbnailLoader);
 

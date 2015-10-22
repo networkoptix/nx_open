@@ -28,6 +28,7 @@ public:
     QString thumbnailId() const;
     QUrl thumbnailUrl() const;
 
+    Q_INVOKABLE void forceLoadThumbnail(qint64 position);
     Q_INVOKABLE void initialize(QObject *item);
 
 signals:

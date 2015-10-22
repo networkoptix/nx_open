@@ -48,7 +48,10 @@ void QnActiveCameraThumbnailLoaderPrivate::clear() {
     thumbnailId = QString();
 }
 
-void QnActiveCameraThumbnailLoaderPrivate::refresh() {
+void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force) {
+    if (force)
+        requestId = invalidRequest;
+
     if (requestId != invalidRequest) {
         requestNextAfterReply = true;
         return;
@@ -79,6 +82,9 @@ QSize QnActiveCameraThumbnailLoaderPrivate::currentSize() const {
 void QnActiveCameraThumbnailLoaderPrivate::at_thumbnailReceived(int status, const QImage &image, int handle) {
     Q_UNUSED(handle)
 
+    if (requestId != handle)
+        return;
+
     requestId = invalidRequest;
 
     if (currentQuality < screenshotQualityList.size() - 1 && !fetchTimer.hasExpired(fastTimeout))
@@ -97,7 +103,7 @@ void QnActiveCameraThumbnailLoaderPrivate::at_thumbnailReceived(int status, cons
     thumbnailPixmap = QPixmap::fromImage(image);
 
     Q_Q(QnActiveCameraThumbnailLoader);
-    if (camera && position > 0) {
+    if (camera) {
         thumbnailId = lit("%1/%2").arg(camera->getId().toString()).arg(position);
         q->thumbnailIdChanged();
     }

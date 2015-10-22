@@ -77,7 +77,7 @@ QnPage {
         target: thumbnailLoader
         property: "position"
         value: videoNavigation.timelinePosition
-        when: videoNavigation.timelineDragging
+        when: videoNavigation.timelineDragging && !mediaPlayer.atLive
     }
 
     QnScalableVideo {
@@ -99,11 +99,8 @@ QnPage {
                 showUi()
         }
 
-        Binding {
-            target: video
-            property: "screenshotSource"
-            value: thumbnailLoader.thumbnailUrl
-            when: videoNavigation.timelineDragging && !mediaPlayer.playing
+        function bindScreenshotSource() {
+            screenshotSource = Qt.binding(function(){ return thumbnailLoader.thumbnailUrl })
         }
     }
 
@@ -127,6 +124,11 @@ QnPage {
             if (playing)
                 video.screenshotSource = ""
         }
+
+        onTimelinePositionRequest: {
+            video.bindScreenshotSource()
+            thumbnailLoader.forceLoadThumbnail(mediaPlayer.position)
+        }
     }
 
     QnVideoNavigation {
@@ -136,6 +138,11 @@ QnPage {
         visible: opacity > 0
         opacity: 1.0
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+
+        onTimelineDraggingChanged: {
+            if (timelineDragging)
+                video.bindScreenshotSource()
+        }
     }
 
     Component.onCompleted: {

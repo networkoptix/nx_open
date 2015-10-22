@@ -35,7 +35,7 @@ public:
 
     QPixmap thumbnail() const;
     void clear();
-    void refresh();
+    void refresh(bool force = false);
     void requestRefresh();
 
     QSize currentSize() const;
