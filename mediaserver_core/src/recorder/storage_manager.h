@@ -184,6 +184,11 @@ private:
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
     
     void writeCameraInfoFiles();
+    static bool renameFileWithDuration(
+        const QString               &oldName,
+        int64_t                     duration,
+        const QnStorageResourcePtr  &storage
+    );
 
 private:
     const QnServer::StoragePool m_role;
