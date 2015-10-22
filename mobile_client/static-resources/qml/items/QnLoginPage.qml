@@ -274,7 +274,8 @@ QnPage {
 
     function loginWithCurrentFields() {
         var sessionId = (state == "FailedSaved" ? loginPage.sessionId : "")
-        LoginFunctions.connectToServer(sessionId, hostField.text, portField.text, loginField.text, passwordField.text)
+        var customConnection = (loginPage.objectName == "newConnectionPage")
+        LoginFunctions.connectToServer(sessionId, hostField.text, portField.text, loginField.text, passwordField.text, customConnection)
     }
 
     focus: true
