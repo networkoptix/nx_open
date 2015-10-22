@@ -56,7 +56,7 @@ chmod -R 755 $BINSTAGE
 
 install -m 755 $SERVER_BIN_PATH/connection_mediator $BINSTAGE/connection_mediator
 install -m 644 init/networkoptix-connection_mediator.conf $INITSTAGE/$COMPANY_NAME-connection_mediator.conf
-install -m 644 etc/networkoptix-connection_mediator.conf $ETCSTAGE/$COMPANY_NAME-connection_mediator.conf
+install -m 644 etc/connection_mediator.conf $ETCSTAGE/connection_mediator.conf
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN

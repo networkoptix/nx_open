@@ -56,7 +56,7 @@ chmod -R 755 $BINSTAGE
 
 install -m 755 $SERVER_BIN_PATH/cloud_db $BINSTAGE/cloud_db
 install -m 644 init/networkoptix-cloud_db.conf $INITSTAGE/$COMPANY_NAME-cloud_db.conf
-install -m 644 etc/networkoptix-cloud_db.conf $ETCSTAGE/$COMPANY_NAME-cloud_db.conf
+install -m 644 etc/cloud_db.conf $ETCSTAGE/cloud_db.conf
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN

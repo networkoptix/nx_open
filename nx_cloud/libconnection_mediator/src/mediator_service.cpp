@@ -21,11 +21,30 @@
 #include "mediaserver_api.h"
 #include "version.h"
 
+static const QLatin1String CLOUD_ADDRESS( "cloudAddress" );
+static const QLatin1String CLOUD_USER( "cloudUser" );
+static const QLatin1String CLOUD_PASSWORD( "cloudPassword" );
+static const QLatin1String CLOUD_UPDATE_INTERVAL( "cloudUpdateInterval" );
+
+static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
+static const QLatin1String DEFAULT_STUN_ADDRESS_TO_LISTEN( ":3345" );
+static const QLatin1String DEFAULT_HTTP_ADDRESS_TO_LISTEN( ":3346" );
+static const QLatin1String DEFAULT_CLOUD_USER( "connection_mediator" );
+static const QLatin1String DEFAULT_CLOUD_PASSWORD( "123456" );
+
+#ifdef Q_OS_LINUX
+static const QString MODULE_NAME = lit( "connection_mediator" );
+static const QString DEFAULT_CONFIG_FILE = QString( "/opt/%1/%2/etc/%2.conf" )
+        .arg( VER_LINUX_ORGANIZATION_NAME ).arg( MODULE_NAME );
+static const QString DEFAULT_VAR_DIR = QString( "/opt/%1/%2/var" )
+        .arg( VER_LINUX_ORGANIZATION_NAME ).arg( MODULE_NAME );
+#endif
+
 namespace nx {
 namespace hpm {
 
 MediatorProcess::MediatorProcess( int argc, char **argv )
-: 
+:
     QtService<QtSingleCoreApplication>(argc, argv, QN_APPLICATION_NAME),
     m_argc( argc ),
     m_argv( argv )
@@ -40,27 +59,6 @@ void MediatorProcess::pleaseStop()
 
 int MediatorProcess::executeApplication()
 {
-    static const QLatin1String CLOUD_USER( "cloudUser" );
-    static const QLatin1String CLOUD_PASSWORD( "cloudPassword" );
-    static const QLatin1String CLOUD_UPDATE_INTERVAL( "cloudUpdateInterval" );
-
-    static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
-    static const QLatin1String DEFAULT_STUN_ADDRESS_TO_LISTEN( ":3345" );
-    static const QLatin1String DEFAULT_HTTP_ADDRESS_TO_LISTEN( ":3346" );
-    static const QLatin1String DEFAULT_CLOUD_USER( "connection_mediator" );
-    static const QLatin1String DEFAULT_CLOUD_PASSWORD( "123456" );
-
-    //reading settings
-#ifdef _WIN32
-    m_settings.reset( new QSettings(QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME) );
-#else
-    const QString configFileName = QString("/opt/%1/%2/etc/%2.conf").arg(VER_LINUX_ORGANIZATION_NAME).arg(VER_PRODUCTNAME_STR);
-    m_settings.reset( new QSettings(configFileName, QSettings::IniFormat) );
-#endif
-
-    const QString& dataLocation = getDataDirectory();
-
-    //parsing command line arguments
     bool showHelp = false;
     bool runWithoutCloud = false;
     QString logLevel;
@@ -79,23 +77,22 @@ int MediatorProcess::executeApplication()
     if( configFile.isEmpty() )
     {
         #ifdef _WIN32
-            m_settings.reset( new QSettings(QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME) );
+            m_settings.reset( new QSettings( QSettings::SystemScope,
+                                             QN_ORGANIZATION_NAME, QN_APPLICATION_NAME ) );
         #else
-            const QString configFileName = QString("/opt/%1/%2/etc/%2.conf").arg(VER_LINUX_ORGANIZATION_NAME).arg(VER_PRODUCTNAME_STR);
-            m_settings.reset( new QSettings(configFileName, QSettings::IniFormat) );
+            m_settings.reset( new QSettings( DEFAULT_CONFIG_FILE,
+                                             QSettings::IniFormat ) );
         #endif
     }
     else
     {
-        m_settings.reset( new QSettings(configFile, QSettings::IniFormat) );
+        m_settings.reset( new QSettings( configFile, QSettings::IniFormat ) );
     }
 
-    //reading settings
-
-    //logging
     if( logLevel != QString::fromLatin1("none") )
     {
-        const QString& logDir = m_settings->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+        const auto defaultLogDir = getDataDirectory() + QLatin1String("/log/");
+        const auto logDir = m_settings->value( "logDir", defaultLogDir ).toString();
         QDir().mkpath( logDir );
         const QString& logFileName = logDir + QLatin1String("/log_file");
         if( cl_log.create( logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1 ) )
@@ -137,12 +134,17 @@ int MediatorProcess::executeApplication()
     TimerManager timerManager;
     std::shared_ptr< CloudDataProvider > cloudDataProvider;
     if( !runWithoutCloud )
+    {
+        auto address = m_settings->value( CLOUD_ADDRESS, lit("") ).toString().toStdString();
+        auto user = m_settings->value( CLOUD_USER, DEFAULT_CLOUD_USER ).toString().toStdString();
+        auto password = m_settings->value( CLOUD_PASSWORD, DEFAULT_CLOUD_PASSWORD ).toString().toStdString();
+        auto update = parseTimerDuration(
+            m_settings->value( CLOUD_UPDATE_INTERVAL ).toString(),
+            CloudDataProvider::DEFAULT_UPDATE_INTERVAL );
+
         cloudDataProvider = std::make_unique< CloudDataProvider >(
-            m_settings->value(CLOUD_USER, DEFAULT_CLOUD_USER).toString().toStdString(),
-            m_settings->value(CLOUD_PASSWORD, DEFAULT_CLOUD_PASSWORD).toString().toStdString(),
-            parseTimerDuration(
-                m_settings->value(CLOUD_UPDATE_INTERVAL).toString(),
-                CloudDataProvider::DEFAULT_UPDATE_INTERVAL));
+            std::move(address), std::move(user), std::move(password), std::move(update) );
+    }
     else
         NX_LOG( lit( "STUN Server is running without cloud (debug mode)" ), cl_logALWAYS );
 
@@ -200,8 +202,7 @@ QString MediatorProcess::getDataDirectory()
         return dataDirFromSettings;
 
 #ifdef Q_OS_LINUX
-    QString defVarDirName = QString("/opt/%1/%2/var").arg(VER_LINUX_ORGANIZATION_NAME).arg(VER_PRODUCTNAME_STR);
-    QString varDirName = m_settings->value("varDir", defVarDirName).toString();
+    QString varDirName = m_settings->value("varDir", DEFAULT_VAR_DIR).toString();
     return varDirName;
 #else
     const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);

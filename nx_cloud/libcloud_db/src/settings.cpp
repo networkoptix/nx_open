@@ -76,6 +76,7 @@ namespace
     //auth settings
     static const QLatin1String AUTH_XML_PATH("auth/rulesXmlPath");
     static const QLatin1String DEFAULT_AUTH_XML_PATH(":/authorization_rules.xml");
+    static const QString MODULE_NAME = lit( "cloud_db" );
 }
 
 
@@ -92,9 +93,9 @@ Settings::Settings()
         QN_ORGANIZATION_NAME,
         QN_APPLICATION_NAME ),
 #else
-    m_settings(
-        lit("/opt/%1/%2/etc/%2.conf").arg(VER_LINUX_ORGANIZATION_NAME).arg(VER_PRODUCTNAME_STR),
-        QSettings::IniFormat ),
+    m_settings( lit("/opt/%1/%2/etc/%2.conf" )
+                .arg( VER_LINUX_ORGANIZATION_NAME ).arg( MODULE_NAME ),
+                QSettings::IniFormat ),
 #endif
     m_showHelp( false )
 {
@@ -152,7 +153,8 @@ QString Settings::dataDir() const
         return dataDirFromSettings;
 
 #ifdef Q_OS_LINUX
-    QString defVarDirName = QString( "/opt/%1/%2/var" ).arg( VER_LINUX_ORGANIZATION_NAME ).arg( VER_PRODUCTNAME_STR );
+    QString defVarDirName = QString( "/opt/%1/%2/var" )
+            .arg( VER_LINUX_ORGANIZATION_NAME ).arg( MODULE_NAME );
     QString varDirName = m_settings.value( "varDir", defVarDirName ).toString();
     return varDirName;
 #else

@@ -37,7 +37,8 @@ class CloudDataProvider
 public:
     static const TimerDuration DEFAULT_UPDATE_INTERVAL;
 
-    CloudDataProvider( const std::string& user, const std::string& password,
+    CloudDataProvider( const std::string& address,
+                       const std::string& user, const std::string& password,
                        TimerDuration updateInterval = DEFAULT_UPDATE_INTERVAL );
     ~CloudDataProvider();
 

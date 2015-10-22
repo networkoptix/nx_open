@@ -33,12 +33,37 @@ std::ostream& operator<<( std::ostream& os,
 const TimerDuration CloudDataProvider::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 5 );
 
-CloudDataProvider::CloudDataProvider( const std::string& user,
+static nx::cdb::api::ConnectionFactory* makeConnectionFactory( const std::string& address )
+{
+    auto factory = createConnectionFactory();
+    if( factory && !address.empty() )
+    {
+        const auto colon = address.find( ":" );
+        if( colon != std::string::npos )
+        {
+            const auto host = address.substr( 0, colon );
+            const auto port = std::stoi( address.substr( colon + 1 ) );
+
+            factory->setCloudEndpoint( address, port );
+            NX_LOG( lm("nx::cdb::api::ConnectionFactory set address %1:%2")
+                    .arg(host).arg(port), cl_logALWAYS );
+        }
+        else
+        {
+            NX_LOG( lm("nx::cdb::api::ConnectionFactory can not pase address %1")
+                     .arg( address ), cl_logERROR );
+        }
+    }
+    return factory;
+}
+
+CloudDataProvider::CloudDataProvider( const std::string& address,
+                                      const std::string& user,
                                       const std::string& password,
                                       TimerDuration updateInterval )
     : m_updateInterval( std::move( updateInterval ) )
     , m_isTerminated( false )
-    , m_connectionFactory( createConnectionFactory() )
+    , m_connectionFactory( makeConnectionFactory( address ) )
     , m_connection( m_connectionFactory->createConnection( user, password ) )
 {
     updateSystemsAsync();
