@@ -53,7 +53,7 @@
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
-        
+
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <appserver.name>Enterprise Controller</appserver.name>
@@ -81,7 +81,7 @@
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
-        
+
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
@@ -379,11 +379,7 @@
                 <!--module>storage_plugins/ftpstorageplugin</module-->
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
-                <module>common_libs/nxemail</module>                
-                <module>mediaserver</module>
-                <module>mediaserver_core</module>
-                <!--<module>mediaproxy</module> -->
-                <!-- <module>testcamera</module> -->
+
             </modules>
             <properties>
                 <additional.compiler>${compiler}</additional.compiler>
@@ -402,7 +398,7 @@
                 <qtlib19>DBus</qtlib19>
             </properties>
             <modules>
-                <module>applauncher</module>
+                <!--<module>applauncher</module>-->
                 <module>client</module>
                 <module>client.core</module>
                 <module>client.bin</module>
