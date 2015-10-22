@@ -151,29 +151,48 @@ int QnConfigureRestHandler::changeAdminPassword(
     if (!admin)
          return ResultFail;
 
+    //making copy of admin user to be able to rollback local changed on DB update failure
+    QnUserResourcePtr updateAdmin = QnUserResourcePtr(new QnUserResource(*admin));
+
+    if (password.isEmpty() &&
+        updateAdmin->getHash() == passwordHash &&
+        updateAdmin->getDigest() == passwordDigest &&
+        updateAdmin->getCryptSha512Hash() == cryptSha512Hash)
+    {
+        //no need to update anything
+        return ResultOk;
+    }
+
     if (!password.isEmpty()) {
         /* check old password */
         if (!admin->checkPassword(oldPassword))
             return ResultFail;
 
         /* set new password */
-        admin->setPassword(password);
-        admin->generateHash();
-        QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
-        admin->setPassword(QString());
-        HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded( admin );
+        updateAdmin->setPassword(password);
+        updateAdmin->generateHash();
+        QnUserResourceList updatedUsers;
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updateAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+            return ResultFail;
+        updateAdmin->setPassword(QString());
     } else {
-        if (admin->getHash() != passwordHash ||
-            admin->getDigest() != passwordDigest ||
-            admin->getCryptSha512Hash() != cryptSha512Hash)
-        {
-            admin->setHash(passwordHash);
-            admin->setDigest(passwordDigest);
-            if( !cryptSha512Hash.isEmpty() )
-                admin->setCryptSha512Hash(cryptSha512Hash);
-            QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
-        }
+        updateAdmin->setHash(passwordHash);
+        updateAdmin->setDigest(passwordDigest);
+        if( !cryptSha512Hash.isEmpty() )
+            updateAdmin->setCryptSha512Hash(cryptSha512Hash);
+        QnUserResourceList updatedUsers;
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updateAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+            return ResultFail;
     }
+
+    //applying changes to local resource
+    //TODO #ak following changes are done non-atomically
+    admin->setRealm(updateAdmin->getRealm());
+    admin->setHash(updateAdmin->getHash());
+    admin->setDigest(updateAdmin->getDigest());
+    admin->setCryptSha512Hash(updateAdmin->getCryptSha512Hash());
+
+    HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updateAdmin);
     return ResultOk;
 }
 
