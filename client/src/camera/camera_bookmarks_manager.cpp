@@ -27,22 +27,27 @@ void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSe
     d->getBookmarksAsync(cameras, filter, internalCallback);
 }
 
-void QnCameraBookmarksManager::addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
     Q_D(QnCameraBookmarksManager);
+    d->addCameraBookmark(bookmark, callback);
 
-    Q_ASSERT_X(!bookmark.cameraId.isEmpty(), Q_FUNC_INFO, "Camera ID should not be empty!");
-
-    d->addCameraBookmark(camera, bookmark, callback);
+    emit bookmarkAdded(bookmark);
 }
 
-void QnCameraBookmarksManager::updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
     Q_D(QnCameraBookmarksManager);
-    d->updateCameraBookmark(camera, bookmark, callback);
+    d->updateCameraBookmark(bookmark, callback);
+
+    emit bookmarkUpdated(bookmark);
 }
 
-void QnCameraBookmarksManager::deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+void QnCameraBookmarksManager::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback) {
     Q_D(QnCameraBookmarksManager);
-    d->deleteCameraBookmark(camera, bookmark, callback);
+    d->deleteCameraBookmark(bookmarkId, callback);
+
+    emit bookmarkRemoved(bookmarkId);
 }
 
 QnCameraBookmarkList QnCameraBookmarksManager::cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const {

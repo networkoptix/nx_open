@@ -146,6 +146,11 @@ QnObject {
         d.paused = true
     }
 
+    function stop() {
+        d.dirty = true
+        d.mediaPlayer.stop()
+    }
+
     function seek(pos) {
         d.dirty = true
 

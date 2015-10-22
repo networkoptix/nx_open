@@ -62,10 +62,10 @@ setup_hdd_environment() {
         if [[ ! -z "$ARCHIVE_FILES" ]] && [[ ! -z "$ARCHIVE_DB" ]]; then ARCHIVE=true; else ARCHIVE=false; fi
         echo "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >&2 >/dev/kmsg
         echo `date` "++++++++++++++ ARCHIVE FOUND ON HDD:"$ARCHIVE" ++++++++++++++" >> $NX1LOG       
-        for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
+        for p in $( lsof $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $BOOTHDDPART
-        for p in $( lsof | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
+        for p in $( lsof $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $DATAHDDPART
         rm -Rf $MNTBOOTHDDPART
@@ -201,17 +201,17 @@ system_restore () {
         read_hdd_environment
         /etc/init.d/nx1led restore         
         rm /etc/udev/rules.d/70-persistent-net.rules
-        for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
+        for p in $( lsof $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $BOOTHDDPART
-        for p in $( lsof | grep $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
+        for p in $( lsof $MNTDATAHDDPART | awk {'print $2'} ); do kill $p; done
         sleep 2
         umount $DATAHDDPART    
         if [ "$ARCHIVE" = "false" ]; then 
             echo "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >&2 >/dev/kmsg
             echo `date` "++++++++++++++ FOREIGN HDD FOUND. FORMATTING THE WHOLE DRIVE... ++++++++++++++" >> $NX1LOG
             dd if=/dev/zero of=$DISK bs=512 count=1 conv=notrunc
-            (echo x; echo z; echo y; echo y) | gdisk $DISK
+            (echo 2; echo x; echo z; echo y; echo y) | gdisk $DISK
             #for v_partition in $(parted -s $DISK print|awk '/^ / {print $1}')
             #do
             #   parted -s $DISK rm ${v_partition}
@@ -236,7 +236,7 @@ system_restore () {
                 shutdown -rF now
                 exit 0
             fi
-            for p in $( lsof | grep $MNTDATAHDDPART | awk {'print $2'} ); do print $p; done            
+            for p in $( lsof $MNTDATAHDDPART | awk {'print $2'} ); do print $p; done            
             sleep 2
             umount $DATAHDDPART
         else    

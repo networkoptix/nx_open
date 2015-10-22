@@ -301,10 +301,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         QTimer *timer = new QTimer(this);
 
         connect(timer,              &QTimer::timeout,                                   this,   &QnMediaResourceWidget::updateIconButton);
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera.data(),    &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera.data(),    &QnResource::statusChanged,                         this,   [this](){ updateIoModuleVisibility(true); });
-        connect(m_camera.data(),    &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
+        connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
+        connect(m_camera,           &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
+        connect(m_camera,           &QnResource::statusChanged,                         this,   [this](){ updateIoModuleVisibility(true); });
+        connect(m_camera,           &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
         timer->start(1000 * 60); /* Update icon button every minute. */
 
         connect(statusOverlayWidget(), &QnStatusOverlayWidget::diagnosticsRequested,    this,   &QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested);
@@ -716,7 +716,7 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    int recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
+    int recordingMode = QnRecordingStatusHelper::currentRecordingMode(m_camera);
     QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
     iconButton()->setVisible(!recIcon.isNull());
     iconButton()->setIcon(recIcon);
@@ -1598,6 +1598,9 @@ void QnMediaResourceWidget::updateBookmarksMode() {
 }
 
 void QnMediaResourceWidget::updateBookmarks() {
+    if (!m_bookmarksOverlayWidget)
+        return;
+
     if (!m_bookmarksQuery) {
         m_bookmarksOverlayWidget->setBookmarks(QnCameraBookmarkList());
         return;
@@ -1607,6 +1610,9 @@ void QnMediaResourceWidget::updateBookmarks() {
 }
 
 void QnMediaResourceWidget::updateBookmarksVisibility() {
+    if (!m_bookmarksOverlayWidget)
+        return;
+
     auto visibility = Invisible;
     if (m_bookmarksQuery) {
         if (options().testFlag(DisplayInfo))
@@ -1632,8 +1638,5 @@ qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const {
 }
 
 qint64 QnMediaResourceWidget::getDisplayTimeMs() const {
-    qint64 timestampMs = getUtcCurrentTimeMs();
-    if(qnSettings->timeMode() == Qn::ServerTimeMode)
-        timestampMs += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
-    return timestampMs;
+    return getUtcCurrentTimeMs() + context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_resource);
 }

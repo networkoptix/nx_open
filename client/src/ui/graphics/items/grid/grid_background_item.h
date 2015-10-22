@@ -46,12 +46,12 @@ private slots:
     void updateDisplay();
     void updateDefaultBackground();
 
-    void at_context_userChanged();
     void at_imageLoaded(const QString& filename, bool ok);
     void setImage(const QImage& image);
 
 private:
     QnAppServerImageCache* cache();
+    void updateConnectedState();
 
     Q_DECLARE_PRIVATE(QnGridBackgroundItem)
     QPointer<QnWorkbenchGridMapper> m_mapper;

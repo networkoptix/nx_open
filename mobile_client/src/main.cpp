@@ -33,6 +33,8 @@ int runUi(QGuiApplication *application) {
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
     thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
 
+    QnCameraThumbnailProvider *activeCameraThumbnailProvider = new QnCameraThumbnailProvider();
+
 #ifndef Q_OS_IOS
     QFont font;
     font.setFamily(lit("Roboto"));
@@ -61,6 +63,7 @@ int runUi(QGuiApplication *application) {
 #endif
 
     engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
+    engine.addImageProvider(lit("active"), activeCameraThumbnailProvider);
     engine.addImageProvider(lit("icon"), iconProvider);
     engine.rootContext()->setContextObject(&context);
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());

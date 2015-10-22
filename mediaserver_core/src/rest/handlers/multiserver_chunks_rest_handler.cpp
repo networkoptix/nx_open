@@ -161,7 +161,6 @@ int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequ
 
         if (request.format == Qn::CompressedPeriodsFormat)
         {            
-            //TODO: #GDM #Bookmarks possibly we should get rid of signed serialization
             result = QnCompressedTime::serialized(timePeriodList, false);
             contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
         }

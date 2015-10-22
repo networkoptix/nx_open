@@ -11,8 +11,6 @@
 #include "utils/common/synctime.h"
 #include "utils/common/model_functions.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "nx_ec/data/api_camera_bookmark_data.h"
-
 
 namespace ec2
 {
@@ -173,14 +171,6 @@ QnUuid QnTransactionLog::transactionHash(const ApiResourceParamWithRefData& para
     hash.addData("res_params");
     hash.addData(param.resourceId.toRfc4122());
     hash.addData(param.name.toUtf8());
-    return QnUuid::fromRfc4122(hash.result());
-}
-
-QnUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const {
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData(extraData.toUtf8());
-    for(const ApiCameraBookmarkTagData tag: data)
-        hash.addData(tag.name.toUtf8());
     return QnUuid::fromRfc4122(hash.result());
 }
 

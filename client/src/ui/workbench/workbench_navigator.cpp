@@ -58,6 +58,7 @@ extern "C"
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
+#include "watchers/workbench_bookmark_tags_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -216,6 +217,14 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
         if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
             QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
+    });
+
+    connect(context()->instance<QnWorkbenchBookmarkTagsWatcher>(), &QnWorkbenchBookmarkTagsWatcher::tagsChanged,
+            this, &QnWorkbenchNavigator::updateBookmarkTags);
+
+    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this, [this](const QnUuid &bookmarkId){
+        m_bookmarkAggregation.removeBookmark(bookmarkId);
+        updateSliderBookmarks();
     });
 }
     
@@ -435,8 +444,7 @@ void QnWorkbenchNavigator::initialize() {
         m_searchQueryStrategy->changeQueryForcibly(QString()); 
     });
 
-    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
-    connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
+    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged,  this, &QnWorkbenchNavigator::updateLocalOffset);
 
     connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),    SIGNAL(stateChanged(bool)), this,   SLOT(setAutoPaused(bool)));
 
@@ -444,6 +452,7 @@ void QnWorkbenchNavigator::initialize() {
     updateCalendar();
     updateScrollBarFromSlider();
     updateTimeSliderWindowSizePolicy();
+    updateBookmarkTags();
 } 
 
 void QnWorkbenchNavigator::deinitialize() {
@@ -988,8 +997,6 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
     }
 
-    action(Qn::ToggleBookmarksSearchAction)->setEnabled(m_currentMediaWidget && m_currentWidget->resource()->flags() & Qn::utc);
-
     updateLocalOffset();
     updateCurrentPeriods();
     updateLiveSupported();
@@ -1004,9 +1011,10 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 }
 
 void QnWorkbenchNavigator::updateLocalOffset() {
-    qint64 localOffset = 0;
-    if(qnSettings->timeMode() == Qn::ServerTimeMode && m_currentMediaWidget && (m_currentWidgetFlags & WidgetUsesUTC))
-        localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_currentMediaWidget->resource(), 0);
+    qint64 localOffset = m_currentMediaWidget
+        ? context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_currentMediaWidget->resource())
+        : 0;
+
     if (m_timeSlider)
         m_timeSlider->setLocalOffset(localOffset);
     if (m_calendar)
@@ -1908,19 +1916,15 @@ void QnWorkbenchNavigator::updateSliderBookmarks() {
 
 /* Bookmark methods. */
 
-QnCameraBookmarkTags QnWorkbenchNavigator::bookmarkTags() const {
-    return m_bookmarkTags;
-}
-
-void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
-    if (m_bookmarkTags == tags)
-        return;
-    m_bookmarkTags = tags;
-
+void QnWorkbenchNavigator::updateBookmarkTags() {
     if (!isValid())
         return;
 
-    QCompleter *completer = new QCompleter(QStringList(m_bookmarkTags.toList()));
+    QStringList tagNames;
+    for (const QnCameraBookmarkTag &tag: context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags())
+        tagNames.append(tag.name);
+
+    QCompleter *completer = new QCompleter(tagNames);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setCompletionMode(QCompleter::InlineCompletion);
 

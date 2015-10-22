@@ -10,8 +10,6 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QAuthenticator>
 
-#include "json_reply_helper.h"
-
 //#define HTTP_CLIENT_DEBUG
 
 namespace
@@ -160,10 +158,9 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
     const bool isRequestError = (errorCode != QNetworkReply::NoError);
     const bool isHttpError = ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast));
     const QByteArray &data = reply->readAll();
-    const int jsonError = isRequestError ? 0 : rtu::helpers::getJsonReplyError(data);
-
+    
     logReply(reply, QString("reply received %1 : %2").arg(errorCode).arg(httpCode));
-    if (isRequestError || isHttpError || jsonError)
+    if (isRequestError || isHttpError)
     { 
         const ErrorCallback &errorCallback = it->error;
         if (errorCallback)
@@ -179,7 +176,7 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
                 break;
             case QNetworkReply::NoError:
             {
-                if (!isHttpError && !jsonError)
+                if (!isHttpError)
                     errorCallback(RequestError::kSuccess);
                 else if (httpCode == kHttpUnauthorized)
                     errorCallback(RequestError::kUnauthorized);

@@ -59,16 +59,23 @@ public:
     /* Bookmarks API */
 
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);    
-    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark);
-    bool removeAllCameraBookmarks(const QString& cameraUniqueId);
-    bool deleteCameraBookmark(const QnUuid &bookmarkId);
+    bool containsBookmark(const QnUuid &bookmarkId) const;
+    QnCameraBookmarkTagList getBookmarkTags(int limit = std::numeric_limits<int>().max());
+
+    bool addBookmark(const QnCameraBookmark &bookmark);
+    bool updateBookmark(const QnCameraBookmark &bookmark);
+    bool deleteAllBookmarksForCamera(const QString& cameraUniqueId);
+    bool deleteBookmark(const QnUuid &bookmarkId);
 
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;
+
+    bool addOrUpdateBookmark(const QnCameraBookmark &bookmark);
 private:
     bool createDatabase();
     bool cleanupEvents();
-    bool migrateBusinessParams();
+    bool migrateBusinessParamsUnderTransaction();
+    bool createBookmarkTagTriggersUnderTransaction();
     bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,

@@ -14,9 +14,11 @@ namespace QnFusionRestHandlerDetail
     Qn::SerializationFormat formatFromParams(const QnRequestParamList& params);
 
     template <class OutputData>
-    void serialize(const OutputData& outputData, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+    void serialize(const OutputData& outputData, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format = Qn::UnsupportedFormat)
     {
-        Qn::SerializationFormat format = formatFromParams(params);
+        if (format == Qn::UnsupportedFormat)
+            format = formatFromParams(params);
+
         switch(format) 
         {
         case Qn::UbjsonFormat:

@@ -73,13 +73,12 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         return QnMediaServerResourcePtr();
     }
 
-    if (!res)
-        return QnMediaServerResourcePtr();
-
     if (action->actionType() == QnBusiness::DiagnosticsAction)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
+
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
+
     return qnResPool->getResourceById<QnMediaServerResource>(res->getParentId());
 }
 

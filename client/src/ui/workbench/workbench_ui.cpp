@@ -2005,6 +2005,7 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged()
 {
     const QRectF paintGeometry = m_calendarItem->paintGeometry();
     m_calendarPinButton->setPos(paintGeometry.topRight() + m_calendarPinOffset);
+    m_calendarPinButton->setVisible(!paintGeometry.isEmpty());
 
     if(m_inCalendarGeometryUpdate)
         return;
@@ -2557,7 +2558,6 @@ void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
     
     QnSearchLineEdit *searchWidget = navigator()->bookmarksSearchWidget();
     searchWidget->setEnabled(opened);
-    action(Qn::ToggleBookmarksSearchAction)->setChecked(opened);
 }
 
 void QnWorkbenchUi::updateSearchOpacity(bool animate) {
@@ -2594,7 +2594,7 @@ void QnWorkbenchUi::setSearchOpacity(qreal opacity, bool animate) {
 void QnWorkbenchUi::updateSearchVisibility(bool animate) {
     ensureAnimationAllowed(animate);
 
-    bool searchVisible = action(Qn::ToggleBookmarksSearchAction)->isEnabled() && m_sliderVisible && isSliderOpened();
+    bool searchVisible = m_sliderVisible && isSliderOpened();
 
     if(m_inactive)
         setSearchVisible(searchVisible && isHovered(), animate);
@@ -2609,7 +2609,8 @@ void QnWorkbenchUi::createSearchWidget() {
     QnSearchLineEdit *searchLine = new QnSearchLineEdit();
     searchLine->setAttribute(Qt::WA_TranslucentBackground);
     searchLine->resize(250, 21);
-    connect(searchLine, &QnSearchLineEdit::escKeyPressed, this, [this]() { setSearchOpened(false, true); } );
+    searchLine->setCloseButtonVisible(false);
+    searchLine->lineEdit()->setPlaceholderText(tr("Search bookmarks"));
 
     navigator()->setBookmarksSearchWidget(searchLine);
 
@@ -2641,9 +2642,8 @@ void QnWorkbenchUi::createSearchWidget() {
     m_searchSizeAnimator->setSpeed(100.0 * 2.0);
     m_searchSizeAnimator->setTimeLimit(500);
 
-    connect(action(Qn::ToggleBookmarksSearchAction), &QAction::toggled,  this,   [this, searchLine](bool checked) {
-        setSearchOpened(checked); 
-        searchLine->setFocus();
+    connect(action(Qn::BookmarksModeAction), &QAction::toggled, this, [this](bool toggled){
+        setSearchOpened(toggled);
     });
 }
 

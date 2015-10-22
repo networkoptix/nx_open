@@ -113,9 +113,8 @@ private:
     unsigned int m_cacheSizeMillis;
     PacketContainerType m_packetsByTimestamp;
     mutable QMutex m_mutex;
-    qint64 m_prevPacketSrcTimestamp;
     //!In micros
-    quint64 m_currentPacketTimestamp;
+    qint64 m_prevPacketSrcTimestamp;
     size_t m_cacheSizeInBytes;
     //!map<event receiver id, function>
     std::map<int, std::function<void (quint64)> > m_eventReceivers;

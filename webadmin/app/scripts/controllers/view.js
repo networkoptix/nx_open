@@ -61,7 +61,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             };
         });
 
-        if(window.jscd.browser === 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
+        if(window.jscd.browser === 'Microsoft Internet Explorer' && ! browserSupports('webm', false, false)){
             if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
                 $scope.ieNoWebm = true;
             }
@@ -87,7 +87,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
 
-        function browserSupports(type,maybe){
+        function browserSupports(type, maybe, native){
             var v = document.createElement('video');
             if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
                 return true;//Native support
@@ -100,7 +100,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                     return true; // Requires plugin, but may be played
                 }
             }
-            if(type === 'hls'){
+            if(type === 'hls' && !native){
                 return !!window.jscd.flashVersion ; // flash hls support
             }
             return false;
@@ -114,8 +114,8 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
         }
 
-        function formatSupported(type){
-            return cameraSupports(type) && browserSupports(type,true);
+        function formatSupported(type, nativeOnly){
+            return cameraSupports(type) && browserSupports(type, true, nativeOnly);
         }
 
         function largeResolution (resolution){
@@ -136,9 +136,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             //1. Does browser and server support webm?
-            if(formatSupported('webm')){
-                $scope.availableResolutions = transcodingResolutions;
-            }else{
+            if(!formatSupported('webm',false) || formatSupported('hls',true) && browserSupports('hls', false, true)){
                 $scope.iOSVideoTooLarge = false;
 
                 //1. collect resolutions with hls
@@ -171,6 +169,10 @@ angular.module('webadminApp').controller('ViewCtrl',
                         console.error("no suitable streams from this camera");
                     }
                 }
+            }
+            else
+            {
+                $scope.availableResolutions = transcodingResolutions;
             }
 
             if($scope.availableResolutions.indexOf($scope.activeResolution)<0){
@@ -211,6 +213,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
         function updateVideoSource(playing) {
+            updateAvailableResolutions();
             var live = !playing;
 
             $scope.positionSelected = !!playing;
@@ -248,7 +251,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             var resolutionHls = resolution === 'Auto'?'lo':resolution;
 
             // Fix here!
-            if(resolutionHls === 'lo' && !$scope.availableResolutions.indexOf('lo')>0){
+            if(resolutionHls === 'lo' && $scope.availableResolutions.indexOf('lo')<0){
                 resolutionHls = 'hi';
             }
 
@@ -262,7 +265,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 // Require plugin
                 { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution === 'lo'?1:0)), type: mimeTypes.rtsp, transport:'rtsp'}
             ],function(src){
-                return formatSupported(src.transport) && $scope.activeFormat === 'Auto'|| $scope.activeFormat === src.type;
+                return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto'|| $scope.activeFormat === src.type;
             });
         }
 
@@ -687,7 +690,12 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.$watch('searchCams',searchCams);
 
-        $scope.$watch('activeCamera.status',function(status){
+        $scope.$watch('activeCamera.status',function(status,oldStatus){
+
+            if(typeof(oldStatus) == "undefined"){
+                return;
+            }
+
             if((!$scope.positionProvider || $scope.positionProvider.liveMode) && !(status === 'Offline' || status === 'Unauthorized')){
                 updateVideoSource();
             }

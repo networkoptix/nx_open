@@ -21,9 +21,9 @@ struct QnScreenshotParameters
 {
     QnScreenshotParameters();
 
-    qint64 timestampMsec;    //in microseconds since epoch
+    qint64 utcTimestampMsec;
     bool isUtc;
-    qint64 adjustedTimeMsec;
+    qint64 displayTimeMsec;
     QString filename;
     Qn::Corner timestampPosition;
     QnItemDewarpingParams itemDewarpingParams;
