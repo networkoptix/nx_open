@@ -37,7 +37,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>nx_cloud</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>libconnection_mediator</artifactId>
             <version>${project.version}</version>
             <type>pom</type>

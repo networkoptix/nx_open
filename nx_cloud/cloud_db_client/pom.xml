@@ -41,6 +41,26 @@
         <mac.defines/>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nxemail</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nxemail/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>windows</id>
@@ -48,7 +68,7 @@
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>            
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>
@@ -59,13 +79,12 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <buildLib>sharedlib</buildLib>
             </properties>
-        </profile>  
-
-    </profiles> 
+        </profile>
+    </profiles>
 
 </project>

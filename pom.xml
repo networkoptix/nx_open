@@ -24,8 +24,8 @@
             <id>localrepository</id>
             <url>file://${root.dir}</url>
         </repository>
-    </repositories>    
-    
+    </repositories>
+
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <appserver.name>Enterprise Controller</appserver.name>
@@ -559,6 +559,8 @@
             <modules>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
+                <module>debsetup/connection_mediator-deb</module>
+                <module>debsetup/cloud_db-deb</module>
             </modules>
             <properties>
                 <modification>ubuntu</modification>
@@ -795,7 +797,7 @@
             <properties>
                 <compile.option2>-angle</compile.option2>
             </properties>
-        </profile> 
+        </profile>
 
         <!-- Mobile client profiles -->
         <profile>
