@@ -83,7 +83,9 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
             emit cameraHistoryInvalidated(camera);
 }
 
-bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback) {
+
+bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback)
+{
     if (isCameraHistoryValid(camera)) {
         executeDelayed([callback] {
             callback(true);
@@ -95,30 +97,23 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
     if (!server)
         return false;
 
-    auto connection = server->apiConnection();
-    if (!connection)
-        return false;
-
     QnChunksRequestData request;
+    request.format = Qn::UbjsonFormat;
     request.resList << camera;
+    
+    using namespace std::placeholders;
+    bool ok = server->newApiConnection().cameraHistoryAsync(request, std::bind(&QnCameraHistoryPool::at_cameraPrepared, this, _1, _2, callback));
+    if (!ok)
+        at_cameraPrepared(false, ec2::ApiCameraHistoryDataList(), callback); // if !ok request didn't start at all
 
-    int handle = connection->cameraHistory(request, this, SLOT(at_cameraPrepared(int, const ec2::ApiCameraHistoryDataList &, int)));
-    if (handle < 0)
-        return false;
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_runningRequests[handle] = callback;
-    }
-
-    return true;
+    return ok;
 }
 
-void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle) {
+void QnCameraHistoryPool::at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback) 
+{
     QnMutexLocker lock(&m_mutex);
 
     QSet<QnUuid> loadedCamerasIds;
-    bool success = (status == 0);
     if (success) {
         for (const auto &detail: periods) {
 
@@ -148,13 +143,11 @@ void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHist
         }  
     }
 
-    if (!m_runningRequests.contains(handle))
-        return;
-    auto handler = m_runningRequests.take(handle);
 
     lock.unlock();
 
-    handler(success);
+    callback(success);
+
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
             emit cameraHistoryChanged(camera);
@@ -325,4 +318,31 @@ std::vector<QnUuid> QnCameraHistoryPool::getServerFootageData(const QnUuid& serv
     for(const auto& value: m_archivedCamerasByServer.value(serverGuid))
         result.push_back(value);
     return result;
+}
+
+bool QnCameraHistoryPool::updateCameraHistoryIfNeedSync(const QnVirtualCameraResourcePtr &camera)
+{
+    if (!camera)
+        return true;
+
+    QnMutexLocker lock(&m_syncLoadMutex);
+    while (m_runningRequests.contains(camera->getId()))
+        m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+
+    if (isCameraHistoryValid(camera))
+        return true;
+
+    bool rez = updateCameraHistoryAsync(camera, [this, camera] (bool success) 
+    {
+        QnMutexLocker lock(&m_syncLoadMutex);
+        m_runningRequests.remove(camera->getId());
+        m_syncLoadWaitCond.wakeAll();
+    });
+    
+    if (!rez) 
+        return rez;
+
+    m_runningRequests.insert(camera->getId());
+    m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+    return rez;
 }
