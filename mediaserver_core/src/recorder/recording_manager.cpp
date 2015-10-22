@@ -346,14 +346,12 @@ bool QnRecordingManager::startOrStopRecording(
 
         someRecordingIsPresent = true;
 
-        if (providerHi)
+        if (recorderHiRes && providerHi)
         {
-            if (recorderHiRes) {
-                if (!recorderHiRes->isRunning()) {
-                    NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
-                    recorderHiRes->start();
-                    camera->inUse(recorderHiRes);
-                }
+            if (!recorderHiRes->isRunning()) {
+                NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
+                recorderHiRes->start();
+                camera->inUse(recorderHiRes);
             }
             providerHi->startIfNotRunning();
         }
@@ -561,8 +559,8 @@ void QnRecordingManager::onTimer()
         auto camera = qnCameraPool->getVideoCamera(itrRec.key());
         const Recorders& recorders = itrRec.value();
 
-        if (!recorders.recorderHiRes && !recorders.recorderLowRes)
-            continue; // no recorders are created now
+        //if (!recorders.recorderHiRes && !recorders.recorderLowRes)
+        //    continue; // no recorders are created now
 
         if (recorders.recorderHiRes)
             recorders.recorderHiRes->updateScheduleInfo(time);
