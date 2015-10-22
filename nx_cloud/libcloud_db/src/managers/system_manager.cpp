@@ -255,9 +255,12 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     systemData->name = newSystem.name;
     systemData->customization = newSystem.customization;
     systemData->authKey = QnUuid::createUuid().toStdString();
-    systemData->ownerAccountID = account->id;
+    systemData->ownerAccountEmail = account->email;
     systemData->status = api::SystemStatus::ssNotActivated;
     QnSql::bind(*systemData, &insertSystemQuery);
+    insertSystemQuery.bindValue(
+        ":ownerAccountID",
+        QnSql::serialized_field(account->id));
     if (!insertSystemQuery.exec())
     {
         NX_LOG(lm("Could not insert system %1 into DB. %2").
@@ -509,9 +512,10 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
 {
     QSqlQuery readSystemsQuery(*connection);
     readSystemsQuery.prepare(
-        "SELECT id, name, customization, auth_key as authKey, "
-        "   owner_account_id as ownerAccountID, status_code as status "
-        "FROM system");
+        "SELECT s.id, s.name, s.customization, s.auth_key as authKey, "
+        "       a.email as ownerAccountEmail, s.status_code as status "
+        "FROM system s, account a "
+        "WHERE s.owner_account_id = a.id");
     if (!readSystemsQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").

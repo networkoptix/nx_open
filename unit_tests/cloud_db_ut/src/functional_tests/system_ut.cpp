@@ -75,6 +75,8 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
         ASSERT_EQ(systems.size(), 2);
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system2) != systems.end());
+        ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+        ASSERT_EQ(account1.email, systems[1].ownerAccountEmail);
     }
 
     //checking account2 system list
@@ -82,9 +84,16 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
         std::vector<api::SystemData> systems;
         ASSERT_EQ(getSystems(account2.email, account2Password, &systems), api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 3);
-        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system2) != systems.end());
-        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system3) != systems.end());
+        const auto system1Iter = std::find(systems.begin(), systems.end(), system1);
+        const auto system2Iter = std::find(systems.begin(), systems.end(), system2);
+        const auto system3Iter = std::find(systems.begin(), systems.end(), system3);
+        ASSERT_TRUE(system1Iter != systems.end());
+        ASSERT_TRUE(system2Iter != systems.end());
+        ASSERT_TRUE(system3Iter != systems.end());
+
+        ASSERT_EQ(account1.email, system1Iter->ownerAccountEmail);
+        ASSERT_EQ(account1.email, system2Iter->ownerAccountEmail);
+        ASSERT_EQ(account2.email, system3Iter->ownerAccountEmail);
     }
 
     //checking sharings from account1 view

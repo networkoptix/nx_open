@@ -33,9 +33,6 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 {
     switch( resID )
     {
-        case attr::accountID:
-            *value = QVariant::fromValue(ownerAccountID);
-            return true;
         case attr::systemID:
             *value = QVariant::fromValue(id);
             return true;

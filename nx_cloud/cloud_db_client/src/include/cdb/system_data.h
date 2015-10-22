@@ -63,7 +63,7 @@ public:
     std::string customization;
     //!Key, system uses to authenticate requests to any cloud module
     std::string authKey;
-    QnUuid ownerAccountID;
+    std::string ownerAccountEmail;
     SystemStatus status;
     //!a true, if cloud connection is activated for this system
     bool cloudConnectionSubscriptionStatus;
@@ -82,7 +82,7 @@ public:
             name == right.name &&
             customization == right.customization &&
             authKey == right.authKey &&
-            ownerAccountID == right.ownerAccountID &&
+            ownerAccountEmail == right.ownerAccountEmail &&
             status == right.status &&
             cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus;
     }
