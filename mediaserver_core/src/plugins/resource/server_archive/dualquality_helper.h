@@ -17,22 +17,22 @@ public:
     void openCamera(const QString& cameraUniqueId);
     void setPrefferedQuality(MediaQuality quality);
     void findDataForTime(
-        const qint64                    time, 
-        DeviceFileCatalog::Chunk        &resultChunk, 
-        DeviceFileCatalogPtr            &resultCatalog, 
-        DeviceFileCatalog::FindMethod   findMethod, 
-        bool                            preciseFind
+        const qint64                        time, 
+        DeviceFileCatalog::TruncableChunk   &resultChunk, 
+        DeviceFileCatalogPtr                &resultCatalog, 
+        DeviceFileCatalog::FindMethod       findMethod, 
+        bool                                preciseFind
     );
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 
 private:
     void findDataForTimeHelper(
-        const qint64                    time,
-        DeviceFileCatalog::Chunk        &resultChunk,
-        DeviceFileCatalogPtr            &resultCatalog,
-        DeviceFileCatalog::FindMethod   findMethod,
-        bool                            preciseFind,
-        QnServer::StoragePool           storageManager
+        const qint64                        time,
+        DeviceFileCatalog::TruncableChunk   &resultChunk,
+        DeviceFileCatalogPtr                &resultCatalog,
+        DeviceFileCatalog::FindMethod       findMethod,
+        bool                                preciseFind,
+        QnServer::StoragePool               storageManager
     );
 
     static int64_t calcDistanceHelper(

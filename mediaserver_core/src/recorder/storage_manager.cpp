@@ -1580,17 +1580,17 @@ void QnStorageManager::writeCameraInfoFiles()
                  it != m_devFileCatalog[i].cend(); 
                  ++it)
             {
-                const auto cameraName = it.key();
+                const auto cameraUniqueId = it.key();
                 auto resource = qnResPool->getResourceByUniqueId(
-                    cameraName
+                    cameraUniqueId
                 );
                 if (!resource)
                     continue;
                 auto camResource = resource.dynamicCast<QnSecurityCamResource>();
-                if (!camResource || camResource->cameraInfoSavedToDisk())
+                if (!camResource || camResource->isCameraInfoSavedToDisk())
                     continue;
 
-                auto path = paths[i] + cameraName + separator + lit("info.txt");
+                auto path = paths[i] + cameraUniqueId + separator + lit("info.txt");
                 auto outFile = std::unique_ptr<QIODevice>(
                     storage->open(path, QIODevice::WriteOnly)
                 );
@@ -1935,6 +1935,9 @@ bool QnStorageManager::renameFileWithDuration(
     auto fname = oldName.mid(lastSepIndex + 1);
     auto fpath = oldName.mid(0, lastSepIndex+1);
 
+    if (fname.indexOf(lit("_")) != -1)
+        return true; // file's already been renamed
+
     auto nameParts = fname.split(lit("."));
     auto newName   = nameParts[0] + lit("_") + QString::number(duration);
     
@@ -1989,7 +1992,13 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
     if (catalog == 0)
         return false;
-    DeviceFileCatalog::Chunk chunk(startDateMs, storageIndex, DeviceFileCatalog::Chunk::FILE_INDEX_NONE, -1, (qint16) timeZone);
+    DeviceFileCatalog::Chunk chunk(
+        startDateMs, 
+        storageIndex, 
+        DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, 
+        -1, 
+        (qint16) timeZone
+    );
     catalog->addRecord(chunk);
     catalog->setLastSyncTime(startDateMs);
     return true;

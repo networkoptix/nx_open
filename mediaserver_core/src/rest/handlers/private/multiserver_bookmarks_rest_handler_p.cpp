@@ -18,6 +18,7 @@
 #include <utils/network/router.h>
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
+#include <utils/network/http/asynchttpclient.h>
 
 namespace {
     static std::array<QString, static_cast<int>(QnBookmarkOperation::Count)>  operations =

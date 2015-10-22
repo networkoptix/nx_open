@@ -37,12 +37,12 @@ void QnDualQualityHelper::openCamera(const QString& cameraUniqueId) {
 }
 
 void QnDualQualityHelper::findDataForTimeHelper(
-    const qint64                    time,
-    DeviceFileCatalog::Chunk        &chunk,
-    DeviceFileCatalogPtr            &catalog,
-    DeviceFileCatalog::FindMethod   findMethod,
-    bool                            preciseFind,
-    QnServer::StoragePool           storageManager
+    const qint64                        time,
+    DeviceFileCatalog::TruncableChunk   &chunk,
+    DeviceFileCatalogPtr                &catalog,
+    DeviceFileCatalog::FindMethod       findMethod,
+    bool                                preciseFind,
+    QnServer::StoragePool               storageManager
 )
 {
     bool usePreciseFind = m_alreadyOnAltChunk || preciseFind;
@@ -60,7 +60,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
     {
         // chunk not found. check in alternate quality
         DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_Low ? m_catalogHi[index] : m_catalogLow[index]);
-        DeviceFileCatalog::Chunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
+        DeviceFileCatalog::TruncableChunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
         qint64 timeDistanceAlt = calcDistanceHelper(altChunk, time, findMethod);
         int findEps = m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : SECOND_STREAM_FIND_EPS;
 
@@ -114,15 +114,15 @@ int64_t QnDualQualityHelper::calcDistanceHelper(
 }
 
 void QnDualQualityHelper::findDataForTime(
-    const qint64                    time, 
-    DeviceFileCatalog::Chunk        &chunk, 
-    DeviceFileCatalogPtr            &catalog, 
-    DeviceFileCatalog::FindMethod   findMethod, 
-    bool                            preciseFind
+    const qint64                        time, 
+    DeviceFileCatalog::TruncableChunk   &chunk, 
+    DeviceFileCatalogPtr                &catalog, 
+    DeviceFileCatalog::FindMethod       findMethod, 
+    bool                                preciseFind
 )
 {
-    DeviceFileCatalog::Chunk normalChunk;
-    DeviceFileCatalog::Chunk backupChunk;
+    DeviceFileCatalog::TruncableChunk normalChunk;
+    DeviceFileCatalog::TruncableChunk backupChunk;
     DeviceFileCatalogPtr normalCatalog;
     DeviceFileCatalogPtr backupCatalog;
 

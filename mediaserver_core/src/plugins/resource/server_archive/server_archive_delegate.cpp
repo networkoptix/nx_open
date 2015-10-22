@@ -182,7 +182,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     m_newQualityTmpData.reset();
     m_newQualityAviDelegate.clear();
 
-    DeviceFileCatalog::Chunk newChunk;
+    DeviceFileCatalog::TruncableChunk newChunk;
     DeviceFileCatalogPtr newChunkCatalog;
 
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
@@ -271,7 +271,7 @@ DeviceFileCatalog::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr
     return catalog->chunkAt(index);
 }
 
-bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog)
+bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& chunk, DeviceFileCatalogPtr& chunkCatalog)
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -312,7 +312,7 @@ begin_label:
     int chunkSwitchCnt = 0;
     while (!data || (m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000))
     {
-        DeviceFileCatalog::Chunk chunk;
+        DeviceFileCatalog::TruncableChunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
         do {
             if (!getNextChunk(chunk, chunkCatalog))
@@ -442,13 +442,18 @@ AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
     return m_aviDelegate->setAudioChannel(num);
 }
 
-bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newChunk, const DeviceFileCatalogPtr& newCatalog)
+bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog)
 {
     if (newChunk.startTimeMs == -1)
         return false;
     m_currentChunk = newChunk;
+    DeviceFileCatalog::TruncableChunk tmp(newChunk);
+    if (tmp.originalDuration != 0)
+        tmp.durationMs = tmp.originalDuration;
+
     m_currentChunkCatalog[(int)newCatalog->getStoragePool()] = newCatalog;
-    QString url = newCatalog->fullFileName(m_currentChunk);
+    QString url = newCatalog->fullFileName(tmp);
+
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));
     m_aviDelegate->close();
     m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url));
