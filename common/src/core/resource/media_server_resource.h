@@ -12,11 +12,11 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
+#include "api/new_server_connection.h"
 
 namespace nx_http {
     class AsyncHttpClientPtr;
 }
-
 class SocketAddress;
 
 class QnMediaServerResource : public QnResource
@@ -52,6 +52,7 @@ public:
     quint16 getPort() const;
 
     QnMediaServerConnectionPtr apiConnection();
+    QnNewMediaServerConnection newApiConnection();
 
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
