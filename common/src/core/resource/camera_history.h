@@ -91,6 +91,13 @@ public:
      * \returns                     True if the camera history for the given camera is already loaded, false otherwise.
      */
     bool isCameraHistoryValid(const QnVirtualCameraResourcePtr &camera) const;
+
+    /**
+     * \brief                       Update camera history for the given camera. Function returns immediately if currently loaded information is up to date
+     * \param camera                Target camera.      
+     * \returns                     True if no error.
+     */
+    bool updateCameraHistoryIfNeedSync(const QnVirtualCameraResourcePtr &camera);
 signals:
     /** 
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
@@ -116,7 +123,7 @@ private:
     QnVirtualCameraResourcePtr toCamera(const QnUuid& guid) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
 
-    Q_SLOT void at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle);
+    void at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback);
 
     /** Mark camera history as dirty and subject to update. */
     void invalidateCameraHistory(const QnUuid &cameraId);
@@ -132,8 +139,10 @@ private:
     /** Set of cameras which have the data loaded and actual. */
     QSet<QnUuid> m_historyValidCameras;
 
-    typedef QMap<int, callbackFunction> HandlerMap;
-    HandlerMap m_runningRequests;
+    //typedef QMap<int, callbackFunction> HandlerMap;
+    QSet<QnUuid> m_runningRequests;
+    mutable QnMutex m_syncLoadMutex;
+    QnWaitCondition m_syncLoadWaitCond;
 };
 
 
