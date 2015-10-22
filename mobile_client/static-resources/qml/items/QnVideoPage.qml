@@ -67,6 +67,19 @@ QnPage {
         onQualityPicked: mediaPlayer.resourceHelper.resolution = resolution
     }
 
+    QnActiveCameraThumbnailLoader {
+        id: thumbnailLoader
+        resourceId: videoPlayer.resourceId
+        Component.onCompleted: initialize(parent)
+    }
+
+    Binding {
+        target: thumbnailLoader
+        property: "position"
+        value: videoNavigation.timelinePosition
+        when: videoNavigation.timelineDragging
+    }
+
     QnScalableVideo {
         id: video
 
@@ -84,6 +97,13 @@ QnPage {
                 hideUi()
             else
                 showUi()
+        }
+
+        Binding {
+            target: video
+            property: "screenshotSource"
+            value: thumbnailLoader.thumbnailUrl
+            when: videoNavigation.timelineDragging && !mediaPlayer.playing
         }
     }
 

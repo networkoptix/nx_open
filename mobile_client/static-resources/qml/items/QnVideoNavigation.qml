@@ -12,6 +12,9 @@ Item {
     property string resourceId
     property var mediaPlayer
 
+    readonly property bool timelineDragging: timeline.dragging
+    readonly property real timelinePosition: timeline.position
+
     width: parent.width
     height: navigator.height + navigationPanel.height
     anchors.bottom: parent.bottom
@@ -107,9 +110,23 @@ Item {
 
                 autoPlay: mediaPlayer.playing
 
-                onMoveFinished: mediaPlayer.seek(position)
+                onMoveFinished: {
+                    if (playbackController.paused)
+                        mediaPlayer.seek(position)
+                    else
+                        mediaPlayer.play(position)
+                }
 
                 onPositionTapped: mediaPlayer.seek(position)
+
+                onPositionChanged: {
+                    if (!dragging)
+                        return
+
+                    var live = position + 1000 >= (new Date()).getTime()
+                    if (!live)
+                        mediaPlayer.stop()
+                }
 
                 Connections {
                     target: mediaPlayer
