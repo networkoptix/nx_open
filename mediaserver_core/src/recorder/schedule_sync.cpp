@@ -6,9 +6,11 @@
 #include <core/resource_management/resource_pool.h>
 #include "common/common_module.h"
 #include <utils/common/util.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/storage_resource.h>
 
 #include "schedule_sync.h"
 

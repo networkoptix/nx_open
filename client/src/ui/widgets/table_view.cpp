@@ -20,7 +20,7 @@ QnTableView::QnTableView(QWidget *parent):
     horizontalScrollBar()->installEventFilter(signalizer);
     verticalScrollBar()->installEventFilter(signalizer);
 
-    connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(resetCursor()));
+    connect(signalizer, &QnSingleEventSignalizer::activated, this, &QnTableView::resetCursor);
 }
 
 QnTableView::~QnTableView() {
@@ -72,9 +72,9 @@ void QnTableView::leaveEvent(QEvent *) {
     resetCursor();
 }
 
-// ------------------------------------------------QnChackableTableView ---------------------
+// ------------------------------------------------QnCheckableTableView ---------------------
 
-void QnChackableTableView::mousePressEvent(QMouseEvent *event)
+void QnCheckableTableView::mousePressEvent(QMouseEvent *event)
 {
     if (isEnabled() && this->model()) {
         QModelIndex index = indexAt(event->pos());

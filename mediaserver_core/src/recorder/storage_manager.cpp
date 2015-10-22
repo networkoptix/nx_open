@@ -38,6 +38,8 @@
 #include <algorithm>
 #include <vector>
 #include <random>
+#include <array>
+#include <sstream>
 #include "database/server_db.h"
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
@@ -49,6 +51,8 @@ namespace {
     static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 3600;
     static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
     static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
+
+    const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 }
 
 class ArchiveScanPosition
@@ -294,8 +298,6 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
-
-    //startRedundantSyncWatchdog();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -657,9 +659,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
             m_chunksDB[storage->getUrl()] = sdb;
         }
         else {
-            qWarning()
-                << "can't initialize sqlLite database! Actions log is not created!"
-                << " file open failed: " << fileName;
+            qWarning()  << "can't initialize sqlLite database! File open failed: " << fileName;
             return QnStorageDbPtr();
         }
     }
@@ -1128,6 +1128,8 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 
 void QnStorageManager::clearSpace()
 {
+    writeCameraInfoFiles();
+
     testOfflineStorages();
     {
         QnMutexLocker lock( &m_sdbMutex );
@@ -1551,6 +1553,63 @@ void QnStorageManager::testStoragesDone()
     rebuildPos.load();
     if (!rebuildPos.isEmpty())
         rebuildCatalogAsync(); // continue to rebuild
+}
+
+void QnStorageManager::writeCameraInfoFiles()
+{
+    for (auto &storage : getWritableStorages())
+    {
+        auto storageUrl = storage->getUrl();
+        auto separator  = getPathSeparator(storageUrl);
+
+        std::array<QString, 2> paths = {
+            closeDirPath(storageUrl) + 
+            DeviceFileCatalog::prefixByCatalog(
+                QnServer::ChunksCatalog::HiQualityCatalog
+            ) + separator
+            ,
+            closeDirPath(storageUrl) + 
+            DeviceFileCatalog::prefixByCatalog(
+                QnServer::ChunksCatalog::LowQualityCatalog
+            ) + separator
+        };
+
+        for (int i = 0; i < 2; ++i) 
+        {
+            for (auto it = m_devFileCatalog[i].cbegin(); 
+                 it != m_devFileCatalog[i].cend(); 
+                 ++it)
+            {
+                const auto cameraName = it.key();
+                auto resource = qnResPool->getResourceByUniqueId(
+                    cameraName
+                );
+                if (!resource)
+                    continue;
+                auto camResource = resource.dynamicCast<QnSecurityCamResource>();
+                if (!camResource || camResource->cameraInfoSavedToDisk())
+                    continue;
+
+                auto path = paths[i] + cameraName + separator + lit("info.txt");
+                auto outFile = std::unique_ptr<QIODevice>(
+                    storage->open(path, QIODevice::WriteOnly)
+                );
+                if (!outFile)
+                    continue;
+                        
+                outFile->write(
+                    static_cast<std::stringstream&>(
+                        std::stringstream() 
+                            << "cameraName="  << camResource->getUserDefinedName().toLatin1().constData() << std::endl
+                            << "cameraModel=" << camResource->getModel().toLatin1().constData()           << std::endl
+                            << "groupID="     << camResource->getGroupId().toLatin1().constData()         << std::endl
+                            << "groupName="   << camResource->getGroupName().toLatin1().constData()       << std::endl
+                    ).str().c_str()
+                ); 
+                camResource->setCameraInfoSavedToDisk();
+            } // for catalogs
+        } // for qualities
+    } // for storages
 }
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)

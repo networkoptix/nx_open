@@ -1,5 +1,4 @@
 #include "storage_list_model.h"
-#include <ui/workbench/workbench_access_controller.h>
 
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
@@ -17,28 +16,33 @@ QnStorageListModel::QnStorageListModel(QObject *parent)
 
 QnStorageListModel::~QnStorageListModel() {}
 
-void QnStorageListModel::setModelData(const QnStorageSpaceReply& data)
+void QnStorageListModel::setStorages(const QnStorageSpaceDataList& storages)
 {
     beginResetModel();
-    m_data = data;
+    m_storages = storages;
     endResetModel();
 }
 
-void QnStorageListModel::addModelData(const QnStorageSpaceData& data)
+void QnStorageListModel::addStorage(const QnStorageSpaceData& data)
 {
     beginResetModel();
-    m_data.storages.push_back(data);
+    // beginInsertRows(QModelIndex(), m_storages.size(), m_storages.size());
+    m_storages.push_back(data);
+    // endInsertRows();
     endResetModel();
+
+    /* Update action column. */
+    // dataChanged(index(0, ChangeGroupActionColumn), index(m_storages.size() - 1, ChangeGroupActionColumn));
 }
 
-QnStorageSpaceReply QnStorageListModel::modelData() const
+QnStorageSpaceDataList QnStorageListModel::storages() const
 {
-    return m_data;
+    return m_storages;
 }
 
 int QnStorageListModel::rowCount(const QModelIndex &parent) const {
     if (!parent.isValid())
-        return m_data.storages.size();
+        return m_storages.size();
     return 0;
 }
 
@@ -61,7 +65,7 @@ QString urlPath(const QString& url)
 
 QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedText) const
 {
-    const QnStorageSpaceData& storageData = m_data.storages[index.row()];
+    const QnStorageSpaceData& storageData = m_storages[index.row()];
     switch (index.column())
     {
     case CheckBoxColumn:
@@ -71,11 +75,20 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     case TypeColumn:
         return storageData.storageType;
     case TotalSpaceColumn:
-        return QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1) + tr("Gb");
+        return storageData.totalSpace > 0
+            ? tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1))
+            : tr("Invalid storage");
     case RemoveActionColumn:
-        return storageData.isExternal || forcedText ? tr("Remove") : QString();
+        return storageData.isExternal || forcedText 
+            ? tr("Remove") 
+            : QString();
+
     case ChangeGroupActionColumn:
-        return m_isBackupRole ? tr("Use as main storage") : tr("Use as backup storage");
+        return m_isBackupRole 
+            ? tr("Use as main storage") 
+            : m_storages.size() > 1
+            ? tr("Use as backup storage")
+            : QString();
     default:
         break;
     }
@@ -101,13 +114,14 @@ QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const
 QVariant QnStorageListModel::mouseCursorData(const QModelIndex &index) const
 {
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
-        return QVariant::fromValue<int>(Qt::PointingHandCursor);
+        if (!index.data(Qt::DisplayRole).toString().isEmpty())
+            return QVariant::fromValue<int>(Qt::PointingHandCursor);
     return QVariant();
 }
 
 QVariant QnStorageListModel::checkstateData(const QModelIndex &index) const
 {
-    const QnStorageSpaceData& storageData = m_data.storages[index.row()];
+    const QnStorageSpaceData& storageData = m_storages[index.row()];
     if (index.column() == CheckBoxColumn)
         return storageData.isUsedForWriting ? Qt::Checked : Qt::Unchecked;
     return QVariant();
@@ -133,7 +147,7 @@ QVariant QnStorageListModel::data(const QModelIndex &index, int role) const
     case Qt::CheckStateRole:
         return checkstateData(index);
     case Qn::StorageSpaceDataRole:
-        return QVariant::fromValue<QnStorageSpaceData>(m_data.storages[index.row()]);
+        return QVariant::fromValue<QnStorageSpaceData>(m_storages[index.row()]);
     default:
         break;
     }
@@ -147,7 +161,7 @@ bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
 
-    QnStorageSpaceData& storageData = m_data.storages[index.row()];
+    QnStorageSpaceData& storageData = m_storages[index.row()];
 
     if (role == Qt::CheckStateRole)
     {
@@ -186,8 +200,10 @@ bool QnStorageListModel::removeRows(int row, int count, const QModelIndex &paren
     if (parent.isValid())
         return false;
 
+    //beginRemoveRows(parent, row, row + count);
     beginResetModel();
-    m_data.storages.erase(m_data.storages.begin() + row, m_data.storages.begin() + row + count);
+    m_storages.erase(m_storages.begin() + row, m_storages.begin() + row + count);
+    //endRemoveRows();
     endResetModel();
     return true;
 }

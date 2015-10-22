@@ -100,3 +100,14 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSearchStrategy,
     (Qn::LongestFirst,      "size")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::RebuildAction,
+(Qn::RebuildAction_Start,   "start")
+(Qn::RebuildAction_Cancel,  "stop")
+(Qn::RebuildAction_ShowProgress, QString())
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupAction,
+(Qn::BackupAction_Start,   "start")
+(Qn::BackupAction_Cancel,  "stop")
+(Qn::BackupAction_ShowProgress, QString())
+)

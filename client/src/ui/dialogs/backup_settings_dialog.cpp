@@ -20,7 +20,7 @@ protected:
             bool leftIsNull = l.id.isNull();
             bool rightIsNull = r.id.isNull();
             if (leftIsNull != rightIsNull)
-                return leftIsNull << rightIsNull;
+                return leftIsNull < rightIsNull;
         }
         return base_type::lessThan(left, right);
     }

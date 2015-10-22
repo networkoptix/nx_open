@@ -182,10 +182,13 @@ private:
     void clearBookmarks();
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
+    
+    void writeCameraInfoFiles();
+
 private:
-    const QnServer::StoragePool   m_role;
-    StorageMap              m_storageRoots;
-    FileCatalogMap          m_devFileCatalog[QnServer::ChunksCatalogCount];
+    const QnServer::StoragePool m_role;
+    StorageMap                  m_storageRoots;
+    FileCatalogMap              m_devFileCatalog[QnServer::ChunksCatalogCount];
 
     mutable QnMutex m_mutexStorages;
     mutable QnMutex m_mutexCatalog;

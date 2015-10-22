@@ -12,10 +12,12 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
-#include <core/resource/storage_resource.h>
-#include "utils/network/http/asynchttpclient.h"
 #include "api/new_server_connection.h"
 
+namespace nx_http {
+    class AsyncHttpClientPtr;
+}
+class SocketAddress;
 
 class QnMediaServerResource : public QnResource
 {
@@ -54,7 +56,6 @@ public:
 
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
-    //void setStorages(const QnAbstractStorageResourceList& storages);
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
@@ -65,8 +66,6 @@ public:
 
     Qn::ServerFlags getServerFlags() const;
     void setServerFlags(Qn::ServerFlags flags);
-
-    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
 
     int getMaxCameras() const;
     void setMaxCameras(int value);
@@ -141,7 +140,6 @@ private:
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
-    //QnAbstractStorageResourceList m_storages;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;

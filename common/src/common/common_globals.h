@@ -35,6 +35,7 @@ namespace Qn
             StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
             ServerFlag BackupType CameraBackupType CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            RebuildAction BackupAction
             FailoverPriority)
     Q_FLAGS(Borders Corners
             ResourceFlags
@@ -745,6 +746,28 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
     static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
 
+    // TODO: #MSAPI move to api/model or even to common_globals, 
+    // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
+    // 
+    // Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
+    // and in handler.
+    // 
+    // And name them sanely =)
+    enum RebuildAction
+    {
+        RebuildAction_ShowProgress,
+        RebuildAction_Start,
+        RebuildAction_Cancel
+    };
+
+    enum BackupAction
+    {
+        BackupAction_ShowProgress,
+        BackupAction_Start,
+        BackupAction_Cancel
+    };
+
+
     /** 
      * backup settings 
      */
@@ -820,6 +843,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
         (Qn::BookmarkSearchStrategy)
+        (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)
         ,

@@ -16,6 +16,7 @@
 
 #include <utils/common/model_functions.h>
 #include <utils/network/router.h>
+#include <utils/network/http/asynchttpclient.h>
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
 

@@ -4,27 +4,34 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
-#include <utils/common/app_info.h>
-#include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
-#include <rest/server/json_rest_result.h>
-#include "utils/common/sleep.h"
-#include "utils/network/networkoptixmodulerevealcommon.h"
-#include "utils/common/util.h"
-#include "media_server_user_attributes.h"
-#include "../resource_management/resource_pool.h"
-#include "utils/serialization/lexical.h"
-#include "core/resource/security_cam_resource.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
-#include "nx_ec/ec_proto_version.h"
-namespace {
 
+#include <core/resource/storage_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/media_server_user_attributes.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/resource_pool.h>
+
+#include "nx_ec/ec_proto_version.h"
+
+#include <rest/server/json_rest_result.h>
+
+#include <utils/common/app_info.h>
+#include "utils/common/delete_later.h"
+#include "utils/common/sleep.h"
+#include "utils/common/util.h"
+#include "utils/network/http/asynchttpclient.h"
+#include "utils/network/networkoptixmodulerevealcommon.h"
+#include "utils/serialization/lexical.h"
+
+
+
+namespace {
     const QString protoVersionPropertyName = lit("protoVersion");
     const QString safeModePropertyName = lit("ecDbReadOnly");
-
 }
 
 
