@@ -16,7 +16,8 @@ public:
 
     mutable QMutex thumbnailMutex;
 
-    QSize thumbnailSize;
+    int currentQuality;
+    QVector<int> screenshotQualityList;
 
     QnVirtualCameraResourcePtr camera;
     qint64 position;
@@ -30,11 +31,14 @@ public:
 
     int requestId;
     bool requestNextAfterReply;
+    QElapsedTimer fetchTimer;
 
     QPixmap thumbnail() const;
     void clear();
     void refresh();
     void requestRefresh();
+
+    QSize currentSize() const;
 
 private slots:
     void at_thumbnailReceived(int status, const QImage &image, int handle);

@@ -8,6 +8,8 @@ namespace {
 
 enum {
     refreshInterval = 300
+    , fastTimeout = 100
+    , longTimeout = 230
 };
 
 enum {
@@ -20,12 +22,19 @@ QnActiveCameraThumbnailLoaderPrivate::QnActiveCameraThumbnailLoaderPrivate(
         QnActiveCameraThumbnailLoader *parent)
     : QObject(parent)
     , q_ptr(parent)
-    , thumbnailSize(0, 128)
+    , currentQuality(0)
     , refreshOperation(new QnPendingOperation([this](){ refresh(); }, refreshInterval, this))
     , imageProvider(nullptr)
     , requestId(invalidRequest)
     , requestNextAfterReply(false)
 {
+    screenshotQualityList.append(128);
+    screenshotQualityList.append(240);
+    screenshotQualityList.append(320);
+    screenshotQualityList.append(480);
+    screenshotQualityList.append(560);
+    screenshotQualityList.append(720);
+    screenshotQualityList.append(1080);
 }
 
 QPixmap QnActiveCameraThumbnailLoaderPrivate::thumbnail() const {
@@ -53,19 +62,29 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh() {
         return;
 
     requestId = server->apiConnection()->getThumbnailAsync(
-                camera, position, -1, thumbnailSize,
+                camera, position, -1, currentSize(),
                 lit("jpg"), QnMediaServerConnection::Precise,
                 this, SLOT(at_thumbnailReceived(int, const QImage&, int)));
+    fetchTimer.start();
 }
 
 void QnActiveCameraThumbnailLoaderPrivate::requestRefresh() {
     refreshOperation->requestOperation();
 }
 
+QSize QnActiveCameraThumbnailLoaderPrivate::currentSize() const {
+    return QSize(0, screenshotQualityList[currentQuality]);
+}
+
 void QnActiveCameraThumbnailLoaderPrivate::at_thumbnailReceived(int status, const QImage &image, int handle) {
     Q_UNUSED(handle)
 
     requestId = invalidRequest;
+
+    if (currentQuality < screenshotQualityList.size() - 1 && !fetchTimer.hasExpired(fastTimeout))
+        ++currentQuality;
+    else if (currentQuality > 0 && fetchTimer.hasExpired(longTimeout))
+        --currentQuality;
 
     if (requestNextAfterReply) {
         requestNextAfterReply = false;
