@@ -95,7 +95,7 @@ QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
     return getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
-bool QnSecurityCamResource::cameraInfoSavedToDisk() const
+bool QnSecurityCamResource::isCameraInfoSavedToDisk() const
 {
     SAFE(return m_cameraInfoSavedToDisk);
 }

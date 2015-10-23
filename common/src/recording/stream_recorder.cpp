@@ -143,18 +143,12 @@ void QnStreamRecorder::close()
         if (m_packetWrited)
             av_write_trailer(m_recordingContextVector[i].formatCtx);
 
-        if (m_startDateTime != qint64(AV_NOPTS_VALUE))
-        {
-            qint64 fileDuration = m_startDateTime != 
-                qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
 
-            fileFinished(
-                fileDuration, 
-                m_recordingContextVector[i].fileName, 
-                m_mediaProvider, 
-                QnFfmpegHelper::getFileSizeByIOContext(m_recordingContextVector[i].formatCtx->pb)
-            );
-        }
+        auto fileSize = 
+            m_startDateTime != qint64(AV_NOPTS_VALUE) ? 
+                QnFfmpegHelper::getFileSizeByIOContext(
+                    m_recordingContextVector[i].formatCtx->pb
+                ) : 0;
 
         if (m_recordingContextVector[i].formatCtx)
         {
@@ -167,6 +161,19 @@ void QnStreamRecorder::close()
             avformat_close_input(&m_recordingContextVector[i].formatCtx);
         }
         m_recordingContextVector[i].formatCtx = 0;
+
+        if (m_startDateTime != qint64(AV_NOPTS_VALUE))
+        {
+            qint64 fileDuration = m_startDateTime != 
+                qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
+
+            fileFinished(
+                fileDuration, 
+                m_recordingContextVector[i].fileName, 
+                m_mediaProvider, 
+                fileSize
+            );
+        }
     }
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {

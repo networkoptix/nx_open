@@ -251,7 +251,7 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-    bool cameraInfoSavedToDisk() const;
+    bool isCameraInfoSavedToDisk() const;
     void setCameraInfoSavedToDisk();
 
 public slots:

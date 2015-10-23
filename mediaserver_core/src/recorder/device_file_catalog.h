@@ -28,8 +28,9 @@ public:
 
     struct Chunk
     {
-        static const quint16 FILE_INDEX_NONE = 0xffff;
-        static const int UnknownDuration = -1;
+        static const quint16 FILE_INDEX_NONE           = 0xffff;
+        static const quint16 FILE_INDEX_WITH_DURATION  = 0xfffe;
+        static const int UnknownDuration               = -1;
 
         Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1), fileSizeHi(0), fileSizeLo(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) : 
@@ -41,7 +42,6 @@ public:
         qint64 distanceToTime(qint64 timeMs) const;
         qint64 endTimeMs() const;
         bool containsTime(qint64 timeMs) const;
-        void truncate(qint64 timeMs);
         qint64 getFileSize() const { return ((qint64) fileSizeHi << 32) + fileSizeLo; } // 256Tb as max file size
         void setFileSize(qint64 value) { fileSizeHi = quint16(value >> 32); fileSizeLo = quint32(value); } // 256Tb as max file size
 
@@ -56,6 +56,23 @@ public:
         qint16 timeZone;
         quint16 fileSizeHi;
         quint32 fileSizeLo;
+    };
+
+    struct TruncableChunk : Chunk
+    {
+        using Chunk::Chunk;
+        int64_t originalDuration;
+
+        TruncableChunk() 
+            : Chunk(),
+              originalDuration(0)
+        {}
+
+        TruncableChunk(const Chunk &other) 
+            : Chunk(other), 
+              originalDuration(other.durationMs) 
+        {}
+        void truncate(qint64 timeMs);
     };
 
     struct EmptyFileInfo

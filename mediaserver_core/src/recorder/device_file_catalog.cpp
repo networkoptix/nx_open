@@ -73,7 +73,7 @@ bool DeviceFileCatalog::Chunk::containsTime(qint64 timeMs) const
         return qBetween(startTimeMs, timeMs, endTimeMs());
 }
 
-void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
+void DeviceFileCatalog::TruncableChunk::truncate(qint64 timeMs)
 {
     durationMs = qMax(0ll, timeMs - startTimeMs);
 }
@@ -323,32 +323,63 @@ int DeviceFileCatalog::detectTimeZone(qint64 startTimeMs, const QString& fileNam
     return result;
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName)
+DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
+    const QnStorageResourcePtr  &storage, 
+    const QString               &fileName
+)
 {
     Chunk chunk;
+    if (fileName.indexOf(lit(".txt")) != -1)
+        return chunk;
 
-    QnAviResourcePtr res(new QnAviResource(fileName));
-    QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
-    avi->setStorage(storage);
-    avi->setFastStreamFind(true);
-    if (avi->open(res) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE) {
-        qint64 startTimeMs = avi->startTime()/1000;
-        qint64 endTimeMs = avi->endTime()/1000;
-        QString baseName = QnFile::baseName(fileName);
-        int fileIndex = baseName.length() <= 3 ? baseName.toInt() : Chunk::FILE_INDEX_NONE;
+    if (fileName.indexOf(lit("_")) == -1)
+    {
+        QnAviResourcePtr res(new QnAviResource(fileName));
+        QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
+        avi->setStorage(storage);
+        avi->setFastStreamFind(true);
+        if (avi->open(res) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE) 
+        {
+            qint64 startTimeMs = avi->startTime()/1000;
+            qint64 endTimeMs = avi->endTime()/1000;
+            QString baseName = QnFile::baseName(fileName);
+            int fileIndex = baseName.length() <= 3 ? baseName.toInt() : Chunk::FILE_INDEX_NONE;
 
-        if (startTimeMs < 1 || endTimeMs - startTimeMs < 1) {
-            delete avi;
-            return chunk;
+            if (startTimeMs < 1 || endTimeMs - startTimeMs < 1) {
+                delete avi;
+                return chunk;
+            }
+            chunk = Chunk(
+                startTimeMs, 
+                getMyStorageMan()->getStorageIndex(storage), 
+                fileIndex, 
+                endTimeMs - startTimeMs, 
+                detectTimeZone(startTimeMs, fileName)
+            );
         }
+        else {
+            qWarning() << "Can't open media file" << fileName << "storage=" << storage->getUrl();
+        }
+        delete avi;    
+        return chunk;
+    }
 
-        //chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
-        chunk = Chunk(startTimeMs, getMyStorageMan()->getStorageIndex(storage), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
-    }
-    else {
-        qWarning() << "Can't open media file" << fileName << "storage=" << storage->getUrl();
-    }
-    delete avi;
+    auto    nameParts   = QnFile::baseName(fileName).split(lit("_"));
+    int64_t startTimeMs = nameParts[0].toLongLong();
+    int64_t durationMs  = nameParts[1].toInt();
+    int     fileIndex   = nameParts[0].length() <= 3 ? nameParts[0].toInt() : 
+                                                       nameParts.size() == 2 ? Chunk::FILE_INDEX_WITH_DURATION : 
+                                                                               Chunk::FILE_INDEX_NONE;
+    if (startTimeMs < 1 || durationMs < 1)
+        return chunk;
+
+    chunk = Chunk(
+        startTimeMs, 
+        getMyStorageMan()->getStorageIndex(storage), 
+        fileIndex, 
+        durationMs, 
+        detectTimeZone(startTimeMs, fileName)
+    );
     return chunk;
 }
 
@@ -803,7 +834,12 @@ void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
 
 QString DeviceFileCatalog::Chunk::fileName() const
 {
-    QString baseName = fileIndex != FILE_INDEX_NONE ? strPadLeft(QString::number(fileIndex), 3, '0') : QString::number(startTimeMs);
+    QString baseName = (fileIndex != FILE_INDEX_NONE && fileIndex != FILE_INDEX_WITH_DURATION) ? 
+                       strPadLeft(QString::number(fileIndex), 3, '0') : 
+                       QString::number(startTimeMs) + 
+                       (fileIndex == FILE_INDEX_WITH_DURATION ? lit("_") + QString::number(durationMs) : 
+                                                                lit(""));
+
     return baseName + QString(".mkv");
 }
 

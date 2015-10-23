@@ -1580,17 +1580,17 @@ void QnStorageManager::writeCameraInfoFiles()
                  it != m_devFileCatalog[i].cend(); 
                  ++it)
             {
-                const auto cameraName = it.key();
+                const auto cameraUniqueId = it.key();
                 auto resource = qnResPool->getResourceByUniqueId(
-                    cameraName
+                    cameraUniqueId
                 );
                 if (!resource)
                     continue;
                 auto camResource = resource.dynamicCast<QnSecurityCamResource>();
-                if (!camResource || camResource->cameraInfoSavedToDisk())
+                if (!camResource || camResource->isCameraInfoSavedToDisk())
                     continue;
 
-                auto path = paths[i] + cameraName + separator + lit("info.txt");
+                auto path = paths[i] + cameraUniqueId + separator + lit("info.txt");
                 auto outFile = std::unique_ptr<QIODevice>(
                     storage->open(path, QIODevice::WriteOnly)
                 );
@@ -1923,6 +1923,30 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrlInternal(const QString& fi
     return ret;
 }
 
+bool QnStorageManager::renameFileWithDuration(
+    const QString               &oldName,
+    int64_t                     duration,
+    const QnStorageResourcePtr  &storage
+)
+{
+    auto separator    = getPathSeparator(oldName);
+    auto lastSepIndex = oldName.lastIndexOf(separator);
+
+    auto fname = oldName.mid(lastSepIndex + 1);
+    auto fpath = oldName.mid(0, lastSepIndex+1);
+
+    if (fname.indexOf(lit("_")) != -1)
+        return true; // file's already been renamed
+
+    auto nameParts = fname.split(lit("."));
+    auto newName   = nameParts[0] + lit("_") + QString::number(duration);
+    
+    for (int i = 1; i < nameParts.size(); ++i)
+        newName += lit(".") + nameParts[i];
+    
+    return storage->renameFile(oldName, fpath + newName);
+}
+
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
 {
     int storageIndex;
@@ -1934,6 +1958,8 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     //if (storageIndex >= 0 && provider)
     //    storage->releaseBitrate(provider);
     storage->addWrited(fileSize);
+    if (!renameFileWithDuration(fileName, durationMs, storage))
+        qDebug() << lit("File %1 rename failed").arg(fileName);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, quality);
     if (catalog == 0)
@@ -1966,7 +1992,13 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
     if (catalog == 0)
         return false;
-    DeviceFileCatalog::Chunk chunk(startDateMs, storageIndex, DeviceFileCatalog::Chunk::FILE_INDEX_NONE, -1, (qint16) timeZone);
+    DeviceFileCatalog::Chunk chunk(
+        startDateMs, 
+        storageIndex, 
+        DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, 
+        -1, 
+        (qint16) timeZone
+    );
     catalog->addRecord(chunk);
     catalog->setLastSyncTime(startDateMs);
     return true;
