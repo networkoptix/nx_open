@@ -189,6 +189,7 @@ private:
         int64_t                     duration,
         const QnStorageResourcePtr  &storage
     );
+    static void updateCameraHistory();
 
 private:
     const QnServer::StoragePool m_role;

@@ -13,6 +13,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/camera_history.h>
+#include "api/app_server_connection.h"
 
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
@@ -1126,6 +1128,49 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
     }
 }
 
+void QnStorageManager::updateCameraHistory() 
+{
+    std::vector<QnUuid> archivedListNew = 
+        qnNormalStorageMan->getCamerasWithArchive();
+
+    std::vector<QnUuid> archivedListNewBackup = 
+        qnBackupStorageMan->getCamerasWithArchive();
+
+    std::sort(archivedListNew.begin(), archivedListNew.end());
+    std::sort(archivedListNewBackup.begin(), archivedListNewBackup.end());
+
+    std::vector<QnUuid> resultNewList;
+    std::set_union(archivedListNew.cbegin(),
+                   archivedListNew.cend(),
+                   archivedListNewBackup.cbegin(),
+                   archivedListNewBackup.cend(),
+                   std::back_inserter(resultNewList));
+
+    std::vector<QnUuid> archivedListOld = 
+        qnCameraHistoryPool->getServerFootageData(qnCommon->moduleGUID());
+
+    std::sort(archivedListOld.begin(), archivedListOld.end());
+    if (archivedListOld == resultNewList) 
+        return;
+
+    const ec2::AbstractECConnectionPtr& appServerConnection = 
+        QnAppServerConnectionFactory::getConnection2();
+
+    ec2::ErrorCode errCode = 
+        appServerConnection->getCameraManager()
+                           ->setCamerasWithArchiveSync(qnCommon->moduleGUID(), 
+                                                       archivedListNew);
+
+    if (errCode != ec2::ErrorCode::ok) {
+        qCritical() << "ECS server error during execute method addCameraHistoryItem: " 
+                    << ec2::toString(errCode);
+        return;
+    }
+    qnCameraHistoryPool->setServerFootageData(qnCommon->moduleGUID(), 
+                                              archivedListNew);
+    return;
+}
+
 void QnStorageManager::clearSpace()
 {
     writeCameraInfoFiles();
@@ -1143,12 +1188,21 @@ void QnStorageManager::clearSpace()
     clearMaxDaysData();
 
     // 2. free storage space
+    bool allStoragesReady = true;
     QSet<QnStorageResourcePtr> storages;
+
     for (const auto& storage: getWritableStorages()) {
-        if (!storage->hasFlags(Qn::storage_fastscan))
+        if (!storage->hasFlags(Qn::storage_fastscan)) {
             storages << storage;
+        } else {
+            allStoragesReady = false;
+        }
     }
 	
+    if (allStoragesReady && m_role == QnServer::StoragePool::Normal) {
+        updateCameraHistory();
+    }
+
     for(const QnStorageResourcePtr& storage: storages)
         clearOldestSpace(storage, true);
     for(const QnStorageResourcePtr& storage: storages)
