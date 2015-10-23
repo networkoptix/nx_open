@@ -12,6 +12,8 @@
 #include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
+#include "../resource/av_resource.h"
+
 
 class QnArecontRtspStreamReader
 :
@@ -36,7 +38,9 @@ private:
     QnMulticodecRtpReader m_rtpStreamParser;
 
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
-    QString generateRequestString(const QnLiveStreamParams& params);
+    QString generateRequestString(
+        const QnLiveStreamParams& params,
+        const QnPlAreconVisionResourcePtr& res);
 };
 
 #endif // ENABLE_ARECONT

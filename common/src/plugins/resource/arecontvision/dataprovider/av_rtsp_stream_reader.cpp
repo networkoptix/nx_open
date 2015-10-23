@@ -9,8 +9,6 @@
 
 #include <utils/common/log.h>
 
-#include "../resource/av_resource.h"
-
 
 QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
@@ -30,12 +28,14 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
-    const auto requestStr = generateRequestString(params);
-
     const Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
 
     auto res = getResource().dynamicCast<QnPlAreconVisionResource>();
+
+    const auto requestStr = generateRequestString(
+        params,
+        res);
     const QString url = lit("rtsp://%1:%2/%3").arg(res->getHostAddress()).arg(554).arg(requestStr);
 
     m_rtpStreamParser.setRequest(url);
@@ -102,24 +102,38 @@ QnConstResourceAudioLayoutPtr QnArecontRtspStreamReader::getDPAudioLayout() cons
     return m_rtpStreamParser.getAudioLayout();
 }
 
-QString QnArecontRtspStreamReader::generateRequestString(const QnLiveStreamParams& params)
+QString QnArecontRtspStreamReader::generateRequestString(
+    const QnLiveStreamParams& params,
+    const QnPlAreconVisionResourcePtr& res)
 {
     static const int SECOND_STREAM_FPS = 5;
+    static const int SECOND_STREAM_BITRATE_KBPS = 512;
 
     QString str;
 
     str += lit("h264.sdp?");
-    if (getRole() == Qn::CR_LiveVideo)
-    {
-        str += lit("Res=full");
-        str += lit("&FPS=%1").arg((int)params.fps);
-    }
-    else
+    if (getRole() == Qn::CR_SecondaryLiveVideo)
     {
         str += lit("Res=half");
         str += lit("&FPS=%1").arg(SECOND_STREAM_FPS);
         str += lit("&QP=37");
+        str += lit("&Ratelimit=%1").arg(SECOND_STREAM_BITRATE_KBPS);
     }
+    else
+    {
+        const int maxWidth = res->getProperty(lit("MaxSensorWidth")).toInt();
+        const int maxHeight = res->getProperty(lit("MaxSensorHeight")).toInt();
+
+        str += lit("Res=full");
+        str += lit("&FPS=%1").arg((int)params.fps);
+        const int desiredBitrateKbps = res->suggestBitrateKbps(
+            params.quality,
+            QSize(maxWidth, maxHeight),
+            params.fps);
+        str += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
+    }
+    if (res->isAudioEnabled())
+        str += lit("&MIC=on");
 
     return str;
 }
