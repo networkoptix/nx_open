@@ -49,7 +49,7 @@ public:
 
 
         qint64 startTimeMs; // chunk startTime at ms
-        int durationMs; // chunk duration at ms
+        mutable int durationMs; // chunk duration at ms
         quint16 storageIndex;
         quint16 fileIndex;
 
@@ -72,6 +72,14 @@ public:
             : Chunk(other), 
               originalDuration(other.durationMs) 
         {}
+
+        const Chunk &toBaseChunk() const
+        {
+            if (originalDuration != 0)
+                durationMs = originalDuration;
+            return *this;
+        }
+
         void truncate(qint64 timeMs);
     };
 
