@@ -332,23 +332,17 @@ QnTimeline::QnTimeline(QQuickItem *parent) :
 
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
 
-    QnTimelineZoomLevel::monthsNames << tr("January")   << tr("February")   << tr("March")
-                                     << tr("April")     << tr("May")        << tr("June")
-                                     << tr("July")      << tr("August")     << tr("September")
-                                     << tr("October")   << tr("November")   << tr("December");
+    d->suffixList << lit("ms") << lit("s") << lit(":");
 
     QnTimelineZoomLevel::maxMonthLength = 0;
-    for (const QString &month : QnTimelineZoomLevel::monthsNames)
-        QnTimelineZoomLevel::maxMonthLength = qMax(QnTimelineZoomLevel::maxMonthLength, month.size());
-
-    d->suffixList << lit("ms") << lit("s") << lit(":");
-    for (const QString &month : QnTimelineZoomLevel::monthsNames)
-        d->suffixList.append(month);
-
-    QDate date(2015, 1, 1);
-    for (int i = 0; i < 12; ++i) {
-        d->suffixList.append(date.toString(lit("MMMM")));
-        date = date.addMonths(1);
+    QLocale locale;
+    for (int i = 1; i <= 12; ++i) {
+        QString standaloneMonthName = locale.standaloneMonthName(i);
+        QString monthName = locale.monthName(i);
+        d->suffixList.append(standaloneMonthName);
+        d->suffixList.append(monthName);
+        QnTimelineZoomLevel::maxMonthLength = qMax(QnTimelineZoomLevel::maxMonthLength,
+                                                   qMax(standaloneMonthName.length(), monthName.length()));
     }
 
     d->updateTextHelper();

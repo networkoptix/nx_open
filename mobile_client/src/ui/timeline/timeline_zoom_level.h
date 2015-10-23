@@ -15,7 +15,6 @@ struct QnTimelineZoomLevel {
         Years
     };
 
-    static QVector<QString> monthsNames;
     static int maxMonthLength;
 
     LevelType type;

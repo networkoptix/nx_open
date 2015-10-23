@@ -1,6 +1,5 @@
 #include "timeline_zoom_level.h"
 
-QVector<QString> QnTimelineZoomLevel::monthsNames;
 int QnTimelineZoomLevel::maxMonthLength = 0;
 
 bool QnTimelineZoomLevel::testTick(qint64 tick) const {
@@ -114,9 +113,9 @@ QString QnTimelineZoomLevel::suffix(qint64 tick) const {
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Days:
-        return dateTime.toString(lit("MMMM"));
+        return QLocale().monthName(dateTime.date().month());
     case Months:
-        return monthsNames[dateTime.date().month() - 1];
+        return QLocale().standaloneMonthName(dateTime.date().month());
     case Milliseconds:
         return lit("ms");
     case Seconds:
