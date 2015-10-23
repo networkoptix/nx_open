@@ -75,6 +75,7 @@ bool DeviceFileCatalog::Chunk::containsTime(qint64 timeMs) const
 
 void DeviceFileCatalog::TruncableChunk::truncate(qint64 timeMs)
 {
+    originalDuration = durationMs;
     durationMs = qMax(0ll, timeMs - startTimeMs);
 }
 
@@ -332,7 +333,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
     if (fileName.indexOf(lit(".txt")) != -1)
         return chunk;
 
-    if (fileName.indexOf(lit("_")) == -1)
+    if (QnFile::baseName(fileName).indexOf(lit("_")) == -1)
     {
         QnAviResourcePtr res(new QnAviResource(fileName));
         QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();

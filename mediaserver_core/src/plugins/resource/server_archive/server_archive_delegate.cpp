@@ -448,10 +448,8 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
         return false;
     m_currentChunk = newChunk;
     
-    DeviceFileCatalog::Chunk baseChunk(newChunk.toBaseChunk());
-
     m_currentChunkCatalog[(int)newCatalog->getStoragePool()] = newCatalog;
-    QString url = newCatalog->fullFileName(baseChunk);
+    QString url = newCatalog->fullFileName(newChunk.toBaseChunk());
 
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));
     m_aviDelegate->close();
