@@ -487,7 +487,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     if (eventType == QnBusiness::CameraMotionEvent) 
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
-        qnCameraHistoryPool->updateCameraHistoryIfNeedSync(camRes);
+        qnCameraHistoryPool->updateCameraHistorySync(camRes);
 
         contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
         contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
@@ -515,7 +515,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
 
                     camera[QLatin1String("name")] = getFullResourceName(camRes, useIp);
 
-                    qnCameraHistoryPool->updateCameraHistoryIfNeedSync(camRes);
+                    qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
                     camera[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, true);
 
