@@ -1782,7 +1782,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
                         .arg((*it)->getUrl())
                         .arg((*it)->calcUsageCoeff());
         if ((*it)->calcUsageCoeff() >= 0) {
-            StorageSpaceInfo tmp = {*it, (*it)->calcUsageCoeff()};
+            StorageSpaceInfo tmp = {*it, static_cast<qint64>((*it)->calcUsageCoeff())};
             storagesInfo.push_back(tmp);
         }
     }

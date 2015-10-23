@@ -21,7 +21,7 @@
 #include <media_server/settings.h>
 #include <recorder/storage_manager.h>
 
-#ifdef __linux__
+#ifndef _WIN32
 #   include <sys/mount.h>
 #   include <sys/types.h>
 #   include <sys/stat.h>
@@ -44,6 +44,12 @@
 #else
     const QString QnFileStorageResource::FROM_SEP = lit("/");
     const QString QnFileStorageResource::TO_SEP = lit("\\");
+#endif
+
+#ifdef __APPLE__
+static const auto MS_NODEV = MNT_NODEV;
+static const auto MS_NOSUID = MNT_NOSUID;
+static const auto MS_NOEXEC = MNT_NOEXEC;
 #endif
 
 
@@ -224,7 +230,11 @@ void QnFileStorageResource::removeOldDirs()
         if (entry.absoluteFilePath().indexOf(prefix) == -1)
             continue;
 
+#if __linux__
         int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
+#elif __APPLE__
+        int ecode = unmount(entry.absoluteFilePath().toLatin1().constData(), 0);
+#endif
         if (ecode != 0)
         {
             bool safeToRemove = true;
@@ -294,6 +304,7 @@ int QnFileStorageResource::mountTmpDrive() const
         S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
     );
 
+#if __linux__
     retCode = mount(        
         srcString.toLatin1().constData(),
         m_localPath.toLatin1().constData(),
@@ -301,6 +312,9 @@ int QnFileStorageResource::mountTmpDrive() const
         MS_NODEV | MS_NOEXEC | MS_NOSUID,
         cifsOptionsString.toLatin1().constData()
     );
+#elif __APPLE__
+#error "TODO BSD-style mount call"
+#endif
 
     if (retCode == -1) 
     {
@@ -376,7 +390,11 @@ QnFileStorageResource::~QnFileStorageResource()
 #ifndef _WIN32
     if (!m_localPath.isEmpty())
     {
+#if __linux__
         umount(m_localPath.toLatin1().constData());
+#elif __APPLE__
+        unmount(m_localPath.toLatin1().constData(), 0);
+#endif
         rmdir(m_localPath.toLatin1().constData());
     }
 #endif
@@ -623,6 +641,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
             S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
         );
 
+#if __linux__
         int retCode = mount(
             srcString.toLatin1().constData(),
             tmpPath.toLatin1().constData(),
@@ -630,6 +649,9 @@ bool QnFileStorageResource::isStorageDirMounted() const
             MS_NOSUID | MS_NODEV | MS_NOEXEC,
             cifsOptionsString.toLatin1().constData()
         );
+#elif __APPLE__
+#error "TODO BSD-style mount call"
+#endif
 
         if (retCode == -1)
         {
@@ -643,7 +665,11 @@ bool QnFileStorageResource::isStorageDirMounted() const
         }
         else
         {
+#if __linux__
             umount(tmpPath.toLatin1().constData());
+#elif __APPLE__
+            unmount(tmpPath.toLatin1().constData(), 0);
+#endif
             rmdir(tmpPath.toLatin1().constData());
         }
         return true;
