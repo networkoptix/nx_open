@@ -101,29 +101,7 @@ QnFlickable {
                 }
                 add: Transition {
                     id: addTransition
-                    enabled: flow.loaded
-                    SequentialAnimation {
-                        ScriptAction {
-                            script: {
-                                console.log("depacited")
-                                console.log(addTransition.ViewTransition.targetIndexes)
-                                addTransition.ViewTransition.item.opacity = 0.0
-                            }
-                        }
-                        PauseAnimation {
-                            duration: 100
-                        }
-                        ParallelAnimation {
-                            NumberAnimation { property: "opacity"; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
-                            NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
-                        }
-                        ScriptAction {
-                            script: {
-                                console.log("opacited")
-                                addTransition.ViewTransition.item.opacity = 1.0
-                            }
-                        }
-                    }
+                    NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
                 }
             }
 
@@ -229,25 +207,7 @@ QnFlickable {
                     }
                     add: Transition {
                         id: hiddenIntemAddTransition
-                        SequentialAnimation {
-                            ScriptAction {
-                                script: {
-                                    hiddenIntemAddTransition.ViewTransition.item.opacity = 0.0
-                                }
-                            }
-                            PauseAnimation {
-                                duration: 100
-                            }
-                            ParallelAnimation {
-                                NumberAnimation { property: "opacity"; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
-                                NumberAnimation { property: "y"; from: hiddenIntemAddTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
-                            }
-                            ScriptAction {
-                                script: {
-                                    hiddenIntemAddTransition.ViewTransition.item.opacity = 1.0
-                                }
-                            }
-                        }
+                        NumberAnimation { property: "y"; from: hiddenIntemAddTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
                     }
                 }
             }
