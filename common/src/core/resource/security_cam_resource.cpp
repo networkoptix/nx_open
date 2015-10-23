@@ -21,6 +21,7 @@
 #include "api/model/api_ioport_data.h"
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
+#include "media_server_user_attributes.h"
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
@@ -65,7 +66,8 @@ QnSecurityCamResource::QnSecurityCamResource():
         &m_mutex ),
     m_cachedIsIOModule(
         [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
-        &m_mutex )
+        &m_mutex ),
+    m_cameraInfoSavedToDisk(false)
 {
     addFlags(Qn::live_cam);
 
@@ -93,6 +95,15 @@ QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
     return getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
+bool QnSecurityCamResource::isCameraInfoSavedToDisk() const
+{
+    SAFE(return m_cameraInfoSavedToDisk);
+}
+
+void QnSecurityCamResource::setCameraInfoSavedToDisk()
+{
+    SAFE(m_cameraInfoSavedToDisk = true);
+}
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
@@ -564,8 +575,7 @@ QString QnSecurityCamResource::getGroupName() const {
 
 QString QnSecurityCamResource::getDefaultGroupName() const
 {
-    QnMutexLocker locker( &m_mutex );
-    return m_groupName;
+    SAFE(return m_groupName);
 }
 
 void QnSecurityCamResource::setGroupName(const QString& value) {
@@ -574,6 +584,7 @@ void QnSecurityCamResource::setGroupName(const QString& value) {
         if(m_groupName == value)
             return;
         m_groupName = value;
+        m_cameraInfoSavedToDisk = false;
     }
     emit groupNameChanged(::toSharedPointer(this));
 }
@@ -588,6 +599,7 @@ void QnSecurityCamResource::setUserDefinedGroupName( const QString& value )
             return;
         (*userAttributesLock)->groupName = value;
     }
+    SAFE(m_cameraInfoSavedToDisk = false);
     emit groupNameChanged(::toSharedPointer(this));
 }
 
@@ -601,9 +613,10 @@ void QnSecurityCamResource::setGroupId(const QString& value) {
         if(m_groupId == value)
             return;
         m_groupId = value;
+        m_cameraInfoSavedToDisk = false;
     }
-
     emit groupIdChanged(::toSharedPointer(this));   
+
 }
 
 QString QnSecurityCamResource::getModel() const {
@@ -611,7 +624,9 @@ QString QnSecurityCamResource::getModel() const {
 }
 
 void QnSecurityCamResource::setModel(const QString &model) {
-    SAFE(m_model = model)
+    QnMutexLocker lk(&m_mutex);
+    m_model = model;
+    m_cameraInfoSavedToDisk = false;
 }
 
 QString QnSecurityCamResource::getFirmware() const {
@@ -774,6 +789,32 @@ bool QnSecurityCamResource::isManuallyAdded() const {
 
 void QnSecurityCamResource::setManuallyAdded(bool value) {
     m_manuallyAdded = value;
+}
+
+Qn::CameraBackupTypes QnSecurityCamResource::getBackupType() const
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+    return (*userAttributesLock)->backupType;
+}
+
+void QnSecurityCamResource::setBackupType(Qn::CameraBackupTypes value)
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+    (*userAttributesLock)->backupType = value;
+}
+
+Qn::CameraBackupTypes QnSecurityCamResource::getActualBackupType() const
+{
+    Qn::CameraBackupTypes result = getBackupType();
+    if (result == Qn::CameraBackup_Default) {
+        QnMediaServerUserAttributesPool::ScopedLock lk(
+            QnMediaServerUserAttributesPool::instance(), 
+            getParentId()
+            );
+        result = (*lk)->backupQuality;
+    }
+
+    return result;
 }
 
 void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality) {

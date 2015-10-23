@@ -96,6 +96,7 @@
 #include <recorder/file_deletor.h>
 #include <recorder/recording_manager.h>
 #include <recorder/storage_manager.h>
+#include <recorder/schedule_sync.h>
 
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/business_event_log_rest_handler.h>
@@ -217,6 +218,7 @@
 #include "crash_reporter.h"
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
+#include "rest/handlers/backup_control_rest_handler.h"
 
 
 #ifdef __arm__
@@ -913,7 +915,9 @@ void MediaServerProcess::stopObjects()
 {
     qWarning() << "QnMain::stopObjects() called";
 
-    QnStorageManager::instance()->cancelRebuildCatalogAsync();
+    qnNormalStorageMan->cancelRebuildCatalogAsync();
+    qnBackupStorageMan->cancelRebuildCatalogAsync();
+
     if (qnFileDeletor)
         qnFileDeletor->pleaseStop();
 
@@ -1298,10 +1302,10 @@ void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& s
     qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
-void MediaServerProcess::at_storageManager_rebuildFinished() {
+void MediaServerProcess::at_storageManager_rebuildFinished(bool isCanceled) {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer);
+    qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, isCanceled);
 }
 
 void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)
@@ -1349,6 +1353,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/backupControl", new QnBackupControlRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler()); // deprecated
     QnRestProcessorPool::instance()->registerHandler("api/businessEvents", new QnBusinessLog2RestHandler()); // new version
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
@@ -1548,13 +1553,29 @@ void MediaServerProcess::run()
 
     //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-    std::unique_ptr<QnStorageManager> storageManager( new QnStorageManager() );
+    std::unique_ptr<QnStorageManager> normalStorageManager(
+        new QnStorageManager(
+            QnServer::StoragePool::Normal
+        )
+    );
+    
+    std::unique_ptr<QnStorageManager> backupStorageManager(
+        new QnStorageManager(
+            QnServer::StoragePool::Backup
+        ) 
+    );
+
     std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
 
     connect(QnResourceDiscoveryManager::instance(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
-    connect(QnStorageManager::instance(), &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
-    connect(QnStorageManager::instance(), &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
-    connect(QnStorageManager::instance(), &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
+    connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
+    connect(qnNormalStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
+    connect(qnNormalStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
+
+    // TODO: #akulikov #backup storages. Check if it is right.
+    connect(qnBackupStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
+    connect(qnBackupStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
+    connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
 
     QString dataLocation = getDataDirectory();
     QDir stateDirectory;
@@ -2114,7 +2135,8 @@ void MediaServerProcess::run()
     for(const QnStorageResourcePtr &storage: modifiedStorages)
         messageProcessor->updateResource(storage);
 
-    qnStorageMan->initDone();
+    qnNormalStorageMan->initDone();
+    qnBackupStorageMan->initDone();
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();
@@ -2182,12 +2204,16 @@ void MediaServerProcess::run()
         m_moduleFinder->start();
     }
 #endif
+    std::unique_ptr<QnScheduleSync> scheduleSync(
+        new QnScheduleSync
+    );
     emit started();
     exec();
 
     disconnect(QnAuthHelper::instance(), 0, this, 0);
     disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
-    disconnect(QnStorageManager::instance(), 0, this, 0);
+    disconnect(qnNormalStorageMan, 0, this, 0);
+    disconnect(qnBackupStorageMan, 0, this, 0);
     disconnect(qnCommon, 0, this, 0);
     disconnect(QnRuntimeInfoManager::instance(), 0, this, 0);
     disconnect(ec2Connection->getTimeManager().get(), 0, this, 0);
@@ -2266,7 +2292,8 @@ void MediaServerProcess::run()
     QnMotionHelper::initStaticInstance( NULL );
 
 
-    QnStorageManager::instance()->stopAsyncTasks();
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 
     ptzPool.reset();
 
@@ -2294,7 +2321,9 @@ void MediaServerProcess::run()
     globalSettings.reset();
 
     fileDeletor.reset();
-    storageManager.reset();
+    normalStorageManager.reset();
+    backupStorageManager.reset();
+
     if (m_mediaServer)
         m_mediaServer->beforeDestroy();
     m_mediaServer.clear();

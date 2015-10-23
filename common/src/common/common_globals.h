@@ -32,16 +32,17 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
-            StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+            StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
-            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            ServerFlag BackupType CameraBackupType CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            RebuildAction BackupAction
             FailoverPriority)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
             PtzDataFields PtzCapabilities PtzTraits 
             MotionTypes TimePeriodTypes 
-            ServerFlags CameraStatusFlags IOPortTypes)
+            ServerFlags CameraBackupTypes CameraStatusFlags IOPortTypes)
 public:
 #else
     Q_NAMESPACE
@@ -153,9 +154,16 @@ public:
         RebuildState_Unknown     = 0,
         RebuildState_None        = 1,
         RebuildState_FullScan    = 2,
-        RebuildState_PartialScan = 3
+        RebuildState_PartialScan = 3,
+        RebuildState_Canceled    = 4,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RebuildState)
+
+    enum BackupState {
+        BackupState_None        = 0,
+        BackupState_InProgress  = 1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupState)
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
@@ -560,6 +568,10 @@ public:
 
         LastItemDataRole,
 
+        StorageSpaceDataRole,                       /** return StorageSpaceData object at QnStorageConfigWidget */
+        BackupSettingsDataRole,                     /** return BackupSettingsData, used in BackupSettings model */
+        TextWidthDataRole,                          /** used in BackupSettings model */
+
         RoleCount
     };
 
@@ -735,6 +747,51 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
     static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
 
+    // TODO: #MSAPI move to api/model or even to common_globals, 
+    // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
+    // 
+    // Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
+    // and in handler.
+    // 
+    // And name them sanely =)
+    enum RebuildAction
+    {
+        RebuildAction_ShowProgress,
+        RebuildAction_Start,
+        RebuildAction_Cancel
+    };
+
+    enum BackupAction
+    {
+        BackupAction_ShowProgress,
+        BackupAction_Start,
+        BackupAction_Cancel
+    };
+
+
+    /** 
+     * backup settings 
+     */
+    enum BackupType
+    {
+        Backup_Disabled,
+        Backup_RealTime,
+        Backup_Schedule
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
+
+    enum CameraBackupType
+    {
+        CameraBackup_Disabled       = 0,
+        CameraBackup_HighQuality    = 1,
+        CameraBackup_LowQuality     = 2,
+        CameraBackup_Both           = CameraBackup_HighQuality | CameraBackup_LowQuality,
+        CameraBackup_Default        = 4 // backup type didn't configured so far. Default value will be used
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupType)
+    Q_DECLARE_FLAGS(CameraBackupTypes, CameraBackupType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupTypes)
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -781,10 +838,13 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
+        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupType)
+        (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
+        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
         (Qn::BookmarkSearchStrategy)
+        (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)
         ,
@@ -792,7 +852,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupTypes)(Qn::CameraStatusFlags),
     (metatype)(numeric)(lexical)
 )
 

@@ -29,6 +29,7 @@ Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnBusiness::EventT
 Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnSystemHealth::MessageType messageType) {
     switch (messageType) {
     case QnSystemHealth::ArchiveRebuildFinished:
+    case QnSystemHealth::ArchiveRebuildCanceled:
         return Qn::CommonNotification;
     default:
         return Qn::SystemNotification;

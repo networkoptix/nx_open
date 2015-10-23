@@ -14,6 +14,7 @@
 #include "business/business_fwd.h"
 #include "api/model/api_ioport_data.h"
 
+#include <mutex>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -163,6 +164,10 @@ public:
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
 
+    Qn::CameraBackupTypes getBackupType() const;
+    void setBackupType(Qn::CameraBackupTypes value);
+    Qn::CameraBackupTypes getActualBackupType() const;
+
     QString getModel() const;
     void setModel(const QString &model);
 
@@ -245,6 +250,10 @@ public:
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
+
+    bool isCameraInfoSavedToDisk() const;
+    void setCameraInfoSavedToDisk();
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -314,6 +323,7 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
+
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
@@ -334,6 +344,8 @@ private:
     mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
+
+    bool m_cameraInfoSavedToDisk;
 
 private slots:
     void resetCachedValues();

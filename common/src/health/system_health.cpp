@@ -24,6 +24,8 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         return tr("Storage is not configured");
     case QnSystemHealth::ArchiveRebuildFinished:
         return tr("Rebuilding archive index is completed");
+    case QnSystemHealth::ArchiveRebuildCanceled:
+        return tr("Rebuilding archive index is canceled by user");
     default:
         break;
     }
@@ -71,6 +73,9 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         break;
     case QnSystemHealth::ArchiveRebuildFinished:
         messageParts << tr("Rebuilding archive index is completed on the following Server:") << resourceName;
+        break;
+    case QnSystemHealth::ArchiveRebuildCanceled:
+        messageParts << tr("Rebuilding archive index is canceled by user on the following Server:") << resourceName;
         break;
     default:
         break;

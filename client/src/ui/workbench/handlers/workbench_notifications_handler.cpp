@@ -129,6 +129,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
+    case QnSystemHealth::ArchiveRebuildCanceled:
     case QnSystemHealth::NoPrimaryTimeServer:
     case QnSystemHealth::SystemIsReadOnly:
         return true;
@@ -217,6 +218,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
 
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::ArchiveRebuildFinished:
+    case QnSystemHealth::ArchiveRebuildCanceled:
         return;
 
     default:

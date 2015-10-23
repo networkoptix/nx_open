@@ -40,6 +40,8 @@
 
 #include <redass/redass_controller.h>
 
+#include <server/server_storage_manager.h>
+
 #include <ui/style/globals.h>
 
 #include <utils/common/app_info.h>
@@ -135,6 +137,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
+    common->store<QnServerStorageManager>(new QnServerStorageManager());
 
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());

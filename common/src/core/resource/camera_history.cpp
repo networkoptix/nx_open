@@ -83,11 +83,13 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
             emit cameraHistoryInvalidated(camera);
 }
 
-bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback) {
-    if (isCameraHistoryValid(camera)) {
-        executeDelayed([callback] {
-            callback(true);
-        });
+
+bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback)
+{
+    if (isCameraHistoryValid(camera)) 
+    {
+        if (callback)
+            executeDelayed([callback] { callback(true); });
         return true;
     }
 
@@ -95,30 +97,26 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
     if (!server)
         return false;
 
-    auto connection = server->apiConnection();
-    if (!connection)
-        return false;
-
     QnChunksRequestData request;
+    request.format = Qn::UbjsonFormat;
     request.resList << camera;
+    
+    using namespace std::placeholders;
+    bool ok = server->newApiConnection().cameraHistoryAsync(request, [this, callback] (bool success, const ec2::ApiCameraHistoryDataList &periods) {
+        at_cameraPrepared(success, periods, callback);
+    });
 
-    int handle = connection->cameraHistory(request, this, SLOT(at_cameraPrepared(int, const ec2::ApiCameraHistoryDataList &, int)));
-    if (handle < 0)
-        return false;
+    if (!ok && callback)
+        executeDelayed([callback] { callback(false); });
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_runningRequests[handle] = callback;
-    }
-
-    return true;
+    return ok;
 }
 
-void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle) {
+void QnCameraHistoryPool::at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback) 
+{
     QnMutexLocker lock(&m_mutex);
 
     QSet<QnUuid> loadedCamerasIds;
-    bool success = (status == 0);
     if (success) {
         for (const auto &detail: periods) {
 
@@ -148,13 +146,11 @@ void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHist
         }  
     }
 
-    if (!m_runningRequests.contains(handle))
-        return;
-    auto handler = m_runningRequests.take(handle);
 
     lock.unlock();
+    if (callback)
+        callback(success);
 
-    handler(success);
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
             emit cameraHistoryChanged(camera);
@@ -244,6 +240,12 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtu
     return result;
 }
 
+QnMediaServerResourcePtr QnCameraHistoryPool::updateCacheAndGetMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod)
+{
+    updateCameraHistorySync(camera);
+    return getMediaServerOnTime(camera, timestampMs, foundPeriod);
+}
+
 QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const {
     Q_ASSERT_X(foundPeriod, Q_FUNC_INFO, "target period MUST be present");
     if (!foundPeriod)
@@ -325,4 +327,31 @@ std::vector<QnUuid> QnCameraHistoryPool::getServerFootageData(const QnUuid& serv
     for(const auto& value: m_archivedCamerasByServer.value(serverGuid))
         result.push_back(value);
     return result;
+}
+
+bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourcePtr &camera)
+{
+    if (!camera)
+        return true;
+
+    QnMutexLocker lock(&m_syncLoadMutex);
+    while (m_runningRequests.contains(camera->getId()))
+        m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+
+    if (isCameraHistoryValid(camera))
+        return true;
+
+    bool rez = updateCameraHistoryAsync(camera, [this, camera] (bool success) 
+    {
+        QnMutexLocker lock(&m_syncLoadMutex);
+        m_runningRequests.remove(camera->getId());
+        m_syncLoadWaitCond.wakeAll();
+    });
+    
+    if (!rez) 
+        return rez;
+
+    m_runningRequests.insert(camera->getId());
+    m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+    return rez;
 }

@@ -25,8 +25,8 @@ public:
     QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnStorageUrlDialog();
 
-    QList<QString> protocols() const;
-    void setProtocols(const QList<QString> &protocols);
+    QSet<QString> protocols() const;
+    void setProtocols(const QSet<QString> &protocols);
 
     QnStorageSpaceData storage() const;
 
@@ -55,7 +55,7 @@ private:
 
     QScopedPointer<Ui::StorageUrlDialog> ui;
     QnMediaServerResourcePtr m_server;
-    QList<QString> m_protocols;
+    QSet<QString> m_protocols;
     QList<ProtocolDescription> m_descriptions;
     QHash<QString, QString> m_urlByProtocol;
     QString m_lastProtocol;

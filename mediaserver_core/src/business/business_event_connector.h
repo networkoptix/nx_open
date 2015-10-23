@@ -72,9 +72,9 @@ public slots:
 
     void at_NoStorages(const QnResourcePtr& resource);
 
-    void at_archiveRebuildFinished(const QnResourcePtr& resource);
+    void at_archiveRebuildFinished(const QnResourcePtr& resource, bool isCanceled);
 
-    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState);
+    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
 };
