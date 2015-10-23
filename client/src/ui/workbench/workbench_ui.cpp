@@ -89,6 +89,10 @@
 #include "workbench_navigator.h"
 #include "workbench_access_controller.h"
 
+#ifdef _DEBUG
+//#define QN_DEBUG_WIDGET
+#endif
+
 
 namespace {
 
@@ -417,8 +421,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Bookmarks search line. */
     createSearchWidget();
 
+#ifdef QN_DEBUG_WIDGET
     /* Debug overlay */
     createDebugWidget();
+#endif
 
     initGraphicsMessageBox();
 
