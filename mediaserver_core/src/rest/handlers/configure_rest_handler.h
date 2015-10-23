@@ -12,6 +12,7 @@ private:
     int changeSystemName(const QString &systemName, qint64 sysIdTime, bool wholeSystem, qint64 remoteTranLogTime);
     int changeAdminPassword(
         const QString &password,
+        const QByteArray &realm,
         const QByteArray &passwordHash,
         const QByteArray &passwordDigest,
         const QByteArray &cryptSha512Hash,

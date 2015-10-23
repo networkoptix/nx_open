@@ -40,12 +40,25 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
-    QString systemName = params.value(lit("systemName"));
-    QString password = params.value(lit("password"));
-    QString oldPassword = params.value(lit("oldPassword"));
-    QByteArray passwordHash = params.value(lit("passwordHash")).toLatin1();
-    QByteArray passwordDigest = params.value(lit("passwordDigest")).toLatin1();
+    const QString systemName = params.value(lit("systemName"));
+    const QString password = params.value(lit("password"));
+    const QString oldPassword = params.value(lit("oldPassword"));
+
+    const QByteArray realm = params.value(lit("realm")).toLatin1();
+    const QByteArray passwordHash = params.value(lit("passwordHash")).toLatin1();
+    const QByteArray passwordDigest = params.value(lit("passwordDigest")).toLatin1();
     QByteArray cryptSha512Hash = params.value(lit("cryptSha512Hash")).toLatin1();
+
+    if (!(passwordHash.isEmpty() == realm.isEmpty() &&
+          passwordDigest.isEmpty() == realm.isEmpty() &&
+          cryptSha512Hash.isEmpty() == realm.isEmpty()))
+    {
+        //these values MUST be all filled or all NOT filled
+        NX_LOG(lit("All password hashes MUST be supplied all together along with realm"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
+        return CODE_OK;
+    }
+
     qint64 sysIdTime = params.value(lit("sysIdTime")).toLongLong();
     qint64 tranLogTime = params.value(lit("tranLogTime")).toLongLong();
     int port = params.value(lit("port")).toInt();
@@ -82,7 +95,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     /* set password */
-    int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, cryptSha512Hash, oldPassword);
+    int changeAdminPasswordResult = changeAdminPassword(password, realm, passwordHash, passwordDigest, cryptSha512Hash, oldPassword);
     if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
     }
@@ -139,6 +152,7 @@ int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 s
 
 int QnConfigureRestHandler::changeAdminPassword(
     const QString &password,
+    const QByteArray &realm,
     const QByteArray &passwordHash,
     const QByteArray &passwordDigest,
     const QByteArray &cryptSha512Hash,
@@ -176,6 +190,7 @@ int QnConfigureRestHandler::changeAdminPassword(
             return ResultFail;
         updateAdmin->setPassword(QString());
     } else {
+        updateAdmin->setRealm(realm);
         updateAdmin->setHash(passwordHash);
         updateAdmin->setDigest(passwordDigest);
         if( !cryptSha512Hash.isEmpty() )
