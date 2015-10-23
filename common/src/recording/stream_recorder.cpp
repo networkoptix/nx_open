@@ -70,6 +70,7 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_device(dev),
     m_firstTime(true),
     m_truncateInterval(0),
+    m_fixedFileName(false),
     m_endDateTime(AV_NOPTS_VALUE),
     m_startDateTime(AV_NOPTS_VALUE),
     m_stopOnWriteError(true),
@@ -97,8 +98,7 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
     m_recordingFinished(false),
-    m_role(Role_ServerRecording),
-    m_fixedFileName(false)
+    m_role(Role_ServerRecording)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false

@@ -20,6 +20,7 @@
 
 class QnTimePeriodList;
 class QnTimePeriod;
+class QnStorageManager;
 
 class DeviceFileCatalog: public QObject
 {
