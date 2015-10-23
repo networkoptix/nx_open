@@ -1,5 +1,5 @@
 from django.db import models
-from account import AccountManager
+from account_backend import AccountManager
 
 class Account(models.Model):
 
