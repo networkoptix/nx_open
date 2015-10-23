@@ -1,10 +1,12 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from account_models import AccountSerializer, CreateAccountSerializer
+from account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdaterSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 import django
 import logging
+
+from api.controllers.cloud_api import account
 
 logger = logging.getLogger('django')
 
@@ -73,15 +75,38 @@ def index(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = AccountSerializer(request.user, data=request.data)
+
+        logger.debug("update")
+        logger.debug(request.data)
+        logger.debug(request.user)
+
+        serializer = AccountUpdaterSerializer(request.user, data=request.data)
         if serializer.is_valid():
+
+            success = account.update(request.user.email, request.session['password'], request.user.first_name, request.user.last_name)
+            #if not success:
+            #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
+
+            logger.debug("updated")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        logger.debug("serializer failed")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+def changePassword(request):
+    old_password = request.data['old_password']
+    new_password = request.data['new_password']
 
+    success = account.changePassword(request.user.email, old_password, new_password)
+    if not success:
+        return Response(False, status=status.HTTP_400_BAD_REQUEST)
+    request.session['password'] = new_password
+    return Response(False, status=status.HTTP_201_CREATED)
 
 
 
@@ -93,9 +118,4 @@ def activate(request):
 @api_view(['POST'])
 @permission_classes(( AllowAny, ))
 def restorePassword(request):
-    return Response(False, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
-def changePassword(request):
     return Response(False, status=status.HTTP_400_BAD_REQUEST)

@@ -25,6 +25,10 @@ angular.module('cloudApp', [
             templateUrl: 'views/systems.html',
             controller: 'SystemsCtrl'
         })
+        .when('/account', {
+            templateUrl: 'views/account.html',
+            controller: 'AccountCtrl'
+        })
         .otherwise({
             templateUrl: 'views/startPage.html',
             controller: 'StartPageCtrl'

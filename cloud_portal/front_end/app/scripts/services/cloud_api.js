@@ -9,6 +9,8 @@ angular.module('cloudApp')
             account:function(){
                 var defer = $q.defer();
                 if(!accountCache){
+
+                    console.log("account request");
                     $http.get(apiBase + '/account').then(function(response){
                         accountCache = response.data;
                         console.log("account",accountCache);
@@ -26,13 +28,6 @@ angular.module('cloudApp')
                 return defer.promise;
             },
 
-            accountPost:function(firstName,lastName,subscribe){
-                return $http.post(apiBase + '/account',{
-                    firstName:firstName,
-                    lastName:lastName,
-                    subscribe:subscribe
-                });
-            },
             login:function(email,password){
                 return $http.post(apiBase + '/account/login',{
                     email:email,
@@ -46,9 +41,25 @@ angular.module('cloudApp')
                 return $http.post(apiBase + '/account/register',{
                     email:email,
                     password:password,
-                    firstName:firstName,
-                    lastName:lastName,
+                    first_name:firstName,
+                    last_name:lastName,
                     subscribe:subscribe
+                });
+            },
+
+
+
+            accountPost:function(firstName,lastName,subscribe){
+                return $http.post(apiBase + '/account',{
+                    first_name:firstName,
+                    last_name:lastName,
+                    subscribe:subscribe
+                });
+            },
+            changePassword:function(newPassword,oldPassword){
+                return $http.get(apiBase + '/account/changePassword',{
+                    new_password:newPassword,
+                    old_password:oldPassword
                 });
             },
 
@@ -60,10 +71,6 @@ angular.module('cloudApp')
             restorePassword:function(){
                 throw "not implemented";
                 return $http.get(apiBase + '/account/restorePassword');
-            },
-            changePassword:function(){
-                throw "not implemented";
-                return $http.get(apiBase + '/account/changePassword');
             },
 
 

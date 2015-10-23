@@ -3,6 +3,12 @@
 angular.module('cloudApp')
     .controller('LoginCtrl', function ($scope, cloudApi, $location,$sessionStorage) {
 
+        cloudApi.account().then(function(account){
+            if(account){
+                $location.path('/systems');
+            }
+        });
+
         function errorHandler(result){
             alert("some error");
             console.error(result);

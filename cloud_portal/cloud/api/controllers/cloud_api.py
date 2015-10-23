@@ -98,6 +98,43 @@ class account(object):
         # REMOVE quotes here, or unJSON
         return code
 
+    @staticmethod
+    def changePassword(email, oldPassword, newPassword, first_name, last_name):
+        realm = settings.CLOUD_CONNECT['password_realm']
+        api_url = settings.CLOUD_CONNECT['url']
+
+        passwordString = '%s:%s:%s' % (email, realm, newPassword)
+        passwordHA1 = md5(passwordString).hexdigest()
+
+        request = '%s/account/update?%s' % (api_url, django.utils.http.urlencode({
+            'passwordHa1':passwordHA1
+        }))
+
+        response = requests.get(request, auth=HTTPDigestAuth(email, oldPassword))
+
+        if response.status_code != 200:
+            return None
+
+        # REMOVE quotes here, or unJSON
+        return response.json()
+
+    @staticmethod
+    def update(email, password, first_name, last_name):
+        api_url = settings.CLOUD_CONNECT['url']
+
+        full_name = '%s %s' % (first_name, last_name)
+
+        request = '%s/account/update?%s' % (api_url, django.utils.http.urlencode({
+            'fullName':full_name
+        }))
+
+        response = requests.get(request, auth=HTTPDigestAuth(email, password))
+
+        if response.status_code != 200:
+            return None
+
+        # REMOVE quotes here, or unJSON
+        return response.json()
 
     @staticmethod
     def get(email=None, password=None):
