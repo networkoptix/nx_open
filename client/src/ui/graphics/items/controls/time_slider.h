@@ -98,7 +98,9 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option);
 
-    explicit QnTimeSlider(QGraphicsItem *parent = NULL);
+    explicit QnTimeSlider(QGraphicsItem *parent = NULL
+        , QGraphicsItem *tooltipParent = NULL);
+
     virtual ~QnTimeSlider();
 
     int lineCount() const;
@@ -199,8 +201,6 @@ signals:
     void selectionReleased();
     void thumbnailsVisibilityChanged();
     void thumbnailClicked();
-
-    void bookmarksUnderCursorUpdated(const QPointF &position);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -357,6 +357,10 @@ private:
     qint64 animationEnd();
 
     void generateProgressPatterns();
+
+    void updateBookmarkTooltip(qint64 timestamp);
+
+    void updateBookmarkTooltipPos(qint64 timestamp);
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
