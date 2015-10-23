@@ -210,7 +210,7 @@ module.exports = function (grunt) {
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.dist %>/../../mediaserver_core/maven/bin-resources/resources/static/*'
+                        src: '<%= yeoman.dist %>/../../cloud/static/*'
                     }
                 ],
                 options: {
@@ -408,16 +408,6 @@ module.exports = function (grunt) {
                         flatten: true,
                         dest: '<%= yeoman.dist %>/fonts',
                         src: ['bower_components/sass-bootstrap/fonts/*']
-                    },
-                    {
-                        expand: true,
-                        cwd: '<%= yeoman.app %>',
-                        flatten: true,
-                        dest: '<%= yeoman.dist %>/components',
-                        src: ['bower_components/mediaelement/build/silverlightmediaelement.xap',
-                            'bower_components/mediaelement/build/flashmediaelement.swf',
-                            'bower_components/locomote/dist/Player.swf']
-
                     }
                 ]
             },
@@ -431,7 +421,7 @@ module.exports = function (grunt) {
                 expand: true,
                 nonull:true,
                 cwd: '<%= yeoman.app %>/../dist',
-                dest: '../mediaserver_core/maven/bin-resources/resources/static/',
+                dest: '../cloud/static/',
                 src: '**'
             }
         },
@@ -558,24 +548,13 @@ module.exports = function (grunt) {
     grunt.registerTask('publish', [
         'build',
         'clean:publish',
-        'copy:publish'
+        'copy:publish',
+        'scp:publish'
     ]);
 
 
     grunt.registerTask('pub', [
         'publish'
     ]);
-
-    grunt.registerTask('demo', [
-        'build',
-        'scp:demo'
-    ]);
-
-
-    grunt.registerTask('de', [
-        'build',
-        'scp:demo_fast'
-    ]);
-
 
 };

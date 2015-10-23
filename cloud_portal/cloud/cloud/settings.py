@@ -137,6 +137,11 @@ LOGGING = {
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "../static"),
+)
+
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -145,8 +150,8 @@ REST_FRAMEWORK = {
 }
 
 CLOUD_CONNECT = {
-    'url': 'http://cloud-demo.hdw.mx:3346',
-    #'url': 'http://localhost:3346',
+    #'url': 'http://cloud-demo.hdw.mx:3346',
+    'url': 'http://localhost:3346',
     #'url': 'http://10.0.3.41:3346',
     'customization':'default',
     'password_realm':'VMS'

@@ -7,6 +7,7 @@ front_end/bower_components
 app/bower_components
 
 cloud/.idea
+cloud/static
 .DS_Store
 
 .*\.pyc$

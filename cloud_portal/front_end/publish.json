@@ -2,31 +2,17 @@
     "options": {
 
     },
-    "demo": {
+    "publish": {
         "options": {
-            "host": "enk.me",
-            "username": "ebalashov",
-            "password": "e8Lp9jTsbgjk"
+            "host": "cloud-demo.hdw.mx",
+            "username": "root",
+            "password": "VhhK4l1SwbMTHlLIWlBNXHLIBv0S1SNA"
         },
         "files": [
             {
-                "cwd": "dist",
+                "cwd": "../cloud/",
                 "src": ["**"],
-                "dest": "/home/ebalashov/public_html/webclient"
-            }
-        ]
-    },
-    "demo_fast": {
-        "options": {
-            "host": "enk.me",
-            "username": "ebalashov",
-            "password": "e8Lp9jTsbgjk"
-        },
-        "files": [
-            {
-                "cwd": "dist",
-                "src": ["**/*.html","**/*.css","**/*.js"],
-                "dest": "/home/ebalashov/public_html/webclient"
+                "dest": "/opt/networkoptix/cloud_portal"
             }
         ]
     }

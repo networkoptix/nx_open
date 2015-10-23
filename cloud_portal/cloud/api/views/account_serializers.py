@@ -1,7 +1,6 @@
 __author__ = 'noptix'
 from api.models import Account
 from rest_framework import serializers
-import email_validator
 import logging
 import django
 
