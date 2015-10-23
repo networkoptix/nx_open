@@ -20,6 +20,23 @@ QnUserResource::QnUserResource():
     addFlags(Qn::user | Qn::remote);
 }
 
+QnUserResource::QnUserResource(const QnUserResource& right)
+:
+    QnResource(right),
+    m_password(right.m_password),
+    m_hash(right.m_hash),
+    m_digest(right.m_digest),
+    m_cryptSha512Hash(right.m_cryptSha512Hash),
+    m_realm(right.m_realm),
+    m_permissions(right.m_permissions),
+    m_isAdmin(right.m_isAdmin),
+    m_isLdap(right.m_isLdap),
+    m_isEnabled(right.m_isEnabled),
+    m_email(right.m_email),
+    m_passwordExpirationTimestamp(right.m_passwordExpirationTimestamp)
+{
+}
+
 QByteArray QnUserResource::getHash() const
 {
     QMutexLocker locker(&m_mutex);

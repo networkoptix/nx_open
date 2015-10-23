@@ -40,12 +40,27 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
-    QString systemName = params.value(lit("systemName"));
-    QString password = params.value(lit("password"));
-    QString oldPassword = params.value(lit("oldPassword"));
-    QByteArray passwordHash = params.value(lit("passwordHash")).toLatin1();
-    QByteArray passwordDigest = params.value(lit("passwordDigest")).toLatin1();
+    const QString systemName = params.value(lit("systemName"));
+    const QString password = params.value(lit("password"));
+    const QString oldPassword = params.value(lit("oldPassword"));
+
+    const QByteArray realm = params.value(lit("realm")).toLatin1();
+    const QByteArray passwordHash = params.value(lit("passwordHash")).toLatin1();
+    const QByteArray passwordDigest = params.value(lit("passwordDigest")).toLatin1();
     QByteArray cryptSha512Hash = params.value(lit("cryptSha512Hash")).toLatin1();
+
+    if (!(passwordHash.isEmpty() == realm.isEmpty() &&
+          passwordDigest.isEmpty() == realm.isEmpty() &&
+          cryptSha512Hash.isEmpty() == realm.isEmpty()))
+    {
+        //these values MUST be all filled or all NOT filled
+        NX_LOG(lit("All password hashes MUST be supplied all together along with realm"));
+        result.setError(
+            QnJsonRestResult::CantProcessRequest,
+            lit("All password hashes MUST be supplied all together along with realm"));
+        return CODE_OK;
+    }
+
     qint64 sysIdTime = params.value(lit("sysIdTime")).toLongLong();
     qint64 tranLogTime = params.value(lit("tranLogTime")).toLongLong();
     int port = params.value(lit("port")).toInt();
@@ -82,7 +97,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     /* set password */
-    int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, cryptSha512Hash, oldPassword);
+    int changeAdminPasswordResult = changeAdminPassword(password, realm, passwordHash, passwordDigest, cryptSha512Hash, oldPassword);
     if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
     }
@@ -139,6 +154,7 @@ int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 s
 
 int QnConfigureRestHandler::changeAdminPassword(
     const QString &password,
+    const QByteArray &realm,
     const QByteArray &passwordHash,
     const QByteArray &passwordDigest,
     const QByteArray &cryptSha512Hash,
@@ -151,29 +167,49 @@ int QnConfigureRestHandler::changeAdminPassword(
     if (!admin)
          return ResultFail;
 
+    //making copy of admin user to be able to rollback local changed on DB update failure
+    QnUserResourcePtr updateAdmin = QnUserResourcePtr(new QnUserResource(*admin));
+
+    if (password.isEmpty() &&
+        updateAdmin->getHash() == passwordHash &&
+        updateAdmin->getDigest() == passwordDigest &&
+        updateAdmin->getCryptSha512Hash() == cryptSha512Hash)
+    {
+        //no need to update anything
+        return ResultOk;
+    }
+
     if (!password.isEmpty()) {
         /* check old password */
         if (!admin->checkPassword(oldPassword))
             return ResultFail;
 
         /* set new password */
-        admin->setPassword(password);
-        admin->generateHash();
-        QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
-        admin->setPassword(QString());
-        HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded( admin );
+        updateAdmin->setPassword(password);
+        updateAdmin->generateHash();
+        QnUserResourceList updatedUsers;
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updateAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+            return ResultFail;
+        updateAdmin->setPassword(QString());
     } else {
-        if (admin->getHash() != passwordHash ||
-            admin->getDigest() != passwordDigest ||
-            admin->getCryptSha512Hash() != cryptSha512Hash)
-        {
-            admin->setHash(passwordHash);
-            admin->setDigest(passwordDigest);
-            if( !cryptSha512Hash.isEmpty() )
-                admin->setCryptSha512Hash(cryptSha512Hash);
-            QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
-        }
+        updateAdmin->setRealm(realm);
+        updateAdmin->setHash(passwordHash);
+        updateAdmin->setDigest(passwordDigest);
+        if( !cryptSha512Hash.isEmpty() )
+            updateAdmin->setCryptSha512Hash(cryptSha512Hash);
+        QnUserResourceList updatedUsers;
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updateAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+            return ResultFail;
     }
+
+    //applying changes to local resource
+    //TODO #ak following changes are done non-atomically
+    admin->setRealm(updateAdmin->getRealm());
+    admin->setHash(updateAdmin->getHash());
+    admin->setDigest(updateAdmin->getDigest());
+    admin->setCryptSha512Hash(updateAdmin->getCryptSha512Hash());
+
+    HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updateAdmin);
     return ResultOk;
 }
 
