@@ -21,7 +21,7 @@
         <global.libs>-lappserver2 -lcommon -lclient.core -lssl -lcrypto</global.libs>
         <!--Specific os libs used-->
         <linux.oslibs>${ffmpeg.libs} -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
-        <android.oslibs/>
+        <android.oslibs>-lturbojpeg</android.oslibs>
         <ios.oslibs>-lturbojpeg</ios.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
