@@ -968,11 +968,14 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
+    int chunkCount = 0;
     for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
          pos[i] = d->timePeriods[i].findNearestPeriod(minimumValue, true);
          end[i] = d->timePeriods[i].findNearestPeriod(maximumValue, true);
          if(end[i] != d->timePeriods[i].end() && end[i]->contains(maximumValue))
              end[i]++;
+
+         chunkCount += std::distance(pos[i], end[i]);
     }
 
     qint64 value = minimumValue;
@@ -988,8 +991,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     colors[Qn::TimePeriodContentCount] = d->chunkColor.darker();
     chunkPainter.setColors(colors);
     chunkPainter.start(value, position(), QRectF(0, y, width(), height() - y),
-                       qMax(1, d->timePeriods[Qn::RecordingContent].size()),
-            minimumValue, maximumValue);
+                       chunkCount, minimumValue, maximumValue);
 
     while (value != maximumValue) {
         qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
