@@ -42,6 +42,14 @@
     </properties>
 
     <dependencies>
+         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nxemail</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nxemail/pom.xml</systemPath>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloud_db_client</artifactId>
