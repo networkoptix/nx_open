@@ -571,6 +571,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
+    case QnSystemHealth::ArchiveRebuildCanceled:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings..."),

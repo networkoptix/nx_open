@@ -59,7 +59,7 @@ private slots:
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
-    void at_storageManager_rebuildFinished();
+    void at_storageManager_rebuildFinished(bool isCanceled);
     void at_timer();
     void at_connectionOpened();
     void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
