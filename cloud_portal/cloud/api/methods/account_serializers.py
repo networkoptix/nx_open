@@ -25,7 +25,13 @@ class CreateAccountSerializer(serializers.Serializer): # ModelSerializer
 class AccountSerializer(serializers.ModelSerializer): # ModelSerializer
     class Meta:
         model = Account
-        fields = ('id', 'email', 'first_name', 'last_name', 'subscribe')
+        fields = ('email', 'first_name', 'last_name', 'subscribe')
+
+
+class AccountUpdaterSerializer(serializers.ModelSerializer): # ModelSerializer
+    class Meta:
+        model = Account
+        fields = ('first_name', 'last_name', 'subscribe')
 
     def validate_email(self, value):
         django.core.validators.validate_email(value)
