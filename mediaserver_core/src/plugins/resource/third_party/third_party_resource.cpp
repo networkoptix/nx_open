@@ -15,8 +15,8 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include "api/app_server_connection.h"
-#include "motion_data_picture.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
+#include <plugins/resource/third_party/motion_data_picture.h>
 #include "third_party_archive_delegate.h"
 #include "third_party_ptz_controller.h"
 #include "third_party_stream_reader.h"
