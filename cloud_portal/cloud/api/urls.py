@@ -1,7 +1,7 @@
 __author__ = 'noptix'
 
 from django.conf.urls import url
-from api.methods import account, systems
+from api.views import account, systems
 
 urlpatterns = [
     url(r'^account$',                   account.index),

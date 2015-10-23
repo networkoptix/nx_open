@@ -153,7 +153,7 @@ CLOUD_CONNECT = {
 }
 
 AUTH_USER_MODEL = 'api.Account'
-AUTHENTICATION_BACKENDS = ('api.account.AccountBackend',)
+AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend',)
 
 
 CORS_ORIGIN_ALLOW_ALL = True #Change this value on production!

@@ -130,7 +130,7 @@
                             <optional>false</optional>
                         </param>
                         <param>
-                            <name>password</name>
+                            <name>new_password</name>
                             <description>New password for account</description>
                             <optional>false</optional>
                         </param>
@@ -140,7 +140,7 @@
                             <optional>true</optional>
                         </param>
                         <param>
-                            <name>oldPasswprd</name>
+                            <name>old_passwprd</name>
                             <description>Old password</description>
                             <optional>true</optional>
                         </param>
