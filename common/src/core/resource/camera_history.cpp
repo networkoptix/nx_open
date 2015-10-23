@@ -86,10 +86,10 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
 
 bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback)
 {
-    if (isCameraHistoryValid(camera)) {
-        executeDelayed([callback] {
-            callback(true);
-        });
+    if (isCameraHistoryValid(camera)) 
+    {
+        if (callback)
+            executeDelayed([callback] { callback(true); });
         return true;
     }
 
@@ -102,9 +102,12 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
     request.resList << camera;
     
     using namespace std::placeholders;
-    bool ok = server->newApiConnection().cameraHistoryAsync(request, std::bind(&QnCameraHistoryPool::at_cameraPrepared, this, _1, _2, callback));
-    if (!ok)
-        at_cameraPrepared(false, ec2::ApiCameraHistoryDataList(), callback); // if !ok request didn't start at all
+    bool ok = server->newApiConnection().cameraHistoryAsync(request, [this, callback] (bool success, const ec2::ApiCameraHistoryDataList &periods) {
+        at_cameraPrepared(success, periods, callback);
+    });
+
+    if (!ok && callback)
+        executeDelayed([callback] { callback(false); });
 
     return ok;
 }
@@ -145,8 +148,8 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const ec2::ApiCameraHi
 
 
     lock.unlock();
-
-    callback(success);
+    if (callback)
+        callback(success);
 
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
@@ -237,6 +240,12 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtu
     return result;
 }
 
+QnMediaServerResourcePtr QnCameraHistoryPool::updateCacheAndGetMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod)
+{
+    updateCameraHistorySync(camera);
+    return getMediaServerOnTime(camera, timestampMs, foundPeriod);
+}
+
 QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const {
     Q_ASSERT_X(foundPeriod, Q_FUNC_INFO, "target period MUST be present");
     if (!foundPeriod)
@@ -320,7 +329,7 @@ std::vector<QnUuid> QnCameraHistoryPool::getServerFootageData(const QnUuid& serv
     return result;
 }
 
-bool QnCameraHistoryPool::updateCameraHistoryIfNeedSync(const QnVirtualCameraResourcePtr &camera)
+bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourcePtr &camera)
 {
     if (!camera)
         return true;

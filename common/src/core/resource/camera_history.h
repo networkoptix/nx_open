@@ -74,6 +74,15 @@ public:
      */
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
 
+    /**
+     * \return                      Server where camera was recorded on specified time. This function could update cache in sync mode if it isn't up to date
+     * \param camera                Camera to find
+     * \param timestamp             Timestamp in milliseconds to find
+     * \param allowOfflineServers   Drop out offline media servers if parameter is false
+     */
+    QnMediaServerResourcePtr updateCacheAndGetMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0);
+
+
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 
     typedef std::function<void(bool success)> callbackFunction;
@@ -97,7 +106,7 @@ public:
      * \param camera                Target camera.      
      * \returns                     True if no error.
      */
-    bool updateCameraHistoryIfNeedSync(const QnVirtualCameraResourcePtr &camera);
+    bool updateCameraHistorySync(const QnVirtualCameraResourcePtr &camera);
 signals:
     /** 
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
