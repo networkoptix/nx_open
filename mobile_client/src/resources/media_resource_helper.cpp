@@ -62,6 +62,14 @@ namespace {
         return protocol == nativeStreamProtocol ? position * 1000 : position;
     }
 
+    QSize sizeFromResolutionString(const QString &resolution) {
+        int pos = resolution.indexOf(QLatin1Char('x'), 0, Qt::CaseInsensitive);
+        if (pos == -1)
+            return QSize();
+
+        return QSize(resolution.left(pos).toInt(), resolution.mid(pos + 1).toInt());
+    }
+
 } // anonymous namespace
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
@@ -297,6 +305,29 @@ QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const {
         return m_nativeProtocol;
 }
 
+qreal QnMediaResourceHelper::aspectRatio() const {
+    if (m_nativeResolutions.isEmpty())
+        return 0;
+
+    QString resolution;
+
+    if (m_nativeResolutions.size() == 1) {
+        resolution = m_nativeResolutions.first();
+    } else {
+        if (m_transcodingSupported) {
+            resolution = m_nativeResolutions.first();
+        } else {
+            resolution = m_nativeResolutions[m_nativeStreamIndex];
+        }
+    }
+
+    QSize size = sizeFromResolutionString(resolution);
+    if (size.isEmpty())
+        return 0;
+
+    return qreal(size.width()) / size.height();
+}
+
 void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key) {
     Q_ASSERT(m_resource == resource);
     if (m_resource != resource)
@@ -342,11 +373,13 @@ void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &reso
     if (m_transcodingSupported != transcodingSupported) {
         m_transcodingSupported = transcodingSupported;
         emit resolutionsChanged();
+        emit aspectRatioChanged();
         emit resolutionChanged();
         emit protocolChanged();
     } else if (!m_transcodingSupported) {
         emit resolutionsChanged();
         emit resolutionChanged();
+        emit aspectRatioChanged();
     }
 
     updateUrl();

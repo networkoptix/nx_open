@@ -32,6 +32,7 @@
     </dependencies>         
     
     <properties>
+        <guid>${applauncher.guid}</guid>
         <product.title>${applauncher.name}</product.title>  
         <product.display.title>${applauncher.display.name}</product.display.title>
         <!--Global libs-->      

@@ -21,6 +21,7 @@
     <name>HD Witness Generic RTSP plugin</name>	
 
     <properties>
+        <guid>${genericrtspplugin.guid}</guid>
         <product.title>${genericrtspplugin.name}</product.title>	
         <!--Global libs-->
         <qt.libs>core</qt.libs>

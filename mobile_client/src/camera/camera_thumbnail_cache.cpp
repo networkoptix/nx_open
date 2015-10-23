@@ -39,7 +39,7 @@ void QnCameraThumbnailCache::stop() {
     m_pixmaps.clear();
 }
 
-QPixmap QnCameraThumbnailCache::thumbnail(const QString &thumbnailId) const {
+QPixmap QnCameraThumbnailCache::getThumbnail(const QString &thumbnailId) const {
     QMutexLocker lock(&m_mutex);
     return m_pixmaps.value(thumbnailId);
 }

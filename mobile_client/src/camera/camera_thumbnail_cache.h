@@ -7,8 +7,9 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/id.h>
 #include <utils/common/singleton.h>
+#include <camera/thumbnail_cache_base.h>
 
-class QnCameraThumbnailCache : public QObject, public Singleton<QnCameraThumbnailCache> {
+class QnCameraThumbnailCache : public QObject, public QnThumbnailCacheBase, public Singleton<QnCameraThumbnailCache> {
     Q_OBJECT
 public:
     struct ThumbnailData {
@@ -28,7 +29,7 @@ public:
     void start();
     void stop();
 
-    QPixmap thumbnail(const QString &thumbnailId) const;
+    virtual QPixmap getThumbnail(const QString &thumbnailId) const override;
     QString thumbnailId(const QnUuid &resourceId);
 
     void refreshThumbnails(const QList<QnUuid> &resourceIds);

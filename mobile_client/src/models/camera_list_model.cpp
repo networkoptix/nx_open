@@ -250,7 +250,7 @@ bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourc
 void QnCameraListModel::at_thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId) {
     m_model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
 
-    QPixmap thumbnail = QnCameraThumbnailCache::instance()->thumbnail(thumbnailId);
+    QPixmap thumbnail = QnCameraThumbnailCache::instance()->getThumbnail(thumbnailId);
     if (!thumbnail.isNull()) {
         QnAspectRatioHash aspectRatios = qnSettings->camerasAspectRatios();
         aspectRatios[resourceId] = static_cast<qreal>(thumbnail.width()) / thumbnail.height();

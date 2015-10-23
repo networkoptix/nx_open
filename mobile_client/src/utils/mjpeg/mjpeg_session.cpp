@@ -7,6 +7,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include <utils/common/delayed.h>
+#include <utils/common/util.h>
 
 #if defined(Q_OS_IOS) || defined(Q_OS_MAC)
 #define USE_LIBJPEG
@@ -450,6 +451,8 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody() {
 
     parserState = ParseBoundary;
     int framePresentationTimeMSec = previousFrameTimestampUSec > 0 ? (frameTimestampUSec - previousFrameTimestampUSec) / 1000 : 0;
+    if (framePresentationTimeMSec > MAX_FRAME_DURATION)
+        framePresentationTimeMSec = 0;
     previousFrameTimestampUSec = frameTimestampUSec;
     frameTimestampUSec = 0;
 
