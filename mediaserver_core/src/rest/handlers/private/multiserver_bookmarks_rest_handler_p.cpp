@@ -56,14 +56,16 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksRemoteAsync(QnMultiSe
 {
     auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
     {
-        QnMultiServerCameraBookmarkList remoteData;
+        QnCameraBookmarkList remoteData;
         bool success = false;
-        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
-            remoteData = QJson::deserialized(msgBody, QnMultiServerCameraBookmarkList(), &success);
+        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
+            remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
+            Q_ASSERT_X(success, Q_FUNC_INFO, "We should receive correct answer here");
+        }
 
         QnMutexLocker lock(&ctx->mutex);
         if (success && !remoteData.empty())
-            outputData.push_back(std::move(remoteData.front()));
+            outputData.push_back(std::move(remoteData));
         ctx->requestsInProgress--;
         ctx->waitCond.wakeAll();
     };
@@ -71,7 +73,7 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksRemoteAsync(QnMultiSe
     QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Get));
 
     QnGetBookmarksRequestData modifiedRequest = ctx->request;
-    modifiedRequest.isLocal = true;
+    modifiedRequest.makeLocal();
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
     nx_http::HttpHeaders headers;
@@ -99,14 +101,16 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksLocal(QnMultiServerCa
 void QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTagsRemoteAsync(QnMultiServerCameraBookmarkTagList& outputData, const QnMediaServerResourcePtr &server, QnGetBookmarkTagsRequestContext* ctx) {
     auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
     {
-        QnMultiServerCameraBookmarkTagList remoteData;
+        QnCameraBookmarkTagList remoteData;
         bool success = false;
-        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
-            remoteData = QJson::deserialized(msgBody, QnMultiServerCameraBookmarkTagList(), &success);
+        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
+            remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
+            Q_ASSERT_X(success, Q_FUNC_INFO, "We should receive correct answer here");
+        }
 
         QnMutexLocker lock(&ctx->mutex);
         if (success && !remoteData.empty())
-            outputData.push_back(std::move(remoteData.front()));
+            outputData.push_back(std::move(remoteData));
         ctx->requestsInProgress--;
         ctx->waitCond.wakeAll();
     };
@@ -114,7 +118,7 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTagsRemoteAsync(QnMult
     QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::GetTags));
 
     QnGetBookmarkTagsRequestData modifiedRequest = ctx->request;
-    modifiedRequest.isLocal = true;
+    modifiedRequest.makeLocal();
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
     nx_http::HttpHeaders headers;
@@ -223,7 +227,7 @@ void QnMultiserverBookmarksRestHandlerPrivate::updateBookmarkRemoteAsync(const Q
     QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Update));
 
     QnMultiserverRequestData modifiedRequest = ctx->request;
-    modifiedRequest.isLocal = true;
+    modifiedRequest.makeLocal();
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
     sendAsyncRequest(server, apiUrl, ctx);
@@ -253,7 +257,7 @@ void QnMultiserverBookmarksRestHandlerPrivate::deleteBookmarkRemoteAsync(const Q
     QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Delete));
 
     QnMultiserverRequestData modifiedRequest = ctx->request;
-    modifiedRequest.isLocal = true;
+    modifiedRequest.makeLocal();
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
     sendAsyncRequest(server, apiUrl, ctx);
