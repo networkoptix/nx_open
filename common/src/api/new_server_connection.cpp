@@ -1,15 +1,22 @@
 #include "new_server_connection.h"
 
-#include "http/custom_headers.h"
-#include "common/common_module.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/user_resource.h"
-#include "utils/network/router.h"
-#include "core/resource_management/resource_pool.h"
-#include "helpers/chunks_request_data.h"
+#include <api/app_server_connection.h>
+#include <api/helpers/chunks_request_data.h>
+
+#include <common/common_module.h>
+
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <http/custom_headers.h>
+
+#include <nx_ec/data/api_data.h>
+
 #include <utils/common/model_functions.h>
-#include "app_server_connection.h"
-#include "nx_ec/data/api_data.h"
+#include <utils/network/http/asynchttpclient.h>
+#include <utils/network/router.h>
+
 
 // --------------------------- public methods -------------------------------------------
 
