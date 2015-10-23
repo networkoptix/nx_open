@@ -42,7 +42,7 @@ TEST_F(CdbFunctionalTest, accountActivation)
     ASSERT_EQ(result, api::ResultCode::forbidden);
 
     result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(api::ResultCode::ok, result);
     ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
     ASSERT_EQ(account1.statusCode, api::AccountStatus::awaitingActivation);
 

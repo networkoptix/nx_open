@@ -6,6 +6,7 @@
 #include "account_manager.h"
 
 #include <functional>
+#include <iostream>
 
 #include <QtCore/QDateTime>
 #include <QtSql/QSqlQuery>
@@ -236,7 +237,8 @@ void AccountManager::accountAdded(
     if( resultCode == db::DBResult::ok )
     {
         //updating cache
-        m_cache.insert( accountData.email, std::move(accountData) );
+        auto email = accountData.email;
+        m_cache.insert( std::move(email), std::move(accountData) );
     }
 
     //adding activation code only in response to portal
