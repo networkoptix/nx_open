@@ -409,8 +409,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ShowDebugOverlayAction).
         flags(Qn::GlobalHotkey).
-        text(tr("Show Debug")).
-        toggledText(tr("Hide Debug")).
+        text(lit("Show Debug")).
+        toggledText(lit("Hide Debug")).
         shortcut(tr("Ctrl+Alt+D")).
         autoRepeat(false);
 
