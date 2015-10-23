@@ -154,7 +154,8 @@ public:
         RebuildState_Unknown     = 0,
         RebuildState_None        = 1,
         RebuildState_FullScan    = 2,
-        RebuildState_PartialScan = 3
+        RebuildState_PartialScan = 3,
+        RebuildState_Canceled    = 4,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RebuildState)
 
