@@ -10,10 +10,10 @@
 #include <api/api_fwd.h>
 #include <api/helpers/request_helpers_fwd.h>
 
+#include <common/common_globals.h>
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
-
 
 #include <core/ptz/ptz_fwd.h>
 #include <utils/common/ldap_fwd.h>
@@ -23,20 +23,6 @@
 
 #include "abstract_connection.h"
 #include "model/manual_camera_seach_reply.h"
-
-// TODO: #MSAPI move to api/model or even to common_globals, 
-// add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
-// 
-// Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
-// and in handler.
-// 
-// And name them sanely =)
-enum RebuildAction
-{
-    RebuildAction_ShowProgress,
-    RebuildAction_Start,
-    RebuildAction_Cancel
-};
 
 class QnMediaServerConnection: public QnAbstractConnection {
     Q_OBJECT
@@ -180,7 +166,11 @@ public:
 
     int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 
-    int getStorageSpaceAsync(QObject *target, const char *slot);
+    /*!
+        \param mainPool returns main storage list if true or backup storage list if false. default value true
+        \returns information about storage.
+    */
+    int getStorageSpaceAsync(bool mainPool, QObject *target, const char *slot);
 
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
@@ -206,7 +196,9 @@ public:
         \param slot Slot MUST have signature (int, QnStorageScanData, int)
         \returns Request handle. -1 In case of failure to start async request
      */
-    int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
+    int doRebuildArchiveAsync(Qn::RebuildAction action, bool isMainPool, QObject *target, const char *slot);
+
+    int backupControlActionAsync(Qn::BackupAction action, QObject *target, const char *slot);
 
     int addBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int updateBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot);

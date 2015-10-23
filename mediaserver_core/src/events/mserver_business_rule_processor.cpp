@@ -40,6 +40,7 @@
 #include <business/actions/system_health_business_action.h>
 #include "core/resource/resource_name.h"
 #include "business/events/mserver_conflict_business_event.h"
+#include "core/resource/camera_history.h"
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -357,7 +358,19 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     NX_LOG( lit("Processing action SendMail. Sending mail to %1").
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
+    QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
 
+    /*
+     * This action instance is not used anymore but storing into the Events Log db.
+     * Therefore we are storing all used emails in order to not recalculate them in
+     * the event log processing methods. --rvasilenko
+     */
+    action->getParams().emailAddress = formatEmailList(recipients);
+    return true;
+}
+
+void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
+{
     QnEmailAttachmentList attachments;
     QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments, true);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);
@@ -386,25 +399,13 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     ec2::ApiEmailData data(
         recipients,
         aggregatedResCount > 1
-            ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams(), aggregatedResCount)
-            : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+        ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams(), aggregatedResCount)
+        : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
         messageBody,
         emailSettings.timeout,
         attachments
-    );
-    QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, data));
+        );
 
-    /*
-     * This action instance is not used anymore but storing into the Events Log db.
-     * Therefore we are storing all used emails in order to not recalculate them in
-     * the event log processing methods. --rvasilenko
-     */
-    action->getParams().emailAddress = formatEmailList(recipients);
-    return true;
-}
-
-void QnMServerBusinessRuleProcessor::sendEmailAsync(const ec2::ApiEmailData& data)
-{
     if (!m_emailManager->sendEmail(data))
     {
         QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
@@ -484,7 +485,11 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
     contextMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
-    if (eventType == QnBusiness::CameraMotionEvent) {
+    if (eventType == QnBusiness::CameraMotionEvent) 
+    {
+        auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
+        qnCameraHistoryPool->updateCameraHistorySync(camRes);
+
         contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
         contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
 
@@ -505,11 +510,13 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
             int screenshotNum = 1;
             for (const QnUuid& cameraId: metadata.cameraRefs)
             {
-                if (QnResourcePtr res = qnResPool->getResourceById(cameraId))
+                if (QnVirtualCameraResourcePtr camRes = qnResPool->getResourceById<QnVirtualCameraResource>(cameraId))
                 {
                     QVariantMap camera;
 
-                    camera[QLatin1String("name")] = getFullResourceName(res, useIp);
+                    camera[QLatin1String("name")] = getFullResourceName(camRes, useIp);
+
+                    qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
                     camera[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, true);
 

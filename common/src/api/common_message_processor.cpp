@@ -16,6 +16,8 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
+#include <core/resource/storage_resource.h>
+
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "runtime_info_manager.h"

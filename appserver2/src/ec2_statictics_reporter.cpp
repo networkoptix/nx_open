@@ -4,6 +4,8 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource/media_server_resource.h>
+
 #include <utils/common/synctime.h>
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */

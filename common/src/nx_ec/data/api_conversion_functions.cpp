@@ -249,6 +249,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
     dst->maxDays = src.maxArchiveDays;
     dst->preferedServerId = src.preferedServerId;
     dst->failoverPriority = src.failoverPriority;
+    dst->backupType = src.backupType;
 }
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
@@ -277,6 +278,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.maxArchiveDays = src->maxDays;
     dst.preferedServerId = src->preferedServerId;
     dst.failoverPriority = src->failoverPriority;
+    dst.backupType = src->backupType;
 }
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
@@ -541,6 +543,7 @@ void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
     dst.storageType = src->getStorageType();
+    dst.isBackup = src->isBackup();
 }
 
 void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
@@ -559,6 +562,7 @@ void fromApiToResource(const ApiStorageData &src, QnStorageResourcePtr &dst) {
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
     dst->setStorageType(src.storageType);
+    dst->setBackup(src.isBackup);
 }
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst) {
@@ -631,6 +635,12 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.serverName = src->name;
     dst.maxCameras = src->maxCameras;
     dst.allowAutoRedundancy = src->isRedundancyEnabled;
+    dst.backupType = src->backupType;
+    dst.backupDaysOfTheWeek = src->backupDaysOfTheWeek;
+    dst.backupStart = src->backupStart;
+    dst.backupDuration = src->backupDuration;
+    dst.backupBitrate = src->backupBitrate;
+    dst.backupQuality = src->backupQuality;
 }
 
 void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst) {
@@ -638,6 +648,12 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->name = src.serverName;
     dst->maxCameras = src.maxCameras;
     dst->isRedundancyEnabled = src.allowAutoRedundancy;
+    dst->backupType = src.backupType;
+    dst->backupDaysOfTheWeek = src.backupDaysOfTheWeek;
+    dst->backupStart = src.backupStart;
+    dst->backupDuration = src.backupDuration;
+    dst->backupBitrate = src.backupBitrate;
+    dst->backupQuality = src.backupQuality;
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {
