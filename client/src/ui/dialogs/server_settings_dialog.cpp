@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
+#include "ui/widgets/properties/storage_config_widget.h"
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
@@ -23,12 +24,14 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     , m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
     , m_generalPage(new QnServerSettingsWidget(this))
     , m_statisticsPage(new QnRecordingStatisticsWidget(this))
+    , m_storagesPage(new QnStorageConfigWidget(this))
     , m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
 {
     ui->setupUi(this);
   
     addPage(SettingsPage, m_generalPage, tr("General"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
+    addPage(StorageManagmentPage, m_storagesPage, tr("Storage management"));
 
 
     connect(m_webPageButton, &QPushButton::clicked, this, [this] {
@@ -74,6 +77,7 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
 
     m_generalPage->setServer(server);
     m_statisticsPage->setServer(server);
+    m_storagesPage->setServer(server);
 
     if (m_server)
         disconnect(m_server, nullptr, this, nullptr);

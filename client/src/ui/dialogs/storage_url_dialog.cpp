@@ -28,18 +28,21 @@ QnStorageUrlDialog::~QnStorageUrlDialog() {
     return;
 }
 
-QList<QString> QnStorageUrlDialog::protocols() const {
+QSet<QString> QnStorageUrlDialog::protocols() const {
     return m_protocols;
 }
 
-void QnStorageUrlDialog::setProtocols(const QList<QString> &protocols) {
+void QnStorageUrlDialog::setProtocols(const QSet<QString> &protocols) {
     if(m_protocols == protocols)
         return;
 
     m_protocols = protocols;
 
     m_descriptions.clear();
-    for(const QString &protocol: m_protocols) {
+
+    QStringList sortedProtocols(m_protocols.toList());
+    sortedProtocols.sort(Qt::CaseInsensitive);
+    for(const QString &protocol: sortedProtocols) {
         ProtocolDescription description = protocolDescription(protocol);
         if(!description.name.isNull())
             m_descriptions.push_back(description);

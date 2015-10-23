@@ -7,6 +7,8 @@
 #include "recorder/storage_manager.h"
 #include "core/resource/network_resource.h"
 
+#include <cmath>
+
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int FIRST_STREAM_FIND_EPS = 1000 * 15;
 
@@ -21,37 +23,47 @@ void QnDualQualityHelper::setResource(const QnNetworkResourcePtr &netResource) {
 }
 
 void QnDualQualityHelper::openCamera(const QString& cameraUniqueId) {
-    m_catalogHi = qnStorageMan->getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
-    m_catalogLow = qnStorageMan->getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
+    m_catalogHi[(int)QnServer::StoragePool::Normal] = 
+        qnNormalStorageMan->getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
+
+    m_catalogHi[(int)QnServer::StoragePool::Backup] = 
+        qnBackupStorageMan->getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
+
+    m_catalogLow[(int)QnServer::StoragePool::Normal] = 
+        qnNormalStorageMan->getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
+
+    m_catalogLow[(int)QnServer::StoragePool::Backup] = 
+        qnBackupStorageMan->getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
 }
 
-
-void QnDualQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod, bool preciseFind)
+void QnDualQualityHelper::findDataForTimeHelper(
+    const qint64                        time,
+    DeviceFileCatalog::TruncableChunk   &chunk,
+    DeviceFileCatalogPtr                &catalog,
+    DeviceFileCatalog::FindMethod       findMethod,
+    bool                                preciseFind,
+    QnServer::StoragePool               storageManager
+)
 {
-    //qDebug() << "find data for time=" << QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("hh:mm:ss.zzz"));
     bool usePreciseFind = m_alreadyOnAltChunk || preciseFind;
     m_alreadyOnAltChunk = false;
+    int index = static_cast<int>(storageManager);
 
-    catalog = (m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi);
+    catalog = (m_quality == MEDIA_Quality_Low ? m_catalogLow[index] : m_catalogHi[index]);
     if (catalog == 0)
         return; // no data in archive
 
     chunk = catalog->chunkAt(catalog->findFileIndex(time, findMethod));
 
-    qint64 timeDistance = chunk.distanceToTime(time);
-
-    if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && chunk.endTimeMs() <= time)
-        timeDistance = INT64_MAX; // actually chunk not found
+    qint64 timeDistance = calcDistanceHelper(chunk, time, findMethod);
     if (timeDistance > 0)
     {
         // chunk not found. check in alternate quality
-        DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_Low ? m_catalogHi : m_catalogLow);
-        DeviceFileCatalog::Chunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
-        qint64 timeDistanceAlt = altChunk.distanceToTime(time);
-        if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs() <= time)
-            timeDistanceAlt = INT64_MAX; // actually chunk not found
-
+        DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_Low ? m_catalogHi[index] : m_catalogLow[index]);
+        DeviceFileCatalog::TruncableChunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
+        qint64 timeDistanceAlt = calcDistanceHelper(altChunk, time, findMethod);
         int findEps = m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : SECOND_STREAM_FIND_EPS;
+
         if (timeDistance - timeDistanceAlt > findEps || (timeDistance > timeDistanceAlt && usePreciseFind))
         {
             if (timeDistanceAlt == 0)
@@ -83,6 +95,78 @@ void QnDualQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
             chunk = altChunk;
             m_alreadyOnAltChunk = true;
         }
+    }
+}
+
+int64_t QnDualQualityHelper::calcDistanceHelper(
+    const DeviceFileCatalog::Chunk  &chunk,
+    const int64_t                   time,
+    DeviceFileCatalog::FindMethod   findMethod
+)
+{
+    qint64 timeDistance = chunk.distanceToTime(time);
+    if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && 
+        chunk.endTimeMs() <= time)
+    {
+        timeDistance = INT64_MAX; // actually chunk not found
+    }
+    return timeDistance;
+}
+
+void QnDualQualityHelper::findDataForTime(
+    const qint64                        time, 
+    DeviceFileCatalog::TruncableChunk   &chunk, 
+    DeviceFileCatalogPtr                &catalog, 
+    DeviceFileCatalog::FindMethod       findMethod, 
+    bool                                preciseFind
+)
+{
+    DeviceFileCatalog::TruncableChunk normalChunk;
+    DeviceFileCatalog::TruncableChunk backupChunk;
+    DeviceFileCatalogPtr normalCatalog;
+    DeviceFileCatalogPtr backupCatalog;
+
+    findDataForTimeHelper(
+        time,
+        normalChunk,
+        normalCatalog,
+        findMethod,
+        preciseFind,
+        QnServer::StoragePool::Normal
+    );
+
+    findDataForTimeHelper(
+        time,
+        backupChunk,
+        backupCatalog,
+        findMethod,
+        preciseFind,
+        QnServer::StoragePool::Backup
+    );
+
+    qint64 timeDistanceNormal = calcDistanceHelper(
+        normalChunk, 
+        time, 
+        findMethod
+    );    
+    qint64 timeDistanceBackup = calcDistanceHelper(
+        backupChunk,
+        time,
+        findMethod
+    );
+    int findEps = (m_quality == MEDIA_Quality_Low) ? FIRST_STREAM_FIND_EPS : 
+                                                     SECOND_STREAM_FIND_EPS; 
+    
+    bool normalBetter = timeDistanceNormal <= timeDistanceBackup ||
+                        ((timeDistanceBackup == 0) && (timeDistanceNormal < findEps)
+                                                   && !preciseFind);
+    if (normalBetter) {
+        chunk = normalChunk;
+        catalog = normalCatalog;
+    }
+    else {
+        chunk = backupChunk;
+        catalog = backupCatalog;
     }
 }
 

@@ -11,6 +11,7 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, SecondStreamQuality)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatisticsDeviceType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PanicMode)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RebuildState)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PeerType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ServerFlags)
@@ -46,6 +47,21 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTraits,
     (Qn::EightWayPtzTrait,         "EightWayPtz")
     (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
 )
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupType,
+    (Qn::Backup_Disabled,          "BackupDisabled")
+    (Qn::Backup_RealTime,          "BackupRealTime")
+    (Qn::Backup_Schedule,          "BackupSchedule")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::CameraBackupType,
+    (Qn::CameraBackup_Disabled,          "CameraBackupDisabled")
+    (Qn::CameraBackup_HighQuality,       "CameraBackupHighQuality")
+    (Qn::CameraBackup_LowQuality,        "CameraBackupLowQuality")
+    (Qn::CameraBackup_Both,              "CameraBackupBoth")
+)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupTypes)
+
 
 // TODO: #Elric #2.3 code duplication ^v
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTrait,
@@ -84,3 +100,14 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSearchStrategy,
     (Qn::LongestFirst,      "size")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::RebuildAction,
+(Qn::RebuildAction_Start,   "start")
+(Qn::RebuildAction_Cancel,  "stop")
+(Qn::RebuildAction_ShowProgress, QString())
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupAction,
+(Qn::BackupAction_Start,   "start")
+(Qn::BackupAction_Cancel,  "stop")
+(Qn::BackupAction_ShowProgress, QString())
+)

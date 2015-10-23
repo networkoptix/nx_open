@@ -39,10 +39,11 @@ public:
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
 
 private:
-    bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, const DeviceFileCatalogPtr& newCatalog);
+    bool switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
-    bool getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
+    bool getNextChunk(DeviceFileCatalog::TruncableChunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
+    void setCatalogs() const;
 
     DeviceFileCatalog::Chunk findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod);
 
@@ -52,12 +53,12 @@ private:
     qint64 m_lastPacketTime;
     
     qint64 m_skipFramesToTime;
-    DeviceFileCatalogPtr m_catalogHi;
-    DeviceFileCatalogPtr m_catalogLow;
+    mutable DeviceFileCatalogPtr m_catalogHi[2];
+    mutable DeviceFileCatalogPtr m_catalogLow[2];
     //QnChunkSequence* m_chunkSequenceHi;
     //QnChunkSequence* m_chunkSequenceLow;
     DeviceFileCatalog::Chunk m_currentChunk;
-    DeviceFileCatalogPtr m_currentChunkCatalog;
+    DeviceFileCatalogPtr m_currentChunkCatalog[2];
 
     QnAviArchiveDelegatePtr m_aviDelegate;
     QnAviResourcePtr m_fileRes;
