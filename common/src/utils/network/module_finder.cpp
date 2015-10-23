@@ -344,7 +344,8 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             lk.unlock();
 
             sendModuleInformation(moduleInformation, address, true);
-        } else {
+        }
+        else {
             lk.unlock();
         }
 

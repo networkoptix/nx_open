@@ -389,11 +389,19 @@ namespace nx_http
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
         AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
+
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,
         int* const statusCode,
         nx_http::BufferType* const msgBody );
+
+    //!Same as downloadFileAsync but provide contentType at callback
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
 }
 
 #endif  //ASYNCHTTPCLIENT_H

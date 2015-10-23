@@ -58,6 +58,14 @@ public:
 
     static QString toNativeDirPath(const QString &dirPath);
 
+    void setBackup(bool value);
+    bool isBackup() const;
+
+    void addWrited(qint64 value);
+    void resetWrited();
+    void setWritedCoeff(double value);
+    double calcUsageCoeff() const;
+
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -73,6 +81,9 @@ private:
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
+    bool    m_isBackup;
+    double  m_writed;
+    double  m_writedCoeff;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

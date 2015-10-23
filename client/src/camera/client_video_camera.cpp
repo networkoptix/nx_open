@@ -173,8 +173,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
         m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
         connect(m_exportRecorder, SIGNAL(finished()), m_exportRecorder, SLOT(deleteLater()));
-        if (storage)
-            m_exportRecorder->setStorage(storage);
 
         m_exportRecorder->setExtraTranscodeParams(transcodeParams);
 
@@ -194,7 +192,15 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setEofDateTime(endTimeUs);
-    m_exportRecorder->setFileName(fileName);
+    
+    if (storage)
+        m_exportRecorder->addRecordingContext(
+            fileName,
+            storage
+        );
+    else
+        m_exportRecorder->addRecordingContext(fileName);
+
     m_exportRecorder->setRole(role);
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);

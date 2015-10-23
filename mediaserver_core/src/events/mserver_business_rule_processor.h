@@ -84,7 +84,7 @@ private:
     bool sendMail(const QnSendMailBusinessActionPtr& action );
     void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
     bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
-    void sendEmailAsync(const ec2::ApiEmailData& data);
+    void sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount);
     QString formatEmailList(const QStringList& value) const;
 
     static QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize);

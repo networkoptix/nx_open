@@ -5,7 +5,11 @@
 QnStorageResource::QnStorageResource():
     m_spaceLimit(0),
     m_maxStoreTime(0),
-    m_usedForWriting(false)
+    m_usedForWriting(false),
+    m_storageBitrateCoeff(0.0),
+    m_isBackup(false),
+    m_writed(0.0),
+    m_writedCoeff(1.0)
 {
     setStatus(Qn::Offline);
 }
@@ -124,6 +128,7 @@ void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
     m_spaceLimit = storage->m_spaceLimit;
     m_maxStoreTime = storage->m_maxStoreTime;
     m_usedForWriting = storage->m_usedForWriting;
+    m_isBackup = storage->m_isBackup;
 }
 
 void QnStorageResource::setUrl(const QString& value)
@@ -155,4 +160,40 @@ QString QnStorageResource::toNativeDirPath(const QString &dirPath)
     if(!result.endsWith(QDir::separator()))
         result.append(QDir::separator());
     return result;
+}
+
+void QnStorageResource::setBackup(bool value)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_isBackup = value;
+}
+
+bool QnStorageResource::isBackup() const 
+{ 
+    QnMutexLocker lk(&m_mutex);
+    return m_isBackup; 
+}
+
+void QnStorageResource::addWrited(qint64 value)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_writed += static_cast<double>(value) / (1024 * 1024);
+}
+
+void QnStorageResource::resetWrited()
+{
+    QnMutexLocker lk(&m_mutex);
+    m_writed = 0.0;
+}
+
+void QnStorageResource::setWritedCoeff(double value)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_writedCoeff = value;
+}
+
+double QnStorageResource::calcUsageCoeff() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_writed / m_writedCoeff;
 }

@@ -66,7 +66,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
                 if( virtualCameraRes )
                 {
                     QnMediaServerResourcePtr mediaServer = 
-                        QnCameraHistoryPool::instance()->getMediaServerOnTime( virtualCameraRes, timestampMs );
+                        qnCameraHistoryPool->updateCacheAndGetMediaServerOnTime( virtualCameraRes, timestampMs );
                     if( mediaServer )
                         serverRes = mediaServer;
                 }
