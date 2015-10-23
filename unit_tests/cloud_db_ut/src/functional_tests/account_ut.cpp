@@ -166,7 +166,7 @@ TEST_F(CdbFunctionalTest, requestQueryDecode)
     account1.passwordHa1 = nx_http::calcHa1(
         "test@yandex.ru",
         moduleInfo().realm.c_str(),
-        account1Password.c_str());
+        account1Password.c_str()).constData();
 
     api::AccountActivationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);

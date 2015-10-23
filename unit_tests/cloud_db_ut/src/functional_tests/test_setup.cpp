@@ -126,16 +126,16 @@ api::ResultCode CdbFunctionalTest::addAccount(
     std::string* const password,
     api::AccountActivationCode* const activationCode)
 {
-    std::ostringstream ss;
     if (accountData->email.empty())
     {
+        std::ostringstream ss;
         ss << "test_" << rand() << "@networkoptix.com";
         accountData->email = ss.str();
     }
 
     if (password->empty())
     {
-        ss = std::ostringstream();
+        std::ostringstream ss;
         ss << rand();
         *password = ss.str();
     }
@@ -147,7 +147,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
             //accountData->email.c_str(),
             moduleInfo().realm.c_str(),
-            password->c_str());
+            password->c_str()).constData();
     if (accountData->customization.empty())
         accountData->customization = QN_CUSTOMIZATION_NAME;
 
