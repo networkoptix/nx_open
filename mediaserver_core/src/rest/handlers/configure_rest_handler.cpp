@@ -55,7 +55,9 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     {
         //these values MUST be all filled or all NOT filled
         NX_LOG(lit("All password hashes MUST be supplied all together along with realm"));
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
+        result.setError(
+            QnJsonRestResult::CantProcessRequest,
+            lit("All password hashes MUST be supplied all together along with realm"));
         return CODE_OK;
     }
 
