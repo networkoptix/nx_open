@@ -1958,7 +1958,8 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     //if (storageIndex >= 0 && provider)
     //    storage->releaseBitrate(provider);
     storage->addWrited(fileSize);
-    if (!renameFileWithDuration(fileName, durationMs, storage))
+    bool renameOK = renameFileWithDuration(fileName, durationMs, storage);
+    if (!renameOK)
         qDebug() << lit("File %1 rename failed").arg(fileName);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, quality);
@@ -1966,7 +1967,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
         return false;
     QnStorageDbPtr sdb = getSDB(storage);
     if (sdb)
-        sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize));
+        sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize, renameOK));
     return true;
 }
 
@@ -1995,7 +1996,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalog::Chunk chunk(
         startDateMs, 
         storageIndex, 
-        DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, 
+        DeviceFileCatalog::Chunk::FILE_INDEX_NONE, 
         -1, 
         (qint16) timeZone
     );

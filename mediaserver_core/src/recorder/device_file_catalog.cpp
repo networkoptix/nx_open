@@ -671,7 +671,7 @@ qint64 DeviceFileCatalog::lastChunkStartTime() const
     return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].startTimeMs;
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
+DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration)
 {
     Q_ASSERT(durationMs < 1000 * 1000);
     QnMutexLocker lock( &m_mutex );
@@ -682,6 +682,8 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint6
         DeviceFileCatalog::Chunk& chunk = *itr;
         chunk.durationMs = durationMs;
         chunk.setFileSize(fileSize);
+        if (indexWithDuration)
+            chunk.fileIndex = Chunk::FILE_INDEX_WITH_DURATION;
         return chunk;
     }
     else {

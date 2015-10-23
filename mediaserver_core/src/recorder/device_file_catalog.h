@@ -94,7 +94,7 @@ public:
     );
     //void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
-    Chunk updateDuration(int durationMs, qint64 fileSize);
+    Chunk updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration);
     qint64 lastChunkStartTime() const;
     Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
 
