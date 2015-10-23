@@ -15,6 +15,7 @@
 #include "utils/network/multicodec_rtp_reader.h"
 #include "utils/common/log.h"
 #include "utils/media/ffmpeg_helper.h"
+#include <plugins/resource/third_party/motion_data_picture.h>
 
 #include "core/datapacket/third_party_audio_data_packet.h"
 #include "core/datapacket/third_party_video_data_packet.h"
@@ -22,7 +23,6 @@
 #include "plugins/plugin_tools.h"
 #include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
 
-#include "motion_data_picture.h"
 #include "version.h"
 
 namespace
