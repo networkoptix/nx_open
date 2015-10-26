@@ -68,7 +68,7 @@ namespace ec2
         int                 maxArchiveDays;
         QnUuid              preferedServerId;
         Qn::FailoverPriority    failoverPriority;
-        Qn::CameraBackupTypes   backupType;
+        Qn::CameraBackupQualities   backupType;
     };
 
 #define ApiCameraAttributesData_Fields_Short \

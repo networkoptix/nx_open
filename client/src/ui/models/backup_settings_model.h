@@ -12,11 +12,14 @@
 
 struct BackupSettingsData
 {
-    BackupSettingsData(): isChecked(false), backupType(Qn::CameraBackup_Disabled) {}
+    BackupSettingsData()
+        : isChecked(false)
+        , backupQualities(Qn::CameraBackup_Disabled) 
+    {}
 
     bool isChecked;
     QnUuid id;
-    Qn::CameraBackupTypes backupType;
+    Qn::CameraBackupQualities backupQualities;
 };
 typedef QList<BackupSettingsData> BackupSettingsDataList;
 Q_DECLARE_METATYPE(BackupSettingsData)
@@ -56,7 +59,7 @@ private:
     QVariant foregroundData(const QModelIndex &index) const;
     QVariant decorationData(const QModelIndex &index) const;
     QVariant checkstateData(const QModelIndex &index) const;
-    QString backupTypeToString(Qn::CameraBackupTypes value) const;
+    QString backupTypeToString(Qn::CameraBackupQualities value) const;
 private:
     BackupSettingsDataList m_data;
 };

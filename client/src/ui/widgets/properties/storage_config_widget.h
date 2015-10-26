@@ -37,6 +37,12 @@ public:
 
     void setServer(const QnMediaServerResourcePtr &server);
     virtual void submitToSettings() override;
+
+    virtual bool hasChanges() const override;
+
+protected:
+    virtual void setReadOnlyInternal(bool readOnly) override;
+
 private:
     void updateStoragesInfo();
     void updateRebuildInfo();
@@ -49,7 +55,6 @@ private:
 
     void updateColumnWidth();
     int getColWidth(const QAbstractItemModel* model, int col);
-    bool hasUnsavedChanges() const;
 
     void startRebuid(bool isMain);
     void cancelRebuild(bool isMain);

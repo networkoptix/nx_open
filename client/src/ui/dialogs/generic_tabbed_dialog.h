@@ -37,6 +37,8 @@ protected:
 
     virtual QString confirmMessageTitle() const;
     virtual QString confirmMessageText() const;
+
+    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 private:
     void initializeTabWidget();
 

@@ -38,7 +38,7 @@ int QnBackupSettingsModel::columnCount(const QModelIndex &parent) const {
     return 0;
 }
 
-QString QnBackupSettingsModel::backupTypeToString(Qn::CameraBackupTypes value) const
+QString QnBackupSettingsModel::backupTypeToString(Qn::CameraBackupQualities value) const
 {
     if (value == Qn::CameraBackup_Default)
         return tr("Default");
@@ -65,7 +65,7 @@ QString QnBackupSettingsModel::displayData(const QModelIndex &index) const
         else
             return tr("<New cameras>");
     case BackupTypeColumn:
-        return backupTypeToString(data.backupType);
+        return backupTypeToString(data.backupQualities);
     default:
         break;
     }

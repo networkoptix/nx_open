@@ -1,4 +1,6 @@
 #include "backup_settings_dialog.h"
+
+#include <api/global_settings.h>
 #include "core/resource/media_server_user_attributes.h"
 #include "ui/widgets/views/checkboxed_header_view.h"
 
@@ -134,12 +136,12 @@ void QnBackupSettingsDialog::at_modelDataChanged()
         if (!value.isChecked)
             continue;
 
-        if (value.backupType & Qn::CameraBackup_LowQuality)
+        if (value.backupQualities.testFlag(Qn::CameraBackup_LowQuality))
             hasLQ = true;
         else
             notHasLQ = true;
 
-        if (value.backupType & Qn::CameraBackup_HighQuality)
+        if (value.backupQualities.testFlag(Qn::CameraBackup_HighQuality))
             hasHQ = true;
         else
             notHasHQ = true;
@@ -184,14 +186,14 @@ void QnBackupSettingsDialog::at_labelClicked()
             continue;
 
         if (ui->checkBoxLQ->checkState() == Qt::Checked)
-            value.backupType |= Qn::CameraBackup_LowQuality;
+            value.backupQualities |= Qn::CameraBackup_LowQuality;
         else if (ui->checkBoxLQ->checkState() == Qt::Unchecked)
-            value.backupType &= ~Qn::CameraBackup_LowQuality;
+            value.backupQualities &= ~Qn::CameraBackup_LowQuality;
 
         if (ui->checkBoxHQ->checkState() == Qt::Checked)
-            value.backupType |= Qn::CameraBackup_HighQuality;
+            value.backupQualities |= Qn::CameraBackup_HighQuality;
         else if (ui->checkBoxHQ->checkState() == Qt::Unchecked)
-            value.backupType &= ~Qn::CameraBackup_HighQuality;
+            value.backupQualities &= ~Qn::CameraBackup_HighQuality;
         
         model->setData(index, QVariant::fromValue<BackupSettingsData>(value), Qn::BackupSettingsDataRole);
     }
@@ -202,30 +204,28 @@ void QnBackupSettingsDialog::at_labelClicked()
     proxyModel->invalidate();
 }
 
-void QnBackupSettingsDialog::updateFromSettings(const BackupSettingsDataList& values, const QnMediaServerUserAttributes& serverAttrs)
-{
+void QnBackupSettingsDialog::updateFromSettings(const BackupSettingsDataList& values) {
     auto modelData = values;
     for (auto& value: modelData) {
-        if (value.backupType == Qn::CameraBackup_Default)
-            value.backupType = serverAttrs.backupQuality;
+        if (value.backupQualities == Qn::CameraBackup_Default)
+            value.backupQualities = qnGlobalSettings->defaultBackupQuality();
     }
 
     BackupSettingsData allCameras;
-    allCameras.backupType = serverAttrs.backupQuality;
+    allCameras.backupQualities = qnGlobalSettings->defaultBackupQuality();
     modelData << allCameras;
 
     m_model->setModelData(modelData);
     ui->gridCameras->selectAll();
 }
 
-void QnBackupSettingsDialog::submitToSettings(BackupSettingsDataList& value, QnMediaServerUserAttributes& serverAttrs)
-{
+void QnBackupSettingsDialog::submitToSettings(BackupSettingsDataList& value) {
     BackupSettingsDataList modelData = m_model->modelData();
     for (auto itr = modelData.begin(); itr != modelData.end(); ++itr)
     {
         if (itr->id.isNull()) 
         {
-            serverAttrs.backupQuality = itr->backupType;
+            qnGlobalSettings->setDefauldBackupQuality(itr->backupQualities);
             modelData.erase(itr); // remove footage data
             break;
         }

@@ -111,6 +111,45 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 QnStorageConfigWidget::~QnStorageConfigWidget()
 {}
 
+void QnStorageConfigWidget::setReadOnlyInternal( bool readOnly ) {
+    //TODO: #GDM #Safe Mode
+}
+
+bool QnStorageConfigWidget::hasChanges() const {
+    QnStorageResourceList storagesToUpdate;
+
+    processStorages(storagesToUpdate, m_mainPool.model->storages(), false);
+    processStorages(storagesToUpdate, m_backupPool.model->storages(), true);
+    if (!storagesToUpdate.isEmpty())
+        return true;
+
+    QSet<QnUuid> newIdList;
+    for (const auto& storageData: m_mainPool.model->storages() + m_backupPool.model->storages())
+        newIdList << storageData.storageId;
+    for (const auto& storage: m_server->getStorages()) {
+        if (!newIdList.contains(storage->getId()))
+            return true;
+    }
+
+    QnMediaServerUserAttributes serverUserAttrs;
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk(QnMediaServerUserAttributesPool::instance(), m_server->getId());
+        serverUserAttrs = *(*lk).data();
+    }
+    if (serverUserAttrs != m_serverUserAttrs)
+        return true;
+
+    for (const auto& camSetting: m_cameraBackupSettings)
+    {
+        auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>(camSetting.id);
+        if (camRes && camSetting.backupQualities != camRes->getBackupQualities())
+            return true;
+    }
+
+    return false;
+}
+
+
 void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
     if (!m_server)
         return;
@@ -358,7 +397,7 @@ void QnStorageConfigWidget::submitToSettings()
     for (const auto& camSetting: cameraBackupSettings)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>(camSetting.id);
-        if (camRes && camSetting.backupType != camRes->getBackupType())
+        if (camRes && camSetting.backupQualities != camRes->getBackupQualities())
             modifiedCameras << camRes;
     }
 
@@ -367,7 +406,7 @@ void QnStorageConfigWidget::submitToSettings()
         for (const auto& camSetting: cameraBackupSettings) 
         {
             if (camSetting.id == camera->getId()) {
-                camera->setBackupType(camSetting.backupType);
+                camera->setBackupQualities(camSetting.backupQualities);
                 break;
             }
         }
@@ -412,46 +451,11 @@ void QnStorageConfigWidget::cancelRebuild(bool isMain) {
     storagePool.rebuildCancelled = true;
 }
 
-bool QnStorageConfigWidget::hasUnsavedChanges() const
-{
-    QnStorageResourceList storagesToUpdate;
-
-    processStorages(storagesToUpdate, m_mainPool.model->storages(), false);
-    processStorages(storagesToUpdate, m_backupPool.model->storages(), true);
-    if (!storagesToUpdate.isEmpty())
-        return true;
-
-    QSet<QnUuid> newIdList;
-    for (const auto& storageData: m_mainPool.model->storages() + m_backupPool.model->storages())
-        newIdList << storageData.storageId;
-    for (const auto& storage: m_server->getStorages()) {
-        if (!newIdList.contains(storage->getId()))
-            return true;
-    }
-
-    QnMediaServerUserAttributes serverUserAttrs;
-    {
-        QnMediaServerUserAttributesPool::ScopedLock lk(QnMediaServerUserAttributesPool::instance(), m_server->getId());
-        serverUserAttrs = *(*lk).data();
-    }
-    if (serverUserAttrs != m_serverUserAttrs)
-        return true;
-
-    for (const auto& camSetting: m_cameraBackupSettings)
-    {
-        auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>(camSetting.id);
-        if (camRes && camSetting.backupType != camRes->getBackupType())
-            return true;
-    }
-
-    return false;
-}
-
 void QnStorageConfigWidget::startBackup() {
     if (!m_server)
         return;
 
-    if (hasUnsavedChanges())
+    if (hasChanges())
     {
         int dialogResult = QMessageBox::question(
             this,
@@ -502,7 +506,7 @@ void QnStorageConfigWidget::at_openBackupSettings_clicked()
         BackupSettingsData data;
         data.isChecked = true;
         data.id = camera->getId();
-        data.backupType = camera->getBackupType();
+        data.backupQualities = camera->getBackupQualities();
 
         for (const auto& oldSetting: m_cameraBackupSettings) {
             if (oldSetting.id == data.id) {
@@ -516,9 +520,9 @@ void QnStorageConfigWidget::at_openBackupSettings_clicked()
 
 
     auto backupSettingsDialog = new QnBackupSettingsDialog(this);
-    backupSettingsDialog->updateFromSettings(m_cameraBackupSettings, m_serverUserAttrs);
+    backupSettingsDialog->updateFromSettings(m_cameraBackupSettings);
     if (backupSettingsDialog->exec())
-        backupSettingsDialog->submitToSettings(m_cameraBackupSettings, m_serverUserAttrs);
+        backupSettingsDialog->submitToSettings(m_cameraBackupSettings);
 }
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
@@ -602,4 +606,5 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
             tr("Archive backup is completed."));
     m_backupCancelled = false;
 }
+
 
