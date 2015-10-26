@@ -1093,7 +1093,7 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
     qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
 
-    qint64 startBound = startBoundTime == -1 ? liveTime - 1000 * 60 * 60 * 4 : startBoundTime;
+    qint64 startBound = startBoundTime == -1 ? liveTime - 1000 * 60 * 60 : startBoundTime;
     qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
 
     bool justStopped = stickyPointKineticHelper.isStopped();
