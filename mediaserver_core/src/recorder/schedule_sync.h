@@ -1,7 +1,7 @@
 #ifndef __SHEDULE_SYNC_H__
 #define __SHEDULE_SYNC_H__
 
-#include <future>
+#include <QtConcurrent>
 #include <atomic>
 #include <vector>
 #include <map>
@@ -73,7 +73,7 @@ private:
     std::atomic<bool>    m_backupSyncOn;
     std::atomic<bool>    m_syncing;
     std::atomic<bool>    m_forced;
-    std::future<void>    m_backupFuture;
+    QFuture<void>        m_backupFuture;
     schedule             m_schedule;
     std::atomic<int64_t> m_syncTimePoint;
 
