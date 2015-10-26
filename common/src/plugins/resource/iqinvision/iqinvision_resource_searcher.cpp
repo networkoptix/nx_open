@@ -4,6 +4,9 @@
 #include "iqinvision_resource_searcher.h"
 #include "iqinvision_resource.h"
 #include "utils/common/sleep.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 #ifndef Q_OS_WIN
 #include <arpa/inet.h>
@@ -147,6 +150,10 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
             return local_results; // already found;
         }
     }
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return local_results; // model forced by ONVIF
 
 
     QnPlIqResourcePtr resource ( new QnPlIqResource() );

@@ -112,7 +112,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, name);
-    if (resourceData.value<bool>(lit("forceONVIF")))
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return false;
 
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)

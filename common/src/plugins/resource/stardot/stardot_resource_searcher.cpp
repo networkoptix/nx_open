@@ -8,6 +8,9 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 static const int CL_BROAD_CAST_RETRY = 1;
 static const int STARDOT_DISCOVERY_PORT = 7364;
@@ -99,6 +102,11 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 QnUuid typeId = qnResTypePool->getResourceTypeId(QnStardotResource::MANUFACTURE, lit("STARDOT_COMMON"));
                 if (typeId.isNull())
                     continue;
+
+                QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), QLatin1String(model));
+                if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+                    continue; // model forced by ONVIF
+
                 resource->setTypeId(typeId);
 
                 resource->setHostAddress(senderEndpoint.address.toString());
@@ -227,6 +235,11 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
 
     if (mac.isEmpty())
         return QList<QnResourcePtr>();
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), model);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        QList<QnResourcePtr>(); // model forced by ONVIF
+
 
     QnStardotResourcePtr res(new QnStardotResource());
 
