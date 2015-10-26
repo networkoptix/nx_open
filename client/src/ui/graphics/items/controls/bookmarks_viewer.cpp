@@ -117,8 +117,7 @@ namespace
             label->setAlignment(params.align);
         }
 
-        static const QString _t = lit("<p>%1</p>");
-        label->setText(_t.arg(trimmedText));
+        label->setText(trimmedText);
         return (insertionIndex + 1);
     }
 
@@ -213,12 +212,6 @@ namespace
 
         void onBookmarkAction(const QString &anchorName);
 
-        
-        virtual void setGeometry(const QRectF &rect) override
-        {
-            QnToolTipWidget::setGeometry(rect);
-        }
-
     private:
         const BookmarkActionFunctionType m_editAction;
         const BookmarkActionFunctionType m_removeAction;
@@ -285,8 +278,6 @@ namespace
         QnProxyLabel *removeActionLabel =
             createButtonLabel(QnBookmarksViewerStrings::removeCaption(), kRemoveActoinAnchorName, this
             , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1));
-
-        setAcceptHoverEvents(true);
 
         actionsLayout->addItem(removeActionLabel);
         actionsLayout->addStretch();
@@ -359,14 +350,7 @@ namespace
 
         setTailWidth(kTailWidth);
 
-        const auto b = boundingRect();
-        const auto cm = contentsMargins();
-        const auto cr = contentsRect();
-
         const bool isFirstItem = !prev();
-        
-        updateGeometry();
-
         const auto height = geometry().height();
         const auto offset = height + (isFirstItem ? kTailHeight : kSpacerHeight);
         const auto currentPos = pos - QPointF(0, offset);
@@ -598,7 +582,6 @@ void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
         return;
 
     const auto newBookmarks = m_getBookmarks(timestamp);
-
     if (m_bookmarks == newBookmarks)
         return;
 
