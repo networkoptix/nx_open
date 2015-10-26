@@ -4,6 +4,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 
 class QnActionParameters;
+class HoverFocusProcessor;
 
 /// @class QnBookmarksViewer
 /// @brief Shows specified bookmarks one above another in defined position
@@ -36,6 +37,11 @@ public slots:
 
     /// @brief clears bookmarks
     void resetBookmarks();
+
+public slots:
+    void setHoverProcessor(HoverFocusProcessor *processor);
+
+    bool isHovered() const;
 
 private:
     class Impl;

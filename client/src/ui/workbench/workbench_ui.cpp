@@ -2418,6 +2418,10 @@ void QnWorkbenchUi::createSliderWidget()
     m_sliderItem->timeSlider()->toolTipItem()->stackBefore(m_sliderItem->timeSlider()->bookmarksViewer());
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+
+    enum {kSliderLeaveTimeout = 200 };
+    m_sliderOpacityProcessor->setHoverLeaveDelay(kSliderLeaveTimeout);
+    m_sliderItem->timeSlider()->bookmarksViewer()->setHoverProcessor(m_sliderOpacityProcessor);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
