@@ -105,6 +105,7 @@ LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
 }
 LIBS += ${global.libs}
+LIBS += ${ffmpeg.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \
