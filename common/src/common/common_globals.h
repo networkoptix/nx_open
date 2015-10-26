@@ -34,7 +34,7 @@ namespace Qn
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
-            ServerFlag BackupType CameraBackupType CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
             RebuildAction BackupAction
             FailoverPriority)
     Q_FLAGS(Borders Corners
@@ -42,7 +42,7 @@ namespace Qn
             CameraCapabilities 
             PtzDataFields PtzCapabilities PtzTraits 
             MotionTypes TimePeriodTypes 
-            ServerFlags CameraBackupTypes CameraStatusFlags IOPortTypes)
+            ServerFlags CameraBackupQualities CameraStatusFlags IOPortTypes)
 public:
 #else
     Q_NAMESPACE
@@ -780,7 +780,7 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
 
-    enum CameraBackupType
+    enum CameraBackupQuality
     {
         CameraBackup_Disabled       = 0,
         CameraBackup_HighQuality    = 1,
@@ -788,9 +788,9 @@ public:
         CameraBackup_Both           = CameraBackup_HighQuality | CameraBackup_LowQuality,
         CameraBackup_Default        = 4 // backup type didn't configured so far. Default value will be used
     };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupType)
-    Q_DECLARE_FLAGS(CameraBackupTypes, CameraBackupType)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupTypes)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupQuality)
+    Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -839,7 +839,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
-        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupType)
+        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
@@ -852,7 +852,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupTypes)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::CameraStatusFlags),
     (metatype)(numeric)(lexical)
 )
 

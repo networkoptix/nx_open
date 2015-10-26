@@ -173,7 +173,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
             return result;
 
         QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), QLatin1String(model));
-        if (resourceData.value<bool>(QLatin1String("forceONVIF")))
+        if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
             return result; // model forced by ONVIF
 
 
@@ -239,7 +239,7 @@ void QnActiResourceSearcher::createResource(
         return;
 
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), devInfo.modelName);
-    if (resourceData.value<bool>(lit("forceONVIF")))
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return; // model forced by ONVIF
 
 

@@ -35,6 +35,7 @@ namespace {
     const qreal stripesMovingSpeed = 0.002;
     const qreal windowMovingSpeed = 0.04;
     const qint64 correctionThreshold = 5000;
+    const qint64 defaultWindowSize = 60 * 60 * 1000;
 
     struct MarkInfo {
         qint64 tick;
@@ -185,9 +186,14 @@ public:
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         30 * min));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           hour));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           3 * hour));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           6 * hour));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           12 * hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            24 * hour));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            1));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            5));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            15));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          1));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          3));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          6));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           1));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           5));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           10));
@@ -332,23 +338,17 @@ QnTimeline::QnTimeline(QQuickItem *parent) :
 
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
 
-    QnTimelineZoomLevel::monthsNames << tr("January")   << tr("February")   << tr("March")
-                                     << tr("April")     << tr("May")        << tr("June")
-                                     << tr("July")      << tr("August")     << tr("September")
-                                     << tr("October")   << tr("November")   << tr("December");
+    d->suffixList << lit("ms") << lit("s") << lit(":");
 
     QnTimelineZoomLevel::maxMonthLength = 0;
-    for (const QString &month : QnTimelineZoomLevel::monthsNames)
-        QnTimelineZoomLevel::maxMonthLength = qMax(QnTimelineZoomLevel::maxMonthLength, month.size());
-
-    d->suffixList << lit("ms") << lit("s") << lit(":");
-    for (const QString &month : QnTimelineZoomLevel::monthsNames)
-        d->suffixList.append(month);
-
-    QDate date(2015, 1, 1);
-    for (int i = 0; i < 12; ++i) {
-        d->suffixList.append(date.toString(lit("MMMM")));
-        date = date.addMonths(1);
+    QLocale locale;
+    for (int i = 1; i <= 12; ++i) {
+        QString standaloneMonthName = locale.standaloneMonthName(i);
+        QString monthName = locale.monthName(i);
+        d->suffixList.append(standaloneMonthName);
+        d->suffixList.append(monthName);
+        QnTimelineZoomLevel::maxMonthLength = qMax(QnTimelineZoomLevel::maxMonthLength,
+                                                   qMax(standaloneMonthName.length(), monthName.length()));
     }
 
     d->updateTextHelper();
@@ -857,14 +857,14 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
             info.zoomIndex = tickLevel;
             markedTicks.append(info);
 
-            lowerTextCount += d->zoomLevels[textMarkLevel].baseValue(tick).size();
-            lowerTextCount += d->zoomLevels[textMarkLevel].subValue(tick).size();
-            lowerTextCount += d->zoomLevels[textMarkLevel].suffix(tick).isEmpty() ? 0 : 1;
+            lowerTextCount += d->zoomLevels[tickLevel].baseValue(tick).size();
+            lowerTextCount += d->zoomLevels[tickLevel].subValue(tick).size();
+            lowerTextCount += d->zoomLevels[tickLevel].suffix(tick).isEmpty() ? 0 : 1;
 
             if (tickLevel > textMarkLevel) {
-                textCount += d->zoomLevels[textMarkLevel + 1].baseValue(tick).size();
-                textCount += d->zoomLevels[textMarkLevel + 1].subValue(tick).size();
-                textCount += d->zoomLevels[textMarkLevel + 1].suffix(tick).isEmpty() ? 0 : 1;
+                textCount += d->zoomLevels[tickLevel].baseValue(tick).size();
+                textCount += d->zoomLevels[tickLevel].subValue(tick).size();
+                textCount += d->zoomLevels[tickLevel].suffix(tick).isEmpty() ? 0 : 1;
             }
         }
 
@@ -884,9 +884,9 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
     QSGGeometry::TexturedPoint2D *lowerTextPoints = lowerTextGeometry->vertexDataAsTexturedPoint2D();
 
     for (const MarkInfo &info: markedTicks) {
-        lowerTextPoints += d->placeText(info, textMarkLevel, lowerTextPoints);
+        lowerTextPoints += d->placeText(info, info.zoomIndex, lowerTextPoints);
         if (info.zoomIndex > textMarkLevel)
-            textPoints += d->placeText(info, textMarkLevel + 1, textPoints);
+            textPoints += d->placeText(info, info.zoomIndex, textPoints);
     }
 
     textNode->markDirty(QSGNode::DirtyGeometry);
@@ -968,11 +968,14 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
+    int chunkCount = 0;
     for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
          pos[i] = d->timePeriods[i].findNearestPeriod(minimumValue, true);
          end[i] = d->timePeriods[i].findNearestPeriod(maximumValue, true);
          if(end[i] != d->timePeriods[i].end() && end[i]->contains(maximumValue))
              end[i]++;
+
+         chunkCount += std::distance(pos[i], end[i]);
     }
 
     qint64 value = minimumValue;
@@ -988,8 +991,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     colors[Qn::TimePeriodContentCount] = d->chunkColor.darker();
     chunkPainter.setColors(colors);
     chunkPainter.start(value, position(), QRectF(0, y, width(), height() - y),
-                       qMax(1, d->timePeriods[Qn::RecordingContent].size()),
-            minimumValue, maximumValue);
+                       chunkCount, minimumValue, maximumValue);
 
     while (value != maximumValue) {
         qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
@@ -1073,12 +1075,17 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         windowEnd += shift;
     }
 
+    qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
+
+    qint64 startBound = startBoundTime == -1 ? liveTime - defaultWindowSize : startBoundTime;
+    qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
+
     zoomKineticHelper.update();
     if (!zoomKineticHelper.isStopped()) {
         windowChanged = true;
 
-        qint64 maxSize = parent->width() / dp(minTickDps) * (365 / 4 * 24 * 60 * 60 * 1000ll);
-        qint64 minSize = parent->width() / dp(1);
+        qint64 maxSize = (liveTime - startBound) * 2;
+        qint64 minSize = startBoundTime == -1 ? maxSize : parent->width() / dp(1);
         qreal factor = startZoom / zoomKineticHelper.value();
         qreal windowSize = qBound<qreal>(minSize, startWindowSize * factor, maxSize);
 
@@ -1089,11 +1096,6 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
         updateZoomLevel();
     }
-
-    qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
-
-    qint64 startBound = startBoundTime == -1 ? liveTime - 1000 * 60 * 60 * 4 : startBoundTime;
-    qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
 
     bool justStopped = stickyPointKineticHelper.isStopped();
     stickyPointKineticHelper.update();

@@ -89,6 +89,10 @@
 #include "workbench_navigator.h"
 #include "workbench_access_controller.h"
 
+#ifdef _DEBUG
+//#define QN_DEBUG_WIDGET
+#endif
+
 
 namespace {
 
@@ -417,8 +421,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Bookmarks search line. */
     createSearchWidget();
 
+#ifdef QN_DEBUG_WIDGET
     /* Debug overlay */
     createDebugWidget();
+#endif
 
     initGraphicsMessageBox();
 
@@ -2365,7 +2371,6 @@ void QnWorkbenchUi::createSliderWidget()
     m_sliderItem = new QnNavigationItem(m_controlsWidget);
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 128));
     m_sliderItem->setFrameWidth(1.0);
-    m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
 
     m_sliderItem->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
@@ -2410,8 +2415,13 @@ void QnWorkbenchUi::createSliderWidget()
     m_sliderResizerWidget->stackBefore(m_sliderShowButton);
     m_sliderResizerWidget->stackBefore(m_sliderZoomButtonsWidget);
     m_sliderItem->stackBefore(m_sliderResizerWidget);
+    m_sliderItem->timeSlider()->toolTipItem()->stackBefore(m_sliderItem->timeSlider()->bookmarksViewer());
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+
+    enum {kSliderLeaveTimeout = 200 };
+    m_sliderOpacityProcessor->setHoverLeaveDelay(kSliderLeaveTimeout);
+    m_sliderItem->timeSlider()->bookmarksViewer()->setHoverProcessor(m_sliderOpacityProcessor);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
@@ -2460,18 +2470,24 @@ void QnWorkbenchUi::createSliderWidget()
     connect(action(Qn::ToggleThumbnailsAction), &QAction::toggled,                  this,           [this](bool checked){ setThumbnailsVisible(checked); });
     connect(action(Qn::ToggleSliderAction),     &QAction::toggled,                  this,           [this](bool checked){ if (!m_ignoreClickEvent) setSliderOpened(checked);});
 
-    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::editBookmarkClicked, this
-        , [this](const QnCameraBookmark &bookmark, QnActionParameters params)
-    {
-        params.setArgument(Qn::CameraBookmarkRole, bookmark);
-        menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, params);
-    });
 
-    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::removeBookmarkClicked, this
-        , [this](const QnCameraBookmark &bookmark, QnActionParameters params)
+    const auto getActionParamsFunc = [this](const QnCameraBookmark &bookmark) -> QnActionParameters
     {
-        params.setArgument(Qn::CameraBookmarkRole, bookmark);
-        menu()->triggerIfPossible(Qn::RemoveCameraBookmarkAction, params);
+        QnActionParameters bookmarkParams(currentTarget(Qn::SliderScope));
+        bookmarkParams.setArgument(Qn::CameraBookmarkRole, bookmark);
+        return bookmarkParams;
+    };
+
+    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::editBookmarkClicked, this
+        , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+    {
+        menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
+    });
+    
+    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::removeBookmarkClicked, this
+        , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+    {
+        menu()->triggerIfPossible(Qn::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
     
 }

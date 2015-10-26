@@ -68,26 +68,6 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
 }
 
-Qn::BackupType QnMediaServerResource::getBackupType() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupType;
-}
-
-Qn::CameraBackupTypes QnMediaServerResource::getDefaultBackupQuality() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-        );
-
-    return (*lk)->backupQuality;
-}
-
 QnMediaServerResource::~QnMediaServerResource()
 {
     QnMutexLocker lock( &m_mutex );
@@ -426,6 +406,16 @@ int QnMediaServerResource::getBackupBitrate() const
     return (*lk)->backupBitrate;
 }
 
+Qn::BackupType QnMediaServerResource::getBackupType() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(
+        QnMediaServerUserAttributesPool::instance(), 
+        getId()
+        );
+
+    return (*lk)->backupType;
+}
+
 void QnMediaServerResource::setBackupType(Qn::BackupType value)
 {
     QnMediaServerUserAttributesPool::ScopedLock lk(
@@ -434,16 +424,6 @@ void QnMediaServerResource::setBackupType(Qn::BackupType value)
         );
 
     (*lk)->backupType = value;
-}
-
-void QnMediaServerResource::setDefaultBackupQuality(Qn::CameraBackupTypes value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-        );
-
-    (*lk)->backupQuality = value;
 }
 
 void QnMediaServerResource::setBackupDOW(int value)

@@ -14,8 +14,7 @@ QnMediaServerUserAttributes::QnMediaServerUserAttributes()
     backupDaysOfTheWeek(0x7f), // all days of week
     backupStart(0), // midnight
     backupDuration(-1), // unlimited duration
-    backupBitrate(-1), // unlimited
-    backupQuality(Qn::Backup_Disabled)
+    backupBitrate(-1) // unlimited
 {
 }
 
@@ -44,9 +43,6 @@ void QnMediaServerUserAttributes::assign(
 
     if (backupStart != right.backupStart)
         modifiedFields->insert("backupStartChanged");
-
-    if (backupQuality != right.backupQuality)
-        modifiedFields->insert("backupQualityChanged");
 
     *this = right;
 }

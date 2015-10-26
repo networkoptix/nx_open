@@ -2106,8 +2106,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
             backup_days_of_the_week,                             \
             backup_start,                                        \
             backup_duration,                                     \
-            backup_bitrate,                                      \
-            backup_quality                                       \
+            backup_bitrate                                       \
         )                                                        \
         VALUES(                                                  \
             :serverID,                                           \
@@ -2118,8 +2117,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
             :backupDaysOfTheWeek,                                \
             :backupStart,                                        \
             :backupDuration,                                     \
-            :backupBitrate,                                      \
-            :backupQuality                                       \
+            :backupBitrate                                       \
         )                                                        \
         ");
     QnSql::bind(data, &insQuery);
@@ -3339,8 +3337,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
             backup_days_of_the_week as backupDaysOfTheWeek,         \
             backup_start as backupStart,                            \
             backup_duration as backupDuration,                      \
-            backup_bitrate as backupBitrate,                        \
-            backup_quality as backupQuality                         \
+            backup_bitrate as backupBitrate                         \
         FROM vms_server_user_attributes                             \
         %1                                                          \
         ORDER BY server_guid                                        \

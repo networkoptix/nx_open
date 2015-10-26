@@ -369,7 +369,7 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool bookmarksModeEnabled) {
         m_bookmarkQuery.clear();
         m_bookmarkAggregation.clear();
         m_timeSlider->setBookmarks(QnCameraBookmarkList());
-        m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
+        m_timeSlider->bookmarksViewer()->resetBookmarks();
     }
 
     emit bookmarksModeEnabledChanged();
@@ -404,7 +404,6 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
     connect(m_timeSlider,                       SIGNAL(thumbnailClicked()),                         this,   SLOT(at_timeSlider_thumbnailClicked()));
 
-    connect(m_timeSlider,   &QnTimeSlider::bookmarksUnderCursorUpdated,     this,   &QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated);
     connect(m_timeSlider,   &QnTimeSlider::windowChanged,                   this,   [this](qint64 windowStart, qint64 windowEnd) {
         if (!m_bookmarkQuery)
             return;
@@ -1519,21 +1518,6 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
 
     return base_type::eventFilter(watched, event);
 }
-
-void QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated(const QPointF& pos)
-{
-    if (qnRuntime->isVideoWallMode())
-    {    
-        m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
-        return;
-    }
-
-    const qint64 position = m_timeSlider->valueFromPosition(pos);
-    const QnActionParameters params(currentTarget(Qn::SliderScope));
-    QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
-    m_timeSlider->bookmarksViewer()->updateBookmarks(bookmarks, params);
-}
-
 
 void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos) {
     if(!context() || !context()->menu()) {
