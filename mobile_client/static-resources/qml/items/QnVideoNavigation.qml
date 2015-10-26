@@ -223,6 +223,8 @@ Item {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/calendar.png"
+                    enabled: timeline.startBound > 0
+                    opacity: enabled ? 1.0 : 0.15
                     onClicked: {
                         calendarPanel.date = timeline.positionDate
                         calendarPanel.show()
@@ -235,6 +237,7 @@ Item {
                     anchors.horizontalCenterOffset: -width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/minus.png"
+                    visible: timeline.startBound > 0
                     onClicked: timeline.zoomOut()
                 }
 
@@ -244,6 +247,7 @@ Item {
                     anchors.horizontalCenterOffset: width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/plus.png"
+                    visible: timeline.startBound > 0
                     onClicked: timeline.zoomIn()
                 }
 
