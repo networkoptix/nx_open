@@ -2106,7 +2106,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
             backup_days_of_the_week,                             \
             backup_start,                                        \
             backup_duration,                                     \
-            backup_bitrate,                                      \
+            backup_bitrate                                       \
         )                                                        \
         VALUES(                                                  \
             :serverID,                                           \
@@ -2117,7 +2117,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
             :backupDaysOfTheWeek,                                \
             :backupStart,                                        \
             :backupDuration,                                     \
-            :backupBitrate,                                      \
+            :backupBitrate                                       \
         )                                                        \
         ");
     QnSql::bind(data, &insQuery);
