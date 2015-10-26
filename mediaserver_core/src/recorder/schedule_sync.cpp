@@ -1,3 +1,7 @@
+#include "schedule_sync.h"
+
+#include <api/global_settings.h>
+
 #include <utils/common/log.h>
 #include <utils/common/synctime.h>
 
@@ -8,11 +12,8 @@
 #include <utils/common/util.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/storage_resource.h>
-
-#include "schedule_sync.h"
 
 #include <mutex>
 #include <numeric>
@@ -82,23 +83,22 @@ boost::optional<QnScheduleSync::ChunkKeyVector>
 QnScheduleSync::getOldestChunk() 
 {
     ChunkKeyVector ret;
-    auto mediaServer = 
-        qnResPool->getResourceById(qnCommon->moduleGUID())
-            .dynamicCast<QnMediaServerResource>();
+    auto mediaServer = qnCommon->currentServer();
     
     Q_ASSERT(mediaServer);    
     int64_t minTime = std::numeric_limits<int64_t>::max();
 
-    for (auto &camera : qnResPool->getAllCameras(mediaServer)) 
-    {
-        auto securityCamera = camera.dynamicCast<QnSecurityCamResource>();
-        Q_ASSERT(securityCamera);
-        
-        auto backupType = securityCamera->getActualBackupType();
+    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(mediaServer, true)) 
+    {       
+        Qn::CameraBackupQualities cameraBackupQualities = camera->getBackupQualities();
+        if (cameraBackupQualities == Qn::CameraBackup_Default)
+            cameraBackupQualities = qnGlobalSettings->defaultBackupQualities();
+
         ChunkKey tmp;
 
-        if (backupType & Qn::CameraBackup_HighQuality)
+        if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::HiQualityCatalog);
+
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
         {
             if (tmp.chunk.startTimeMs < minTime)
@@ -113,8 +113,9 @@ QnScheduleSync::getOldestChunk()
             }
         }
 
-        if (backupType & Qn::CameraBackup_LowQuality)
+        if (cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality))
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::LowQualityCatalog);
+
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
         {
             if (tmp.chunk.startTimeMs < minTime)

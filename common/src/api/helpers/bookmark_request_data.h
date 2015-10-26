@@ -17,7 +17,6 @@ struct QnGetBookmarksRequestData: public QnMultiserverRequestData {
     virtual bool isValid() const override;
 
     QnCameraBookmarkSearchFilter filter;
-    Qn::SerializationFormat format;
     QnVirtualCameraResourceList cameras;
 };
 
@@ -30,7 +29,6 @@ struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData {
 
     static int unlimited();
 
-    Qn::SerializationFormat format;
     int limit;
 };
 

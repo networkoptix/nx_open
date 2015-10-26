@@ -21,6 +21,7 @@
     <name>HD Witness Media Server</name>
 
     <properties>
+        <guid>${mediaserver.guid}</guid>
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>

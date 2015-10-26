@@ -27,7 +27,6 @@ public:
     int     backupStart;         // seconds from 00:00:00. Error if rDOW set and this is not set
     int     backupDuration;      // duration of synchronization period in seconds. -1 if not set.
     int     backupBitrate;       // bitrate cap in bytes per second. Any value <= 0 if not capped.
-    Qn::CameraBackupTypes backupQuality; // default value for camera's backup type
 
     QnMediaServerUserAttributes();
     void assign(
@@ -45,7 +44,6 @@ public:
     (backupStart)                    \
     (backupDuration)                 \
     (backupBitrate)                  \
-    (backupQuality)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaServerUserAttributes, (eq))
 

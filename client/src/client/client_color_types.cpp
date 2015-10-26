@@ -88,6 +88,7 @@ QnStatisticsColors::QnStatisticsColors() {
 
 QnIoModuleColors::QnIoModuleColors() {
     idLabel = QColor(0x57, 0x57, 0x57);
+    buttonBackground = QColor("#1c1c1c");
 }
 
 QnScheduleGridColors::QnScheduleGridColors() {
@@ -196,6 +197,13 @@ QnFailoverPriorityColors::QnFailoverPriorityColors() {
     low     = QColor(0x9eb236);
     medium  = QColor(0xcc853d);
     high    = QColor(0xff5500);
+}
+
+QnBackupCamerasColors::QnBackupCamerasColors() {
+    disabled= QColor(0x808080);
+    low     = QColor(0x9eb236);
+    high    = QColor(0xff5500);
+    both    = QColor(0xcc853d);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

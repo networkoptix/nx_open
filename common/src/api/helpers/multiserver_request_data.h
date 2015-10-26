@@ -19,5 +19,9 @@ struct QnMultiserverRequestData {
     virtual QUrlQuery toUrlQuery() const;
     virtual bool isValid() const;
 
-    bool isLocal;   
+    /* Fix fields to make local request. */
+    void makeLocal(Qn::SerializationFormat localFormat = Qn::UbjsonFormat);
+
+    bool isLocal;
+    Qn::SerializationFormat format;
 };

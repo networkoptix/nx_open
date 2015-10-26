@@ -249,7 +249,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
     dst->maxDays = src.maxArchiveDays;
     dst->preferedServerId = src.preferedServerId;
     dst->failoverPriority = src.failoverPriority;
-    dst->backupType = src.backupType;
+    dst->backupQualities = src.backupType;
 }
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
@@ -278,7 +278,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.maxArchiveDays = src->maxDays;
     dst.preferedServerId = src->preferedServerId;
     dst.failoverPriority = src->failoverPriority;
-    dst.backupType = src->backupType;
+    dst.backupType = src->backupQualities;
 }
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
@@ -635,7 +635,6 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.backupStart = src->backupStart;
     dst.backupDuration = src->backupDuration;
     dst.backupBitrate = src->backupBitrate;
-    dst.backupQuality = src->backupQuality;
 }
 
 void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst) {
@@ -648,7 +647,6 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->backupStart = src.backupStart;
     dst->backupDuration = src.backupDuration;
     dst->backupBitrate = src.backupBitrate;
-    dst->backupQuality = src.backupQuality;
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {

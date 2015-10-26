@@ -791,30 +791,21 @@ void QnSecurityCamResource::setManuallyAdded(bool value) {
     m_manuallyAdded = value;
 }
 
-Qn::CameraBackupTypes QnSecurityCamResource::getBackupType() const
+Qn::CameraBackupQualities QnSecurityCamResource::getBackupQualities() const
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    return (*userAttributesLock)->backupType;
+    return (*userAttributesLock)->backupQualities;
 }
 
-void QnSecurityCamResource::setBackupType(Qn::CameraBackupTypes value)
+void QnSecurityCamResource::setBackupQualities(Qn::CameraBackupQualities value)
 {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    (*userAttributesLock)->backupType = value;
-}
-
-Qn::CameraBackupTypes QnSecurityCamResource::getActualBackupType() const
-{
-    Qn::CameraBackupTypes result = getBackupType();
-    if (result == Qn::CameraBackup_Default) {
-        QnMediaServerUserAttributesPool::ScopedLock lk(
-            QnMediaServerUserAttributesPool::instance(), 
-            getParentId()
-            );
-        result = (*lk)->backupQuality;
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if ((*userAttributesLock)->backupQualities == value)
+            return;
+        (*userAttributesLock)->backupQualities = value;
     }
-
-    return result;
+    emit backupQualitiesChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality) {

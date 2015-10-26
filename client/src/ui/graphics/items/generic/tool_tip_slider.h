@@ -22,11 +22,13 @@ class QnToolTipSlider: public Animated<GraphicsSlider>, public ToolTipQueryable 
     typedef Animated<GraphicsSlider> base_type;
 
 public:
-    explicit QnToolTipSlider(QGraphicsItem *parent = NULL);
+    explicit QnToolTipSlider(QGraphicsItem *parent = NULL
+        , QGraphicsItem *tooltipParent = NULL);
     virtual ~QnToolTipSlider();
 
     QnToolTipWidget *toolTipItem() const;
-    void setToolTipItem(QnToolTipWidget *toolTipItem);
+    void setToolTipItem(QnToolTipWidget *toolTipItem
+        , QGraphicsItem *tooltipParent);
 
     bool isToolTipAutoHidden() const;
     void setAutoHideToolTip(bool autoHideToolTip);
@@ -36,8 +38,6 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 protected:
-    QnToolTipSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent);
-
     virtual void sliderChange(SliderChange change) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void timerEvent(QTimerEvent *event) override;
@@ -49,8 +49,6 @@ protected:
     virtual bool showOwnTooltip(const QPointF &pos) override;
 
 private:
-    void init();
-
     void hideToolTip();
     void showToolTip();
     
