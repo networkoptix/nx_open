@@ -799,8 +799,13 @@ Qn::CameraBackupQualities QnSecurityCamResource::getBackupQualities() const
 
 void QnSecurityCamResource::setBackupQualities(Qn::CameraBackupQualities value)
 {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    (*userAttributesLock)->backupQualities = value;
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if ((*userAttributesLock)->backupQualities == value)
+            return;
+        (*userAttributesLock)->backupQualities = value;
+    }
+    emit backupQualitiesChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality) {

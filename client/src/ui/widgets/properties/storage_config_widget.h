@@ -8,23 +8,21 @@
 #include <api/model/api_model_fwd.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/media_server_user_attributes.h>
 
 #include <server/server_storage_manager_fwd.h>
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
-#include "api/model/rebuild_archive_reply.h"
-#include "core/resource/media_server_user_attributes.h"
-#include "ui/models/backup_settings_model.h"
-#include "api/model/backup_status_reply.h"
 
 namespace Ui {
     class StorageConfigWidget;
 }
 
 class QnStorageListModel;
-class QnStorageConfigWidget: public Connective<QnAbstractPreferencesWidget>
+class QnStorageConfigWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -74,8 +72,6 @@ private slots:
     void at_addExtStorage(bool addToMain);
     
     void at_openBackupSchedule_clicked();
-    void at_openBackupSettings_clicked();
-    
     
     void at_backupTypeComboBoxChange(int index);
 private:
@@ -93,7 +89,6 @@ private:
     StoragePool m_mainPool;
     StoragePool m_backupPool;
     QnMediaServerUserAttributes m_serverUserAttrs;
-    BackupSettingsDataList m_cameraBackupSettings;
 
     bool m_backupCancelled;
 private:
