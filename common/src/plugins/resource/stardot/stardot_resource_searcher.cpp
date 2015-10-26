@@ -238,7 +238,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
 
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), model);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
-        QList<QnResourcePtr>(); // model forced by ONVIF
+        return QList<QnResourcePtr>(); // model forced by ONVIF
 
 
     QnStardotResourcePtr res(new QnStardotResource());

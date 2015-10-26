@@ -129,7 +129,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
-        QList<QnResourcePtr>(); // model forced by ONVIF
+        return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
@@ -225,7 +225,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
-        local_result; // model forced by ONVIF
+        return local_result; // model forced by ONVIF
 
     resource->setTypeId(rt);
     resource->setName(name);
