@@ -185,9 +185,14 @@ public:
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         30 * min));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           hour));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           3 * hour));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           6 * hour));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           12 * hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            24 * hour));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            1));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            5));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            15));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          1));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          3));
+        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          6));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           1));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           5));
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           10));
@@ -851,14 +856,14 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
             info.zoomIndex = tickLevel;
             markedTicks.append(info);
 
-            lowerTextCount += d->zoomLevels[textMarkLevel].baseValue(tick).size();
-            lowerTextCount += d->zoomLevels[textMarkLevel].subValue(tick).size();
-            lowerTextCount += d->zoomLevels[textMarkLevel].suffix(tick).isEmpty() ? 0 : 1;
+            lowerTextCount += d->zoomLevels[tickLevel].baseValue(tick).size();
+            lowerTextCount += d->zoomLevels[tickLevel].subValue(tick).size();
+            lowerTextCount += d->zoomLevels[tickLevel].suffix(tick).isEmpty() ? 0 : 1;
 
             if (tickLevel > textMarkLevel) {
-                textCount += d->zoomLevels[textMarkLevel + 1].baseValue(tick).size();
-                textCount += d->zoomLevels[textMarkLevel + 1].subValue(tick).size();
-                textCount += d->zoomLevels[textMarkLevel + 1].suffix(tick).isEmpty() ? 0 : 1;
+                textCount += d->zoomLevels[tickLevel].baseValue(tick).size();
+                textCount += d->zoomLevels[tickLevel].subValue(tick).size();
+                textCount += d->zoomLevels[tickLevel].suffix(tick).isEmpty() ? 0 : 1;
             }
         }
 
@@ -878,9 +883,9 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
     QSGGeometry::TexturedPoint2D *lowerTextPoints = lowerTextGeometry->vertexDataAsTexturedPoint2D();
 
     for (const MarkInfo &info: markedTicks) {
-        lowerTextPoints += d->placeText(info, textMarkLevel, lowerTextPoints);
+        lowerTextPoints += d->placeText(info, info.zoomIndex, lowerTextPoints);
         if (info.zoomIndex > textMarkLevel)
-            textPoints += d->placeText(info, textMarkLevel + 1, textPoints);
+            textPoints += d->placeText(info, info.zoomIndex, textPoints);
     }
 
     textNode->markDirty(QSGNode::DirtyGeometry);
