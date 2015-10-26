@@ -10,13 +10,14 @@
 #include <stdint.h>
 #include <string>
 
+#include <boost/optional.h>
+
 #include <utils/common/uuid.h>
 
 
 namespace nx {
 namespace cdb {
 namespace api {
-
 
 enum class AccountStatus
 {
@@ -32,7 +33,7 @@ public:
     QnUuid id;
     //!User email. Used as unique user id
     std::string email;
-    //!Hex representation of HA1 (see rfc2617) digest of user's password. Realm is usually NetworkOptix
+    //!Hex representation of HA1 (see rfc2617) digest of user's password. Realm is usually VMS
     std::string passwordHa1;
     std::string fullName;
     std::string customization;
@@ -49,6 +50,14 @@ class AccountActivationCode
 {
 public:
     std::string code;
+};
+
+class AccountUpdateData
+{
+public:
+    boost::optional<std::string> passwordHa1;
+    boost::optional<std::string> fullName;
+    boost::optional<std::string> customization;
 };
 
 }   //api

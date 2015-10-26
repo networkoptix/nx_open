@@ -108,6 +108,26 @@ void AccountManager::getAccount(
     completionHandler(api::ResultCode::notFound, data::AccountData());
 }
 
+void AccountManager::updateAccount(
+    const AuthorizationInfo& authzInfo,
+    data::AccountUpdateData accountData,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    std::string accountEmail;
+    if (!authzInfo.get( attr::authAccountEmail, &accountEmail))
+    {
+        completionHandler(api::ResultCode::forbidden, data::AccountData());
+        return;
+    }
+    accountData.email = accountEmail;
+
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<data::AccountUpdateData>(
+        std::bind(&AccountManager::updateAccountInDb, this, _1, _2),
+        std::move(accountData),
+        std::bind(&AccountManager::accountUpdated, this, _1, _2, std::move(completionHandler)));
+}
+
 boost::optional<data::AccountData> AccountManager::findAccountByUserName(
     const std::string& userName ) const
 {
@@ -319,6 +339,57 @@ void AccountManager::accountVerified(
     completionHandler( fromDbResultCode( resultCode ) );
 }
 
+nx::db::DBResult AccountManager::updateAccountInDB(
+    QSqlDatabase* const tran,
+    const data::AccountUpdateData& accountData)
+{
+    assert(static_cast<bool>(accountData.passwordHa1) ||
+           static_cast<bool>(accountData.fullName) ||
+           static_cast<bool>(accountData.customization));
+    
+    QSqlQuery updateAccountQuery( *connection );
+    QStringList accountUpdateFieldsSql;
+    if (accountData.passwordHa1)
+        accountUpdateFieldsSql << lit("password_ha1=:passwordHa1");
+    if (accountData.fullName)
+        accountUpdateFieldsSql << lit("full_name=:fullName");
+    if (accountData.customization)
+        accountUpdateFieldsSql << lit("customization=:customization");
+    updateAccountQuery.prepare( 
+        lit("UPDATE account SET %1 WHERE email=:email").
+            arg(accountUpdateFieldsSql.join(lit(","))));
+    QnSql::bind( accountData, &updateAccountQuery );
+    if( !updateAccountQuery.exec() )
+    {
+        NX_LOG(lit( "Could not update account in DB. %1").
+            arg(connection->lastError().text(), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+    
+    return db::DBResult::ok;
+}
+
+void AccountManager::accountUpdated(
+    nx::db::DBResult resultCode,
+    data::AccountUpdateData accountData,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (resultCode == db::DBResult::ok)
+    {
+        m_cache.atomicUpdate(
+            accountData.email,
+            [&accountData](api::AccountData& account) {
+                if (accountData.passwordHa1)
+                    account.passwordHa1 = accountData.passwordHa1.get();
+                if (accountData.fullName)
+                    account.fullName = accountData.fullName.get();
+                if (accountData.customization)
+                    account.customization = accountData.customization.get();
+            });
+    }
+    
+    completionHandler(fromDbResultCode(resultCode));
+}
 
 }   //cdb
 }   //nx
