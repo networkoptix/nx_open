@@ -358,9 +358,7 @@ private:
 
     void generateProgressPatterns();
 
-    void updateBookmarkTooltip(qint64 timestamp);
-
-    void updateBookmarkTooltipPos(qint64 timestamp);
+    void processBoomarksHover(QGraphicsSceneHoverEvent *event);
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
@@ -433,7 +431,7 @@ private:
 
     QLocale m_locale;
 
-    QPointF m_lastLineBarMousePos;
+    QPointF m_currentRulerRectMousePos;
     qreal m_lastLineBarValue;
 
     QnBookmarksViewer *m_bookmarksViewer;

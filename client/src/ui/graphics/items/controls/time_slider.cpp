@@ -478,7 +478,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     m_pixmapCache(new QnTimeSliderPixmapCache(this)),
     m_localOffset(0)
 
-    , m_lastLineBarMousePos()
+    , m_currentRulerRectMousePos()
     , m_lastLineBarValue()
     , m_bookmarksViewer(new QnBookmarksViewer( 
         std::bind(&QnTimeSlider::bookmarksAtPosition, this, std::placeholders::_1)
@@ -855,35 +855,8 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
         }
         else 
         {
-
-            if (!m_lastLineBarMousePos.isNull())
-            {
-            }
             m_bookmarksViewer->updateOnWindowChange();
-            /*
-            if ()
-            {
-                if ((m_lastLineBarValue >= start) && (m_lastLineBarValue <= end))
-                {
-                    const qreal endDiff = std::abs(m_windowEnd - end);
-                    const qreal startDiff = std::abs(m_windowStart - start);
-                    const qreal maxDiff = std::max(startDiff, endDiff);
-                    enum { kMinUpdateInterval = 1000 };
-                    if (maxDiff > kMinUpdateInterval)
-                    {
-                        const qreal coeff = (m_lastLineBarValue - start) / (end - start);
-                        m_lastLineBarMousePos = QPointF(coeff * rulerRect().width() , m_lastLineBarMousePos.y());
 
-                        updateBookmarkTooltipPos(m_lastLineBarValue);
-                    }
-                }
-                else
-                {
-                    m_lastLineBarMousePos = QPointF();
-                    m_bookmarksViewer->hide();
-                }
-            }
-            */
             qint64 oldWindowSize = m_windowEnd - m_windowStart;
 
             m_windowStart = start;
@@ -2583,25 +2556,17 @@ void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
     
-    const bool isGrabbing = (scene()->mouseGrabberItem() == this);
-    if (!isGrabbing)
-        grabMouse();
-    
     unsetCursor();
 }
 
 void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 
-    const bool isGrabbing = (scene()->mouseGrabberItem() == this);
-    if (isGrabbing)
-        ungrabMouse();
-
     unsetCursor();
 
     setThumbnailSelecting(m_lastHoverThumbnail, false);
 
-    m_bookmarksViewer->hide();
+    m_currentRulerRectMousePos = QPointF();
 }
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
@@ -2627,6 +2592,40 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
         setThumbnailSelecting(m_lastHoverThumbnail, false);
         m_lastHoverThumbnail = -1;
     }
+
+    processBoomarksHover(event);
+}
+
+void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent *event)
+{  
+    const auto pos = event->pos();
+    m_currentRulerRectMousePos = event->pos();
+
+    enum { kMouseMoveFilterTimeout = 100 };
+    const auto filterMouseMove = [this, pos]()
+    {
+        if (pos != m_currentRulerRectMousePos)
+            return;
+
+        if (!rulerRect().contains(pos))
+        {
+            m_bookmarksViewer->resetBookmarks();
+            return;
+        }
+
+        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+        if (lineBarRect.contains(pos))
+        {
+            const auto timestamp = valueFromPosition(pos);
+            const auto emptyBookmarks = bookmarksAtPosition(timestamp).empty();
+            if (emptyBookmarks)
+                m_bookmarksViewer->resetBookmarks();
+            else
+                m_bookmarksViewer->setTargetTimestamp(timestamp);
+        }
+    };
+
+    executeDelayed(filterMouseMove, kMouseMoveFilterTimeout);
 }
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
@@ -2659,71 +2658,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) 
 {
     dragProcessor()->mouseMoveEvent(this, event);
-
-    const auto pos = event->pos();
-    const bool isGrabbing = (scene()->mouseGrabberItem() == this);
-    if (!rulerRect().contains(pos) && isGrabbing)
-    {
-        ungrabMouse();
-        m_bookmarksViewer->resetBookmarks();
-    }
-    else
-    {
-        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
-        if (lineBarRect.contains(pos))
-        {
-            m_lastLineBarMousePos = pos;
-
-            const auto timestamp = valueFromPosition(pos);
-            const auto emptyBookmarks = bookmarksAtPosition(timestamp).empty();
-            if (emptyBookmarks)
-            {
-                m_bookmarksViewer->resetBookmarks();
-            }
-            else
-            {
-                enum { kMouseMoveFilterTimeout = 100 };
-                const auto updateBookmarksTimetamp = [this, pos, timestamp]()
-                {
-                    const bool isGrabbing = (scene()->mouseGrabberItem() == this);
-                    if (isGrabbing && (m_lastLineBarMousePos == pos))
-                        m_bookmarksViewer->setTargetTimestamp(timestamp);
-                };
-
-                executeDelayed(updateBookmarksTimetamp, kMouseMoveFilterTimeout);
-            }
-        }
-    }
     event->accept();
-}
-
-void QnTimeSlider::updateBookmarkTooltip(qint64 timestamp)
-{
-    /*
-    if (qnRuntime->isVideoWallMode())
-    {    
-        bookmarksViewer()->resetBookmarks();
-        return;
-    }
-
-    QnCameraBookmarkList bookmarks = bookmarksAtPosition(timestamp);
-    if (bookmarksViewer()->updateBookmarks(bookmarks) && !bookmarks.empty())
-        updateBookmarkTooltipPos(timestamp);
-        */
-}
-
-void QnTimeSlider::updateBookmarkTooltipPos(qint64 timestamp)
-{
-    /*
-    const auto lineBarRect = positionRect(rulerRect(), lineBarPosition);
-
-    const auto timestampPos = positionFromValue(timestamp);
-    const auto target = QPointF(timestampPos.x(), lineBarRect.top());
-
-    const auto viewer = bookmarksViewer();
-    const auto tooltipPos = viewer->mapToParent(viewer->mapFromItem(this, target.x(), target.y()));
-    viewer->updatePosition(tooltipPos);
-    */
 }
 
 void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
