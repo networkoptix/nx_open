@@ -21,9 +21,16 @@ public:
 
     const QnBackupCamerasColors &colors() const;
     void setColors(const QnBackupCamerasColors &colors);
+
+protected:
+    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
+
 private:
     void updateQualitiesForSelectedCameras(Qn::CameraBackupQualities qualities);
 
 private:
+    class QnBackupCamerasDialogDelegate;
+
+    QnBackupCamerasDialogDelegate* m_delegate;
     QnBackupCamerasResourceModelDelegate* m_customColumnDelegate;
 };

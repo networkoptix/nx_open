@@ -92,7 +92,7 @@ QnScheduleSync::getOldestChunk()
     {       
         Qn::CameraBackupQualities cameraBackupQualities = camera->getBackupQualities();
         if (cameraBackupQualities == Qn::CameraBackup_Default)
-            cameraBackupQualities = qnGlobalSettings->defaultBackupQuality();
+            cameraBackupQualities = qnGlobalSettings->defaultBackupQualities();
 
         ChunkKey tmp;
 

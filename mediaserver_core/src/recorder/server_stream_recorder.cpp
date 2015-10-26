@@ -543,7 +543,7 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
 
     Qn::CameraBackupQualities cameraBackupQualities = cam->getBackupQualities();
     if (cameraBackupQualities == Qn::CameraBackup_Default)
-        cameraBackupQualities = qnGlobalSettings->defaultBackupQuality();
+        cameraBackupQualities = qnGlobalSettings->defaultBackupQualities();
 
     if (m_catalog == QnServer::HiQualityCatalog)
         return cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality);

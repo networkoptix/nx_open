@@ -51,8 +51,8 @@ public:
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
 
-    Qn::CameraBackupQualities defaultBackupQuality() const;
-    void setDefauldBackupQuality(Qn::CameraBackupQualities value);
+    Qn::CameraBackupQualities defaultBackupQualities() const;
+    void setDefauldBackupQualities(Qn::CameraBackupQualities value);
 signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
@@ -71,7 +71,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
-    QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_defaultBackupQualityAdaptor;
+    QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_defaultBackupQualitiesAdaptor;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;

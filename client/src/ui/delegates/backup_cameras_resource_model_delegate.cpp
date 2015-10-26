@@ -25,8 +25,12 @@ QVariant QnBackupCamerasResourceModelDelegate::data(const QModelIndex &index, in
         return QVariant();
 
     auto qualities = camera->getBackupQualities();
+
+    if (m_forcedQualities.contains(camera->getId()))
+        qualities = m_forcedQualities[camera->getId()];
+   
     if (qualities == Qn::CameraBackup_Default)
-        qualities = qnGlobalSettings->defaultBackupQuality();
+        qualities = qnGlobalSettings->defaultBackupQualities();
 
     switch (role) {
     case Qt::DisplayRole:
@@ -67,6 +71,16 @@ const QnBackupCamerasColors &QnBackupCamerasResourceModelDelegate::colors() cons
 void QnBackupCamerasResourceModelDelegate::setColors(const QnBackupCamerasColors &colors) {
     m_colors = colors;
     emit notifyDataChanged();
+}
+
+void QnBackupCamerasResourceModelDelegate::forceCamerasQualities( const QnVirtualCameraResourceList &cameras, Qn::CameraBackupQualities qualities ) {
+    for (const QnVirtualCameraResourcePtr &camera: cameras)
+        m_forcedQualities[camera->getId()] = qualities;
+    emit notifyDataChanged();
+}
+
+QHash<QnUuid, Qn::CameraBackupQualities> QnBackupCamerasResourceModelDelegate::forcedCamerasQualities() const {
+    return m_forcedQualities;
 }
 
 

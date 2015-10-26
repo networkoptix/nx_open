@@ -47,7 +47,7 @@ namespace {
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
-    const QString nameDefaultBackupQuality(lit("defaultBackupQuality"));
+    const QString nameDefaultBackupQualities(lit("defaultBackupQualities"));
 
     const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -70,7 +70,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, true, this);
-    m_defaultBackupQualityAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameDefaultBackupQuality, Qn::CameraBackup_Disabled, this);
+    m_defaultBackupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameDefaultBackupQualities, Qn::CameraBackup_Disabled, this);
 
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
@@ -284,10 +284,10 @@ void QnGlobalSettings::setUpdateNotificationsEnabled(bool updateNotificationsEna
     m_updateNotificationsEnabledAdaptor->setValue(updateNotificationsEnabled);
 }
 
-Qn::CameraBackupQualities QnGlobalSettings::defaultBackupQuality() const {
-    return m_defaultBackupQualityAdaptor->value();
+Qn::CameraBackupQualities QnGlobalSettings::defaultBackupQualities() const {
+    return m_defaultBackupQualitiesAdaptor->value();
 }
 
-void QnGlobalSettings::setDefauldBackupQuality( Qn::CameraBackupQualities value ) {
-    m_defaultBackupQualityAdaptor->setValue(value);
+void QnGlobalSettings::setDefauldBackupQualities( Qn::CameraBackupQualities value ) {
+    m_defaultBackupQualitiesAdaptor->setValue(value);
 }
