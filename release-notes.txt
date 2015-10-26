@@ -1,3 +1,41 @@
+-----------------------------------------------2.5.0.xxxx-----------------------------------------
+NEW FEATURES
+    Bookmarks - VMS-256
+    Redundant storage - VMS-939
+    New mobile clients - MOBILE-10
+	
+NEW DEVICE SUPPORT
+    Axis Q6000E panoramic camera - VMS-686
+
+IMPROVEMENTS
+    Support of Wiper/Light/Aux commands on PTZ Bosch and Redvision cameras - VISTA-60
+    Implemented "Advanced" Settings for DWC-BVI2IR cameras - VMS-415
+    Improved auto discovery - it's faster now - VMS-466
+    Added "Connect" button to the "Connection Test" dialog - VMS-263
+    Added layout backgrounds to the Video Wall mode - VMS-741
+    Transcoding is enabled by default for video export from multisensor cameras - VMS-265
+    "Timeline mode" is renamed to "Time Mode". Now it affects timeline and timestamps in Event Logs and Audit Trail - VMS-602
+    Added tracking of the instant erasing of archive more then one hour length for any camera to the Audit Trail - VMS-1004
+    Added notification if maximum number of cameras is exceeded on the Server - VMS-751
+    Simplified "Camera recording" action settings. Now just "pre recording" and "post recording" can be configured - VMS-881
+    "Search" tab little improvement - Search text-input area is focused automatically - VMS-269
+    Long camera names are not shown on the small items any more - VMS-991
+    Improved sorting of device list in Web Client. Now it's similar to Desktop Client - VISTA-61
+    Added an ability to download API documentation to Web Admin Interface - VISTA-62
+    Added easy API export to containers like mkv, avi and such - VMS-763
+
+BUG FIXES
+    Digital input/output didn't work for ACTi V23. Fixed. - VMS-1157
+    Digital input/output doesn't work for Messoa camera. Fixed. - VMS-1187
+    Changes were not applied in the Client till relogin if Server's port was changed via Web Admin Interface. Fixed. - VMS-1160
+    System time could be changed if Server marked as Time Server started later then other Servers. Fixed. - VMS-1149
+    Chunks on the timeline weren't loaded if system time was changed back for some reasons. Fixed. - VMS-1142
+    Middle-click on the item with any default rotation always led to rotation to 0 degree. Fixed. - VMS-490
+    If some filters were disabled in Audit Trail, total activity was not refreshed. Fixed. - VISTA-8
+    Chunks on the timeline were displayed with local Server Time for cameras added as HTTP-links. Fixed. - VMS-821
+    Chunks weren't disappear from timeline after Server's stop. Fixed. VMS-929
+
+
 -----------------------------------------------2.4.1.xxxx-----------------------------------------
 NEW FEATURES
 
@@ -8,12 +46,12 @@ NEW FEATURES
 NEW DEVICE SUPPORT
 
     Bosch X1600 8 channel encoder - VMS-notlisted
-    ACTi i96 camera - VMS-notlsted
+    ACTi i96 camera - VMS-notlisted
 
 IMPROVEMENTS (TBC)
 
     Added Restart Device and Reset to Factory Defaults to Web Admin Interface (Nx1 only). 
-    Improved accuracy of Storage Analytics feature. - VMS-956
+    Improved accuracy of Storage Analytics feature - VMS-956
     Added autofocus support for Vista VK2-3MPBIR28V12re and VK2-3MPVRDIR28V12re cameras - VISTA-53
     Improved ONVIF PTZ support for Redvision dome camera RVX-IP30-IRWL-W - VMS-719
     Added PTZ presets support on Axis M7016 Encoder - VISTA-54
@@ -51,7 +89,6 @@ Axis P8221 I/O Module
 ACTi V32 16 channel IP encoder
 Digital Watchdog DWC-BVI2IR
 Latest standard Arecont and Axis cameras are supported
-
 
 
 IMPROVEMENTS:

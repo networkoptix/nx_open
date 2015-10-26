@@ -1,0 +1,60 @@
+{
+   QRegExp
+   Memcheck:Cond
+   ...
+   fun:_ZNK7QRegExp7indexInERK7QStringiNS_9CaretModeE
+   fun:_ZNK7QString5splitERK7QRegExpNS_13SplitBehaviorE
+   fun:_ZL11readTabFileRK7QStringP11QStringList
+   ...
+}
+{
+   QRegExp
+   Memcheck:Value8
+   ...
+   fun:_ZNK7QRegExp7indexInERK7QStringiNS_9CaretModeE
+   fun:_ZNK7QString5splitERK7QRegExpNS_13SplitBehaviorE
+   fun:_ZL11readTabFileRK7QStringP11QStringList
+   ...
+}
+{
+   avformat_open_input
+   Memcheck:Cond
+   ...
+   fun:av_probe_input_format3
+   fun:av_probe_input_format2
+   fun:av_probe_input_buffer
+   fun:avformat_open_input
+   ...
+}
+{
+   avformat_open_input
+   Memcheck:Value8
+   ...
+   fun:av_probe_input_format3
+   fun:av_probe_input_format2
+   fun:av_probe_input_buffer
+   fun:avformat_open_input
+   ...
+}
+{
+   QnMotionEstimation
+   Memcheck:Cond
+   fun:_ZN18QnMotionEstimation19analizeMotionAmountEPh
+   fun:_ZN18QnMotionEstimation12analizeFrameERKSt10shared_ptrI21QnCompressedVideoDataE
+   ...
+}
+{
+   QFileDevice
+   Memcheck:Param
+   write(buf)
+   ...
+   fun:_ZN11QFileDevice5flushEv
+   ...
+}
+{
+   getpwuid
+   Memcheck:Leak
+   ...
+   fun:getpwuid
+   ...
+}

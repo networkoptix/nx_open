@@ -40,6 +40,7 @@
         <!--Global libs-->
         <template>lib</template>
         <qt.libs>core gui network multimedia concurrent sql</qt.libs>
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
         <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</global.libs>
         <!--Specific os libs used-->

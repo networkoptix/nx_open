@@ -38,6 +38,7 @@
         <!--Global libs-->      
         <template>app</template>
         <qt.libs>core gui network xml widgets</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
