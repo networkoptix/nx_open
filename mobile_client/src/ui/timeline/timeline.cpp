@@ -35,6 +35,7 @@ namespace {
     const qreal stripesMovingSpeed = 0.002;
     const qreal windowMovingSpeed = 0.04;
     const qint64 correctionThreshold = 5000;
+    const qint64 defaultWindowSize = 60 * 60 * 1000;
 
     struct MarkInfo {
         qint64 tick;
@@ -1074,12 +1075,17 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         windowEnd += shift;
     }
 
+    qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
+
+    qint64 startBound = startBoundTime == -1 ? liveTime - defaultWindowSize : startBoundTime;
+    qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
+
     zoomKineticHelper.update();
     if (!zoomKineticHelper.isStopped()) {
         windowChanged = true;
 
-        qint64 maxSize = parent->width() / dp(minTickDps) * (365 / 4 * 24 * 60 * 60 * 1000ll);
-        qint64 minSize = parent->width() / dp(1);
+        qint64 maxSize = (liveTime - startBound) * 2;
+        qint64 minSize = startBoundTime == -1 ? maxSize : parent->width() / dp(1);
         qreal factor = startZoom / zoomKineticHelper.value();
         qreal windowSize = qBound<qreal>(minSize, startWindowSize * factor, maxSize);
 
@@ -1090,11 +1096,6 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
         updateZoomLevel();
     }
-
-    qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
-
-    qint64 startBound = startBoundTime == -1 ? liveTime - 1000 * 60 * 60 : startBoundTime;
-    qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
 
     bool justStopped = stickyPointKineticHelper.isStopped();
     stickyPointKineticHelper.update();
