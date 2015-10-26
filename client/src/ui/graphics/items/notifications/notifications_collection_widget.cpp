@@ -494,7 +494,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& bu
     return NULL;
 }
 
-void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params )
+void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction, const QVariant& params )
 {
     QnResourcePtr resource;
     if( params.canConvert<QnResourcePtr>() )
@@ -505,6 +505,10 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         return;
 
     item = new QnNotificationWidget(m_list);
+
+    QnActionParameters actionParams;
+    if( params.canConvert<QnActionParameters>() )
+        actionParams = params.value<QnActionParameters>();
 
     switch (message) {
     case QnSystemHealth::EmailIsEmpty:
@@ -546,9 +550,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         break;
     case QnSystemHealth::NoPrimaryTimeServer:
     {
-        QnActionParameters actionParams;
-        if( params.canConvert<QnActionParameters>() )
-            actionParams = params.value<QnActionParameters>();
         item->addActionButton(
             qnSkin->icon( "events/settings.png" ),
             tr("Time Synchronization..."),
@@ -572,6 +573,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveBackupFinished:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings..."),
@@ -585,7 +587,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
 
     QString resourceName = getResourceName(resource);
     item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
-    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
+    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, businessAction, resourceName));
     item->setNotificationLevel(QnNotificationLevels::notificationLevel(message));
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
@@ -664,7 +666,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         default:
             break;
         }
-        showSystemHealthMessage(message, QVariant::fromValue(resource));
+        showSystemHealthMessage(message, QnAbstractBusinessActionPtr(), QVariant::fromValue(resource));
     }
 
     //TODO: #GDM #Business REMOVE DEBUG

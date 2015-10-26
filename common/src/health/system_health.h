@@ -3,6 +3,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QObject>
+#include "business/business_fwd.h"
 
 namespace QnSystemHealth {
     enum MessageType {
@@ -21,6 +22,7 @@ namespace QnSystemHealth {
         StoragesAreFull,
         ArchiveRebuildFinished,
         ArchiveRebuildCanceled,
+        ArchiveBackupFinished,
 
         NotDefined,
 
@@ -39,7 +41,9 @@ public:
     static QString messageName(QnSystemHealth::MessageType messageType, QString resourceName = QString());
 
     /** Text that is used where the full description is required, e.g. in notification hints. */
-    static QString messageDescription(QnSystemHealth::MessageType messageType, QString resourceName = QString());
+    static QString messageDescription(QnSystemHealth::MessageType messageType, const QnAbstractBusinessActionPtr &businessAction, QString resourceName);
+private:
+    static QString backupPositionToStr(const QDateTime& dt);
 };
 
 

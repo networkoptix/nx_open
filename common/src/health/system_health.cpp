@@ -1,4 +1,7 @@
 #include "system_health.h"
+#include "business/actions/abstract_business_action.h"
+#include "utils/common/synctime.h"
+
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType) {
     switch (messageType) {
@@ -26,6 +29,8 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         return tr("Rebuilding archive index is completed");
     case QnSystemHealth::ArchiveRebuildCanceled:
         return tr("Rebuilding archive index is canceled by user");
+    case QnSystemHealth::ArchiveBackupFinished:
+        return tr("Archive backup finished");
     default:
         break;
     }
@@ -43,7 +48,25 @@ QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType mes
     return messageTitle(messageType);
 }
 
-QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, QString resourceName) {
+QString QnSystemHealthStringsHelper::backupPositionToStr(const QDateTime& dt)
+{
+    QDateTime now = qnSyncTime->currentDateTime();
+    int days = dt.daysTo(now);
+    int weeks = days / 7;
+    days -= weeks *7;
+    QString diffStr;
+    if (weeks > 0)
+        diffStr = tr("%n weeks ", "", weeks);
+    if (days > 0)
+        diffStr += tr("%n days ", "", days);
+    if (!diffStr.isEmpty())
+        diffStr = tr("(%1before now)").arg(diffStr);
+
+    return tr("%1 %2 %3").arg(dt.date().toString()).arg(dt.time().toString(lit("hh:mm"))).arg(diffStr);
+}
+
+QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, const QnAbstractBusinessActionPtr &businessAction, QString resourceName) 
+{
     QStringList messageParts;
 
     switch (messageType) {
@@ -76,6 +99,20 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         break;
     case QnSystemHealth::ArchiveRebuildCanceled:
         messageParts << tr("Rebuilding archive index is canceled by user on the following Server:") << resourceName;
+        break;
+    case QnSystemHealth::ArchiveBackupFinished:
+        if (businessAction) {
+            qint64 backupPos = businessAction->getRuntimeParams().caption.toLongLong();
+            if (backupPos > 0) {
+                QDateTime dt = QDateTime::fromMSecsSinceEpoch(backupPos);
+                messageParts << tr("Archive backup finished to position %1").arg(backupPositionToStr(dt));
+            }
+            else {
+                messageParts << tr("Nothing to backup (no video archive or no backup cameras configured)");
+            }
+        }
+        else
+            messageParts << tr("Archive backup finished");
         break;
     default:
         break;

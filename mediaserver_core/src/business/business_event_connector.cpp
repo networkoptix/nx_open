@@ -154,6 +154,15 @@ void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &re
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
+void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs) 
+{
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::ArchiveBackupFinished, resource->getId()));
+    auto params = action->getRuntimeParams();
+    params.caption = QString::number(timestampMs);
+    action->setRuntimeParams(params);
+    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+}
+
 bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage)
 {
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);

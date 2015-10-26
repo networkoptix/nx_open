@@ -85,9 +85,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 
     if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
         int healthMessage = eventType - QnBusiness::SystemHealthEvent;
-        QnUuid resourceId = params.eventResourceId;
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId);
-        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
+        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), businessAction);
         return;
     }
 
@@ -102,17 +100,24 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message) {
-    addSystemHealthEvent(message, QnResourcePtr());
+    addSystemHealthEvent(message, QnAbstractBusinessActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource) {
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction) 
+{
+    QnResourcePtr resource;
+    if (businessAction) {
+        auto resourceId = businessAction->getRuntimeParams().eventResourceId;
+        resource = qnResPool->getResourceById(resourceId);
+    }
+
     if (message == QnSystemHealth::StoragesAreFull)
         return; //Bug #2308: Need to remove notification "Storages are full"
 
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
 
-    setSystemHealthEventVisible( message, resource, true );
+    setSystemHealthEventVisible( message, resource, true, businessAction);
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message) {
@@ -130,6 +135,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveBackupFinished:
     case QnSystemHealth::NoPrimaryTimeServer:
     case QnSystemHealth::SystemIsReadOnly:
         return true;
@@ -143,14 +149,22 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible) {
-    setSystemHealthEventVisibleInternal(message, QVariant(), visible);
+    setSystemHealthEventVisibleInternal(message, QVariant(), visible, QnAbstractBusinessActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool visible) {
-    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible );
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, 
+                                                                  const QnResourcePtr &resource, 
+                                                                  bool visible, const 
+                                                                  QnAbstractBusinessActionPtr &businessAction) 
+{
+    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible, businessAction );
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible ) {
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, 
+                                                                          const QVariant& params, 
+                                                                          bool visible,
+                                                                          const QnAbstractBusinessActionPtr &businessAction)
+{
     bool canShow = true;
 
     bool connected = !qnCommon->remoteGUID().isNull();
@@ -174,7 +188,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSys
     canShow &= isAllowedByFilter;
 
     if( visible && canShow )
-        emit systemHealthEventAdded( message, params );
+        emit systemHealthEventAdded( message, businessAction, params );
     else
         emit systemHealthEventRemoved( message, params );
 }
@@ -219,6 +233,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveBackupFinished:
         return;
 
     default:

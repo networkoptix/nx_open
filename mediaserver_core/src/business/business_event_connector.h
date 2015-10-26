@@ -74,6 +74,8 @@ public slots:
 
     void at_archiveRebuildFinished(const QnResourcePtr& resource, bool isCanceled);
 
+    void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs);
+
     bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:
     void onNewResource(const QnResourcePtr &resource);

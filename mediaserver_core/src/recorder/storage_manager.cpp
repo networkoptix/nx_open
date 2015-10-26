@@ -295,6 +295,10 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
+    if (m_role == QnServer::StoragePool::Backup)
+        connect(qnScheduleSync, &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
+        
+
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
     m_clearMotionTimer.restart();

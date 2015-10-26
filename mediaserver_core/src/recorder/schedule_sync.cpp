@@ -38,7 +38,6 @@ QnScheduleSync::QnScheduleSync()
             QnScheduleSync_instance = this;
         }
     );
-    start();
 }
 
 QnScheduleSync::~QnScheduleSync()
@@ -448,6 +447,7 @@ void QnScheduleSync::start()
                     m_syncData.clear();
                     m_forced  = false;
                     m_syncing = false;
+                    emit backupFinished(m_syncTimePoint);
                 }
             }
         }

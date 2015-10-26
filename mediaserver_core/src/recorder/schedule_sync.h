@@ -11,8 +11,9 @@
 #include <api/model/backup_status_reply.h>
 #include <recorder/storage_manager.h>
 
-class QnScheduleSync
+class QnScheduleSync: public QObject
 {
+    Q_OBJECT
 private:
     struct schedule
     {
@@ -46,18 +47,19 @@ public:
 public:
     QnScheduleSync();
     ~QnScheduleSync();
+signals:
+    void backupFinished(qint64 timestampMs);
 public:
     static QnScheduleSync *instance();
     int forceStart(); 
     int stop();
     int interrupt();
     QnBackupStatusData getStatus() const;
-
+    void start();
 private:
     template<typename NeedStopCB>
     void synchronize(NeedStopCB needStop);
 
-    void start();
     void renewSchedule();
     void copyChunk(const ChunkKey &chunkKey);
 
