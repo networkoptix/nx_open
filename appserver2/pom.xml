@@ -26,6 +26,7 @@
         <!--Global libs-->		
         <template>lib</template>
         <qt.libs>core network xml sql concurrent</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>

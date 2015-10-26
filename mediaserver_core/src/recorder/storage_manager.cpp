@@ -163,15 +163,15 @@ public:
     {
         while (!needToStop())
         {
-            if (m_fullScanCanceled) {
+            if (m_fullScanCanceled)
                 m_scanTasks.detachDataByCondition([](const ScanData& data, const QVariant&) { return !data.partialScan; });
-                m_fullScanCanceled = false;
-            }
 
             {
                 QnMutexLocker lock( &m_mutex );
                 if (m_scanTasks.isEmpty()) {
-                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
+                    auto state = m_fullScanCanceled ? Qn::RebuildState_Canceled : Qn::RebuildState_None;
+                    m_owner->setRebuildInfo(QnStorageScanData(state, QString(), 1.0));
+                    m_fullScanCanceled = false;
                     m_waitCond.wait(&m_mutex, 100);
                     continue;
                 }
@@ -424,13 +424,16 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     bool isRebuildFinished = false;
     {
         QnMutexLocker lock( &m_rebuildStateMtx );
-        isRebuildFinished = (data.state == Qn::RebuildState_None && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
+        isRebuildFinished = ((data.state == Qn::RebuildState_None || Qn::RebuildState_Canceled) && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
         m_archiveRebuildInfo = data;
+        if (m_archiveRebuildInfo.state == Qn::RebuildState_Canceled)
+            m_archiveRebuildInfo.state = Qn::RebuildState_None;
     }
     if (isRebuildFinished) {
         if (!QnResource::isStopping())
             ArchiveScanPosition::reset(); // do not reset position if server is going to restart
-        emit rebuildFinished();
+        bool isCancel = data.state == Qn::RebuildState_Canceled;
+        emit rebuildFinished(isCancel);
     }
 }
 
@@ -1779,7 +1782,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
                         .arg((*it)->getUrl())
                         .arg((*it)->calcUsageCoeff());
         if ((*it)->calcUsageCoeff() >= 0) {
-            StorageSpaceInfo tmp = {*it, (*it)->calcUsageCoeff()};
+            StorageSpaceInfo tmp = {*it, static_cast<qint64>((*it)->calcUsageCoeff())};
             storagesInfo.push_back(tmp);
         }
     }
