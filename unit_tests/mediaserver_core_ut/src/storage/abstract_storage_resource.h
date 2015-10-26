@@ -12,6 +12,7 @@
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
 #include <recorder/storage_manager.h>
+#include <recorder/schedule_sync.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
@@ -91,9 +92,10 @@ namespace test
         QString                             ftpStorageUrl;
         QString                             smbStorageUrl;
         std::vector<QnStorageResource *>    storages;
-        std::unique_ptr<QnStorageManager>   storageManager;
-        std::unique_ptr<QnResourcePool>     resourcePool;
         std::unique_ptr<QnLongRunnablePool> runnablePool;
+        std::unique_ptr<QnResourcePool>     resourcePool;
+        std::unique_ptr<QnScheduleSync>     scheduleSync;
+        std::unique_ptr<QnStorageManager>   storageManager;
         QnResourceStatusDictionary          rdict;
 
 #ifndef _WIN32
