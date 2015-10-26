@@ -92,6 +92,10 @@ void QnBusinessEventRule::setActionParams(const QnBusinessActionParameters &para
     m_actionParams = params;
 }
 
+bool QnBusinessEventRule::isActionProlonged() const {
+    return QnBusiness::isActionProlonged(m_actionType, m_actionParams);
+}
+
 int QnBusinessEventRule::aggregationPeriod() const {
     return m_aggregationPeriod;
 }

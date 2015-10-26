@@ -45,6 +45,8 @@ public:
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
 
+    bool isActionProlonged() const;
+
     /* action aggregation period in seconds */
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
