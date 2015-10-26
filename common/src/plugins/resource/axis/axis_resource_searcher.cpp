@@ -7,6 +7,9 @@
 #include <core/resource/camera_resource.h>
 
 #include "axis_resource.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 extern QString getValueFromString(const QString& line);
 
@@ -106,6 +109,10 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QnUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (typeId.isNull())
         return QList<QnResourcePtr>();
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnPlAxisResourcePtr resource(new QnPlAxisResource());
     resource->setTypeId(typeId);
@@ -208,6 +215,9 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         }
     }
 
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return local_results; // model forced by ONVIF
 
     QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
