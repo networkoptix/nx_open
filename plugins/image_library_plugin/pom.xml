@@ -21,6 +21,7 @@
     <name>HD Witness Image Library Plugin</name>	
 
     <properties>
+        <guid>${image_library_plugin.guid}</guid>
         <product.title>${project.name}</product.title>	
         <!--Global libs-->
         <qt.libs>core</qt.libs>

@@ -8,6 +8,7 @@
 class QnWorkbenchStateDelegate;
 class QnServerSettingsWidget;
 class QnRecordingStatisticsWidget;
+class QnStorageConfigWidget;
 
 namespace Ui {
     class ServerSettingsDialog;
@@ -22,6 +23,7 @@ public:
     enum DialogPage {
         SettingsPage,
         StatisticsPage,
+        StorageManagmentPage,
 
         PageCount
     };
@@ -46,5 +48,6 @@ private:
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
     QnServerSettingsWidget* m_generalPage;
     QnRecordingStatisticsWidget* m_statisticsPage;
+    QnStorageConfigWidget* m_storagesPage;
     QPushButton* m_webPageButton;
 };

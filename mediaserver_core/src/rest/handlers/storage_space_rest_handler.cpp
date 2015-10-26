@@ -23,21 +23,17 @@ QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
 
-int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     QnStorageSpaceReply reply;
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
-        m_monitor->totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition |
-            QnPlatformMonitor::NetworkPartition
-        );
+    bool useMainPool = !params.contains("mainPool") || params.value("mainPool").toInt() != 0;
+    bool useBackup = !useMainPool;
 
-    for(int i = 0; i < partitions.size(); i++)
-        partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
-
+    auto storageMan = useMainPool ? qnNormalStorageMan : qnBackupStorageMan;
     QList<QString> storagePaths;
-    for(const QnStorageResourcePtr &storage: qnStorageMan->getStorages()) {
+    for(const QnStorageResourcePtr &storage: storageMan->getStorages()) 
+    {
         QString path;
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource>(storage);
         if (fileStorage != nullptr)
@@ -73,49 +69,69 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         storagePaths.push_back(path);        
     }
 
-    for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
-        bool hasStorage = false;
-        for(const QString &storagePath: storagePaths) {
-            if (closeDirPath(storagePath).startsWith(partition.path) ||
-                partition.path.indexOf(NX_TEMP_FOLDER_NAME) != -1)
-            {
-                hasStorage = true;
-                break;
+    if (useMainPool)
+    {
+        for (auto &storage : qnBackupStorageMan->getStorages())
+        {
+            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource>(storage);
+            if (fileStorage != nullptr)
+                storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
+        }
+
+        QList<QnPlatformMonitor::PartitionSpace> partitions =
+            m_monitor->totalPartitionSpaceInfo(
+            QnPlatformMonitor::LocalDiskPartition |
+            QnPlatformMonitor::NetworkPartition
+            );
+
+        for(int i = 0; i < partitions.size(); i++)
+            partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
+
+        for(const QnPlatformMonitor::PartitionSpace &partition: partitions) 
+        {
+            bool hasStorage = false;
+            for(const QString &storagePath: storagePaths) {
+                if (closeDirPath(storagePath).startsWith(partition.path) ||
+                    partition.path.indexOf(NX_TEMP_FOLDER_NAME) != -1)
+                {
+                    hasStorage = true;
+                    break;
+                }
             }
+            if(hasStorage)
+                continue;
+
+            const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
+
+            QnStorageSpaceData data;
+            data.url = partition.path + QnAppInfo::mediaFolderName();
+            data.storageId = QnUuid();
+            data.totalSpace = partition.sizeBytes;
+            data.freeSpace = partition.freeBytes;
+            data.reservedSpace = defaultStorageSpaceLimit;
+            data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
+            data.isUsedForWriting = false;
+            data.storageType = QnLexical::serialized(partition.type);
+
+            if( data.totalSpace < defaultStorageSpaceLimit )
+                continue;
+
+            QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.url, false));
+            if (storage) {
+                storage->setUrl(data.url); /* createStorage does not fill url. */
+                storage->setSpaceLimit(defaultStorageSpaceLimit);
+                if (storage->getStorageType().isEmpty())
+                    storage->setStorageType(data.storageType);
+                data.isWritable = storage->getCapabilities() & 
+                                  QnAbstractStorageResource::cap::WriteFile;
+            } else {
+                data.isWritable = false;
+            }
+
+            reply.storages.push_back(data);
         }
-        if(hasStorage)
-            continue;
-
-        const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
-
-        QnStorageSpaceData data;
-        data.url = partition.path + QnAppInfo::mediaFolderName();
-        data.storageId = QnUuid();
-        data.totalSpace = partition.sizeBytes;
-        data.freeSpace = partition.freeBytes;
-        data.reservedSpace = defaultStorageSpaceLimit;
-        data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
-        data.isUsedForWriting = false;
-        data.storageType = QnLexical::serialized(partition.type);
-
-        if( data.totalSpace < defaultStorageSpaceLimit )
-            continue;
-
-        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.url, false));
-        if (storage) {
-            storage->setUrl(data.url); /* createStorage does not fill url. */
-            storage->setSpaceLimit(defaultStorageSpaceLimit);
-            if (storage->getStorageType().isEmpty())
-                storage->setStorageType(data.storageType);
-            data.isWritable = storage->getCapabilities() & 
-                              QnAbstractStorageResource::cap::WriteFile;
-        } else {
-            data.isWritable = false;
-        }
-
-        reply.storages.push_back(data);
     }
-    
+
     for (const auto storagePlugin : 
          PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {

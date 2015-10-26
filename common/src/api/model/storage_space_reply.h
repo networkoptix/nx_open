@@ -10,7 +10,7 @@
 #include "storage_status_reply.h"
 
 struct QnStorageSpaceReply {
-    QList<QnStorageSpaceData> storages;
+    QnStorageSpaceDataList storages;
     QList<QString> storageProtocols;
 };
 

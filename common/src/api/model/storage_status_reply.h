@@ -1,5 +1,6 @@
-#ifndef QN_STORAGE_STATUS_REPLY_H
-#define QN_STORAGE_STATUS_REPLY_H
+#pragma once
+
+#include <api/model/api_model_fwd.h>
 
 #include <QtCore/QMetaType>
 
@@ -18,7 +19,6 @@ struct QnStorageSpaceData {
     bool isUsedForWriting;
     QString storageType;
 };
-
 #define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)(storageType)
 
 struct QnStorageStatusReply {
@@ -28,6 +28,5 @@ struct QnStorageStatusReply {
 
 #define QnStorageStatusReply_Fields (pluginExists)(storage)
 
+QN_FUSION_DECLARE_FUNCTIONS(QnStorageSpaceData, (eq)(metatype))
 QN_FUSION_DECLARE_FUNCTIONS(QnStorageStatusReply, (json)(metatype))
-
-#endif // QN_CHECK_STORAGE_REPLY_H

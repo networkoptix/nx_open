@@ -8,7 +8,7 @@
 #include <business/business_action_factory.h>
 
 #include <core/resource/network_resource.h>
-#include <core/resource/camera_bookmark.h>
+#include "core/resource/camera_bookmark.h"
 #include <core/resource_management/resource_pool.h>
 
 #include <media_server/serverutil.h>
@@ -727,7 +727,7 @@ void QnServerDb::getAndSerializeActions(
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes = qnResPool->getResourceById<QnNetworkResource>(eventResId);
             if (camRes) {
-                if (qnStorageMan->isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
+                if (QnStorageManager::isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
                     flags |= QnBusinessActionData::MotionExists;
 
             }
@@ -1010,5 +1010,72 @@ bool QnServerDb::deleteBookmark(const QnUuid &bookmarkId) {
     if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM bookmarks)", m_sdb, Q_FUNC_INFO))
         return false;
 
+    return tran.commit();
+}
+
+bool QnServerDb::setLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatalog catalog, qint64 timestampMs)
+{
+    QSqlQuery updQuery(m_sdb);
+    updQuery.prepare("INSERT OR REPLACE INTO last_backup_time (camera_id, catalog, timestamp) \
+                     VALUES (:camera_id, :catalog, :timestamp)");
+    updQuery.addBindValue(QnSql::serialized_field(cameraId));
+    updQuery.addBindValue((int) catalog);
+    updQuery.addBindValue(timestampMs);
+    bool result = updQuery.exec();
+    if (!result)
+        qWarning() << Q_FUNC_INFO << updQuery.lastError().text();
+    return result;
+}
+
+qint64 QnServerDb::getLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatalog catalog) const
+{
+    qint64 result = 0;
+
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT timestamp FROM last_backup_time WHERE camera_id = :camera_id AND catalog = :catalog");
+    query.addBindValue(QnSql::serialized_field(cameraId));
+    query.addBindValue((int) catalog);
+    if (query.exec()) {
+        if (query.next())
+            result = query.value(0).toLongLong();
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    }
+
+    return result;
+}
+
+bool QnServerDb::deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete) 
+{
+    QnDbTransactionLocker tran(getTransaction());
+
+    for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
+    {
+        const QString& cameraUniqueId = itr.key();
+        qint64 timestampMs = itr.value();
+
+        {
+            QSqlQuery delQuery(m_sdb);
+            delQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid IN (SELECT guid from bookmarks WHERE unique_id = :id AND start_time < :timestamp)");
+            delQuery.bindValue(":id", cameraUniqueId);
+            delQuery.bindValue(":timestamp", timestampMs);
+            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                return false;
+        }
+
+        {
+            QSqlQuery delQuery(m_sdb);
+            delQuery.prepare("DELETE FROM bookmarks WHERE unique_id = :id AND start_time < :timestamp");
+            delQuery.bindValue(":id", cameraUniqueId);
+            delQuery.bindValue(":timestamp", timestampMs);
+            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                return false;
+        }
+
+        if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM bookmarks)", m_sdb, Q_FUNC_INFO))
+            return false;
+
+    }
     return tran.commit();
 }

@@ -12,6 +12,7 @@
 #include <utils/db/db_helper.h>
 #include <utils/common/uuid.h>
 #include <utils/common/singleton.h>
+#include "server/server_globals.h"
 
 class QnTimePeriod;
 
@@ -66,6 +67,9 @@ public:
     bool updateBookmark(const QnCameraBookmark &bookmark);
     bool deleteAllBookmarksForCamera(const QString& cameraUniqueId);
     bool deleteBookmark(const QnUuid &bookmarkId);
+    bool deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete);
+    bool setLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog, qint64 timestampMs);
+    qint64 getLastBackupTime(const QnUuid& camera, QnServer::ChunksCatalog catalog) const;
 
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;

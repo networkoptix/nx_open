@@ -17,13 +17,20 @@ public:
     Q_NAMESPACE
 #endif
 
-        enum ChunksCatalog {
-            LowQualityCatalog,
-            HiQualityCatalog,
+    enum ChunksCatalog {
+        LowQualityCatalog,
+        HiQualityCatalog,
 
-            ChunksCatalogCount
+        ChunksCatalogCount
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ChunksCatalog)
+
+    enum class StoragePool
+    {
+        Normal  = 0,
+        Backup  = 1,
+        None    = 2
+    };
 
 } // namespace QnServer
 

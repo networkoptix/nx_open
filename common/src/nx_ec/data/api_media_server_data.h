@@ -6,18 +6,61 @@
 
 namespace ec2
 {
+    namespace backup 
+    {
+        enum DayOfWeek
+        {
+            NoDay       = 0,
+            Monday      = 2,
+            Tuesday     = 4,
+            Wednsday    = 8,
+            Thursday    = 16,
+            Friday      = 32,
+            Saturday    = 64,
+            Sunday      = 128
+        };
+
+        inline DayOfWeek fromQtDOW(int qtDOW)
+        {
+            switch (qtDOW)
+            {
+            case 1:
+                return Monday;
+            case 2:
+                return Tuesday;
+            case 3:
+                return Wednsday;
+            case 4:
+                return Thursday;
+            case 5:
+                return Friday;
+            case 6:
+                return Saturday;
+            case 7:
+                return Sunday;
+            default:
+                return NoDay;
+            }
+        };
+    }
 
     struct ApiStorageData: ApiResourceData
     {
-        ApiStorageData(): spaceLimit(0), usedForWriting(0) {}
+        ApiStorageData(): spaceLimit(0), usedForWriting(0), isBackup(false) {}
 
         qint64          spaceLimit;
         bool            usedForWriting;
         QString         storageType;
-
         std::vector<ApiResourceParamData> addParams;
+        bool            isBackup;              // is storage used for backup
     };
-#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)(storageType)(addParams)
+#define ApiStorageData_Fields   \
+    ApiResourceData_Fields      \
+    (spaceLimit)                \
+    (usedForWriting)            \
+    (storageType)               \
+    (addParams)                 \
+    (isBackup)                  
 
 
     struct ApiMediaServerData: ApiResourceData
@@ -40,17 +83,48 @@ namespace ec2
 
     struct ApiMediaServerUserAttributesData: ApiData
     {
-        ApiMediaServerUserAttributesData(): maxCameras(0), allowAutoRedundancy(false) {}
+        ApiMediaServerUserAttributesData(): 
+            maxCameras(0), 
+            allowAutoRedundancy(false),
+            backupType(Qn::Backup_Disabled),
+            backupDaysOfTheWeek(0x7f), // all days of week
+            backupStart(0), // midnight
+            backupDuration(-1), // unlimited duration
+            backupBitrate(-1), // unlimited
+            backupQuality(Qn::Backup_Disabled)
+        {}
 
         QnUuid          serverID;
         QString         serverName;
         int             maxCameras;
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
+
+        // redundant storage settings
+        Qn::BackupType      backupType;
+        int                 backupDaysOfTheWeek; // Days of the week mask. See backup::DayOfWeek enum 
+        int                 backupStart;         // seconds from 00:00:00. Error if bDOW set and this is not set
+        int                 backupDuration;      // duration of synchronization period in seconds. -1 if not set.
+        int                 backupBitrate;       // bitrate cap in bytes per second. -1 if not capped.
+        Qn::CameraBackupTypes backupQuality;     // default value for camera's backup type
     };
 
-#define ApiMediaServerUserAttributesData_Fields_Short (maxCameras)(allowAutoRedundancy)
-#define ApiMediaServerUserAttributesData_Fields (serverID) (serverName) ApiMediaServerUserAttributesData_Fields_Short
+#define ApiMediaServerUserAttributesData_Fields_Short   \
+    (maxCameras)                                        \
+    (allowAutoRedundancy)                               \
+    (backupType)                                        \
+    (backupDaysOfTheWeek)                               \
+    (backupStart)                                       \
+    (backupDuration)                                    \
+    (backupBitrate)                                     \
+    (backupQuality)
 
+#define ApiMediaServerUserAttributesData_Fields     \
+    (serverID)                                      \
+    (serverName)                                    \
+    ApiMediaServerUserAttributesData_Fields_Short
+
+
+    QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerUserAttributesData, (eq))
 
     struct ApiMediaServerDataEx
     :

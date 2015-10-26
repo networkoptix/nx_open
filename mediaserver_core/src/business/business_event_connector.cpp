@@ -152,14 +152,17 @@ void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &re
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
-bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState)
+bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage)
 {
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
     bool isOnState = eventState == QnBusiness::ActiveState;
     if (params.eventType >= QnBusiness::UserDefinedEvent)
     {
-        if (params.resourceName.isEmpty() && params.caption.isEmpty() &&  params.description.isEmpty())
+        if (params.resourceName.isEmpty() && params.caption.isEmpty() &&  params.description.isEmpty()) {
+            if (errMessage)
+                *errMessage = "At least one of values 'resourceName', 'caption' or 'description' should be filled";
             return false;
+        }
         at_customEvent(params.resourceName, params.caption, params.description, params.metadata, eventState, params.eventTimestampUsec);
         return true;
     }
@@ -167,18 +170,27 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
     switch (params.eventType)
     {
         case QnBusiness::CameraMotionEvent:
-            if (!resource)
+            if (!resource) {
+                if (errMessage)
+                    *errMessage = "'CameraMotionEvent' requires 'resource' parameter";
                 return false;
+            }
             at_motionDetected(resource, isOnState, params.eventTimestampUsec, QnConstAbstractDataPacketPtr());
             break;
         case QnBusiness::CameraInputEvent:
-            if (!resource)
+            if (!resource) {
+                if (errMessage)
+                    *errMessage = "'CameraInputEvent' requires 'resource' parameter";
                 return false;
+            }
             at_cameraInput(resource, params.inputPortId, isOnState, params.eventTimestampUsec);
             break;
         case QnBusiness::CameraDisconnectEvent:
-            if (!resource)
+            if (!resource) {
+                if (errMessage)
+                    *errMessage = "'CameraDisconnectEvent' requires 'resource' parameter";
                 return false;
+            }
             at_cameraDisconnected(resource, params.eventTimestampUsec);
             break;
         case QnBusiness::StorageFailureEvent:
@@ -187,8 +199,11 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
             at_storageFailure(resource, params.eventTimestampUsec, params.reasonCode, params.description);
             break;
         case QnBusiness::NetworkIssueEvent:
-            if (!resource)
+            if (!resource) {
+                if (errMessage)
+                    *errMessage = "'NetworkIssueEvent' requires 'resource' parameter";
                 return false;
+            }
             at_networkIssue(resource, params.eventTimestampUsec, params.reasonCode, params.description);
             break;
         case QnBusiness::CameraIpConflictEvent:
@@ -221,6 +236,8 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
             at_licenseIssueEvent(resource, params.eventTimestampUsec, params.reasonCode, params.description);
             break;
         default:
+            if (errMessage)
+                *errMessage = lit("Unknown event type '%1'").arg(params.eventType);
             return false;
     }
     return true;

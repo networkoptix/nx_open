@@ -22,7 +22,7 @@
     <name>Nx SMTP client</name>
 
     <properties>
-        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
+        <guid>${nxemail.guid}</guid>
         <product.title>${company.name} nxemail</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
