@@ -6,6 +6,9 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/socket.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
@@ -141,6 +144,10 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             if (rt.isNull())
                 continue;
 
+            QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+            if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+                continue; // model forced by ONVIF
+
             resource->setTypeId(rt);
             resource->setName(name);
             resource->setModel(name);
@@ -211,6 +218,10 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return QList<QnResourcePtr>();
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnNetworkResourcePtr resource ( new QnPlDlinkResource() );
 

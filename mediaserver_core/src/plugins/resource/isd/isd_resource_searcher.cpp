@@ -4,6 +4,9 @@
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"
 #include <utils/network/http/httptypes.h>
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 
 extern QString getValueFromString(const QString& line);
@@ -124,6 +127,10 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
             return QList<QnResourcePtr>();
     }
 
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return QList<QnResourcePtr>(); // model forced by ONVIF
+
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
     resource->setTypeId(rt);
@@ -215,6 +222,10 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
         if (rt.isNull())
             return local_result;
     }
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return local_result; // model forced by ONVIF
 
     resource->setTypeId(rt);
     resource->setName(name);
