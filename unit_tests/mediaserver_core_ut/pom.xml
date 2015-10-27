@@ -21,6 +21,7 @@
     <name>HD Witness Mediaserver Core Unit Tests</name>
 
     <properties>
+        <guid>${mediaserver.guid}</guid>
         <product.title>HD Witness Mediaserver Core Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
