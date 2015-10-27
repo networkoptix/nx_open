@@ -307,7 +307,7 @@ int QnScheduleSync::stop()
     m_forced        = false;
     m_syncing       = false;
    
-    m_backupFuture.wait();
+    m_backupFuture.waitForFinished();
     return Ok;
 }
 
@@ -386,8 +386,7 @@ void QnScheduleSync::start()
     REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
     m_backupSyncOn         = true;
 
-    m_backupFuture = std::async(
-        std::launch::async,
+    m_backupFuture = QtConcurrent::run(
         [this]
         {
             while (m_backupSyncOn)
