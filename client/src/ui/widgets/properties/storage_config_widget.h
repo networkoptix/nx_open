@@ -88,7 +88,7 @@ private:
 
     StoragePool m_mainPool;
     StoragePool m_backupPool;
-    QnMediaServerUserAttributes m_serverUserAttrs;
+    QnServerBackupSchedule m_backupSchedule;
 
     bool m_backupCancelled;
 private:

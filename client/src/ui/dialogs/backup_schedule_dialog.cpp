@@ -1,5 +1,6 @@
 #include "backup_schedule_dialog.h"
-#include "core/resource/media_server_user_attributes.h"
+
+#include <core/resource/server_backup_schedule.h>
 
 namespace {
     static const int SECS_PER_DAY = 3600 * 24;
@@ -30,7 +31,7 @@ void QnBackupScheduleDialog::at_bandwidthComboBoxChange(int index)
     ui->bandwidthLabel->setEnabled(index > 0);
 }
 
-void QnBackupScheduleDialog::updateFromSettings(const QnMediaServerUserAttributes& value)
+void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& value)
 {
     int mask = 1;
     for (int i = 1; i <=7; ++i) {
@@ -64,7 +65,7 @@ void QnBackupScheduleDialog::setNearestValue(QComboBox* combobox, int time)
         combobox->setCurrentIndex(bestIndex);
 }
 
-void QnBackupScheduleDialog::submitToSettings(QnMediaServerUserAttributes& value)
+void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
 {
     value.backupDaysOfTheWeek = 0;
     int mask = 1;

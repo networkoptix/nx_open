@@ -71,7 +71,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     , m_storages()
     , m_mainPool()
     , m_backupPool()
-    , m_serverUserAttrs()
+    , m_backupSchedule()
     , m_backupCancelled(false)
 {
     ui->setupUi(this);
@@ -134,15 +134,7 @@ bool QnStorageConfigWidget::hasChanges() const {
             return true;
     }
 
-    QnMediaServerUserAttributes serverUserAttrs;
-    {
-        QnMediaServerUserAttributesPool::ScopedLock lk(QnMediaServerUserAttributesPool::instance(), m_server->getId());
-        serverUserAttrs = *(*lk).data();
-    }
-    if (serverUserAttrs != m_serverUserAttrs)
-        return true;
-
-    return false;
+    return (m_server->getBackupSchedule() != m_backupSchedule);
 }
 
 
@@ -187,10 +179,10 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
 }
 
 void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index) {
-    m_serverUserAttrs.backupType = static_cast<Qn::BackupType>(ui->comboBoxBackupType->itemData(index).toInt());
+    m_backupSchedule.backupType = static_cast<Qn::BackupType>(ui->comboBoxBackupType->itemData(index).toInt());
 
-    ui->pushButtonSchedule->setEnabled(m_serverUserAttrs.backupType == Qn::Backup_Schedule);
-    ui->backupStartButton->setEnabled(m_serverUserAttrs.backupType == Qn::Backup_Schedule); 
+    ui->pushButtonSchedule->setEnabled(m_backupSchedule.backupType == Qn::Backup_Schedule);
+    ui->backupStartButton->setEnabled(m_backupSchedule.backupType == Qn::Backup_Schedule); 
 }
 
 void QnStorageConfigWidget::updateFromSettings()
@@ -198,12 +190,9 @@ void QnStorageConfigWidget::updateFromSettings()
     if (!m_server)
         return;
 
-    {
-        QnMediaServerUserAttributesPool::ScopedLock lk(QnMediaServerUserAttributesPool::instance(), m_server->getId());
-        m_serverUserAttrs = *(*lk).data();
-    }
+    m_backupSchedule = m_server->getBackupSchedule();
 
-    ui->comboBoxBackupType->setCurrentIndex(ui->comboBoxBackupType->findData(m_serverUserAttrs.backupType));    
+    ui->comboBoxBackupType->setCurrentIndex(ui->comboBoxBackupType->findData(m_backupSchedule.backupType));    
 
     updateStoragesInfo();
     updateRebuildInfo();
@@ -371,19 +360,9 @@ void QnStorageConfigWidget::submitToSettings()
     if (!storagesToRemove.empty())
         conn->getMediaServerManager()->removeStorages(storagesToRemove, this, []{});
     
-    QnMediaServerUserAttributes serverUserAttrs;
-    {
-        QnMediaServerUserAttributesPool::ScopedLock lk(QnMediaServerUserAttributesPool::instance(), m_server->getId());
-        serverUserAttrs = *(*lk).data();
-    }
-    if (serverUserAttrs != m_serverUserAttrs) 
-    {
+    if (m_backupSchedule != m_server->getBackupSchedule()) {
         qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
-            server->setBackupType(m_serverUserAttrs.backupType);
-            server->setBackupDOW(m_serverUserAttrs.backupDaysOfTheWeek);
-            server->setBackupStart(m_serverUserAttrs.backupStart);
-            server->setBackupDuration(m_serverUserAttrs.backupDuration);
-            server->setBackupBitrate(m_serverUserAttrs.backupBitrate);
+            server->setBackupSchedule(m_backupSchedule);
         });
     }
 }
@@ -463,9 +442,9 @@ void QnStorageConfigWidget::at_openBackupSchedule_clicked()
         return;
 
     auto scheduleDialog = new QnBackupScheduleDialog(this);
-    scheduleDialog->updateFromSettings(m_serverUserAttrs);
+    scheduleDialog->updateFromSettings(m_backupSchedule);
     if (scheduleDialog->exec())
-        scheduleDialog->submitToSettings(m_serverUserAttrs);
+        scheduleDialog->submitToSettings(m_backupSchedule);
 }
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)

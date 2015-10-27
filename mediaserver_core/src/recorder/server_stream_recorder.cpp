@@ -10,6 +10,8 @@
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
+#include <core/resource/server_backup_schedule.h>
+
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
 #include "core/resource_management/resource_pool.h"
@@ -535,7 +537,7 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
     auto mediaServer = qnCommon->currentServer();
     Q_ASSERT(mediaServer);
 
-    if (mediaServer->getBackupType() != Qn::Backup_RealTime)
+    if (mediaServer->getBackupSchedule().backupType != Qn::Backup_RealTime)
         return false;
 
     auto cam = m_device.dynamicCast<QnSecurityCamResource>();
