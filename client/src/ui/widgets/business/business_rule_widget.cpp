@@ -302,7 +302,7 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model || m_updating || index == -1)
         return;
 
-    if (QnBusiness::hasToggleState(m_model->eventType()) && !m_model->isActionProlonged())
+    if (!QnBusiness::hasToggleState(m_model->eventType()) || m_model->isActionProlonged())
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();

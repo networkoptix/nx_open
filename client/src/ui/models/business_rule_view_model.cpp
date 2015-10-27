@@ -103,7 +103,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
         item->setData(actionType);
-        item->setData(isActionProlonged(), ProlongedActionRole);
+        item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
         
         QList<QStandardItem *> row;
         row << item;
