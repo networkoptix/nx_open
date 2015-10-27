@@ -42,6 +42,7 @@ extern "C"
 #include <camera/resource_display.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
+#include <camera/camera_bookmark_aggregation.h>
 
 #include <server/server_storage_manager.h>
 
@@ -122,6 +123,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
     m_bookmarkQuery(nullptr),
+    m_bookmarkAggregation(new QnCameraBookmarkAggregation()),
     m_sliderBookmarksRefreshOperation(new QnPendingOperation([this](){ updateSliderBookmarks(); }, updateBookmarksInterval, this)),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0)
@@ -206,7 +208,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         auto filter = m_bookmarkQuery->filter();
         filter.text = text;
         m_bookmarkQuery->setFilter(filter);
-        m_bookmarkAggregation.clear();
+        m_bookmarkAggregation->clear();
     });
 
 
@@ -228,7 +230,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
             this, &QnWorkbenchNavigator::updateBookmarkTags);
 
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this, [this](const QnUuid &bookmarkId){
-        m_bookmarkAggregation.removeBookmark(bookmarkId);
+        m_bookmarkAggregation->removeBookmark(bookmarkId);
         updateSliderBookmarks();
     });
 }
@@ -367,7 +369,7 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool bookmarksModeEnabled) {
         if (m_bookmarkQuery)
             disconnect(m_bookmarkQuery, nullptr, this, nullptr);
         m_bookmarkQuery.clear();
-        m_bookmarkAggregation.clear();
+        m_bookmarkAggregation->clear();
         m_timeSlider->setBookmarks(QnCameraBookmarkList());
         m_timeSlider->bookmarksViewer()->resetBookmarks();
     }
@@ -482,7 +484,7 @@ void QnWorkbenchNavigator::deinitialize() {
     if (m_bookmarkQuery) {
         m_bookmarkQuery->setCamera(QnVirtualCameraResourcePtr());
         m_bookmarkQuery->setFilter(QnCameraBookmarkSearchFilter());
-        m_bookmarkAggregation.clear();
+        m_bookmarkAggregation->clear();
     }
     m_searchQueryStrategy->changeQueryForcibly(QString());
 
@@ -981,7 +983,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     m_currentWidgetLoaded = false;
 
     if (m_bookmarkQuery) {
-        m_bookmarkAggregation.clear();
+        m_bookmarkAggregation->clear();
         m_bookmarkQuery->setCamera(m_currentMediaWidget ? m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>() : QnVirtualCameraResourcePtr());
     }
 
@@ -1717,7 +1719,7 @@ void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked() {
 }
 
 void QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks) {
-    m_bookmarkAggregation.mergeBookmarkList(bookmarks);
+    m_bookmarkAggregation->mergeBookmarkList(bookmarks);
     m_sliderBookmarksRefreshOperation->requestOperation();
 }
 
@@ -1901,7 +1903,7 @@ void QnWorkbenchNavigator::updateSliderBookmarks() {
     if (!bookmarksModeEnabled())
         return;
 
-    m_timeSlider->setBookmarks(m_bookmarkAggregation.bookmarkList());
+    m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
 }
 
 /* Bookmark methods. */
