@@ -105,19 +105,13 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction) 
 {
-    QnResourcePtr resource;
-    if (businessAction) {
-        auto resourceId = businessAction->getRuntimeParams().eventResourceId;
-        resource = qnResPool->getResourceById(resourceId);
-    }
-
     if (message == QnSystemHealth::StoragesAreFull)
         return; //Bug #2308: Need to remove notification "Storages are full"
 
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
 
-    setSystemHealthEventVisible( message, resource, true, businessAction);
+    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( businessAction), true);
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message) {
@@ -149,21 +143,19 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible) {
-    setSystemHealthEventVisibleInternal(message, QVariant(), visible, QnAbstractBusinessActionPtr());
+    setSystemHealthEventVisibleInternal(message, QVariant(), visible);
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, 
                                                                   const QnResourcePtr &resource, 
-                                                                  bool visible, const 
-                                                                  QnAbstractBusinessActionPtr &businessAction) 
+                                                                  bool visible)
 {
-    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible, businessAction );
+    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible);
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, 
                                                                           const QVariant& params, 
-                                                                          bool visible,
-                                                                          const QnAbstractBusinessActionPtr &businessAction)
+                                                                          bool visible)
 {
     bool canShow = true;
 
@@ -188,7 +180,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSys
     canShow &= isAllowedByFilter;
 
     if( visible && canShow )
-        emit systemHealthEventAdded( message, businessAction, params );
+        emit systemHealthEventAdded( message, params );
     else
         emit systemHealthEventRemoved( message, params );
 }

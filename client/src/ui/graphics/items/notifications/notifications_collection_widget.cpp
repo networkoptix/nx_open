@@ -39,6 +39,7 @@
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <health/system_health_helper.h>
 
 #include <utils/math/color_transformations.h>
 #include <utils/app_server_notification_cache.h>
@@ -494,11 +495,22 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& bu
     return NULL;
 }
 
-void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction, const QVariant& params )
+void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params )
 {
+
     QnResourcePtr resource;
     if( params.canConvert<QnResourcePtr>() )
         resource = params.value<QnResourcePtr>();
+
+    QnAbstractBusinessActionPtr businessAction;
+    if( params.canConvert<QnAbstractBusinessActionPtr>() ) 
+    {
+        businessAction = params.value<QnAbstractBusinessActionPtr>();
+        if (businessAction) {
+            auto resourceId = businessAction->getRuntimeParams().eventResourceId;
+            resource = qnResPool->getResourceById(resourceId);
+        }
+    }
 
     QnNotificationWidget *item = findItem( message, resource );
     if (item)
@@ -666,7 +678,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         default:
             break;
         }
-        showSystemHealthMessage(message, QnAbstractBusinessActionPtr(), QVariant::fromValue(resource));
+        showSystemHealthMessage(message, QVariant::fromValue(resource));
     }
 
     //TODO: #GDM #Business REMOVE DEBUG

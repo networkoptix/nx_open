@@ -12,7 +12,6 @@
 
 #include "core/resource/resource.h"
 #include <core/resource_management/resource_pool.h>
-#include "health/system_health.h"
 #include "business/actions/system_health_business_action.h"
 #include "core/resource/camera_resource.h"
 #include "business/events/custom_business_event.h"

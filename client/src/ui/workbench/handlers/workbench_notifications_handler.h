@@ -30,7 +30,7 @@ public:
     void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction);
 
 signals:
-    void systemHealthEventAdded( QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction, const QVariant& params );
+    void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );
     void systemHealthEventRemoved( QnSystemHealth::MessageType message, const QVariant& params );
 
     void businessActionAdded(const QnAbstractBusinessActionPtr& businessAction);
@@ -62,9 +62,9 @@ private:
 
     void setSystemHealthEventVisible( QnSystemHealth::MessageType message, bool visible);
    // void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnActionParameters& actionParams, bool visible );
-    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible, const QnAbstractBusinessActionPtr &businessAction = QnAbstractBusinessActionPtr());
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
-    void setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible, const QnAbstractBusinessActionPtr &businessAction);
+    void setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible);
 
     void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
 
