@@ -1838,11 +1838,11 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
                 drawLastMinute(painter, lineRect);
             drawSeparator(painter, lineRect);
 
-            if (line == 0)
-                drawBookmarks(painter, lineRect);
 
             lineTop += lineHeight;
         }
+
+        drawBookmarks(painter, lineBarRect);
     }
 
     /* Draw thumbnails. */
