@@ -54,7 +54,9 @@ bool QnArecontRtspStreamReader::isStreamOpened() const
 
 QnMetaDataV1Ptr QnArecontRtspStreamReader::getCameraMetadata()
 {
-    return QnMetaDataV1Ptr(0);
+    auto motion = static_cast<QnPlAreconVisionResource*>(getResource().data())->getCameraMetadata();
+    filterMotionByMask(motion);
+    return motion;
 }
 
 void QnArecontRtspStreamReader::pleaseStop()
@@ -77,20 +79,12 @@ QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
     {
         rez = m_rtpStreamParser.getNextData();
         if (rez) 
-        {
-            //QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(rez);
-            //ToDo: if (videoData)
-            //    parseMotionInfo(videoData);
-
-            //if (!videoData || isGotFrame(videoData))
             break;
-        }
-        else {
-            errorCount++;
-            if (errorCount > 1) {
-                closeStream();
-                break;
-            }
+
+        errorCount++;
+        if (errorCount > 1) {
+            closeStream();
+            break;
         }
     }
 

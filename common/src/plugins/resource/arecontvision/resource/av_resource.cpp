@@ -335,6 +335,56 @@ bool QnPlAreconVisionResource::isH264() const
     return getProperty(lit("Codec")) == lit("H.264");
 }
 
+QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
+{
+    QnMetaDataV1Ptr motion(new QnMetaDataV1());
+    QVariant mdresult;
+    if (!getParamPhysical(QLatin1String("mdresult"), mdresult))
+        return QnMetaDataV1Ptr(0);
+
+    if (mdresult.toString() == QLatin1String("no motion"))
+        return motion; // no motion detected
+
+
+    int zones = totalMdZones() == 1024 ? 32 : 8;
+
+    QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
+    if (md.size() < zones*zones)
+        return QnMetaDataV1Ptr(0);
+
+    int pixelZoneSize = getZoneSite() * 32;
+    if (pixelZoneSize == 0)
+        return QnMetaDataV1Ptr(0);
+
+    QVariant maxSensorWidth = getProperty(lit("MaxSensorWidth"));
+    QVariant maxSensorHight = getProperty(lit("MaxSensorHeight"));
+
+    QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
+    QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
+
+    for (int x = 0; x < zones; ++x)
+    {
+        for (int y = 0; y < zones; ++y)
+        {
+            int index = y*zones + x;
+            QString m = md.at(index);
+
+
+            if (m == QLatin1String("00") || m == QLatin1String("0"))
+                continue;
+
+            QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
+
+            motion->mapMotion(imageRect, currZoneRect);
+
+        }
+    }
+
+    //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
+    motion->m_duration = 1000 * 1000 * 1000; // 1000 sec 
+    return motion;
+}
+
 // ===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &val)
 {
@@ -477,7 +527,8 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
     return getHostAddress() == lit("172.16.1.196") ||
-           getHostAddress() == lit("192.168.0.223");
+           getHostAddress() == lit("192.168.0.223") ||
+           getHostAddress() == lit("192.168.1.2");
 }
 
 bool QnPlAreconVisionResource::isAbstractResource() const

@@ -417,52 +417,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
-    QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    QVariant mdresult;
-    if (!getResource()->getParamPhysical(QLatin1String("mdresult"), mdresult))
-        return QnMetaDataV1Ptr(0);
-
-    if (mdresult.toString() == QLatin1String("no motion"))
-        return motion; // no motion detected
-
-
-    const QnPlAreconVisionResource* avRes = dynamic_cast<QnPlAreconVisionResource*>(getResource().data());
-    int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
-
-    QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
-    if (md.size() < zones*zones)
-        return QnMetaDataV1Ptr(0);
-
-    int pixelZoneSize = avRes->getZoneSite() * 32;
-    if (pixelZoneSize == 0)
-        return QnMetaDataV1Ptr(0);
-
-    QVariant maxSensorWidth = getResource()->getProperty(lit("MaxSensorWidth"));
-    QVariant maxSensorHight = getResource()->getProperty(lit("MaxSensorHeight"));
-    
-    QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
-    QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
-
-    for (int x = 0; x < zones; ++x)
-    {
-        for (int y = 0; y < zones; ++y)
-        {
-            int index = y*zones + x;
-            QString m = md.at(index) ;
-
-
-            if (m == QLatin1String("00") || m == QLatin1String("0"))
-                continue;
-
-            QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
-
-            motion->mapMotion(imageRect, currZoneRect);
-
-        }
-    }
-
-    //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = 1000*1000*1000; // 1000 sec 
+    auto motion = static_cast<QnPlAreconVisionResource*>(getResource().data())->getCameraMetadata();
     filterMotionByMask(motion);
     return motion;
 }

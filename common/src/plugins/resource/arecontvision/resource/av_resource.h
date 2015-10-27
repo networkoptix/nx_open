@@ -60,6 +60,8 @@ public:
     bool isH264() const;
     int getZoneSite() const;
 
+    QnMetaDataV1Ptr getCameraMetadata();
+
     static QnPlAreconVisionResource* createResourceByName(const QString &name);
     static QnPlAreconVisionResource* createResourceByTypeId(QnUuid rt);
 
