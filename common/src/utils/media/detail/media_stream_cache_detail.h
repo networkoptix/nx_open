@@ -8,11 +8,13 @@
 
 #include <deque>
 #include <map>
+#include <set>
 
 #include <QtCore/QElapsedTimer>
 
 #include <core/datapacket/abstract_data_packet.h>
 
+class QnMediaStreamEventReceiver;
 
 namespace detail {
 
@@ -57,14 +59,11 @@ public:
     //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
 
-    /*!
-        \return id of event receiver
-    */
-    int addKeyFrameEventReceiver( std::function<void (quint64)> keyFrameEventReceiver );
+    void addEventReceiver( QnMediaStreamEventReceiver* keyFrameEventReceiver );
     /*!
         \param receiverID id received from \a MediaStreamCache::addKeyFrameEventReceiver
     */
-    void removeKeyFrameEventReceiver( int receiverID );
+    void removeEventReceiver( QnMediaStreamEventReceiver* keyFrameEventReceiver );
 
     //!Prevents data starting with \a timestamp from removal
     /*!
@@ -115,8 +114,7 @@ private:
     qint64 m_prevPacketSrcTimestamp;
     size_t m_cacheSizeInBytes;
     //!map<event receiver id, function>
-    std::map<int, std::function<void (quint64)> > m_eventReceivers;
-    int m_prevGivenEventReceiverID;
+    std::set<QnMediaStreamEventReceiver* > m_eventReceivers;
     std::map<int, quint64> m_dataBlockings;
     mutable QElapsedTimer m_inactivityTimer;
 };
