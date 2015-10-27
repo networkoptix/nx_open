@@ -17,6 +17,7 @@
                 <param name = "MaxSensorWidth" default_value ="2560"/>
                 <param name = "MaxSensorHeight" default_value ="1920"/>
                 <param name = "MaxFPS" default_value ="3"/>
+                <param name = "VideoLayout" default_value="width=4;height=1;sensors=0,1,2,3"/>
             </params>
         </resource>
         <resource name = "3236" public ="3100">
