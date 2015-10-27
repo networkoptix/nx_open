@@ -90,9 +90,7 @@ QnScheduleSync::getOldestChunk()
 
     for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(mediaServer, true)) 
     {       
-        Qn::CameraBackupQualities cameraBackupQualities = camera->getBackupQualities();
-        if (cameraBackupQualities == Qn::CameraBackup_Default)
-            cameraBackupQualities = qnGlobalSettings->defaultBackupQualities();
+        Qn::CameraBackupQualities cameraBackupQualities = camera->getActualBackupQualities();
 
         ChunkKey tmp;
 
