@@ -105,6 +105,8 @@ QnObject {
     }
 
     function play(pos) {
+        d.paused = false
+
         if (!d.dirty) {
             if (!playing)
                 d.mediaPlayer.play()
@@ -136,7 +138,6 @@ QnObject {
 
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()
-        d.paused = false
 
         d.dirty = false
     }
