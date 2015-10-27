@@ -115,7 +115,7 @@ void QnAxClientWindow::setSpeed(double speed) {
 }
 
 qint64 QnAxClientWindow::currentTimeUsec() const {
-    return m_context ? m_context->navigator()->position() : 0;
+    return m_context ? m_context->navigator()->positionUsec() : 0;
 }
 
 void QnAxClientWindow::setCurrentTimeUsec(qint64 timeUsec) {
