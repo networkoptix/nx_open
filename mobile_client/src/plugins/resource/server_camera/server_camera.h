@@ -11,6 +11,8 @@ typedef QList<QnServerCameraPtr> QnServerCameraList;
 class QnServerCamera: public QnVirtualCameraResource {
     Q_OBJECT
 
+    typedef QnVirtualCameraResource base_type;
+
 public:
     QnServerCamera(const QnUuid& resourceTypeId);
 
@@ -21,6 +23,7 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
     virtual Qn::ResourceStatus getStatus() const override;
+    virtual Qn::ResourceFlags flags() const override;
 
     void setTmpStatus(Qn::ResourceStatus value);
 

@@ -60,6 +60,14 @@ Qn::ResourceStatus QnServerCamera::getStatus() const
         return QnResource::getStatus();
 }
 
+Qn::ResourceFlags QnServerCamera::flags() const
+{
+    Qn::ResourceFlags flags = base_type::flags();
+    if (isIOModule())
+        flags |= Qn::io_module;
+    return flags;
+}
+
 void QnServerCamera::setTmpStatus(Qn::ResourceStatus value)
 {
     if (value != m_tmpStatus) {
