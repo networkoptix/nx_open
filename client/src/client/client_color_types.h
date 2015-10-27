@@ -168,6 +168,7 @@ struct QnResourceWidgetFrameColors {
 struct QnBookmarkColors {
     QnBookmarkColors();
 
+    QColor tooltipBackground;
     QColor background;
     QColor text;
 };

@@ -1,6 +1,7 @@
 
 #include "bookmarks_viewer.h"
 
+#include <client/client_color_types.h>
 #include <core/resource/camera_bookmark.h>
 
 #include <ui/common/palette.h>
@@ -11,8 +12,6 @@
 
 namespace
 {
-    const auto kBookmarkColor = QColor("#204969");
-
     enum 
     {
         kBookmarkFrameWidth = 250
@@ -268,8 +267,10 @@ namespace
         setMinimumWidth(kBookmarkFrameWidth);
         setMaximumWidth(kBookmarkFrameWidth);
 
-        setWindowColor(kBookmarkColor);
-        setFrameColor(kBookmarkColor);
+        static const QnBookmarkColors colors = QnBookmarkColors();
+
+        setWindowColor(colors.tooltipBackground);
+        setFrameColor(colors.tooltipBackground);
 
         QGraphicsLinearLayout *actionsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
         QnProxyLabel *editActionLabel =
