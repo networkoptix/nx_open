@@ -96,6 +96,7 @@
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile></newmobile>
+        <ffmpeg.libs></ffmpeg.libs>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
         <!-- compile.option2. See profile angle  -->
