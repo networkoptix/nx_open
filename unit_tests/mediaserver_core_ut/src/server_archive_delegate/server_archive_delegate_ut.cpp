@@ -16,6 +16,7 @@
 #include "utils/common/util.h"
 
 #include <stdexcept>
+#include <functional>
 
 const QString normalStorageUrl = lit("C/HD Witness Media");
 const QString backupStorageUrl = lit("D/HD Witness Media");
@@ -85,6 +86,20 @@ struct AuxData
 
     void cleanup()
     {
+        std::function<bool (const QString &)> recursiveCleaner =
+            [](const QString &path)
+            {
+                QDir dir(path);
+                QFileInfoList entryList = dir.entryInfoList(
+                    QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
+                    QDir::DirsFirst
+                );
+                for (auto &entry : entryList) 
+                {
+                    if 
+                }
+            };
+
         QDir().rmpath(nLqPath);
         QDir().rmpath(nHqPath);
         QDir().rmpath(bLqPath);
