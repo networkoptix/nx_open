@@ -39,7 +39,6 @@ QnScheduleSync::QnScheduleSync()
             QnScheduleSync_instance = this;
         }
     );
-    start();
 }
 
 QnScheduleSync::~QnScheduleSync()
@@ -208,6 +207,7 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                     .arg(newFileName),
                 cl_logWARNING
             );
+            return;
         }
 
         int bitrate = m_schedule.backupBitrate;
@@ -306,7 +306,7 @@ int QnScheduleSync::stop()
     m_forced        = false;
     m_syncing       = false;
    
-    m_backupFuture.wait();
+    m_backupFuture.waitForFinished();
     return Ok;
 }
 
@@ -376,8 +376,7 @@ void QnScheduleSync::start()
     REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
     m_backupSyncOn         = true;
 
-    m_backupFuture = std::async(
-        std::launch::async,
+    m_backupFuture = QtConcurrent::run(
         [this]
         {
             while (m_backupSyncOn)
@@ -438,6 +437,7 @@ void QnScheduleSync::start()
                     m_syncData.clear();
                     m_forced  = false;
                     m_syncing = false;
+                    emit backupFinished(m_syncTimePoint);
                 }
             }
         }

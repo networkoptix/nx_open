@@ -11,7 +11,7 @@
 #include <business/events/abstract_business_event.h>
 #include <business/business_strings_helper.h>
 
-#include <health/system_health.h>
+#include <health/system_health_helper.h>
 
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 

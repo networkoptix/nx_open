@@ -45,7 +45,7 @@ namespace test
             );
 
             storageManager = std::unique_ptr<QnStorageManager>(
-                new QnStorageManager
+                new QnStorageManager(QnServer::StoragePool::Normal)
             );
 
 #ifndef _WIN32

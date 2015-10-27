@@ -1,7 +1,7 @@
 #ifndef __SHEDULE_SYNC_H__
 #define __SHEDULE_SYNC_H__
 
-#include <future>
+#include <QtConcurrent>
 #include <atomic>
 #include <vector>
 #include <map>
@@ -12,8 +12,9 @@
 #include <recorder/storage_manager.h>
 #include <core/resource/server_backup_schedule.h>
 
-class QnScheduleSync
+class QnScheduleSync: public QObject
 {
+    Q_OBJECT
 private:
     struct ChunkKey 
     {
@@ -38,18 +39,19 @@ public:
 public:
     QnScheduleSync();
     ~QnScheduleSync();
+signals:
+    void backupFinished(qint64 timestampMs);
 public:
     static QnScheduleSync *instance();
     int forceStart(); 
     int stop();
     int interrupt();
     QnBackupStatusData getStatus() const;
-
+    void start();
 private:
     template<typename NeedStopCB>
     void synchronize(NeedStopCB needStop);
 
-    void start();
     void renewSchedule();
     void copyChunk(const ChunkKey &chunkKey);
 
@@ -65,7 +67,7 @@ private:
     std::atomic<bool>    m_backupSyncOn;
     std::atomic<bool>    m_syncing;
     std::atomic<bool>    m_forced;
-    std::future<void>    m_backupFuture;
+    QFuture<void>        m_backupFuture;
     QnServerBackupSchedule  m_schedule;
     std::atomic<int64_t> m_syncTimePoint;
 

@@ -631,8 +631,9 @@
             </activation>
             <properties>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <toolchain.version>codesourcery-2013.11</toolchain.version>
+                <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
+                <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
