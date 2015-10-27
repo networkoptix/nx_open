@@ -40,7 +40,11 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
     virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
+    bool isBackupRole() const;
     void setBackupRole(bool value);
+
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
 protected:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 private:
@@ -52,6 +56,7 @@ private:
 private:
     QnStorageSpaceDataList m_storages;
     bool m_isBackupRole;
+    bool m_readOnly;
     QBrush m_linkBrush;
     QFont m_linkFont;
 };

@@ -9,6 +9,7 @@ namespace {
 QnStorageListModel::QnStorageListModel(QObject *parent)
     : base_type(parent)
     , m_isBackupRole(false)
+    , m_readOnly(false)
     , m_linkBrush(QPalette().link())
 {
     m_linkFont.setUnderline(true);
@@ -26,13 +27,8 @@ void QnStorageListModel::setStorages(const QnStorageSpaceDataList& storages)
 void QnStorageListModel::addStorage(const QnStorageSpaceData& data)
 {
     beginResetModel();
-    // beginInsertRows(QModelIndex(), m_storages.size(), m_storages.size());
     m_storages.push_back(data);
-    // endInsertRows();
     endResetModel();
-
-    /* Update action column. */
-    // dataChanged(index(0, ChangeGroupActionColumn), index(m_storages.size() - 1, ChangeGroupActionColumn));
 }
 
 QnStorageSpaceDataList QnStorageListModel::storages() const
@@ -79,11 +75,14 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
             ? tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1))
             : tr("Invalid storage");
     case RemoveActionColumn:
-        return storageData.isExternal || forcedText 
+        return (storageData.isExternal || forcedText) && (!m_readOnly)
             ? tr("Remove") 
             : QString();
 
     case ChangeGroupActionColumn:
+        if (m_readOnly)
+            return QString();
+
         return m_isBackupRole 
             ? tr("Use as main storage") 
             : m_storages.size() > 1
@@ -96,23 +95,29 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     return QString();
 }
 
-QVariant QnStorageListModel::fontData(const QModelIndex &index) const 
-{
+QVariant QnStorageListModel::fontData(const QModelIndex &index) const {
+    if (m_readOnly)
+        return QVariant();
+
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
         return m_linkFont;
 
     return QVariant();
 }
 
-QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const 
-{
+QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const {
+    if (m_readOnly)
+        return QVariant();
+
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
         return m_linkBrush;
     return QVariant();
 }
 
-QVariant QnStorageListModel::mouseCursorData(const QModelIndex &index) const
-{
+QVariant QnStorageListModel::mouseCursorData(const QModelIndex &index) const {
+    if (m_readOnly)
+        return QVariant();
+
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
         if (!index.data(Qt::DisplayRole).toString().isEmpty())
             return QVariant::fromValue<int>(Qt::PointingHandCursor);
@@ -158,7 +163,7 @@ QVariant QnStorageListModel::data(const QModelIndex &index, int role) const
 
 bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()) || m_readOnly)
         return false;
 
     QnStorageSpaceData& storageData = m_storages[index.row()];
@@ -190,9 +195,25 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
-void QnStorageListModel::setBackupRole(bool value)
-{
+bool QnStorageListModel::isBackupRole() const {
+    return m_isBackupRole;
+}
+
+void QnStorageListModel::setBackupRole(bool value) {
     m_isBackupRole = value;
+}
+
+bool QnStorageListModel::isReadOnly() const {
+    return m_readOnly;
+}
+
+void QnStorageListModel::setReadOnly( bool readOnly ) {
+    if (m_readOnly == readOnly)
+        return;
+
+    beginResetModel();
+    m_readOnly = readOnly;
+    endResetModel();
 }
 
 bool QnStorageListModel::removeRows(int row, int count, const QModelIndex &parent)
@@ -200,10 +221,9 @@ bool QnStorageListModel::removeRows(int row, int count, const QModelIndex &paren
     if (parent.isValid())
         return false;
 
-    //beginRemoveRows(parent, row, row + count);
     beginResetModel();
     m_storages.erase(m_storages.begin() + row, m_storages.begin() + row + count);
-    //endRemoveRows();
     endResetModel();
     return true;
 }
+

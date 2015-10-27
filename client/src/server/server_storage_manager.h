@@ -6,6 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx_ec/data/api_fwd.h>
+
 #include <server/server_storage_manager_fwd.h>
 
 #include <utils/common/singleton.h>
@@ -30,6 +32,9 @@ public:
 
     bool backupServerStorages(const QnMediaServerResourcePtr &server);
     bool cancelBackupServerStorages(const QnMediaServerResourcePtr &server);
+
+    void saveStorages(const QnMediaServerResourcePtr &server, const QnStorageResourceList &storages);
+    void deleteStorages(const QnMediaServerResourcePtr &server, const ec2::ApiIdDataList &ids);
 
 signals:
     void serverProtocolsChanged(const QnMediaServerResourcePtr &server, const QSet<QString> &protocols);
