@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include "media_stream_cache_detail.h"
+#include "utils/media/media_stream_cache.h"
 
 #include <core/datapacket/media_data_packet.h>
 #include <utils/common/log.h>
@@ -17,8 +18,7 @@ MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
     m_cacheSizeMillis( cacheSizeMillis ),
     m_mutex( QMutex::Recursive ),   //TODO #ak get rid of Recursive mutex
     m_prevPacketSrcTimestamp( -1 ),
-    m_cacheSizeInBytes( 0 ),
-    m_prevGivenEventReceiverID( 0 )
+    m_cacheSizeInBytes( 0 )
 {
     m_inactivityTimer.restart();
 }
@@ -50,9 +50,10 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     if( qAbs(data->timestamp - m_prevPacketSrcTimestamp) > MAX_ALLOWED_TIMESTAMP_DIFF )
     {
-        //TODO #ak timestamp discontinuity
-        m_prevPacketSrcTimestamp = data->timestamp;
+        for( auto eventReceiver: m_eventReceivers )
+            eventReceiver->onDiscontinue();
     }
+    m_prevPacketSrcTimestamp = data->timestamp;
 
     //searching position to insert to. in most cases (or in every case in case of h.264@baseline) insertion is done to the end
     PacketContainerType::iterator posToInsert = m_packetsByTimestamp.end();
@@ -95,7 +96,7 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 #endif
 
     for( auto eventReceiver: m_eventReceivers )
-        eventReceiver.second(data->timestamp);
+        eventReceiver->onKeyFrame(data->timestamp);
     const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
     if( maxTimestamp - m_packetsByTimestamp.front().timestamp > m_cacheSizeMillis*USEC_PER_MS )
     {
@@ -247,20 +248,16 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
     return it->packet;
 }
 
-int MediaStreamCache::addKeyFrameEventReceiver(
-    std::function<void (quint64)> keyFrameEventReceiver )
+void MediaStreamCache::addEventReceiver( QnMediaStreamEventReceiver* eventReceiver )
 {
     QMutexLocker lk( &m_mutex );
-    m_eventReceivers.emplace(
-        ++m_prevGivenEventReceiverID,
-        std::move(keyFrameEventReceiver) );
-    return m_prevGivenEventReceiverID;
+    m_eventReceivers.emplace(eventReceiver);
 }
 
-void MediaStreamCache::removeKeyFrameEventReceiver( int receiverID )
+void MediaStreamCache::removeEventReceiver( QnMediaStreamEventReceiver* eventReceiver )
 {
     QMutexLocker lk( &m_mutex );
-    m_eventReceivers.erase( receiverID );
+    m_eventReceivers.erase( eventReceiver );
 }
 
 int MediaStreamCache::blockData( quint64 timestamp )
