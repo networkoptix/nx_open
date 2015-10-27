@@ -840,7 +840,8 @@ void QnWorkbenchNavigator::jumpForward() {
 
     m_pausedOverride = false;
 
-    qint64 pos;
+    /* Default value should never be used, adding just in case of black magic. */
+    qint64 pos = DATETIME_NOW;
     if(!(m_currentWidgetFlags & WidgetSupportsPeriods)) {
         pos = reader->endTime();
     } else if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget)) {
