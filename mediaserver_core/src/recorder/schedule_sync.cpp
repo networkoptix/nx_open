@@ -209,6 +209,7 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                     .arg(newFileName),
                 cl_logWARNING
             );
+            return;
         }
 
         int bitrate = m_schedule.bitrate;
