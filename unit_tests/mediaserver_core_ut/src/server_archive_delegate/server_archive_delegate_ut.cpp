@@ -11,44 +11,100 @@
 #include <recorder/storage_manager.h>
 #include <recorder/schedule_sync.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
+#include <core/resource_management/status_dictionary.h>
 #include <media_server/settings.h>
 #include "utils/common/util.h"
 
-#include <cstdio>
+#include <stdexcept>
 
-struct Singletons 
+const QString normalStorageUrl = lit("C/HD Witness Media");
+const QString backupStorageUrl = lit("D/HD Witness Media");
+
+const QString nLqPath = 
+    normalStorageUrl + lit("/low_quality/camera_unique_id/2015/10/22/19");
+
+const QString nHqPath =
+    normalStorageUrl + lit("/hi_quality/camera_unique_id/2015/10/22/19");
+
+const QString bLqPath = 
+    backupStorageUrl + lit("/low_quality/camera_unique_id/2015/10/22/19");
+
+const QString bHqPath = 
+    backupStorageUrl + lit("/hi_quality/camera_unique_id/2015/10/22/19");
+
+struct AuxData
 {
-    std::unique_ptr<QnLongRunnablePool> runnablePool;
-    std::unique_ptr<QnResourcePool>     resourcePool;
-    std::unique_ptr<QnScheduleSync>     scheduleSync;
-    std::unique_ptr<QnStorageManager>   normalManager;
-    std::unique_ptr<QnStorageManager>   backupManager;
+    QnStorageResourcePtr        normalStorage;
+    QnStorageResourcePtr        backupStorage;
+    QnLongRunnablePool          runnablePool;
+    QnResourcePool              resourcePool;
+    QnScheduleSync              scheduleSync;
+    QnStorageManager            normalManager;
+    QnStorageManager            backupManager;
+    QnResourceStatusDictionary  rdict;
 #ifndef _WIN32
-    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+    QnPlatformAbstraction platformAbstraction;
 #endif
 
-    Singletons() 
-        : runnablePool(new QnLongRunnablePool),
-          resourcePool(new QnResourcePool),
-          scheduleSync(new QnScheduleSync),
-          normalManager(new QnStorageManager(QnServer::StoragePool::Normal)),
-          backupManager(new QnStorageManager(QnServer::StoragePool::Backup))
-#ifndef _WIN32
-          ,platformAbstraction(new QnPlatformAbstraction)
-#endif
-    {}
-
-    ~Singletons() 
+    AuxData() 
+        : normalManager(QnServer::StoragePool::Normal),
+          backupManager(QnServer::StoragePool::Backup)
     {
-        backupManager.reset();
-        normalManager.reset();
-        scheduleSync.reset();
-        resourcePool.reset();
-        runnablePool.reset();
+        if (!createTestPhysicalData())
+            throw std::runtime_error("createTestDirs() failed");
+
+        normalStorage.reset(new QnFileStorageResource);
+        normalStorage->setUrl(normalStorageUrl);
+
+        backupStorage.reset(new QnFileStorageResource);
+        backupStorage->setUrl(backupStorageUrl);
+
+        qnNormalStorageMan->addStorage(normalStorage);
+        qnNormalStorageMan->addStorage(backupStorage);
+    }
+
+    bool createTestPhysicalData()
+    {
+        if (!QDir().mkpath(nLqPath) || !QDir().mkpath(nHqPath) || 
+            !QDir().mkpath(bLqPath) || !QDir().mkpath(bHqPath))
+        {
+            return false;
+        }
+
+        if (!QFile::copy(":/1445529661948_77158.mkv", nLqPath + lit("/1445529661948_77158.mkv")) || 
+            !QFile::copy(":/1445529661948_77158.mkv", nHqPath + lit("/1445529661948_77158.mkv")))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    bool fillCatalogs()
+    {
+    }
+
+    void cleanup()
+    {
+        QDir().rmpath(nLqPath);
+        QDir().rmpath(nHqPath);
+        QDir().rmpath(bLqPath);
+        QDir().rmpath(bHqPath);
+    }
+
+    ~AuxData() 
+    {
+        cleanup();
     }
 };
 
 TEST(ServerArchiveDelegateTest, Main) 
 {
-    Singletons s_;
+    try
+    {
+        AuxData auxData;
+    }
+    catch (const std::exception &e)
+    {
+        ASSERT_TRUE(false) << e.what();
+    }
 }
