@@ -56,7 +56,7 @@ QString QnSystemHealthStringsHelper::backupPositionToStr(const QDateTime& dt)
     
     QDateTime now = qnSyncTime->currentDateTime();
 
-    QString result = tr("%1 %2").arg(dt.date().toString()).arg(dt.time().toString(Qt::DefaultLocaleShortDate));
+    QString result = lit("%1 %2").arg(dt.date().toString()).arg(dt.time().toString(Qt::DefaultLocaleShortDate));
 
     qint64 deltaMs = now.toMSecsSinceEpoch() - dt.toMSecsSinceEpoch();
     if (deltaMs > MinDeltaForMessageMs) {
