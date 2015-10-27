@@ -10,6 +10,7 @@
 
 #include <memory>
 
+#include <common/common_module.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/log.h>
 #include <utils/network/http/httpclient.h>
@@ -18,6 +19,7 @@
 
 #include "core/resource/resource_command_processor.h"
 #include "core/resource/resource_command.h"
+#include "core/resource_management/resource_data_pool.h"
 
 #include "av_resource.h"
 #include "av_panoramic.h"
@@ -526,9 +528,8 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
-    return getHostAddress() == lit("172.16.1.196") ||
-           getHostAddress() == lit("192.168.0.223") ||
-           getHostAddress() == lit("192.168.1.2");
+    return qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(
+        lit("isRTSPSupported"), false);
 }
 
 bool QnPlAreconVisionResource::isAbstractResource() const

@@ -73,6 +73,12 @@
             ],
             "onvifPtzStopBroken": true
         },
+	{
+            "keys": [
+                "ArecontVision|5245DN-01"
+            ],
+            "isRTSPSupported": true
+	},
         {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
