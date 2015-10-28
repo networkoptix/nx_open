@@ -46,8 +46,6 @@ public:
     bool flushRecords();
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
-    void beforeDelete();
-    void afterDelete();
     bool replaceChunks(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks);
 private:
     bool createDatabase();

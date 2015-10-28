@@ -80,7 +80,7 @@ public:
      * \param timestamp             Timestamp in milliseconds to find
      * \param allowOfflineServers   Drop out offline media servers if parameter is false
      */
-    QnMediaServerResourcePtr updateCacheAndGetMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0);
+    QnMediaServerResourcePtr getMediaServerOnTimeSync(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0);
 
 
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
