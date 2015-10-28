@@ -26,6 +26,7 @@
 #include <atomic>
 #include <future>
 #include <mutex>
+#include "storage_db_pool.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -112,13 +113,7 @@ public:
     QnStorageScanData rebuildInfo() const;
     bool needToStopMediaScan() const;
     
-    /*
-    * Return full path list from storage_index.csv (include absent in DB storages)
-    */
-    QStringList getAllStoragePathes() const;
-
     void initDone();
-    int getStorageIndex(const QnStorageResourcePtr& storage);
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
 
     /*
@@ -145,7 +140,6 @@ private:
                                     const QList<QnServer::ChunksCatalog> &catalogs, int limit);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, const QnTimePeriod period);
-    int detectStorageIndex(const QString& path);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
     void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
@@ -170,7 +164,6 @@ private:
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
-    QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
     void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
@@ -203,7 +196,6 @@ private:
     mutable QnMutex m_rebuildStateMtx;
     mutable QnMutex m_localPatches;
 
-    QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storagesStatisticsReady;
     QTimer m_timer;
 
@@ -224,9 +216,7 @@ private:
 
     ScanMediaFilesTask* m_rebuildArchiveThread;
 
-    QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
-    mutable QnMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
     mutable QnMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
@@ -234,6 +224,7 @@ private:
     QElapsedTimer m_clearBookmarksTimer;
     QElapsedTimer m_removeEmtyDirTimer;
     QMap<QString, qint64> m_lastCatalogTimes;
+    QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

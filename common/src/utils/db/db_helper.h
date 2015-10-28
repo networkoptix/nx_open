@@ -55,10 +55,11 @@ public:
 protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);
-
+    void removeDatabase();
 protected:
     QSqlDatabase m_sdb;
     mutable QReadWriteLock m_mutex;
+    QString m_connectionName;
 };
 
 #endif // __QN_DB_HELPER_H__
