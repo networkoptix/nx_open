@@ -322,6 +322,8 @@ Item {
                 anchors.verticalCenter: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
 
+                loading: mediaPlayer.loading
+
                 onPausedChanged: {
                     if (paused)
                         mediaPlayer.pause()
