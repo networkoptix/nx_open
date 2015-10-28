@@ -46,7 +46,7 @@ public slots:
 
     bool isHovered() const;
 
-public slots:
+public:
     const QnBookmarkColors &colors() const;
 
     void setColors(const QnBookmarkColors &colors);
