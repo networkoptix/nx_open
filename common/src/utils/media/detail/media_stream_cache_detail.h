@@ -111,7 +111,7 @@ private:
     //!map<timestamp, pair<packet, key_flag> >
     typedef std::deque<MediaPacketContext> PacketContainerType;
 
-    const unsigned int m_cacheSizeMillis;
+    const qint64 m_cacheSizeUsec;
     const qint64 m_maxCacheSizeUsec;
     PacketContainerType m_packetsByTimestamp;
     mutable QMutex m_mutex;

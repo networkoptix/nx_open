@@ -74,9 +74,14 @@ quint64 MediaStreamCache::SequentialReadContext::currentPos() const
 }
 
 
-MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
+MediaStreamCache::MediaStreamCache(
+    unsigned int cacheSizeMillis,
+    unsigned int maxCacheSizeMillis)
 :
-    m_sharedImpl( std::make_shared<detail::MediaStreamCache>( cacheSizeMillis ) )
+    m_sharedImpl(
+        std::make_shared<detail::MediaStreamCache>(
+            cacheSizeMillis,
+            maxCacheSizeMillis))
 {
 }
 
