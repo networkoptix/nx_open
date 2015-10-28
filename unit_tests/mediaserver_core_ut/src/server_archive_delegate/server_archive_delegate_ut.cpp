@@ -47,17 +47,17 @@ public:
         m_commonModule.reset(new QnCommonModule);
         m_commonModule->setModuleGUID(sGuid);
         
-        m_mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
-        m_mediaServer->setId(sGuid);
-        m_resourcePool->addResource(m_mediaServer);
+        //m_mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
+        //m_mediaServer->setId(sGuid);
+        //m_resourcePool->addResource(m_mediaServer);
 
         m_runnablePool.reset(new QnLongRunnablePool);
         m_normalManager.reset(new QnStorageManager(QnServer::StoragePool::Normal));
         m_backupManager.reset(new QnStorageManager(QnServer::StoragePool::Backup));
-        m_scheduleSync.reset(new QnScheduleSync);
+        //m_scheduleSync.reset(new QnScheduleSync);
 
-        qnNormalStorageMan->initDone();
-        qnBackupStorageMan->initDone();
+        //qnNormalStorageMan->initDone();
+        //qnBackupStorageMan->initDone();
 
         m_normalStorage = QnStorageResourcePtr(new QnFileStorageResource);
         m_normalStorage->setUrl(normalStorageUrl);
@@ -87,28 +87,33 @@ public:
         m_normalManager.reset();
         m_backupManager.reset();
         m_scheduleSync.reset();
-        m_mediaServer.reset();
+        //m_mediaServer.reset();
         m_commonModule.reset();
         m_runnablePool.reset();
         m_resourceTypePool.reset();
 
         std::function<bool (const QString &)> recursiveClean =
-            [&](const QString &path) {
+            [&](const QString &path) 
+            {
                 QDir dir(path);
                 QFileInfoList entryList = dir.entryInfoList(
-                        QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, 
-                        QDir::DirsFirst);
+                    QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, 
+                    QDir::DirsFirst
+                );
                 
-                for (auto &entry : entryList) {
+                for (auto &entry : entryList) 
+                {
                     auto tmp = entry.absoluteFilePath();
-                    if (entry.isDir()) {
+                    if (entry.isDir()) 
+                    {
                          if (!recursiveClean(entry.absoluteFilePath()))
                             return false;
-                    } else if (entry.isFile() ) {
+                    } 
+                    else if (entry.isFile()) 
+                    {
                         bool result = dir.remove(entry.absoluteFilePath());
-                        if (!result) {
+                        if (!result)
                             return false;
-                        }
                     }
                 }
                 dir.rmpath(path);
@@ -148,9 +153,9 @@ private:
     std::unique_ptr<QnStorageManager>   m_normalManager;
     std::unique_ptr<QnStorageManager>   m_backupManager;
     std::unique_ptr<QnResourceTypePool> m_resourceTypePool;
-    QnMediaServerResourcePtr            m_mediaServer;    
+    //QnMediaServerResourcePtr            m_mediaServer;    
     QnResourceStatusDictionary          m_rdict;
-    QnMediaServerUserAttributesPool     m_mediaServerAttrPool;
+    //QnMediaServerUserAttributesPool     m_mediaServerAttrPool;
 #ifndef _WIN32
     QnPlatformAbstraction platformAbstraction;
 #endif
