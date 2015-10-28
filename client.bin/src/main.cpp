@@ -120,6 +120,7 @@ extern "C"
 #include <utils/network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
+#include <utils/server_port_watcher.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -464,6 +465,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+
+    QScopedPointer<QnServerPortWatcher> serverPortWatcher(new QnServerPortWatcher(context.data()));
 
     Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
 #ifdef Q_OS_LINUX

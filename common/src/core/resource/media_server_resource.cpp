@@ -339,10 +339,15 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         setStorages(otherStorages);
         */
     }
-    if (netAddrListChanged || getPort() != localOther->getPort()) {
+
+    const bool portChanged = getPort() != localOther->getPort();
+    if (netAddrListChanged || portChanged) 
+    {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         if (m_restConnection)
             m_restConnection->setUrl(m_apiUrl);
+        if (portChanged)
+            apiPortChanged(::toSharedPointer(this));
     } else {
         m_url = oldUrl; //rollback changed value to autodetected
     }
