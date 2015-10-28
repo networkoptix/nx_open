@@ -2619,6 +2619,8 @@ void QnWorkbenchUi::updateSearchVisibility(bool animate) {
 
     if(!searchVisible)
         setSearchOpened(false);
+    else if (action(Qn::BookmarksModeAction)->isChecked())
+        setSearchOpened(true);
 }
 
 void QnWorkbenchUi::createSearchWidget() {
