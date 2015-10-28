@@ -11,7 +11,7 @@
 #include "nx_ec/ec2_lib.h"
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
-#include "plugins/resource/server_camera/server_camera_factory.h"
+#include "plugins/resource/mobile_client_camera/mobile_client_camera_factory.h"
 #include "utils/common/app_info.h"
 #include "utils/common/log.h"
 #include "utils/network/module_finder.h"
@@ -95,7 +95,7 @@ int runApplication(QGuiApplication *application) {
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_MobileClient)); // TODO: #dklychkov check connection type
     ec2::ResourceContext resourceContext(
-        QnServerCameraFactory::instance(),
+        QnMobileClientCameraFactory::instance(),
         qnResPool,
         qnResTypePool);
     ec2ConnectionFactory->setContext(resourceContext);
