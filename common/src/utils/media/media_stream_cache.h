@@ -13,7 +13,13 @@
 
 #include <core/dataconsumer/abstract_data_receptor.h>
 
-
+class QnMediaStreamEventReceiver
+{
+public:
+    virtual void onKeyFrame(quint64 currentPacketTimestampUSec) = 0;
+    virtual void onDiscontinue() = 0;
+    virtual ~QnMediaStreamEventReceiver() {}
+};
 
 namespace detail
 {
@@ -98,11 +104,11 @@ public:
     /*!
         \return id of event receiver
     */
-    int addKeyFrameEventReceiver( std::function<void (quint64)> keyFrameEventReceiver );
+    void addEventReceiver( QnMediaStreamEventReceiver* eventReceiver );
     /*!
         \param receiverID id received from \a MediaStreamCache::addKeyFrameEventReceiver
     */
-    void removeKeyFrameEventReceiver( int receiverID );
+    void removeEventReceiver( QnMediaStreamEventReceiver* eventReceiver );
 
     //!Prevents data starting with \a timestamp from removal
     /*!
