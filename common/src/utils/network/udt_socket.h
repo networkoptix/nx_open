@@ -124,6 +124,15 @@ public:
         Q_UNUSED(info);
         return false;
     }
+    virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override {
+        Q_UNUSED(info);
+        return false; // not implemented yet
+    }
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override {
+        Q_UNUSED(result);
+        return false; // not implemented yet
+    }
+
     UdtStreamSocket( bool natTraversal );
     UdtStreamSocket( bool natTraversal, detail::UdtSocketImpl* impl );
     // We must declare this trivial constructor even it is trivial.

@@ -1324,6 +1324,18 @@ bool QnSSLSocket::isConnected() const
     return d->wrappedSocket->isConnected();
 }
 
+bool QnSSLSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
+{
+    Q_D(const QnSSLSocket);
+    return d->wrappedSocket->setKeepAlive( info );
+}
+
+bool QnSSLSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
+{
+    Q_D(const QnSSLSocket);
+    return d->wrappedSocket->getKeepAlive( result );
+}
+
 bool QnSSLSocket::connectWithoutEncryption(
     const QString& foreignAddress,
     unsigned short foreignPort,
