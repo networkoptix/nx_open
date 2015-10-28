@@ -254,31 +254,29 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     if (!camera)
         return false;
 
-    QnUuid ruleId = action->getBusinessRuleId();
+    int fixedDurationMs = action->getParams().bookmarkDuration;
 
-    int fixedDuration = action->getParams().bookmarkDuration;
+    qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
+    qint64 endTimeMs = startTimeMs;
 
-    qint64 startTime = 0;
-    qint64 endTime = qnSyncTime->currentMSecsSinceEpoch();
-
-    if (fixedDuration <= 0) {
+    if (fixedDurationMs <= 0) 
+    {
+        // bookmark as an prolonged action
         if (action->getToggleState() == QnBusiness::ActiveState) {
-            m_runningBookmarkActions[ruleId] = qnSyncTime->currentMSecsSinceEpoch();
+            m_runningBookmarkActions[camera->getId()] = startTimeMs;
             return true;
         }
 
-        if (!m_runningBookmarkActions.contains(ruleId))
+        if (!m_runningBookmarkActions.contains(camera->getId()))
             return false;
 
-        startTime = m_runningBookmarkActions.take(ruleId);
-    } else {
-        startTime = qnSyncTime->currentMSecsSinceEpoch();
+        startTimeMs = m_runningBookmarkActions.take(camera->getId());
     }
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
-    bookmark.startTimeMs = startTime;
-    bookmark.durationMs = fixedDuration > 0 ? fixedDuration : endTime - startTime;
+    bookmark.startTimeMs = startTimeMs;
+    bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.cameraId = camera->getUniqueId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
