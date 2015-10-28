@@ -47,18 +47,30 @@ QnStorageConfigWidget::StoragePool::StoragePool()
 }
 
 
-class QnCustomItemDelegate: public QStyledItemDelegate 
+class QnStorageTableItemDelegate: public QStyledItemDelegate 
 {
     typedef QStyledItemDelegate base_type;
 
 public:
-    explicit QnCustomItemDelegate(QObject *parent = NULL): base_type(parent) {}
+    explicit QnStorageTableItemDelegate(QObject *parent = NULL): base_type(parent) {}
 
     virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override
     {
         QSize result = base_type::sizeHint(option, index);
         result.setWidth(result.width() + COLUMN_SPACING);
         return result;
+    }
+
+protected:
+    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
+         base_type::initStyleOption(option, index);
+
+         QnStorageSpaceData data = index.data(Qn::StorageSpaceDataRole).value<QnStorageSpaceData>();
+         if (!data.isWritable) {
+             if (QStyleOptionViewItemV4 *vopt = qstyleoption_cast<QStyleOptionViewItemV4 *>(option)) {
+                 vopt->state &= ~QStyle::State_Enabled;
+             }
+         }
     }
 };
 
@@ -174,7 +186,7 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
 
 void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storagePool)
 {
-    tableView->setItemDelegate(new QnCustomItemDelegate(this));
+    tableView->setItemDelegate(new QnStorageTableItemDelegate(this));
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
     
@@ -229,18 +241,15 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
 
     if (index.column() == QnStorageListModel::ChangeGroupActionColumn)
     {
-        if (isMain && m_mainPool.model->storages().size() <= 1)
-            return;
-
         QnStorageListModel* fromModel = m_mainPool.model.data();
         QnStorageListModel* toModel = m_backupPool.model.data();
         if (!isMain)
             qSwap(fromModel, toModel);
 
-        QVariant data = index.data(Qn::StorageSpaceDataRole);
-        if (!data.canConvert<QnStorageSpaceData>())
+        QnStorageSpaceData record = index.data(Qn::StorageSpaceDataRole).value<QnStorageSpaceData>();
+        if (!fromModel->canMoveStorage(record))
             return;
-        QnStorageSpaceData record = data.value<QnStorageSpaceData>();
+
         fromModel->removeRow(index.row());
         toModel->addStorage(record);
         updateColumnWidth();
@@ -249,10 +258,7 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
     {
         QnStorageListModel* model = isMain ? m_mainPool.model.data() : m_backupPool.model.data();
 
-        QVariant data = index.data(Qn::StorageSpaceDataRole);
-        if (!data.canConvert<QnStorageSpaceData>())
-            return;
-        QnStorageSpaceData record = data.value<QnStorageSpaceData>();
+        QnStorageSpaceData record = index.data(Qn::StorageSpaceDataRole).value<QnStorageSpaceData>();
         if (record.isExternal)
             model->removeRow(index.row());
         updateColumnWidth();

@@ -73,7 +73,10 @@ QString QnActiveCameraThumbnailLoader::thumbnailId() const {
 }
 
 QUrl QnActiveCameraThumbnailLoader::thumbnailUrl() const {
-    return QUrl(lit("image://%1/%2").arg(lit("active")).arg(thumbnailId()));
+    QString id = thumbnailId();
+    if (id.isNull())
+        return QUrl();
+    return QUrl(lit("image://%1/%2").arg(lit("active")).arg(id));
 }
 
 void QnActiveCameraThumbnailLoader::forceLoadThumbnail(qint64 position) {

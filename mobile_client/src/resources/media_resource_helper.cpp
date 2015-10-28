@@ -73,7 +73,7 @@ namespace {
 } // anonymous namespace
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
-    QObject(parent),
+    base_type(parent),
     m_position(-1),
     m_nativeStreamIndex(1),
     m_transcodingSupported(true),
@@ -89,14 +89,12 @@ QString QnMediaResourceHelper::resourceId() const {
 }
 
 void QnMediaResourceHelper::setResourceId(const QString &id) {
-    QnUuid uuid(id);
-
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById(uuid).dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid::fromStringSafe(id));
     if (camera == m_camera)
         return;
 
     if (m_camera)
-        disconnect(m_camera.data(), nullptr, this, nullptr);
+        disconnect(m_camera, nullptr, this, nullptr);
 
     m_camera = camera;
 
@@ -105,11 +103,20 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
 
         m_nativeProtocol = nativeStreamProtocol;
 
-        connect(m_camera.data(), &QnResource::propertyChanged, this, &QnMediaResourceHelper::at_resourcePropertyChanged);
-        connect(m_camera.data(), &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
-        connect(m_camera.data(), &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
+        connect(m_camera, &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
+        connect(m_camera, &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
+        connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key){
+            Q_ASSERT(m_camera == resource);
+            if (m_camera != resource)
+                return;
+
+            if (key != Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+                return;
+
+            updateMediaStreams();
+        });
         at_resource_parentIdChanged(camera);
-        at_resourcePropertyChanged(camera, Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
+        updateMediaStreams();
 
         emit resourceIdChanged();
         emit resourceNameChanged();
@@ -332,15 +339,15 @@ qreal QnMediaResourceHelper::aspectRatio() const {
     if (!layoutSize.isEmpty())
         aspectRatio *= qreal(layoutSize.width()) / layoutSize.height();
 
+    int rotation = m_camera->getProperty(QnMediaResource::rotationKey()).toInt();
+    if (rotation % 90 == 0 && rotation % 180 != 0)
+        aspectRatio = 1.0 / aspectRatio;
+
     return aspectRatio;
 }
 
-void QnMediaResourceHelper::at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key) {
-    Q_ASSERT(m_camera == resource);
-    if (m_camera != resource)
-        return;
-
-    if (key != Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+void QnMediaResourceHelper::updateMediaStreams() {
+    if (!m_camera)
         return;
 
     CameraMediaStreams supportedStreams = QJson::deserialized<CameraMediaStreams>(m_camera->getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME).toLatin1());

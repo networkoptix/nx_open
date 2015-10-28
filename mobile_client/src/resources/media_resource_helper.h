@@ -5,8 +5,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
+#include <utils/common/connective.h>
 
-class QnMediaResourceHelper : public QObject {
+class QnMediaResourceHelper : public Connective<QObject> {
     Q_OBJECT
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
@@ -19,6 +20,8 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(qreal aspectRatio READ aspectRatio NOTIFY aspectRatioChanged)
 
     Q_ENUMS(Protocol)
+
+    typedef Connective<QObject> base_type;
 
 public:
     enum Protocol {
@@ -63,7 +66,7 @@ signals:
     void aspectRatioChanged();
 
 private:
-    void at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key);
+    void updateMediaStreams();
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
 
 private:
