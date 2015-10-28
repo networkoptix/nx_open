@@ -94,7 +94,7 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
         return;
 
     if (m_camera)
-        disconnect(m_camera.data(), nullptr, this, nullptr);
+        disconnect(m_camera, nullptr, this, nullptr);
 
     m_camera = camera;
 
@@ -103,9 +103,9 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
 
         m_nativeProtocol = nativeStreamProtocol;
 
-        connect(m_camera.data(), &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
-        connect(m_camera.data(), &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
-        connect(m_camera.data(), &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key){
+        connect(m_camera, &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
+        connect(m_camera, &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
+        connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key){
             Q_ASSERT(m_camera == resource);
             if (m_camera != resource)
                 return;
