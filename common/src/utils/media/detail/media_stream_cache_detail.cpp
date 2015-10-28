@@ -21,8 +21,8 @@ MediaStreamCache::MediaStreamCache(
     unsigned int desiredCacheSizeMillis,
     unsigned int maxCacheSizeMillis)
 :
-    m_cacheSizeMillis( desiredCacheSizeMillis ),
-    m_maxCacheSizeUsec( (qint64)maxCacheSizeMillis*USEC_PER_MS ),
+    m_cacheSizeUsec( ((qint64)desiredCacheSizeMillis)*USEC_PER_MS),
+    m_maxCacheSizeUsec( ((qint64)maxCacheSizeMillis)*USEC_PER_MS ),
     m_mutex( QMutex::Recursive ),   //TODO #ak get rid of Recursive mutex
     m_prevPacketSrcTimestamp( -1 ),
     m_cacheSizeInBytes( 0 )
@@ -107,7 +107,7 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 void MediaStreamCache::clearCacheIfNeeded(QMutexLocker* const /*lk*/)
 {
     const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
-    if( maxTimestamp - m_packetsByTimestamp.front().timestamp <= m_cacheSizeMillis*USEC_PER_MS )
+    if(maxTimestamp - m_packetsByTimestamp.front().timestamp <= m_cacheSizeUsec)
         return;
 
     //determining left-most position of active blockings
@@ -121,7 +121,7 @@ void MediaStreamCache::clearCacheIfNeeded(QMutexLocker* const /*lk*/)
             minReadingTimestamp = it->second;
     }
 
-    //TODO #ak putting a hard limit on cache size by time and packet count
+    //putting a hard limit on cache size by time and packet count
     const qint64 currentCacheSizeUsec = maxTimestamp - minReadingTimestamp;
     if (currentCacheSizeUsec > m_maxCacheSizeUsec)
         minReadingTimestamp = maxTimestamp - m_maxCacheSizeUsec;
@@ -130,7 +130,7 @@ void MediaStreamCache::clearCacheIfNeeded(QMutexLocker* const /*lk*/)
     PacketContainerType::iterator lastItToRemove = std::lower_bound(
         m_packetsByTimestamp.begin(),
         m_packetsByTimestamp.end(),
-        std::min<>( minReadingTimestamp, maxTimestamp - m_cacheSizeMillis*USEC_PER_MS ),
+        std::min<>(minReadingTimestamp, maxTimestamp - m_cacheSizeUsec),
         []( const MediaStreamCache::MediaPacketContext& one, quint64 two ) -> bool {
             return one.timestamp < two;
         } );
