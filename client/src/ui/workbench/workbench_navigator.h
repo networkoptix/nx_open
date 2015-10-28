@@ -219,7 +219,7 @@ private:
     QnCachingCameraDataLoader* loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
-    void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
+    void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
     void updateBookmarkTags();
 

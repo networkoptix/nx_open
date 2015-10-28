@@ -259,7 +259,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     int fixedDuration = action->getParams().bookmarkDuration;
 
     qint64 startTime = 0;
-    qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 endTime = qnSyncTime->currentMSecsSinceEpoch();
 
     if (fixedDuration <= 0) {
         if (action->getToggleState() == QnBusiness::ActiveState) {
