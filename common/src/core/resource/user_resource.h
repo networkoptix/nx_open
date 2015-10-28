@@ -14,6 +14,7 @@ class QnUserResource : public QnResource
 
 public:
     QnUserResource();
+    QnUserResource(const QnUserResource&);
 
     QByteArray getHash() const;
     void setHash(const QByteArray&hash);

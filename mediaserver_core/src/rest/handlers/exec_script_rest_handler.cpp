@@ -41,6 +41,7 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
 
 void QnExecScript::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
 {
+    Q_UNUSED(owner);
     QnJsonRestResult reply;
     if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
         return;
