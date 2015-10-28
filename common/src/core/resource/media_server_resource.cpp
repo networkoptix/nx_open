@@ -33,6 +33,12 @@
 namespace {
     const QString protoVersionPropertyName = lit("protoVersion");
     const QString safeModePropertyName = lit("ecDbReadOnly");
+
+    quint16 portFromUrl(const QString &strUrl)
+    {
+        const QUrl url(strUrl);
+        return url.port(DEFAULT_APPSERVER_PORT);
+    }
 }
 
 
@@ -213,8 +219,7 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 }
 
 quint16 QnMediaServerResource::getPort() const {
-    QUrl url(getApiUrl());
-    return url.port(DEFAULT_APPSERVER_PORT);
+    return portFromUrl(getApiUrl());
 }
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
@@ -340,14 +345,15 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         */
     }
 
-    const bool currentPortChanged = getPort() != localOther->getPort();
+
+    const bool currentPortChanged = (portFromUrl(m_apiUrl) != localOther->getPort());
     if (netAddrListChanged || currentPortChanged ) 
     {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         if (m_restConnection)
             m_restConnection->setUrl(m_apiUrl);
         if (currentPortChanged )
-            emit portChanged(::toSharedPointer(this));
+            modifiedFields << "portChanged";
     } else {
         m_url = oldUrl; //rollback changed value to autodetected
     }
