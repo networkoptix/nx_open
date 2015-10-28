@@ -219,6 +219,7 @@
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
 #include "rest/handlers/backup_control_rest_handler.h"
+#include <database/server_db.h>
 
 
 #ifdef __arm__
@@ -1534,6 +1535,7 @@ void MediaServerProcess::run()
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("/proxy/*/hls/*"), AuthMethod::noAuth );
 
+    std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
 
     QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
@@ -2428,6 +2430,11 @@ protected:
     virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
+
+        QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
+        QCoreApplication::setApplicationName(lit(QN_APPLICATION_NAME));
+        if (QCoreApplication::applicationVersion().isEmpty())
+            QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
         if (application->isRunning())
         {
