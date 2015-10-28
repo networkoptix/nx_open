@@ -41,6 +41,7 @@
 #include "core/resource/resource_name.h"
 #include "business/events/mserver_conflict_business_event.h"
 #include "core/resource/camera_history.h"
+#include <utils/common/synctime.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
