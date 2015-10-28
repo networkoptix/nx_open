@@ -1,5 +1,7 @@
 #include "storage_list_model.h"
 
+#include <core/resource/storage_resource.h>
+
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
 }
@@ -21,6 +23,7 @@ void QnStorageListModel::setStorages(const QnStorageSpaceDataList& storages)
 {
     beginResetModel();
     m_storages = storages;
+    sortStorages();
     endResetModel();
 }
 
@@ -28,8 +31,26 @@ void QnStorageListModel::addStorage(const QnStorageSpaceData& data)
 {
     beginResetModel();
     m_storages.push_back(data);
+    sortStorages();
     endResetModel();
 }
+
+
+void QnStorageListModel::sortStorages() {
+    qSort(m_storages.begin(), m_storages.end(), [](const QnStorageSpaceData &left, const QnStorageSpaceData &right) {
+        
+        /* Local storages should go first. */
+        if (left.isExternal != right.isExternal)
+            return right.isExternal;
+
+        /* Group storages by plugin. */
+        if (left.storageType != right.storageType)
+            return QString::compare(left.storageType, right.storageType, Qt::CaseInsensitive) < 0;
+
+        return QString::compare(left.url, right.url, Qt::CaseInsensitive) < 0;
+    });
+}
+
 
 QnStorageSpaceDataList QnStorageListModel::storages() const
 {
@@ -71,9 +92,12 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     case TypeColumn:
         return storageData.storageType;
     case TotalSpaceColumn:
-        return storageData.totalSpace > 0
-            ? tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1))
-            : tr("Invalid storage");
+        switch (storageData.totalSpace) {
+        case QnStorageResource::UnknownSize:
+            return tr("Invalid storage");
+        default:
+            return tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1));
+        }
     case RemoveActionColumn:
         return (storageData.isExternal || forcedText) && (!m_readOnly)
             ? tr("Remove") 
@@ -83,9 +107,12 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
         if (m_readOnly)
             return QString();
 
+        if (!storageData.isWritable)
+            return tr("Inaccessible");
+
         return m_isBackupRole 
             ? tr("Use as main storage") 
-            : m_storages.size() > 1
+            : canMoveStorage(storageData)
             ? tr("Use as backup storage")
             : QString();
     default:
@@ -99,6 +126,10 @@ QVariant QnStorageListModel::fontData(const QModelIndex &index) const {
     if (m_readOnly)
         return QVariant();
 
+    const QnStorageSpaceData& storageData = m_storages[index.row()];
+    if (!storageData.isWritable)
+        return QVariant();
+
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
         return m_linkFont;
 
@@ -109,8 +140,13 @@ QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const {
     if (m_readOnly)
         return QVariant();
 
+    const QnStorageSpaceData& storageData = m_storages[index.row()];
+    if (!storageData.isWritable)
+        return QVariant();
+
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
         return m_linkBrush;
+
     return QVariant();
 }
 
@@ -118,17 +154,23 @@ QVariant QnStorageListModel::mouseCursorData(const QModelIndex &index) const {
     if (m_readOnly)
         return QVariant();
 
+    const QnStorageSpaceData& storageData = m_storages[index.row()];
+    if (!storageData.isWritable)
+        return QVariant();
+
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
         if (!index.data(Qt::DisplayRole).toString().isEmpty())
             return QVariant::fromValue<int>(Qt::PointingHandCursor);
+
     return QVariant();
 }
 
 QVariant QnStorageListModel::checkstateData(const QModelIndex &index) const
 {
-    const QnStorageSpaceData& storageData = m_storages[index.row()];
-    if (index.column() == CheckBoxColumn)
-        return storageData.isUsedForWriting ? Qt::Checked : Qt::Unchecked;
+    if (index.column() == CheckBoxColumn) {
+        const QnStorageSpaceData& storageData = m_storages[index.row()];
+        return storageData.isUsedForWriting && storageData.isWritable ? Qt::Checked : Qt::Unchecked;
+    }
     return QVariant();
 }
 
@@ -167,6 +209,8 @@ bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value
         return false;
 
     QnStorageSpaceData& storageData = m_storages[index.row()];
+    if (!storageData.isWritable)
+        return false;
 
     if (role == Qt::CheckStateRole)
     {
@@ -225,5 +269,27 @@ bool QnStorageListModel::removeRows(int row, int count, const QModelIndex &paren
     m_storages.erase(m_storages.begin() + row, m_storages.begin() + row + count);
     endResetModel();
     return true;
+}
+
+bool QnStorageListModel::canMoveStorage( const QnStorageSpaceData& data ) const {
+    if (!data.isWritable)
+        return false;
+
+    if (isBackupRole())
+        return true;
+
+    /* Check that at least one writable storage left in the main pool. */
+    return std::any_of(m_storages.cbegin(), m_storages.cend(), [data](const QnStorageSpaceData &other) {
+
+        /* Do not count subject to remove. */
+        if (other.url == data.url)
+            return false;
+
+        if (!other.isWritable)
+            return false;
+
+        return true;
+    });
+
 }
 

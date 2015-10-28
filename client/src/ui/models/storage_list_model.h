@@ -33,6 +33,9 @@ public:
     void addStorage(const QnStorageSpaceData& data);
     QnStorageSpaceDataList storages() const;
 
+    /** Check if the storage can be moved from this model to another. */
+    bool canMoveStorage(const QnStorageSpaceData& data) const;
+
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
@@ -53,6 +56,8 @@ private:
     QVariant foregroundData(const QModelIndex &index) const;
     QVariant mouseCursorData(const QModelIndex &index) const;
     QVariant checkstateData(const QModelIndex &index) const;
+
+    void sortStorages();
 private:
     QnStorageSpaceDataList m_storages;
     bool m_isBackupRole;
