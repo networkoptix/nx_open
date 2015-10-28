@@ -215,8 +215,9 @@ public:
                 ASSERT_TRUE(!d.isEmpty());
                 if (response.messageBody.contains("\"serverFlags\""))
                     ++m_firstRequest;
+                ++m_requests;
                 qDebug() << "doParallelTest(). completed: " << m_requests << "of" << MT_REQUESTS * 2;
-                if (++m_requests == MT_REQUESTS * 2) 
+                if (m_requests == MT_REQUESTS * 2) 
                 {
                     ASSERT_EQ(m_firstRequest, MT_REQUESTS);
                     //m_processor.stopAsync();

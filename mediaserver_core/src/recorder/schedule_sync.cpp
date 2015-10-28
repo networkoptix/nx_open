@@ -18,7 +18,6 @@
 #include <mutex>
 #include <numeric>
 
-static std::once_flag QnScheduleSync_flag;
 static QnScheduleSync *QnScheduleSync_instance = nullptr;
 
 QnScheduleSync *QnScheduleSync::instance()
@@ -32,18 +31,14 @@ QnScheduleSync::QnScheduleSync()
       m_forced(false),
       m_syncTimePoint(0)
 {
-    std::call_once(
-        QnScheduleSync_flag, 
-        [this]
-        {
-            QnScheduleSync_instance = this;
-        }
-    );
+    Q_ASSERT(QnScheduleSync_instance == 0);
+    QnScheduleSync_instance = this;
 }
 
 QnScheduleSync::~QnScheduleSync()
 {
     stop();
+    QnScheduleSync_instance = 0;
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
