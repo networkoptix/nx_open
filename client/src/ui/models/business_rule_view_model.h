@@ -95,6 +95,8 @@ public:
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
 
+    bool isActionProlonged() const;
+
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
 

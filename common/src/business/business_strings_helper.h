@@ -48,7 +48,10 @@ public:
     static QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic);
 
     static QString toggleStateToString(QnBusiness::EventState state);
-    static QString eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType);
+    static QString eventTypeString(QnBusiness::EventType eventType,
+                                   QnBusiness::EventState eventState,
+                                   QnBusiness::ActionType actionType,
+                                   const QnBusinessActionParameters &actionParams);
     static QString bruleDescriptionText(const QnBusinessEventRulePtr& bRule);
     static QnResourcePtr eventSource(const QnBusinessEventParameters &params);
 

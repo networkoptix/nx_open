@@ -73,7 +73,7 @@ private:
     int nativeStreamIndex(const QString &resolution) const;
 
 private:
-    QnResourcePtr m_resource;
+    QnVirtualCameraResourcePtr m_camera;
     QUrl m_url;
     qint64 m_position;
     QString m_resolution;

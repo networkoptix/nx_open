@@ -35,7 +35,7 @@ namespace {
     const qreal stripesMovingSpeed = 0.002;
     const qreal windowMovingSpeed = 0.04;
     const qint64 correctionThreshold = 5000;
-    const qint64 defaultWindowSize = 60 * 60 * 1000;
+    const qint64 defaultWindowSize = 90 * 60 * 1000;
 
     struct MarkInfo {
         qint64 tick;
@@ -159,6 +159,8 @@ public:
         startBoundTime(-1),
         endBoundTime(-1),
         targetPosition(-1),
+        windowStart(QDateTime::currentMSecsSinceEpoch() - defaultWindowSize),
+        windowEnd(windowStart + defaultWindowSize * 2),
         textTexture(0),
         textLevel(1.0),
         targetTextLevel(1.0),

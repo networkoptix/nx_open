@@ -35,6 +35,8 @@ class QnVideoWallControlMessage;
 
 class QnLayoutItemData;
 
+struct QnServerBackupSchedule;
+
 class QnResourceCommand;
 typedef std::shared_ptr<QnResourceCommand> QnResourceCommandPtr;
 

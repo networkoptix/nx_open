@@ -10,20 +10,12 @@
 #include <common/common_globals.h>
 #include <api/model/backup_status_reply.h>
 #include <recorder/storage_manager.h>
+#include <core/resource/server_backup_schedule.h>
 
 class QnScheduleSync: public QObject
 {
     Q_OBJECT
 private:
-    struct schedule
-    {
-        int dow;
-        int start;
-        int duration;
-        int bitrate;
-        Qn::BackupType type;
-    };
-
     struct ChunkKey 
     {
         DeviceFileCatalog::Chunk chunk;
@@ -76,7 +68,7 @@ private:
     std::atomic<bool>    m_syncing;
     std::atomic<bool>    m_forced;
     QFuture<void>        m_backupFuture;
-    schedule             m_schedule;
+    QnServerBackupSchedule  m_schedule;
     std::atomic<int64_t> m_syncTimePoint;
 
     std::map<ChunkKey, double> m_syncData;

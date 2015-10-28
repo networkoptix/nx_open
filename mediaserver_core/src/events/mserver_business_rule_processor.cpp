@@ -255,21 +255,29 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
 
     QnUuid ruleId = action->getBusinessRuleId();
 
-    if (action->getToggleState() == QnBusiness::ActiveState) {
-        m_runningBookmarkActions[ruleId] = QDateTime::currentMSecsSinceEpoch();
-        return true;
-    }
+    int fixedDuration = action->getParams().bookmarkDuration;
 
-    if (!m_runningBookmarkActions.contains(ruleId))
-        return false;
-
-    qint64 startTime = m_runningBookmarkActions.take(ruleId);
+    qint64 startTime = 0;
     qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+
+    if (fixedDuration <= 0) {
+        if (action->getToggleState() == QnBusiness::ActiveState) {
+            m_runningBookmarkActions[ruleId] = QDateTime::currentMSecsSinceEpoch();
+            return true;
+        }
+
+        if (!m_runningBookmarkActions.contains(ruleId))
+            return false;
+
+        startTime = m_runningBookmarkActions.take(ruleId);
+    } else {
+        startTime = QDateTime::currentMSecsSinceEpoch();
+    }
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
     bookmark.startTimeMs = startTime;
-    bookmark.durationMs = endTime - startTime;
+    bookmark.durationMs = fixedDuration > 0 ? fixedDuration : endTime - startTime;
     bookmark.cameraId = camera->getUniqueId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));

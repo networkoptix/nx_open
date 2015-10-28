@@ -10,14 +10,16 @@ namespace ec2
     {
         enum DayOfWeek
         {
-            NoDay       = 0,
-            Monday      = 2,
-            Tuesday     = 4,
-            Wednsday    = 8,
-            Thursday    = 16,
-            Friday      = 32,
-            Saturday    = 64,
-            Sunday      = 128
+            NoDay       = 0x00,
+            Monday      = 0x01,
+            Tuesday     = 0x02,
+            Wednsday    = 0x04,
+            Thursday    = 0x08,
+            Friday      = 0x10,
+            Saturday    = 0x20,
+            Sunday      = 0x40,
+
+            AllDays     = 0x7F
         };
 
         inline DayOfWeek fromQtDOW(int qtDOW)
@@ -87,7 +89,7 @@ namespace ec2
             maxCameras(0), 
             allowAutoRedundancy(false),
             backupType(Qn::Backup_Disabled),
-            backupDaysOfTheWeek(0x7f), // all days of week
+            backupDaysOfTheWeek(backup::AllDays),
             backupStart(0), // midnight
             backupDuration(-1), // unlimited duration
             backupBitrate(-1) // unlimited

@@ -12,6 +12,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_user_attributes.h>
+#include <core/resource/server_backup_schedule.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -366,103 +367,19 @@ int QnMediaServerResource::getMaxCameras() const
     return (*lk)->maxCameras;
 }
 
-int QnMediaServerResource::getBackupDOW() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupDaysOfTheWeek;
+QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const {
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    return (*lk)->backupSchedule;
 }
 
-int QnMediaServerResource::getBackupStart() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupStart;
-}
-
-int QnMediaServerResource::getBackupDuration() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupDuration;
-}
-
-int QnMediaServerResource::getBackupBitrate() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupBitrate;
-}
-
-Qn::BackupType QnMediaServerResource::getBackupType() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-        );
-
-    return (*lk)->backupType;
-}
-
-void QnMediaServerResource::setBackupType(Qn::BackupType value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-        );
-
-    (*lk)->backupType = value;
-}
-
-void QnMediaServerResource::setBackupDOW(int value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    (*lk)->backupDaysOfTheWeek = value;
-}
-
-void QnMediaServerResource::setBackupStart(int value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    (*lk)->backupStart = value;
-}
-void QnMediaServerResource::setBackupDuration(int value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    (*lk)->backupDuration = value;
-}
-
-void QnMediaServerResource::setBackupBitrate(int value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    (*lk)->backupBitrate = value;
+void QnMediaServerResource::setBackupSchedule(const QnServerBackupSchedule &value) {
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->backupSchedule == value)
+            return;
+        (*lk)->backupSchedule = value;
+    }
+    emit backupScheduleChanged(::toSharedPointer(this));
 }
 
 void QnMediaServerResource::setRedundancy(bool value)
