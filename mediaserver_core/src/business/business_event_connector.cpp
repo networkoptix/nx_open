@@ -170,7 +170,7 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
     {
         if (params.resourceName.isEmpty() && params.caption.isEmpty() &&  params.description.isEmpty()) {
             if (errMessage)
-                *errMessage = "At least one of values 'resourceName', 'caption' or 'description' should be filled";
+                *errMessage = "At least one of values 'source', 'caption' or 'description' should be filled";
             return false;
         }
         at_customEvent(params.resourceName, params.caption, params.description, params.metadata, eventState, params.eventTimestampUsec);
