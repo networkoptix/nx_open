@@ -8,6 +8,7 @@
 #include <QCoreApplication>
 
 #include <utils/common/log.h>
+#include <utils/network/http/httpclient.h>
 #include <utils/network/http/auth_tools.h>
 
 

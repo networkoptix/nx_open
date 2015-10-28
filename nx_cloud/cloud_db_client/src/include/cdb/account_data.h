@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <string>
 
-#include <boost/optional.h>
+#include <boost/optional.hpp>
 
 #include <utils/common/uuid.h>
 

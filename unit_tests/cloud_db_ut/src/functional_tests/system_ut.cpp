@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
+TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 {
     //waiting for cloud_db initialization
     waitUntilStarted();
@@ -159,7 +159,7 @@ TEST_F(CdbFunctionalTest, systemSharing_getCloudUsers)
     }
 }
 
-TEST_F(CdbFunctionalTest, systemSharing_maintenance)
+TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 {
     //waiting for cloud_db initialization
     waitUntilStarted();
@@ -471,7 +471,7 @@ TEST_F(CdbFunctionalTest, systemSharing_maintenance)
     }
 }
 
-TEST_F(CdbFunctionalTest, systemSharing_owner)
+TEST_F(CdbFunctionalTest, system_sharing_owner)
 {
     //waiting for cloud_db initialization
     waitUntilStarted();

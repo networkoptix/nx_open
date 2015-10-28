@@ -116,15 +116,17 @@ void AccountManager::updateAccount(
     std::string accountEmail;
     if (!authzInfo.get( attr::authAccountEmail, &accountEmail))
     {
-        completionHandler(api::ResultCode::forbidden, data::AccountData());
+        completionHandler(api::ResultCode::forbidden);
         return;
     }
-    accountData.email = accountEmail;
+
+    data::AccountUpdateDataWithEmail updateDataWithEmail(std::move(accountData));
+    updateDataWithEmail.email = accountEmail;
 
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountUpdateData>(
-        std::bind(&AccountManager::updateAccountInDb, this, _1, _2),
-        std::move(accountData),
+    m_dbManager->executeUpdate<data::AccountUpdateDataWithEmail>(
+        std::bind(&AccountManager::updateAccountInDB, this, _1, _2),
+        std::move(updateDataWithEmail),
         std::bind(&AccountManager::accountUpdated, this, _1, _2, std::move(completionHandler)));
 }
 
@@ -340,8 +342,8 @@ void AccountManager::accountVerified(
 }
 
 nx::db::DBResult AccountManager::updateAccountInDB(
-    QSqlDatabase* const tran,
-    const data::AccountUpdateData& accountData)
+    QSqlDatabase* const connection,
+    const data::AccountUpdateDataWithEmail& accountData)
 {
     assert(static_cast<bool>(accountData.passwordHa1) ||
            static_cast<bool>(accountData.fullName) ||
@@ -358,11 +360,23 @@ nx::db::DBResult AccountManager::updateAccountInDB(
     updateAccountQuery.prepare( 
         lit("UPDATE account SET %1 WHERE email=:email").
             arg(accountUpdateFieldsSql.join(lit(","))));
-    QnSql::bind( accountData, &updateAccountQuery );
+    //TODO #ak use fusion here (at the moment it is missing boost::optional support)
+    if (accountData.passwordHa1)
+        updateAccountQuery.bindValue(
+            ":passwordHa1",
+            QnSql::serialized_field(accountData.passwordHa1.get()));
+    if (accountData.fullName)
+        updateAccountQuery.bindValue(
+            ":fullName",
+            QnSql::serialized_field(accountData.fullName.get()));
+    if (accountData.customization)
+        updateAccountQuery.bindValue(
+            ":customization",
+            QnSql::serialized_field(accountData.customization.get()));
     if( !updateAccountQuery.exec() )
     {
-        NX_LOG(lit( "Could not update account in DB. %1").
-            arg(connection->lastError().text(), cl_logDEBUG1);
+        NX_LOG(lit("Could not update account in DB. %1").
+            arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
     
@@ -371,7 +385,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 
 void AccountManager::accountUpdated(
     nx::db::DBResult resultCode,
-    data::AccountUpdateData accountData,
+    data::AccountUpdateDataWithEmail accountData,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (resultCode == db::DBResult::ok)

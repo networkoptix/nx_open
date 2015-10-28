@@ -37,6 +37,26 @@ bool AccountActivationCode::getAsVariant(int /*resID*/, QVariant* const /*value*
     return false;
 }
 
+
+bool AccountUpdateData::getAsVariant(int resID, QVariant* const value) const
+{
+    //TODO #ak
+    return false;
+}
+
+
+AccountUpdateDataWithEmail::AccountUpdateDataWithEmail(AccountUpdateData&& rhs)
+:
+    AccountUpdateData(std::move(rhs))
+{
+}
+
+
+//QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+//    (AccountUpdateDataWithEmail),
+//    (sql_record),
+//    _Fields)
+
 }   //data
 }   //cdb
 }   //nx

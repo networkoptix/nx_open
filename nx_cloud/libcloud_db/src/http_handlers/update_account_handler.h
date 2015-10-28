@@ -20,7 +20,6 @@
 namespace nx {
 namespace cdb {
 
-
 class AccountManager;
 
 class UpdateAccountHttpHandler
@@ -40,11 +39,10 @@ public:
             authorizationManager,
             std::bind(
                 &AccountManager::updateAccount, accountManager,
-                std::placeholders::_1, std::placeholders::_2))
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
     {
     }
 };
-
 
 }   //cdb
 }   //nx

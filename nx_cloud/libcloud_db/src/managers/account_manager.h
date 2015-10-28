@@ -60,7 +60,7 @@ public:
         std::function<void(api::ResultCode, data::AccountData)> completionHandler);
     void updateAccount(
         const AuthorizationInfo& authzInfo,
-        data::AccountData accountData,
+        data::AccountUpdateData accountData,
         std::function<void(api::ResultCode)> completionHandler);
 
     boost::optional<data::AccountData> findAccountByUserName(
@@ -101,10 +101,10 @@ private:
 
     nx::db::DBResult updateAccountInDB(
         QSqlDatabase* const tran,
-        const data::AccountUpdateData& accountData);
+        const data::AccountUpdateDataWithEmail& accountData);
     void accountUpdated(
         nx::db::DBResult resultCode,
-        data::AccountUpdateData accountData,
+        data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler );
 };
 

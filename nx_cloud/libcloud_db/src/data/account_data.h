@@ -42,6 +42,31 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
+class AccountUpdateData
+:
+    public api::AccountUpdateData,
+    public stree::AbstractResourceReader
+{
+public:
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+};
+
+class AccountUpdateDataWithEmail
+:
+    public AccountUpdateData
+{
+public:
+    std::string email;
+
+    AccountUpdateDataWithEmail(AccountUpdateData&& rhs);
+};
+
+//#define AccountUpdateDataWithEmail_Fields (passwordHa1)(fullName)(customization)(email)
+//
+//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+//    (AccountUpdateDataWithEmail),
+//    (sql_record))
+
 }   //data
 }   //cdb
 }   //nx

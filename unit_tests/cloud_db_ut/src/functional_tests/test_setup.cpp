@@ -43,6 +43,7 @@ CdbFunctionalTest::CdbFunctionalTest()
     *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
     *b = strdup("-db/driverName"); *b = strdup("QSQLITE");
     *b = strdup("-db/name"); *b = strdup(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
+    *b = strdup("--email/smtpServer=");
 
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
     
