@@ -60,6 +60,9 @@ private:
     void startBackup();
     void cancelBackup();
 
+    /** Check if backup can be started right now - and show additional info if not. */
+    bool canStartBackup(const QnBackupStatusData& data, QString *info);
+
 private slots:
     
     void at_serverStorageSpaceChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageSpaceDataList &storages);
@@ -83,7 +86,6 @@ private:
         StoragePool();
         QScopedPointer<QnStorageListModel> model;
         bool rebuildCancelled;
-        bool hasStorageChanges;
     };
 
     StoragePool m_mainPool;

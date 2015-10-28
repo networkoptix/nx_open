@@ -42,7 +42,6 @@ namespace {
 QnStorageConfigWidget::StoragePool::StoragePool() 
     : model(new QnStorageListModel())
     , rebuildCancelled(false)
-    , hasStorageChanges(false)
 {
 }
 
@@ -109,7 +108,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     connect(ui->rebuildBackupWidget,        &QnStorageRebuildWidget::cancelRequested, this, [this]{ cancelRebuild(false); });
 
     connect(ui->pushButtonSchedule,         &QPushButton::clicked, this, &QnStorageConfigWidget::at_openBackupSchedule_clicked);
-    connect(ui->pushButtonCameraSettings,   &QPushButton::clicked,  action(Qn::OpenBackupCamerasAction), &QAction::trigger);
+    connect(ui->pushButtonCameraSettings,   &QPushButton::clicked,  this, [this]{
+        menu()->trigger(Qn::OpenBackupCamerasAction);
+        updateBackupInfo();
+    });
 
     connect(ui->backupStartButton,          &QPushButton::clicked, this, &QnStorageConfigWidget::startBackup);
     connect(ui->backupStopButton,           &QPushButton::clicked, this, &QnStorageConfigWidget::cancelBackup);
@@ -211,9 +213,8 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, StoragePool* storag
 
 void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index) {
     m_backupSchedule.backupType = static_cast<Qn::BackupType>(ui->comboBoxBackupType->itemData(index).toInt());
-
     ui->pushButtonSchedule->setEnabled(m_backupSchedule.backupType == Qn::Backup_Schedule);
-    ui->backupStartButton->setEnabled(m_backupSchedule.backupType == Qn::Backup_Schedule); 
+    emit hasChangesChanged();
 }
 
 void QnStorageConfigWidget::updateFromSettings()
@@ -452,18 +453,6 @@ void QnStorageConfigWidget::startBackup() {
     if (!m_server)
         return;
 
-    if (hasChanges())
-    {
-        int dialogResult = QMessageBox::question(
-            this,
-            tr("Confirm save changes"),
-            tr("You have unsaved changes. This action requires to save it. Save changed and continue?"),
-            QMessageBox::Yes | QMessageBox::Cancel);
-        if(dialogResult != QMessageBox::Yes)
-            return;
-        submitToSettings();
-    }
-
     if (qnServerStorageManager->backupServerStorages(m_server)) {
         ui->backupStartButton->setEnabled(false);
         m_backupCancelled = false;
@@ -488,6 +477,38 @@ void QnStorageConfigWidget::at_openBackupSchedule_clicked() {
             scheduleDialog->submitToSettings(m_backupSchedule);
 }
 
+bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QString *info) {
+
+    using boost::algorithm::any_of;
+
+    auto error = [info](const QString &error) -> bool {
+        if (info)
+            *info = error;
+        return false;
+    };
+
+    if (data.state != Qn::BackupState_None) 
+        return error(tr("Backup is already in progress."));
+
+    if (m_backupSchedule.backupType != Qn::Backup_Schedule)
+        return error(tr("Manual backup is available only in Schedule mode."));
+
+    if (!any_of(m_backupPool.model->storages(), [](const QnStorageSpaceData &storage){
+        return storage.isWritable && storage.isUsedForWriting;
+    }))
+        return error(tr("Select at least one backup storage."));
+
+    if (!any_of(qnResPool->getAllCameras(QnResourcePtr(), true), [](const QnVirtualCameraResourcePtr &camera){
+        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
+    }))
+        return error(tr("Select at least one camera to backup"));
+
+    if (hasChanges())
+        return error(tr("Apply changes before starting backup."));
+
+    return true;
+}
+
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 {
     QString status;
@@ -495,14 +516,14 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
     if (reply.progress >= 0)
         ui->progressBarBackup->setValue(reply.progress * 100 + 0.5);
 
-    bool canStartBackup = 
-            reply.state == Qn::BackupState_None
-        &&  !hasChanges();
-
+    QString backupInfo;
+    bool canStartBackup = this->canStartBackup(reply, &backupInfo);
+    ui->backupWarningLabel->setText(backupInfo);
+            
     ui->backupStartButton->setEnabled(canStartBackup);
     ui->backupStopButton->setEnabled(reply.state == Qn::BackupState_InProgress);
     ui->stackedWidgetBackupInfo->setCurrentWidget(reply.state == Qn::BackupState_InProgress ? ui->backupProgressPage : ui->backupPreparePage);
-    ui->stackedWidgetBackupInfo->setVisible(reply.state == Qn::BackupState_InProgress);
+    //ui->stackedWidgetBackupInfo->setVisible(reply.state == Qn::BackupState_InProgress);
 }
 
 
@@ -510,7 +531,6 @@ void QnStorageConfigWidget::updateStoragesUi( QnServerStoragesPool pool, const Q
     bool isMain = (pool == QnServerStoragesPool::Main);
     StoragePool& storagePool = (isMain ? m_mainPool : m_backupPool);
     storagePool.model->setStorages(storages);
-    storagePool.hasStorageChanges = false;
     updateColumnWidth();
 }
 
@@ -579,5 +599,6 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
             tr("Archive backup is completed."));
     m_backupCancelled = false;
 }
+
 
 
