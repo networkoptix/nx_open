@@ -251,6 +251,9 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             }
         }
 
+        fromFile.reset();
+        toFile.reset();
+
         // add chunk to catalog
         bool result = qnBackupStorageMan->fileStarted(
             chunkKey.chunk.startTimeMs,
