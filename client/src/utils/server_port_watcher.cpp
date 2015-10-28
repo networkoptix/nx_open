@@ -30,7 +30,7 @@ QnServerPortWatcher::QnServerPortWatcher(QnWorkbenchContext *context
             return;
 
         QObject::disconnect(m_currentServerResource.data(), nullptr, this, nullptr);
-
+        m_currentServerResource.reset();
     });
 
     QObject::connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived
@@ -40,7 +40,7 @@ QnServerPortWatcher::QnServerPortWatcher(QnWorkbenchContext *context
         if (!m_currentServerResource)
             return;
 
-        QObject::connect(m_currentServerResource.data(), &QnMediaServerResource::apiPortChanged, this
+        QObject::connect(m_currentServerResource.data(), &QnMediaServerResource::portChanged, this
             , [context, this](const QnResourcePtr &)
         {
             if (!m_currentServerResource)
