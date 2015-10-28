@@ -340,7 +340,7 @@ qreal QnMediaResourceHelper::aspectRatio() const {
         aspectRatio *= qreal(layoutSize.width()) / layoutSize.height();
 
     int rotation = m_camera->getProperty(QnMediaResource::rotationKey()).toInt();
-    if (rotation == 90 || rotation == -90)
+    if (rotation % 90 == 0 && rotation % 180 != 0)
         aspectRatio = 1.0 / aspectRatio;
 
     return aspectRatio;
