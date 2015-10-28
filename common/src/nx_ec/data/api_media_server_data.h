@@ -8,12 +8,13 @@ namespace ec2
 {
     namespace backup 
     {
+        //TODO: #rvasilenko move out to more general space
         enum DayOfWeek
         {
-            NoDay       = 0x00,
+            Never       = 0x00,
             Monday      = 0x01,
             Tuesday     = 0x02,
-            Wednsday    = 0x04,
+            Wednesday   = 0x04,
             Thursday    = 0x08,
             Friday      = 0x10,
             Saturday    = 0x20,
@@ -21,29 +22,11 @@ namespace ec2
 
             AllDays     = 0x7F
         };
+        Q_DECLARE_FLAGS(DaysOfWeek, DayOfWeek)
+        Q_DECLARE_OPERATORS_FOR_FLAGS(DaysOfWeek)
 
-        inline DayOfWeek fromQtDOW(int qtDOW)
-        {
-            switch (qtDOW)
-            {
-            case 1:
-                return Monday;
-            case 2:
-                return Tuesday;
-            case 3:
-                return Wednsday;
-            case 4:
-                return Thursday;
-            case 5:
-                return Friday;
-            case 6:
-                return Saturday;
-            case 7:
-                return Sunday;
-            default:
-                return NoDay;
-            }
-        };
+        backup::DayOfWeek fromQtDOW(Qt::DayOfWeek qtDOW);
+        backup::DaysOfWeek fromQtDOW(QList<Qt::DayOfWeek> days);
     }
 
     struct ApiStorageData: ApiResourceData

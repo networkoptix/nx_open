@@ -394,13 +394,19 @@ void QnScheduleSync::start()
                 {
                     if (m_forced)
                         return true;
+
                     if (m_schedule.backupType != Qn::Backup_Schedule)
                         return false;
 
                     QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
                     const auto curDate = now.date();
 
-                    if ((ec2::backup::fromQtDOW(curDate.dayOfWeek()) & m_schedule.backupDaysOfTheWeek))
+                    if (m_schedule.backupDaysOfTheWeek == ec2::backup::Never)
+                        return false;
+
+                    ec2::backup::DaysOfWeek allowedDays = static_cast<ec2::backup::DaysOfWeek>(m_schedule.backupDaysOfTheWeek);
+
+                    if (allowedDays.testFlag(ec2::backup::fromQtDOW(curDate.dayOfWeek())))
                     {
                         const auto curTime = now.time();
                         if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 && 

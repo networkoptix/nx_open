@@ -1,11 +1,14 @@
 #pragma once
-#include <QtCore/QScopedPointer>
-#include <QtWidgets/QDialog>
 
-#include "core/resource/resource_fwd.h"
-#include "api/model/storage_status_reply.h"
+#include <array>
+
+#include <core/resource/server_backup_schedule.h>
+
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
-#include "ui_backup_schedule_dialog.h"
+
+namespace Ui {
+    class BackupScheduleDialog;
+}
 
 class QnBackupScheduleDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
@@ -14,16 +17,18 @@ class QnBackupScheduleDialog: public QnWorkbenchStateDependentButtonBoxDialog {
 
 public:
     QnBackupScheduleDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
-    virtual ~QnBackupScheduleDialog() {}
+    virtual ~QnBackupScheduleDialog();
 
     void updateFromSettings(const QnServerBackupSchedule& value);
     void submitToSettings(QnServerBackupSchedule& value);
 private:
     void setNearestValue(QComboBox* combobox, int time);
+    void initDayOfWeekCheckboxes();
+
 private slots:
     void at_bandwidthComboBoxChange(int index);
-protected:
-    virtual void accept() override;
+
 private:
     QScopedPointer<Ui::BackupScheduleDialog> ui;
+    std::array<QCheckBox*, 7> m_dowCheckboxes;
 };
