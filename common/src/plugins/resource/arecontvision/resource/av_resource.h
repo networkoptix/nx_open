@@ -86,6 +86,7 @@ protected:
 private:
     int m_totalMdZones;
     int m_zoneSite;
+    bool m_cameraReportedRTSPSupport;
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;

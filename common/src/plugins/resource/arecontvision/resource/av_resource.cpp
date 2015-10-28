@@ -32,7 +32,8 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64),
-      m_zoneSite(8)
+      m_zoneSite(8),
+      m_cameraReportedRTSPSupport(false)
 {
     setVendor(lit("ArecontVision"));
 }
@@ -300,6 +301,10 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
+    //QVariant val;
+    //if (getParamPhysical(lit("rtspSupported"), val))
+    //    m_cameraReportedRTSPSupport = val.toBool();
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -528,8 +533,9 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
-    return qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(
-        lit("isRTSPSupported"), false);
+    return m_cameraReportedRTSPSupport ||
+           qnCommon->dataPool()->data(toSharedPointer(this)).
+               value<bool>(lit("isRTSPSupported"), false);
 }
 
 bool QnPlAreconVisionResource::isAbstractResource() const
