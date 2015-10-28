@@ -47,6 +47,7 @@ namespace {
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
+    const QString nameDefaultBackupQualities(lit("defaultBackupQualities"));
 
     const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -69,6 +70,8 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, true, this);
+    m_defaultBackupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameDefaultBackupQualities, Qn::CameraBackup_Disabled, this);
+
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
@@ -279,4 +282,12 @@ bool QnGlobalSettings::isUpdateNotificationsEnabled() const {
 
 void QnGlobalSettings::setUpdateNotificationsEnabled(bool updateNotificationsEnabled) {
     m_updateNotificationsEnabledAdaptor->setValue(updateNotificationsEnabled);
+}
+
+Qn::CameraBackupQualities QnGlobalSettings::defaultBackupQualities() const {
+    return m_defaultBackupQualitiesAdaptor->value();
+}
+
+void QnGlobalSettings::setDefauldBackupQualities( Qn::CameraBackupQualities value ) {
+    m_defaultBackupQualitiesAdaptor->setValue(value);
 }

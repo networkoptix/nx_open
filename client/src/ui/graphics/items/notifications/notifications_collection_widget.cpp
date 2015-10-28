@@ -39,6 +39,7 @@
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <health/system_health_helper.h>
 
 #include <utils/math/color_transformations.h>
 #include <utils/app_server_notification_cache.h>
@@ -496,15 +497,30 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& bu
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params )
 {
+
     QnResourcePtr resource;
     if( params.canConvert<QnResourcePtr>() )
         resource = params.value<QnResourcePtr>();
+
+    QnAbstractBusinessActionPtr businessAction;
+    if( params.canConvert<QnAbstractBusinessActionPtr>() ) 
+    {
+        businessAction = params.value<QnAbstractBusinessActionPtr>();
+        if (businessAction) {
+            auto resourceId = businessAction->getRuntimeParams().eventResourceId;
+            resource = qnResPool->getResourceById(resourceId);
+        }
+    }
 
     QnNotificationWidget *item = findItem( message, resource );
     if (item)
         return;
 
     item = new QnNotificationWidget(m_list);
+
+    QnActionParameters actionParams;
+    if( params.canConvert<QnActionParameters>() )
+        actionParams = params.value<QnActionParameters>();
 
     switch (message) {
     case QnSystemHealth::EmailIsEmpty:
@@ -546,9 +562,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         break;
     case QnSystemHealth::NoPrimaryTimeServer:
     {
-        QnActionParameters actionParams;
-        if( params.canConvert<QnActionParameters>() )
-            actionParams = params.value<QnActionParameters>();
         item->addActionButton(
             qnSkin->icon( "events/settings.png" ),
             tr("Time Synchronization..."),
@@ -572,6 +585,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveBackupFinished:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings..."),
@@ -585,7 +599,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
 
     QString resourceName = getResourceName(resource);
     item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
-    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
+    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, businessAction, resourceName));
     item->setNotificationLevel(QnNotificationLevels::notificationLevel(message));
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));

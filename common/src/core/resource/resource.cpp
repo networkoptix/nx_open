@@ -192,6 +192,28 @@ QnResource::QnResource():
 {
 }
 
+QnResource::QnResource(const QnResource& right)
+:
+    m_parentId(right.m_parentId),
+    m_name(right.m_name),
+    m_url(right.m_url),
+    m_resourcePool(right.m_resourcePool),
+    m_id(right.m_id),
+    m_typeId(right.m_typeId),
+    m_flags(right.m_flags),
+    m_lastDiscoveredTime(right.m_lastDiscoveredTime),
+    m_tags(right.m_tags),
+    m_initialized(right.m_initialized),
+    m_lastInitTime(right.m_lastInitTime),
+    m_prevInitializationResult(right.m_prevInitializationResult),
+    m_lastMediaIssue(right.m_lastMediaIssue),
+    m_initializationAttemptCount(right.m_initializationAttemptCount),
+    m_locallySavedProperties(right.m_locallySavedProperties),
+    m_removedFromPool(right.m_removedFromPool),
+    m_initInProgress(right.m_initInProgress)
+{
+}
+
 QnResource::~QnResource()
 {
     disconnectAllConsumers();

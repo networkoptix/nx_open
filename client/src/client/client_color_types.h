@@ -101,8 +101,9 @@ struct QnIoModuleColors {
     QnIoModuleColors();
 
     QColor idLabel;
+    QColor buttonBackground;
 };
-#define QnIoModuleColors_Fields (idLabel)
+#define QnIoModuleColors_Fields (idLabel)(buttonBackground)
 
 
 struct QnScheduleGridColors {
@@ -257,6 +258,16 @@ struct QnFailoverPriorityColors {
 };
 #define QnFailoverPriorityColors_Fields (never)(low)(medium)(high)
 
+struct QnBackupCamerasColors {
+    QnBackupCamerasColors();
+
+    QColor disabled;
+    QColor low;
+    QColor high;
+    QColor both;
+};
+#define QnBackupCamerasColors_Fields (disabled)(low)(high)(both)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -265,7 +276,7 @@ struct QnFailoverPriorityColors {
     (QnUserManagementColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \
     (QnFailoverPriorityColors) \
-
+    (QnBackupCamerasColors) \
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

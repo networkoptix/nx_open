@@ -172,6 +172,20 @@ QString QnGenericTabbedDialog::confirmMessageText() const {
     return tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n');
 }
 
+void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
+    base_type::buttonBoxClicked(button);
+
+    switch (button) {
+    case QDialogButtonBox::Apply:
+        if (!confirm())
+            return;
+        submitData();
+        break;
+    default:
+        break;
+    }
+}
+
 bool QnGenericTabbedDialog::tryClose(bool force) {
     if (!discard())
         return false;   //TODO: #dklychkov and what then? see QnWorkbenchConnectHandler

@@ -28,7 +28,10 @@ void QnTimelineChunkPainter::start(qint64 startPos, qint64 centralPos, const QRe
     m_centralPosition = centralPos;
     m_centralCoordinate = xFromValue(m_centralPosition);
     m_minChunkLength = (windowEnd - windowStart) / rect.width();
-    int rectCount = chunkCount + 2;
+
+    // There cannot be more rectangles than count of pixels
+    const int maxRectCount = rect.width();
+    int rectCount = qMin(maxRectCount, chunkCount * 2 + 2);
     /* +2 is for the situations like this:
      *            chunk
      *             \/
@@ -45,9 +48,6 @@ void QnTimelineChunkPainter::paintChunk(qint64 length, Qn::TimePeriodContent con
     Q_ASSERT(length >= 0);
 
     if (length < 0)
-        return;
-
-    if (m_index >= m_geometry->vertexCount() - 4)
         return;
 
     if (m_pendingLength > 0 && m_pendingLength + length > m_minChunkLength) {
@@ -89,6 +89,9 @@ void QnTimelineChunkPainter::storeChunk(qint64 length, Qn::TimePeriodContent con
 }
 
 void QnTimelineChunkPainter::flushChunk() {
+    if (m_index > m_geometry->vertexCount() - 6)
+        return;
+
     qint64 leftPosition = m_pendingPosition;
     qint64 rightPosition = m_pendingPosition + m_pendingLength;
 

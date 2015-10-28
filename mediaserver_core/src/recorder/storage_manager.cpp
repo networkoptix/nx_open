@@ -295,6 +295,10 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
+    if (m_role == QnServer::StoragePool::Backup)
+        connect(qnScheduleSync, &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
+        
+
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
     m_clearMotionTimer.restart();
@@ -1764,7 +1768,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
 
     struct StorageSpaceInfo {
         QnStorageResourcePtr storage;
-        qint64 usageCoeff;
+        double usageCoeff;
     };
     std::vector<StorageSpaceInfo> storagesInfo;
 
@@ -1781,7 +1785,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
                         .arg((*it)->getUrl())
                         .arg((*it)->calcUsageCoeff());
         if ((*it)->calcUsageCoeff() >= 0) {
-            StorageSpaceInfo tmp = {*it, static_cast<qint64>((*it)->calcUsageCoeff())};
+            StorageSpaceInfo tmp = {*it, (*it)->calcUsageCoeff()};
             storagesInfo.push_back(tmp);
         }
     }

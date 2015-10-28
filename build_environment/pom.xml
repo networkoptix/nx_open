@@ -749,6 +749,13 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>libjpeg-turbo</artifactId>
+                    <version>1.4.2-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>
             </dependencies>
         </profile>
         <profile>

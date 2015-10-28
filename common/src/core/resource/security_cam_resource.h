@@ -164,9 +164,8 @@ public:
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
 
-    Qn::CameraBackupTypes getBackupType() const;
-    void setBackupType(Qn::CameraBackupTypes value);
-    Qn::CameraBackupTypes getActualBackupType() const;
+    Qn::CameraBackupQualities getBackupQualities() const;
+    void setBackupQualities(Qn::CameraBackupQualities value);
 
     QString getModel() const;
     void setModel(const QString &model);
@@ -271,6 +270,7 @@ signals:
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
+    void backupQualitiesChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 

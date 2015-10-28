@@ -23,12 +23,13 @@ function saveCurrentSession() {
     }
 }
 
-function connectToServer(sessionId, host, port, login, password) {
+function connectToServer(sessionId, host, port, login, password, customConnection) {
     mainWindow.currentHost = host
     mainWindow.currentPort = port
     mainWindow.currentLogin = login
     mainWindow.currentPasswrod = password
     mainWindow.currentSessionId = sessionId
+    mainWindow.customConnection = customConnection ? true : false
 
     sideNavigation.hide()
     connectionManager.connectToServer(makeUrl(host, port, login, password))

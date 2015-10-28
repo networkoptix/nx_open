@@ -24,6 +24,7 @@ Window {
     property string currentLogin
     property string currentPasswrod
     property string currentSessionId
+    property bool customConnection: false
 
     readonly property bool isPhone: getDeviceIsPhone()
 

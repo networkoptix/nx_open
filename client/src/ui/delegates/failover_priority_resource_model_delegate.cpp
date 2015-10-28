@@ -23,6 +23,8 @@ QVariant QnFailoverPriorityResourceModelDelegate::data(const QModelIndex &index,
         return QVariant();
 
     auto priority = camera->failoverPriority();
+    if (m_forcedPriorities.contains(camera->getId()))
+        priority = m_forcedPriorities[camera->getId()];
 
     switch (role) {
     case Qt::DisplayRole:
@@ -63,5 +65,15 @@ const QnFailoverPriorityColors &QnFailoverPriorityResourceModelDelegate::colors(
 void QnFailoverPriorityResourceModelDelegate::setColors(const QnFailoverPriorityColors &colors) {
     m_colors = colors;
     emit notifyDataChanged();
+}
+
+void QnFailoverPriorityResourceModelDelegate::forceCamerasPriority( const QnVirtualCameraResourceList &cameras, Qn::FailoverPriority priority ) {
+    for (const QnVirtualCameraResourcePtr &camera: cameras)
+        m_forcedPriorities[camera->getId()] = priority;
+    emit notifyDataChanged();
+}
+
+QHash<QnUuid, Qn::FailoverPriority> QnFailoverPriorityResourceModelDelegate::forcedCamerasPriorities() const {
+    return m_forcedPriorities;
 }
 
