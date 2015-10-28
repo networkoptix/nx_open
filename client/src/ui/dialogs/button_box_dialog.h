@@ -30,9 +30,10 @@ protected:
     virtual bool event(QEvent *event) override;
 
     virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button);
-private:
-    void initializeButtonBox();
 
+    virtual void initializeButtonBox();
+
+private:
     Q_SLOT void at_buttonBox_clicked(QAbstractButton *button);
 
 private:

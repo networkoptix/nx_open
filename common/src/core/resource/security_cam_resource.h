@@ -167,6 +167,9 @@ public:
     Qn::CameraBackupQualities getBackupQualities() const;
     void setBackupQualities(Qn::CameraBackupQualities value);
 
+    /** Get backup qualities, substantiating default value. */
+    Qn::CameraBackupQualities getActualBackupQualities() const;
+
     QString getModel() const;
     void setModel(const QString &model);
 

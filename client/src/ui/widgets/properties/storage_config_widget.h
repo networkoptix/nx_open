@@ -60,6 +60,9 @@ private:
     void startBackup();
     void cancelBackup();
 
+    /** Check if backup can be started right now - and show additional info if not. */
+    bool canStartBackup(const QnBackupStatusData& data, QString *info);
+
 private slots:
     
     void at_serverStorageSpaceChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageSpaceDataList &storages);
@@ -83,15 +86,16 @@ private:
         StoragePool();
         QScopedPointer<QnStorageListModel> model;
         bool rebuildCancelled;
-        bool hasStorageChanges;
     };
 
     StoragePool m_mainPool;
     StoragePool m_backupPool;
-    QnMediaServerUserAttributes m_serverUserAttrs;
+    QnServerBackupSchedule m_backupSchedule;
 
     bool m_backupCancelled;
+    bool m_updating;
 private:
     void setupGrid(QTableView* tableView, StoragePool* storagePool);
-    void processStorages(QnStorageResourceList& result, const QList<QnStorageSpaceData>& newData, bool isBackupPool) const;
+    void applyStoragesChanges(QnStorageResourceList& result, const QList<QnStorageSpaceData> &storages, bool isBackupPool) const;
+    bool hasStoragesChanges(const QList<QnStorageSpaceData> &storages, bool isBackupPool) const;
 };

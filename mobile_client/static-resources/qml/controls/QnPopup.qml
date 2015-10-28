@@ -22,7 +22,8 @@ FocusScope {
 
             popup.hidden()
 
-            d.lastFocusedItem.forceActiveFocus()
+            if (Window.activeFocusItem == popup)
+                d.lastFocusedItem.forceActiveFocus()
         }
     }
 

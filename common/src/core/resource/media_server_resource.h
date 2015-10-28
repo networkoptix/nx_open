@@ -12,6 +12,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
+
 #include "api/new_server_connection.h"
 
 namespace nx_http {
@@ -73,17 +74,8 @@ public:
     void setRedundancy(bool value);
     bool isRedundancy() const;
 
-    Qn::BackupType getBackupType() const;
-    int getBackupDOW() const;
-    int getBackupStart() const;
-    int getBackupDuration() const;
-    int getBackupBitrate() const;
-
-    void setBackupType(Qn::BackupType value);
-    void setBackupDOW(int value);
-    void setBackupStart(int value);
-    void setBackupDuration(int value);
-    void setBackupBitrate(int value);
+    QnServerBackupSchedule getBackupSchedule() const;
+    void setBackupSchedule(const QnServerBackupSchedule &value);
 
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
@@ -124,6 +116,7 @@ private slots:
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 signals:
+    void portChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
@@ -131,6 +124,7 @@ signals:
     void versionChanged(const QnResourcePtr &resource);
     void systemNameChanged(const QnResourcePtr &resource);
     void redundancyChanged(const QnResourcePtr &resource);
+    void backupScheduleChanged(const QnResourcePtr &resource);
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;

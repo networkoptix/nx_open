@@ -89,9 +89,7 @@ QnScheduleSync::getOldestChunk()
 
     for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(mediaServer, true)) 
     {       
-        Qn::CameraBackupQualities cameraBackupQualities = camera->getBackupQualities();
-        if (cameraBackupQualities == Qn::CameraBackup_Default)
-            cameraBackupQualities = qnGlobalSettings->defaultBackupQualities();
+        Qn::CameraBackupQualities cameraBackupQualities = camera->getActualBackupQualities();
 
         ChunkKey tmp;
 
@@ -212,7 +210,7 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return;
         }
 
-        int bitrate = m_schedule.bitrate;
+        int bitrate = m_schedule.backupBitrate;
         if (bitrate <= 0) // not capped
         {
             auto data = fromFile->readAll();
@@ -365,20 +363,11 @@ QnBackupStatusData QnScheduleSync::getStatus() const
 
 void QnScheduleSync::renewSchedule()
 {
-    auto resource = qnResPool->getResourceById(
-        qnCommon->moduleGUID()
-    );
-    auto mediaServer = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT(mediaServer);
+    auto server = qnCommon->currentServer();
+    Q_ASSERT(server);
 
-    if (mediaServer)
-    {
-        m_schedule.type     = mediaServer->getBackupType();
-        m_schedule.dow      = mediaServer->getBackupDOW();
-        m_schedule.start    = mediaServer->getBackupStart();
-        m_schedule.duration = mediaServer->getBackupDuration();
-        m_schedule.bitrate  = mediaServer->getBackupBitrate();
-    }
+    if (server)
+        m_schedule = server->getBackupSchedule();
 }
 
 void QnScheduleSync::start()
@@ -405,23 +394,23 @@ void QnScheduleSync::start()
                 {
                     if (m_forced)
                         return true;
-                    if (m_schedule.type != Qn::Backup_Schedule)
+                    if (m_schedule.backupType != Qn::Backup_Schedule)
                         return false;
 
                     QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
                     const auto curDate = now.date();
 
-                    if ((ec2::backup::fromQtDOW(curDate.dayOfWeek()) & m_schedule.dow))
+                    if ((ec2::backup::fromQtDOW(curDate.dayOfWeek()) & m_schedule.backupDaysOfTheWeek))
                     {
                         const auto curTime = now.time();
-                        if (curTime.msecsSinceStartOfDay() > m_schedule.start * 1000 && 
-                            m_schedule.duration == -1) // sync without end time
+                        if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 && 
+                            m_schedule.backupDuration == -1) // sync without end time
                         {
                             return true;
                         }
 
-                        if (curTime.msecsSinceStartOfDay() > m_schedule.start * 1000 &&
-                            curTime.msecsSinceStartOfDay() < m_schedule.start * 1000 + m_schedule.duration * 1000) // 'normal' schedule sync
+                        if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 &&
+                            curTime.msecsSinceStartOfDay() < m_schedule.backupStart * 1000 + m_schedule.backupDuration * 1000) // 'normal' schedule sync
                         {
                             return true;
                         }

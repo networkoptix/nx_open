@@ -129,9 +129,11 @@ QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
     selected = QColor(64, 130, 180, 128);
 }
 
-QnBookmarkColors::QnBookmarkColors() {
-    background = QColor("#b22e6996");
-    text = QColor(Qt::white);
+QnBookmarkColors::QnBookmarkColors()
+    : tooltipBackground("#204969")
+    , background("#b22e6996")
+    , text(Qt::white)
+{
 }
 
 QnLicensesListModelColors::QnLicensesListModelColors() {

@@ -16,8 +16,8 @@ public:
     QnBackupScheduleDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnBackupScheduleDialog() {}
 
-    void updateFromSettings(const QnMediaServerUserAttributes& value);
-    void submitToSettings(QnMediaServerUserAttributes& value);
+    void updateFromSettings(const QnServerBackupSchedule& value);
+    void submitToSettings(QnServerBackupSchedule& value);
 private:
     void setNearestValue(QComboBox* combobox, int time);
 private slots:
