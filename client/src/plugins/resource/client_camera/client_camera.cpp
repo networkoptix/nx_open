@@ -6,8 +6,6 @@
 QnClientCamera::QnClientCamera(const QnUuid &resourceTypeId)
     : base_type(resourceTypeId)
 {
-    setTypeId(resourceTypeId);
-    addFlags(Qn::server_live_cam | Qn::depend_on_parent_status);
 }
 
 Qn::ResourceFlags QnClientCamera::flags() const {
