@@ -41,6 +41,7 @@
 #include "core/resource/resource_name.h"
 #include "business/events/mserver_conflict_business_event.h"
 #include "core/resource/camera_history.h"
+#include "utils/common/synctime.h"
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -256,7 +257,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     QnUuid ruleId = action->getBusinessRuleId();
 
     if (action->getToggleState() == QnBusiness::ActiveState) {
-        m_runningBookmarkActions[ruleId] = QDateTime::currentMSecsSinceEpoch();
+        m_runningBookmarkActions[ruleId] = qnSyncTime->currentMSecsSinceEpoch();
         return true;
     }
 
@@ -264,7 +265,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
         return false;
 
     qint64 startTime = m_runningBookmarkActions.take(ruleId);
-    qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 endTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
