@@ -87,6 +87,10 @@ private:
     int m_totalMdZones;
     int m_zoneSite;
     bool m_cameraReportedRTSPSupport;
+    int m_channelCount;
+    int m_prevMotionChannel;
+
+    bool getParamPhysical2(int channel, const QString& name, QVariant &val);
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;

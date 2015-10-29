@@ -55,6 +55,8 @@ bool QnArecontRtspStreamReader::isStreamOpened() const
 QnMetaDataV1Ptr QnArecontRtspStreamReader::getCameraMetadata()
 {
     auto motion = static_cast<QnPlAreconVisionResource*>(getResource().data())->getCameraMetadata();
+    if (!motion)
+        return motion;
     filterMotionByMask(motion);
     return motion;
 }
@@ -103,6 +105,9 @@ QString QnArecontRtspStreamReader::generateRequestString(
     static const int SECOND_STREAM_FPS = 5;
     static const int SECOND_STREAM_BITRATE_KBPS = 512;
 
+    const int maxWidth = res->getProperty(lit("MaxSensorWidth")).toInt();
+    const int maxHeight = res->getProperty(lit("MaxSensorHeight")).toInt();
+
     QString str;
 
     str += lit("h264.sdp?");
@@ -115,9 +120,6 @@ QString QnArecontRtspStreamReader::generateRequestString(
     }
     else
     {
-        const int maxWidth = res->getProperty(lit("MaxSensorWidth")).toInt();
-        const int maxHeight = res->getProperty(lit("MaxSensorHeight")).toInt();
-
         str += lit("Res=full");
         str += lit("&FPS=%1").arg((int)params.fps);
         const int desiredBitrateKbps = res->suggestBitrateKbps(
@@ -126,6 +128,8 @@ QString QnArecontRtspStreamReader::generateRequestString(
             params.fps);
         str += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
     }
+    str += lit("&x0=%1&y0=%2&x1=%3&y1=%4").arg(0).arg(0).arg(maxWidth).arg(maxHeight);
+    str += lit("&ssn=%1").arg(rand());
     if (res->isAudioEnabled())
         str += lit("&MIC=on");
 

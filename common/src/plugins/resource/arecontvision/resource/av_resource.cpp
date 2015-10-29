@@ -33,7 +33,9 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64),
       m_zoneSite(8),
-      m_cameraReportedRTSPSupport(false)
+      m_cameraReportedRTSPSupport(false),
+      m_channelCount(0),
+      m_prevMotionChannel(0)
 {
     setVendor(lit("ArecontVision"));
 }
@@ -305,6 +307,8 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     //if (getParamPhysical(lit("rtspSupported"), val))
     //    m_cameraReportedRTSPSupport = val.toBool();
 
+    m_channelCount = isPanoramic() ? 4 : 1;
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -346,8 +350,20 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     QVariant mdresult;
-    if (!getParamPhysical(QLatin1String("mdresult"), mdresult))
-        return QnMetaDataV1Ptr(0);
+    if (m_channelCount == 1)
+    {
+        if (!getParamPhysical(QLatin1String("mdresult"), mdresult))
+            return QnMetaDataV1Ptr(0);
+    }
+    else
+    {
+        if (!getParamPhysical2(m_prevMotionChannel+1, QLatin1String("mdresult"), mdresult))
+            return QnMetaDataV1Ptr(0);
+        motion->channelNumber = m_prevMotionChannel;
+        ++m_prevMotionChannel;
+        if (m_prevMotionChannel == m_channelCount)
+            m_prevMotionChannel = 0;
+    }
 
     if (mdresult.toString() == QLatin1String("no motion"))
         return motion; // no motion detected
@@ -533,6 +549,9 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
+    return true;
+
+
     return m_cameraReportedRTSPSupport ||
            qnCommon->dataPool()->data(toSharedPointer(this)).
                value<bool>(lit("isRTSPSupported"), false);
@@ -542,6 +561,33 @@ bool QnPlAreconVisionResource::isAbstractResource() const
 {
     QnUuid baseTypeId = qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract"));
     return getTypeId() == baseTypeId;
+}
+
+bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QVariant &val)
+{
+    m_mutex.lock();
+    m_mutex.unlock();
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
+    QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
+
+    CLHttpStatus status = connection.doGET(request);
+    if (status == CL_HTTP_AUTH_REQUIRED)
+        setStatus(Qn::Unauthorized);
+
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+
+
+    QByteArray response;
+    connection.readAll(response);
+    int index = response.indexOf('=');
+    if (index==-1)
+        return false;
+
+    val = QLatin1String(response.mid(index+1));
+
+    return true;
 }
 
 #endif

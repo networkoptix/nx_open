@@ -418,6 +418,8 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     auto motion = static_cast<QnPlAreconVisionResource*>(getResource().data())->getCameraMetadata();
+    if (!motion)
+        return motion;
     filterMotionByMask(motion);
     return motion;
 }
