@@ -29,6 +29,8 @@ public:
     }
 };
 
+template<typename T> QWeakPointer<T> DependedSingleTone<T>::m_instance;
+
 class QnStorageDbPool: public DependedSingleTone<QnStorageDbPool>
 {
 public:

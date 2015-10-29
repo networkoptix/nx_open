@@ -5,8 +5,6 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "utils/common/log.h"
 
-template<>
-QWeakPointer<QnStorageDbPool> DependedSingleTone<QnStorageDbPool>::m_instance;
 
 namespace
 {

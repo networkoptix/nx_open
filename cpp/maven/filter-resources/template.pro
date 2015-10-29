@@ -6,6 +6,9 @@ LIBTYPE = ${libtype}
 TEMPLATE = ${template}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
+unix {
+    VERSION = ${linux.release.version}
+}
 QT += ${qt.libs}
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
