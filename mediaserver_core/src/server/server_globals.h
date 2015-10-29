@@ -47,6 +47,7 @@ public:
     enum class BackupResultCode {
         Failed,
         EndOfPeriod,
+        Cancelled,
         Done
     };
 } // namespace QnServer

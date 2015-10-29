@@ -29,6 +29,9 @@ QnScheduleSync::QnScheduleSync()
     : m_backupSyncOn(false),
       m_syncing(false),
       m_forced(false),
+      m_interrupted(false),
+      m_backupDone(false),
+      m_curDow(ec2::backup::NoDay),
       m_syncTimePoint(0)
 {
     Q_ASSERT(QnScheduleSync_instance == 0);
@@ -252,8 +255,8 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
     return CopyError::NoError;
 }
 
-template<typename NeedStopCB>
-bool QnScheduleSync::synchronize(NeedStopCB needStop)
+template<typename NeedMoveOnCB>
+QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     while (1) {
         auto chunkKeyVector = getOldestChunk();
@@ -270,14 +273,24 @@ bool QnScheduleSync::synchronize(NeedStopCB needStop)
                     err == CopyError::FromStorageError) {
                     emit backupFinished(m_syncTimePoint, 
                                         QnServer::BackupResultCode::Failed);
-                    return false;
+                    return QnServer::BackupResultCode::Failed;
                 }
             }
         }
-        if (needStop())
+        auto needMoveOnCode = needMoveOn();
+        bool needStop = needMoveOnCode != SyncCode::Ok;
+        if (needStop) {
+            if (needMoveOnCode == SyncCode::OutOfTime) {
+                return QnServer::BackupResultCode::EndOfPeriod;
+            } else if (needMoveOnCode == SyncCode::WrongBackupType || 
+                       needMoveOnCode == SyncCode::Interrupted) {
+                return QnServer::BackupResultCode::Cancelled;
+            }
             break;
+        }
     }
-    return true;
+    m_interrupted = true; // we are done till next backup period
+    return QnServer::BackupResultCode::Done;
 }
 
 int QnScheduleSync::stop() 
@@ -308,6 +321,7 @@ int QnScheduleSync::interrupt()
         return Idle;
     m_syncing = false;
     m_forced = false;
+    m_interrupted = true;
     return Ok;
 }
 
@@ -319,6 +333,7 @@ int QnScheduleSync::forceStart()
         return Forced;
     
     m_forced = true;
+    m_interrupted = false;
     return Ok;
 }
 
@@ -349,15 +364,27 @@ void QnScheduleSync::renewSchedule()
     auto server = qnCommon->currentServer();
     Q_ASSERT(server);
 
-    if (server)
+    auto oldSchedule = m_schedule;
+    if (server) {
         m_schedule = server->getBackupSchedule();
+    }
+    if (m_interrupted) {
+        bool scheduleChanged = 
+            oldSchedule.backupDaysOfTheWeek != m_schedule.backupDaysOfTheWeek ||
+            oldSchedule.backupDuration != m_schedule.backupDuration ||
+            oldSchedule.backupStart != m_schedule.backupStart ||
+            oldSchedule.backupType != m_schedule.backupType;        
+        if (scheduleChanged) {
+            m_interrupted = false;
+        }
+    }
 }
 
 void QnScheduleSync::start()
 {
     static const auto 
     REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
-    m_backupSyncOn         = true;
+    m_backupSyncOn = true;
 
     m_backupFuture = QtConcurrent::run(
         [this]
@@ -376,52 +403,50 @@ void QnScheduleSync::start()
                 auto isItTimeForSync = [this] ()
                 {
                     if (m_forced)
-                        return true;
+                        return SyncCode::Ok;
                     if (m_schedule.backupType != Qn::Backup_Schedule)
-                        return false;
+                        return SyncCode::WrongBackupType;
 
                     QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
                     const auto curDate = now.date();
+                    const auto curDow = ec2::backup::fromQtDOW(curDate.dayOfWeek());
+                    
+                    if (curDow == ec2::backup::NoDay || curDow != m_curDow) { 
+                        m_curDow = curDow;
+                        m_interrupted = false; // new day - new life
+                    }
 
-                    if ((ec2::backup::fromQtDOW(curDate.dayOfWeek()) & m_schedule.backupDaysOfTheWeek))
+                    if (m_interrupted)
+                        return SyncCode::Interrupted;
+
+                    if (curDow & m_schedule.backupDaysOfTheWeek) 
                     {
                         const auto curTime = now.time();
                         if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 && 
                             m_schedule.backupDuration == -1) // sync without end time
                         {
-                            return true;
+                            return SyncCode::Ok;
                         }
 
                         if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 &&
-                            curTime.msecsSinceStartOfDay() < m_schedule.backupStart * 1000 + m_schedule.backupDuration * 1000) // 'normal' schedule sync
+                            curTime.msecsSinceStartOfDay() < m_schedule.backupStart * 1000 + 
+                                                             m_schedule.backupDuration * 1000) // 'normal' schedule sync
                         {
-                            return true;
+                            return SyncCode::Ok;
                         }
                     }
-                    return false;
+                    return SyncCode::OutOfTime;
                 };
 
-                if (isItTimeForSync()) // we are there
+                if (isItTimeForSync() == SyncCode::Ok) // we are there
                 {
                     m_syncing = true;
                     m_syncTimePoint = 0;
-                    bool result = synchronize(
-                        [this, isItTimeForSync]
-                        {
-                            if (!m_backupSyncOn || // stop forced
-                                !isItTimeForSync() || // synchronization period is over
-                                !m_syncing) // interrupted by user
-                            {
-                                return true;
-                            }
-                            return false;
-                        }
-                    );
+                    auto result = synchronize(isItTimeForSync);
                     m_syncData.clear();
-                    m_forced  = false;
+                    m_forced = false;
                     m_syncing = false;
-                    emit backupFinished(m_syncTimePoint, 
-                                        QnServer::BackupResultCode::Done);
+                    emit backupFinished(m_syncTimePoint, result);
                 }
             }
         }

@@ -11,6 +11,7 @@
 #include <api/model/backup_status_reply.h>
 #include <recorder/storage_manager.h>
 #include <core/resource/server_backup_schedule.h>
+#include <nx_ec/data/api_media_server_data.h>
 
 class QnScheduleSync: public QObject
 {
@@ -76,9 +77,16 @@ private:
 #undef ENUM_APPLY
 #undef COPY_ERROR_LIST
 
+    enum class SyncCode {
+        Interrupted,
+        OutOfTime,
+        WrongBackupType,
+        Ok
+    };
+
 private:
-    template<typename NeedStopCB>
-    bool synchronize(NeedStopCB needStop);
+    template<typename NeedMoveOnCB>
+    QnServer::BackupResultCode synchronize(NeedMoveOnCB needMoveOn);
 
     void renewSchedule();
     CopyError copyChunk(const ChunkKey &chunkKey);
@@ -92,12 +100,16 @@ private:
     );
 
 private:
-    std::atomic<bool>    m_backupSyncOn;
-    std::atomic<bool>    m_syncing;
-    std::atomic<bool>    m_forced;
-    QFuture<void>        m_backupFuture;
+    std::atomic<bool>       m_backupSyncOn;
+    std::atomic<bool>       m_syncing;
+    std::atomic<bool>       m_forced;
+    std::atomic<bool>       m_interrupted;
+    bool                    m_backupDone;
+    ec2::backup::DayOfWeek  m_curDow;
+
+    QFuture<void>           m_backupFuture;
     QnServerBackupSchedule  m_schedule;
-    std::atomic<int64_t> m_syncTimePoint;
+    std::atomic<int64_t>    m_syncTimePoint;
 
     std::map<ChunkKey, double> m_syncData;
     mutable std::mutex         m_syncDataMutex;
