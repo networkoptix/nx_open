@@ -30,6 +30,7 @@
 #include "http_handlers/add_account_handler.h"
 #include "http_handlers/bind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
+#include "http_handlers/update_account_handler.h"
 #include "http_handlers/get_cloud_users_of_system.h"
 #include "http_handlers/get_systems_handler.h"
 #include "http_handlers/get_cdb_nonce_handler.h"
@@ -268,6 +269,12 @@ void CloudDBProcess::registerApiHandlers(
         GetAccountHttpHandler::HANDLER_PATH,
         [accountManager, &authorizationManager]() -> std::unique_ptr<GetAccountHttpHandler> {
             return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<UpdateAccountHttpHandler>(
+        UpdateAccountHttpHandler::HANDLER_PATH,
+        [accountManager, &authorizationManager]() -> std::unique_ptr<UpdateAccountHttpHandler> {
+            return std::make_unique<UpdateAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
     //systems

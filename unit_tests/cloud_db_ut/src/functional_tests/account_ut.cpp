@@ -187,6 +187,36 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
 
 TEST_F(CdbFunctionalTest, account_update)
 {
+    waitUntilStarted();
+
+    api::AccountData account1;
+    std::string account1Password;
+    api::ResultCode result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(result, api::ResultCode::ok);
+
+    result = getAccount(account1.email, account1Password, &account1);
+    ASSERT_EQ(result, api::ResultCode::ok);
+
+    //changing password
+    std::string account1NewPassword = account1Password + "new";
+    api::AccountUpdateData update;
+    update.passwordHa1 = nx_http::calcHa1(
+        account1.email.c_str(),
+        moduleInfo().realm.c_str(),
+        account1NewPassword.c_str()).constData();
+    update.fullName = account1.fullName + "new";
+    update.customization = account1.customization + "new";
+
+    result = updateAccount(account1.email, account1Password, update);
+    ASSERT_EQ(result, api::ResultCode::ok);
+
+    account1.fullName = update.fullName.get();
+    account1.customization = update.customization.get();
+
+    api::AccountData newAccount;
+    result = getAccount(account1.email, account1NewPassword, &newAccount);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(newAccount, account1);
 }
 
 }   //cdb

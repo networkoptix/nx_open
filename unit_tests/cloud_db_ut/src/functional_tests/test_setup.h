@@ -53,6 +53,11 @@ protected:
     api::ResultCode addActivatedAccount(
         api::AccountData* const accountData,
         std::string* const password);
+    api::ResultCode updateAccount(
+        const std::string& email,
+        const std::string& password,
+        api::AccountUpdateData updateData);
+
     api::ResultCode bindRandomSystem(
         const std::string& email,
         const std::string& password,
@@ -100,6 +105,10 @@ private:
     > m_connectionFactory;
     api::ModuleInfo m_moduleInfo;
 };
+
+namespace api {
+    bool operator==(const api::AccountData& left, const api::AccountData& right);
+}
 
 }   //cdb
 }   //nx

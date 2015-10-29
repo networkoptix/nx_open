@@ -222,6 +222,25 @@ api::ResultCode CdbFunctionalTest::addActivatedAccount(
     return resCode;
 }
 
+api::ResultCode CdbFunctionalTest::updateAccount(
+    const std::string& email,
+    const std::string& password,
+    api::AccountUpdateData updateData)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::AccountManager::updateAccount,
+                connection->accountManager(),
+                std::move(updateData),
+                std::placeholders::_1));
+
+    return resCode;
+}
+
 api::ResultCode CdbFunctionalTest::bindRandomSystem(
     const std::string& email,
     const std::string& password,
@@ -381,6 +400,20 @@ api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
     }
 
     return api::SystemAccessRole::none;
+}
+
+
+namespace api {
+    bool operator==(const api::AccountData& left, const api::AccountData& right)
+    {
+        return 
+            left.id == right.id &&
+            left.email == right.email &&
+            left.passwordHa1 == right.passwordHa1 &&
+            left.fullName == right.fullName &&
+            left.customization == right.customization &&
+            left.statusCode == right.statusCode;
+    }
 }
 
 }   //cdb
