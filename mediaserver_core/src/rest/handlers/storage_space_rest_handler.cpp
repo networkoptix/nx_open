@@ -28,7 +28,6 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
     QnStorageSpaceReply reply;
 
     bool useMainPool = !params.contains("mainPool") || params.value("mainPool").toInt() != 0;
-    bool useBackup = !useMainPool;
 
     const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     auto enoughSpace = [defaultStorageSpaceLimit](const QnStorageSpaceData &data) {
