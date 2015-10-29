@@ -10,6 +10,8 @@
 
 #include <type_traits>
 
+#include <QtCore/QUrlQuery>
+
 #include <utils/serialization/json.h>
 
 

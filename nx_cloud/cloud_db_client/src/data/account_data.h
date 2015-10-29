@@ -49,6 +49,16 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (AccountData)(AccountActivationCode),
     (json)(sql_record) )
 
+
+////////////////////////////////////////////////////////////
+//// class AccountUpdateData
+////////////////////////////////////////////////////////////
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data);
+void serializeToUrlQuery(const AccountUpdateData&, QUrlQuery* const urlQuery);
+
+bool deserialize(QnJsonContext*, const QJsonValue&, AccountUpdateData*);
+
 }   //api
 }   //cdb
 }   //nx

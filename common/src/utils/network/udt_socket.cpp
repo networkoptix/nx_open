@@ -1111,7 +1111,7 @@ void* UdtPollSetImpl::Remove( UdtSocketImpl* imp , aio::EventType eventType ) {
             std::map<UDTSOCKET,SocketUserData>::iterator
                 ib = socket_user_data_.find(imp->udt_handler());
             if( ib == socket_user_data_.end() || ib->second.write_data == boost::none )
-                return false;
+                return NULL;
             void* rudata = ib->second.write_data.get();
             int remain_event_type = UDT_EPOLL_ERR;
             ib->second.write_data = boost::none;

@@ -39,6 +39,9 @@ public:
     */
     virtual void getAccount(
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) = 0;
+    virtual void updateAccount(
+        api::AccountUpdateData accountData,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 }   //api

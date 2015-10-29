@@ -57,7 +57,11 @@ public:
     //!Retrieves account corresponding to authorization data \a authzInfo
     void getAccount(
         const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode, data::AccountData)> completionHandler );
+        std::function<void(api::ResultCode, data::AccountData)> completionHandler);
+    void updateAccount(
+        const AuthorizationInfo& authzInfo,
+        data::AccountUpdateData accountData,
+        std::function<void(api::ResultCode)> completionHandler);
 
     boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const;
@@ -93,6 +97,14 @@ private:
         nx::db::DBResult resultCode,
         data::AccountActivationCode verificationCode,
         const std::string accountEmail,
+        std::function<void(api::ResultCode)> completionHandler );
+
+    nx::db::DBResult updateAccountInDB(
+        QSqlDatabase* const tran,
+        const data::AccountUpdateDataWithEmail& accountData);
+    void accountUpdated(
+        nx::db::DBResult resultCode,
+        data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler );
 };
 

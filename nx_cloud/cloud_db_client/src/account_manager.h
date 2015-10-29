@@ -43,6 +43,9 @@ public:
     //!Implementation of api::AccountManager::getAccount
     virtual void getAccount(
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) override;
+    virtual void updateAccount(
+        api::AccountUpdateData accountData,
+        std::function<void(api::ResultCode)> completionHandler) override;
 };
 
 

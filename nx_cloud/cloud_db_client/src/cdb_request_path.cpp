@@ -12,6 +12,7 @@ namespace cdb {
 const char* ACCOUNT_REGISTER_PATH = "/account/register";
 const char* ACCOUNT_ACTIVATE_PATH = "/account/activate";
 const char* ACCOUNT_GET_PATH = "/account/get";
+const char* ACCOUNT_UPDATE_PATH = "/account/update";
 
 const char* SYSTEM_BIND_PATH = "/system/bind";
 const char* SYSTEM_UNBIND_PATH = "/system/unbind";

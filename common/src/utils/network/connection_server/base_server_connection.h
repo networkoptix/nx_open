@@ -160,7 +160,6 @@ namespace nx_api
 
             assert( count == m_bytesToSend );
 
-            typedef typename CustomConnectionManagerType::ConnectionType ConnectionType;
             static_cast<CustomConnectionType*>(this)->readyToSendData();
         }
 

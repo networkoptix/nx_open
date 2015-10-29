@@ -51,6 +51,17 @@ void AccountManager::getAccount(
         std::bind(completionHandler, std::placeholders::_1, api::AccountData()));
 }
 
+void AccountManager::updateAccount(
+    api::AccountUpdateData accountData,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    executeRequest(
+        ACCOUNT_UPDATE_PATH,
+        std::move(accountData),
+        completionHandler,
+        completionHandler);
+}
+
 }   //cl
 }   //cdb
 }   //nx
