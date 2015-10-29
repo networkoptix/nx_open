@@ -8,6 +8,7 @@
 #include <nx_ec/data/api_media_server_data.h>
 
 #include <ui/common/palette.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
     const int secsPerDay = 3600 * 24;
@@ -35,7 +36,11 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent, Qt::WindowFlags 
         ui->comboBoxTimeStart->addItem(t.toString(Qt::DefaultLocaleShortDate), i * 3600);
         ui->comboBoxTimeTo->addItem(t.toString(Qt::DefaultLocaleShortDate), i * 3600);
     }
-    connect(ui->comboBoxBandwidth, SIGNAL(currentIndexChanged(int)), this, SLOT(at_bandwidthComboBoxChange(int)));
+    connect(ui->comboBoxBandwidth, QnComboboxCurrentIndexChanged, this, [this](int index){
+        ui->spinBoxBandwidth->setEnabled(index > 0);
+        ui->bandwidthLabel->setEnabled(index > 0);
+    });
+
 }
 
 QnBackupScheduleDialog::~QnBackupScheduleDialog() 
@@ -67,11 +72,6 @@ void QnBackupScheduleDialog::initDayOfWeekCheckboxes() {
     ui->weekDaysLayout->addStretch();
 }
 
-void QnBackupScheduleDialog::at_bandwidthComboBoxChange(int index)
-{
-    ui->spinBoxBandwidth->setEnabled(index > 0);
-    ui->bandwidthLabel->setEnabled(index > 0);
-}
 
 void QnBackupScheduleDialog::setNearestValue(QComboBox* combobox, int time)
 {
@@ -93,7 +93,7 @@ void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& va
     ec2::backup::DaysOfWeek allowedDays = static_cast<ec2::backup::DaysOfWeek>(value.backupDaysOfTheWeek);
     for (int i = 1; i <= 7; ++i) {
         Qt::DayOfWeek day = static_cast<Qt::DayOfWeek>(i);
-        m_dowCheckboxes[i - 1]->setChecked(allowedDays.testFlag(ec2::backup::fromQtDOW(day)));
+        checkboxByDayOfWeek(day)->setChecked(allowedDays.testFlag(ec2::backup::fromQtDOW(day)));
     }
 
 
@@ -111,8 +111,9 @@ void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
 {
     QList<Qt::DayOfWeek> days;
     for (int i = 1; i <= 7; ++i) {
-        if (m_dowCheckboxes[i - 1]->isChecked())
-            days << static_cast<Qt::DayOfWeek>(i);
+        Qt::DayOfWeek day = static_cast<Qt::DayOfWeek>(i);
+        if (checkboxByDayOfWeek(day)->isChecked())
+            days << day;
     }
 
     value.backupDaysOfTheWeek = ec2::backup::fromQtDOW(days);
@@ -131,4 +132,8 @@ void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
     value.backupBitrate = ui->spinBoxBandwidth->value() * 1000000 / 8;
     if (ui->comboBoxBandwidth->currentIndex() == 0)
         value.backupBitrate = -value.backupBitrate;
+}
+
+QCheckBox* QnBackupScheduleDialog::checkboxByDayOfWeek( Qt::DayOfWeek day ) {
+    return m_dowCheckboxes[static_cast<int>(day) - 1];
 }

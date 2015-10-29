@@ -25,8 +25,7 @@ private:
     void setNearestValue(QComboBox* combobox, int time);
     void initDayOfWeekCheckboxes();
 
-private slots:
-    void at_bandwidthComboBoxChange(int index);
+    QCheckBox* checkboxByDayOfWeek(Qt::DayOfWeek day);
 
 private:
     QScopedPointer<Ui::BackupScheduleDialog> ui;
