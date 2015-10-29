@@ -100,6 +100,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnUserManagementColors>();
     qRegisterMetaType<QnVideowallManageWidgetColors>();
     qRegisterMetaType<QnServerUpdatesColors>();
+    qRegisterMetaType<QnBackupScheduleColors>();
     qRegisterMetaType<QnFailoverPriorityColors>();
     qRegisterMetaType<QnBackupCamerasColors>();
 
@@ -128,6 +129,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnUserManagementColors>();
     QnJsonSerializer::registerSerializer<QnVideowallManageWidgetColors>();
     QnJsonSerializer::registerSerializer<QnServerUpdatesColors>();
+    QnJsonSerializer::registerSerializer<QnBackupScheduleColors>();
     QnJsonSerializer::registerSerializer<QnFailoverPriorityColors>();
     QnJsonSerializer::registerSerializer<QnBackupCamerasColors>();
 

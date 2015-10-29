@@ -194,6 +194,10 @@ QnServerUpdatesColors::QnServerUpdatesColors() {
     error = Qt::red;
 }
 
+QnBackupScheduleColors::QnBackupScheduleColors() {
+    weekEnd = QColor(0xff8080);
+}
+
 QnFailoverPriorityColors::QnFailoverPriorityColors() {
     never   = QColor(0x808080);
     low     = QColor(0x9eb236);

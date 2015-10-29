@@ -249,6 +249,13 @@ struct QnServerUpdatesColors {
 };
 #define QnServerUpdatesColors_Fields (latest)(target)(error)
 
+struct QnBackupScheduleColors {
+    QnBackupScheduleColors();
+
+    QColor weekEnd;
+};
+#define QnBackupScheduleColors_Fields (weekEnd)
+
 struct QnFailoverPriorityColors {
     QnFailoverPriorityColors();
 
@@ -276,6 +283,7 @@ struct QnBackupCamerasColors {
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnUserManagementColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \
+    (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \
     (QnBackupCamerasColors) \
 
