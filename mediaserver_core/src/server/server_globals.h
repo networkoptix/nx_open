@@ -26,23 +26,11 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ChunksCatalog)
 
     enum class StoragePool : int {
-        None    = 0,
-        Normal  = 1,
-        Backup  = 2,
-        Both    = Normal | Backup
+        Normal  = 0,
+        Backup  = 1,
+        None    = 2,
+        Both    = 4
     };
-
-    inline StoragePool 
-    operator | (StoragePool lhs, StoragePool rhs) {
-        return static_cast<StoragePool>
-            (static_cast<int>(lhs) | static_cast<int>(rhs));
-    }
-
-    inline StoragePool 
-    operator & (StoragePool lhs, StoragePool rhs) {
-        return static_cast<StoragePool>
-            (static_cast<int>(lhs) & static_cast<int>(rhs));
-    }
 
     enum class BackupResultCode {
         Failed,
