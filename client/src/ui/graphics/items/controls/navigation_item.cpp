@@ -393,7 +393,6 @@ void QnNavigationItem::updateBookButtonEnabled()
     const auto currentWidget = navigator()->currentWidget();
     const bool bookmarksEnabled = currentWidget 
         && currentWidget->resource()->flags().testFlag(Qn::live);
-    const auto f = currentWidget->resource()->flags();
     const auto layout = context()->workbench()->currentLayout();
     const bool bookmarkMode = (!bookmarksEnabled ? false 
         : layout->data(Qn::LayoutBookmarksModeRole).toBool());
