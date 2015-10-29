@@ -453,7 +453,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
 
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));
     m_aviDelegate->close();
-    m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url));
+    m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url, QnServer::StoragePool::Both));
 
     bool rez = m_aviDelegate->open(m_fileRes);
     if (rez)
@@ -512,10 +512,8 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
             m_newQualityAviDelegate->setFastStreamFind(true);
 
             m_newQualityAviDelegate->setStorage(
-                QnStorageManager::getStorageByUrl(
-                    m_newQualityFileRes->getUrl()
-                )
-            );
+                QnStorageManager::getStorageByUrl(m_newQualityFileRes->getUrl(),
+                                                  QnServer::StoragePool::Both));
 
             if (!m_newQualityAviDelegate->open(m_newQualityFileRes))
                 continue;

@@ -27,8 +27,7 @@ private:
     typedef std::vector<ChunkKey> ChunkKeyVector;
 
 public:
-    enum code
-    {
+    enum code {
         Ok = 0,
         Started,
         Syncing,
@@ -40,7 +39,7 @@ public:
     QnScheduleSync();
     ~QnScheduleSync();
 signals:
-    void backupFinished(qint64 timestampMs);
+    void backupFinished(qint64 timestampMs, QnServer::BackupResultCode status);
 public:
     static QnScheduleSync *instance();
     int forceStart(); 
@@ -48,12 +47,41 @@ public:
     int interrupt();
     QnBackupStatusData getStatus() const;
     void start();
+
+private:
+#define COPY_ERROR_LIST(APPLY) \
+    APPLY(GetCatalogError) \
+    APPLY(NoBackupStorageError) \
+    APPLY(FromStorageError) \
+    APPLY(FileOpenError) \
+    APPLY(ChunkError) \
+    APPLY(NoError)
+
+#define ENUM_APPLY(value) value,
+
+    enum class CopyError {
+        COPY_ERROR_LIST(ENUM_APPLY)
+    };
+
+#define TO_STRING_APPLY(value) case CopyError::value: return lit(#value);
+
+    QString copyErrorString(CopyError error) {
+        switch (error) {
+            COPY_ERROR_LIST(TO_STRING_APPLY)
+        }
+        return QString();
+    }
+
+#undef TO_STRING_APPLY
+#undef ENUM_APPLY
+#undef COPY_ERROR_LIST
+
 private:
     template<typename NeedStopCB>
-    void synchronize(NeedStopCB needStop);
+    bool synchronize(NeedStopCB needStop);
 
     void renewSchedule();
-    void copyChunk(const ChunkKey &chunkKey);
+    CopyError copyChunk(const ChunkKey &chunkKey);
 
     int state() const;
 

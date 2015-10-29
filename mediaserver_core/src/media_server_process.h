@@ -9,6 +9,7 @@
 #include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <server/server_globals.h>
 
 #include "http/auto_request_forwarder.h"
 #include "http/progressive_downloading_server.h"
@@ -60,7 +61,7 @@ private slots:
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
     void at_storageManager_rebuildFinished(bool isCanceled);
-    void at_archiveBackupFinished(qint64 backupedToMs);
+    void at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code);
     void at_timer();
     void at_connectionOpened();
     void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);

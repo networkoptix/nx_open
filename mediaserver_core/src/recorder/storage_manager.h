@@ -67,7 +67,8 @@ public:
     * timeZone server time zone offset in munutes. If value==-1 - current(system) time zone is used
     */
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
-    static QnStorageResourcePtr getStorageByUrl(const QString &storageUrl);
+    static QnStorageResourcePtr getStorageByUrl(const QString &storageUrl, 
+                                                QnServer::StoragePool pool);
 
     bool checkIfMyStorage(const QnStorageResourcePtr &storage) const;
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);
@@ -124,7 +125,7 @@ signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
     void rebuildFinished(bool isCanceled);
-    void backupFinished(qint64 backupedToMs);
+    void backupFinished(qint64 backupedToMs, QnServer::BackupResultCode);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);

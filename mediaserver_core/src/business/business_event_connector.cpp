@@ -17,7 +17,6 @@
 #include "business/events/custom_business_event.h"
 #include "business/events/conflict_business_event.h"
 
-
 //#define REDUCE_NET_ISSUE_HACK
 
 static QnBusinessEventConnector* _instance = NULL;
@@ -153,7 +152,7 @@ void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &re
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
-void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs) 
+void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs, QnServer::BackupResultCode code) 
 {
     QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::ArchiveBackupFinished, resource->getId()));
     auto params = action->getRuntimeParams();

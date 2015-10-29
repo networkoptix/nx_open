@@ -1597,7 +1597,9 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
 
     QSet<QnStorageResourcePtr> storages;
     for (const auto& storage: getWritableStorages()) {
-        if (!storage->hasFlags(Qn::storage_fastscan) || storage->getFreeSpace() > storage->getSpaceLimit())
+        bool validStorage = !storage->hasFlags(Qn::storage_fastscan) || 
+                             storage->getFreeSpace() > storage->getSpaceLimit();
+        if (validStorage)
             storages << storage;
     }
 
@@ -1896,7 +1898,7 @@ QnStorageResourcePtr QnStorageManager::findStorageByOldIndex(int oldIndex)
         for(int idx: itr.value())
         {
             if (oldIndex == idx)
-                return getStorageByUrl(itr.key());
+                return getStorageByUrl(itr.key(), QnServer::StoragePool::Both);
         }
     }
     return QnStorageResourcePtr();
@@ -2022,10 +2024,17 @@ void QnStorageManager::getCamerasWithArchiveInternal(std::set<QString>& result, 
     }
 }
 
-QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString &storageUrl)
+QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString &storageUrl,
+                                                       QnServer::StoragePool pool)
 {
-    QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlInternal(storageUrl);
-    if (!storage)
-        storage = qnBackupStorageMan->getStorageByUrlInternal(storageUrl);
-    return storage;
+    QnStorageResourcePtr result;
+    if ((pool & QnServer::StoragePool::Normal) == QnServer::StoragePool::Normal) {
+        result = qnNormalStorageMan->getStorageByUrlInternal(storageUrl);
+        if (result)
+            return result;
+    }
+    if ((pool & QnServer::StoragePool::Backup) == QnServer::StoragePool::Backup) {
+        result = qnBackupStorageMan->getStorageByUrlInternal(storageUrl);
+    }
+    return result;
 }

@@ -131,38 +131,32 @@ QnScheduleSync::getOldestChunk()
     return ret;
 }
 
-void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
+QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 {
     auto fromCatalog = qnNormalStorageMan->getFileCatalog(
         chunkKey.cameraID,
         chunkKey.catalog
     );
     if (!fromCatalog)
-    {
-        NX_LOG(
-            lit("[QnScheduleSync::copyChunk] get fromCatalog failed"),
-            cl_logDEBUG1
-        );
-        return;
-    }
+        return CopyError::GetCatalogError;
 
     auto toCatalog = qnBackupStorageMan->getFileCatalog(
         chunkKey.cameraID,
         chunkKey.catalog
     );
     if (!toCatalog)
-    {
-        NX_LOG(
-            lit("[QnScheduleSync::copyChunk] get toCatalog failed"),
-            cl_logDEBUG1
-        );
-        return;
-    }
+        return CopyError::GetCatalogError;
 
     if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs)
     {
         QString fromFileFullName = fromCatalog->fullFileName(chunkKey.chunk);            
-        auto fromStorage = qnNormalStorageMan->getStorageByUrl(fromFileFullName);
+        auto fromStorage = QnStorageManager::getStorageByUrl(
+            fromFileFullName, 
+            QnServer::StoragePool::Normal
+        );
+        
+        if (!fromStorage)
+            return CopyError::FromStorageError;
 
         std::unique_ptr<QIODevice> fromFile = std::unique_ptr<QIODevice>(
             fromStorage->open(
@@ -173,13 +167,8 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
         auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
         if (!toStorage)
-        {
-            NX_LOG(
-                lit("[QnScheduleSync::copyChunk] toStorage is invalid"),
-                cl_logDEBUG1
-            );
-            return;
-        }
+            return CopyError::NoBackupStorageError;
+
         auto newStorageUrl = toStorage->getUrl();
         auto oldSeparator = getPathSeparator(relativeFileName);
         auto newSeparator = getPathSeparator(newStorageUrl);
@@ -195,15 +184,7 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
 
         if (!fromFile || !toFile)
-        {
-            NX_LOG(
-                lit("[QnScheduleSync::synchronize] file %1 or %2 open error")
-                    .arg(fromFileFullName)
-                    .arg(newFileName),
-                cl_logWARNING
-            );
-            return;
-        }
+            return CopyError::FileOpenError;
 
         int bitrate = m_schedule.backupBitrate;
         if (bitrate <= 0) // not capped
@@ -256,13 +237,7 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
 
         if (!result)
-        {
-            NX_LOG(
-                lit("[QnScheduleSync::synchronize] fileStarted() for file %1 failed")
-                    .arg(newFileName),
-                cl_logWARNING
-            );
-        }
+            return CopyError::ChunkError;
 
         result = qnBackupStorageMan->fileFinished(
             chunkKey.chunk.durationMs,
@@ -272,27 +247,37 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
 
         if (!result)
-            NX_LOG(
-                lit("[QnScheduleSync::synchronize] fileFinished() for file %1 failed")
-                    .arg(newFileName),
-                cl_logWARNING
-            );
+            return CopyError::ChunkError;
     }
+    return CopyError::NoError;
 }
 
 template<typename NeedStopCB>
-void QnScheduleSync::synchronize(NeedStopCB needStop)
+bool QnScheduleSync::synchronize(NeedStopCB needStop)
 {
-    while (1)
-    {
+    while (1) {
         auto chunkKeyVector = getOldestChunk();
         if (!chunkKeyVector)
             break;
-        for (const auto &chunkKey : *chunkKeyVector)
-            copyChunk(chunkKey);
+        for (const auto &chunkKey : *chunkKeyVector) {
+            auto err = copyChunk(chunkKey);
+            if (err != CopyError::NoError) {
+                NX_LOG(
+                    lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)),
+                    cl_logDEBUG1
+                );
+                if (err == CopyError::NoBackupStorageError || 
+                    err == CopyError::FromStorageError) {
+                    emit backupFinished(m_syncTimePoint, 
+                                        QnServer::BackupResultCode::Failed);
+                    return false;
+                }
+            }
+        }
         if (needStop())
             break;
     }
+    return true;
 }
 
 int QnScheduleSync::stop() 
@@ -420,14 +405,14 @@ void QnScheduleSync::start()
                 {
                     m_syncing = true;
                     m_syncTimePoint = 0;
-                    synchronize(
+                    bool result = synchronize(
                         [this, isItTimeForSync]
                         {
                             if (!m_backupSyncOn || // stop forced
                                 !isItTimeForSync() || // synchronization period is over
                                 !m_syncing) // interrupted by user
                             {
-                               return true;
+                                return true;
                             }
                             return false;
                         }
@@ -435,7 +420,8 @@ void QnScheduleSync::start()
                     m_syncData.clear();
                     m_forced  = false;
                     m_syncing = false;
-                    emit backupFinished(m_syncTimePoint);
+                    emit backupFinished(m_syncTimePoint, 
+                                        QnServer::BackupResultCode::Done);
                 }
             }
         }

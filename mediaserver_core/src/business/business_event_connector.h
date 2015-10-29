@@ -8,6 +8,7 @@
 
 #include <business/business_fwd.h>
 #include "business/business_event_parameters.h"
+#include <server/server_globals.h>
 
 struct QnModuleInformation;
 
@@ -74,7 +75,7 @@ public slots:
 
     void at_archiveRebuildFinished(const QnResourcePtr& resource, bool isCanceled);
 
-    void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs);
+    void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs, QnServer::BackupResultCode code);
 
     bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:

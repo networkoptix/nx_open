@@ -1309,10 +1309,10 @@ void MediaServerProcess::at_storageManager_rebuildFinished(bool isCanceled) {
     qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, isCanceled);
 }
 
-void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs) {
+void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code) {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_archiveBackupFinished(m_mediaServer, backupedToMs);
+    qnBusinessRuleConnector->at_archiveBackupFinished(m_mediaServer, backupedToMs, code);
 }
 
 void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)
