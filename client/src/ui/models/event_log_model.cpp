@@ -10,8 +10,6 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <plugins/resource/server_camera/server_camera.h>
-
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/business_help.h>

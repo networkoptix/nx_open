@@ -261,6 +261,8 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
 
     int fixedDurationMs = action->getParams().bookmarkDuration;
 
+    auto runningKey = guidFromArbitraryData(action->getBusinessRuleId().toRfc4122() + camera->getId().toRfc4122());
+
     qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
     qint64 endTimeMs = startTimeMs;
 
@@ -268,14 +270,14 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     {
         // bookmark as an prolonged action
         if (action->getToggleState() == QnBusiness::ActiveState) {
-            m_runningBookmarkActions[camera->getId()] = startTimeMs;
+            m_runningBookmarkActions[runningKey] = startTimeMs;
             return true;
         }
 
-        if (!m_runningBookmarkActions.contains(camera->getId()))
+        if (!m_runningBookmarkActions.contains(runningKey))
             return false;
 
-        startTimeMs = m_runningBookmarkActions.take(camera->getId());
+        startTimeMs = m_runningBookmarkActions.take(runningKey);
     }
 
     QnCameraBookmark bookmark;

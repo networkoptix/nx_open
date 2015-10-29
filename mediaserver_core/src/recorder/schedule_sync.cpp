@@ -31,7 +31,7 @@ QnScheduleSync::QnScheduleSync()
       m_forced(false),
       m_interrupted(false),
       m_backupDone(false),
-      m_curDow(ec2::backup::NoDay),
+      m_curDow(ec2::backup::Never),
       m_syncTimePoint(0)
 {
     Q_ASSERT(QnScheduleSync_instance == 0);
@@ -407,19 +407,24 @@ void QnScheduleSync::start()
                     if (m_schedule.backupType != Qn::Backup_Schedule)
                         return SyncCode::WrongBackupType;
 
-                    QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
-                    const auto curDate = now.date();
-                    const auto curDow = ec2::backup::fromQtDOW(curDate.dayOfWeek());
+                    if (m_schedule.backupDaysOfTheWeek == ec2::backup::Never)
+                        return SyncCode::WrongBackupType;
+
+                    QDateTime now = qnSyncTime->currentDateTime();                        
+                    const Qt::DayOfWeek today = static_cast<Qt::DayOfWeek>(now.date().dayOfWeek());
+
+                    ec2::backup::DaysOfWeek allowedDays = 
+                        static_cast<ec2::backup::DaysOfWeek>(m_schedule.backupDaysOfTheWeek);
                     
-                    if (curDow == ec2::backup::NoDay || curDow != m_curDow) { 
-                        m_curDow = curDow;
+                    if (m_curDow == ec2::backup::Never || ec2::backup::fromQtDOW(today) != m_curDow) { 
+                        m_curDow = ec2::backup::fromQtDOW(today);
                         m_interrupted = false; // new day - new life
                     }
 
                     if (m_interrupted)
                         return SyncCode::Interrupted;
 
-                    if (curDow & m_schedule.backupDaysOfTheWeek) 
+                    if (allowedDays.testFlag(ec2::backup::fromQtDOW(today))) 
                     {
                         const auto curTime = now.time();
                         if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 && 

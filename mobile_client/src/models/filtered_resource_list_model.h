@@ -4,9 +4,13 @@
 #include <QtCore/QAbstractListModel>
 
 #include <core/resource/resource_fwd.h>
+#include <utils/common/connective.h>
 
-class QnFilteredResourceListModel : public QAbstractListModel {
+class QnFilteredResourceListModel : public Connective<QAbstractListModel> {
     Q_OBJECT
+
+    typedef Connective<QAbstractListModel> base_type;
+
 public:
     QnFilteredResourceListModel(QObject *parent = 0);
     ~QnFilteredResourceListModel();

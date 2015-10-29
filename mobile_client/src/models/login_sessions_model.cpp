@@ -203,7 +203,7 @@ void QnLoginSessionsModel::at_moduleFinder_moduleAddressLost(const QnModuleInfor
     if (row >= 0) {
         beginRemoveRows(QModelIndex(), row, row);
         m_discoveredSessions.removeAt(i);
-        endInsertRows();
+        endRemoveRows();
     } else {
         m_discoveredSessions.removeAt(i);
     }

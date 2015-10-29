@@ -88,7 +88,7 @@ Item {
                         maximumLineCount: 2
                         font.pixelSize: sp(14)
                         font.weight: Font.Normal
-                        color: QnTheme.cameraOfflineText
+                        color: QnTheme.cameraText
                     }
                 }
 

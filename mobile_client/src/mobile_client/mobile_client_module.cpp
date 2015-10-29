@@ -19,7 +19,7 @@
 #include "utils/common/long_runnable.h"
 #include "utils/common/app_info.h"
 #include "utils/common/synctime.h"
-#include "plugins/resource/server_camera/server_camera_factory.h"
+#include "plugins/resource/mobile_client_camera/mobile_client_camera_factory.h"
 #include "mobile_client/mobile_client_message_processor.h"
 #include "watchers/user_watcher.h"
 
@@ -57,13 +57,13 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnMobileClientMessageProcessor>(new QnMobileClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
-    common->store<QnServerCameraFactory>(new QnServerCameraFactory());
+    common->store<QnMobileClientCameraFactory>(new QnMobileClientCameraFactory());
 
     common->store<QnUserWatcher>(new QnUserWatcher());
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
-    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
 }
 
 QnMobileClientModule::~QnMobileClientModule() {
