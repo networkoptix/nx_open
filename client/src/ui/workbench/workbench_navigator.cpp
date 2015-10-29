@@ -1884,7 +1884,7 @@ bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr 
         { return widget->resource()->toResourcePtr()->getId() == cameraId; });
 }
 
-void QnWorkbenchNavigator::updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera) {
+void QnWorkbenchNavigator::updateHistoryForCamera(QnVirtualCameraResourcePtr camera) {
     if (!camera)
         return;
 
