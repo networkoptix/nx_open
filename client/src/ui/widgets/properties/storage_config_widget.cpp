@@ -108,7 +108,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     connect(ui->rebuildBackupWidget,        &QnStorageRebuildWidget::cancelRequested, this, [this]{ cancelRebuild(false); });
 
     connect(ui->pushButtonSchedule,         &QPushButton::clicked, this, &QnStorageConfigWidget::at_openBackupSchedule_clicked);
-    connect(ui->pushButtonCameraSettings,   &QPushButton::clicked,  this, [this]{
+    connect(ui->camerasToBackupButton,      &QPushButton::clicked,  this, [this]{
         menu()->trigger(Qn::OpenBackupCamerasAction);
         updateBackupInfo();
     });
@@ -131,7 +131,17 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     });
 
     at_backupTypeComboBoxChange(ui->comboBoxBackupType->currentIndex());
+
+    retranslateUi();
 }
+
+void QnStorageConfigWidget::retranslateUi() {
+    ui->camerasToBackupButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Devices to Backup..."),
+        tr("Cameras to Backup...")
+        ));
+}
+
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
 {}

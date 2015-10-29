@@ -38,6 +38,7 @@ public:
 
     virtual bool hasChanges() const override;
 
+    virtual void retranslateUi() override;
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
 
