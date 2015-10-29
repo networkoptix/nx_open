@@ -75,7 +75,7 @@ public slots:
 
     void at_archiveRebuildFinished(const QnResourcePtr& resource, bool isCanceled);
 
-    void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs, QnServer::BackupResultCode code);
+    void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 
     bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:

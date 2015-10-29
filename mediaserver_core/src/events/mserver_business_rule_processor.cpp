@@ -131,6 +131,11 @@ struct QnEmailAttachmentData {
             imageName = lit("license.png");
             imagePath = lit(":/skin/email_attachments/server.png");
             break;
+        case QnBusiness::BackupFinishedEvent:
+            templatePath = lit(":/email_templates/backup_finished.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
         case QnBusiness::UserDefinedEvent:
             templatePath = lit(":/email_templates/generic_event.mustache");
             imageName = lit("server.png");
@@ -631,6 +636,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     case StorageFailureEvent:
     case ServerFailureEvent: 
     case LicenseIssueEvent:
+    case BackupFinishedEvent:
         {
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;

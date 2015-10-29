@@ -152,13 +152,9 @@ void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &re
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
-void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs, QnServer::BackupResultCode code) 
+void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText)
 {
-    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::ArchiveBackupFinished, resource->getId()));
-    auto params = action->getRuntimeParams();
-    params.caption = QString::number(timestampMs);
-    action->setRuntimeParams(params);
-    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+    QnBackupFinishedBusinessEventPtr bEvent(new QnBackupFinishedBusinessEvent(resource, timeStamp, reasonCode, reasonText));
 }
 
 bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage)
@@ -243,6 +239,11 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
             if (!resource)
                 resource = qnResPool->getResourceById(params.sourceServerId);
             at_licenseIssueEvent(resource, params.eventTimestampUsec, params.reasonCode, params.description);
+            break;
+        case QnBusiness::BackupFinishedEvent:
+            if (!resource)
+                resource = qnResPool->getResourceById(params.sourceServerId);
+            at_archiveBackupFinished(resource, params.eventTimestampUsec, params.reasonCode, params.description);
             break;
         default:
             if (errMessage)
