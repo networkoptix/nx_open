@@ -2028,16 +2028,12 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString &storageUrl
                                                        QnServer::StoragePool pool)
 {
     QnStorageResourcePtr result;
-    bool isNormalManagerSuits = pool == QnServer::StoragePool::Normal ||
-                                pool == QnServer::StoragePool::Both;
-    if (isNormalManagerSuits) {
+    if ((pool & QnServer::StoragePool::Normal) == QnServer::StoragePool::Normal) {
         result = qnNormalStorageMan->getStorageByUrlInternal(storageUrl);
         if (result)
             return result;
     }
-    bool isBackupManagerSuits = pool == QnServer::StoragePool::Backup ||
-                                pool == QnServer::StoragePool::Both;
-    if (isBackupManagerSuits) {
+    if ((pool & QnServer::StoragePool::Backup) == QnServer::StoragePool::Backup) {
         result = qnBackupStorageMan->getStorageByUrlInternal(storageUrl);
     }
     return result;

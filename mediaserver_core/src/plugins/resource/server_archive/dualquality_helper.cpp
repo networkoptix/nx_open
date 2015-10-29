@@ -23,17 +23,21 @@ void QnDualQualityHelper::setResource(const QnNetworkResourcePtr &netResource) {
 }
 
 void QnDualQualityHelper::openCamera(const QString& cameraUniqueId) {
-    m_catalogHi[(int)QnServer::StoragePool::Normal] = 
-        qnNormalStorageMan->getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
+    m_catalogHi[QnServer::StoragePool::Normal] = 
+        qnNormalStorageMan->getFileCatalog(cameraUniqueId, 
+                                           QnServer::HiQualityCatalog);
 
-    m_catalogHi[(int)QnServer::StoragePool::Backup] = 
-        qnBackupStorageMan->getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
+    m_catalogHi[QnServer::StoragePool::Backup] = 
+        qnBackupStorageMan->getFileCatalog(cameraUniqueId, 
+                                           QnServer::HiQualityCatalog);
 
-    m_catalogLow[(int)QnServer::StoragePool::Normal] = 
-        qnNormalStorageMan->getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
+    m_catalogLow[QnServer::StoragePool::Normal] = 
+        qnNormalStorageMan->getFileCatalog(cameraUniqueId, 
+                                           QnServer::LowQualityCatalog);
 
-    m_catalogLow[(int)QnServer::StoragePool::Backup] = 
-        qnBackupStorageMan->getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
+    m_catalogLow[QnServer::StoragePool::Backup] = 
+        qnBackupStorageMan->getFileCatalog(cameraUniqueId, 
+                                           QnServer::LowQualityCatalog);
 }
 
 void QnDualQualityHelper::findDataForTimeHelper(
@@ -47,9 +51,9 @@ void QnDualQualityHelper::findDataForTimeHelper(
 {
     bool usePreciseFind = m_alreadyOnAltChunk || preciseFind;
     m_alreadyOnAltChunk = false;
-    int index = static_cast<int>(storageManager);
 
-    catalog = (m_quality == MEDIA_Quality_Low ? m_catalogLow[index] : m_catalogHi[index]);
+    catalog = (m_quality == MEDIA_Quality_Low ? m_catalogLow[storageManager] : 
+                                                m_catalogHi[storageManager]);
     if (catalog == 0)
         return; // no data in archive
 
@@ -59,7 +63,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
     if (timeDistance > 0)
     {
         // chunk not found. check in alternate quality
-        DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_Low ? m_catalogHi[index] : m_catalogLow[index]);
+        DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_Low ? m_catalogHi[storageManager] : m_catalogLow[storageManager]);
         DeviceFileCatalog::TruncableChunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
         qint64 timeDistanceAlt = calcDistanceHelper(altChunk, time, findMethod);
         int findEps = m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : SECOND_STREAM_FIND_EPS;
