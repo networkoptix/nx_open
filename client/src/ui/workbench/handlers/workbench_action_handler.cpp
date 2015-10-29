@@ -1375,12 +1375,17 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
-    bool enable = action(Qn::BookmarksModeAction)->isChecked();
+    const auto bookmarkModeAction = action(Qn::BookmarksModeAction);
+    const bool checked = bookmarkModeAction->isChecked();
+    const bool enabled = bookmarkModeAction->isEnabled();
 
-    if (enable)
+    if (enabled)
+        context()->workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
+
+    if (checked)
         menu()->trigger(Qn::StopSmartSearchAction, QnActionParameters(display()->widgets()));
 
-    navigator()->setBookmarksModeEnabled(enable);
+    navigator()->setBookmarksModeEnabled(checked);
 }
 
 void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
