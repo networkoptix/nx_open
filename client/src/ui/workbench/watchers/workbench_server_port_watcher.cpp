@@ -12,7 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 
 QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
-    : Connective<QObject>(parent)
+    : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
     , m_currentServerId()
@@ -35,6 +35,8 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
         , this, [this]()
     {
         const auto currentServer = qnCommon->currentServer();
+        
+        Q_ASSERT_X(!currentServer.isNull(), Q_FUNC_INFO, "qnCommon->currentServer() is NULL!");
         if (!currentServer)
             return;
 
