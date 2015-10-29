@@ -35,7 +35,7 @@ AsyncClient::~AsyncClient()
 void AsyncClient::setCredentials( String userName, String key )
 {
     QnMutexLocker lock( &m_mutex );
-    Credentials credentials = { userName, key };
+    Credentials credentials = { std::move( userName ), std::move( key ) };
     m_credentials = std::move( credentials );
 }
 

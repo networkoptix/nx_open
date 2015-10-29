@@ -125,6 +125,7 @@ namespace nx_api
                 assert( !m_sendQueue.empty() );
                 //completion handler is allowed to remove this connection, so moving handler to local variable
                 sendCompletionHandler = std::move( m_sendQueue.front().handler );
+                m_serializer.setMessage( nullptr );
                 m_sendQueue.pop_front();
 
                 if( sendCompletionHandler )
