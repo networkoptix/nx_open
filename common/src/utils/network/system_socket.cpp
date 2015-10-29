@@ -454,7 +454,6 @@ bool Socket::createSocket(int type, int protocol)
     return true;
 }
 
-
 //////////////////////////////////////////////////////////
 ///////// class CommunicatingSocket
 //////////////////////////////////////////////////////////
@@ -955,6 +954,87 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 #endif
 }
 
+bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
+{
+    int isEnabled = info ? 1 : 0;
+    if (setsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
+                   &isEnabled, sizeof(isEnabled)) < 0)
+        return false;
+
+    if (!info)
+        return true;
+
+    #if defined(Q_OS_WIN)
+        struct tcp_keepalive ka = { TRUE, info->timeSec * 1000,
+                                          info->intervalSec * 1000 }; // s to ms
+        if (WSAIoctl(m_implDelegate.handle(), SIO_KEEPALIVE_VALS,
+                     &ka, sizeof(ka), 0, 0, 0, 0, 0) != 0)
+            return false;
+
+        return true;
+    #elif defined(Q_OS_LINUX)
+        if (setsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPIDLE,
+                       &info->timeSec, sizeof(info->timeSec)) < 0)
+            return false;
+
+        if (setsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPINTVL,
+                       &info->intervalSec, sizeof(info->intervalSec)) < 0)
+            return false;
+
+        if (setsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPCNT,
+                       &info->probeCount, sizeof(info->probeCount)) < 0)
+            return false;
+
+        return true;
+    #else
+        return false;
+    #endif
+}
+
+bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
+{
+    int isEnabled;
+    socklen_t length;
+    if (getsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
+                   &isEnabled, &length) < 0)
+        return false;
+
+    if (!isEnabled)
+    {
+        *result = boost::none;
+        return true;
+    }
+
+    #if defined(Q_OS_WIN)
+        struct tcp_keepalive ka;
+        if (WSAIoctl(m_implDelegate.handle(), SIO_KEEPALIVE_VALS,
+                     0, 0, &ka, sizeof(ka), 0, 0, 0) != 0)
+            return false;
+
+        Q_ASSERT_X(ka.onoff == TRUE, Q_FUNC_INFO, "WSAIoctl problem occured");
+        *result = TcpKeepAlive(ka.keepalivetime / 1000, // ms to s
+                               ka.keepaliveinterval / 1000);
+        return true;
+    #elif defined(Q_OS_LINUX)
+        KeepAliveOptions info;
+        if (getsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPIDLE,
+                       &info.timeSec, &length) < 0)
+            return false;
+
+        if (getsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPINTVL,
+                       &info.intervalSec, &length) < 0)
+            return false;
+
+        if (getsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPCNT,
+                       &info.probeCount, &length) < 0)
+            return false;
+
+        *result = std::move(info);
+        return true;
+    #else
+        return false;
+    #endif
+}
 
 //////////////////////////////////////////////////////////
 ///////// class TCPServerSocket

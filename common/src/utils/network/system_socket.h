@@ -245,6 +245,10 @@ public:
     virtual bool toggleStatisticsCollection( bool val ) override;
     //!Implementation of AbstractStreamSocket::getConnectionStatistics
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
+    //!Implementation of AbstractStreamSocket::setKeepAlive
+    virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
+    //!Implementation of AbstractStreamSocket::getKeepAlive
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override;
 
 private:
     // Access for TCPServerSocket::accept() connection creation

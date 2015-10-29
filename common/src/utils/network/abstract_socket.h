@@ -306,6 +306,14 @@ struct StreamSocketInfo
     }
 };
 
+struct KeepAliveOptions
+{
+    int timeSec, intervalSec, probeCount;
+
+    KeepAliveOptions(int time = 0, int interval = 0, int probes = 0)
+        : timeSec(time), intervalSec(interval), probeCount(probes) {}
+};
+
 //!Interface for connection-orientied sockets
 class AbstractStreamSocket
 :
@@ -342,6 +350,16 @@ public:
         \note on win32 for tcp protocol this function is pretty slow, so it is not recommended to call it too often
     */
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) = 0;
+    //!Set keep alive options
+    /*!
+        \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
+    */
+    virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) = 0;
+    //!Reads keep alive options
+    /*!
+        \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
+    */
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) = 0;
 };
 
 //!Stream socket with encryption
