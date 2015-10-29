@@ -1324,8 +1324,8 @@ void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer:
         case QnServer::BackupResultCode::Done:
             reason = QnBusiness::BackupDone;
             break;
-        case QnServer::BackupResultCode::Canceled:
-            reason = QnBusiness::BackupCanceled;
+        case QnServer::BackupResultCode::Cancelled:
+            reason = QnBusiness::BackupCancelled;
             break;
         default:
             break;

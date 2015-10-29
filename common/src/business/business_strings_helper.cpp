@@ -384,7 +384,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("Archive backup is successfully completed");
         break;
     }
-    case BackupCanceled: {
+    case BackupCancelled: {
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion

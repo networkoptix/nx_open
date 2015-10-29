@@ -66,7 +66,7 @@ public:
         BackupFailed,
         BackupEndOfPeriod,
         BackupDone,
-        BackupCanceled
+        BackupCancelled
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
