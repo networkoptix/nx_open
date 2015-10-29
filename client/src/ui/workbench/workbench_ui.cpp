@@ -1490,8 +1490,6 @@ void QnWorkbenchUi::createTitleWidget() {
     titleLayout->setStretchFactor(tabBarWidget, 0x1000);
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)
-        , kDefaultSizeMultiplier, Qn::MainWindow_TitleBar_NewLayout_Help));
     if (QnScreenRecorder::isSupported())
     {
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)

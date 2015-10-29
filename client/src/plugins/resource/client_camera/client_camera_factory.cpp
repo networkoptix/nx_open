@@ -1,11 +1,11 @@
-#include "server_camera_factory.h"
+#include "client_camera_factory.h"
 
 #include <core/resource/resource_type.h>
 #include <core/resource/client_storage_resource.h>
 
-#include "server_camera.h"
+#include "client_camera.h"
 
-QnResourcePtr QnServerCameraFactory::createResource(const QnUuid &resourceTypeId, const QnResourceParams &) {
+QnResourcePtr QnClientCameraFactory::createResource(const QnUuid &resourceTypeId, const QnResourceParams &) {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())
@@ -18,7 +18,7 @@ QnResourcePtr QnServerCameraFactory::createResource(const QnUuid &resourceTypeId
         if (!resourceType->isCamera())
             return QnResourcePtr();
 
-        return QnResourcePtr(new QnServerCamera(resourceTypeId));
+        return QnResourcePtr(new QnClientCamera(resourceTypeId));
     }
 }
 

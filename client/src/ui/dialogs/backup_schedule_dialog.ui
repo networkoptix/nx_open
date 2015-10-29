@@ -20,7 +20,7 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="weekDaysLayout">
        <property name="spacing">
         <number>8</number>
        </property>
@@ -30,68 +30,6 @@
           <string>Write backups on</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox1">
-         <property name="text">
-          <string>Monday</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox2">
-         <property name="text">
-          <string>Tuesday</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox3">
-         <property name="text">
-          <string>Wednesday</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox4">
-         <property name="text">
-          <string>Thursday</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox5">
-         <property name="text">
-          <string>Friday</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox6">
-         <property name="text">
-          <string>Saturday</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox7">
-         <property name="text">
-          <string>Sunday</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>

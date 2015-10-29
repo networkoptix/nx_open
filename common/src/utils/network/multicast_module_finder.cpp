@@ -42,6 +42,7 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     m_pingTimeoutMillis(pingTimeoutMillis == 0 ? defaultPingTimeoutMs : pingTimeoutMillis),
     m_keepAliveMultiply(keepAliveMultiply == 0 ? defaultKeepAliveMultiply : keepAliveMultiply),
     m_prevPingClock(0),
+    m_checkInterfacesTimeoutMs(checkInterfacesTimeoutMs),
     m_lastInterfacesCheckMs(0),
     m_compatibilityMode(false),
     m_multicastGroupAddress(multicastGroupAddress.isNull() ? defaultModuleRevealMulticastGroup : multicastGroupAddress),
@@ -75,6 +76,10 @@ bool QnMulticastModuleFinder::isCompatibilityMode() const {
 
 void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
+}
+
+void QnMulticastModuleFinder::setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs) {
+    m_checkInterfacesTimeoutMs = checkInterfacesTimeoutMs;
 }
 
 void QnMulticastModuleFinder::updateInterfaces() {
@@ -231,7 +236,7 @@ void QnMulticastModuleFinder::run() {
     while (!needToStop()) {
         quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
 
-        if (currentClock - m_lastInterfacesCheckMs >= checkInterfacesTimeoutMs) {
+        if (currentClock - m_lastInterfacesCheckMs >= m_checkInterfacesTimeoutMs) {
             updateInterfaces();
             m_lastInterfacesCheckMs = currentClock;
         }
