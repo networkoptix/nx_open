@@ -1586,7 +1586,6 @@ void MediaServerProcess::run()
         )
     );
     
-    std::unique_ptr<QnScheduleSync> scheduleSync(new QnScheduleSync);
     std::unique_ptr<QnStorageManager> backupStorageManager(
         new QnStorageManager(
             QnServer::StoragePool::Backup
@@ -2233,7 +2232,7 @@ void MediaServerProcess::run()
         m_moduleFinder->start();
     }
 #endif
-    scheduleSync->start();
+    qnBackupStorageMan->scheduleSync()->start();
     emit started();
     exec();
 
