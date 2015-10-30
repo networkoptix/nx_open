@@ -3,7 +3,7 @@
 #include "aio/aioservice.h"
 
 #include "cloud_connectivity/address_resolver.h"
-#include "cloud_connectivity/cloud_connection_info.h"
+#include "cloud_connectivity/mediator_connector.h"
 
 namespace nx {
 
@@ -19,8 +19,8 @@ public:
     { return instance().m_addressResolver; }
 
     inline static
-    cc::CloudConnectionInfo& cloudInfo()
-    { return instance().m_cloudConnectionInfo; }
+    cc::MediatorConnector& mediatorConnector()
+    { return instance().m_mediatorConnector; }
 
 private:
     SocketGlobals();
@@ -33,7 +33,7 @@ private:
     std::shared_ptr< QnLog::Logs > m_log;
     aio::AIOService m_aioService;
     cc::AddressResolver m_addressResolver;
-    cc::CloudConnectionInfo m_cloudConnectionInfo;
+    cc::MediatorConnector m_mediatorConnector;
 };
 
 } // namespace nx

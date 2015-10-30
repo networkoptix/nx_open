@@ -53,7 +53,6 @@ TEST_F( ConnectTest, BindConnect )
     }
 
     stun::AsyncClient msClient( address );
-    msClient.setCredentials( SYSTEM_ID, AUTH_KEY );
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
                                              stun::cc::methods::bind ) );
@@ -62,6 +61,7 @@ TEST_F( ConnectTest, BindConnect )
         request.newAttribute< stun::cc::attrs::PublicEndpointList >(
             std::list< SocketAddress >( 1, testHttpServer.serverAddress() ) );
 
+        request.insertIntegrity( SYSTEM_ID, AUTH_KEY );
         cloud.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
         SyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;

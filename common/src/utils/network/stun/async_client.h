@@ -31,33 +31,23 @@ public:
 
     static const struct Timeouts { uint send, recv; } DEFAULT_TIMEOUTS;
 
-    // TODO: pass timeouts
     AsyncClient( const SocketAddress& endpoint, bool useSsl = false,
                  Timeouts timeouts = DEFAULT_TIMEOUTS );
     ~AsyncClient();
+
     Q_DISABLE_COPY( AsyncClient );
-
-
-    //!Sets authorization information.
-    /*!
-        Each set \class Message will be appended by fallow fields automaticly:
-          - \class attrs::UserName as \param userName
-          - \class attrs::Nonce as random number
-          - \class attrs::MessageIntegrity as HMAC-SHA1( \param key, message body )
-    */
-    void setCredentials( String userName, String key );
 
     //!Asynchronously openes connection to the server, specified during initialization
     /*!
         \param connectHandler Will be called once to deliver connection completeness
         \param indicationHandler Will be called for each indication message
-        \param disconnectHandler Will be called on disconnect
+        \param disconnectHandler Will be called on disconnect (may be repeated if reconnected)
         \return \a false, if could not start asynchronous operation
         \note It is valid to call after \fn sendRequest to setup handlers
     */
-    bool openConnection( ConnectionHandler connectHandler,
-                         IndicationHandler indicationHandler,
-                         ConnectionHandler disconnectHandler );
+    bool openConnection( ConnectionHandler connectHandler = nullptr,
+                         IndicationHandler indicationHandler = nullptr,
+                         ConnectionHandler disconnectHandler = nullptr );
 
     //!Sends message asynchronously
     /*!

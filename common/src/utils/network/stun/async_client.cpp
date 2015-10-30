@@ -22,21 +22,13 @@ AsyncClient::~AsyncClient()
     std::unique_ptr< AbstractStreamSocket > connectingSocket;
     {
         QnMutexLocker lock( &m_mutex );
-        connectingSocket = std::move(m_connectingSocket);
+        connectingSocket = std::move( m_connectingSocket );
         m_state = State::terminated;
     }
 
-    if(connectingSocket)
-        connectingSocket->terminateAsyncIO(true);
+    if( connectingSocket )
+        connectingSocket->terminateAsyncIO( true );
     m_baseConnection.reset();
-}
-
-
-void AsyncClient::setCredentials( String userName, String key )
-{
-    QnMutexLocker lock( &m_mutex );
-    Credentials credentials = { std::move( userName ), std::move( key ) };
-    m_credentials = std::move( credentials );
 }
 
 bool AsyncClient::openConnection( ConnectionHandler connectHandler,
@@ -45,9 +37,9 @@ bool AsyncClient::openConnection( ConnectionHandler connectHandler,
 {
     QnMutexLocker lock( &m_mutex );
 
-    m_connectHandler = std::move( connectHandler );
-    m_indicationHandler = std::move( indicationHandler );
-    m_disconnectHandler = std::move( disconnectHandler );
+    if( connectHandler ) m_connectHandler = std::move( connectHandler );
+    if( indicationHandler ) m_indicationHandler = std::move( indicationHandler );
+    if( disconnectHandler ) m_disconnectHandler = std::move( disconnectHandler );
 
     return openConnectionImpl( &lock );
 }
@@ -87,7 +79,7 @@ void AsyncClient::closeConnection( BaseConnectionType* connection )
     SystemError::ErrorCode errorCode;
     {
         QnMutexLocker lock( &m_mutex );
-        std::swap( disconnectHandler, m_disconnectHandler );
+        disconnectHandler = m_disconnectHandler;
 
         errorCode = SystemError::getLastOSErrorCode();
         closeConnectionImpl( &lock, errorCode );
@@ -194,10 +186,8 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
         auto request = std::move( m_requestQueue.front().first );
         auto handler = std::move( m_requestQueue.front().second );
         auto transactionId = request.header.transactionId;
-        m_requestQueue.pop_front();
-        if( m_credentials )
-            request.insertIntegrity( m_credentials->userName, m_credentials->key );
 
+        m_requestQueue.pop_front();
         m_baseConnection->sendMessage(
             std::move( request ),
             [ = ]( SystemError::ErrorCode code ) mutable

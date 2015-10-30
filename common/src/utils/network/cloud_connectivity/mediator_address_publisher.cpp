@@ -17,7 +17,7 @@ MediatorAddressPublisher::MediatorAddressPublisher( String serverId,
     , m_updateInterval( std::move( updateInterval ) )
     , isTerminating( false )
 {
-    SocketGlobals::cloudInfo().enableMediator();
+    SocketGlobals::mediatorConnector().enable();
 }
 
 MediatorAddressPublisher::~MediatorAddressPublisher()
@@ -50,17 +50,6 @@ void MediatorAddressPublisher::authorizationChanged(
     m_stunAuthorization = std::move( authorization );
     if( m_stunClient )
     {
-        // updated will be performed by running timer
-        m_pingedAddresses.clear();
-        m_publishedAddresses.clear();
-
-        if( m_stunAuthorization )
-        {
-            m_stunClient->setCredentials( m_stunAuthorization->systemId,
-                                          m_stunAuthorization->key );
-            return;
-        }
-
         const auto stunClient = std::move( m_stunClient );
         lk.unlock();
     }
@@ -98,21 +87,39 @@ bool MediatorAddressPublisher::isCloudReady()
 {
     if( !m_stunClient )
     {
-        const auto address = SocketGlobals::cloudInfo().mediatorAddress();
-        if( !address )
+        m_stunClient = SocketGlobals::mediatorConnector().client();
+        if( !m_stunClient )
         {
             NX_LOGX( lit( "Mediator address is not resolved yet" ), cl_logDEBUG1 );
             return false;
         }
+
         if( !m_stunAuthorization )
         {
             NX_LOGX( lit( "No authorization info yet" ), cl_logDEBUG1 );
             return false;
         }
 
-        m_stunClient = std::make_unique< stun::AsyncClient >( *address );
-        m_stunClient->setCredentials( m_stunAuthorization->systemId,
-                                      m_stunAuthorization->key );
+        m_stunClient->openConnection(
+            [ this ]( SystemError::ErrorCode code )
+            {
+                if( code == SystemError::noError )
+                    NX_LOGX( lit( "Mediator connection is estabilished" ),
+                             cl_logDEBUG1 );
+            },
+            [ this ]( stun::Message indication )
+            {
+                static_cast< void >( indication ); // TODO
+            },
+            [ this ]( SystemError::ErrorCode code )
+            {
+                NX_LOGX( lit( "Mediator connection has been lost: %1" )
+                         .arg( SystemError::toString( code ) ),
+                         cl_logDEBUG1 );
+
+                QnMutexLocker lk( &m_mutex );
+                m_publishedAddresses.clear();
+            });
     }
 
     return m_stunClient && m_stunAuthorization;
@@ -131,6 +138,7 @@ void MediatorAddressPublisher::pingReportedAddresses()
     request.newAttribute< stun::cc::attrs::SystemId >( m_stunAuthorization->systemId );
     request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_reportedAddresses );
+    request.insertIntegrity( m_stunAuthorization->systemId, m_stunAuthorization->key );
 
     const auto ret = m_stunClient->sendRequest(
         std::move( request ),
@@ -173,6 +181,7 @@ void MediatorAddressPublisher::publishPingedAddresses()
     request.newAttribute< stun::cc::attrs::SystemId >( m_stunAuthorization->systemId );
     request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_pingedAddresses );
+    request.insertIntegrity( m_stunAuthorization->systemId, m_stunAuthorization->key );
 
     const auto ret = m_stunClient->sendRequest(
         std::move( request ),

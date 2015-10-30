@@ -1,4 +1,4 @@
-#include "cloud_connection_info.h"
+#include "mediator_connector.h"
 
 #include "common/common_globals.h"
 #include "utils/common/cpp14.h"
@@ -9,34 +9,34 @@ static const std::chrono::minutes RETRY_INTERVAL( 10 );
 namespace nx {
 namespace cc {
 
-CloudConnectionInfo::CloudConnectionInfo()
+MediatorConnector::MediatorConnector()
     : m_isTerminating( false )
-    , m_mediatorEndpointFetcher(
+    , m_endpointFetcher(
         lit( "hpm" ),
         std::make_unique<RandomEndpointSelector>() )
 {
 }
 
-CloudConnectionInfo::~CloudConnectionInfo()
+MediatorConnector::~MediatorConnector()
 {
     QnMutexLocker lk( &m_mutex );
     m_isTerminating = true;
 }
 
-void CloudConnectionInfo::enableMediator( bool waitComplete )
+void MediatorConnector::enable( bool waitComplete )
 {
     bool needToFetch = false;
     {
         QnMutexLocker lk( &m_mutex );
-        if( !m_mediatorPromise )
+        if( !m_promise )
         {
             needToFetch = true;
-            m_mediatorPromise = std::promise< bool >();
+            m_promise = std::promise< bool >();
         }
     }
 
     if( needToFetch )
-        m_mediatorEndpointFetcher.get(
+        m_endpointFetcher.get(
             [ this ]( nx_http::StatusCode::Value status, SocketAddress address )
         {
             if( status != nx_http::StatusCode::ok )
@@ -45,12 +45,12 @@ void CloudConnectionInfo::enableMediator( bool waitComplete )
                          .arg( status ), cl_logERROR );
 
                 QnMutexLocker lk( &m_mutex );
-                m_mediatorPromise->set_value( false );
+                m_promise->set_value( false );
 
                 // retry after some delay
                 if( !m_isTerminating )
                     m_timerGuard = TimerManager::instance()->addTimer(
-                        [ this ]( quint64 ) { enableMediator( false ); },
+                        [ this ]( quint64 ) { enable( false ); },
                         RETRY_INTERVAL );
             }
             else
@@ -59,19 +59,28 @@ void CloudConnectionInfo::enableMediator( bool waitComplete )
                          .arg( address.toString() ), cl_logALWAYS );
 
                 QnMutexLocker lk( &m_mutex );
-                m_mediatorAddress = std::move( address );
-                m_mediatorPromise->set_value( true );
+                m_endpoint = std::move( address );
+                m_promise->set_value( true );
             }
         });
 
     if( waitComplete )
-        m_mediatorPromise->get_future().wait();
+        m_promise->get_future().wait();
 }
 
-boost::optional< SocketAddress > CloudConnectionInfo::mediatorAddress() const
+std::unique_ptr< stun::AsyncClient > MediatorConnector::client()
 {
     QnMutexLocker lk( &m_mutex );
-    return m_mediatorAddress;
+    if( !m_endpoint )
+        return nullptr;
+
+    return std::make_unique< stun::AsyncClient >( *m_endpoint );
+}
+
+void MediatorConnector::mockupAddress( SocketAddress address )
+{
+    QnMutexLocker lk( &m_mutex );
+    m_endpoint = std::move( address );
 }
 
 }   //cc

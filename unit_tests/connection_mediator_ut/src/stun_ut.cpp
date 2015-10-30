@@ -51,7 +51,6 @@ static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
 TEST_F( StunCustomTest, Ping )
 {
     AsyncClient client( address );
-    client.setCredentials( SERVER_ID, AUTH_KEY );
 
     stun::Message request( Header( MessageClass::request, stun::cc::methods::ping ) );
     request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
@@ -61,6 +60,7 @@ TEST_F( StunCustomTest, Ping )
     allEndpoints.push_back( GOOD_ADDRESS );
     allEndpoints.push_back( BAD_ADDRESS );
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( allEndpoints );
+    request.insertIntegrity( SERVER_ID, AUTH_KEY );
 
     cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
     mediaserverApi.expect_pingServer( GOOD_ADDRESS, SERVER_ID, true );
@@ -86,7 +86,6 @@ TEST_F( StunCustomTest, Ping )
 TEST_F( StunCustomTest, BindConnect )
 {
     AsyncClient msClient( address );
-    msClient.setCredentials( SERVER_ID, AUTH_KEY );
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::bind ) );
         request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
@@ -94,6 +93,7 @@ TEST_F( StunCustomTest, BindConnect )
         request.newAttribute< stun::cc::attrs::PublicEndpointList >(
                     std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
 
+        request.insertIntegrity( SERVER_ID, AUTH_KEY );
         cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;

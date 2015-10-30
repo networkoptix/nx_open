@@ -299,14 +299,11 @@ void AddressResolver::dnsResolve( HaInfoIterator info )
 void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk )
 {
     info->second.mediatorProgress();
+    if( !m_stunClient )
+        m_stunClient = SocketGlobals::mediatorConnector().client();
+
     if( m_stunClient )
         return mediatorStunResolve( info, lk );
-
-    if( auto address = SocketGlobals::cloudInfo().mediatorAddress() )
-    {
-        m_stunClient = std::make_unique< stun::AsyncClient >( *address );
-        return mediatorStunResolve( info, lk );
-    }
 
     NX_LOGX( lit( "Mediator address is not resolved yet" ), cl_logDEBUG1 );
     info->second.setMediatorEntries();
