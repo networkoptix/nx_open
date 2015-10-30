@@ -44,7 +44,7 @@ public:
             (static_cast<int>(lhs) & static_cast<int>(rhs));
     }
 
-    enum class BackupResultCode {
+    enum BackupResultCode {
         Failed,
         EndOfPeriod,
         Cancelled,
