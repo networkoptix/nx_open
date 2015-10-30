@@ -47,6 +47,8 @@ public:
     virtual bool getNoDelay( bool* value ) const override;
     virtual bool toggleStatisticsCollection( bool val ) override;
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
+    virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override;
 
 protected:
     virtual void postImpl( std::function<void()>&& handler ) override;
