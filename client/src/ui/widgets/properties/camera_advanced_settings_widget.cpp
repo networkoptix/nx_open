@@ -106,10 +106,11 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
 
     if (m_page == Page::Web) {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
-        QUrl targetUrl;
-        targetUrl.setHost(m_camera->getHostAddress());
-        targetUrl.setPort(m_camera->httpPort());
-        targetUrl.setPath(resourceData.value<QString>(lit("urlLocalePath"), QString()));
+        QUrl targetUrl = QString(lit("http://%1:%2/%3"))
+            .arg(m_camera->getHostAddress())
+            .arg(m_camera->httpPort())
+            .arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
+
         targetUrl.setUserName( m_camera->getAuth().user() );
         targetUrl.setPassword( m_camera->getAuth().password() );
         m_cameraAdvancedSettingsWebPage->networkAccessManager()->setProxy(QnNetworkProxyFactory::instance()->proxyToResource(m_camera));
