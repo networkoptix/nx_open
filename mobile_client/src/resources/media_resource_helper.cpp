@@ -200,6 +200,9 @@ void QnMediaResourceHelper::updateUrl() {
             query.addQueryItem(lit("auth"), getAuth(user, protocol));
     }
 
+    if (protocol == Mjpeg)
+        query.addQueryItem(lit("ct"), lit("false"));
+
     url.setQuery(query);
 
     setUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
