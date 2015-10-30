@@ -1007,16 +1007,8 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
     }
 
     #if defined(Q_OS_WIN)
-        struct tcp_keepalive ka;
-        if (WSAIoctl(m_implDelegate.handle(), SIO_KEEPALIVE_VALS,
-                     NULL, 0, &ka, sizeof(ka), 0, 0, 0) != 0)
-            return false;
-
-        Q_ASSERT_X(ka.onoff == TRUE, Q_FUNC_INFO, "WSAIoctl problem occured");
-        *result = KeepAliveOptions(
-            ka.keepalivetime / 1000, // ms to s
-            ka.keepaliveinterval / 1000,
-            10);    //TODO #ak 10 is hard-coded in windows vista or later. Fuck XP!
+        // zero values will indicate inability to read actual values
+        *result = KeepAliveOptions();
         return true;
     #elif defined(Q_OS_LINUX)
         KeepAliveOptions info;
