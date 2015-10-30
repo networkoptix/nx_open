@@ -68,6 +68,7 @@ QnPage {
             mediaPlayer.seek(mediaPlayer.position)
             mediaPlayer.resourceHelper.resolution = resolution
         }
+        onHidden: videoPlayer.forceActiveFocus()
     }
 
     QnActiveCameraThumbnailLoader {
