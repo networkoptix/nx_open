@@ -13,9 +13,16 @@
 namespace detail
 {
 
-MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
+static qint64 MAX_ALLOWED_TIMESTAMP_DIFF = 5 * 1000 * 1000UL;  //5 seconds
+static const int USEC_PER_MS = 1000;
+static const int USEC_PER_SEC = 1000 * 1000;
+
+MediaStreamCache::MediaStreamCache(
+    unsigned int desiredCacheSizeMillis,
+    unsigned int maxCacheSizeMillis)
 :
-    m_cacheSizeMillis( cacheSizeMillis ),
+    m_cacheSizeUsec( ((qint64)desiredCacheSizeMillis)*USEC_PER_MS),
+    m_maxCacheSizeUsec( ((qint64)maxCacheSizeMillis)*USEC_PER_MS ),
     m_mutex( QMutex::Recursive ),   //TODO #ak get rid of Recursive mutex
     m_prevPacketSrcTimestamp( -1 ),
     m_cacheSizeInBytes( 0 )
@@ -28,10 +35,6 @@ bool MediaStreamCache::canAcceptData() const
 {
     return true;
 }
-
-static qint64 MAX_ALLOWED_TIMESTAMP_DIFF = 5*1000*1000UL;  //5 seconds
-static const int USEC_PER_MS = 1000;
-static const int USEC_PER_SEC = 1000 * 1000;
 
 //!Implementation of QnAbstractDataReceptor::putData
 void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
@@ -75,6 +78,8 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
     if( mediaPacket )
         m_cacheSizeInBytes += mediaPacket->dataSize();
 
+    clearCacheIfNeeded(&lk);
+
     if( !isKeyFrame )
         return; //no sense to perform this operation more than once per GOP
 
@@ -97,45 +102,53 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     for( auto eventReceiver: m_eventReceivers )
         eventReceiver->onKeyFrame(data->timestamp);
-    const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
-    if( maxTimestamp - m_packetsByTimestamp.front().timestamp > m_cacheSizeMillis*USEC_PER_MS )
-    {
-        //determining left-most position of active blockings
-        quint64 minReadingTimestamp = std::numeric_limits<quint64>::max();
-        for( std::map<int, quint64>::const_iterator
-            it = m_dataBlockings.begin();
-            it != m_dataBlockings.end();
-            ++it )
-        {
-            if( it->second < minReadingTimestamp )
-                minReadingTimestamp = it->second;
-        }
+}
 
-        //removing old packets up to key frame, but not futher any position of sequential reading
-        //PacketContainerType::iterator lastItToRemove = m_packetsByTimestamp.lower_bound( std::min<>( minReadingTimestamp, maxTimestamp - m_cacheSizeMillis*USEC_PER_MS ) );
-        PacketContainerType::iterator lastItToRemove = std::lower_bound(
-            m_packetsByTimestamp.begin(),
-            m_packetsByTimestamp.end(),
-            std::min<>( minReadingTimestamp, maxTimestamp - m_cacheSizeMillis*USEC_PER_MS ),
-            []( const MediaStreamCache::MediaPacketContext& one, quint64 two ) -> bool {
-                return one.timestamp < two;
-            } );
-        if( lastItToRemove != m_packetsByTimestamp.begin() )
-            --lastItToRemove;
-        //iterating to first key frame to the left from lastItToRemove
-        for( ; lastItToRemove != m_packetsByTimestamp.begin() && !lastItToRemove->isKeyFrame; --lastItToRemove ) {}
-        //updating cache size (in bytes)
-        for( PacketContainerType::const_iterator
-            it = m_packetsByTimestamp.cbegin();
-            it != lastItToRemove;
-            ++it )
-        {
-            const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(it->packet.get());
-            if( mediaPacket )
-                m_cacheSizeInBytes -= mediaPacket->dataSize();
-        }
-        m_packetsByTimestamp.erase( m_packetsByTimestamp.begin(), lastItToRemove );
+void MediaStreamCache::clearCacheIfNeeded(QMutexLocker* const /*lk*/)
+{
+    const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
+    if(maxTimestamp - m_packetsByTimestamp.front().timestamp <= m_cacheSizeUsec)
+        return;
+
+    //determining left-most position of active blockings
+    quint64 minReadingTimestamp = std::numeric_limits<quint64>::max();
+    for( std::map<int, quint64>::const_iterator
+        it = m_dataBlockings.begin();
+        it != m_dataBlockings.end();
+        ++it )
+    {
+        if( it->second < minReadingTimestamp )
+            minReadingTimestamp = it->second;
     }
+
+    //putting a hard limit on cache size by time and packet count
+    const qint64 currentCacheSizeUsec = maxTimestamp - minReadingTimestamp;
+    if (currentCacheSizeUsec > m_maxCacheSizeUsec)
+        minReadingTimestamp = maxTimestamp - m_maxCacheSizeUsec;
+
+    //removing old packets up to key frame, but not futher any position of sequential reading
+    PacketContainerType::iterator lastItToRemove = std::lower_bound(
+        m_packetsByTimestamp.begin(),
+        m_packetsByTimestamp.end(),
+        std::min<>(minReadingTimestamp, maxTimestamp - m_cacheSizeUsec),
+        []( const MediaStreamCache::MediaPacketContext& one, quint64 two ) -> bool {
+            return one.timestamp < two;
+        } );
+    if( lastItToRemove != m_packetsByTimestamp.begin() )
+        --lastItToRemove;
+    //iterating to first key frame to the left from lastItToRemove
+    for( ; lastItToRemove != m_packetsByTimestamp.begin() && !lastItToRemove->isKeyFrame; --lastItToRemove ) {}
+    //updating cache size (in bytes)
+    for( PacketContainerType::const_iterator
+        it = m_packetsByTimestamp.cbegin();
+        it != lastItToRemove;
+        ++it )
+    {
+        const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(it->packet.get());
+        if( mediaPacket )
+            m_cacheSizeInBytes -= mediaPacket->dataSize();
+    }
+    m_packetsByTimestamp.erase( m_packetsByTimestamp.begin(), lastItToRemove );
 }
 
 void MediaStreamCache::clear()
@@ -184,7 +197,8 @@ int MediaStreamCache::getMaxBitrate() const
     const qint64 durationUSec = m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.rbegin()->timestamp - m_packetsByTimestamp.begin()->timestamp);
     if( durationUSec == 0 )
         return -1;
-    //TODO: #ak is is normal to make calculations in 64 bit and return 32 bit?
+    //using int64 for intermediate result to avoid int overflow while multiplying by USEC_PER_SEC.
+    //  Multiplication is before division to keep accuracy
     return ((qint64)m_cacheSizeInBytes) * USEC_PER_SEC / durationUSec * CHAR_BIT;
 }
 

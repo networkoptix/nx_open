@@ -78,7 +78,8 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)), 
             ioBlockSize, 
-            ffmpegBufferSize
+            ffmpegBufferSize,
+            getId()
         ) 
     );
     rez->setSystemFlags(systemFlags);
@@ -539,7 +540,7 @@ QnStorageResource* QnFileStorageResource::instance(const QString&)
 
 float QnFileStorageResource::getAvarageWritingUsage() const
 {
-    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getPath());
+    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getId());
     return writer ? writer->getAvarageUsage() : 0;
 }
 

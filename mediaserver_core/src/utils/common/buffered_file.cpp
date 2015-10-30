@@ -135,21 +135,14 @@ QnWriterPool::WritersMap QnWriterPool::getAllWriters()
     return m_writers;
 }
 
-QueueFileWriter* QnWriterPool::getWriter(const QString& fileName)
+QueueFileWriter* QnWriterPool::getWriter(const QnUuid& writerPoolId)
 {
-    QString drive = fileName.left(fileName.indexOf('/'));
-    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(fileName);
-    if (storage)
-        drive = storage->getPath();
-    if (drive.endsWith('/'))
-        drive = drive.left(drive.length()-1);
 
     QMutexLocker lock(&m_mutex);
-    WritersMap::iterator itr = m_writers.find(drive);
+    WritersMap::iterator itr = m_writers.find(writerPoolId);
     if (itr == m_writers.end())
-    {
-        itr = m_writers.insert(drive, new QueueFileWriter());
-    }
+        itr = m_writers.insert(writerPoolId, new QueueFileWriter());
+    Q_ASSERT(m_writers.size() < 16); // increase this value if you need more storages
     return itr.value();
 }
 
@@ -162,13 +155,14 @@ QnWriterPool* QnWriterPool::instance()
 
 // -------------- QBufferedFile -------------
 
-QBufferedFile::QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int fileBlockSize, int minBufferSize): 
+QBufferedFile::QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int fileBlockSize, int minBufferSize, const QnUuid& writerPoolId): 
     m_fileEngine(fileImpl), 
     m_cycleBuffer(fileBlockSize+minBufferSize, SECTOR_SIZE),
     m_queueWriter(0),
     m_cachedBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE),
     m_tmpBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE),
-    m_lastSeekPos(AV_NOPTS_VALUE)
+    m_lastSeekPos(AV_NOPTS_VALUE),
+    m_writerPoolId(writerPoolId)
 {
     m_systemDependentFlags = 0;
     m_minBufferSize = minBufferSize;
@@ -412,7 +406,7 @@ bool QBufferedFile::open(QIODevice::OpenMode mode)
         return false;
     m_filePos = 0;
     if (mode & QIODevice::WriteOnly)
-        m_queueWriter = QnWriterPool::instance()->getWriter(m_fileEngine->getFileName());
+        m_queueWriter = QnWriterPool::instance()->getWriter(m_writerPoolId);
     m_actualFileSize = 0;
     return QIODevice::open(mode | QIODevice::Unbuffered);
 }

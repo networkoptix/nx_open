@@ -22,9 +22,13 @@ class MediaStreamCache
 {
 public:
     /*!
-        \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
+        \param desiredCacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis 
+            is dropped unless data is blocked by \a MediaStreamCache::blockData call
+        \param maxCacheSizeMillis if cache size increases this value, data is dropped despite existing blockings
     */
-    MediaStreamCache( unsigned int cacheSizeMillis );
+    MediaStreamCache(
+        unsigned int desiredCacheSizeMillis,
+        unsigned int maxCacheSizeMillis);
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     bool canAcceptData() const;
@@ -107,7 +111,8 @@ private:
     //!map<timestamp, pair<packet, key_flag> >
     typedef std::deque<MediaPacketContext> PacketContainerType;
 
-    unsigned int m_cacheSizeMillis;
+    const qint64 m_cacheSizeUsec;
+    const qint64 m_maxCacheSizeUsec;
     PacketContainerType m_packetsByTimestamp;
     mutable QMutex m_mutex;
     //!In micros
@@ -117,6 +122,8 @@ private:
     std::set<QnMediaStreamEventReceiver* > m_eventReceivers;
     std::map<int, quint64> m_dataBlockings;
     mutable QElapsedTimer m_inactivityTimer;
+
+    void clearCacheIfNeeded(QMutexLocker* const lk);
 };
 
 }

@@ -65,7 +65,9 @@ public:
     /*!
         \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
     */
-    MediaStreamCache( unsigned int cacheSizeMillis );
+    MediaStreamCache(
+        unsigned int cacheSizeMillis,
+        unsigned int maxCacheSizeMillis);
     virtual ~MediaStreamCache();
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
