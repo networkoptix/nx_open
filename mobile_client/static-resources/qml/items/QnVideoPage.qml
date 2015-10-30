@@ -64,7 +64,10 @@ QnPage {
         id: qualityDialog
         resolutionList: mediaPlayer.resourceHelper.resolutions
         currentResolution: mediaPlayer.resourceHelper.resolution
-        onQualityPicked: mediaPlayer.resourceHelper.resolution = resolution
+        onQualityPicked: {
+            mediaPlayer.seek(mediaPlayer.position)
+            mediaPlayer.resourceHelper.resolution = resolution
+        }
     }
 
     QnActiveCameraThumbnailLoader {
