@@ -289,7 +289,7 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
             break;
         }
     }
-    m_interrupted = true; // we are done till next backup period
+    m_interrupted = true; // we are done till the next backup period
     return QnServer::BackupResultCode::Done;
 }
 
@@ -369,13 +369,8 @@ void QnScheduleSync::renewSchedule()
         m_schedule = server->getBackupSchedule();
     }
     if (m_interrupted) {
-        bool scheduleChanged = 
-            oldSchedule.backupDaysOfTheWeek != m_schedule.backupDaysOfTheWeek ||
-            oldSchedule.backupDuration != m_schedule.backupDuration ||
-            oldSchedule.backupStart != m_schedule.backupStart ||
-            oldSchedule.backupType != m_schedule.backupType;        
-        if (scheduleChanged) {
-            m_interrupted = false;
+        if (oldSchedule != m_schedule) {
+            m_interrupted = false; // schedule changed, starting from a scratch
         }
     }
 }
