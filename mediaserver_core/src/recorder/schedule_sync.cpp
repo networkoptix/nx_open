@@ -301,6 +301,7 @@ int QnScheduleSync::stop()
     m_backupSyncOn  = false;
     m_forced        = false;
     m_syncing       = false;
+    m_interrupted   = true;
    
     m_backupFuture.waitForFinished();
     return Ok;
