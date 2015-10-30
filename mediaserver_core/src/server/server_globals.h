@@ -50,9 +50,8 @@ public:
         Cancelled,
         Done
     };
-    Q_DECLARE_METATYPE(BackupResultCode)
 } // namespace QnServer
-
+Q_DECLARE_METATYPE(QnServer::BackupResultCode);
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )
 
 #endif // QN_SERVER_GLOBALS_H
