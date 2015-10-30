@@ -165,7 +165,7 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi 
 
 if [[ "${box}" == "bpi" ]]; then 
-    cp -f /usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/lib/libstdc++.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f /usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
