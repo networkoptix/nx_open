@@ -26,6 +26,7 @@
         <!--Global libs-->		
         <template>lib</template>
         <qt.libs>core network xml sql concurrent</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
@@ -41,6 +42,7 @@
         <linux.defines/>
         <mac.defines/>      
         <android.defines/>
+        <ios.defines/>
 
         <buildLib>sharedlib</buildLib>
 
@@ -49,11 +51,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>build_variables</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
     </dependencies>    
 

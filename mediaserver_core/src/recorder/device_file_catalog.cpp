@@ -30,6 +30,7 @@
 
 #include <boost/array.hpp>
 #include "utils/common/concurrent.h"
+#include "storage_db_pool.h"
 
 QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
@@ -352,7 +353,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
             }
             chunk = Chunk(
                 startTimeMs, 
-                getMyStorageMan()->getStorageIndex(storage), 
+                qnStorageDbPool->getStorageIndex(storage), 
                 fileIndex, 
                 endTimeMs - startTimeMs, 
                 detectTimeZone(startTimeMs, fileName)
@@ -376,7 +377,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
     chunk = Chunk(
         startTimeMs, 
-        getMyStorageMan()->getStorageIndex(storage), 
+        qnStorageDbPool->getStorageIndex(storage), 
         fileIndex, 
         durationMs, 
         detectTimeZone(startTimeMs, fileName)

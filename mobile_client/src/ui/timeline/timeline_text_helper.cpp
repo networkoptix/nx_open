@@ -1,11 +1,64 @@
 #include "timeline_text_helper.h"
 
+#include <algorithm>
+
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 #include <QtCore/QDebug>
 
 namespace {
-    const int charsPerLine = 12;
+    const int minTextureSize = 256;
+    const int maxTextureSize = 8192;
+
+    class StringPacker {
+        struct StringInfo {
+            QString string;
+            int width;
+
+            StringInfo(const QString &string, int width) : string(string), width(width) {}
+
+            bool operator <(const StringInfo &other) const {
+                return width > other.width;
+            }
+        };
+
+        struct Line {
+            QStringList strings;
+            int width;
+
+            Line() : width(0) {}
+        };
+
+        QStringList result;
+
+        QList<StringInfo> measuredStrings;
+        int lineHeight;
+        int textureSize;
+
+    public:
+        StringPacker(const QStringList &strings, const QFontMetrics &fm)
+            : result(strings)
+            , lineHeight(fm.height())
+            , textureSize(minTextureSize)
+        {
+            for (const QString &string: strings) {
+                StringInfo info(string, fm.size(Qt::TextSingleLine, string).width());
+                measuredStrings.insert(std::lower_bound(measuredStrings.begin(), measuredStrings.end(), info), info);
+            }
+
+            pack();
+
+            measuredStrings.clear();
+        }
+
+        int resultSize() const { return textureSize; }
+        QStringList resultStrings() { return result; }
+
+    private:
+        void pack();
+        bool tryPack(int resultSize);
+    };
+
 }
 
 class QnTimelineTextHelperPrivate {
@@ -30,15 +83,6 @@ public:
         , pixelRatio(pixelRatio)
     {}
 
-    void drawNumbers(QPainter *painter) {
-        int y = fm.ascent();
-        for (int i = 0; i <= 9; ++i) {
-            if (digitWidth * (i + 1) > texture.width())
-                qWarning() << "QnTimelineTextHelper: Digit is out of bounds:" << i;
-            painter->drawText(digitWidth * i, y, QString::number(i));
-        }
-    }
-
     void addString(const QString &string, QPainter *painter, int &x, int &y) {
         if (strings.contains(string))
             return;
@@ -60,10 +104,14 @@ public:
 QnTimelineTextHelper::QnTimelineTextHelper(const QFont &font, qreal pixelRatio, const QColor &color, const QStringList &strings) :
     d(new QnTimelineTextHelperPrivate(font, pixelRatio))
 {
-    int textureSize = 128;
-    int desiredSize = charsPerLine * maxCharWidth();
-    while (textureSize < desiredSize)
-        textureSize *= 2;
+    QStringList packedStrings = strings;
+    for (int i = 0; i <= 9; ++i)
+        packedStrings.append(QString::number(i));
+
+    StringPacker stringPacker(packedStrings, d->fm);
+
+    int textureSize = stringPacker.resultSize();
+    packedStrings = stringPacker.resultStrings();
 
     d->texture = QImage(textureSize, textureSize, QImage::Format_RGBA8888);
     d->texture.fill(Qt::transparent);
@@ -74,11 +122,9 @@ QnTimelineTextHelper::QnTimelineTextHelper(const QFont &font, qreal pixelRatio, 
         painter.setPen(color);
         painter.setBrush(color);
 
-        d->drawNumbers(&painter);
-
-        int x = d->digitWidth * 10;
+        int x = 0;
         int y = 0;
-        for (const QString &string: strings)
+        for (const QString &string: packedStrings)
             d->addString(string, &painter, x, y);
     }
 }
@@ -87,13 +133,7 @@ QnTimelineTextHelper::~QnTimelineTextHelper() {
 }
 
 QRectF QnTimelineTextHelper::digitCoordinates(int digit) const {
-    if (digit > 9 || digit < 0)
-        return QRectF();
-
-    qreal w = d->texture.width();
-    qreal h = d->texture.height();
-
-    return QRectF(digit * d->digitWidth / w, 0.0, d->digitWidth / w, d->lineHeight / h);
+    return stringCoordinates(QString::number(digit));
 }
 
 QRectF QnTimelineTextHelper::stringCoordinates(const QString &string) const {
@@ -132,4 +172,48 @@ int QnTimelineTextHelper::spaceWidth() const {
 
 qreal QnTimelineTextHelper::pixelRatio() const {
     return d->pixelRatio;
+}
+
+void StringPacker::pack() {
+    textureSize = minTextureSize;
+    while (textureSize <= maxTextureSize) {
+        if (tryPack(textureSize))
+            break;
+
+        textureSize *= 2;
+    }
+}
+
+bool StringPacker::tryPack(int size) {
+    QList<Line> lines;
+
+    int height = 0;
+
+    for (const StringInfo &info: measuredStrings) {
+        if (info.width > size)
+            return false;
+
+        int i = 0;
+        for (i = 0; i < lines.size(); ++i) {
+            if (lines[i].width + info.width < size)
+                break;
+        }
+        if (i == lines.size()) {
+            height += lineHeight;
+            lines.append(Line());
+        }
+
+        if (height > size)
+            return false;
+
+        Line &line = lines[i];
+        line.strings.append(info.string);
+        line.width += info.width;
+    }
+
+    result.clear();
+    for (const Line &line: lines)
+        result.append(line.strings);
+
+    return true;
 }

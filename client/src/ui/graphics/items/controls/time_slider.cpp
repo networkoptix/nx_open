@@ -34,6 +34,7 @@
 
 #include <ui/help/help_topics.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
@@ -443,8 +444,10 @@ Q_GLOBAL_STATIC(QnTimeSliderStepStorage, timeSteps);
 // -------------------------------------------------------------------------- //
 // QnTimeSlider
 // -------------------------------------------------------------------------- //
-QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
-    base_type(parent),
+QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
+    , QGraphicsItem *tooltipParent):
+    base_type(parent, tooltipParent),
+
     m_windowStart(0),
     m_windowEnd(0),
     m_minimalWindow(0),
@@ -475,9 +478,23 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_pixmapCache(new QnTimeSliderPixmapCache(this)),
     m_localOffset(0)
 
-    , m_lastLineBarMousePos()
+    , m_currentRulerRectMousePos()
     , m_lastLineBarValue()
-    , m_bookmarksViewer(new QnBookmarksViewer(parent))
+    , m_bookmarksViewer(new QnBookmarksViewer( 
+        std::bind(&QnTimeSlider::bookmarksAtPosition, this, std::placeholders::_1)
+        , [this](qint64 timestamp) -> QPointF
+        {
+            if ((timestamp < m_windowStart) || (timestamp > m_windowEnd))
+                return QPointF();   /// Out of window
+
+            const auto viewer = bookmarksViewer();
+            const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+
+            const auto pos = positionFromValue(timestamp);
+            const auto target = QPointF(pos.x(), lineBarRect.top());
+            return viewer->mapToParent(viewer->mapFromItem(this, target.x(), target.y()));
+        }
+        , this))
     , m_bookmarksVisible(false)
 {
     /* Prepare thumbnail update timer. */
@@ -525,6 +542,11 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     updateMinimalWindow();
     updatePixmapCache();
     sliderChange(SliderRangeChange);
+
+    m_bookmarksViewer->setParent(this);
+    m_bookmarksViewer->setParentItem(tooltipParent);
+    m_bookmarksViewer->setZValue(std::numeric_limits<qreal>::max());
+    toolTipItem()->stackBefore(m_bookmarksViewer);
 }
 
 QnTimeSlider::~QnTimeSlider() {
@@ -833,28 +855,8 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
         }
         else 
         {
-            if (!m_lastLineBarMousePos.isNull())
-            {
-                if ((m_lastLineBarValue >= start) && (m_lastLineBarValue <= end))
-                {
-                    const qreal endDiff = std::abs(m_windowEnd - end);
-                    const qreal startDiff = std::abs(m_windowStart - start);
-                    const qreal maxDiff = std::max(startDiff, endDiff);
-                    enum { kMinUpdateInterval = 1000 };
-                    if (maxDiff > kMinUpdateInterval)
-                    {
-                        const qreal coeff = (m_lastLineBarValue - start) / (end - start);
-                        m_lastLineBarMousePos = QPointF(coeff * rulerRect().width() , m_lastLineBarMousePos.y());
-                        m_bookmarksViewer->updatePosition(QPointF(mapToParent(m_lastLineBarMousePos).x(), 0), true);
-                    }
-                }
-                else
-                {
-                    m_lastLineBarMousePos = QPointF();
-                    m_bookmarksViewer->hide();
-                }
-            }
-            
+            m_bookmarksViewer->updateOnWindowChange();
+
             qint64 oldWindowSize = m_windowEnd - m_windowStart;
 
             m_windowStart = start;
@@ -1836,11 +1838,11 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
                 drawLastMinute(painter, lineRect);
             drawSeparator(painter, lineRect);
 
-            if (line == 0)
-                drawBookmarks(painter, lineRect);
 
             lineTop += lineHeight;
         }
+
+        drawBookmarks(painter, lineBarRect);
     }
 
     /* Draw thumbnails. */
@@ -2554,19 +2556,17 @@ void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
     
-    grabMouse();
-    
     unsetCursor();
 }
 
 void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 
-    ungrabMouse();
-
     unsetCursor();
 
     setThumbnailSelecting(m_lastHoverThumbnail, false);
+
+    m_currentRulerRectMousePos = QPointF();
 }
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
@@ -2592,6 +2592,40 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
         setThumbnailSelecting(m_lastHoverThumbnail, false);
         m_lastHoverThumbnail = -1;
     }
+
+    processBoomarksHover(event);
+}
+
+void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent *event)
+{  
+    const auto pos = event->pos();
+    m_currentRulerRectMousePos = event->pos();
+
+    enum { kMouseMoveFilterTimeout = 100 };
+    const auto filterMouseMove = [this, pos]()
+    {
+        if (pos != m_currentRulerRectMousePos)
+            return;
+
+        if (!rulerRect().contains(pos))
+        {
+            m_bookmarksViewer->resetBookmarks();
+            return;
+        }
+
+        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+        if (lineBarRect.contains(pos))
+        {
+            const auto timestamp = valueFromPosition(pos);
+            const auto emptyBookmarks = bookmarksAtPosition(timestamp).empty();
+            if (emptyBookmarks)
+                m_bookmarksViewer->resetBookmarks();
+            else
+                m_bookmarksViewer->setTargetTimestamp(timestamp);
+        }
+    };
+
+    executeDelayed(filterMouseMove, kMouseMoveFilterTimeout);
 }
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
@@ -2624,30 +2658,6 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) 
 {
     dragProcessor()->mouseMoveEvent(this, event);
-
-    const auto pos = event->pos();
-    const bool isGrabbing = (scene()->mouseGrabberItem() == this);
-    if (!rulerRect().contains(pos) && isGrabbing)
-    {
-        ungrabMouse();
-        m_bookmarksViewer->hideDelayed();
-    }
-    else
-    {
-        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
-        if (lineBarRect.contains(pos))
-        {
-            m_lastLineBarMousePos = pos;
-            m_lastLineBarValue = valueFromPosition(pos);
-
-            m_bookmarksViewer->updatePosition(QPointF(mapToParent(pos).x(), 0), false);
-            bookmarksUnderCursorUpdated(pos);
-        }
-        else if (isGrabbing)
-        {
-            m_bookmarksViewer->hideDelayed();
-        }
-    }
     event->accept();
 }
 

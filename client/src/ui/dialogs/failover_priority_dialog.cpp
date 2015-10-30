@@ -178,14 +178,28 @@ void QnFailoverPriorityDialog::setColors(const QnFailoverPriorityColors &colors)
 
 
 void QnFailoverPriorityDialog::updatePriorityForSelectedCameras(Qn::FailoverPriority priority) {
-    auto modified = selectedResources().filtered<QnVirtualCameraResource>([priority](const QnVirtualCameraResourcePtr &camera) {
-        return camera->failoverPriority() != priority;
+    m_customColumnDelegate->forceCamerasPriority(selectedResources().filtered<QnVirtualCameraResource>(), priority);   
+}
+
+void QnFailoverPriorityDialog::buttonBoxClicked( QDialogButtonBox::StandardButton button ) {
+    if (button != QDialogButtonBox::Ok)
+        return;
+
+    /* We should update default cameras to old value - what have user seen in the dialog. */
+    auto forced = m_customColumnDelegate->forcedCamerasPriorities();
+
+    /* Update all default cameras and all cameras that we have changed. */
+    auto modified = qnResPool->getAllCameras(QnResourcePtr(), true).filtered([this, &forced](const QnVirtualCameraResourcePtr &camera) {
+        return forced.contains(camera->getId());
     });
 
     if (modified.isEmpty())
         return;
 
-    qnResourcesChangesManager->saveCameras(modified, [priority](const QnVirtualCameraResourcePtr &camera) {
-        camera->setFailoverPriority(priority);
+    qnResourcesChangesManager->saveCameras(modified, [this, &forced](const QnVirtualCameraResourcePtr &camera) {
+        if (forced.contains(camera->getId()))
+            camera->setFailoverPriority(forced[camera->getId()]);
+        else
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
     });
 }

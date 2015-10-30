@@ -249,7 +249,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
     dst->maxDays = src.maxArchiveDays;
     dst->preferedServerId = src.preferedServerId;
     dst->failoverPriority = src.failoverPriority;
-    dst->backupType = src.backupType;
+    dst->backupQualities = src.backupType;
 }
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
@@ -278,7 +278,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.maxArchiveDays = src->maxDays;
     dst.preferedServerId = src->preferedServerId;
     dst.failoverPriority = src->failoverPriority;
-    dst.backupType = src->backupType;
+    dst.backupType = src->backupQualities;
 }
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
@@ -630,12 +630,11 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.serverName = src->name;
     dst.maxCameras = src->maxCameras;
     dst.allowAutoRedundancy = src->isRedundancyEnabled;
-    dst.backupType = src->backupType;
-    dst.backupDaysOfTheWeek = src->backupDaysOfTheWeek;
-    dst.backupStart = src->backupStart;
-    dst.backupDuration = src->backupDuration;
-    dst.backupBitrate = src->backupBitrate;
-    dst.backupQuality = src->backupQuality;
+    dst.backupType = src->backupSchedule.backupType;
+    dst.backupDaysOfTheWeek = src->backupSchedule.backupDaysOfTheWeek;
+    dst.backupStart = src->backupSchedule.backupStart;
+    dst.backupDuration = src->backupSchedule.backupDuration;
+    dst.backupBitrate = src->backupSchedule.backupBitrate;
 }
 
 void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst) {
@@ -643,12 +642,11 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->name = src.serverName;
     dst->maxCameras = src.maxCameras;
     dst->isRedundancyEnabled = src.allowAutoRedundancy;
-    dst->backupType = src.backupType;
-    dst->backupDaysOfTheWeek = src.backupDaysOfTheWeek;
-    dst->backupStart = src.backupStart;
-    dst->backupDuration = src.backupDuration;
-    dst->backupBitrate = src.backupBitrate;
-    dst->backupQuality = src.backupQuality;
+    dst->backupSchedule.backupType = src.backupType;
+    dst->backupSchedule.backupDaysOfTheWeek = src.backupDaysOfTheWeek;
+    dst->backupSchedule.backupStart = src.backupStart;
+    dst->backupSchedule.backupDuration = src.backupDuration;
+    dst->backupSchedule.backupBitrate = src.backupBitrate;
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {

@@ -85,9 +85,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 
     if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
         int healthMessage = eventType - QnBusiness::SystemHealthEvent;
-        QnUuid resourceId = params.eventResourceId;
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId);
-        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
+        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), businessAction);
         return;
     }
 
@@ -102,17 +100,18 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message) {
-    addSystemHealthEvent(message, QnResourcePtr());
+    addSystemHealthEvent(message, QnAbstractBusinessActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource) {
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction) 
+{
     if (message == QnSystemHealth::StoragesAreFull)
         return; //Bug #2308: Need to remove notification "Storages are full"
 
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
 
-    setSystemHealthEventVisible( message, resource, true );
+    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( businessAction), true);
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message) {
@@ -130,6 +129,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveBackupFinished:
     case QnSystemHealth::NoPrimaryTimeServer:
     case QnSystemHealth::SystemIsReadOnly:
         return true;
@@ -146,11 +146,17 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
     setSystemHealthEventVisibleInternal(message, QVariant(), visible);
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool visible) {
-    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible );
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, 
+                                                                  const QnResourcePtr &resource, 
+                                                                  bool visible)
+{
+    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible);
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible ) {
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, 
+                                                                          const QVariant& params, 
+                                                                          bool visible)
+{
     bool canShow = true;
 
     bool connected = !qnCommon->remoteGUID().isNull();
@@ -219,6 +225,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveBackupFinished:
         return;
 
     default:

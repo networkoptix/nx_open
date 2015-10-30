@@ -3,7 +3,6 @@
 #include <functional>
 
 #include <camera/camera_bookmarks_manager_fwd.h>
-#include <camera/camera_bookmark_aggregation.h>
 #include <core/resource/camera_bookmark.h>
 #include <utils/common/id.h>
 #include <utils/common/connective.h>

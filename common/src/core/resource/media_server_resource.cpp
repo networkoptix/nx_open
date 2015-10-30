@@ -12,6 +12,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_user_attributes.h>
+#include <core/resource/server_backup_schedule.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -32,6 +33,12 @@
 namespace {
     const QString protoVersionPropertyName = lit("protoVersion");
     const QString safeModePropertyName = lit("ecDbReadOnly");
+
+    quint16 portFromUrl(const QString &strUrl)
+    {
+        const QUrl url(strUrl);
+        return url.port(DEFAULT_APPSERVER_PORT);
+    }
 }
 
 
@@ -66,26 +73,6 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
     connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
     connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
-}
-
-Qn::BackupType QnMediaServerResource::getBackupType() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupType;
-}
-
-Qn::CameraBackupTypes QnMediaServerResource::getDefaultBackupQuality() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-        );
-
-    return (*lk)->backupQuality;
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -232,8 +219,7 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 }
 
 quint16 QnMediaServerResource::getPort() const {
-    QUrl url(getApiUrl());
-    return url.port(DEFAULT_APPSERVER_PORT);
+    return portFromUrl(getApiUrl());
 }
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
@@ -358,10 +344,16 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         setStorages(otherStorages);
         */
     }
-    if (netAddrListChanged || getPort() != localOther->getPort()) {
+
+
+    const bool currentPortChanged = (portFromUrl(m_apiUrl) != localOther->getPort());
+    if (netAddrListChanged || currentPortChanged ) 
+    {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         if (m_restConnection)
             m_restConnection->setUrl(m_apiUrl);
+        if (currentPortChanged )
+            modifiedFields << "portChanged";
     } else {
         m_url = oldUrl; //rollback changed value to autodetected
     }
@@ -386,103 +378,19 @@ int QnMediaServerResource::getMaxCameras() const
     return (*lk)->maxCameras;
 }
 
-int QnMediaServerResource::getBackupDOW() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupDaysOfTheWeek;
+QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const {
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    return (*lk)->backupSchedule;
 }
 
-int QnMediaServerResource::getBackupStart() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupStart;
-}
-
-int QnMediaServerResource::getBackupDuration() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupDuration;
-}
-
-int QnMediaServerResource::getBackupBitrate() const
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    return (*lk)->backupBitrate;
-}
-
-void QnMediaServerResource::setBackupType(Qn::BackupType value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-        );
-
-    (*lk)->backupType = value;
-}
-
-void QnMediaServerResource::setDefaultBackupQuality(Qn::CameraBackupTypes value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-        );
-
-    (*lk)->backupQuality = value;
-}
-
-void QnMediaServerResource::setBackupDOW(int value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    (*lk)->backupDaysOfTheWeek = value;
-}
-
-void QnMediaServerResource::setBackupStart(int value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    (*lk)->backupStart = value;
-}
-void QnMediaServerResource::setBackupDuration(int value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    (*lk)->backupDuration = value;
-}
-
-void QnMediaServerResource::setBackupBitrate(int value)
-{
-    QnMediaServerUserAttributesPool::ScopedLock lk(
-        QnMediaServerUserAttributesPool::instance(), 
-        getId()
-    );
-
-    (*lk)->backupBitrate = value;
+void QnMediaServerResource::setBackupSchedule(const QnServerBackupSchedule &value) {
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->backupSchedule == value)
+            return;
+        (*lk)->backupSchedule = value;
+    }
+    emit backupScheduleChanged(::toSharedPointer(this));
 }
 
 void QnMediaServerResource::setRedundancy(bool value)

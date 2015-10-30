@@ -42,6 +42,7 @@ extern "C"
 #include <camera/resource_display.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
+#include <camera/camera_bookmark_aggregation.h>
 
 #include <server/server_storage_manager.h>
 
@@ -122,6 +123,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
     m_bookmarkQuery(nullptr),
+    m_bookmarkAggregation(new QnCameraBookmarkAggregation()),
     m_sliderBookmarksRefreshOperation(new QnPendingOperation([this](){ updateSliderBookmarks(); }, updateBookmarksInterval, this)),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0)
@@ -206,7 +208,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         auto filter = m_bookmarkQuery->filter();
         filter.text = text;
         m_bookmarkQuery->setFilter(filter);
-        m_bookmarkAggregation.clear();
+        m_bookmarkAggregation->clear();
     });
 
 
@@ -228,7 +230,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
             this, &QnWorkbenchNavigator::updateBookmarkTags);
 
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this, [this](const QnUuid &bookmarkId){
-        m_bookmarkAggregation.removeBookmark(bookmarkId);
+        m_bookmarkAggregation->removeBookmark(bookmarkId);
         updateSliderBookmarks();
     });
 }
@@ -367,9 +369,9 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool bookmarksModeEnabled) {
         if (m_bookmarkQuery)
             disconnect(m_bookmarkQuery, nullptr, this, nullptr);
         m_bookmarkQuery.clear();
-        m_bookmarkAggregation.clear();
+        m_bookmarkAggregation->clear();
         m_timeSlider->setBookmarks(QnCameraBookmarkList());
-        m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
+        m_timeSlider->bookmarksViewer()->resetBookmarks();
     }
 
     emit bookmarksModeEnabledChanged();
@@ -404,7 +406,6 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
     connect(m_timeSlider,                       SIGNAL(thumbnailClicked()),                         this,   SLOT(at_timeSlider_thumbnailClicked()));
 
-    connect(m_timeSlider,   &QnTimeSlider::bookmarksUnderCursorUpdated,     this,   &QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated);
     connect(m_timeSlider,   &QnTimeSlider::windowChanged,                   this,   [this](qint64 windowStart, qint64 windowEnd) {
         if (!m_bookmarkQuery)
             return;
@@ -483,7 +484,7 @@ void QnWorkbenchNavigator::deinitialize() {
     if (m_bookmarkQuery) {
         m_bookmarkQuery->setCamera(QnVirtualCameraResourcePtr());
         m_bookmarkQuery->setFilter(QnCameraBookmarkSearchFilter());
-        m_bookmarkAggregation.clear();
+        m_bookmarkAggregation->clear();
     }
     m_searchQueryStrategy->changeQueryForcibly(QString());
 
@@ -841,7 +842,8 @@ void QnWorkbenchNavigator::jumpForward() {
 
     m_pausedOverride = false;
 
-    qint64 pos;
+    /* Default value should never be used, adding just in case of black magic. */
+    qint64 pos = DATETIME_NOW;
     if(!(m_currentWidgetFlags & WidgetSupportsPeriods)) {
         pos = reader->endTime();
     } else if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget)) {
@@ -981,7 +983,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     m_currentWidgetLoaded = false;
 
     if (m_bookmarkQuery) {
-        m_bookmarkAggregation.clear();
+        m_bookmarkAggregation->clear();
         m_bookmarkQuery->setCamera(m_currentMediaWidget ? m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>() : QnVirtualCameraResourcePtr());
     }
 
@@ -1520,21 +1522,6 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
     return base_type::eventFilter(watched, event);
 }
 
-void QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated(const QPointF& pos)
-{
-    if (qnRuntime->isVideoWallMode())
-    {    
-        m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
-        return;
-    }
-
-    const qint64 position = m_timeSlider->valueFromPosition(pos);
-    const QnActionParameters params(currentTarget(Qn::SliderScope));
-    QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
-    m_timeSlider->bookmarksViewer()->updateBookmarks(bookmarks, params);
-}
-
-
 void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos) {
     if(!context() || !context()->menu()) {
         qnWarning("Requesting context menu for a time slider while no menu manager instance is available.");
@@ -1732,7 +1719,7 @@ void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked() {
 }
 
 void QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks) {
-    m_bookmarkAggregation.mergeBookmarkList(bookmarks);
+    m_bookmarkAggregation->mergeBookmarkList(bookmarks);
     m_sliderBookmarksRefreshOperation->requestOperation();
 }
 
@@ -1897,7 +1884,7 @@ bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr 
         { return widget->resource()->toResourcePtr()->getId() == cameraId; });
 }
 
-void QnWorkbenchNavigator::updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera) {
+void QnWorkbenchNavigator::updateHistoryForCamera(QnVirtualCameraResourcePtr camera) {
     if (!camera)
         return;
 
@@ -1916,7 +1903,7 @@ void QnWorkbenchNavigator::updateSliderBookmarks() {
     if (!bookmarksModeEnabled())
         return;
 
-    m_timeSlider->setBookmarks(m_bookmarkAggregation.bookmarkList());
+    m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
 }
 
 /* Bookmark methods. */

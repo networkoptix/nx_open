@@ -1,3 +1,7 @@
+#include "schedule_sync.h"
+
+#include <api/global_settings.h>
+
 #include <utils/common/log.h>
 #include <utils/common/synctime.h>
 
@@ -8,16 +12,12 @@
 #include <utils/common/util.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/storage_resource.h>
-
-#include "schedule_sync.h"
 
 #include <mutex>
 #include <numeric>
 
-static std::once_flag QnScheduleSync_flag;
 static QnScheduleSync *QnScheduleSync_instance = nullptr;
 
 QnScheduleSync *QnScheduleSync::instance()
@@ -31,19 +31,14 @@ QnScheduleSync::QnScheduleSync()
       m_forced(false),
       m_syncTimePoint(0)
 {
-    std::call_once(
-        QnScheduleSync_flag, 
-        [this]
-        {
-            QnScheduleSync_instance = this;
-        }
-    );
-    start();
+    Q_ASSERT(QnScheduleSync_instance == 0);
+    QnScheduleSync_instance = this;
 }
 
 QnScheduleSync::~QnScheduleSync()
 {
     stop();
+    QnScheduleSync_instance = 0;
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
@@ -82,23 +77,20 @@ boost::optional<QnScheduleSync::ChunkKeyVector>
 QnScheduleSync::getOldestChunk() 
 {
     ChunkKeyVector ret;
-    auto mediaServer = 
-        qnResPool->getResourceById(qnCommon->moduleGUID())
-            .dynamicCast<QnMediaServerResource>();
+    auto mediaServer = qnCommon->currentServer();
     
     Q_ASSERT(mediaServer);    
     int64_t minTime = std::numeric_limits<int64_t>::max();
 
-    for (auto &camera : qnResPool->getAllCameras(mediaServer)) 
-    {
-        auto securityCamera = camera.dynamicCast<QnSecurityCamResource>();
-        Q_ASSERT(securityCamera);
-        
-        auto backupType = securityCamera->getActualBackupType();
+    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(mediaServer, true)) 
+    {       
+        Qn::CameraBackupQualities cameraBackupQualities = camera->getActualBackupQualities();
+
         ChunkKey tmp;
 
-        if (backupType & Qn::CameraBackup_HighQuality)
+        if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::HiQualityCatalog);
+
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
         {
             if (tmp.chunk.startTimeMs < minTime)
@@ -113,8 +105,9 @@ QnScheduleSync::getOldestChunk()
             }
         }
 
-        if (backupType & Qn::CameraBackup_LowQuality)
+        if (cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality))
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::LowQualityCatalog);
+
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
         {
             if (tmp.chunk.startTimeMs < minTime)
@@ -209,9 +202,10 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                     .arg(newFileName),
                 cl_logWARNING
             );
+            return;
         }
 
-        int bitrate = m_schedule.bitrate;
+        int bitrate = m_schedule.backupBitrate;
         if (bitrate <= 0) // not capped
         {
             auto data = fromFile->readAll();
@@ -249,6 +243,9 @@ void QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                     );
             }
         }
+
+        fromFile.reset();
+        toFile.reset();
 
         // add chunk to catalog
         bool result = qnBackupStorageMan->fileStarted(
@@ -307,7 +304,7 @@ int QnScheduleSync::stop()
     m_forced        = false;
     m_syncing       = false;
    
-    m_backupFuture.wait();
+    m_backupFuture.waitForFinished();
     return Ok;
 }
 
@@ -364,20 +361,11 @@ QnBackupStatusData QnScheduleSync::getStatus() const
 
 void QnScheduleSync::renewSchedule()
 {
-    auto resource = qnResPool->getResourceById(
-        qnCommon->moduleGUID()
-    );
-    auto mediaServer = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT(mediaServer);
+    auto server = qnCommon->currentServer();
+    Q_ASSERT(server);
 
-    if (mediaServer)
-    {
-        m_schedule.type     = mediaServer->getBackupType();
-        m_schedule.dow      = mediaServer->getBackupDOW();
-        m_schedule.start    = mediaServer->getBackupStart();
-        m_schedule.duration = mediaServer->getBackupDuration();
-        m_schedule.bitrate  = mediaServer->getBackupBitrate();
-    }
+    if (server)
+        m_schedule = server->getBackupSchedule();
 }
 
 void QnScheduleSync::start()
@@ -386,8 +374,7 @@ void QnScheduleSync::start()
     REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
     m_backupSyncOn         = true;
 
-    m_backupFuture = std::async(
-        std::launch::async,
+    m_backupFuture = QtConcurrent::run(
         [this]
         {
             while (m_backupSyncOn)
@@ -405,23 +392,29 @@ void QnScheduleSync::start()
                 {
                     if (m_forced)
                         return true;
-                    if (m_schedule.type != Qn::Backup_Schedule)
+
+                    if (m_schedule.backupType != Qn::Backup_Schedule)
                         return false;
 
-                    QDateTime now = QDateTime::fromMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());                        
-                    const auto curDate = now.date();
+                    if (m_schedule.backupDaysOfTheWeek == ec2::backup::Never)
+                        return false;
 
-                    if ((ec2::backup::fromQtDOW(curDate.dayOfWeek()) & m_schedule.dow))
+                    QDateTime now = qnSyncTime->currentDateTime();                        
+                    const Qt::DayOfWeek today = static_cast<Qt::DayOfWeek>(now.date().dayOfWeek());
+
+                    ec2::backup::DaysOfWeek allowedDays = static_cast<ec2::backup::DaysOfWeek>(m_schedule.backupDaysOfTheWeek);
+
+                    if (allowedDays.testFlag(ec2::backup::fromQtDOW(today)))
                     {
                         const auto curTime = now.time();
-                        if (curTime.msecsSinceStartOfDay() > m_schedule.start * 1000 && 
-                            m_schedule.duration == -1) // sync without end time
+                        if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 && 
+                            m_schedule.backupDuration == -1) // sync without end time
                         {
                             return true;
                         }
 
-                        if (curTime.msecsSinceStartOfDay() > m_schedule.start * 1000 &&
-                            curTime.msecsSinceStartOfDay() < m_schedule.start * 1000 + m_schedule.duration * 1000) // 'normal' schedule sync
+                        if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 &&
+                            curTime.msecsSinceStartOfDay() < m_schedule.backupStart * 1000 + m_schedule.backupDuration * 1000) // 'normal' schedule sync
                         {
                             return true;
                         }
@@ -448,6 +441,7 @@ void QnScheduleSync::start()
                     m_syncData.clear();
                     m_forced  = false;
                     m_syncing = false;
+                    emit backupFinished(m_syncTimePoint);
                 }
             }
         }

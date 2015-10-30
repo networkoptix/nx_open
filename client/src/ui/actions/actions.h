@@ -188,6 +188,11 @@ namespace Qn {
         OpenFailoverPriorityAction,
 
         /**
+         * Opens the Backup Cameras dialog.
+         */
+        OpenBackupCamerasAction,
+
+        /**
          * Opens videowall control layouts for all items in the provided QnVideoWallItemIndexList.
          */
         StartVideoWallControlAction,

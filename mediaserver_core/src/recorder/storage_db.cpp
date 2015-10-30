@@ -24,32 +24,8 @@ QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
 
 QnStorageDb::~QnStorageDb()
 {
+    flushRecords();
 }
-
-void QnStorageDb::beforeDelete()
-{
-}
-
-void QnStorageDb::afterDelete()
-{
-    QnMutexLocker lock( &m_delMutex );
-
-    QnDbTransactionLocker tran(getTransaction());
-    for(const DeleteRecordInfo& delRecord: m_recordsToDelete) {
-        if (!deleteRecordsInternal(delRecord)) {
-            return; // keep record list to delete. try to the next time
-        }
-    }
-    if( !tran.commit() )
-    {
-        NX_LOG( lit("Error commiting to storage DB %1. %2").
-            arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
-        m_needReopenDB = true;
-    }
-
-    m_recordsToDelete.clear();
-}
-
 
 bool QnStorageDb::deleteRecords(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, qint64 startTimeMs)
 {
@@ -105,6 +81,13 @@ bool QnStorageDb::flushRecordsNoLock()
     for(const DelayedData& data: m_delayedData)
         if( !addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk) )
             return false;
+
+    for(const DeleteRecordInfo& delRecord: m_recordsToDelete) {
+        if (!deleteRecordsInternal(delRecord)) {
+            return false; // keep record list to delete. try to the next time
+        }
+    }
+
     if( !tran.commit() )
     {
         qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
@@ -113,6 +96,7 @@ bool QnStorageDb::flushRecordsNoLock()
     }
     m_lastTranTime.restart();
     m_delayedData.clear();
+    m_recordsToDelete.clear();
     return true;
 }
 

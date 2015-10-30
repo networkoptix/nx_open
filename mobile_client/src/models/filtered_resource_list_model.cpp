@@ -4,7 +4,7 @@
 #include "mobile_client/mobile_client_roles.h"
 
 QnFilteredResourceListModel::QnFilteredResourceListModel(QObject *parent) :
-    QAbstractListModel(parent)
+    base_type(parent)
 {
 }
 
@@ -19,6 +19,8 @@ void QnFilteredResourceListModel::resetResources() {
 }
 
 int QnFilteredResourceListModel::rowCount(const QModelIndex &parent) const {
+    Q_UNUSED(parent)
+
     return m_resources.size();
 }
 
@@ -66,6 +68,9 @@ void QnFilteredResourceListModel::at_resourcePool_resourceAdded(const QnResource
     if (!filterAcceptsResource(resource))
         return;
 
+    connect(resource,   &QnResource::nameChanged,       this,   &QnFilteredResourceListModel::at_resourcePool_resourceChanged);
+    connect(resource,   &QnResource::statusChanged,     this,   &QnFilteredResourceListModel::at_resourcePool_resourceChanged);
+
     beginInsertRows(QModelIndex(), m_resources.size(), m_resources.size());
     m_resources.append(resource);
     endInsertRows();
@@ -79,6 +84,8 @@ void QnFilteredResourceListModel::at_resourcePool_resourceRemoved(const QnResour
     beginRemoveRows(QModelIndex(), row, row);
     m_resources.removeAt(row);
     endRemoveRows();
+
+    disconnect(resource, nullptr, this, nullptr);
 }
 
 void QnFilteredResourceListModel::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
@@ -99,7 +106,7 @@ void QnFilteredResourceListModel::at_resourcePool_resourceChanged(const QnResour
 }
 
 void QnFilteredResourceListModel::resetResourcesInternal() {
-    disconnect(qnResPool, 0, this, 0);
+    disconnect(qnResPool, nullptr, this, nullptr);
 
     m_resources.clear();
     foreach (const QnResourcePtr &resource, qnResPool->getResources())

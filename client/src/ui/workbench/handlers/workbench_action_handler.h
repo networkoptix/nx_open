@@ -231,6 +231,7 @@ private:
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
     void openFailoverPriorityDialog();
+    void openBackupCamerasDialog();
 
     QnAdjustVideoDialog* adjustVideoDialog();
 

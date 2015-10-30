@@ -12,7 +12,6 @@
 
 #include "core/resource/resource.h"
 #include <core/resource_management/resource_pool.h>
-#include "health/system_health.h"
 #include "business/actions/system_health_business_action.h"
 #include "core/resource/camera_resource.h"
 #include "business/events/custom_business_event.h"
@@ -154,6 +153,15 @@ void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &re
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
+void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timestampMs) 
+{
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::ArchiveBackupFinished, resource->getId()));
+    auto params = action->getRuntimeParams();
+    params.caption = QString::number(timestampMs);
+    action->setRuntimeParams(params);
+    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+}
+
 bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage)
 {
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
@@ -162,7 +170,7 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
     {
         if (params.resourceName.isEmpty() && params.caption.isEmpty() &&  params.description.isEmpty()) {
             if (errMessage)
-                *errMessage = "At least one of values 'resourceName', 'caption' or 'description' should be filled";
+                *errMessage = "At least one of values 'source', 'caption' or 'description' should be filled";
             return false;
         }
         at_customEvent(params.resourceName, params.caption, params.description, params.metadata, eventState, params.eventTimestampUsec);

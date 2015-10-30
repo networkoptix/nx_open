@@ -69,6 +69,9 @@ namespace {
             if (!resource->hasFlags(Qn::live_cam))
                 return false;
 
+            if (resource->hasFlags(Qn::desktop_camera) || resource->hasFlags(Qn::io_module))
+                return false;
+
             if (m_serverId.isNull())
                 return true;
 

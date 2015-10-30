@@ -700,7 +700,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.digia</groupId>
-                    <version>5.5.0-SNAPSHOT</version>
+                    <version>5.5.1-SNAPSHOT</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
@@ -746,6 +746,13 @@
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
                     <version>${openssl.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>libjpeg-turbo</artifactId>
+                    <version>1.4.2-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>

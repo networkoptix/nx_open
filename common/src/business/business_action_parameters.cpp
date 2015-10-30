@@ -16,6 +16,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , inputPortId()
     , sayText()
     , tags()
+    , bookmarkDuration(0)
 {}
 
 

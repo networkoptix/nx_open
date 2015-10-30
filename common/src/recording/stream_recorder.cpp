@@ -871,21 +871,8 @@ bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 
 void QnStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
 {
-    assert(false);
-    //Q_UNUSED(provider);
-    //m_recordingContextVector.clear();
-
-    //auto storage = QnStorageResourcePtr(
-    //    QnStoragePluginFactory::instance()->createStorage(
-    //        m_fixedFileName
-    //    )
-    //);
-
-    //if (storage)
-    //    m_recordingContextVector.emplace_back(
-    //        m_fixedFileName,
-    //        storage
-    //    );
+    assert(!m_recordingContextVector.empty());  // if you are here check that you've called 
+    Q_UNUSED(provider);                         // addRecordingContext() before.
 }
 
 QString QnStreamRecorder::fixedFileName() const
