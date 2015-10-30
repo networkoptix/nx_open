@@ -2,15 +2,26 @@
 
 #include <core/resource/storage_resource.h>
 
+#include <utils/common/collection.h>
+
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
+
+    int storageIndex(const QnStorageModelInfoList &list, const QnStorageModelInfo& storage) {
+        auto byId  = [storage](const QnStorageModelInfo &info)  { return storage.id  == info.id;   };
+        auto byUrl = [storage](const QnStorageModelInfo &info)  { return storage.url == info.url;  };
+
+        return storage.id.isNull()
+            ? qnIndexOf(list, byUrl)
+            : qnIndexOf(list, byId);
+    }
+
 }
 
 // ------------------ QnStorageListMode --------------------------
 
 QnStorageListModel::QnStorageListModel(QObject *parent)
     : base_type(parent)
-    , m_isBackupRole(false)
     , m_readOnly(false)
     , m_linkBrush(QPalette().link())
 {
@@ -19,7 +30,7 @@ QnStorageListModel::QnStorageListModel(QObject *parent)
 
 QnStorageListModel::~QnStorageListModel() {}
 
-void QnStorageListModel::setStorages(const QnStorageSpaceDataList& storages)
+void QnStorageListModel::setStorages(const QnStorageModelInfoList& storages)
 {
     beginResetModel();
     m_storages = storages;
@@ -27,17 +38,37 @@ void QnStorageListModel::setStorages(const QnStorageSpaceDataList& storages)
     endResetModel();
 }
 
-void QnStorageListModel::addStorage(const QnStorageSpaceData& data)
+void QnStorageListModel::addStorage(const QnStorageModelInfo& storage)
 {
     beginResetModel();
-    m_storages.push_back(data);
+    m_storages.push_back(storage);
     sortStorages();
     endResetModel();
 }
 
+void QnStorageListModel::updateStorage( const QnStorageModelInfo& storage ) {
+    int idx = storageIndex(m_storages, storage);
+    if (idx < 0)
+        return;
+
+    beginResetModel();
+    m_storages[idx] = storage;
+    endResetModel();
+}
+
+
+void QnStorageListModel::removeStorage(const QnStorageModelInfo& storage) {  
+    int idx = storageIndex(m_storages, storage);
+    if (idx < 0)
+        return;
+
+    beginResetModel();
+    m_storages.removeAt(idx);
+    endResetModel();
+}
 
 void QnStorageListModel::sortStorages() {
-    qSort(m_storages.begin(), m_storages.end(), [](const QnStorageSpaceData &left, const QnStorageSpaceData &right) {
+    qSort(m_storages.begin(), m_storages.end(), [](const QnStorageModelInfo &left, const QnStorageModelInfo &right) {
         
         /* Local storages should go first. */
         if (left.isExternal != right.isExternal)
@@ -51,9 +82,13 @@ void QnStorageListModel::sortStorages() {
     });
 }
 
+QnStorageModelInfo QnStorageListModel::storage( const QModelIndex &index ) const {
+    if (!index.isValid() || index.row() >= m_storages.size())
+        return QnStorageModelInfo();
+    return m_storages[index.row()];
+}
 
-QnStorageSpaceDataList QnStorageListModel::storages() const
-{
+QnStorageModelInfoList QnStorageListModel::storages() const {
     return m_storages;
 }
 
@@ -82,7 +117,7 @@ QString urlPath(const QString& url)
 
 QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedText) const
 {
-    const QnStorageSpaceData& storageData = m_storages[index.row()];
+    QnStorageModelInfo storageData = storage(index);
     switch (index.column())
     {
     case CheckBoxColumn:
@@ -110,7 +145,7 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
         if (!storageData.isWritable)
             return tr("Inaccessible");
 
-        return m_isBackupRole 
+        return storageData.isBackup
             ? tr("Use as main storage") 
             : canMoveStorage(storageData)
             ? tr("Use as backup storage")
@@ -126,7 +161,7 @@ QVariant QnStorageListModel::fontData(const QModelIndex &index) const {
     if (m_readOnly)
         return QVariant();
 
-    const QnStorageSpaceData& storageData = m_storages[index.row()];
+    QnStorageModelInfo storageData = storage(index);
     if (!storageData.isWritable)
         return QVariant();
 
@@ -140,7 +175,7 @@ QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const {
     if (m_readOnly)
         return QVariant();
 
-    const QnStorageSpaceData& storageData = m_storages[index.row()];
+    QnStorageModelInfo storageData = storage(index);
     if (!storageData.isWritable)
         return QVariant();
 
@@ -154,7 +189,7 @@ QVariant QnStorageListModel::mouseCursorData(const QModelIndex &index) const {
     if (m_readOnly)
         return QVariant();
 
-    const QnStorageSpaceData& storageData = m_storages[index.row()];
+    QnStorageModelInfo storageData = storage(index);
     if (!storageData.isWritable)
         return QVariant();
 
@@ -168,8 +203,10 @@ QVariant QnStorageListModel::mouseCursorData(const QModelIndex &index) const {
 QVariant QnStorageListModel::checkstateData(const QModelIndex &index) const
 {
     if (index.column() == CheckBoxColumn) {
-        const QnStorageSpaceData& storageData = m_storages[index.row()];
-        return storageData.isUsedForWriting && storageData.isWritable ? Qt::Checked : Qt::Unchecked;
+        QnStorageModelInfo storageData = storage(index);
+        return storageData.isUsed && storageData.isWritable 
+            ? Qt::Checked 
+            : Qt::Unchecked;
     }
     return QVariant();
 }
@@ -193,13 +230,11 @@ QVariant QnStorageListModel::data(const QModelIndex &index, int role) const
         return mouseCursorData(index);
     case Qt::CheckStateRole:
         return checkstateData(index);
-    case Qn::StorageSpaceDataRole:
-        return QVariant::fromValue<QnStorageSpaceData>(m_storages[index.row()]);
+    case Qn::StorageInfoDataRole:
+        return QVariant::fromValue<QnStorageModelInfo>(storage(index));
     default:
         break;
     }
-    return QVariant();
-
     return QVariant();
 }
 
@@ -208,13 +243,13 @@ bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()) || m_readOnly)
         return false;
 
-    QnStorageSpaceData& storageData = m_storages[index.row()];
+    QnStorageModelInfo storageData = storage(index);
     if (!storageData.isWritable)
         return false;
 
     if (role == Qt::CheckStateRole)
     {
-        storageData.isUsedForWriting = (value == Qt::Checked);
+        storageData.isUsed = (value == Qt::Checked);
         emit dataChanged(index, index, QVector<int>() << role);
         return true;
     }
@@ -223,28 +258,19 @@ bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value
     }
 }
 
-QVariant QnStorageListModel::headerData(int section, Qt::Orientation orientation, int role) const 
-{
-    // column headers aren't used so far
-    return base_type::headerData(section, orientation, role);
-}
-
 Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
+    QnStorageModelInfo storageData = storage(index);
+
     Qt::ItemFlags flags = Qt::NoItemFlags;
-    flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    flags |= Qt::ItemIsSelectable;
+    
+    if (storageData.isWritable)
+        flags |= Qt::ItemIsEnabled;
 
     if (index.column() == CheckBoxColumn)
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;
-}
-
-bool QnStorageListModel::isBackupRole() const {
-    return m_isBackupRole;
-}
-
-void QnStorageListModel::setBackupRole(bool value) {
-    m_isBackupRole = value;
 }
 
 bool QnStorageListModel::isReadOnly() const {
@@ -260,26 +286,15 @@ void QnStorageListModel::setReadOnly( bool readOnly ) {
     endResetModel();
 }
 
-bool QnStorageListModel::removeRows(int row, int count, const QModelIndex &parent)
-{
-    if (parent.isValid())
-        return false;
-
-    beginResetModel();
-    m_storages.erase(m_storages.begin() + row, m_storages.begin() + row + count);
-    endResetModel();
-    return true;
-}
-
-bool QnStorageListModel::canMoveStorage( const QnStorageSpaceData& data ) const {
+bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const {
     if (!data.isWritable)
         return false;
 
-    if (isBackupRole())
+    if (data.isBackup)
         return true;
 
     /* Check that at least one writable storage left in the main pool. */
-    return std::any_of(m_storages.cbegin(), m_storages.cend(), [data](const QnStorageSpaceData &other) {
+    return std::any_of(m_storages.cbegin(), m_storages.cend(), [data](const QnStorageModelInfo &other) {
 
         /* Do not count subject to remove. */
         if (other.url == data.url)
@@ -292,4 +307,3 @@ bool QnStorageListModel::canMoveStorage( const QnStorageSpaceData& data ) const 
     });
 
 }
-

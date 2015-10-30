@@ -12,6 +12,7 @@
 
 #include <server/server_storage_manager_fwd.h>
 
+#include <ui/models/storage_model_info.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -43,17 +44,18 @@ protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
 
 private:
-    void updateStoragesInfo();
+    /** Load initial storages data from resource pool. */
+    void loadStoragesFromResources();
+
     void updateRebuildInfo();
     void updateBackupInfo();
     void at_eventsGrid_clicked(const QModelIndex& index);
 
-    void updateStoragesUi(QnServerStoragesPool pool, const QnStorageSpaceDataList &storages);
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply);
 
     void updateColumnWidth();
-    int getColWidth(const QAbstractItemModel* model, int col);
+    int getColWidth(int col);
 
     void startRebuid(bool isMain);
     void cancelRebuild(bool isMain);
@@ -65,8 +67,7 @@ private:
     bool canStartBackup(const QnBackupStatusData& data, QString *info);
 
 private slots:
-    
-    void at_serverStorageSpaceChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageSpaceDataList &storages);
+   
     void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
     void at_serverBackupStatusChanged(const QnMediaServerResourcePtr &server, const QnBackupStatusData &status);
     
@@ -81,11 +82,11 @@ private slots:
 private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;
-    QnStorageResourceList m_storages;
+    QScopedPointer<QnStorageListModel> m_model;
+
     struct StoragePool
     {
-        StoragePool();
-        QScopedPointer<QnStorageListModel> model;
+        StoragePool();        
         bool rebuildCancelled;
     };
 
@@ -96,7 +97,7 @@ private:
     bool m_backupCancelled;
     bool m_updating;
 private:
-    void setupGrid(QTableView* tableView, StoragePool* storagePool);
-    void applyStoragesChanges(QnStorageResourceList& result, const QList<QnStorageSpaceData> &storages, bool isBackupPool) const;
-    bool hasStoragesChanges(const QList<QnStorageSpaceData> &storages, bool isBackupPool) const;
+    void setupGrid(QTableView* tableView, bool isMainPool);
+    void applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const;
+    bool hasStoragesChanges(const QnStorageModelInfoList &storages) const;
 };
