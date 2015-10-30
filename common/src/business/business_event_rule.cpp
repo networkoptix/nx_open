@@ -236,7 +236,7 @@ QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(22, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::LicenseIssueEvent, admin));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(23, 30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::LicenseIssueEvent));
 
-    result << getSystemRules() << getRulesUpd43();
+    result << getSystemRules() << getRulesUpd43() << getRulesUpd48();
     return result;
 }
 
@@ -261,5 +261,13 @@ QnBusinessEventRuleList QnBusinessEventRule::getRulesUpd43()
     QnBusinessEventRuleList result;
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(24,  0,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::UserDefinedEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(900022, 0,     QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::UserDefinedEvent));
+    return result;
+}
+
+QnBusinessEventRuleList QnBusinessEventRule::getRulesUpd48()
+{
+    QnBusinessEventRuleList result;
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900023,  0,    QByteArray(),   0, QnBusiness::ShowPopupAction,   QnBusiness::BackupFinishedEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900024,  0,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::BackupFinishedEvent));
     return result;
 }

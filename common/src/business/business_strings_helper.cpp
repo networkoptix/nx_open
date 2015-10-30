@@ -96,6 +96,7 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case ServerConflictEvent:   return tr("Server Conflict");
     case ServerStartEvent:      return tr("Server Started");
     case LicenseIssueEvent:     return tr("License Issue");
+    case BackupFinishedEvent:   return tr("Archive backup finished");
 
     case AnyServerEvent:        return tr("Any Server Issue");
     case AnyBusinessEvent:      return tr("Any Event");
@@ -154,6 +155,8 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
         return tr("Server \'%1\' has a license problem").arg(resourceName);
+    case BackupFinishedEvent:
+        return tr("Server \'%1\' has finished an archive backup").arg(resourceName);
     case UserDefinedEvent:
         return !params.caption.isEmpty() ? params.caption :
                !params.description.isEmpty() ? params.description : resourceName;
@@ -224,6 +227,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case NetworkIssueEvent:
     case ServerFailureEvent: 
     case LicenseIssueEvent:
+    case BackupFinishedEvent:
     {
         result += tr("Reason: %1").arg(eventReason(params));
         break;
@@ -365,6 +369,28 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
         break;
     }
+
+    case BackupFailed: {
+        result = tr("Archive backup failed because of no backup storages available");
+        break;
+    }
+    case BackupEndOfPeriod: {
+        qint64 timeStampMs = params.description.toLongLong();
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
+        // todo: #gdm add server/client timezone conversion
+        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+    }
+    case BackupDone: {
+        result = tr("Archive backup is successfully completed");
+        break;
+    }
+    case BackupCancelled: {
+        qint64 timeStampMs = params.description.toLongLong();
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
+        // todo: #gdm add server/client timezone conversion
+        result = tr("Archive backup is canceled by user. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+    }
+
     case LicenseRemoved: {
         QnVirtualCameraResourceList disabledCameras;
         for (const QString &id: reasonParamsEncoded.split(L';'))

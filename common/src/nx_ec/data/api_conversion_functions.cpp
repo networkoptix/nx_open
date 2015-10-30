@@ -632,8 +632,8 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.allowAutoRedundancy = src->isRedundancyEnabled;
     dst.backupType = src->backupSchedule.backupType;
     dst.backupDaysOfTheWeek = src->backupSchedule.backupDaysOfTheWeek;
-    dst.backupStart = src->backupSchedule.backupStart;
-    dst.backupDuration = src->backupSchedule.backupDuration;
+    dst.backupStart = src->backupSchedule.backupStartSec;
+    dst.backupDuration = src->backupSchedule.backupDurationSec;
     dst.backupBitrate = src->backupSchedule.backupBitrate;
 }
 
@@ -644,8 +644,8 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->isRedundancyEnabled = src.allowAutoRedundancy;
     dst->backupSchedule.backupType = src.backupType;
     dst->backupSchedule.backupDaysOfTheWeek = src.backupDaysOfTheWeek;
-    dst->backupSchedule.backupStart = src.backupStart;
-    dst->backupSchedule.backupDuration = src.backupDuration;
+    dst->backupSchedule.backupStartSec = src.backupStart;
+    dst->backupSchedule.backupDurationSec = src.backupDuration;
     dst->backupSchedule.backupBitrate = src.backupBitrate;
 }
 
