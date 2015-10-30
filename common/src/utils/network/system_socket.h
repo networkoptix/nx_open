@@ -253,6 +253,11 @@ public:
 private:
     // Access for TCPServerSocket::accept() connection creation
     friend class TCPServerSocket;
+
+    #if defined(Q_OS_WIN)
+        QnMutex m_mutex;
+        boost::optional< KeepAliveOptions > m_keepAlive;
+    #endif
 };
 
 /**
@@ -288,7 +293,7 @@ protected:
     virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) override;
 
 private:
-    bool setListen(int queueLen) ;
+    bool setListen(int queueLen);
 };
 
 /**

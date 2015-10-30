@@ -957,14 +957,6 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 
 bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 {
-    int isEnabled = info ? 1 : 0;
-    if (setsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
-                   reinterpret_cast<const char*>(&isEnabled), sizeof(isEnabled)) != 0)
-        return false;
-
-    if (!info)
-        return true;
-
     #if defined(Q_OS_WIN)
         struct tcp_keepalive ka = { TRUE, info->timeSec * 1000,
                                           info->intervalSec * 1000 }; // s to ms
@@ -972,8 +964,18 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
                      &ka, sizeof(ka), NULL, 0, NULL, NULL, NULL) != 0)
             return false;
 
+        QnMutexLocker lk( &m_mutex );
+        m_keepAlive = std::move( info );
         return true;
     #elif defined(Q_OS_LINUX)
+        int isEnabled = info ? 1 : 0;
+        if (setsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
+                       &isEnabled, sizeof(isEnabled)) != 0)
+            return false;
+
+        if (!info)
+            return true;
+
         if (setsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPIDLE,
                        &info->timeSec, sizeof(info->timeSec)) < 0)
             return false;
@@ -988,6 +990,12 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 
         return true;
     #else
+        int isEnabled = info ? 1 : 0;
+        if (setsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
+                       &isEnabled, sizeof(isEnabled)) != 0)
+            return false;
+
+        // TODO: #mu osx impl?
         return false;
     #endif
 }
@@ -1007,8 +1015,8 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
     }
 
     #if defined(Q_OS_WIN)
-        // zero values will indicate inability to read actual values
-        *result = KeepAliveOptions();
+        QnMutexLocker lk( &m_mutex );
+        *result = m_keepAlive;
         return true;
     #elif defined(Q_OS_LINUX)
         KeepAliveOptions info;
@@ -1027,6 +1035,7 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
         *result = std::move(info);
         return true;
     #else
+        // TODO: #mu osx impl?
         return false;
     #endif
 }
