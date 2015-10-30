@@ -34,6 +34,7 @@ class TestStorageThread;
 class RebuildAsyncTask;
 class ScanMediaFilesTask;
 class QnUuid;
+class QnScheduleSync;
 
 class QnStorageManager: public QObject
 {
@@ -124,6 +125,8 @@ public:
     * Return camera list with existing archive. Camera Unique ID is used as camera ID
     */
     std::vector<QnUuid> getCamerasWithArchive() const;
+
+    QnScheduleSync* scheduleSync() const;
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
@@ -188,7 +191,6 @@ private:
         const QnStorageResourcePtr  &storage
     );
     static void updateCameraHistory();
-
 private:
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
@@ -229,6 +231,7 @@ private:
     QElapsedTimer m_removeEmtyDirTimer;
     QMap<QString, qint64> m_lastCatalogTimes;
     QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
+    std::unique_ptr<QnScheduleSync> m_scheduleSync;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
