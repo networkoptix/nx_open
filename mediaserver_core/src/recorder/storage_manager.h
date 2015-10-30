@@ -26,6 +26,7 @@
 #include <atomic>
 #include <future>
 #include <mutex>
+#include <array>
 #include "storage_db_pool.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -69,6 +70,8 @@ public:
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
     static QnStorageResourcePtr getStorageByUrl(const QString &storageUrl, 
                                                 QnServer::StoragePool pool);
+    
+    static const std::array<QnServer::StoragePool, 2> getPools();
 
     bool checkIfMyStorage(const QnStorageResourcePtr &storage) const;
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);

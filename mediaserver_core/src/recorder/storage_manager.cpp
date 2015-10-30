@@ -2038,3 +2038,10 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString &storageUrl
     }
     return result;
 }
+
+const std::array<QnServer::StoragePool, 2> QnStorageManager::getPools() {
+    static const 
+    std::array<QnServer::StoragePool, 2> pools = {QnServer::StoragePool::Normal, 
+                                                  QnServer::StoragePool::Backup};
+    return pools;
+}

@@ -422,15 +422,15 @@ void QnScheduleSync::start()
                     if (allowedDays.testFlag(ec2::backup::fromQtDOW(today))) 
                     {
                         const auto curTime = now.time();
-                        if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 && 
-                            m_schedule.backupDuration == -1) // sync without end time
+                        if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec* 1000 && 
+                            m_schedule.backupDurationSec == -1) // sync without end time
                         {
                             return SyncCode::Ok;
                         }
 
-                        if (curTime.msecsSinceStartOfDay() > m_schedule.backupStart * 1000 &&
-                            curTime.msecsSinceStartOfDay() < m_schedule.backupStart * 1000 + 
-                                                             m_schedule.backupDuration * 1000) // 'normal' schedule sync
+                        if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec * 1000 &&
+                            curTime.msecsSinceStartOfDay() < m_schedule.backupStartSec * 1000 + 
+                                                             m_schedule.backupDurationSec * 1000) // 'normal' schedule sync
                         {
                             return SyncCode::Ok;
                         }

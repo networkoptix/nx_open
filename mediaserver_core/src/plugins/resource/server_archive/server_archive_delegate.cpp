@@ -14,8 +14,6 @@
 #include "core/resource/network_resource.h"
 #include "plugins/resource/avi/avi_resource.h"
 
-#include <array>
-
 static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int USEC_IN_MSEC = 1000;
@@ -52,10 +50,7 @@ qint64 QnServerArchiveDelegate::startTime() const
     setCatalogs();
     qint64 ret = INT64_MAX;
 
-    std::array<QnServer::StoragePool, 2> pools = {QnServer::StoragePool::Normal, 
-                                                  QnServer::StoragePool::Backup};
-
-    for (QnServer::StoragePool i : pools) // normal and backup
+    for (QnServer::StoragePool i : QnStorageManager::getPools()) // normal and backup
     {
         ret = m_catalogHi[i] && 
               m_catalogHi[i]->minTime() != AV_NOPTS_VALUE && 
@@ -78,10 +73,7 @@ qint64 QnServerArchiveDelegate::endTime() const
     setCatalogs();
     qint64 ret = 0;
 
-    std::array<QnServer::StoragePool, 2> pools = {QnServer::StoragePool::Normal, 
-                                                  QnServer::StoragePool::Backup};
-
-    for (QnServer::StoragePool i : pools) // normal and backup
+    for (QnServer::StoragePool i : QnStorageManager::getPools()) // normal and backup
     {
         ret = m_catalogHi[i] && 
               m_catalogHi[i]->maxTime() != AV_NOPTS_VALUE && 
@@ -488,10 +480,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
     if (!fastSwitch)
     {
         // no immediate seek is need. change catalog on next i-frame
-        std::array<QnServer::StoragePool, 2> pools = {QnServer::StoragePool::Normal, 
-                                                      QnServer::StoragePool::Backup};
-
-        for (QnServer::StoragePool i : pools) // normal and backup
+        for (QnServer::StoragePool i : QnStorageManager::getPools()) // normal and backup
         {
             m_newQualityCatalog = (quality == MEDIA_Quality_Low ? m_catalogLow[i] : m_catalogHi[i]);
             m_newQualityChunk = findChunk(m_newQualityCatalog, timeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
