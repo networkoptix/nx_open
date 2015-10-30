@@ -141,11 +141,11 @@ void QnBackupScheduleDialog::setNearestValue(QComboBox* combobox, int time)
 void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& value)
 {
     ec2::backup::DaysOfWeek allowedDays = static_cast<ec2::backup::DaysOfWeek>(value.backupDaysOfTheWeek);
-    for (int i = 1; i <= 7; ++i) {
-        Qt::DayOfWeek day = static_cast<Qt::DayOfWeek>(i);
-        checkboxByDayOfWeek(day)->setChecked(allowedDays.testFlag(ec2::backup::fromQtDOW(day)));
+    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+        Qt::DayOfWeek day = indexToDay(i);
+        QCheckBox* checkbox = m_dowCheckboxes[i];
+        checkbox->setChecked(allowedDays.testFlag(ec2::backup::fromQtDOW(day)));
     }
-
 
     setNearestValue(ui->comboBoxTimeStart, value.backupStart);
     if (value.backupDuration == -1)
@@ -161,9 +161,10 @@ void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& va
 void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
 {
     QList<Qt::DayOfWeek> days;
-    for (int i = 1; i <= 7; ++i) {
-        Qt::DayOfWeek day = static_cast<Qt::DayOfWeek>(i);
-        if (checkboxByDayOfWeek(day)->isChecked())
+    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+        Qt::DayOfWeek day = indexToDay(i);
+        QCheckBox* checkbox = m_dowCheckboxes[i];
+        if (checkbox->isChecked())
             days << day;
     }
 
