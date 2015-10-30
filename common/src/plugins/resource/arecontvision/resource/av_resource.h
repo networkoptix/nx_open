@@ -61,6 +61,13 @@ public:
     int getZoneSite() const;
 
     QnMetaDataV1Ptr getCameraMetadata();
+    QString generateRequestString(
+        const QHash<QByteArray, QVariant>& streamParam,
+        bool h264,
+        bool resolutionFULL,
+        bool blackWhite,
+        int* const outQuality,
+        QSize* const outResolution);
 
     static QnPlAreconVisionResource* createResourceByName(const QString &name);
     static QnPlAreconVisionResource* createResourceByTypeId(QnUuid rt);
@@ -86,9 +93,9 @@ protected:
 private:
     int m_totalMdZones;
     int m_zoneSite;
-    bool m_cameraReportedRTSPSupport;
     int m_channelCount;
     int m_prevMotionChannel;
+    bool m_dualsensor;
 
     bool getParamPhysical2(int channel, const QString& name, QVariant &val);
 };

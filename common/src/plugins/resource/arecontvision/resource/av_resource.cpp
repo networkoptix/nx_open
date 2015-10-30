@@ -33,9 +33,9 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64),
       m_zoneSite(8),
-      m_cameraReportedRTSPSupport(false),
       m_channelCount(0),
-      m_prevMotionChannel(0)
+      m_prevMotionChannel(0),
+      m_dualsensor(false)
 {
     setVendor(lit("ArecontVision"));
 }
@@ -303,11 +303,8 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
-    //QVariant val;
-    //if (getParamPhysical(lit("rtspSupported"), val))
-    //    m_cameraReportedRTSPSupport = val.toBool();
-
     m_channelCount = isPanoramic() ? 4 : 1;
+    m_dualsensor = isDualSensor();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -406,6 +403,122 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
     motion->m_duration = 1000 * 1000 * 1000; // 1000 sec 
     return motion;
+}
+
+QString QnPlAreconVisionResource::generateRequestString(
+    const QHash<QByteArray, QVariant>& streamParams,
+    bool h264,
+    bool resolutionFULL,
+    bool blackWhite,
+    int* const outQuality,
+    QSize* const outResolution)
+{
+    QString request;
+
+    int left;
+    int top;
+    int right;
+    int bottom;
+
+    int width;
+    int height;
+
+    int quality = 0;
+
+    int streamID;
+
+    int bitrate = 0;
+
+    if (!streamParams.contains("Quality") || !streamParams.contains("resolution") ||
+        !streamParams.contains("image_left") || !streamParams.contains("image_top") ||
+        !streamParams.contains("image_right") || !streamParams.contains("image_bottom") ||
+        (h264 && !streamParams.contains("streamID")))
+    {
+        NX_LOG("Error!!! parameter is missing in stream params.", cl_logERROR);
+        //return QnAbstractMediaDataPtr(0);
+    }
+
+    // =========
+    left = streamParams.value("image_left").toInt();
+    top = streamParams.value("image_top").toInt();
+    right = streamParams.value("image_right").toInt();
+    bottom = streamParams.value("image_bottom").toInt();
+
+    if (m_dualsensor && blackWhite) //3130 || 3135
+    {
+        right = right / 3 * 2;
+        bottom = bottom / 3 * 2;
+
+        right = right / 32 * 32;
+        bottom = bottom / 16 * 16;
+
+        right = qMin(1280, right);
+        bottom = qMin(1024, bottom);
+
+    }
+
+    //right = 1280;
+    //bottom = 1024;
+
+    //right/=2;
+    //bottom/=2;
+
+    width = right - left;
+    height = bottom - top;
+
+    quality = streamParams.value("Quality").toInt();
+    //quality = getQuality();
+
+    streamID = 0;
+    if (h264)
+    {
+        streamID = streamParams.value("streamID").toInt();
+        //bitrate = streamParams.value("Bitrate").toInt();
+        bitrate = getProperty(lit("Bitrate")).toInt();
+    }
+    // =========
+
+    if (h264)
+        quality = 37 - quality; // for H.264 it's not quality; it's qp
+
+    if (!h264)
+        request += QLatin1String("image");
+    else
+        request += QLatin1String("h264");
+
+    request += QLatin1String("?res=");
+    if (resolutionFULL)
+        request += QLatin1String("full");
+    else
+        request += QLatin1String("half");
+
+    request += QLatin1String(";x0=") + QString::number(left)
+        + QLatin1String(";y0=") + QString::number(top)
+        + QLatin1String(";x1=") + QString::number(right)
+        + QLatin1String(";y1=") + QString::number(bottom);
+
+    if (!h264)
+        request += QLatin1String(";quality=");
+    else
+        request += QLatin1String(";qp=");
+
+    request += QString::number(quality) + QLatin1String(";doublescan=0") + QLatin1String(";ssn=") + QString::number(streamID);
+
+    //h264?res=full;x0=0;y0=0;x1=1600;y1=1184;qp=27;doublescan=0;iframe=0;ssn=574;netasciiblksize1450
+    //request = "image?res=full;x0=0;y0=0;x1=800;y1=600;quality=10;doublescan=0;ssn=4184;";
+
+    if (h264)
+    {
+        if (bitrate)
+            request += QLatin1String("bitrate=") + QString::number(bitrate) + QLatin1Char(';');
+    }
+
+    if (outQuality)
+        *outQuality = quality;
+    if (outResolution)
+        *outResolution = QSize(width, height);
+
+    return request;
 }
 
 // ===============================================================================================================================
@@ -549,12 +662,9 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
-    return true;
-
-
-    return m_cameraReportedRTSPSupport ||
+    return isH264() &&
            qnCommon->dataPool()->data(toSharedPointer(this)).
-               value<bool>(lit("isRTSPSupported"), false);
+               value<bool>(lit("isRTSPSupported"), true);
 }
 
 bool QnPlAreconVisionResource::isAbstractResource() const

@@ -12,13 +12,16 @@
 #include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
+#include "basic_av_stream_reader.h"
 #include "../resource/av_resource.h"
 
 
 class QnArecontRtspStreamReader
 :
-    public CLServerPushStreamReader
+    public QnBasicAvStreamReader<CLServerPushStreamReader>
 {
+    typedef QnBasicAvStreamReader<CLServerPushStreamReader> parent_type;
+
 public:
     QnArecontRtspStreamReader(const QnResourcePtr& res);
     virtual ~QnArecontRtspStreamReader();
@@ -33,14 +36,12 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual void pleaseStop() override;
+    virtual void pleaseReopenStream() override;
 
 private:
     QnMulticodecRtpReader m_rtpStreamParser;
 
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
-    QString generateRequestString(
-        const QnLiveStreamParams& params,
-        const QnPlAreconVisionResourcePtr& res);
 };
 
 #endif // ENABLE_ARECONT

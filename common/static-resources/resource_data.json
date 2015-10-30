@@ -75,9 +75,9 @@
         },
 	{
             "keys": [
-                "ArecontVision|5245DN-01"
+                "ArecontVision|??05", "ArecontVision|?155"
             ],
-            "isRTSPSupported": true
+            "isRTSPSupported": false
 	},
         {
             "keys": [

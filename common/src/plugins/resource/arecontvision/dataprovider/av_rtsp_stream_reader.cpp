@@ -8,10 +8,15 @@
 #include "av_rtsp_stream_reader.h"
 
 #include <utils/common/log.h>
+#include <utils/network/rtsp/rtsp_types.h>
 
 
-QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res):
-    CLServerPushStreamReader(res),
+static const int SECOND_STREAM_FPS = 5;
+static const int SECOND_STREAM_BITRATE_KBPS = 512;
+
+QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res)
+:
+    parent_type(res),
     m_rtpStreamParser(res)
 {
 }
@@ -33,10 +38,43 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
 
     auto res = getResource().dynamicCast<QnPlAreconVisionResource>();
 
-    const auto requestStr = generateRequestString(
-        params,
-        res);
-    const QString url = lit("rtsp://%1:%2/%3").arg(res->getHostAddress()).arg(554).arg(requestStr);
+    QString requestStr;
+    {
+        QMutexLocker lk(&m_mutex);
+        requestStr = res->generateRequestString(
+            m_streamParam,
+            res->isH264(),
+            role != Qn::CR_SecondaryLiveVideo,
+            false,  //blackWhite
+            NULL,   //outQuality,
+            NULL);  //outResolution
+        requestStr.replace(lit("h264"), lit("h264.sdp"));
+        requestStr.replace(lit(";"), lit("&"));
+
+        //requestStr = generateRequestString(
+        //    params,
+        //    res);
+    }
+
+    const auto maxResolution = getMaxSensorSize();
+    if (getRole() == Qn::CR_SecondaryLiveVideo)
+    {
+        requestStr += lit("&FPS=%1").arg(SECOND_STREAM_FPS);
+        requestStr += lit("&Ratelimit=%1").arg(SECOND_STREAM_BITRATE_KBPS);
+    }
+    else
+    {
+        requestStr += lit("&FPS=%1").arg((int)params.fps);
+        const int desiredBitrateKbps = res->suggestBitrateKbps(
+            params.quality,
+            QSize(maxResolution.width(), maxResolution.height()),
+            params.fps);
+        requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
+    }
+    if (res->isAudioEnabled())
+        requestStr += lit("&MIC=on");
+
+    const QString url = lit("rtsp://%1:%2/%3").arg(res->getHostAddress()).arg(nx_rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
 
     m_rtpStreamParser.setRequest(url);
     return m_rtpStreamParser.openStream();
@@ -65,6 +103,12 @@ void QnArecontRtspStreamReader::pleaseStop()
 {
     CLServerPushStreamReader::pleaseStop();
     m_rtpStreamParser.pleaseStop();
+}
+
+void QnArecontRtspStreamReader::pleaseReopenStream()
+{
+    parent_type::pleaseReopenStream();
+    CLServerPushStreamReader::pleaseReopenStream();
 }
 
 QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
@@ -96,44 +140,6 @@ QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
 QnConstResourceAudioLayoutPtr QnArecontRtspStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
-}
-
-QString QnArecontRtspStreamReader::generateRequestString(
-    const QnLiveStreamParams& params,
-    const QnPlAreconVisionResourcePtr& res)
-{
-    static const int SECOND_STREAM_FPS = 5;
-    static const int SECOND_STREAM_BITRATE_KBPS = 512;
-
-    const int maxWidth = res->getProperty(lit("MaxSensorWidth")).toInt();
-    const int maxHeight = res->getProperty(lit("MaxSensorHeight")).toInt();
-
-    QString str;
-
-    str += lit("h264.sdp?");
-    if (getRole() == Qn::CR_SecondaryLiveVideo)
-    {
-        str += lit("Res=half");
-        str += lit("&FPS=%1").arg(SECOND_STREAM_FPS);
-        str += lit("&QP=37");
-        str += lit("&Ratelimit=%1").arg(SECOND_STREAM_BITRATE_KBPS);
-    }
-    else
-    {
-        str += lit("Res=full");
-        str += lit("&FPS=%1").arg((int)params.fps);
-        const int desiredBitrateKbps = res->suggestBitrateKbps(
-            params.quality,
-            QSize(maxWidth, maxHeight),
-            params.fps);
-        str += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
-    }
-    str += lit("&x0=%1&y0=%2&x1=%3&y1=%4").arg(0).arg(0).arg(maxWidth).arg(maxHeight);
-    str += lit("&ssn=%1").arg(rand());
-    if (res->isAudioEnabled())
-        str += lit("&MIC=on");
-
-    return str;
 }
 
 #endif // ENABLE_ARECONT
