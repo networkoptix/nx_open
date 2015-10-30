@@ -82,7 +82,7 @@ static int qt_repeatCount(const QString &s, int i)
 static QString zeroPad(long value, int width)
 {
     if ( value < 0 )
-        return QString::number(qAbs(value)).rightJustified(width, QLatin1Char('0'), true).prepend(QLatin1Char('-'));
+        return QString::number(qAbs(value)).rightJustified(width>0 ? width-1 : 0, QLatin1Char('0'), true).prepend(QLatin1Char('-'));
     else
         return QString::number(value).rightJustified(width, QLatin1Char('0'), true);
 }
