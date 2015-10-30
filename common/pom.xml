@@ -26,7 +26,7 @@
         <template>lib</template>
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>
-        <global.libs>-lswscale</global.libs>
+        <global.libs>-lswscale -ludt</global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32</windows.oslibs>
