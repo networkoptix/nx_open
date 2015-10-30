@@ -12,6 +12,7 @@
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
 #  include <iphlpapi.h>
+#  include <Mstcpip.h>
 #  include "win32_socket_tools.h"
 #else
 #  include <netinet/tcp.h>
@@ -958,7 +959,7 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 {
     int isEnabled = info ? 1 : 0;
     if (setsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
-                   &isEnabled, sizeof(isEnabled)) < 0)
+                   reinterpret_cast<const char*>(&isEnabled), sizeof(isEnabled)) != 0)
         return false;
 
     if (!info)
@@ -968,7 +969,7 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
         struct tcp_keepalive ka = { TRUE, info->timeSec * 1000,
                                           info->intervalSec * 1000 }; // s to ms
         if (WSAIoctl(m_implDelegate.handle(), SIO_KEEPALIVE_VALS,
-                     &ka, sizeof(ka), 0, 0, 0, 0, 0) != 0)
+                     &ka, sizeof(ka), NULL, 0, NULL, NULL, NULL) != 0)
             return false;
 
         return true;
@@ -993,10 +994,10 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 
 bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
 {
-    int isEnabled;
-    socklen_t length;
+    int isEnabled = 0;
+    socklen_t length = 0;
     if (getsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
-                   &isEnabled, &length) < 0)
+                   reinterpret_cast<char*>(&isEnabled), &length) != 0)
         return false;
 
     if (!isEnabled)
@@ -1008,12 +1009,14 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
     #if defined(Q_OS_WIN)
         struct tcp_keepalive ka;
         if (WSAIoctl(m_implDelegate.handle(), SIO_KEEPALIVE_VALS,
-                     0, 0, &ka, sizeof(ka), 0, 0, 0) != 0)
+                     NULL, 0, &ka, sizeof(ka), 0, 0, 0) != 0)
             return false;
 
         Q_ASSERT_X(ka.onoff == TRUE, Q_FUNC_INFO, "WSAIoctl problem occured");
-        *result = TcpKeepAlive(ka.keepalivetime / 1000, // ms to s
-                               ka.keepaliveinterval / 1000);
+        *result = KeepAliveOptions(
+            ka.keepalivetime / 1000, // ms to s
+            ka.keepaliveinterval / 1000,
+            10);    //TODO #ak 10 is hard-coded in windows vista or later. Fuck XP!
         return true;
     #elif defined(Q_OS_LINUX)
         KeepAliveOptions info;

@@ -308,7 +308,11 @@ struct StreamSocketInfo
 
 struct KeepAliveOptions
 {
-    int timeSec, intervalSec, probeCount;
+    //!timeout, in milliseconds, with no activity until the first keep-alive packet is sent
+    int timeSec;
+    //!interval, in milliseconds, between when successive keep-alive packets are sent if no acknowledgement is received
+    int intervalSec;
+    int probeCount;
 
     KeepAliveOptions(int time = 0, int interval = 0, int probes = 0)
         : timeSec(time), intervalSec(interval), probeCount(probes) {}
