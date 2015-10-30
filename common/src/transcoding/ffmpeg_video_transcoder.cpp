@@ -159,7 +159,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if (!decoder)
         decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
-    *result = QnCompressedVideoDataPtr();
+    if (result)
+        *result = QnCompressedVideoDataPtr();
 
     if (!decoder->decode(video, &m_decodedVideoFrame))
         return 0; // ignore decode error
