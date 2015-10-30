@@ -219,6 +219,7 @@
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
 #include "rest/handlers/backup_control_rest_handler.h"
+#include <database/server_db.h>
 
 
 #ifdef __arm__
@@ -1308,10 +1309,29 @@ void MediaServerProcess::at_storageManager_rebuildFinished(bool isCanceled) {
     qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, isCanceled);
 }
 
-void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs) {
+void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code) {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_archiveBackupFinished(m_mediaServer, backupedToMs);
+    QnBusiness::EventReason reason = QnBusiness::NoReason;
+    switch(code) 
+    {
+        case QnServer::BackupResultCode::Failed:
+            reason = QnBusiness::BackupFailed;
+            break;
+        case QnServer::BackupResultCode::EndOfPeriod:
+            reason = QnBusiness::BackupEndOfPeriod;
+            break;
+        case QnServer::BackupResultCode::Done:
+            reason = QnBusiness::BackupDone;
+            break;
+        case QnServer::BackupResultCode::Cancelled:
+            reason = QnBusiness::BackupCancelled;
+            break;
+        default:
+            break;
+    }
+
+    qnBusinessRuleConnector->at_archiveBackupFinished(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, QString::number(backupedToMs));
 }
 
 void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)
@@ -1534,6 +1554,7 @@ void MediaServerProcess::run()
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("/proxy/*/hls/*"), AuthMethod::noAuth );
 
+    std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
 
     QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
@@ -2428,6 +2449,11 @@ protected:
     virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
+
+        QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
+        QCoreApplication::setApplicationName(lit(QN_APPLICATION_NAME));
+        if (QCoreApplication::applicationVersion().isEmpty())
+            QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
         if (application->isRunning())
         {

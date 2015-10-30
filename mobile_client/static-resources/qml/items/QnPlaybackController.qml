@@ -3,11 +3,13 @@ import QtQuick 2.0
 import com.networkoptix.qml 1.0
 
 import "../icons"
+import "../controls"
 
 Item {
     id: rootItem
 
     property bool paused: false
+    property bool loading: false
 
     property bool speedEnabled: false
     readonly property alias dragging: d.dragging
@@ -159,6 +161,23 @@ Item {
             border.width: dp(2)
             border.color: QnTheme.playPause
             color: "transparent"
+        }
+
+        QnCircleProgressIndicator {
+            id: preloader
+
+            anchors.centerIn: circle
+            width: circle.width - dp(6)
+            height: circle.height - dp(6)
+            color: QnTheme.playPause
+            opacity: rootItem.loading ? 1.0 : 0.0
+            visible: opacity > 0
+            Behavior on opacity {
+                SequentialAnimation {
+                    PauseAnimation { duration: preloader.visible ? 0 : 250 }
+                    NumberAnimation { duration: 250 }
+                }
+            }
         }
 
         Rectangle {

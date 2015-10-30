@@ -98,9 +98,6 @@ Item {
                 width: parent.width
                 height: dp(150)
 
-                windowEnd: (new Date(Date.now() + 60 * 60 * 1000)).getTime()
-                windowStart: (new Date(Date.now() - 60 * 60 * 1000)).getTime()
-
                 stickToEnd: mediaPlayer.atLive && !playbackController.paused
 
                 chunkBarHeight: dp(32)
@@ -324,6 +321,8 @@ Item {
 
                 anchors.verticalCenter: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
+
+                loading: mediaPlayer.loading
 
                 onPausedChanged: {
                     if (paused)

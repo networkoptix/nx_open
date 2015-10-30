@@ -240,7 +240,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtu
     return result;
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::updateCacheAndGetMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod)
+QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTimeSync(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod)
 {
     updateCameraHistorySync(camera);
     return getMediaServerOnTime(camera, timestampMs, foundPeriod);

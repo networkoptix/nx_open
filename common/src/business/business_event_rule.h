@@ -45,6 +45,8 @@ public:
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
 
+    bool isActionProlonged() const;
+
     /* action aggregation period in seconds */
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
@@ -67,6 +69,7 @@ public:
     static QnBusinessEventRuleList getDefaultRules();
     static QnBusinessEventRuleList getSystemRules();
     static QnBusinessEventRuleList getRulesUpd43();
+    static QnBusinessEventRuleList getRulesUpd48();
 
     QnBusinessEventRule* clone();
     void removeResource(const QnUuid& resId);

@@ -10,6 +10,8 @@
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
+#include <core/resource/server_backup_schedule.h>
+
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
 #include "core/resource_management/resource_pool.h"
@@ -535,15 +537,13 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
     auto mediaServer = qnCommon->currentServer();
     Q_ASSERT(mediaServer);
 
-    if (mediaServer->getBackupType() != Qn::Backup_RealTime)
+    if (mediaServer->getBackupSchedule().backupType != Qn::Backup_RealTime)
         return false;
 
     auto cam = m_device.dynamicCast<QnSecurityCamResource>();
     Q_ASSERT(cam);
 
-    Qn::CameraBackupQualities cameraBackupQualities = cam->getBackupQualities();
-    if (cameraBackupQualities == Qn::CameraBackup_Default)
-        cameraBackupQualities = qnGlobalSettings->defaultBackupQualities();
+    Qn::CameraBackupQualities cameraBackupQualities = cam->getActualBackupQualities();
 
     if (m_catalog == QnServer::HiQualityCatalog)
         return cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality);
@@ -559,37 +559,38 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();
-        QnStorageResourcePtr storages[2] = {QnStorageResourcePtr(), QnStorageResourcePtr()};
         
-        storages[(int)QnServer::StoragePool::Normal] = qnNormalStorageMan->getOptimalStorageRoot(provider);
-        if (isRedundantSyncOn())
-            storages[(int)QnServer::StoragePool::Backup] = qnBackupStorageMan->getOptimalStorageRoot(provider);
+        auto normalStorage = qnNormalStorageMan->getOptimalStorageRoot(provider);
+        QnStorageResourcePtr backupStorage;
 
-        if (storages[(int)QnServer::StoragePool::Normal] || storages[(int)QnServer::StoragePool::Backup])
+        if (isRedundantSyncOn())
+            backupStorage = qnBackupStorageMan->getOptimalStorageRoot(provider);
+
+        if (normalStorage || backupStorage)
             setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
 
-        if (storages[(int)QnServer::StoragePool::Normal])
+        if (normalStorage)
             m_recordingContextVector.emplace_back(
                 qnNormalStorageMan->getFileName(
                     m_startDateTime/1000, 
                     m_currentTimeZone, 
                     netResource, 
                     DeviceFileCatalog::prefixByCatalog(m_catalog), 
-                    storages[(int)QnServer::StoragePool::Normal]
+                    normalStorage
                 ), 
-                storages[(int)QnServer::StoragePool::Normal]
+                normalStorage
             );
 
-        if (storages[(int)QnServer::StoragePool::Backup])
+        if (backupStorage)
             m_recordingContextVector.emplace_back(
                 qnBackupStorageMan->getFileName(
                     m_startDateTime/1000, 
                     m_currentTimeZone, 
                     netResource, 
                     DeviceFileCatalog::prefixByCatalog(m_catalog), 
-                    storages[(int)QnServer::StoragePool::Backup]
+                    backupStorage
                 ), 
-                storages[(int)QnServer::StoragePool::Backup]
+                backupStorage
             );
     }
 }

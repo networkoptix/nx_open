@@ -20,24 +20,11 @@ QnStorageRebuildWidget::~QnStorageRebuildWidget()
 {}
 
 void QnStorageRebuildWidget::loadData( const QnStorageScanData &data ) {
-    QString status;
-    if (!data.path.isEmpty()) {
-        if (data.state == Qn::RebuildState_FullScan)
-            status = tr("Rebuild archive index for storage '%1' is in progress").arg(data.path);
-        else if (data.state == Qn::RebuildState_PartialScan)
-            status = tr("Fast archive scan for storage '%1' is in progress").arg(data.path);
-    }
-    else if (data.state == Qn::RebuildState_FullScan)
-        status = tr("Rebuild archive index for storage '%1' is in progress").arg(data.path);
-    else if (data.state == Qn::RebuildState_PartialScan)
-        status = tr("Fast archive scan for storage '%1' is in progress").arg(data.path);
-
-    ui->statusLabel->setText(status);
+    ui->statusLabel->setText(tr("Rebuild archive index for storage '%1' is in progress").arg(data.path));
 
     if (data.progress >= 0)
         ui->progressBar->setValue(data.progress * 100 + 0.5);
-    ui->stopButton->setEnabled(data.state == Qn::RebuildState_FullScan);
 
-    ui->stackedWidget->setCurrentWidget(data.state > Qn::RebuildState_None ? ui->progressPage : ui->preparePage);
-    ui->stackedWidget->setVisible(data.state > Qn::RebuildState_None);
+    ui->stopButton->setEnabled(data.state == Qn::RebuildState_FullScan);
+    setVisible(data.state == Qn::RebuildState_FullScan);
 }

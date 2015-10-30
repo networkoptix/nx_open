@@ -388,3 +388,12 @@ void trimInPlace( QString* const str, const QString& symbols )
 QString htmlBold(const QString &source) {
     return lit("<b>%1</b>").arg(source);
 }
+
+QString elideString(const QString &source, int maxLength, const QString &tail)
+{
+    static const auto resultTemplate = lit("%1%2");
+
+    const auto tailLength = tail.length();
+    return (source.length() <= maxLength ? source 
+        : resultTemplate.arg(source.left(maxLength - tailLength), tail));
+}

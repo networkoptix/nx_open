@@ -79,15 +79,19 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
 
     connect(ui->pingButton,             &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_pingButton_clicked);
     
+    connect(ui->nameLineEdit,           &QLineEdit::textChanged,    this,   &QnAbstractPreferencesWidget::hasChangesChanged);
+
     connect(ui->failoverCheckBox,       &QCheckBox::stateChanged,       this,   [this] {
         ui->maxCamerasWidget->setEnabled(ui->failoverCheckBox->isChecked());
         updateFailoverLabel();
+        emit hasChangesChanged();
     });
 
     
     connect(ui->maxCamerasSpinBox,      QnSpinboxIntValueChanged,       this,   [this] {
         m_maxCamerasAdjusted = true;
         updateFailoverLabel();
+        emit hasChangesChanged();
     });
 
     connect(ui->failoverPriorityButton, &QPushButton::clicked,  action(Qn::OpenFailoverPriorityAction), &QAction::trigger);

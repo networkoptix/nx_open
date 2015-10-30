@@ -75,7 +75,7 @@ public:
         QHBoxLayout* layout = new QHBoxLayout(m_placeholder);
         m_placeholder->setLayout(layout);
 
-        QLabel* label = new QLabel(tr("Set Quality:"), parent);
+        QLabel* label = new QLabel(tr("Set quality:"), parent);
         layout->addWidget(label);
 
         for (int i = 0; i < Qn::CameraBackup_Default; ++i) {
@@ -170,7 +170,6 @@ private:
     QWidget* initDefaultValueWidget(QWidget* parent) {
         QWidget* panel = new QWidget(parent);
         QHBoxLayout* layout = new QHBoxLayout(panel);
-        panel->setLayout(layout);
 
         QLabel* caption = new QLabel(tr("Default value for new cameras:"), panel);
         layout->addWidget(caption);

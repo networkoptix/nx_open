@@ -26,10 +26,10 @@
         <assembly-skip>true</assembly-skip>
         <rename-skip>true</rename-skip>
         <template>lib</template>
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Global libs-->
-        <global.libs>-lcommon -lappserver2 -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
@@ -64,6 +64,15 @@
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
         </dependency>           
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>client.core</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/client.core/pom.xml</systemPath>
+        </dependency>       
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>client</artifactId>

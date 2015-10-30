@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <client/client_color_types.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
 class QnActionParameters;
@@ -11,6 +12,8 @@ class HoverFocusProcessor;
 class QnBookmarksViewer : public QGraphicsWidget
 {
     Q_OBJECT
+    Q_PROPERTY(QnBookmarkColors colors READ colors WRITE setColors)
+
 public:
     typedef std::function<QnCameraBookmarkList (qint64 timestamp)> GetBookmarksFunc;
     typedef std::function<QPointF (qint64 timestamp)> GetPosOnTimelineFunc;
@@ -42,6 +45,11 @@ public slots:
     void setHoverProcessor(HoverFocusProcessor *processor);
 
     bool isHovered() const;
+
+public:
+    const QnBookmarkColors &colors() const;
+
+    void setColors(const QnBookmarkColors &colors);
 
 private:
     class Impl;
