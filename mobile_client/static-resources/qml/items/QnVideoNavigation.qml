@@ -106,7 +106,7 @@ Item {
                 chunkProvider: mediaPlayer.chunkProvider
                 startBound: mediaPlayer.chunkProvider.bottomBound
 
-                autoPlay: !mediaPlayer.hasTimestamp
+                autoPlay: mediaPlayer.playing && !mediaPlayer.hasTimestamp
 
                 onMoveFinished: {
                     if (playbackController.paused)
@@ -284,7 +284,7 @@ Item {
                     verticalAlignment: Text.AlignVCenter
 
                     text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy"))
-                    color: "white"
+                    color: QnTheme.windowText
 
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
