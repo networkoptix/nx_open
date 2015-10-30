@@ -1532,7 +1532,8 @@ void QnStorageManager::stopAsyncTasks()
         delete m_rebuildArchiveThread;
         m_rebuildArchiveThread = 0;
     }
-    qnScheduleSync->stop();
+    if (m_role == QnServer::StoragePool::Backup)
+        qnScheduleSync->stop();
 }
 
 void QnStorageManager::updateStorageStatistics()
