@@ -26,3 +26,14 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageSpaceData &reply )
     , isExternal(reply.isExternal)
 {}
 
+QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
+    : id(storage->getId())
+    , isUsed(storage->isUsedForWriting())
+    , url(storage->getUrl())
+    , storageType(storage->getStorageType())
+    , totalSpace(storage->getTotalSpace())
+    , isWritable(storage->isWritable())
+    , isBackup(storage->isBackup())
+    , isExternal(storage->isExternal())
+{}
+

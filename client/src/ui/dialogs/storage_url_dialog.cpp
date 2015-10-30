@@ -202,7 +202,6 @@ bool QnStorageUrlDialog::storageAlreadyUsed(const QString &path) const {
     QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
 
     return boost::algorithm::any_of(servers, [path](const QnMediaServerResourcePtr &server) {
-        //TODO: #GDM very weak comparison, also storage already added to dialog but not saved is not counted
         return !server->getStorageByUrl(path).isNull();
     });
 

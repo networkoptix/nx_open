@@ -22,7 +22,7 @@ struct QnStorageSpaceData {
     QString storageType;
 
     QnStorageSpaceData();
-    QnStorageSpaceData(const QnStorageResourcePtr &storage);
+    explicit QnStorageSpaceData(const QnStorageResourcePtr &storage);
 };
 #define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)(storageType)(isBackup)
 

@@ -15,7 +15,12 @@
 
 namespace {
     const int updateRebuildStatusDelayMs = 500;
+
+    /** Delay between requests when the backup is running. */ 
     const int updateBackupStatusDelayMs = 500;
+
+    /** Regular check if backup started. */
+    const int updateBackupRegularStatusDelayMs = 500;
 }
 
 struct ServerPoolInfo {
@@ -113,6 +118,13 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
 
     for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
         resourceAdded(server);
+
+    QTimer *updateBackupTimer = new QTimer(this);
+    updateBackupTimer->setInterval(updateBackupRegularStatusDelayMs);
+    connect(updateBackupTimer, &QTimer::timeout, this, [this]{
+        for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
+            sendBackupRequest(server);
+    });
 }
 
 QnServerStorageManager::~QnServerStorageManager() {
@@ -145,7 +157,7 @@ QnStorageScanData QnServerStorageManager::rebuildStatus( const QnMediaServerReso
     return m_serverInfo[server].storages[static_cast<int>(pool)].rebuildStatus;
 }
 
-QnBackupStatusData QnServerStorageManager::backupStatus( const QnMediaServerResourcePtr &server ) const {
+QnBackupStatusData QnServerStorageManager::backupStatus( const QnMediaServerResourcePtr &server) const {
     if (!m_serverInfo.contains(server))
         return QnBackupStatusData();
 
@@ -168,8 +180,13 @@ bool QnServerStorageManager::cancelBackupServerStorages( const QnMediaServerReso
     return sendBackupRequest(server, Qn::BackupAction_Cancel);
 }
 
+void QnServerStorageManager::checkBackupStatus( const QnMediaServerResourcePtr &server ) {
+    sendBackupRequest(server);
+}
+
+
 //TODO: #GDM SafeMode
-void QnServerStorageManager::saveStorages(const QnMediaServerResourcePtr &server, const QnStorageResourceList &storages ) {
+void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages ) {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn)
         return;
@@ -178,7 +195,7 @@ void QnServerStorageManager::saveStorages(const QnMediaServerResourcePtr &server
 }
 
 //TODO: #GDM SafeMode
-void QnServerStorageManager::deleteStorages(const QnMediaServerResourcePtr &server, const ec2::ApiIdDataList &ids ) {
+void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids ) {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn)
         return;
@@ -246,8 +263,6 @@ bool QnServerStorageManager::sendBackupRequest( const QnMediaServerResourcePtr &
     if (!isServerValid(server))
         return false;
 
-    //TODO: #GDM enqueue server if status is not Online
-
     int handle = server->apiConnection()->backupControlActionAsync(
         action, 
         this, 
@@ -297,8 +312,6 @@ void QnServerStorageManager::at_backupStatusReply( int status, const QnBackupSta
 bool QnServerStorageManager::sendStorageSpaceRequest( const QnMediaServerResourcePtr &server) {
     if (!isServerValid(server))
         return false;
-
-    //TODO: #GDM enqueue server if status is not Online
 
     int handle = server->apiConnection()->getStorageSpaceAsync(
         this, 

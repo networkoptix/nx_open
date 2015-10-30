@@ -8,12 +8,8 @@ namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
 
     int storageIndex(const QnStorageModelInfoList &list, const QnStorageModelInfo& storage) {
-        auto byId  = [storage](const QnStorageModelInfo &info)  { return storage.id  == info.id;   };
-        auto byUrl = [storage](const QnStorageModelInfo &info)  { return storage.url == info.url;  };
-
-        return storage.id.isNull()
-            ? qnIndexOf(list, byUrl)
-            : qnIndexOf(list, byId);
+        auto byId = [storage](const QnStorageModelInfo &info)  { return storage.id == info.id;  };
+        return qnIndexOf(list, byId);
     }
 
 }
@@ -38,10 +34,14 @@ void QnStorageListModel::setStorages(const QnStorageModelInfoList& storages)
     endResetModel();
 }
 
-void QnStorageListModel::addStorage(const QnStorageModelInfo& storage)
-{
+void QnStorageListModel::addStorage(const QnStorageModelInfo& storage) {
     beginResetModel();
-    m_storages.push_back(storage);
+
+    int idx = storageIndex(m_storages, storage);
+    if (idx >= 0)   /* Storage already exists, updating fields. */
+        m_storages[idx] = storage;
+    else
+        m_storages.push_back(storage);
     sortStorages();
     endResetModel();
 }
@@ -243,7 +243,7 @@ bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()) || m_readOnly)
         return false;
 
-    QnStorageModelInfo storageData = storage(index);
+    QnStorageModelInfo &storageData = m_storages[index.row()];
     if (!storageData.isWritable)
         return false;
 
@@ -264,7 +264,7 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = Qt::NoItemFlags;
     flags |= Qt::ItemIsSelectable;
     
-    if (storageData.isWritable)
+    if (storageData.isWritable || index.column() == RemoveActionColumn)
         flags |= Qt::ItemIsEnabled;
 
     if (index.column() == CheckBoxColumn)

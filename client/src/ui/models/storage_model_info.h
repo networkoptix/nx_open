@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
+
 #include <utils/common/uuid.h>
 
 struct QnStorageSpaceData;
@@ -15,7 +17,8 @@ struct QnStorageModelInfo {
     bool isExternal;
 
     QnStorageModelInfo();
-    QnStorageModelInfo(const QnStorageSpaceData &reply);
+    explicit QnStorageModelInfo(const QnStorageSpaceData &reply);
+    explicit QnStorageModelInfo(const QnStorageResourcePtr &storage);
 };
 
 typedef QList<QnStorageModelInfo> QnStorageModelInfoList;

@@ -38,10 +38,11 @@ public:
     virtual void submitToSettings() override;
 
     virtual bool hasChanges() const override;
-
     virtual void retranslateUi() override;
 protected:
+
     virtual void setReadOnlyInternal(bool readOnly) override;
+    virtual void showEvent(QShowEvent *event) override;
 
 private:
     /** Load initial storages data from resource pool. */

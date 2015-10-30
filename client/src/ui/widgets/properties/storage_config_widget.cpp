@@ -154,6 +154,12 @@ void QnStorageConfigWidget::setReadOnlyInternal( bool readOnly ) {
     //TODO: #GDM #Safe Mode
 }
 
+void QnStorageConfigWidget::showEvent( QShowEvent *event ) {
+    base_type::showEvent(event);
+    if (m_server)
+        qnServerStorageManager->checkBackupStatus(m_server);
+}
+
 bool QnStorageConfigWidget::hasChanges() const {
     if (isReadOnly())
         return false;
@@ -163,7 +169,6 @@ bool QnStorageConfigWidget::hasChanges() const {
 
     return (m_server->getBackupSchedule() != m_backupSchedule);
 }
-
 
 void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
     if (!m_server || isReadOnly())
@@ -178,7 +183,9 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
     /* Check if somebody have added this storage right now */
     if(!item.id.isNull())
         return;
-    item.isBackup = !addToMain;  
+
+    item.id = QnStorageResource::fillID(m_server->getId(), item.url);
+    item.isBackup = !addToMain;
 
     m_model->addStorage(item);
     updateColumnWidth();
@@ -224,27 +231,26 @@ void QnStorageConfigWidget::updateFromSettings()
     if (!m_server)
         return;
 
-    {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        loadStoragesFromResources();
-        m_backupSchedule = m_server->getBackupSchedule();
-        ui->comboBoxBackupType->setCurrentIndex(ui->comboBoxBackupType->findData(m_backupSchedule.backupType));    
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    loadStoragesFromResources();
+    m_backupSchedule = m_server->getBackupSchedule();
+    ui->comboBoxBackupType->setCurrentIndex(ui->comboBoxBackupType->findData(m_backupSchedule.backupType));    
 
-        updateColumnWidth();
-        updateRebuildInfo();
-        updateBackupInfo();
-    }
+    updateRebuildInfo();
+    updateBackupInfo();
+
 }
 
 void QnStorageConfigWidget::loadStoragesFromResources() {
-    QnStorageModelInfoList storages;
-        
-    for (const QnStorageResourcePtr &storage: qnResPool->getResourcesByParentId(m_server->getId()).filtered<QnClientStorageResource>())
+    Q_ASSERT_X(m_server, Q_FUNC_INFO, "Server must exist here");
+
+    QnStorageModelInfoList storages;       
+    for (const QnStorageResourcePtr &storage: m_server->getStorages())
         storages.append(QnStorageModelInfo(storage));
-
     m_model->setStorages(storages);
-}
 
+    updateColumnWidth();
+}
 
 void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
 {
@@ -334,6 +340,7 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
         else {
             // create new storage
             QnClientStorageResourcePtr storage(new QnClientStorageResource());
+            storage->setId(storageData.id);
             QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
             if (resType)
                 storage->setTypeId(resType->getId());
@@ -344,6 +351,8 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
             storage->setUsedForWriting(storageData.isUsed);
             storage->setStorageType(storageData.storageType);
             storage->setBackup(storageData.isBackup);
+            qnResPool->addResource(storage);
+
             result << storage;
         }
     }
@@ -355,11 +364,8 @@ bool QnStorageConfigWidget::hasStoragesChanges( const QnStorageModelInfoList &st
 
     for(const auto& storageData: storages) {
         /* New storage was added. */
-        if (storageData.id.isNull())
-            return true;
-
-        QnStorageResourcePtr storage = m_server->getStorageByUrl(storageData.url);
-        if (!storage)
+        QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(storageData.id);
+        if (!storage || storage->getParentId() != m_server->getId())
             return true;
 
         /* Storage was modified. */
@@ -386,16 +392,20 @@ void QnStorageConfigWidget::submitToSettings()
     QSet<QnUuid> newIdList;
     for (const auto& storageData: m_model->storages())
         newIdList << storageData.id;
+
     for (const auto& storage: m_server->getStorages()) {
-        if (!newIdList.contains(storage->getId()))
+        if (!newIdList.contains(storage->getId())) {
             storagesToRemove.push_back(storage->getId());
+            qnResPool->removeResource(storage);
+        }
     }
 
     if (!storagesToUpdate.empty())
-        qnServerStorageManager->saveStorages(m_server, storagesToUpdate);
+        qnServerStorageManager->saveStorages(storagesToUpdate);
+
 
     if (!storagesToRemove.empty())
-        qnServerStorageManager->deleteStorages(m_server, storagesToRemove);
+        qnServerStorageManager->deleteStorages(storagesToRemove);
     
     if (m_backupSchedule != m_server->getBackupSchedule()) {
         qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
@@ -582,6 +592,3 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
             tr("Archive backup is completed."));
     m_backupCancelled = false;
 }
-
-
-

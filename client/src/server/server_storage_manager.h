@@ -31,10 +31,10 @@ public:
 
     bool backupServerStorages(const QnMediaServerResourcePtr &server);
     bool cancelBackupServerStorages(const QnMediaServerResourcePtr &server);
+    void checkBackupStatus(const QnMediaServerResourcePtr &server);
 
-    void saveStorages(const QnMediaServerResourcePtr &server, const QnStorageResourceList &storages);
-    void deleteStorages(const QnMediaServerResourcePtr &server, const ec2::ApiIdDataList &ids);
-
+    void saveStorages(const QnStorageResourceList &storages);
+    void deleteStorages(const ec2::ApiIdDataList &ids);
 signals:
     void serverProtocolsChanged(const QnMediaServerResourcePtr &server, const QSet<QString> &protocols);
     void serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
