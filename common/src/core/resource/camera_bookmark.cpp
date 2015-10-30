@@ -4,6 +4,13 @@
 
 #include <utils/common/model_functions.h>
 
+namespace 
+{
+    QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter) {
+        return QStringList(tags.toList()).join(delimiter);
+    }
+}
+
 qint64 QnCameraBookmark::endTimeMs() const {
     return startTimeMs + durationMs;
 }
@@ -12,8 +19,12 @@ bool QnCameraBookmark::isNull() const {
     return guid.isNull();
 }
 
-QString QnCameraBookmark::tagsAsString(QChar delimiter) const {
-    return QStringList(tags.toList()).join(delimiter);
+QString QnCameraBookmark::tagsAsString(const QString &delimiter) const {
+    return tagsToString(tags, delimiter);
+}
+
+QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter) {
+    return ::tagsToString(tags, delimiter);
 }
 
 //TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
@@ -182,7 +193,7 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
         dbg.nospace() << "QnCameraBookmark INSTANT (" << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs).toString(lit("dd hh:mm")) << ')';
     dbg.space() << "timeout" << bookmark.timeout;
     dbg.space() << bookmark.name << bookmark.description;
-    dbg.space() << bookmark.tagsAsString(L' ');
+    dbg.space() << bookmark.tagsAsString();
     return dbg.space();
 }
 

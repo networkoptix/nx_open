@@ -133,6 +133,8 @@ QnBookmarkColors::QnBookmarkColors()
     : tooltipBackground("#204969")
     , background("#b22e6996")
     , text(Qt::white)
+    , separator("#3E6E93")
+    , tags("#698796")
 {
 }
 
