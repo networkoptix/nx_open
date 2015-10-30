@@ -129,6 +129,14 @@ QnPage {
                 video.screenshotSource = ""
         }
 
+        onLoadingChanged: {
+            if (!loading)
+                return
+
+            video.bindScreenshotSource()
+            thumbnailLoader.forceLoadThumbnail(mediaPlayer.position)
+        }
+
         onTimelinePositionRequest: {
             video.bindScreenshotSource()
             thumbnailLoader.forceLoadThumbnail(mediaPlayer.position)
