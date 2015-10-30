@@ -23,6 +23,8 @@
     <properties>
         <guid>${xvbadecoder.guid}</guid>
         <product.title>${xvbadecoder.name}</product.title>	
+        <qt.libs></qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <!--Global libs-->
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->

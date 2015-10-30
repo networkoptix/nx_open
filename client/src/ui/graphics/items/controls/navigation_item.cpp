@@ -110,7 +110,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
-    m_timeSlider = new QnTimeSlider(this);
+    m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
     m_timeSlider->setRulerHeight(70.0);
 

@@ -379,6 +379,15 @@
         }
     },
  
+    "QnBackupCamerasDialog": {
+        "colors": {
+            "disabled": "#808080",
+            "low":  "#9eb236",
+            "high": "#ff5500",
+            "both": "#cc853d"
+        }
+    },
+ 
     "QnFailoverPriorityDialog": {
         "colors": {
             "never": "#808080",

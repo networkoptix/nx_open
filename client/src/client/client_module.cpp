@@ -36,7 +36,7 @@
 
 #include <platform/platform_abstraction.h>
 
-#include <plugins/resource/server_camera/server_camera_factory.h>
+#include <plugins/resource/client_camera/client_camera_factory.h>
 
 #include <redass/redass_controller.h>
 
@@ -133,7 +133,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
-    common->store<QnServerCameraFactory>(new QnServerCameraFactory());
+    common->store<QnClientCameraFactory>(new QnClientCameraFactory());
 
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
@@ -146,7 +146,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
-    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnClientCameraFactory::instance());
 }
 
 QnClientModule::~QnClientModule() {

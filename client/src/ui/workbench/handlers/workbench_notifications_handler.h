@@ -27,7 +27,7 @@ public:
     virtual ~QnWorkbenchNotificationsHandler();
 
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
-    void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
+    void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction);
 
 signals:
     void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );
@@ -60,11 +60,11 @@ private:
      */
     bool adminOnlyMessage(QnSystemHealth::MessageType message);
 
-    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, bool visible );
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, bool visible);
    // void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnActionParameters& actionParams, bool visible );
-    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible );
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
-    void setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible );
+    void setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible);
 
     void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
 

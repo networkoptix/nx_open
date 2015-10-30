@@ -2,7 +2,11 @@
 
 #include <client/client_color_types.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include <ui/delegates/resource_pool_model_custom_column_delegate.h>
+
+#include <utils/common/uuid.h>
 
 class QnFailoverPriorityResourceModelDelegate: public QnResourcePoolModelCustomColumnDelegate {
     Q_OBJECT
@@ -18,6 +22,10 @@ public:
 
     const QnFailoverPriorityColors &colors() const;
     void setColors(const QnFailoverPriorityColors &colors);
+
+    void forceCamerasPriority(const QnVirtualCameraResourceList &cameras, Qn::FailoverPriority priority);
+    QHash<QnUuid, Qn::FailoverPriority> forcedCamerasPriorities() const;
 private:
     QnFailoverPriorityColors m_colors;
+    QHash<QnUuid, Qn::FailoverPriority> m_forcedPriorities;
 };

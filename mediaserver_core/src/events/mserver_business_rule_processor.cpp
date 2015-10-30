@@ -41,6 +41,7 @@
 #include "core/resource/resource_name.h"
 #include "business/events/mserver_conflict_business_event.h"
 #include "core/resource/camera_history.h"
+#include <utils/common/synctime.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -253,23 +254,31 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     if (!camera)
         return false;
 
-    QnUuid ruleId = action->getBusinessRuleId();
+    int fixedDurationMs = action->getParams().bookmarkDuration;
 
-    if (action->getToggleState() == QnBusiness::ActiveState) {
-        m_runningBookmarkActions[ruleId] = QDateTime::currentMSecsSinceEpoch();
-        return true;
+    auto runningKey = guidFromArbitraryData(action->getBusinessRuleId().toRfc4122() + camera->getId().toRfc4122());
+
+    qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
+    qint64 endTimeMs = startTimeMs;
+
+    if (fixedDurationMs <= 0) 
+    {
+        // bookmark as an prolonged action
+        if (action->getToggleState() == QnBusiness::ActiveState) {
+            m_runningBookmarkActions[runningKey] = startTimeMs;
+            return true;
+        }
+
+        if (!m_runningBookmarkActions.contains(runningKey))
+            return false;
+
+        startTimeMs = m_runningBookmarkActions.take(runningKey);
     }
-
-    if (!m_runningBookmarkActions.contains(ruleId))
-        return false;
-
-    qint64 startTime = m_runningBookmarkActions.take(ruleId);
-    qint64 endTime = QDateTime::currentMSecsSinceEpoch();
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
-    bookmark.startTimeMs = startTime;
-    bookmark.durationMs = endTime - startTime;
+    bookmark.startTimeMs = startTimeMs;
+    bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.cameraId = camera->getUniqueId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));

@@ -78,7 +78,7 @@ QnDbHelper::QnDbHelper()
 
 QnDbHelper::~QnDbHelper()
 {
-
+    removeDatabase();
 }
 
 QList<QByteArray> quotedSplit(const QByteArray& data)
@@ -180,9 +180,16 @@ void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
     QFileInfo dirInfo(fileName);    
     if (!QDir().mkpath(dirInfo.absoluteDir().path()))
         qWarning() << "can't create folder for sqlLite database!\n" << fileName;
-
+    m_connectionName = dbname;
     m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
     m_sdb.setDatabaseName(fileName);
+}
+
+void QnDbHelper::removeDatabase()
+{
+    m_sdb = QSqlDatabase();
+    if (!m_connectionName.isEmpty())
+        QSqlDatabase::removeDatabase(m_connectionName);
 }
 
 bool QnDbHelper::applyUpdates(const QString &dirName) {

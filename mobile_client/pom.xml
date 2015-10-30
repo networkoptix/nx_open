@@ -22,7 +22,7 @@
         <global.libs>-lappserver2 -lcommon -lclient.core -lssl -lcrypto</global.libs>
         <!--Specific os libs used-->
         <linux.oslibs>${ffmpeg.libs} -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
-        <android.oslibs/>
+        <android.oslibs>-lturbojpeg</android.oslibs>
         <ios.oslibs>-lturbojpeg</ios.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
@@ -39,24 +39,6 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>appserver2</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
-        </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>client.core</artifactId>

@@ -9,7 +9,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
-#include <camera/camera_bookmark_aggregation.h>
 
 #include <client/client_globals.h>
 
@@ -40,6 +39,7 @@ class QnSearchLineEdit;
 class QnSearchQueryStrategy;
 class QnThreadedChunksMergeTool;
 class QnPendingOperation;
+class QnCameraBookmarkAggregation;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -203,7 +203,6 @@ protected slots:
     void at_timeSlider_selectionPressed();
     void at_timeSlider_selectionReleased();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
-    void at_timeSlider_bookmarksUnderCursorUpdated(const QPointF& pos);
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_thumbnailClicked();
 
@@ -220,7 +219,7 @@ private:
     QnCachingCameraDataLoader* loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
-    void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
+    void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
     void updateBookmarkTags();
 
@@ -274,7 +273,7 @@ private:
 
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
     QnCameraBookmarksQueryPtr m_bookmarkQuery;
-    QnCameraBookmarkAggregation m_bookmarkAggregation;
+    QScopedPointer<QnCameraBookmarkAggregation> m_bookmarkAggregation;
     QnPendingOperation *m_sliderBookmarksRefreshOperation;
 
     QnCameraDataManager* m_cameraDataManager;

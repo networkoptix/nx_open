@@ -1,5 +1,6 @@
 #include "server_storage_manager.h"
 
+#include <api/app_server_connection.h>
 #include <api/media_server_connection.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/rebuild_archive_reply.h>
@@ -175,6 +176,32 @@ bool QnServerStorageManager::cancelBackupServerStorages( const QnMediaServerReso
     return sendBackupRequest(server, Qn::BackupAction_Cancel);
 }
 
+//TODO: #GDM SafeMode
+void QnServerStorageManager::saveStorages(const QnMediaServerResourcePtr &server, const QnStorageResourceList &storages ) {
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    if (!conn)
+        return;
+
+    //TODO: #GDM remove the workaround, listen to storageChanged/Removed
+    conn->getMediaServerManager()->saveStorages(storages, this, [this, server]() {
+        sendStorageSpaceRequest(server, QnServerStoragesPool::Main);
+        sendStorageSpaceRequest(server, QnServerStoragesPool::Backup);
+    });
+}
+
+//TODO: #GDM SafeMode
+void QnServerStorageManager::deleteStorages(const QnMediaServerResourcePtr &server, const ec2::ApiIdDataList &ids ) {
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    if (!conn)
+        return;
+
+    //TODO: #GDM remove the workaround, listen to storageChanged/Removed
+    conn->getMediaServerManager()->removeStorages(ids, this, [this, server]() {
+        sendStorageSpaceRequest(server, QnServerStoragesPool::Main);
+        sendStorageSpaceRequest(server, QnServerStoragesPool::Backup);
+    });
+}
+
 bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, Qn::RebuildAction action ) {
     if (!isServerValid(server))
         return false;
@@ -342,3 +369,4 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         emit serverProtocolsChanged(requestKey.server, replyProtocols);
     }
 }
+

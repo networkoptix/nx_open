@@ -157,15 +157,15 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 
         ui->actionAtLabel->setText(m_model->actionType() == QnBusiness::SendMailAction ? tr("to") : tr("at"));
 
-        bool actionIsInstant = !QnBusiness::hasToggleState(m_model->actionType());
+        bool actionIsInstant = !m_model->isActionProlonged();
         ui->aggregationWidget->setVisible(actionIsInstant);
 
         initActionParameters();
     }
 
-    if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField)) {
-        bool prolonged = QnBusiness::hasToggleState(m_model->eventType()) && !QnBusiness::hasToggleState(m_model->actionType());
-        ui->eventStatesComboBox->setVisible(prolonged);
+    if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField)) {
+        bool isEventProlonged = QnBusiness::hasToggleState(m_model->eventType());
+        ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
@@ -302,8 +302,7 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model || m_updating || index == -1)
         return;
 
-    bool prolonged = QnBusiness::hasToggleState(m_model->eventType()) && !QnBusiness::hasToggleState(m_model->actionType());
-    if (!prolonged)
+    if (!QnBusiness::hasToggleState(m_model->eventType()) || m_model->isActionProlonged())
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();

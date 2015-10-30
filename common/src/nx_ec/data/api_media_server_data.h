@@ -8,40 +8,25 @@ namespace ec2
 {
     namespace backup 
     {
+        //TODO: #rvasilenko move out to more general space
         enum DayOfWeek
         {
-            NoDay       = 0,
-            Monday      = 2,
-            Tuesday     = 4,
-            Wednsday    = 8,
-            Thursday    = 16,
-            Friday      = 32,
-            Saturday    = 64,
-            Sunday      = 128
-        };
+            Never       = 0x00,
+            Monday      = 0x01,
+            Tuesday     = 0x02,
+            Wednesday   = 0x04,
+            Thursday    = 0x08,
+            Friday      = 0x10,
+            Saturday    = 0x20,
+            Sunday      = 0x40,
 
-        inline DayOfWeek fromQtDOW(int qtDOW)
-        {
-            switch (qtDOW)
-            {
-            case 1:
-                return Monday;
-            case 2:
-                return Tuesday;
-            case 3:
-                return Wednsday;
-            case 4:
-                return Thursday;
-            case 5:
-                return Friday;
-            case 6:
-                return Saturday;
-            case 7:
-                return Sunday;
-            default:
-                return NoDay;
-            }
+            AllDays     = 0x7F
         };
+        Q_DECLARE_FLAGS(DaysOfWeek, DayOfWeek)
+        Q_DECLARE_OPERATORS_FOR_FLAGS(DaysOfWeek)
+
+        backup::DayOfWeek fromQtDOW(Qt::DayOfWeek qtDOW);
+        backup::DaysOfWeek fromQtDOW(QList<Qt::DayOfWeek> days);
     }
 
     struct ApiStorageData: ApiResourceData
@@ -87,11 +72,10 @@ namespace ec2
             maxCameras(0), 
             allowAutoRedundancy(false),
             backupType(Qn::Backup_Disabled),
-            backupDaysOfTheWeek(0x7f), // all days of week
+            backupDaysOfTheWeek(backup::AllDays),
             backupStart(0), // midnight
             backupDuration(-1), // unlimited duration
-            backupBitrate(-1), // unlimited
-            backupQuality(Qn::Backup_Disabled)
+            backupBitrate(-1) // unlimited
         {}
 
         QnUuid          serverID;
@@ -105,7 +89,6 @@ namespace ec2
         int                 backupStart;         // seconds from 00:00:00. Error if bDOW set and this is not set
         int                 backupDuration;      // duration of synchronization period in seconds. -1 if not set.
         int                 backupBitrate;       // bitrate cap in bytes per second. -1 if not capped.
-        Qn::CameraBackupTypes backupQuality;     // default value for camera's backup type
     };
 
 #define ApiMediaServerUserAttributesData_Fields_Short   \
@@ -116,7 +99,6 @@ namespace ec2
     (backupStart)                                       \
     (backupDuration)                                    \
     (backupBitrate)                                     \
-    (backupQuality)
 
 #define ApiMediaServerUserAttributesData_Fields     \
     (serverID)                                      \

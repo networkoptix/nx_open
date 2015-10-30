@@ -7,6 +7,7 @@ class QnAbstractPreferencesWidget;
 
 class QnGenericTabbedDialog: public QnButtonBoxDialog {
     Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
     typedef QnButtonBoxDialog base_type;
 public:
@@ -21,6 +22,8 @@ public:
     void forcedUpdate();
     bool tryClose(bool force);
 
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
 protected:
     void retranslateUi();
 
@@ -37,6 +40,13 @@ protected:
 
     virtual QString confirmMessageTitle() const;
     virtual QString confirmMessageText() const;
+
+    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
+
+    virtual void initializeButtonBox() override;
+
+    /** Update state of the dialog buttons. */
+    virtual void updateButtonBox();
 private:
     void initializeTabWidget();
 
@@ -55,6 +65,8 @@ private:
 
     QList<Page> m_pages;
     QPointer<QTabWidget> m_tabWidget;
+    bool m_readOnly;
+    bool m_updating;
 
 };
 

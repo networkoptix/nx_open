@@ -30,8 +30,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     ui->setupUi(this);
   
     addPage(SettingsPage, m_generalPage, tr("General"));
+    addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
-    addPage(StorageManagmentPage, m_storagesPage, tr("Storage management"));
 
 
     connect(m_webPageButton, &QPushButton::clicked, this, [this] {
@@ -56,9 +56,12 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     });  
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
+
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
     safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 

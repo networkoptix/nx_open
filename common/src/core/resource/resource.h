@@ -51,6 +51,7 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
     QnResource();
+    QnResource(const QnResource&);
     virtual ~QnResource();
 
     QnUuid getId() const;

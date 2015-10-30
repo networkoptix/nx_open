@@ -447,7 +447,7 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 qint64 QnFileStorageResource::getFreeSpace()
 {
     if (!initOrUpdate())
-        return -1;
+        return QnStorageResource::UnknownSize;
 
     return getDiskFreeSpace(
         m_localPath.isEmpty() ?
@@ -459,7 +459,7 @@ qint64 QnFileStorageResource::getFreeSpace()
 qint64 QnFileStorageResource::getTotalSpace()
 {
     if (!initOrUpdate())
-        return -1;
+        return QnStorageResource::UnknownSize;
 
     return getDiskTotalSpace(
         m_localPath.isEmpty() ?

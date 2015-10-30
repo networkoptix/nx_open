@@ -6,6 +6,9 @@ LIBTYPE = ${libtype}
 TEMPLATE = ${template}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
+unix {
+    VERSION = ${linux.release.version}
+}
 QT += ${qt.libs}
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
@@ -169,7 +172,7 @@ CONFIG += ${arch}
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
   ICON = ${customization.dir}/icons/hdw_logo.ico
-  LIBS += ${windows.oslibs}
+  LIBS += ${windows.oslibs} ${ffmpeg.libs}
   DEFINES += NOMINMAX= ${windows.defines}
   DEFINES += ${global.windows.defines}
   win32-msvc* {
@@ -219,6 +222,7 @@ unix:!android:!mac {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+  LIBS += ${ffmpeg.libs}
 }
 
 ## MAC OS
@@ -231,6 +235,10 @@ macx {
   CONFIG -= app_bundle objective_c
 
   INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
+
+  !ios {
+    LIBS += ${ffmpeg.libs}
+  }
 }
 
 INCLUDEPATH += ${environment.dir}/boost_1_56_0
@@ -247,7 +255,12 @@ android {
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 }
 
-
+## iOS
+ios {
+    LIBS += ${ios.oslibs}
+    DEFINES += ${ios.defines}
+    QMAKE_MOC_OPTIONS += -DQ_OS_IOS
+}
 
 
 

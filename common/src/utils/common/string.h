@@ -93,4 +93,6 @@ void trimInPlace( QString* const str, const QString& symbols = QLatin1String(" "
 
 QString htmlBold(const QString &source);
 
+QString elideString(const QString &source, int maxLength, const QString &tail = lit("..."));
+
 #endif // QN_STRING_H

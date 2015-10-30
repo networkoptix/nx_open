@@ -130,28 +130,23 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    if (QnBusiness::hasToggleState(action->actionType()))
-    {
+    if (action->isProlonged()) {
         // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
         QString actionKey = action->getExternalUniqKey();
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
 
-        if (action->getToggleState() == QnBusiness::ActiveState)
-        {
+        if (action->getToggleState() == QnBusiness::ActiveState) {
             if (++m_actionInProgress[actionKey] > 1)
                 return true; // ignore duplicated start
-        }
-        else if (action->getToggleState() == QnBusiness::InactiveState)
-        {
+        } else if (action->getToggleState() == QnBusiness::InactiveState) {
             if (--m_actionInProgress[actionKey] > 0)
                 return true; // ignore duplicated stop
             m_actionInProgress.remove(actionKey);
         }
     }
 
-    switch( action->actionType() )
-    {
+    switch (action->actionType()) {
     case QnBusiness::DiagnosticsAction:
         return true;
 
@@ -371,7 +366,7 @@ QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(const QnAbstr
         {
             QnAbstractBusinessActionPtr action;
 
-            if (QnBusiness::hasToggleState(rule->actionType()))
+            if (rule->isActionProlonged())
                 action = processToggleAction(bEvent, rule);
             else
                 action = processInstantAction(bEvent, rule);

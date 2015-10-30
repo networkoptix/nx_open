@@ -409,8 +409,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ShowDebugOverlayAction).
         flags(Qn::GlobalHotkey).
-        text(tr("Show Debug")).
-        toggledText(tr("Hide Debug")).
+        text(lit("Show Debug")).
+        toggledText(lit("Hide Debug")).
         shortcut(tr("Ctrl+Alt+D")).
         autoRepeat(false);
 
@@ -535,6 +535,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Failover Priority..."));
+
+    factory(Qn::OpenBackupCamerasAction).
+        mode(QnActionTypes::DesktopMode).
+        flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Cameras to Backup..."));
 
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).

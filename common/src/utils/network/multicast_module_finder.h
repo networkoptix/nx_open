@@ -55,6 +55,8 @@ class QnMulticastModuleFinder : public QnLongRunnable {
     //! \param compatibilityMode         New compatibility mode state.
     void setCompatibilityMode(bool compatibilityMode);
 
+    void setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs);
+
     //! Returns \fn run (DEBUG ONLY!)
     static bool isDisabled;
 
@@ -81,6 +83,7 @@ private:
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
+    unsigned int m_checkInterfacesTimeoutMs;
     quint64 m_lastInterfacesCheckMs;
     bool m_compatibilityMode;
     QHostAddress m_multicastGroupAddress;

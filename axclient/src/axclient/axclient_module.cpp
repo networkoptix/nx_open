@@ -10,11 +10,14 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec2_lib.h>
 
-#include <plugins/resource/server_camera/server_camera_factory.h>
+#include <plugins/resource/client_camera/client_camera_factory.h>
+#include <plugins/storage/file_storage/qtfile_storage_resource.h>
+#include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/customization/customization.h>
 #include <ui/customization/customizer.h>
@@ -49,7 +52,7 @@ QnAxClientModule::QnAxClientModule(QObject *parent)
     QApplication::setStyle(style);
 
     auto ec2ConnectionFactory = getConnectionFactory(Qn::PT_DesktopClient);
-    ec2ConnectionFactory->setContext(ec2::ResourceContext(QnServerCameraFactory::instance(), qnResPool, qnResTypePool));
+    ec2ConnectionFactory->setContext(ec2::ResourceContext(QnClientCameraFactory::instance(), qnResPool, qnResTypePool));
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory);
     qnCommon->store<ec2::AbstractECConnectionFactory>(ec2ConnectionFactory);
 
@@ -67,6 +70,10 @@ QnAxClientModule::QnAxClientModule(QObject *parent)
     runtimeData.peer.peerType = Qn::PT_DesktopClient;
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
+
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 }
 
 QnAxClientModule::~QnAxClientModule() {

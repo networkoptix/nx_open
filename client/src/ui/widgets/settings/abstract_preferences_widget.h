@@ -46,6 +46,10 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+signals:
+    /** Signal is emitted whenever hasChanges() is changed. */
+    void hasChangesChanged();
+
 protected:
     virtual void setReadOnlyInternal(bool readOnly);
 

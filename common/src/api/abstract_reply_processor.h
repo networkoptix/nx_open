@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+#include <common/common_globals.h>
+
 #include <utils/common/request_param.h>
 
 #include <rest/server/json_rest_result.h>
@@ -152,12 +154,34 @@ protected:
 
         T reply;
         if(status == 0) {
-            bool jsonDeserialized = QJson::deserialize(response.data, &reply);
-            if (!jsonDeserialized) {
-#ifdef JSON_REPLY_DEBUG
-                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
-#endif
-                status = 1;
+            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(response.headers.value("Content-Type"));
+            Q_ASSERT_X(format != Qn::UnsupportedFormat, Q_FUNC_INFO, "Invalid content-type header");
+            
+            switch (format) {
+            case Qn::JsonFormat:
+                {
+                    bool parsed = QJson::deserialize(response.data, &reply);
+                    if (!parsed) {
+                    #ifdef JSON_REPLY_DEBUG
+                        qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+                    #endif
+                        status = 1;
+                    }
+                    break;
+                }
+                case Qn::UbjsonFormat:
+                {
+                    bool parsed = false;
+                    reply = QnUbjson::deserialized(response.data, reply, &parsed);
+                    if (!parsed)
+                        status = 1;
+                    break;
+                }
+                default:
+                {
+                    status = 2;
+                    break;
+                }
             }
         } else {
 #ifdef JSON_REPLY_DEBUG

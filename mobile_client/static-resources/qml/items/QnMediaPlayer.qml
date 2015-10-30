@@ -12,6 +12,7 @@ QnObject {
 
     property string resourceId
 
+    readonly property bool loading: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position == 0 : false
     readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position > 0 : false
     readonly property bool atLive: d.position < 0
 
@@ -105,6 +106,8 @@ QnObject {
     }
 
     function play(pos) {
+        d.paused = false
+
         if (!d.dirty) {
             if (!playing)
                 d.mediaPlayer.play()
@@ -136,7 +139,6 @@ QnObject {
 
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()
-        d.paused = false
 
         d.dirty = false
     }
