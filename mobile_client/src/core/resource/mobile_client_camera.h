@@ -1,6 +1,6 @@
 #pragma once
 
-#include <plugins/resource/client_core_camera/client_core_camera.h>
+#include <core/resource/client_core_camera.h>
 
 class QnMobileClientCamera: public QnClientCoreCamera {
     Q_OBJECT
