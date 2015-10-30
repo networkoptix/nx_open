@@ -434,6 +434,15 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             );
         break;
     }
+    case QnBusiness::BackupFinishedEvent: {
+        item->addActionButton(
+            qnSkin->icon("events/server.png"),
+            tr("Server Settings..."),
+            Qn::ServerSettingsAction,
+            QnActionParameters(resource)
+        );
+        break;
+    }
     case QnBusiness::UserDefinedEvent: 
     {
         QnVirtualCameraResourceList camList = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
@@ -585,7 +594,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
-    case QnSystemHealth::ArchiveBackupFinished:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings..."),

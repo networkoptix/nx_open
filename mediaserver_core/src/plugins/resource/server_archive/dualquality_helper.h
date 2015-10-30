@@ -41,9 +41,10 @@ private:
         DeviceFileCatalog::FindMethod   findMethod
     );
 
+    typedef std::map<QnServer::StoragePool, DeviceFileCatalogPtr> PoolToCatalogMap;
 private:
-    DeviceFileCatalogPtr m_catalogHi[2];
-    DeviceFileCatalogPtr m_catalogLow[2];
+    PoolToCatalogMap m_catalogHi;
+    PoolToCatalogMap m_catalogLow;
     MediaQuality m_quality;
     bool m_alreadyOnAltChunk;
 };
