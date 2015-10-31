@@ -363,9 +363,9 @@
                 <os>
                     <family>!mac</family>
                 </os>
-                <property>
+<!--                <property>
                     <name>!newmobile</name>
-                </property>
+                </property> -->
             </activation>
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
@@ -555,7 +555,8 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>!newmobile</name>
+                    <name>arch</name>
+                    <value>x64</value>
                 </property>
             </activation>
             <properties>
@@ -831,8 +832,9 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>newmobile</name>
-                </property>
+                    <name>arch</name>
+                    <value>arm-mobile</value>
+                </property>                               
             </activation>
             <modules>
                 <module>client.core</module>
@@ -847,7 +849,7 @@
                     <family>unix</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android</value>
                 </property>
             </activation>
@@ -876,7 +878,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android-desktop</value>
                 </property>
             </activation>
@@ -893,7 +895,7 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>ios</value>
                 </property>
             </activation>

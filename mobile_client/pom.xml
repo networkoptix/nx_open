@@ -68,7 +68,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android</value>
                 </property>
             </activation>
@@ -146,7 +146,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>ios</value>
                 </property>
             </activation>
