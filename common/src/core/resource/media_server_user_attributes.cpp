@@ -34,7 +34,8 @@ void QnMediaServerUserAttributes::assign(
 
 
 
-QnMediaServerUserAttributesPool::QnMediaServerUserAttributesPool()
+QnMediaServerUserAttributesPool::QnMediaServerUserAttributesPool(QObject *parent):
+    QObject(parent)
 {
     setElementInitializer( []( const QnUuid& serverID, QnMediaServerUserAttributesPtr& userAttributes ){
         userAttributes = QnMediaServerUserAttributesPtr( new QnMediaServerUserAttributes() );

@@ -46,7 +46,6 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
-#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
@@ -204,7 +203,6 @@
 
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
 #include "utils/network/nettools.h"
@@ -1523,16 +1521,8 @@ void MediaServerProcess::run()
         QnSSLSocket::initSSLEngine( certData );
     }
 
-    QScopedPointer<QnSyncTime> syncTime(new QnSyncTime());
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
-
-    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
-    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());
-    std::unique_ptr<QnResourceStatusDictionary> statusDict(new QnResourceStatusDictionary());
-    std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary(new QnServerAdditionalAddressesDictionary());
-
 
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
 
