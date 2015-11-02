@@ -297,8 +297,10 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
-    if (m_role == QnServer::StoragePool::Backup)
-        connect(qnScheduleSync, &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
+    if (m_role == QnServer::StoragePool::Backup) {
+        m_scheduleSync.reset(new QnScheduleSync());
+        connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
+    }
         
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
@@ -1532,7 +1534,6 @@ void QnStorageManager::stopAsyncTasks()
         delete m_rebuildArchiveThread;
         m_rebuildArchiveThread = 0;
     }
-    qnScheduleSync->stop();
 }
 
 void QnStorageManager::updateStorageStatistics()
@@ -2044,4 +2045,9 @@ const std::array<QnServer::StoragePool, 2> QnStorageManager::getPools() {
     std::array<QnServer::StoragePool, 2> pools = {QnServer::StoragePool::Normal, 
                                                   QnServer::StoragePool::Backup};
     return pools;
+}
+
+QnScheduleSync* QnStorageManager::scheduleSync() const
+{
+    return m_scheduleSync.get();
 }

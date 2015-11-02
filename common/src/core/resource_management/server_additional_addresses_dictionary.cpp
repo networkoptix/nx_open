@@ -1,5 +1,11 @@
 #include "server_additional_addresses_dictionary.h"
 
+QnServerAdditionalAddressesDictionary::QnServerAdditionalAddressesDictionary(QObject *parent):
+        QObject(parent)
+{
+
+}
+
 QList<QUrl> QnServerAdditionalAddressesDictionary::additionalUrls(const QnUuid &serverId) const {
     QnMutexLocker lock(&m_mutex);
     return m_discoveryInfoById.value(serverId).additionalUrls;

@@ -53,7 +53,7 @@ class QnMediaServerUserAttributesPool
 {
     Q_OBJECT
 public:
-    QnMediaServerUserAttributesPool();
+    QnMediaServerUserAttributesPool(QObject *parent = NULL);
 
     QnMediaServerUserAttributesList getAttributesList( const QList<QnUuid>& idList );
 };
