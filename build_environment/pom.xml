@@ -168,7 +168,8 @@
             <id>nomobile</id>
             <activation>
                 <property>
-                    <name>!newmobile</name>
+                    <name>arch</name>
+                    <value>!arm-mobile</value>
                 </property>
             </activation>
             <dependencies>
@@ -694,7 +695,8 @@
                     <family>unix</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>arch</name>
+                    <value>arm-mobile</value>
                 </property>
             </activation>
             <dependencies>

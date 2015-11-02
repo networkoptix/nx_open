@@ -26,12 +26,7 @@
 #include <client/desktop_client_message_processor.h>
 
 #include <core/ptz/client_ptz_controller_pool.h>
-#include <core/resource/camera_user_attribute_pool.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
-#include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resources_changes_manager.h>
 
 #include <platform/platform_abstraction.h>
@@ -117,15 +112,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnGlobals>(new QnGlobals());
     common->store<QnSessionManager>(new QnSessionManager());
 
-    common->store<QnCameraUserAttributePool>(new QnCameraUserAttributePool());
-    common->store<QnMediaServerUserAttributesPool>(new QnMediaServerUserAttributesPool());
     common->store<QnRedAssController>(new QnRedAssController());
-
-    common->store<QnSyncTime>(new QnSyncTime());
-
-    common->store<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary());
-    common->store<QnResourceStatusDictionary>(new QnResourceStatusDictionary());
-    common->store<QnServerAdditionalAddressesDictionary>(new QnServerAdditionalAddressesDictionary());
 
     common->store<QnPlatformAbstraction>(new QnPlatformAbstraction());
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());

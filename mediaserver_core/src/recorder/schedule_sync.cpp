@@ -18,13 +18,6 @@
 #include <mutex>
 #include <numeric>
 
-static QnScheduleSync *QnScheduleSync_instance = nullptr;
-
-QnScheduleSync *QnScheduleSync::instance()
-{
-    return QnScheduleSync_instance;
-}
-
 QnScheduleSync::QnScheduleSync()
     : m_backupSyncOn(false),
       m_syncing(false),
@@ -34,14 +27,11 @@ QnScheduleSync::QnScheduleSync()
       m_curDow(ec2::backup::Never),
       m_syncTimePoint(0)
 {
-    Q_ASSERT(QnScheduleSync_instance == 0);
-    QnScheduleSync_instance = this;
 }
 
 QnScheduleSync::~QnScheduleSync()
 {
     stop();
-    QnScheduleSync_instance = 0;
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(

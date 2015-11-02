@@ -42,7 +42,6 @@ public:
 signals:
     void backupFinished(qint64 timestampMs, QnServer::BackupResultCode status);
 public:
-    static QnScheduleSync *instance();
     int forceStart(); 
     int stop();
     int interrupt();
@@ -114,8 +113,6 @@ private:
     std::map<ChunkKey, double> m_syncData;
     mutable std::mutex         m_syncDataMutex;
 };
-
-#define qnScheduleSync QnScheduleSync::instance()
 
 #endif
 

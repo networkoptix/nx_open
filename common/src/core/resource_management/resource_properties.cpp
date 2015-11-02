@@ -2,6 +2,12 @@
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 
+QnResourcePropertyDictionary::QnResourcePropertyDictionary(QObject *parent):
+        QObject(parent)
+{
+
+}
+
 void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 {
     ec2::ApiResourceParamWithRefDataList params;
