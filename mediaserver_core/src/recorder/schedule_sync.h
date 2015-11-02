@@ -12,8 +12,9 @@
 #include <recorder/storage_manager.h>
 #include <core/resource/server_backup_schedule.h>
 #include <nx_ec/data/api_media_server_data.h>
+#include "utils/common/long_runnable.h"
 
-class QnScheduleSync: public QObject
+class QnScheduleSync: public QnLongRunnable
 {
     Q_OBJECT
 private:
@@ -43,10 +44,10 @@ signals:
     void backupFinished(qint64 timestampMs, QnServer::BackupResultCode status);
 public:
     int forceStart(); 
-    int stop();
+    virtual void stop() override;
     int interrupt();
     QnBackupStatusData getStatus() const;
-    void start();
+    virtual void run() override;
 
 private:
 #define COPY_ERROR_LIST(APPLY) \
@@ -106,7 +107,6 @@ private:
     bool                    m_backupDone;
     ec2::backup::DayOfWeek  m_curDow;
 
-    QFuture<void>           m_backupFuture;
     QnServerBackupSchedule  m_schedule;
     std::atomic<int64_t>    m_syncTimePoint;
 
