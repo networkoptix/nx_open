@@ -206,6 +206,7 @@ void QnMediaResourceHelper::updateUrl() {
 
     query.addQueryItem(lit("X-runtime-guid"), qnCommon->runningInstanceGUID().toString());
     query.addQueryItem(lit("X-Nx-User-Name"), QnAppServerConnectionFactory::url().userName());
+    query.addQueryItem(lit("User-Agent"), QLatin1String(nx_http::userAgentString()));
 
     url.setQuery(query);
 
