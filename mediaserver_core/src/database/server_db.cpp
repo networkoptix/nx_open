@@ -935,11 +935,22 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
             return false;
     }
 
+    const auto trimTags = [](const QnCameraBookmark &bookmark) -> QnCameraBookmarkTags
+    {
+        QnCameraBookmarkTags result;
+        for(const auto tag: bookmark.tags)
+            result.insert(tag.trimmed());
+
+        return result;
+    };
+
+    const auto trimmedTags = trimTags(bookmark);
+
     {
         QSqlQuery tagQuery(m_sdb);
         tagQuery.prepare("INSERT INTO bookmark_tags ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
         tagQuery.bindValue(":bookmark_guid", bookmark.guid.toRfc4122());
-        for (const QString tag: bookmark.tags) {
+        for (const QString tag: trimmedTags) {
             tagQuery.bindValue(":name", tag);
             if (!execSQLQuery(&tagQuery, Q_FUNC_INFO))
                 return false;
@@ -952,7 +963,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
         query.bindValue(":docid", docId);
         query.bindValue(":name", bookmark.name);
         query.bindValue(":description", bookmark.description);
-        query.bindValue(":tags", bookmark.tagsAsString(L' '));
+        query.bindValue(":tags", QnCameraBookmark::tagsToString(trimmedTags));
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return false;
     }

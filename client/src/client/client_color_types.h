@@ -171,8 +171,12 @@ struct QnBookmarkColors {
     QColor tooltipBackground;
     QColor background;
     QColor text;
+
+    QColor separator;
+    QColor tags;
 };
-#define QnBookmarkColors_Fields (tooltipBackground)(background)(text)
+
+#define QnBookmarkColors_Fields (tooltipBackground)(background)(text)(separator)(tags)
 
 
 struct QnLicensesListModelColors {
@@ -249,6 +253,13 @@ struct QnServerUpdatesColors {
 };
 #define QnServerUpdatesColors_Fields (latest)(target)(error)
 
+struct QnBackupScheduleColors {
+    QnBackupScheduleColors();
+
+    QColor weekEnd;
+};
+#define QnBackupScheduleColors_Fields (weekEnd)
+
 struct QnFailoverPriorityColors {
     QnFailoverPriorityColors();
 
@@ -276,6 +287,7 @@ struct QnBackupCamerasColors {
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnUserManagementColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \
+    (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \
     (QnBackupCamerasColors) \
 

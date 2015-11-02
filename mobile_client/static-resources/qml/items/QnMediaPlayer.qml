@@ -17,6 +17,7 @@ QnObject {
     readonly property bool atLive: d.position < 0
 
     readonly property alias position: d.position
+    readonly property bool hasTimestamp: d.mediaPlayer && d.mediaPlayer.hasTimestamp
 
     readonly property var mediaPlayer: d.mediaPlayer
     readonly property var chunkProvider: chunkProvider
@@ -56,6 +57,8 @@ QnObject {
 
             onPositionChanged: updatePosition()
             onSourceChanged: console.log(source)
+
+            readonly property bool hasTimestamp: false
         }
     }
 
@@ -68,6 +71,8 @@ QnObject {
             onPositionChanged: updatePosition()
             onSourceChanged: console.log(source)
             reconnectOnPlay: atLive
+
+            readonly property bool hasTimestamp: true
         }
     }
 
@@ -169,8 +174,16 @@ QnObject {
         if (d.position < 0)
             return
 
-        d.position += d.mediaPlayer.position - d.prevPlayerPosition
-        d.prevPlayerPosition = d.mediaPlayer.position
+        if (mediaPlayer.hasTimestamp) {
+            if (mediaPlayer.timestamp >= 0) {
+                d.position = mediaPlayer.timestamp
+                timelineCorrectionRequest(d.position)
+            }
+            return
+        } else {
+            d.position += d.mediaPlayer.position - d.prevPlayerPosition
+            d.prevPlayerPosition = d.mediaPlayer.position
+        }
 
         if (d.chunkEnd >= 0 && d.position >= d.chunkEnd) {
             seek(d.chunkEnd + 1)

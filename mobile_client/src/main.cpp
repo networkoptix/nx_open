@@ -11,7 +11,7 @@
 #include "nx_ec/ec2_lib.h"
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
-#include "plugins/resource/mobile_client_camera/mobile_client_camera_factory.h"
+#include "core/resource/mobile_client_camera_factory.h"
 #include "utils/common/app_info.h"
 #include "utils/common/log.h"
 #include "utils/network/module_finder.h"

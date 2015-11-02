@@ -11,6 +11,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_plugin_factory.h>
+#include <core/resource/client_camera_factory.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec2_lib.h>

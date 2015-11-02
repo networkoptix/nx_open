@@ -31,6 +31,7 @@ public:
 
     void setUsedForWriting(bool isUsedForWriting);
     bool isUsedForWriting() const;
+
     virtual QString getPath() const;
     static QString urlToPath(const QString &url);
 
@@ -66,6 +67,7 @@ public:
     void setWritedCoeff(double value);
     double calcUsageCoeff() const;
 
+    bool isWritable() const;
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -73,6 +75,9 @@ signals:
      * @param newEndTime - Not used now, reserved for future use
      */
     void archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
+
+    void isUsedForWritingChanged(const QnResourcePtr &resource);
+    void isBackupChanged(const QnResourcePtr &resource);
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds

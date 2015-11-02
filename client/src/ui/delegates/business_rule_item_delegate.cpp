@@ -204,10 +204,10 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     }
     case QnBusiness::ActionColumn:
     {
-        bool instant = index.data(Qn::ActionIsInstantRole).toBool();
+        bool instantOnly = !QnBusiness::hasToggleState(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>());
         QComboBox* comboBox = new QComboBox(parent);
         for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
-            if (instant && QnBusiness::hasToggleState(actionType))
+            if (instantOnly && QnBusiness::hasToggleState(actionType))
                 continue;
             comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
         }

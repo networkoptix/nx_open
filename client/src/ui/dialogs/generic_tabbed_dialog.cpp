@@ -45,10 +45,10 @@ void QnGenericTabbedDialog::setCurrentPage(int key) {
 }
 
 void QnGenericTabbedDialog::reject() {
-    if (!tryClose(false))
+    if (!discard())
         return;
 
-    loadData();
+    tryClose(true);
     base_type::reject();
 }
 

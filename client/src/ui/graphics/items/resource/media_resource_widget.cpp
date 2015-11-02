@@ -131,10 +131,14 @@ namespace
     const qint64 bookmarksFilterPrecisionMs = 5 * 60 * 1000;
 
     QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs, const QString &text = QString()) {
+        if (positionMs <= 0)
+            return QnCameraBookmarkSearchFilter::invalidFilter();
+
+        QnCameraBookmarkSearchFilter result;
+
         /* Round the current time to reload bookmarks only once a time. */
         qint64 mid = positionMs - (positionMs % bookmarksFilterPrecisionMs);
 
-        QnCameraBookmarkSearchFilter result;
         result.startTimeMs = mid - bookmarksFilterPrecisionMs;
 
         /* Seek forward twice as long so when the mid point changes, next period will be preloaded. */

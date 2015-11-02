@@ -328,9 +328,7 @@ void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
             bitrateAnalizePeriodMs,
             this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
         m_requests.insert(handle, m_server->getId());
-        // todo: we are using main pool here. probably it need update
-        handle = m_server->apiConnection()->getStorageSpaceAsync(true,
-            this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
+        handle = m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
         m_requests.insert(handle, m_server->getId());
     }
 }
@@ -356,8 +354,9 @@ void QnRecordingStatisticsWidget::at_gotStorageSpace(int status, const QnStorage
         return;
     m_requests.remove(requestNum);
     if (status == 0) {
-        for (const auto& storage: data.storages) 
+        for (const auto& storage: data.storages) {
             m_availStorages << storage;
+        }
     }
     if (m_requests.isEmpty()) {
         requestFinished();

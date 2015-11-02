@@ -19,7 +19,7 @@
 #include "utils/common/long_runnable.h"
 #include "utils/common/app_info.h"
 #include "utils/common/synctime.h"
-#include "plugins/resource/mobile_client_camera/mobile_client_camera_factory.h"
+#include "core/resource/mobile_client_camera_factory.h"
 #include "mobile_client/mobile_client_message_processor.h"
 #include "watchers/user_watcher.h"
 

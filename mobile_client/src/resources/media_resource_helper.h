@@ -85,6 +85,7 @@ private:
     int m_nativeStreamIndex;
     QMap<int, QString> m_nativeResolutions;
     bool m_transcodingSupported;
+    Protocol m_transcodingProtocol;
     Protocol m_nativeProtocol;
 };
 
