@@ -30,8 +30,6 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         return tr("Rebuilding archive index is completed");
     case QnSystemHealth::ArchiveRebuildCanceled:
         return tr("Rebuilding archive index is canceled by user");
-    case QnSystemHealth::ArchiveBackupFinished:
-        return tr("Archive backup finished");
     default:
         break;
     }
@@ -102,20 +100,6 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         break;
     case QnSystemHealth::ArchiveRebuildCanceled:
         messageParts << tr("Rebuilding archive index is canceled by user on the following Server:") << resourceName;
-        break;
-    case QnSystemHealth::ArchiveBackupFinished:
-        if (businessAction) {
-            qint64 backupPos = businessAction->getRuntimeParams().caption.toLongLong();
-            if (backupPos > 0) {
-                QDateTime dt = QDateTime::fromMSecsSinceEpoch(backupPos);
-                messageParts << tr("Archive backup finished to position %1").arg(backupPositionToStr(dt));
-            }
-            else {
-                messageParts << tr("Nothing to backup (no video archive or no backup cameras configured)");
-            }
-        }
-        else
-            messageParts << tr("Archive backup finished");
         break;
     default:
         break;

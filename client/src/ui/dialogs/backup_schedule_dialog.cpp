@@ -147,11 +147,11 @@ void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& va
         checkbox->setChecked(allowedDays.testFlag(ec2::backup::fromQtDOW(day)));
     }
 
-    setNearestValue(ui->comboBoxTimeStart, value.backupStart);
-    if (value.backupDuration == -1)
-        setNearestValue(ui->comboBoxTimeTo, value.backupDuration);
+    setNearestValue(ui->comboBoxTimeStart, value.backupStartSec);
+    if (value.backupDurationSec == -1)
+        setNearestValue(ui->comboBoxTimeTo, value.backupDurationSec);
     else
-        setNearestValue(ui->comboBoxTimeTo, (value.backupStart + value.backupDuration) % secsPerDay);
+        setNearestValue(ui->comboBoxTimeTo, (value.backupStartSec + value.backupDurationSec) % secsPerDay);
 
     ui->spinBoxBandwidth->setValue(qAbs(bytesToMBits(value.backupBitrate)));
         
@@ -170,15 +170,15 @@ void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
 
     value.backupDaysOfTheWeek = ec2::backup::fromQtDOW(days);
 
-    value.backupStart = ui->comboBoxTimeStart->itemData(ui->comboBoxTimeStart->currentIndex()).toInt();
+    value.backupStartSec = ui->comboBoxTimeStart->itemData(ui->comboBoxTimeStart->currentIndex()).toInt();
     int backupEnd = ui->comboBoxTimeTo->itemData(ui->comboBoxTimeTo->currentIndex()).toInt();
     if (backupEnd == -1) {
-        value.backupDuration = backupEnd;
+        value.backupDurationSec = backupEnd;
     }
     else {
-        if (backupEnd < value.backupStart)
+        if (backupEnd < value.backupStartSec)
             backupEnd += secsPerDay;
-        value.backupDuration = backupEnd - value.backupStart;
+        value.backupDurationSec = backupEnd - value.backupStartSec;
     }
 
     value.backupBitrate = mBitsToBytes(ui->spinBoxBandwidth->value());

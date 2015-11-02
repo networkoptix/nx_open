@@ -1397,6 +1397,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
                 return false;
         }
     }
+    else if (updateName == lit(":/updates/48_add_business_rules.sql")) {
+        for(const auto& bRule: QnBusinessEventRule::getRulesUpd48())
+        {
+            ApiBusinessRuleData bRuleData;
+            fromResourceToApi(bRule, bRuleData);
+            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+                return false;
+        }
+    }
     else if (updateName == lit(":/updates/43_resync_client_info_data.sql")) {
         if (!m_dbJustCreated)
             m_needResyncClientInfoData = true;
