@@ -573,7 +573,7 @@
         </profile>
 
         <profile>
-            <id>linux-noarm</id>
+            <id>linux-noarm1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -592,6 +592,29 @@
                 <modification>ubuntu</modification>
             </properties>
         </profile>
+
+        <profile>
+            <id>linux-noarm2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>linux</value>
+                </property>
+            </activation>
+            <modules>
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>
+            </modules>
+            <properties>
+                <modification>ubuntu</modification>
+            </properties>
+        </profile>
+
 
         <profile>
             <id>linux-arm</id>
