@@ -952,7 +952,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
         query.bindValue(":docid", docId);
         query.bindValue(":name", bookmark.name);
         query.bindValue(":description", bookmark.description);
-        query.bindValue(":tags", bookmark.tagsAsString());
+        query.bindValue(":tags", QnCameraBookmark::tagsToString(bookmark.tags));
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return false;
     }

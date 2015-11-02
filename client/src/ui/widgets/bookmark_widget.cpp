@@ -64,7 +64,7 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
     ui->timeoutComboBox->setCurrentIndex(timeoutIdx < 0 ? defaultTimeoutIdx : timeoutIdx);
 
     m_selectedTags = bookmark.tags;
-    ui->tagsLineEdit->setText(bookmark.tagsAsString());
+    ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(bookmark.tags));
 
     updateTagsList();
 }

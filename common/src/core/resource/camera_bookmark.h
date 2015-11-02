@@ -57,8 +57,6 @@ struct QnCameraBookmark {
     /** \returns True if bookmark is valid, false otherwise. */
     bool isValid() const;
 
-    QString tagsAsString(const QString &delimiter = lit(", ")) const;
-
     static QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter = lit(", "));
 
     static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);

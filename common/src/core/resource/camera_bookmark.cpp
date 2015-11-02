@@ -4,13 +4,6 @@
 
 #include <utils/common/model_functions.h>
 
-namespace 
-{
-    QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter) {
-        return QStringList(tags.toList()).join(delimiter);
-    }
-}
-
 qint64 QnCameraBookmark::endTimeMs() const {
     return startTimeMs + durationMs;
 }
@@ -19,12 +12,8 @@ bool QnCameraBookmark::isNull() const {
     return guid.isNull();
 }
 
-QString QnCameraBookmark::tagsAsString(const QString &delimiter) const {
-    return tagsToString(tags, delimiter);
-}
-
-QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter) {
-    return ::tagsToString(tags, delimiter);
+QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &bokmarkTags, const QString &delimiter) {
+    return QStringList(bokmarkTags.toList()).join(delimiter);
 }
 
 //TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
@@ -193,7 +182,7 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
         dbg.nospace() << "QnCameraBookmark INSTANT (" << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs).toString(lit("dd hh:mm")) << ')';
     dbg.space() << "timeout" << bookmark.timeout;
     dbg.space() << bookmark.name << bookmark.description;
-    dbg.space() << bookmark.tagsAsString();
+    dbg.space() << QnCameraBookmark::tagsToString(bookmark.tags);
     return dbg.space();
 }
 
