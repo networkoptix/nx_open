@@ -203,6 +203,9 @@ void QnMediaResourceHelper::updateUrl() {
     if (protocol == Mjpeg)
         query.addQueryItem(lit("ct"), lit("false"));
 
+    query.addQueryItem(lit("X-runtime-guid"), qnCommon->runningInstanceGUID().toString());
+    query.addQueryItem(lit("X-Nx-User-Name"), QnAppServerConnectionFactory::url().userName());
+
     url.setQuery(query);
 
     setUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
