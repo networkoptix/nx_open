@@ -115,6 +115,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    m_volumeSlider->toolTipItem()->setParentItem(parent);
 
     m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);

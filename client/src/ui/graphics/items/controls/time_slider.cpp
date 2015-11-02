@@ -446,7 +446,7 @@ Q_GLOBAL_STATIC(QnTimeSliderStepStorage, timeSteps);
 // -------------------------------------------------------------------------- //
 QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     , QGraphicsItem *tooltipParent):
-    base_type(parent, tooltipParent),
+    base_type(parent),
 
     m_windowStart(0),
     m_windowEnd(0),
@@ -546,6 +546,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     m_bookmarksViewer->setParent(this);
     m_bookmarksViewer->setParentItem(tooltipParent);
     m_bookmarksViewer->setZValue(std::numeric_limits<qreal>::max());
+    toolTipItem()->setParentItem(tooltipParent);
     toolTipItem()->stackBefore(m_bookmarksViewer);
 }
 
