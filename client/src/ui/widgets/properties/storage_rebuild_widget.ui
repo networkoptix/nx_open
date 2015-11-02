@@ -6,48 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>661</width>
-    <height>87</height>
+    <width>410</width>
+    <height>49</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <item>
-    <widget class="QStackedWidget" name="stackedWidget">
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="preparePage">
-      <layout class="QHBoxLayout" name="horizontalLayout_4"/>
-     </widget>
-     <widget class="QWidget" name="progressPage">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QnWordWrappedLabel" name="statusLabel" native="true"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QProgressBar" name="progressBar">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="stopButton">
-           <property name="text">
-            <string>Cancel</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </widget>
+    <widget class="QnWordWrappedLabel" name="statusLabel" native="true"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopButton">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

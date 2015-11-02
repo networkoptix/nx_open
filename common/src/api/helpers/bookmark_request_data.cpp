@@ -15,7 +15,6 @@ namespace {
     const QString endTimeKey        (lit("endTime"));
     const QString strategyKey       (lit("strategy"));
     const QString filterKey         (lit("filter"));
-    const QString formatKey         (lit("format"));
     const QString physicalIdKey     (lit("physicalId"));
     const QString macKey            (lit("mac"));
     const QString cameraIdKey       (lit("cameraId"));
@@ -38,15 +37,8 @@ namespace {
 QnGetBookmarksRequestData::QnGetBookmarksRequestData()
     : QnMultiserverRequestData()
     , filter()
-#ifdef _DEBUG
-    , format(Qn::JsonFormat)
-#else
-    , format(Qn::UbjsonFormat)
-#endif
     , cameras()
-{
-
-}
+{}
 
 void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params) {
     QnMultiserverRequestData::loadFromParams(params);
@@ -63,7 +55,6 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
         filter.limit = qMax(0LL, params.value(limitKey).toLongLong());
 
     filter.text = params.value(filterKey);
-    QnLexical::deserialize(params.value(formatKey), &format);
 
     for (const auto& id: params.allValues(physicalIdKey)) {
         if (QnVirtualCameraResourcePtr camera = qnResPool->getNetResourceByPhysicalId(id).dynamicCast<QnVirtualCameraResource>())
@@ -88,7 +79,6 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const {
     result.insert(filterKey,        QnLexical::serialized(filter.text));
     result.insert(limitKey,         QnLexical::serialized(filter.limit));
     result.insert(strategyKey,      QnLexical::serialized(filter.strategy));
-    result.insert(formatKey,        QnLexical::serialized(format));
 
     for (const auto &camera: cameras)
         result.insert(physicalIdKey,QnLexical::serialized(camera->getPhysicalId()));
@@ -108,7 +98,6 @@ bool QnGetBookmarksRequestData::isValid() const {
 
 QnGetBookmarkTagsRequestData::QnGetBookmarkTagsRequestData(int limit)
     : QnMultiserverRequestData()
-    , format(Qn::JsonFormat)
     , limit(limit)
 {}
 
@@ -119,13 +108,11 @@ int QnGetBookmarkTagsRequestData::unlimited() {
 void QnGetBookmarkTagsRequestData::loadFromParams(const QnRequestParamList& params) {
     QnMultiserverRequestData::loadFromParams(params);
     limit = QnLexical::deserialized<int>(params.value(limitKey), unlimited());
-    QnLexical::deserialize(params.value(formatKey), &format);
 }
 
 QnRequestParamList QnGetBookmarkTagsRequestData::toParams() const {
     QnRequestParamList result = QnMultiserverRequestData::toParams();
     result.insert(limitKey,     QnLexical::serialized(limit));
-    result.insert(formatKey,    QnLexical::serialized(format));
     return result;
 }
 

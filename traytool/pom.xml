@@ -40,6 +40,7 @@
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <qt.libs>core gui widgets</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>

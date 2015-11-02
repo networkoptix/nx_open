@@ -98,9 +98,6 @@ Item {
                 width: parent.width
                 height: dp(150)
 
-                windowEnd: (new Date(Date.now() + 5 * 60 * 1000)).getTime()
-                windowStart: (new Date(Date.now() - 5 * 60 * 1000)).getTime()
-
                 stickToEnd: mediaPlayer.atLive && !playbackController.paused
 
                 chunkBarHeight: dp(32)
@@ -223,6 +220,8 @@ Item {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/calendar.png"
+                    enabled: timeline.startBound > 0
+                    opacity: enabled ? 1.0 : 0.15
                     onClicked: {
                         calendarPanel.date = timeline.positionDate
                         calendarPanel.show()
@@ -235,6 +234,7 @@ Item {
                     anchors.horizontalCenterOffset: -width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/minus.png"
+                    visible: timeline.startBound > 0
                     onClicked: timeline.zoomOut()
                 }
 
@@ -244,6 +244,7 @@ Item {
                     anchors.horizontalCenterOffset: width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/plus.png"
+                    visible: timeline.startBound > 0
                     onClicked: timeline.zoomIn()
                 }
 
@@ -320,6 +321,8 @@ Item {
 
                 anchors.verticalCenter: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
+
+                loading: mediaPlayer.loading
 
                 onPausedChanged: {
                     if (paused)

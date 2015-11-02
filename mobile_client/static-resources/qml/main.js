@@ -68,19 +68,22 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
 
 function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, statusMessage) {
     var push = stackView.depth == 1
-    var item
 
-    if (!push) {
-        item = stackView.find(function(item, index) {return item.objectName === "loginPage"})
-        if (!item)
-            push = true
-    }
+    var item = null
+
+    var pageName = mainWindow.customConnection ? "newConnectionPage" : "loginPage"
+
+    if (stackView.currentItem.objectName == pageName)
+        item = stackView.currentItem
 
     sideNavigation.hide()
-    menuBackButton.animateToBack()
-    sideNavigation.enabled = false
 
-    if (push) {
+    if (!mainWindow.customConnection) {
+        menuBackButton.animateToBack()
+        sideNavigation.enabled = false
+    }
+
+    if (!item) {
         var pushList = []
         if (stackView.depth == 1)
             pushList.push(loginPageComponent)
@@ -100,7 +103,8 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
         stackView.push(pushList)
         item = stackView.get(stackView.depth - 1)
     } else {
-        item.title = _systemName
+        if (_systemName && item.objectName != "newConnectionPage")
+            item.title = _systemName
         item.host = _host
         item.port = _port
         item.login = _login
@@ -113,6 +117,7 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
 
 function gotoNewSession() {
     mainWindow.currentSessionId = ""
+    mainWindow.currentSystemName = ""
     sideNavigation.enabled = true
     menuBackButton.animateToMenu()
 

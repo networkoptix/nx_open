@@ -7,15 +7,11 @@
 #include <utils/common/model_functions.h>
 
 QnMediaServerUserAttributes::QnMediaServerUserAttributes()
-:
-    maxCameras(0),
-    isRedundancyEnabled(false),
-    backupType(Qn::Backup_Disabled),
-    backupDaysOfTheWeek(0x7f), // all days of week
-    backupStart(0), // midnight
-    backupDuration(-1), // unlimited duration
-    backupBitrate(-1), // unlimited
-    backupQuality(Qn::Backup_Disabled)
+    : serverID()
+    , maxCameras(0)
+    , isRedundancyEnabled(false)
+    , name()
+    , backupSchedule()
 {
 }
 
@@ -30,23 +26,8 @@ void QnMediaServerUserAttributes::assign(
     if (name != right.name)
         modifiedFields->insert("nameChanged");
 
-    if (backupType != right.backupType)
-        modifiedFields->insert("backupType");
-
-    if (backupDaysOfTheWeek != right.backupDaysOfTheWeek)
-        modifiedFields->insert("backupDaysOfTheWeekChanged");
-
-    if (backupBitrate != right.backupBitrate)
-        modifiedFields->insert("backupBitrateChanged");
-
-    if (backupDuration != right.backupDuration)
-        modifiedFields->insert("backupDurationChanged");
-
-    if (backupStart != right.backupStart)
-        modifiedFields->insert("backupStartChanged");
-
-    if (backupQuality != right.backupQuality)
-        modifiedFields->insert("backupQualityChanged");
+    if (backupSchedule != right.backupSchedule)
+        modifiedFields->insert("backupScheduleChanged");
 
     *this = right;
 }

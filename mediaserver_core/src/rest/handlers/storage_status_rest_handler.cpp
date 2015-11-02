@@ -25,8 +25,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlExact(storageUrl);
     if (!storage)
         storage = qnBackupStorageMan->getStorageByUrlExact(storageUrl);
-
-    bool exists = storage;
+        
     if (!storage) {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
         if(storage) {
@@ -47,35 +46,34 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
             return CODE_INVALID_PARAMETER;
     }
     
+    bool exists = !storage.isNull();
+
     QnStorageStatusReply reply;
-    reply.pluginExists = storage;
-    reply.storage.storageId = exists ? storage->getId() : QnUuid();
-    reply.storage.url = storageUrl;
-    reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
-    reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;
-    reply.storage.totalSpace = storage ? storage->getTotalSpace() : -1;
-    reply.storage.isExternal = storage && storage->isExternal();
-    reply.storage.storageType = storage->getStorageType();
+    reply.pluginExists = exists;
+    reply.storage.url           = storageUrl;
+
+    if (storage) {
+        reply.storage.storageId     = storage->getId();
+        reply.storage.freeSpace     = storage->getFreeSpace();
+        reply.storage.reservedSpace = storage->getSpaceLimit();
+        reply.storage.totalSpace    = storage->getTotalSpace();
+        reply.storage.isExternal    = storage->isExternal();
+        reply.storage.storageType   = storage->getStorageType();
+
 #ifdef WIN32
-    if (!reply.storage.isExternal) {
-        reply.storage.isWritable = false;
-        reply.storage.isUsedForWriting = false;
-    }
-    else 
+        if (!reply.storage.isExternal) {
+            //TODO: #rvasilenko this 'if' looks strange. BTW, this handler is not used in client
+            reply.storage.isWritable = false;
+            reply.storage.isUsedForWriting = false;
+        }
+        else 
 #endif
-    {
-        reply.storage.isWritable = storage ? 
-                                   storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile : 
-                                   false;
-        reply.storage.isUsedForWriting = exists ? storage->isUsedForWriting() : false;
+        {
+            reply.storage.isWritable = storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile;
+            reply.storage.isUsedForWriting = storage->isUsedForWriting();
+        }
     }
         
-    // TODO: #Elric remove once UnknownSize is dropped.
-    if(reply.storage.totalSpace == QnStorageResource::UnknownSize)
-        reply.storage.totalSpace = -1;
-    if(reply.storage.freeSpace == QnStorageResource::UnknownSize)
-        reply.storage.freeSpace = -1;
-
     result.setReply(reply);
     return CODE_OK;
 }

@@ -4,6 +4,7 @@
 #include <QtGui/QFontMetrics>
 
 #include <core/resource/camera_bookmark.h>
+#include <utils/common/string.h>
 
 namespace {
     const int maximumBookmarkWidth = 250;
@@ -14,15 +15,6 @@ namespace {
     const int radius = 4;
     const int captionFontSize = 16;
     const int descriptionFontSize = 12;
-
-    QString elidedString(const QString &string, int length) {
-        static const QString tail = lit("...");
-
-        if (string.length() <= length + tail.length())
-            return string;
-
-        return string.left(length) + tail;
-    }
 }
 
 class QnBookmarkItemPrivate {
@@ -104,8 +96,8 @@ QnBookmarkItemPrivate::QnBookmarkItemPrivate(QnBookmarkItem *parent)
 void QnBookmarkItemPrivate::updatePixmap() {
     Q_Q(QnBookmarkItem);
 
-    QString caption = elidedString(bookmark.name, maximumCaptionLength);
-    QString description = elidedString(bookmark.description, maximumDescriptionLength);
+    QString caption = elideString(bookmark.name, maximumCaptionLength);
+    QString description = elideString(bookmark.description, maximumDescriptionLength);
     int maxTextWidth = maximumBookmarkWidth - 2 * padding;
 
     QFont descriptionFont = q->font();

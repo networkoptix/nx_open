@@ -19,6 +19,7 @@ namespace Qn
     static const QByteArray CUSTOM_USERNAME_HEADER_NAME = "X-Nx-User-Name";
     static const QByteArray AUTH_SESSION_HEADER_NAME = "X-Auth-Session";
     static const QByteArray USER_HOST_HEADER_NAME = "X-User-Host";
+    static const QByteArray USER_AGENT_HEADER_NAME = "User-Agent";
     static const QByteArray CAMERA_UNIQUE_ID_HEADER_NAME = "physicalId";
     static const QByteArray REALM_HEADER_NAME = "X-Nx-Realm";
     static const QByteArray AUTH_RESULT_HEADER_NAME = "X-Auth-Result";

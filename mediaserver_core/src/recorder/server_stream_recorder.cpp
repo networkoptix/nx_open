@@ -1,5 +1,7 @@
 #include "server_stream_recorder.h"
 
+#include <api/global_settings.h>
+
 #include <common/common_module.h>
 #include <common/common_globals.h>
 #include "motion/motion_helper.h"
@@ -8,6 +10,8 @@
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
+#include <core/resource/server_backup_schedule.h>
+
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
 #include "core/resource_management/resource_pool.h"
@@ -530,26 +534,22 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 
 bool QnServerStreamRecorder::isRedundantSyncOn() const 
 {
-    auto resource = qnResPool->getResourceById(
-        qnCommon->moduleGUID()
-    );
-    auto mediaServer = resource.dynamicCast<QnMediaServerResource>();
+    auto mediaServer = qnCommon->currentServer();
     Q_ASSERT(mediaServer);
 
-    if (!(mediaServer->getBackupType() & Qn::Backup_RealTime))
+    if (mediaServer->getBackupSchedule().backupType != Qn::Backup_RealTime)
         return false;
 
     auto cam = m_device.dynamicCast<QnSecurityCamResource>();
     Q_ASSERT(cam);
 
-    Qn::CameraBackupTypes cameraBackupMode = cam->getActualBackupType();
-    if (m_catalog == QnServer::HiQualityCatalog && !(cameraBackupMode & Qn::CameraBackup_HighQuality) ||
-        m_catalog == QnServer::LowQualityCatalog && !(cameraBackupMode & Qn::CameraBackup_LowQuality))
-    {
-        return false;
-    }
+    Qn::CameraBackupQualities cameraBackupQualities = cam->getActualBackupQualities();
 
-    return true;
+    if (m_catalog == QnServer::HiQualityCatalog)
+        return cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality);
+
+    Q_ASSERT_X(m_catalog == QnServer::LowQualityCatalog, Q_FUNC_INFO, "Only two options are allowed");
+    return cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality);
 }
 
 void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)

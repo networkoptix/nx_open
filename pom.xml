@@ -56,6 +56,7 @@
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+        <linux.release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</linux.release.version>
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
@@ -96,6 +97,7 @@
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile></newmobile>
+        <ffmpeg.libs></ffmpeg.libs>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
         <!-- compile.option2. See profile angle  -->
@@ -110,7 +112,7 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
-        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -638,8 +640,9 @@
             </activation>
             <properties>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <toolchain.version>codesourcery-2013.11</toolchain.version>
+                <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
+                <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>

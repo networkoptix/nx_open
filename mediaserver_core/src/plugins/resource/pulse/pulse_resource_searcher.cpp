@@ -7,6 +7,9 @@
 
 #include "pulse_searcher_helper.h"
 #include "../pulse/pulse_resource.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 
 QnPlPulseSearcher::QnPlPulseSearcher()
@@ -37,6 +40,11 @@ QnResourceList QnPlPulseSearcher::findResources()
         QnNetworkResourcePtr res = createResource(r.manufacture, r.name);
         if (!res)
             continue;
+
+        QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), r.name);
+        if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+            continue; // model forced by ONVIF
+
         QnPhysicalCameraResourcePtr cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
         
         res->setName(r.name);

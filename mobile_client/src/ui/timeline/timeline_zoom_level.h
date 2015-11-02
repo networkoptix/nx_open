@@ -15,7 +15,6 @@ struct QnTimelineZoomLevel {
         Years
     };
 
-    static QVector<QString> monthsNames;
     static int maxMonthLength;
 
     LevelType type;
@@ -31,7 +30,7 @@ struct QnTimelineZoomLevel {
     {}
 
     bool testTick(qint64 tick) const;
-    qint64 nextTick(qint64 tick, int count = 1) const;
+    qint64 nextTick(qint64 tick) const;
     qint64 alignTick(qint64 tick) const;
     QString suffix(qint64 tick) const;
     int tickCount(qint64 start, qint64 end) const;

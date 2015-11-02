@@ -117,7 +117,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
 
         int packetSize = (m_recvBuffer[2]<<8) + m_recvBuffer[3];
         quint8 streamIndex = m_recvBuffer[1];
-        Q_ASSERT(streamIndex <= 1);
+        //Q_ASSERT(streamIndex <= 1);
         bufferSize = 0;
         while (m_socket->isConnected() && bufferSize < packetSize)
         {

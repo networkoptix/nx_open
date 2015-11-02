@@ -29,6 +29,7 @@
         <template>app</template>
         <!--Global libs-->      
         <qt.libs>qml quick core gui network</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <qt.dir>${env.ENVIRONMENT}/qt542/${arch}</qt.dir>
         <global.libs/>
         <!--Specific os libs used-->

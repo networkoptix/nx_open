@@ -19,7 +19,7 @@ void QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark) 
             Q_ASSERT(oldIt != m_bookmarkList.end());
             if (oldIt != m_bookmarkList.end()) {
                 if (oldIt < it) {
-                    /* For optimiation purposes we suppose the iterator behaves like a pointer.
+                    /* For optimization purposes we suppose the iterator behaves like a pointer.
                      * So if we removed something before 'it' then 'it' should be decreased. */
                     --it;
                 }

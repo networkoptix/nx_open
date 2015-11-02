@@ -70,8 +70,7 @@ extern "C"
 #include "core/resource_management/resource_discovery_manager.h"
 
 #include "api/app_server_connection.h"
-//#include <plugins/resource/server_camera/server_camera.h>
-#include <plugins/resource/server_camera/server_camera_factory.h>
+#include <plugins/resource/client_camera/client_camera_factory.h>
 
 
 #include "plugins/plugin_manager.h"
@@ -415,7 +414,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory( startupParams.videoWallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
     ec2::ResourceContext resCtx(
-        QnServerCameraFactory::instance(),
+        QnClientCameraFactory::instance(),
         qnResPool,
         qnResTypePool );
 	ec2ConnectionFactory->setContext( resCtx );

@@ -462,10 +462,14 @@ QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState stat
     return QString();
 }
 
-QString QnBusinessStringsHelper::eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType) 
+QString QnBusinessStringsHelper::eventTypeString(
+        QnBusiness::EventType eventType,
+        QnBusiness::EventState eventState,
+        QnBusiness::ActionType actionType,
+        const QnBusinessActionParameters &actionParams)
 {
     QString typeStr = QnBusinessStringsHelper::eventName(eventType);
-    if (QnBusiness::hasToggleState(actionType))
+    if (QnBusiness::isActionProlonged(actionType, actionParams))
         return tr("While %1").arg(typeStr);
     else
         return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
@@ -474,6 +478,6 @@ QString QnBusinessStringsHelper::eventTypeString(QnBusiness::EventType eventType
 
 QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule)
 {
-    QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType());
+    QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType(), bRule->actionParams());
     return tr("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
 }
