@@ -529,16 +529,36 @@ static QStringList listRecordFolders()
     return folderPaths;
 }
 
+QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
+{
+    QnStorageResourceList result;
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
+    for (const auto& storage: storages)
+    {
+        const qint64 totalSpace = storage->getTotalSpace();
+        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < defaultStorageSpaceLimit)
+            result << storage; // if storage size isn't known do not delete it
+    }
+    return result;
+}
+
+
 QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
 {
     QnStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     for(const QString& folderPath: listRecordFolders())
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
+        const qint64 totalSpace = storage->getTotalSpace();
+        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < defaultStorageSpaceLimit)
+            continue; // if storage size isn't known do not add it by default
+
+
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
@@ -2146,7 +2166,16 @@ void MediaServerProcess::run()
         }
     }
 
-    QnStorageResourceList storages = m_mediaServer->getStorages();
+    QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+    if (!storagesToRemove.isEmpty()) {
+        ec2::ApiIdDataList idList;
+        for (const auto& value: storagesToRemove)
+            idList.push_back(value->getId());
+        if (ec2Connection->getMediaServerManager()->removeStoragesSync(idList) != ec2::ErrorCode::ok)
+            qWarning() << "Failed to remove deprecated storages on startup. Postpone removing to the next start...";
+        qnResPool->removeResources(storagesToRemove);
+    }
+
     QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
     modifiedStorages.append(updateStorages(m_mediaServer));
     saveStorages(ec2Connection, modifiedStorages);
