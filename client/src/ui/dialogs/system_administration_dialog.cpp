@@ -22,16 +22,14 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
-QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::QnSystemAdministrationDialog),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnSystemAdministrationDialog>(this))
+QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) 
+    : base_type(parent)
+    , ui(new Ui::QnSystemAdministrationDialog)
 {
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_Help);
 
-    m_updatesWidget = new QnServerUpdatesWidget(this);
+    auto updatesWidget = new QnServerUpdatesWidget(this);
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
     auto smtpWidget = new QnSmtpSettingsWidget(this);
     auto routingWidget = new QnRoutingManagementWidget(this);
@@ -39,18 +37,18 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     addPage(GeneralPage,            generalWidget,                          tr("General"));
     addPage(LicensesPage,           new QnLicenseManagerWidget(this),       tr("Licenses"));
     addPage(SmtpPage,               smtpWidget,                             tr("Email"));
-    addPage(UpdatesPage,            m_updatesWidget,                        tr("Updates"));
+    addPage(UpdatesPage,            updatesWidget,                          tr("Updates"));
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
     addPage(TimeServerSelection,    new QnTimeServerSelectionWidget(this),  tr("Time Synchronization"));
 
-    loadData();
+    loadDataToUi();
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
     safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
-    safeModeWatcher->addControlledWidget(m_updatesWidget, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    safeModeWatcher->addControlledWidget(updatesWidget, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
     safeModeWatcher->addControlledWidget(generalWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
     safeModeWatcher->addControlledWidget(smtpWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
     safeModeWatcher->addControlledWidget(routingWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
@@ -61,20 +59,5 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     setPageEnabled(UpdatesPage, !qnCommon->isReadOnly());
 }
 
-QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}
-
-void QnSystemAdministrationDialog::reject() {
-    if (!m_updatesWidget->cancelUpdate()) {
-        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state."));
-        return;
-    }
-    base_type::reject();
-}
-
-void QnSystemAdministrationDialog::accept() {
-    if (m_updatesWidget->isUpdating()) {
-        QMessageBox::information(this, tr("Information"), tr("Update is in process now."));
-        return;
-    }
-    base_type::accept();
-}
+QnSystemAdministrationDialog::~QnSystemAdministrationDialog()
+{}

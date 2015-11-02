@@ -42,13 +42,13 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(ui->bookmarksButton,      &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenBookmarksSearchAction); });
 }
 
-void QnGeneralSystemAdministrationWidget::updateFromSettings() {
-    ui->systemSettingsWidget->updateFromSettings();
+void QnGeneralSystemAdministrationWidget::loadDataToUi() {
+    ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
 }
 
-void QnGeneralSystemAdministrationWidget::submitToSettings() {
-    ui->systemSettingsWidget->submitToSettings();
+void QnGeneralSystemAdministrationWidget::applyChanges() {
+    ui->systemSettingsWidget->applyChanges();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const  {

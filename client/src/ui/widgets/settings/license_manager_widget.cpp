@@ -83,8 +83,16 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 {
 }
 
-void QnLicenseManagerWidget::updateFromSettings() {
+void QnLicenseManagerWidget::loadDataToUi() {
     updateLicenses();
+}
+
+bool QnLicenseManagerWidget::hasChanges() const {
+    return false;
+}
+
+void QnLicenseManagerWidget::applyChanges() {
+    /* This widget is read-only. */
 }
 
 void QnLicenseManagerWidget::updateLicenses() {

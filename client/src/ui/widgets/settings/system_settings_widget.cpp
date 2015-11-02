@@ -54,7 +54,7 @@ void QnSystemSettingsWidget::retranslateUi() {
 }
 
 
-void QnSystemSettingsWidget::updateFromSettings() {
+void QnSystemSettingsWidget::loadDataToUi() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
 
     QSet<QString> disabledVendors = settings->disabledVendorsSet();
@@ -70,7 +70,7 @@ void QnSystemSettingsWidget::updateFromSettings() {
     ui->statisticsReportCheckBox->setChecked(ec2::Ec2StaticticsReporter::isAllowed(qnResPool->getResources<QnMediaServerResource>()));
 }
 
-void QnSystemSettingsWidget::submitToSettings() {
+void QnSystemSettingsWidget::applyChanges() {
     if (!hasChanges())
         return;
 

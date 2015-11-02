@@ -92,7 +92,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     connect(m_timeoutTimer,                 &QTimer::timeout,                   this,   &QnSmtpSettingsWidget::at_timer_timeout);
     connect(ui->simpleEmailLineEdit,        &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailSimple);
     connect(ui->emailLineEdit,              &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailAdvanced);
-    connect(QnGlobalSettings::instance(),   &QnGlobalSettings::emailSettingsChanged, this,  &QnSmtpSettingsWidget::updateFromSettings);
+    connect(QnGlobalSettings::instance(),   &QnGlobalSettings::emailSettingsChanged, this,  &QnSmtpSettingsWidget::loadDataToUi);
 
     m_timeoutTimer->setSingleShot(false);
 
@@ -139,7 +139,7 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 {
 }
 
-void QnSmtpSettingsWidget::updateFromSettings() {
+void QnSmtpSettingsWidget::loadDataToUi() {
     finishTesting();
 
     QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
@@ -161,21 +161,12 @@ void QnSmtpSettingsWidget::updateFromSettings() {
         : SimplePage);
 }
 
-void QnSmtpSettingsWidget::submitToSettings() {
+void QnSmtpSettingsWidget::applyChanges() {
+    finishTesting();
     if (isReadOnly())
         return;
 
     QnGlobalSettings::instance()->setEmailSettings(settings());
-}
-
-bool QnSmtpSettingsWidget::confirm() {
-    finishTesting();
-    return base_type::confirm();
-}
-
-bool QnSmtpSettingsWidget::discard() {
-    finishTesting();
-    return base_type::discard();
 }
 
 void QnSmtpSettingsWidget::setReadOnlyInternal(bool readOnly) {

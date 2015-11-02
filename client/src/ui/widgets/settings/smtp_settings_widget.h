@@ -1,5 +1,4 @@
-#ifndef SMTP_SETTINGS_WIDGET_H
-#define SMTP_SETTINGS_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include <QtCore/QTimer>
@@ -25,14 +24,10 @@ public:
     explicit QnSmtpSettingsWidget(QWidget *parent = 0);
     ~QnSmtpSettingsWidget();
 
-    virtual void updateFromSettings() override;
-    virtual void submitToSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
-
-    virtual bool confirm() override;
-    virtual bool discard() override;
-
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
 
@@ -62,5 +57,3 @@ private:
 
     QTimer *m_timeoutTimer;
 };
-
-#endif // SMTP_SETTINGS_WIDGET_H

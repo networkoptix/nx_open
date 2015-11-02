@@ -226,8 +226,7 @@ void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index) {
     emit hasChangesChanged();
 }
 
-void QnStorageConfigWidget::updateFromSettings()
-{
+void QnStorageConfigWidget::loadDataToUi() {
     if (!m_server)
         return;
 
@@ -379,7 +378,7 @@ bool QnStorageConfigWidget::hasStoragesChanges( const QnStorageModelInfoList &st
 }
 
 
-void QnStorageConfigWidget::submitToSettings()
+void QnStorageConfigWidget::applyChanges()
 {
     if (isReadOnly())
         return;

@@ -48,25 +48,25 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
     }
 
     resize(1, 1); // set widget size to minimal possible
-    loadData();
+    loadDataToUi();
 }
 
 QnPreferencesDialog::~QnPreferencesDialog() {}
 
-void QnPreferencesDialog::submitData() {
-    base_type::submitData();
+void QnPreferencesDialog::applyChanges() {
+    base_type::applyChanges();
     if (qnSettings->isWritable())
         qnSettings->save();
 }
 
-bool QnPreferencesDialog::confirm() {
+bool QnPreferencesDialog::canApplyChanges() {
 #ifdef Q_OS_MACX
     // TODO: #dklychkov remove this if the way to restart the app will be found
     return true;
 #endif
 
-    bool allPagesConfirm = base_type::confirm();
-    if (allPagesConfirm)
+    bool allPagesCanApplyChanges = base_type::canApplyChanges();
+    if (allPagesCanApplyChanges)
         return true;
 
     QMessageBox::StandardButton result = QMessageBox::information(

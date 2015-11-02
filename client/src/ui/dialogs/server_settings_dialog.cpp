@@ -18,10 +18,8 @@
 
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(parent)
     , ui(new Ui::ServerSettingsDialog)
     , m_server()
-    , m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
     , m_generalPage(new QnServerSettingsWidget(this))
     , m_statisticsPage(new QnRecordingStatisticsWidget(this))
     , m_storagesPage(new QnStorageConfigWidget(this))
@@ -95,12 +93,11 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
         });
     }
 
-    loadData();
+    loadDataToUi();
 }
 
-void QnServerSettingsDialog::loadData() {
-    base_type::loadData();
-    
+void QnServerSettingsDialog::retranslateUi() {
+    base_type::retranslateUi();
     if (m_server) {
         bool readOnly = !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
         setWindowTitle(readOnly
@@ -111,8 +108,8 @@ void QnServerSettingsDialog::loadData() {
     } else {
         setWindowTitle(tr("Server Settings"));
     }
-
 }
+
 
 QString QnServerSettingsDialog::confirmMessageTitle() const {
     return tr("Server not saved");

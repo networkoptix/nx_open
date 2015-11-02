@@ -80,12 +80,12 @@ QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget() {
 }
 
 
-void QnTimeServerSelectionWidget::updateFromSettings() {
+void QnTimeServerSelectionWidget::loadDataToUi() {
     PRINT_DEBUG("provide selected server to model:");
     m_model->setSelectedServer(selectedServer());
 }
 
-void QnTimeServerSelectionWidget::submitToSettings() {
+void QnTimeServerSelectionWidget::applyChanges() {
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;

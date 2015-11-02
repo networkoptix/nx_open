@@ -3,8 +3,6 @@
 
 #include <client/client_settings.h>
 
-#include <api/app_server_connection.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 
@@ -13,21 +11,19 @@
 
 #include <health/system_health_helper.h>
 
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/resource_property_adaptors.h>
 
-//TODO: #GDM #Common handle user changing here
-
-QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::PopupSettingsWidget),
-    m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this))
+QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) 
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
+    , ui(new Ui::PopupSettingsWidget)
+    , m_businessRulesCheckBoxes()
+    , m_systemHealthCheckBoxes()
+    , m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this))
 {
     ui->setupUi(this);
 
@@ -40,6 +36,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
         m_businessRulesCheckBoxes[eventType] = checkbox;
     }
 
+    static_assert(QnSystemHealth::MessageTypeCount < 64, "We are packing messages to single quint64");
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType(i)));
@@ -47,88 +44,89 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
         m_systemHealthCheckBoxes << checkbox;
     }
 
-    m_adaptor->setResource(context()->user()); // TODO: #Elric listen to changes?
+    connect(m_adaptor,              &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnPopupSettingsWidget::loadDataToUi);
 
-    connect(ui->showAllCheckBox,    &QCheckBox::toggled,                                this,   &QnPopupSettingsWidget::at_showAllCheckBox_toggled);
-    connect(m_adaptor,              &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnPopupSettingsWidget::at_showBusinessEvents_valueChanged);
+    connect(ui->showAllCheckBox,    &QCheckBox::toggled,                                this,   [this](bool checked){
+        // TODO: #GDM #Common also update checked state!
+        // TODO: #GDM #Common maybe tristate for 'show all' checkbox would be better.
+        for (QCheckBox* checkbox: m_businessRulesCheckBoxes) {
+            checkbox->setEnabled(!checked);
+        }
+
+        for (QCheckBox* checkbox:  m_systemHealthCheckBoxes) {
+            checkbox->setEnabled(!checked);
+        }
+    });
+    
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
 {
 }
 
-void QnPopupSettingsWidget::updateFromSettings() {
+void QnPopupSettingsWidget::loadDataToUi() {
+    bool all = true;
+
     quint64 healthShown = qnSettings->popupSystemHealth();
     quint64 healthFlag = 1;
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        bool checked = healthShown & healthFlag;
+        bool checked = ((healthShown & healthFlag) == healthFlag);
         m_systemHealthCheckBoxes[i]->setChecked(checked);
         healthFlag = healthFlag << 1;
+
+        all &= checked;
     }
 
-    at_showBusinessEvents_valueChanged();
-}
+    if (context()->user())
+        m_adaptor->setResource(context()->user());   
 
-void QnPopupSettingsWidget::submitToSettings() {
-    if (context()->user()) {
-        quint64 eventsShown = 0xFFFFFFFFFFFFFFFFull;
-        if (!ui->showAllCheckBox->isChecked()) {
-            quint64 eventsFlag = 1;
-            for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
-                if (!m_businessRulesCheckBoxes[eventType]->isChecked())
-                    eventsShown &= ~eventsFlag;
-                eventsFlag = eventsFlag << 1;
-            }
-        }
+    QList<QnBusiness::EventType> watchedEvents = context()->user()
+        ? m_adaptor->watchedEvents()
+        : QnBusiness::allEvents();
 
-        m_adaptor->setValue(eventsShown);
-    }
-
-    quint64 healthShown = qnSettings->popupSystemHealth();
-    quint64 healthFlag = 1;
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        if (m_systemHealthCheckBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
-            healthShown |= healthFlag;
-        } else {
-            healthShown &= ~healthFlag;
-        }
-        healthFlag = healthFlag << 1;
-    }
-
-    qnSettings->setPopupSystemHealth(healthShown);
-}
-
-void QnPopupSettingsWidget::at_showAllCheckBox_toggled(bool checked) {
-    // TODO: #GDM #Common also update checked state!
-    // TODO: #GDM #Common maybe tristate for 'show all' checkbox would be better.
-    foreach (QCheckBox* checkbox, m_businessRulesCheckBoxes) {
-        checkbox->setEnabled(!checked);
-    }
-
-    foreach (QCheckBox* checkbox, m_systemHealthCheckBoxes) {
-        checkbox->setEnabled(!checked);
-    }
-}
-
-void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged() {
-    bool all = true;
-    if (!ui->showAllCheckBox->isChecked()) {
-        foreach (QCheckBox* systemHealthCheckbox, m_systemHealthCheckBoxes) {
-            if (!systemHealthCheckbox->isChecked()) {
-                all = false;
-                break;
-            }
-        }
-    }
-
-    quint64 eventsShown = m_adaptor->value();
-    quint64 eventsFlag = 1;
-    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
-        bool checked = eventsShown & eventsFlag;
+    for (QnBusiness::EventType eventType: m_businessRulesCheckBoxes.keys()) {
+        bool checked = watchedEvents.contains(eventType);
         m_businessRulesCheckBoxes[eventType]->setChecked(checked);
-        all = all && checked;
-        eventsFlag = eventsFlag << 1;
+        all &= checked;
     }
 
     ui->showAllCheckBox->setChecked(all);
+
+    ui->businessEventsGroupBox->setEnabled(context()->user());
+}
+
+void QnPopupSettingsWidget::applyChanges() {
+    if (context()->user())
+        m_adaptor->setWatchedEvents(watchedEvents());
+    qnSettings->setPopupSystemHealth(watchedSystemHealth());
+}
+
+bool QnPopupSettingsWidget::hasChanges() const  {
+    return qnSettings->popupSystemHealth() != watchedSystemHealth()
+        || (context()->user() && m_adaptor->watchedEvents() != watchedEvents());
+}
+
+QList<QnBusiness::EventType> QnPopupSettingsWidget::watchedEvents() const {
+    if (ui->showAllCheckBox->isChecked())
+        return QnBusiness::allEvents();
+
+    QList<QnBusiness::EventType> result;
+    for (QnBusiness::EventType eventType: m_businessRulesCheckBoxes.keys())
+        if (m_businessRulesCheckBoxes[eventType]->isChecked())
+            result << eventType;
+    return result;
+}
+
+quint64 QnPopupSettingsWidget::watchedSystemHealth() const {
+    quint64 result = qnSettings->popupSystemHealth();
+    quint64 healthFlag = 1;
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        if (m_systemHealthCheckBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
+            result |= healthFlag;
+        } else {
+            result &= ~healthFlag;
+        }
+        healthFlag = healthFlag << 1;
+    }
+    return result;
 }

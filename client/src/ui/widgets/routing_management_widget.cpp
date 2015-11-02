@@ -204,11 +204,11 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
 
-void QnRoutingManagementWidget::updateFromSettings() {
+void QnRoutingManagementWidget::loadDataToUi() {
     ui->warningLabel->hide();
 }
 
-void QnRoutingManagementWidget::submitToSettings() {
+void QnRoutingManagementWidget::applyChanges() {
     ui->warningLabel->hide();
     if (isReadOnly())
         return;
@@ -259,6 +259,14 @@ void QnRoutingManagementWidget::submitToSettings() {
     }
 
     m_changes->changes.clear();
+}
+
+bool QnRoutingManagementWidget::hasChanges() const {
+    if (isReadOnly())
+        return false;
+
+    //TODO: #GDM implement correctly
+    return false;
 }
 
 void QnRoutingManagementWidget::setReadOnlyInternal(bool readOnly) {
@@ -358,6 +366,8 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     }
 
     m_serverAddressesModel->addAddress(explicitUrl);
+
+    emit hasChangesChanged();
 }
 
 void QnRoutingManagementWidget::at_removeButton_clicked() {
@@ -374,6 +384,8 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
 
     int row = qMin(m_sortedServerAddressesModel->rowCount() - 1, currentIndex.row());
     ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(row, 0));
+
+    emit hasChangesChanged();
 }
 
 void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelIndex &current, const QModelIndex &previous) {
