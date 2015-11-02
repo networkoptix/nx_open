@@ -176,7 +176,7 @@ struct QnBookmarkColors {
     QColor tags;
 };
 
-#define QnBookmarkColors_Fields (tooltipBackground)(background)(text)(separator)
+#define QnBookmarkColors_Fields (tooltipBackground)(background)(text)(separator)(tags)
 
 
 struct QnLicensesListModelColors {

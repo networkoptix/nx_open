@@ -12,7 +12,7 @@
 
 #include <utils/common/string.h>
 
-#include <QTextDocument> // remove!
+#include <QTextDocument>
 
 namespace
 {
@@ -100,18 +100,23 @@ namespace
             return insertionIndex;
         }
         
-        if (insertionIndex) /// Insert separator
+        if (insertionIndex && !separator) /// Insert separator
         {
             separator = new QnSeparator(separatorColor, parent);
             layout->insertItem(insertionIndex++, separator);
         }
         
-        if (!label)
+        const bool noLabel = !label;
+        if (noLabel)
         {
             label = new QnProxyLabel(parent);
-            label->setText(trimmedText);
             layout->insertItem(insertionIndex, label);
+        }
 
+        label->setText(trimmedText);
+
+        if (noLabel)
+        {
             const LabelParams &params = kLabelParams[labelParamsId];
             QFont font = label->font();
             font.setBold(params.bold);
@@ -123,14 +128,10 @@ namespace
             const auto labelSize = kBookmarkFrameWidth - label->geometry().x() * 2;
 
             label->setWordWrap(true);
-            label->setMaximumWidth(labelSize);
-            label->setMinimumWidth(labelSize);
+            label->setPreferredWidth(labelSize);
             label->setAlignment(Qt::AlignLeft);
-            label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+            label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
         }
-
-
-        label->setText(trimmedText);
 
         if (label->textFormat() == Qt::RichText)    /// Workaround for wrong sizeHint when rendering 'complex' html
         {
@@ -304,9 +305,8 @@ namespace
         , m_tagsSeparator(nullptr)
         , m_buttonsSeparator(new QnSeparator(colors.separator, this))
     {   
-        setMinimumWidth(kBookmarkFrameWidth);
-        setMaximumWidth(kBookmarkFrameWidth);
-        setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+        setPreferredWidth(kBookmarkFrameWidth);
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
         QGraphicsLinearLayout *actionsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
         QnProxyLabel *editActionLabel =
@@ -321,7 +321,7 @@ namespace
         
         m_layout->addItem(m_buttonsSeparator);
         m_layout->addItem(actionsLayout);
-        m_layout->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+        m_layout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
     }
 
     BookmarkToolTipFrame::~BookmarkToolTipFrame()
@@ -450,7 +450,7 @@ namespace
         }
 
         static const QString htmlTemplate = lit("<html><body>%1</body></html>");
-        const auto tags = htmlTemplate.arg(tagsList.join(lit("")));
+        const auto tags = (tagsList.empty() ? QString() : htmlTemplate.arg(tagsList.join(lit(""))));
         position = renewLabel(position, m_tags, tags
             , m_tagsSeparator, colors.separator, this, m_layout, kTagsIndex);
     }
