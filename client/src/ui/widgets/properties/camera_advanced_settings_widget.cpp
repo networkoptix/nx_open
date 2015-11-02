@@ -105,6 +105,7 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
         return;
 
     if (m_page == Page::Web) {
+        // QUrl doesn't work if it isn't constructed from QString and uses credentials. It stays invalid with error code 'AuthorityPresentAndPathIsRelative' --rvasilenko, Qt 5.2.1
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         QUrl targetUrl = QString(lit("http://%1:%2/%3"))
             .arg(m_camera->getHostAddress())
