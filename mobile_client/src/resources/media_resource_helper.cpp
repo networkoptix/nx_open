@@ -26,7 +26,7 @@ namespace {
     QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #elif defined(Q_OS_ANDROID)
     QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
-    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Webm;
+    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #else
     QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
     QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
@@ -77,6 +77,7 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     m_position(-1),
     m_nativeStreamIndex(1),
     m_transcodingSupported(true),
+    m_transcodingProtocol(transcodingProtocol),
     m_nativeProtocol(nativeStreamProtocol)
 {
     setStardardResolutions();
@@ -165,7 +166,7 @@ void QnMediaResourceHelper::updateUrl() {
 
     QUrlQuery query;
 
-    Protocol protocol = m_transcodingSupported ? transcodingProtocol : m_nativeProtocol;
+    Protocol protocol = m_transcodingSupported ? m_transcodingProtocol : m_nativeProtocol;
     QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user();
 
     url.setScheme(protocolScheme(protocol));
@@ -312,7 +313,7 @@ QString QnMediaResourceHelper::optimalResolution() const {
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const {
     if (m_transcodingSupported)
-        return transcodingProtocol;
+        return m_transcodingProtocol;
     else
         return m_nativeProtocol;
 }
