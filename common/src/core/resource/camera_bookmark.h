@@ -86,6 +86,8 @@ struct QnCameraBookmarkSearchFilter {
     bool isValid() const;
 
     bool checkBookmark(const QnCameraBookmark &bookmark) const;
+
+    static QnCameraBookmarkSearchFilter invalidFilter();
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
 

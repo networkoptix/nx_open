@@ -231,6 +231,14 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
     return true;
 }
 
+QnCameraBookmarkSearchFilter QnCameraBookmarkSearchFilter::invalidFilter() {
+    QnCameraBookmarkSearchFilter filter;
+    filter.startTimeMs = 0;
+    filter.endTimeMs = -1;
+    filter.limit = 0;
+    return filter;
+}
+
 void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/) {return ;}
 void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
 
