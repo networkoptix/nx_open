@@ -482,17 +482,24 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     , m_lastLineBarValue()
     , m_bookmarksViewer(new QnBookmarksViewer( 
         std::bind(&QnTimeSlider::bookmarksAtPosition, this, std::placeholders::_1)
-        , [this](qint64 timestamp) -> QPointF
+        , [this](qint64 timestamp) -> QnBookmarksViewer::PosAndBoundsPair
         {
             if ((timestamp < m_windowStart) || (timestamp > m_windowEnd))
-                return QPointF();   /// Out of window
+                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
 
             const auto viewer = bookmarksViewer();
             const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
 
             const auto pos = positionFromValue(timestamp);
             const auto target = QPointF(pos.x(), lineBarRect.top());
-            return viewer->mapToParent(viewer->mapFromItem(this, target.x(), target.y()));
+
+            Q_D(const GraphicsSlider);
+
+            const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
+            const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
+            const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
+            const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
+            return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
         }
         , this))
     , m_bookmarksVisible(false)
