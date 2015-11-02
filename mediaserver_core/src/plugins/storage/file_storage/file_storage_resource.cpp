@@ -361,7 +361,6 @@ void QnFileStorageResource::setUrl(const QString& url)
 }
 
 QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
-    m_storageBitrateCoeff(1.0),
     m_dirty(false),
     m_valid(false),
     m_capabilities(0),
@@ -542,11 +541,6 @@ float QnFileStorageResource::getAvarageWritingUsage() const
 {
     QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getId());
     return writer ? writer->getAvarageUsage() : 0;
-}
-
-float QnFileStorageResource::getStorageBitrateCoeff() const
-{
-    return m_storageBitrateCoeff;
 }
 
 #ifdef _WIN32
