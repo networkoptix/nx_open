@@ -369,6 +369,10 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         if (processedStorages.contains(spaceInfo.storageId))
             continue;
 
+        /* Storage was already added */
+        if (QnStorageResourcePtr existing = requestKey.server->getStorageByUrl(spaceInfo.url))
+            continue;
+
         Q_ASSERT_X(spaceInfo.storageId.isNull(), Q_FUNC_INFO, "We should process only non-pool storages here");
         if (!spaceInfo.storageId.isNull())
             continue;
