@@ -35,7 +35,7 @@ QnImageButtonWidget::StateFlags findValidState(QnImageButtonWidget::StateFlags f
     case CHECKED_HOVERED_DISABLED:
         TRY(CHECKED | HOVERED | DISABLED);
         TRY(CHECKED | DISABLED);
-        TRY(CHECKED);
+        TRY(DISABLED);
         return 0;
     case CHECKED_HOVERED:
         TRY(CHECKED | HOVERED);
@@ -46,7 +46,7 @@ QnImageButtonWidget::StateFlags findValidState(QnImageButtonWidget::StateFlags f
         /* Fall through. */
     case CHECKED_DISABLED:
         TRY(CHECKED | DISABLED);
-        TRY(CHECKED);
+        TRY(DISABLED);
         return 0;
     case HOVERED_DISABLED_PRESSED:
         TRY(HOVERED | DISABLED | PRESSED);
