@@ -1654,8 +1654,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     if (layout->resource())
         disconnect(layout->resource(), NULL, this, NULL);
 
-    layout->setData(Qn::LayoutBookmarksModeRole, action(Qn::BookmarksModeAction)->isChecked());
-
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
 

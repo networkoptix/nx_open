@@ -51,7 +51,7 @@ void QnStorageUrlDialog::setProtocols(const QSet<QString> &protocols) {
     updateComboBox();
 }
 
-QnStorageSpaceData QnStorageUrlDialog::storage() const {
+QnStorageModelInfo QnStorageUrlDialog::storage() const {
     return m_storage;
 }
 
@@ -144,7 +144,7 @@ void QnStorageUrlDialog::accept()
     setEnabled(true);
     unsetCursor();
 
-    m_storage = result.reply().value<QnStorageStatusReply>().storage;
+    m_storage = QnStorageModelInfo(result.reply().value<QnStorageStatusReply>().storage);
     if(result.status() != 0 || !m_storage.isWritable || !m_storage.isExternal) {
         QMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
         return;
@@ -196,20 +196,12 @@ void QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged() {
 
     ui->urlEdit->setText(url);
     ui->urlEdit->setPlaceholderText(placeholder);
-
-#ifdef Q_OS_WIN
-    //ui->browseButton->setVisible(m_lastProtocol == lit("smb"));
-    ui->browseButton->setVisible(false);
-#else
-    ui->browseButton->setVisible(false);
-#endif
 }
 
 bool QnStorageUrlDialog::storageAlreadyUsed(const QString &path) const {
     QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
 
     return boost::algorithm::any_of(servers, [path](const QnMediaServerResourcePtr &server) {
-        //TODO: #GDM very weak comparison, also storage already added to dialog but not saved is not counted
         return !server->getStorageByUrl(path).isNull();
     });
 

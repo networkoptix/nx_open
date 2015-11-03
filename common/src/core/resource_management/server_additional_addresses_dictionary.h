@@ -9,6 +9,8 @@ class QnServerAdditionalAddressesDictionary: public QObject, public Singleton<Qn
 {
     Q_OBJECT
 public:
+    QnServerAdditionalAddressesDictionary(QObject *parent = NULL);
+    
     QList<QUrl> additionalUrls(const QnUuid &serverId) const;
     QList<QUrl> ignoredUrls(const QnUuid &serverId) const;
     void setAdditionalUrls(const QnUuid &serverId, const QList<QUrl> &additionalUrls);

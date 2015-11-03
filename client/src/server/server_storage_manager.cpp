@@ -9,24 +9,26 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/client_storage_resource.h>
 
 #include <utils/common/delayed.h>
 
 namespace {
     const int updateRebuildStatusDelayMs = 500;
+
+    /** Delay between requests when the backup is running. */ 
     const int updateBackupStatusDelayMs = 500;
+
+    /** Regular check if backup started. */
+    const int updateBackupRegularStatusDelayMs = 500;
 }
 
 struct ServerPoolInfo {
-    int archiveRebuildRequestHandle;
-    int storageSpaceRequestHandle;
-    QnStorageSpaceDataList storages;
+    int archiveRebuildRequestHandle;  
     QnStorageScanData rebuildStatus;
 
     ServerPoolInfo()
         : archiveRebuildRequestHandle(0)
-        , storageSpaceRequestHandle(0)
-        , storages()
         , rebuildStatus()
     {}
 };
@@ -35,12 +37,14 @@ struct QnServerStorageManager::ServerInfo {
     std::array<ServerPoolInfo, static_cast<int>(QnServerStoragesPool::Count)> storages;
     QSet<QString> protocols;
     int backupRequestHandle;
+    int storageSpaceRequestHandle;
     QnBackupStatusData backupStatus;
 
     ServerInfo()
         : storages()
         , protocols()
         , backupRequestHandle(0)
+        , storageSpaceRequestHandle(0)
         , backupStatus()
     {}
 };
@@ -114,6 +118,13 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
 
     for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
         resourceAdded(server);
+
+    QTimer *updateBackupTimer = new QTimer(this);
+    updateBackupTimer->setInterval(updateBackupRegularStatusDelayMs);
+    connect(updateBackupTimer, &QTimer::timeout, this, [this]{
+        for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
+            sendBackupRequest(server);
+    });
 }
 
 QnServerStorageManager::~QnServerStorageManager() {
@@ -132,13 +143,6 @@ bool QnServerStorageManager::isServerValid( const QnMediaServerResourcePtr &serv
     return server->getStatus() == Qn::Online;
 }
 
-QnStorageSpaceDataList QnServerStorageManager::storages( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool ) const {
-    if (!m_serverInfo.contains(server))
-        return QnStorageSpaceDataList();
-
-    return m_serverInfo[server].storages[static_cast<int>(pool)].storages;
-}
-
 QSet<QString> QnServerStorageManager::protocols( const QnMediaServerResourcePtr &server ) const {
     if (!m_serverInfo.contains(server))
         return QSet<QString>();
@@ -153,7 +157,7 @@ QnStorageScanData QnServerStorageManager::rebuildStatus( const QnMediaServerReso
     return m_serverInfo[server].storages[static_cast<int>(pool)].rebuildStatus;
 }
 
-QnBackupStatusData QnServerStorageManager::backupStatus( const QnMediaServerResourcePtr &server ) const {
+QnBackupStatusData QnServerStorageManager::backupStatus( const QnMediaServerResourcePtr &server) const {
     if (!m_serverInfo.contains(server))
         return QnBackupStatusData();
 
@@ -176,30 +180,27 @@ bool QnServerStorageManager::cancelBackupServerStorages( const QnMediaServerReso
     return sendBackupRequest(server, Qn::BackupAction_Cancel);
 }
 
+void QnServerStorageManager::checkBackupStatus( const QnMediaServerResourcePtr &server ) {
+    sendBackupRequest(server);
+}
+
+
 //TODO: #GDM SafeMode
-void QnServerStorageManager::saveStorages(const QnMediaServerResourcePtr &server, const QnStorageResourceList &storages ) {
+void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages ) {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn)
         return;
 
-    //TODO: #GDM remove the workaround, listen to storageChanged/Removed
-    conn->getMediaServerManager()->saveStorages(storages, this, [this, server]() {
-        sendStorageSpaceRequest(server, QnServerStoragesPool::Main);
-        sendStorageSpaceRequest(server, QnServerStoragesPool::Backup);
-    });
+    conn->getMediaServerManager()->saveStorages(storages, this, [] {});
 }
 
 //TODO: #GDM SafeMode
-void QnServerStorageManager::deleteStorages(const QnMediaServerResourcePtr &server, const ec2::ApiIdDataList &ids ) {
+void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids ) {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn)
         return;
 
-    //TODO: #GDM remove the workaround, listen to storageChanged/Removed
-    conn->getMediaServerManager()->removeStorages(ids, this, [this, server]() {
-        sendStorageSpaceRequest(server, QnServerStoragesPool::Main);
-        sendStorageSpaceRequest(server, QnServerStoragesPool::Backup);
-    });
+    conn->getMediaServerManager()->removeStorages(ids, this, [] {});
 }
 
 bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, Qn::RebuildAction action ) {
@@ -241,7 +242,7 @@ void QnServerStorageManager::at_archiveRebuildReply( int status, const QnStorage
     if (reply.state > Qn::RebuildState_None || status != 0)
         executeDelayed([this, requestKey]{ sendArchiveRebuildRequest(requestKey.server, requestKey.pool); }, updateRebuildStatusDelayMs);
     else
-        executeDelayed([this, requestKey]{ sendStorageSpaceRequest(requestKey.server, requestKey.pool); }, updateRebuildStatusDelayMs);
+        executeDelayed([this, requestKey]{ sendStorageSpaceRequest(requestKey.server); }, updateRebuildStatusDelayMs);
 
     if(status != 0)
         return;
@@ -261,8 +262,6 @@ void QnServerStorageManager::at_archiveRebuildReply( int status, const QnStorage
 bool QnServerStorageManager::sendBackupRequest( const QnMediaServerResourcePtr &server, Qn::BackupAction action ) {
     if (!isServerValid(server))
         return false;
-
-    //TODO: #GDM enqueue server if status is not Online
 
     int handle = server->apiConnection()->backupControlActionAsync(
         action, 
@@ -310,25 +309,33 @@ void QnServerStorageManager::at_backupStatusReply( int status, const QnBackupSta
     }
 }
 
-bool QnServerStorageManager::sendStorageSpaceRequest( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool ) {
+bool QnServerStorageManager::sendStorageSpaceRequest( const QnMediaServerResourcePtr &server) {
     if (!isServerValid(server))
         return false;
 
-    //TODO: #GDM enqueue server if status is not Online
-
     int handle = server->apiConnection()->getStorageSpaceAsync(
-        pool == QnServerStoragesPool::Main, 
         this, 
         SLOT(at_storageSpaceReply(int, const QnStorageSpaceReply &, int)));
     if (handle <= 0)
         return false;
 
-    m_requests.insert(handle, RequestKey(server, pool));
-    m_serverInfo[server].storages[static_cast<int>(pool)].storageSpaceRequestHandle = handle;
+    m_requests.insert(handle, RequestKey(server, QnServerStoragesPool::Main));
+    m_serverInfo[server].storageSpaceRequestHandle = handle;
     return true;
 }
 
 void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSpaceReply &reply, int handle ) {
+
+    for (const QnStorageSpaceData &spaceInfo: reply.storages) {
+        QnClientStorageResourcePtr storage = qnResPool->getResourceById<QnClientStorageResource>(spaceInfo.storageId);
+        if (!storage)
+            continue;
+
+        storage->setFreeSpace(spaceInfo.freeSpace);
+        storage->setTotalSpace(spaceInfo.totalSpace);
+        storage->setWritable(spaceInfo.isWritable);
+    }
+
     /* Requests were invalidated. */
     if (!m_requests.contains(handle))
         return;
@@ -340,28 +347,14 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         return;
 
     ServerInfo &serverInfo = m_serverInfo[requestKey.server];
-    ServerPoolInfo &poolInfo = serverInfo.storages[static_cast<int>(requestKey.pool)];
 
-    if (poolInfo.storageSpaceRequestHandle != handle)
+    if (serverInfo.storageSpaceRequestHandle != handle)
         return;
     
-    poolInfo.storageSpaceRequestHandle = 0;
+    serverInfo.storageSpaceRequestHandle = 0;
 
     if(status != 0)
         return;
-
-    QnStorageSpaceDataList storages(reply.storages);
-    qSort(storages.begin(), storages.end(), [](const QnStorageSpaceData &l, const QnStorageSpaceData &r) 
-    {
-        if (l.isExternal != r.isExternal)
-            return l.isExternal < r.isExternal; 
-        return l.url < r.url;
-    });
-
-    if (poolInfo.storages != storages) {
-        poolInfo.storages = storages;
-        emit serverStorageSpaceChanged(requestKey.server, requestKey.pool, storages);
-    }
 
     auto replyProtocols = reply.storageProtocols.toSet();
     if (serverInfo.protocols != replyProtocols) {

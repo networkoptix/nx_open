@@ -244,9 +244,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QPushButton" name="pushButtonCameraSettings">
+      <widget class="QPushButton" name="camerasToBackupButton">
        <property name="text">
-        <string>Cameras to Backup...</string>
+        <string notr="true">&lt;Cameras to Backup...&gt;</string>
        </property>
       </widget>
      </item>

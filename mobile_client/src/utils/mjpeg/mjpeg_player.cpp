@@ -7,6 +7,10 @@
 #include <utils/common/delayed.h>
 #include "mjpeg_session.h"
 
+namespace {
+    const qint64 invalidTimestamp = -1;
+}
+
 class QnMjpegPlayerPrivate : public QObject {
     Q_DECLARE_PUBLIC(QnMjpegPlayer)
     QnMjpegPlayer *q_ptr;
@@ -21,6 +25,7 @@ public:
 
     QAbstractVideoSurface *videoSurface;
     int position;
+    qint64 timestamp;
 
     bool reconnectOnPlay;
 
@@ -64,7 +69,7 @@ void QnMjpegPlayerPrivate::processFrame() {
     int presentationTime;
     QImage image;
 
-    if (!session->dequeueFrame(&image, &presentationTime))
+    if (!session->dequeueFrame(&image, &timestamp, &presentationTime))
         return;
 
     position += presentationTime;
@@ -127,6 +132,7 @@ QnMjpegPlayer::QnMjpegPlayer(QObject *parent)
 
     connect(d->session, &QnMjpegSession::frameEnqueued, d, &QnMjpegPlayerPrivate::at_session_frameEnqueued);
     connect(d->session, &QnMjpegSession::urlChanged, this, &QnMjpegPlayer::sourceChanged);
+    connect(this,   &QnMjpegPlayer::positionChanged, this, &QnMjpegPlayer::timestampChanged);
 }
 
 QnMjpegPlayer::~QnMjpegPlayer() {
@@ -165,6 +171,12 @@ int QnMjpegPlayer::position() const {
     Q_D(const QnMjpegPlayer);
 
     return d->position;
+}
+
+qint64 QnMjpegPlayer::timestamp() const {
+    Q_D(const QnMjpegPlayer);
+
+    return d->timestamp;
 }
 
 bool QnMjpegPlayer::reconnectOnPlay() const {
@@ -210,6 +222,7 @@ void QnMjpegPlayer::pause() {
     if (d->reconnectOnPlay) {
         d->session->stop();
         d->position = 0;
+        d->timestamp = invalidTimestamp;
         emit positionChanged();
     }
 }
@@ -221,6 +234,8 @@ void QnMjpegPlayer::stop() {
     d->setState(Stopped);
 
     d->position = 0;
+    d->timestamp = invalidTimestamp;
+
     emit positionChanged();
 }
 

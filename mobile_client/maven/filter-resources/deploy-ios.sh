@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [[ ${skip.sign} == true ]]; then
-    exit 0
-fi
-
 TARGET_SDK=${TARGET_SDK:-iphoneos}
 
 /usr/bin/xcrun -sdk "${TARGET_SDK}" PackageApplication \

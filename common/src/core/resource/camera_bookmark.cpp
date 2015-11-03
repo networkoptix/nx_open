@@ -12,8 +12,8 @@ bool QnCameraBookmark::isNull() const {
     return guid.isNull();
 }
 
-QString QnCameraBookmark::tagsAsString(QChar delimiter) const {
-    return QStringList(tags.toList()).join(delimiter);
+QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &bokmarkTags, const QString &delimiter) {
+    return QStringList(bokmarkTags.toList()).join(delimiter);
 }
 
 //TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
@@ -182,7 +182,7 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
         dbg.nospace() << "QnCameraBookmark INSTANT (" << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs).toString(lit("dd hh:mm")) << ')';
     dbg.space() << "timeout" << bookmark.timeout;
     dbg.space() << bookmark.name << bookmark.description;
-    dbg.space() << bookmark.tagsAsString(L' ');
+    dbg.space() << QnCameraBookmark::tagsToString(bookmark.tags);
     return dbg.space();
 }
 
@@ -229,6 +229,14 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
     }
 
     return true;
+}
+
+QnCameraBookmarkSearchFilter QnCameraBookmarkSearchFilter::invalidFilter() {
+    QnCameraBookmarkSearchFilter filter;
+    filter.startTimeMs = 0;
+    filter.endTimeMs = -1;
+    filter.limit = 0;
+    return filter;
 }
 
 void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/) {return ;}

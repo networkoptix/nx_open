@@ -117,6 +117,7 @@
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
+        <qt.version>5.2.1-SNAPSHOT</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
@@ -357,14 +358,15 @@
             </modules>
         </profile>
        <profile>
-            <id>nomac</id>
+            <id>nomac-nomobile</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>!mac</family>
                 </os>
                 <property>
-                    <name>!newmobile</name>
+                    <name>newmobile</name>
+                    <value>!true</value>
                 </property>
             </activation>
             <modules>
@@ -555,7 +557,8 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>!newmobile</name>
+                    <name>newmobile</name>
+                    <value>!true</value>
                 </property>
             </activation>
             <properties>
@@ -830,10 +833,19 @@
             <id>mobile-common</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>i386</arch>
+                </os>                
                 <property>
                     <name>newmobile</name>
+                    <value>true</value>
                 </property>
             </activation>
+            <properties>
+                <qt.version>5.5.1-SNAPSHOT</qt.version>
+            </properties>            
             <modules>
                 <module>client.core</module>
                 <module>mobile_client</module>
@@ -845,9 +857,11 @@
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
+                    <name>linux</name>
+                    <arch>i386</arch>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android</value>
                 </property>
             </activation>
@@ -875,8 +889,13 @@
             <id>mobile-android-desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>i386</arch>
+                </os>                
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android-desktop</value>
                 </property>
             </activation>
@@ -893,7 +912,7 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>ios</value>
                 </property>
             </activation>

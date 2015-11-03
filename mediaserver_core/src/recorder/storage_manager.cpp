@@ -50,7 +50,7 @@
 namespace {
     static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
     static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
-    static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 3600;
+    static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
     static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
     static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
@@ -297,8 +297,10 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
-    if (m_role == QnServer::StoragePool::Backup)
-        connect(qnScheduleSync, &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
+    if (m_role == QnServer::StoragePool::Backup) {
+        m_scheduleSync.reset(new QnScheduleSync());
+        connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
+    }
         
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
@@ -1531,7 +1533,6 @@ void QnStorageManager::stopAsyncTasks()
         delete m_rebuildArchiveThread;
         m_rebuildArchiveThread = 0;
     }
-    qnScheduleSync->stop();
 }
 
 void QnStorageManager::updateStorageStatistics()
@@ -2036,4 +2037,16 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString &storageUrl
         result = qnBackupStorageMan->getStorageByUrlInternal(storageUrl);
     }
     return result;
+}
+
+const std::array<QnServer::StoragePool, 2> QnStorageManager::getPools() {
+    static const 
+    std::array<QnServer::StoragePool, 2> pools = {QnServer::StoragePool::Normal, 
+                                                  QnServer::StoragePool::Backup};
+    return pools;
+}
+
+QnScheduleSync* QnStorageManager::scheduleSync() const
+{
+    return m_scheduleSync.get();
 }

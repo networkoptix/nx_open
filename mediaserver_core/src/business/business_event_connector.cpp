@@ -155,6 +155,7 @@ void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &re
 void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText)
 {
     QnBackupFinishedBusinessEventPtr bEvent(new QnBackupFinishedBusinessEvent(resource, timeStamp, reasonCode, reasonText));
+    qnBusinessRuleProcessor->processBusinessEvent(bEvent);
 }
 
 bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage)

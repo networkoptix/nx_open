@@ -34,7 +34,7 @@ class QnCameraUserAttributePool
 {
     Q_OBJECT
 public:
-    QnCameraUserAttributePool();
+    QnCameraUserAttributePool(QObject *parent = NULL);
     virtual ~QnCameraUserAttributePool();
 
     QnCameraUserAttributesList getAttributesList( const QList<QnUuid>& idList );

@@ -23,7 +23,6 @@ public:
     virtual ~QnServerStorageManager();
 
     QSet<QString> protocols(const QnMediaServerResourcePtr &server) const;
-    QnStorageSpaceDataList storages(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool) const;
     QnStorageScanData rebuildStatus(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool) const;
     QnBackupStatusData backupStatus(const QnMediaServerResourcePtr &server) const;
 
@@ -32,13 +31,12 @@ public:
 
     bool backupServerStorages(const QnMediaServerResourcePtr &server);
     bool cancelBackupServerStorages(const QnMediaServerResourcePtr &server);
+    void checkBackupStatus(const QnMediaServerResourcePtr &server);
 
-    void saveStorages(const QnMediaServerResourcePtr &server, const QnStorageResourceList &storages);
-    void deleteStorages(const QnMediaServerResourcePtr &server, const ec2::ApiIdDataList &ids);
-
+    void saveStorages(const QnStorageResourceList &storages);
+    void deleteStorages(const ec2::ApiIdDataList &ids);
 signals:
     void serverProtocolsChanged(const QnMediaServerResourcePtr &server, const QSet<QString> &protocols);
-    void serverStorageSpaceChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageSpaceDataList &storages);
     void serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
     void serverBackupStatusChanged(const QnMediaServerResourcePtr &server, const QnBackupStatusData &status);
 
@@ -50,7 +48,7 @@ private:
 
     bool sendArchiveRebuildRequest(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, Qn::RebuildAction action = Qn::RebuildAction_ShowProgress);
     bool sendBackupRequest(const QnMediaServerResourcePtr &server, Qn::BackupAction action = Qn::BackupAction_ShowProgress);
-    bool sendStorageSpaceRequest(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool);
+    bool sendStorageSpaceRequest(const QnMediaServerResourcePtr &server);
 
 private slots:
     void at_archiveRebuildReply (int status, const QnStorageScanData    &reply, int handle);

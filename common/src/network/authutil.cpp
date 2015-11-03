@@ -118,6 +118,6 @@ QByteArray createHttpQueryAuthParam(
     md5Hash.addData( nedoHa2 );
     const QByteArray& authDigest = md5Hash.result().toHex();
 
-    return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
+    return (userName.toUtf8().toLower() + ":" + nonce + ":" + authDigest).toBase64();
 }
 
