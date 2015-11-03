@@ -245,7 +245,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     {
         const auto currentWidget = navigator()->currentWidget();
         if (currentWidget)
-            connect(currentWidget, SIGNAL(optionsChanged()), this, SLOT(updateBookButtonEnabled()));
+            connect(currentWidget, &QnResourceWidget::optionsChanged, this, &QnNavigationItem::updateBookButtonEnabled);
     });
 
     connect(navigator(),                    SIGNAL(currentWidgetAboutToBeChanged()),    m_speedSlider,  SLOT(finishAnimations()));
