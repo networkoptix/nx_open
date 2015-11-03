@@ -363,10 +363,9 @@
                 <os>
                     <family>!mac</family>
                 </os>
-                <property>
-                    <name>arch</name>
-                    <value>!arm-mobile</value>
-                </property>
+<!--                <property>
+                    <name>!newmobile</name>
+                </property> -->
             </activation>
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
@@ -581,7 +580,8 @@
                     <name>linux</name>
                 </os>
                 <property>
-                    <name>!box</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
             <modules>
@@ -735,7 +735,8 @@
                     <arch>amd64</arch>
                 </os>
                 <property>
-                    <name>!box</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
             <properties>
@@ -753,7 +754,8 @@
                     <arch>i386</arch>
                 </os>
                 <property>
-                    <name>!box</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
             <properties>
