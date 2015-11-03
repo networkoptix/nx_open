@@ -150,7 +150,7 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const QnUuid& requestI
 
     lock.unlock();
     if (callback)
-        callback(success);
+        executeDelayed([callback, success] { callback(success); }, kDefaultDelay, this->thread());
 
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
