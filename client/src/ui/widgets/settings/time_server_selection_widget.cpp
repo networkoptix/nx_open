@@ -68,6 +68,8 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
 
     connect(qnSyncTime, &QnSyncTime::timeChanged, this, &QnTimeServerSelectionWidget::updateTime);
 
+    connect(m_model, &QnTimeServerSelectionModel::dataChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
     QTimer* timer = new QTimer(this);
     timer->setInterval(1000);
     timer->setSingleShot(false);
