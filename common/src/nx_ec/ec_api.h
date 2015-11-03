@@ -303,6 +303,13 @@ namespace ec2
             return removeStorages( storages, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode removeStoragesSync( const ApiIdDataList& storages) {
+            return impl::doSyncCall<impl::SimpleHandler>( 
+                [=](const impl::SimpleHandlerPtr &handler) { return this->removeStorages(storages, handler); });
+        }
+
+
+
         /*!
             \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
                 If NULL, returned list contains data of all known servers
