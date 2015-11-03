@@ -30,7 +30,8 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     //m_sendMotion(false),
     m_eof(false),
     m_quality(MEDIA_Quality_High),
-    m_mutex( QnMutex::Recursive )    //just to be sure no callback can occur and block
+    m_mutex( QnMutex::Recursive ),    //just to be sure no callback can occur and block
+    m_lastChunkQuality(QnServer::LowQualityCatalog)
 {
     m_flags |= Flag_CanSendMotion;
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());

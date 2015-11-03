@@ -126,6 +126,7 @@ private:
 
     bool fillCatalogs()
     {
+        return false;
     }
 
 public:
@@ -151,9 +152,9 @@ private:
     QnResourceStatusDictionary m_rdict;
     //QnMediaServerUserAttributesPool     m_mediaServerAttrPool;
 
-#ifndef _WIN32
-    QnPlatformAbstraction platformAbstraction;
-#endif
+//#ifndef _WIN32
+//    QnPlatformAbstraction platformAbstraction;
+//#endif
 };
 
 TEST(ServerArchiveDelegateTest, Main) {
