@@ -234,6 +234,20 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(action(Qn::ToggleSyncAction),   SIGNAL(triggered()),                        this,           SLOT(at_syncButton_clicked()));
     connect(action(Qn::ToggleMuteAction),   SIGNAL(toggled(bool)),                      m_volumeSlider, SLOT(setMute(bool)));
     
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged,    this,  [this]()
+    {
+        const auto currentWidget = navigator()->currentWidget();
+        if (currentWidget)
+            disconnect(currentWidget, &QnResourceWidget::optionsChanged, this, nullptr);
+    });
+
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this, [this]()
+    {
+        const auto currentWidget = navigator()->currentWidget();
+        if (currentWidget)
+            connect(currentWidget, SIGNAL(optionsChanged()), this, SLOT(updateBookButtonEnabled()));
+    });
+
     connect(navigator(),                    SIGNAL(currentWidgetAboutToBeChanged()),    m_speedSlider,  SLOT(finishAnimations()));
     connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateSyncButtonEnabled()));
     connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateJumpButtonsTooltips()));
@@ -392,9 +406,14 @@ void QnNavigationItem::updateJumpButtonsTooltips() {
 void QnNavigationItem::updateBookButtonEnabled()
 {
     const auto currentWidget = navigator()->currentWidget();
-    const bool bookmarksEnabled = currentWidget 
-        && currentWidget->resource()->flags().testFlag(Qn::live);
-    
+
+    const bool motionSearchMode = (currentWidget 
+        && currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
+
+    const bool bookmarksEnabled = (!motionSearchMode && currentWidget 
+        && currentWidget->resource()->flags().testFlag(Qn::live));
+
+
     const auto layout = workbench()->currentLayout();
     const bool bookmarkMode = bookmarksEnabled 
         && layout->data(Qn::LayoutBookmarksModeRole).toBool();
