@@ -21,7 +21,7 @@ private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
 public:
-    QnFileStorageResource(QnStorageManager *storageManager);
+    QnFileStorageResource();
     ~QnFileStorageResource();
 
     static QnStorageResource* instance(const QString&);
@@ -84,10 +84,9 @@ private:
     mutable bool m_valid;
 
 private:
-    mutable QnMutex      m_mutexPermission;
+    mutable QnMutex     m_mutexPermission;
     mutable int         m_capabilities;
     mutable QString     m_localPath;
-    QnStorageManager    *m_storageManager;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

@@ -660,7 +660,6 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 
 QnStorageManager::~QnStorageManager()
 {
-    // stopRedundantSyncWatchdog();
     if (m_role == QnServer::StoragePool::Normal)
         QnNormalStorageManager_instance = nullptr;
     else if (m_role == QnServer::StoragePool::Backup)

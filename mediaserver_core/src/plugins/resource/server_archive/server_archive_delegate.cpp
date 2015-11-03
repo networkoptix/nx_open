@@ -372,7 +372,7 @@ begin_label:
         if (m_afterSeek)
             data->flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_afterSeek = false;
-        if (m_currentChunkCatalog == m_catalogLow)
+        if (m_lastChunkQuality == QnServer::LowQualityCatalog)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
     }
     
@@ -444,6 +444,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_currentChunk = newChunk;
     
     m_currentChunkCatalog[newCatalog->getStoragePool()] = newCatalog;
+    m_lastChunkQuality = newCatalog->getRole();
     QString url = newCatalog->fullFileName(newChunk.toBaseChunk());
 
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));

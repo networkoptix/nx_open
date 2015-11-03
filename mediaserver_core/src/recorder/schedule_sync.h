@@ -56,7 +56,8 @@ private:
     APPLY(FromStorageError) \
     APPLY(FileOpenError) \
     APPLY(ChunkError) \
-    APPLY(NoError)
+    APPLY(NoError) \
+    APPLY(Interrupted)
 
 #define ENUM_APPLY(value) value,
 
