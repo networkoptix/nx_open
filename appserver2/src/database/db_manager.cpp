@@ -88,7 +88,7 @@ void assertSorted(std::vector<T> &data, QnUuid Field::*idField) {
         return;
 
     QByteArray prev = (data[0].*idField).toRfc4122();
-    for (int i = 1; i < data.size(); ++i) {
+    for (size_t i = 1; i < data.size(); ++i) {
         QByteArray next = (data[i].*idField).toRfc4122();
         assert(next >= prev);
         prev = next;

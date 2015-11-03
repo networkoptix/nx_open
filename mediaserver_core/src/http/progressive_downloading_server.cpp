@@ -50,7 +50,8 @@ public:
         bool standFrameDuration,
         bool dropLateFrames,
         unsigned int maxFramesToCacheBeforeDrop,
-        bool liveMode)
+        bool liveMode,
+        bool continuousTimestamps)
     :
         QnAbstractDataConsumer(50),
         m_owner(owner),
@@ -63,6 +64,7 @@ public:
         m_lastRtTime( 0 ),
         m_endTimeUsec( AV_NOPTS_VALUE ),
         m_liveMode(liveMode),
+        m_continuousTimestamps(continuousTimestamps),
         m_needKeyData(false)
     {
         if( dropLateFrames )
@@ -165,7 +167,7 @@ protected:
         if (media && m_auditHandle)
             qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
-        if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
+        if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
         {
             if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
                 media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
@@ -214,6 +216,7 @@ private:
     qint64 m_lastRtTime;
     qint64 m_endTimeUsec;
     bool m_liveMode;
+    bool m_continuousTimestamps;
     bool m_needKeyData;
     AuditHandle m_auditHandle;
 
@@ -354,6 +357,7 @@ static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
 static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
 static const QLatin1String RT_OPTIMIZATION_PARAM_NAME( "rt" ); // realtime transcode optimization
+static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
@@ -599,6 +603,8 @@ void QnProgressiveDownloadingConsumer::run()
             dropLateFrames = true;
         }
 
+        bool continuousTimestamps = decodedUrlQuery.queryItemValue(CONTINUOUS_TIMESTAMPS_PARAM_NAME) != lit("false");
+
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
         
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
@@ -621,7 +627,8 @@ void QnProgressiveDownloadingConsumer::run()
             standFrameDuration,
             dropLateFrames,
             maxFramesToCacheBeforeDrop,
-            isLive);
+            isLive,
+            continuousTimestamps);
 
         qint64 timeUSec = DATETIME_NOW;
         if (isLive)

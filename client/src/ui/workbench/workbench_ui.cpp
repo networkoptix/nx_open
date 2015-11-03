@@ -2568,6 +2568,7 @@ void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
     } else {
         m_searchSizeAnimator->stop();
         m_searchWidget->setPaintSize(newSize);
+        m_searchWidget->setVisible(opened);
     }
     
     QnSearchLineEdit *searchWidget = navigator()->bookmarksSearchWidget();
@@ -2657,6 +2658,10 @@ void QnWorkbenchUi::createSearchWidget() {
     m_searchSizeAnimator->setAccessor(new PropertyAccessor("paintSize"));
     m_searchSizeAnimator->setSpeed(100.0 * 2.0);
     m_searchSizeAnimator->setTimeLimit(500);
+    connect(m_searchSizeAnimator, &VariantAnimator::valueChanged, this, [this](const QVariant &value)
+    {
+        m_searchWidget->setVisible(!qFuzzyIsNull(value.toSizeF().height()));
+    });
 
     connect(action(Qn::BookmarksModeAction), &QAction::toggled, this, [this](bool toggled){
         setSearchOpened(toggled);

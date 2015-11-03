@@ -9,6 +9,8 @@ Item {
     property bool useShadeSize: Qt.platform.os == "android" || Qt.platform.os == "ios"
     property alias statusBarHeight: statusBarShade.height
 
+    property real rightPadding: dp(56)
+
     readonly property real fullHeight: height + (useShadeSize ? statusBarHeight : 0)
 
     property alias backgroundOpacity: backgroundRectangle.opacity
@@ -55,10 +57,16 @@ Item {
         Text {
             id: label
             anchors.verticalCenter: parent.verticalCenter
-            x: dp(72)
+            anchors.left: parent.left
+            anchors.leftMargin: dp(72)
+            anchors.right: parent.right
+            anchors.rightMargin: rightPadding
+
             font.pixelSize: sp(20)
             font.weight: Font.DemiBold
             color: QnTheme.windowText
+
+            elide: Text.ElideRight
         }
 
         Item {

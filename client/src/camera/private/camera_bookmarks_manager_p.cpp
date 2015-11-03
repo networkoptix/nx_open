@@ -245,7 +245,7 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId
     case QueryInfo::QueryState::Invalid:
         return true;
     case QueryInfo::QueryState::Queued:
-        return !info.requestTimer.isValid() || info.requestTimer.hasExpired(minimimumRequestTimeoutMs);
+        return !info.requestTimer.isValid() || info.requestTimer.hasExpired(minimimumRequestTimeoutMs) || !query->isValid();
     case QueryInfo::QueryState::Requested:
         return false;
     case QueryInfo::QueryState::Actual:
@@ -320,9 +320,19 @@ void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBook
     }
 
     QueryInfo &info = m_queries[queryId];
+    info.requestTimer.restart();
+
+    if (!query->isValid()) {
+        info.state = QueryInfo::QueryState::Actual;
+
+        if (callback)
+            callback(false, QnCameraBookmarkList());
+
+        return;
+    }
+
     info.state = QueryInfo::QueryState::Requested;
-    info.requestTimer.restart(); 
-    info.requestId = getBookmarksAsync(query->cameras(), query->filter(), 
+    info.requestId = getBookmarksAsync(query->cameras(), query->filter(),
         [this, queryId, callback](bool success, QnCameraBookmarkList bookmarks, int requestId) {
         if (success && m_queries.contains(queryId) && requestId != invalidRequestId) {
             QueryInfo &info = m_queries[queryId];

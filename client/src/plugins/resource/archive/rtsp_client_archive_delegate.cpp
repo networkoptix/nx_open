@@ -19,7 +19,6 @@ extern "C"
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 
-#include <plugins/resource/client_camera/client_camera.h>
 #include <plugins/resource/archive/archive_stream_reader.h>
 
 #include <redass/redass_controller.h>

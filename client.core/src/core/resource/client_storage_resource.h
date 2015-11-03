@@ -1,28 +1,30 @@
-#ifndef __CLIENT_STORAGE_RESOURCE_H__
-#define __CLIENT_STORAGE_RESOURCE_H__
+#pragma once
+
+#include <core/resource/client_resource_fwd.h>
 
 #include <core/resource/storage_resource.h>
+
 /*
 *   This class used only for manipulating storage as User Interface entity. 
-*   Never use any functions derived from QnAbstractStorageResource.
 */
 class QnClientStorageResource
     : public QnStorageResource
 {
+    Q_OBJECT
+
 public:
     enum StorageFlags {
         ReadOnly        = 0x1,
         ContainsCameras = 0x2,
     };
 
-    QnClientStorageResource() {}
-    virtual ~QnClientStorageResource() {}
+    QnClientStorageResource();
+    virtual ~QnClientStorageResource();
 
-    static QnStorageResource* instance();
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
-
-    virtual int getCapabilities() const override;
+    
     virtual bool isAvailable() const override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
@@ -31,10 +33,25 @@ public:
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
+
+    void setFreeSpace(qint64 value);
     virtual qint64 getFreeSpace() override;
+
+    void setTotalSpace(qint64 value);
     virtual qint64 getTotalSpace() override;
+
+    void setWritable(bool isWritable);
+    virtual int getCapabilities() const override;
+
+signals:
+    void freeSpaceChanged(const QnResourcePtr &storage);
+    void totalSpaceChanged(const QnResourcePtr &storage);
+    void isWritableChanged(const QnResourcePtr &storage);
+
+private:
+    qint64 m_freeSpace;
+    qint64 m_totalSpace;
+    bool m_writable;
+
 };
 
-typedef QSharedPointer<QnClientStorageResource> QnClientStorageResourcePtr;
-
-#endif // __CLIENT_STORAGE_RESOURCE_H__

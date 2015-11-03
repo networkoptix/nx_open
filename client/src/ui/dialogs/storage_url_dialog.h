@@ -9,6 +9,7 @@
 #include "api/model/storage_status_reply.h"
 
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/models/storage_model_info.h>
 
 struct QnStorageStatusReply;
 
@@ -28,7 +29,7 @@ public:
     QSet<QString> protocols() const;
     void setProtocols(const QSet<QString> &protocols);
 
-    QnStorageSpaceData storage() const;
+    QnStorageModelInfo storage() const;
 
 protected:
     virtual void accept() override;
@@ -59,7 +60,7 @@ private:
     QList<ProtocolDescription> m_descriptions;
     QHash<QString, QString> m_urlByProtocol;
     QString m_lastProtocol;
-    QnStorageSpaceData m_storage;
+    QnStorageModelInfo m_storage;
 };
 
 #endif // QN_STORAGE_URL_DIALOG_H

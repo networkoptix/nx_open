@@ -11,7 +11,21 @@ QnStorageSpaceData::QnStorageSpaceData()
     , isExternal(false)
     , isWritable(false)
     , isUsedForWriting(false)
+    , isBackup(false)
     , storageType()
+{}
+
+QnStorageSpaceData::QnStorageSpaceData( const QnStorageResourcePtr &storage )
+    : url(storage->getUrl())
+    , storageId(storage->getId())
+    , totalSpace(storage->getTotalSpace())
+    , freeSpace(storage->getFreeSpace())
+    , reservedSpace(storage->getSpaceLimit())
+    , isExternal(storage->isExternal())
+    , isWritable(storage->isWritable())
+    , isUsedForWriting(storage->isUsedForWriting())
+    , isBackup(storage->isBackup())
+    , storageType(storage->getStorageType())
 {}
 
 QnStorageStatusReply::QnStorageStatusReply()
