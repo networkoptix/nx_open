@@ -15,7 +15,9 @@ void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByt
     QnResource::updateInner(other, modifiedFields);
 
     QnClientStorageResource* localOther = dynamic_cast<QnClientStorageResource*>(other.data());
-    if(localOther) {
+
+    /* Do not overwrite space info data with invalid values. */
+    if(localOther && localOther->isSpaceInfoAvailable()) {
         if (m_freeSpace != localOther->m_freeSpace)
             modifiedFields << "freeSpaceChanged";
         m_freeSpace = localOther->m_freeSpace;
@@ -28,6 +30,10 @@ void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByt
             modifiedFields << "isWritableChanged";
         m_writable = localOther->m_writable;
     }
+}
+
+bool QnClientStorageResource::isSpaceInfoAvailable() const {
+    return m_totalSpace != QnStorageResource::UnknownSize;
 }
 
 
