@@ -22,6 +22,7 @@
 #include "core/resource/mobile_client_camera_factory.h"
 #include "mobile_client/mobile_client_message_processor.h"
 #include "watchers/user_watcher.h"
+#include "watchers/available_cameras_watcher.h"
 
 #include "version.h"
 
@@ -59,7 +60,12 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnMobileClientCameraFactory>(new QnMobileClientCameraFactory());
 
-    common->store<QnUserWatcher>(new QnUserWatcher());
+    QnUserWatcher *userWatcher = new QnUserWatcher();
+    common->store<QnUserWatcher>(userWatcher);
+
+    QnAvailableCamerasWatcher *availableCamerasWatcher = new QnAvailableCamerasWatcher();
+    common->store<QnAvailableCamerasWatcher>(availableCamerasWatcher);
+    connect(userWatcher, &QnUserWatcher::userChanged, availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
