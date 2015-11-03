@@ -832,12 +832,7 @@
         <profile>
             <id>mobile-common</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>i386</arch>
-                </os>                
+                <activeByDefault>false</activeByDefault>               
                 <property>
                     <name>newmobile</name>
                     <value>true</value>
