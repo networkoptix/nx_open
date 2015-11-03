@@ -32,10 +32,10 @@ public:
     QnStorageConfigWidget(QWidget* parent = 0);
     virtual ~QnStorageConfigWidget();
 
-    virtual void updateFromSettings() override;
+    virtual void loadDataToUi() override;
 
     void setServer(const QnMediaServerResourcePtr &server);
-    virtual void submitToSettings() override;
+    virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
     virtual void retranslateUi() override;

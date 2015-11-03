@@ -119,6 +119,8 @@ namespace
     };
 
     CameraLicenseStatus cameraLicenseStatus(const QnVirtualCameraResourcePtr &camera) {
+        //TODO: #ynikitenkov licenses calculating should not occur too often
+        // possibly we should keep instance of the QnCamLicenseUsageHelper in the widget
         bool licenseUsed = camera->isLicenseUsed();
         bool overflow = QnCamLicenseUsageHelper(camera, true).isOverflowForCamera(camera);
 
@@ -1497,6 +1499,12 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
+    //TODO: #ynikitenkov now this method is called a lot of times even for non-io cameras
+    // we need to check it more smooth way, without recalculating licenses too often
+    // possibly, this code would work well (checking required
+    //     if (!resource()->toResource()->hasFlags(Qn::io_module))
+    //         return;
+
     const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
     const bool ioModule = m_camera && m_camera->hasFlags(Qn::io_module);
     const bool ioBtnChecked = (button && button->isChecked());

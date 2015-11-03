@@ -64,7 +64,7 @@ bool QnLookAndFeelPreferencesWidget::event(QEvent *event) {
     return result;
 }
 
-void QnLookAndFeelPreferencesWidget::submitToSettings() {
+void QnLookAndFeelPreferencesWidget::applyChanges() {
     qnSettings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     qnSettings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
@@ -80,7 +80,7 @@ void QnLookAndFeelPreferencesWidget::submitToSettings() {
     }
 }
 
-void QnLookAndFeelPreferencesWidget::updateFromSettings() {
+void QnLookAndFeelPreferencesWidget::loadDataToUi() {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     m_oldSkin = ui->skinComboBox->findData(qnSettings->clientSkin());
@@ -140,12 +140,20 @@ void QnLookAndFeelPreferencesWidget::updateFromSettings() {
     }
 }
 
-bool QnLookAndFeelPreferencesWidget::confirm() {
+bool QnLookAndFeelPreferencesWidget::hasChanges() const {
+    //TODO: #GDM implement me
+    return true;
+}
+
+
+bool QnLookAndFeelPreferencesWidget::canApplyChanges() {
+    /* These changes can be applied only after reboot. */
     return m_oldLanguage == ui->languageComboBox->currentIndex()
         && m_oldSkin == ui->skinComboBox->currentIndex();
 }
 
-bool QnLookAndFeelPreferencesWidget::discard() {
+bool QnLookAndFeelPreferencesWidget::canDiscardChanges() {
+    //TODO: #GDM restoring changes does not belongs here
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
     if (backgroundAllowed)
         qnSettings->setBackground(m_oldBackground);

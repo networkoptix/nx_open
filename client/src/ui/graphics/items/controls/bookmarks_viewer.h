@@ -15,8 +15,10 @@ class QnBookmarksViewer : public QGraphicsWidget
     Q_PROPERTY(QnBookmarkColors colors READ colors WRITE setColors)
 
 public:
+    typedef QPair<qreal, qreal> Bounds;
+    typedef std::pair<QPointF, Bounds> PosAndBoundsPair;
     typedef std::function<QnCameraBookmarkList (qint64 timestamp)> GetBookmarksFunc;
-    typedef std::function<QPointF (qint64 timestamp)> GetPosOnTimelineFunc;
+    typedef std::function<PosAndBoundsPair (qint64 timestamp)> GetPosOnTimelineFunc;
 
     QnBookmarksViewer(const GetBookmarksFunc &getBookmarksFunc
         , const GetPosOnTimelineFunc &getPosFunc

@@ -262,11 +262,22 @@ QnMediaServerResourcePtr QnRecordingStatisticsWidget::server() const {
 }
 
 void QnRecordingStatisticsWidget::setServer(const QnMediaServerResourcePtr &server) {
+    if (m_server == server)
+        return;
     m_server = server;
+    // loadDataToUi() is called from the dialog
 }
 
-void QnRecordingStatisticsWidget::updateFromSettings() {
+void QnRecordingStatisticsWidget::loadDataToUi() {
     updateData();
+}
+
+void QnRecordingStatisticsWidget::applyChanges() {
+    /* This widget is read-only. */
+}
+
+bool QnRecordingStatisticsWidget::hasChanges() const {
+    return false;
 }
 
 void QnRecordingStatisticsWidget::updateData() {

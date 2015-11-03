@@ -3,11 +3,6 @@
 #include <QtGui/QGuiApplication>
 
 #include "core/resource_management/resource_pool.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource/camera_user_attribute_pool.h"
-#include "core/resource/media_server_user_attributes.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "common/common_module.h"
 #include "api/app_server_connection.h"
 #include "api/session_manager.h"
@@ -18,10 +13,10 @@
 #include "mobile_client/mobile_client_settings.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/app_info.h"
-#include "utils/common/synctime.h"
 #include "core/resource/mobile_client_camera_factory.h"
 #include "mobile_client/mobile_client_message_processor.h"
 #include "watchers/user_watcher.h"
+#include "watchers/available_cameras_watcher.h"
 
 #include "version.h"
 
@@ -45,21 +40,18 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnMobileClientSettings>(new QnMobileClientSettings);
     common->store<QnSessionManager>(new QnSessionManager());
 
-    common->store<QnCameraUserAttributePool>(new QnCameraUserAttributePool());
-    common->store<QnMediaServerUserAttributesPool>(new QnMediaServerUserAttributesPool());
-    common->store<QnSyncTime>(new QnSyncTime());
-
-    common->store<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary());
-    common->store<QnResourceStatusDictionary>(new QnResourceStatusDictionary());
-    common->store<QnServerAdditionalAddressesDictionary>(new QnServerAdditionalAddressesDictionary());
-
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
     common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnMobileClientMessageProcessor>(new QnMobileClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnMobileClientCameraFactory>(new QnMobileClientCameraFactory());
 
-    common->store<QnUserWatcher>(new QnUserWatcher());
+    QnUserWatcher *userWatcher = new QnUserWatcher();
+    common->store<QnUserWatcher>(userWatcher);
+
+    QnAvailableCamerasWatcher *availableCamerasWatcher = new QnAvailableCamerasWatcher();
+    common->store<QnAvailableCamerasWatcher>(availableCamerasWatcher);
+    connect(userWatcher, &QnUserWatcher::userChanged, availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
