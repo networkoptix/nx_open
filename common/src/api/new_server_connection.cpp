@@ -127,10 +127,12 @@ bool QnNewMediaServerConnection::sendRequest(const QnUuid& serverId, const QUrl&
         if (QnUserResourcePtr admin = qnResPool->getAdministrator()) 
         {
             // if auth is not known, use admin hash
-            apiUrl.setUserName(admin->getName());
-            apiUrl.setPassword(QString::fromUtf8(admin->getDigest()));
+            user = admin->getName();
+            password = QString::fromUtf8(admin->getDigest());
             authType = nx_http::AsyncHttpClient::authDigestWithPasswordHash;
         }
     }
+    apiUrl.setUserName(user);
+    apiUrl.setPassword(password);
     return nx_http::downloadFileAsyncEx( apiUrl, callback, headers, authType );
 }
