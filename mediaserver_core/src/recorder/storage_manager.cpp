@@ -1605,9 +1605,11 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     }
 
     for (auto it = storages.cbegin(); it != storages.cend(); ++it) {
+#if 0
         qDebug() << lit("Storage %1 usage coeff: %2")
                         .arg((*it)->getUrl())
                         .arg((*it)->calcUsageCoeff());
+#endif
         if ((*it)->calcUsageCoeff() >= 0) {
             StorageSpaceInfo tmp = {*it, (*it)->calcUsageCoeff()};
             storagesInfo.push_back(tmp);
