@@ -326,11 +326,14 @@ bool QnServerStorageManager::sendStorageSpaceRequest( const QnMediaServerResourc
 
 void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSpaceReply &reply, int handle ) {
 
+    QSet<QnUuid> processedStorages;
+
     for (const QnStorageSpaceData &spaceInfo: reply.storages) {
         QnClientStorageResourcePtr storage = qnResPool->getResourceById<QnClientStorageResource>(spaceInfo.storageId);
         if (!storage)
             continue;
 
+        processedStorages.insert(spaceInfo.storageId);
         storage->setFreeSpace(spaceInfo.freeSpace);
         storage->setTotalSpace(spaceInfo.totalSpace);
         storage->setWritable(spaceInfo.isWritable);
@@ -355,6 +358,43 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
 
     if(status != 0)
         return;
+
+    /* 
+     * Reply can contain some storages that were instantiated after the server starts.
+     * Therefore they will be absent in the resource pool, but user can add them manually.
+     * This code should be executed if and only if server still exists and our request is actual.
+     */
+    for (const QnStorageSpaceData &spaceInfo: reply.storages) {
+        /* Skip storages that are already exist. */
+        if (processedStorages.contains(spaceInfo.storageId))
+            continue;
+
+        Q_ASSERT_X(spaceInfo.storageId.isNull(), Q_FUNC_INFO, "We should process only non-pool storages here");
+        if (!spaceInfo.storageId.isNull())
+            continue;
+
+        QnUuid serverId = requestKey.server->getId();
+
+        QnClientStorageResourcePtr storage(new QnClientStorageResource());
+        storage->setId(QnStorageResource::fillID(serverId, spaceInfo.url));
+        QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+        if (resType)
+            storage->setTypeId(resType->getId());
+
+        storage->setName(QnUuid::createUuid().toString());
+        storage->setParentId(serverId);
+        storage->setUsedForWriting(false);
+        storage->setBackup(false);
+
+        storage->setUrl(spaceInfo.url);
+        storage->setStorageType(spaceInfo.storageType);
+        storage->setWritable(spaceInfo.isWritable);
+        storage->setFreeSpace(spaceInfo.freeSpace);
+        storage->setTotalSpace(spaceInfo.totalSpace);
+
+        qnResPool->addResource(storage);
+    }
+
 
     auto replyProtocols = reply.storageProtocols.toSet();
     if (serverInfo.protocols != replyProtocols) {
