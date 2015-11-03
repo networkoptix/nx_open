@@ -5,10 +5,6 @@
 
 namespace {
     const int defaultTimeoutIdx = 0;
-
-    QString tagsAsString(const QnCameraBookmarkTags &tags) {
-        return QStringList(tags.toList()).join(lit(", "));
-    }
 }
 
 QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
@@ -22,12 +18,16 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
             m_selectedTags.remove(link);
         else
             m_selectedTags.insert(link.trimmed());
-        ui->tagsLineEdit->setText(tagsAsString(m_selectedTags));
+        ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(m_selectedTags));
         updateTagsList();
     });
 
-    connect(ui->tagsLineEdit, &QLineEdit::textEdited, this, [this](const QString &text) {
-        m_selectedTags = text.split(QRegExp(lit("[ ,]")), QString::SkipEmptyParts).toSet();
+    connect(ui->tagsLineEdit, &QLineEdit::textEdited, this, [this](const QString &text)
+    {
+        m_selectedTags.clear();
+        for(auto &tag: text.split(L',', QString::SkipEmptyParts).toSet())
+            m_selectedTags.insert(tag.trimmed());
+
         updateTagsList();
     });
 
@@ -64,7 +64,7 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
     ui->timeoutComboBox->setCurrentIndex(timeoutIdx < 0 ? defaultTimeoutIdx : timeoutIdx);
 
     m_selectedTags = bookmark.tags;
-    ui->tagsLineEdit->setText(tagsAsString(m_selectedTags));
+    ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(bookmark.tags));
 
     updateTagsList();
 }

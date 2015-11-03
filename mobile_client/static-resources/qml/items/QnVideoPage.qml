@@ -64,7 +64,11 @@ QnPage {
         id: qualityDialog
         resolutionList: mediaPlayer.resourceHelper.resolutions
         currentResolution: mediaPlayer.resourceHelper.resolution
-        onQualityPicked: mediaPlayer.resourceHelper.resolution = resolution
+        onQualityPicked: {
+            mediaPlayer.seek(mediaPlayer.position)
+            mediaPlayer.resourceHelper.resolution = resolution
+        }
+        onHidden: videoPlayer.forceActiveFocus()
     }
 
     QnActiveCameraThumbnailLoader {
@@ -123,6 +127,14 @@ QnPage {
         onPlayingChanged: {
             if (playing)
                 video.screenshotSource = ""
+        }
+
+        onLoadingChanged: {
+            if (!loading)
+                return
+
+            video.bindScreenshotSource()
+            thumbnailLoader.forceLoadThumbnail(mediaPlayer.position)
         }
 
         onTimelinePositionRequest: {

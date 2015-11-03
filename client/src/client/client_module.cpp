@@ -26,12 +26,11 @@
 #include <client/desktop_client_message_processor.h>
 
 #include <core/ptz/client_ptz_controller_pool.h>
+#include <core/resource/client_camera_factory.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 
 #include <platform/platform_abstraction.h>
-
-#include <plugins/resource/client_camera/client_camera_factory.h>
 
 #include <redass/redass_controller.h>
 

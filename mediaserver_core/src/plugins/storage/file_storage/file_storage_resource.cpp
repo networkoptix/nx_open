@@ -373,12 +373,12 @@ void QnFileStorageResource::setUrl(const QString& url)
     m_dirty = true;
 }
 
-QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
+QnFileStorageResource::QnFileStorageResource()
+    :
     m_storageBitrateCoeff(1.0),
     m_dirty(false),
     m_valid(false),
-    m_capabilities(0),
-    m_storageManager(storageManager)
+    m_capabilities(0)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -549,8 +549,7 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 
 QnStorageResource* QnFileStorageResource::instance(const QString&)
 {
-    assert(qnNormalStorageMan);
-    QnStorageResource* storage = new QnFileStorageResource(qnNormalStorageMan);
+    QnStorageResource* storage = new QnFileStorageResource();
     storage->setSpaceLimit(
         MSSettings::roSettings()->value(
             nx_ms_conf::MIN_STORAGE_SPACE, 

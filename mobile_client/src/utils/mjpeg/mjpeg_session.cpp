@@ -66,6 +66,7 @@ class QnMjpegSessionPrivate : public QObject {
 public:
     struct FrameData {
         int presentationTime;
+        qint64 timestamp;
         QImage image;
     };
 
@@ -109,8 +110,8 @@ public:
 
     void setState(QnMjpegSession::State state);
 
-    void decodeAndEnqueueFrame(const QByteArray &data, int presentationTime);
-    bool dequeueFrame(QImage *image, int *presentationTime);
+    void decodeAndEnqueueFrame(const QByteArray &data, qint64 timestampMs, int presentationTime);
+    bool dequeueFrame(QImage *image, qint64 *timestamp, int *presentationTime);
 
     bool connect();
     void disconnect();
@@ -147,9 +148,10 @@ void QnMjpegSessionPrivate::setState(QnMjpegSession::State state) {
     q->stateChanged();
 }
 
-void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, int presentationTime) {
+void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, qint64 timestampMs, int presentationTime) {
     FrameData frameData;
     frameData.image = decompressJpegImage(data.data(), data.size());
+    frameData.timestamp = timestampMs;
     frameData.presentationTime = presentationTime;
 
     queueSemaphore.acquire();
@@ -167,7 +169,7 @@ void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, int pr
     q->frameEnqueued();
 }
 
-bool QnMjpegSessionPrivate::dequeueFrame(QImage *image, int *presentationTime) {
+bool QnMjpegSessionPrivate::dequeueFrame(QImage *image, qint64 *timestamp, int *presentationTime) {
     QMutexLocker lock(&mutex);
 
     if (frameQueue.isEmpty())
@@ -177,6 +179,9 @@ bool QnMjpegSessionPrivate::dequeueFrame(QImage *image, int *presentationTime) {
 
     if (image)
         *image = frameData.image;
+
+    if (timestamp)
+        *timestamp = frameData.timestamp;
 
     if (presentationTime)
         *presentationTime = frameData.presentationTime;
@@ -453,11 +458,12 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody() {
     int framePresentationTimeMSec = previousFrameTimestampUSec > 0 ? (frameTimestampUSec - previousFrameTimestampUSec) / 1000 : 0;
     if (framePresentationTimeMSec > MAX_FRAME_DURATION)
         framePresentationTimeMSec = 0;
-    previousFrameTimestampUSec = frameTimestampUSec;
-    frameTimestampUSec = 0;
 
     if (!previousFrameData.isEmpty())
-        decodeAndEnqueueFrame(previousFrameData, framePresentationTimeMSec);
+        decodeAndEnqueueFrame(previousFrameData, previousFrameTimestampUSec / 1000, framePresentationTimeMSec);
+
+    previousFrameTimestampUSec = frameTimestampUSec;
+    frameTimestampUSec = 0;
 
     previousFrameData = httpBuffer.left(bodyLength);
 
@@ -510,10 +516,10 @@ QnMjpegSession::State QnMjpegSession::state() const {
     return d->state;
 }
 
-bool QnMjpegSession::dequeueFrame(QImage *image, int *presentationTime) {
+bool QnMjpegSession::dequeueFrame(QImage *image, qint64 *timestamp, int *presentationTime) {
     Q_D(QnMjpegSession);
 
-    return d->dequeueFrame(image, presentationTime);
+    return d->dequeueFrame(image, timestamp, presentationTime);
 }
 
 void QnMjpegSession::start() {

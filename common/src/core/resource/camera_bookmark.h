@@ -57,7 +57,7 @@ struct QnCameraBookmark {
     /** \returns True if bookmark is valid, false otherwise. */
     bool isValid() const;
 
-    QString tagsAsString(QChar delimiter = L' ') const;
+    static QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter = lit(", "));
 
     static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
 };
@@ -86,6 +86,8 @@ struct QnCameraBookmarkSearchFilter {
     bool isValid() const;
 
     bool checkBookmark(const QnCameraBookmark &bookmark) const;
+
+    static QnCameraBookmarkSearchFilter invalidFilter();
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
 

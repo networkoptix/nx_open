@@ -2,8 +2,7 @@
 
 #include <core/resource/resource_type.h>
 #include <core/resource/client_storage_resource.h>
-
-#include "client_camera.h"
+#include <core/resource/client_camera.h>
 
 QnResourcePtr QnClientCameraFactory::createResource(const QnUuid &resourceTypeId, const QnResourceParams &) {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -18,7 +17,7 @@ QnResourcePtr QnClientCameraFactory::createResource(const QnUuid &resourceTypeId
         if (!resourceType->isCamera())
             return QnResourcePtr();
 
-        return QnResourcePtr(new QnClientCamera(resourceTypeId));
+        return QnResourcePtr(new QnClientCameraResource(resourceTypeId));
     }
 }
 

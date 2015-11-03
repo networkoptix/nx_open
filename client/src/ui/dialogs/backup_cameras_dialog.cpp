@@ -3,8 +3,9 @@
 #include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <ui/common/palette.h>
 #include <ui/delegates/backup_cameras_resource_model_delegate.h>
@@ -18,6 +19,7 @@ namespace {
     const int dialogMinimumWidth = 800;
 }
 
+//TODO: #GDM move out common code with failover priority dialog to a new dialog class with delegate
 class QnBackupCamerasDialog::QnBackupCamerasDialogDelegate: public QnResourceSelectionDialogDelegate {
     typedef QnResourceSelectionDialogDelegate base_type;
 
@@ -32,6 +34,8 @@ public:
 
     base_type(parent)
         , m_placeholder(nullptr)
+        , m_hintPage(nullptr)
+        , m_buttonsPage(nullptr)
         , m_callback(callback)
         , m_colors()
         , m_defaultQualitiesModel(nullptr)
@@ -67,14 +71,9 @@ public:
         parent->layout()->addWidget(initLine(parent));
         m_placeholder = initPlacehoder(parent);
         parent->layout()->addWidget(m_placeholder);
-        if (QBoxLayout* boxLayout = qobject_cast<QHBoxLayout*>(parent->layout())) {
-            boxLayout->addStretch();
-        }
         parent->layout()->addWidget(initDefaultValueWidget(parent));
 
-        QHBoxLayout* layout = new QHBoxLayout(m_placeholder);
-        m_placeholder->setLayout(layout);
-
+        QHBoxLayout* layout = new QHBoxLayout(m_buttonsPage);
         QLabel* label = new QLabel(tr("Set quality:"), parent);
         layout->addWidget(label);
 
@@ -90,10 +89,13 @@ public:
     }
 
     virtual bool validate(const QnResourceList &selected) override {
-        bool visible = !selected.filtered<QnVirtualCameraResource>().isEmpty();
+        if (!m_placeholder)
+            return true;
 
-        if (m_placeholder)
-            m_placeholder->setVisible(visible);
+        bool visible = !selected.filtered<QnVirtualCameraResource>().isEmpty();
+        m_placeholder->setCurrentWidget(visible
+            ? m_buttonsPage
+            : m_hintPage);
         return true;
     }
 
@@ -159,11 +161,23 @@ private:
         return line;
     }
 
-    QWidget* initPlacehoder(QWidget* parent) {
-        QWidget* placeholder = new QWidget(parent);
+    QStackedWidget* initPlacehoder(QWidget* parent) {
+        QStackedWidget* placeholder = new QStackedWidget(parent);
         placeholder->setContentsMargins(0, 0, 0, 0);
         setPaletteColor(placeholder, QPalette::Window, qApp->palette().color(QPalette::Base));
         placeholder->setAutoFillBackground(true);
+        
+        const QString hint = QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Select devices to setup backup quality"),
+            tr("Select cameras to setup backup quality")
+            );
+
+        m_hintPage = new QLabel(hint, placeholder);
+        m_hintPage->setAlignment(Qt::AlignCenter);
+        placeholder->addWidget(m_hintPage);
+        m_buttonsPage = new QWidget(placeholder);
+        placeholder->addWidget(m_buttonsPage);
+
         return placeholder;
     }
 
@@ -171,7 +185,11 @@ private:
         QWidget* panel = new QWidget(parent);
         QHBoxLayout* layout = new QHBoxLayout(panel);
 
-        QLabel* caption = new QLabel(tr("Default value for new cameras:"), panel);
+        const QString title = QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Default value for new devices:"),
+            tr("Default value for new cameras:")
+            );
+        QLabel* caption = new QLabel(title, panel);
         layout->addWidget(caption);
 
         QComboBox* combobox = new QComboBox(panel);
@@ -190,7 +208,10 @@ private:
     } 
 
 private:
-    QWidget* m_placeholder;
+    QStackedWidget* m_placeholder;
+    QLabel* m_hintPage;
+    QWidget* m_buttonsPage;
+
     ButtonCallback m_callback;
     QnBackupCamerasColors m_colors;
     QStandardItemModel *m_defaultQualitiesModel;
@@ -206,8 +227,12 @@ QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent /*= nullptr*/):
     , m_delegate(nullptr)
     , m_customColumnDelegate(new QnBackupCamerasResourceModelDelegate(this))
 {
-    //TODO: #GDM "devices"?
-    setWindowTitle(tr("Select Cameras to Backup..."));
+    const QString title = QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Select Devices to Backup..."),
+        tr("Select Cameras to Backup...")
+        );
+
+    setWindowTitle(title);
     setMinimumWidth(dialogMinimumWidth);
 
     m_delegate = new QnBackupCamerasDialogDelegate(
@@ -262,7 +287,8 @@ void QnBackupCamerasDialog::setColors(const QnBackupCamerasColors &colors) {
 }
 
 void QnBackupCamerasDialog::updateQualitiesForSelectedCameras(Qn::CameraBackupQualities qualities) {
-    m_customColumnDelegate->forceCamerasQualities(selectedResources().filtered<QnVirtualCameraResource>(), qualities);   
+    m_customColumnDelegate->forceCamerasQualities(selectedResources().filtered<QnVirtualCameraResource>(), qualities);
+    setSelectedResources(QnResourceList());
 }
 
 void QnBackupCamerasDialog::buttonBoxClicked( QDialogButtonBox::StandardButton button ) {

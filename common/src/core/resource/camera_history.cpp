@@ -102,18 +102,19 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
     request.resList << camera;
     
     using namespace std::placeholders;
-    bool ok = server->newApiConnection().cameraHistoryAsync(request, [this, callback] (bool success, const ec2::ApiCameraHistoryDataList &periods) {
-        at_cameraPrepared(success, periods, callback);
+    QnUuid requestId = server->serverRestConnection()->cameraHistoryAsync(request, [this, callback] (bool success, QnUuid id, const ec2::ApiCameraHistoryDataList &periods) {
+        at_cameraPrepared(success, QnUuid(), periods, callback);
     });
 
-    if (!ok && callback)
+    if (requestId.isNull() && callback)
         executeDelayed([callback] { callback(false); });
 
-    return ok;
+    return !requestId.isNull();
 }
 
-void QnCameraHistoryPool::at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback) 
+void QnCameraHistoryPool::at_cameraPrepared(bool success, const QnUuid& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback) 
 {
+    Q_UNUSED(requestId);
     QnMutexLocker lock(&m_mutex);
 
     QSet<QnUuid> loadedCamerasIds;

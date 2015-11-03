@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/customization/customized.h>
+#include <ui/models/storage_model_info.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include "api/model/storage_space_reply.h"
 
@@ -29,22 +30,21 @@ public:
     QnStorageListModel(QObject *parent = 0);
     ~QnStorageListModel();
 
-    void setStorages(const QnStorageSpaceDataList& storages);
-    void addStorage(const QnStorageSpaceData& data);
-    QnStorageSpaceDataList storages() const;
+    void setStorages(const QnStorageModelInfoList& storages);
+    void addStorage(const QnStorageModelInfo& storage);
+    void updateStorage(const QnStorageModelInfo& storage);
+    void removeStorage(const QnStorageModelInfo& storage);
+
+    QnStorageModelInfo storage(const QModelIndex &index) const;
+    QnStorageModelInfoList storages() const;
 
     /** Check if the storage can be moved from this model to another. */
-    bool canMoveStorage(const QnStorageSpaceData& data) const;
+    bool canMoveStorage(const QnStorageModelInfo& data) const;
 
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
-    virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-
-    bool isBackupRole() const;
-    void setBackupRole(bool value);
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -59,8 +59,7 @@ private:
 
     void sortStorages();
 private:
-    QnStorageSpaceDataList m_storages;
-    bool m_isBackupRole;
+    QnStorageModelInfoList m_storages;
     bool m_readOnly;
     QBrush m_linkBrush;
     QFont m_linkFont;
