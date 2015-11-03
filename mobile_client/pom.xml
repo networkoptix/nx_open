@@ -67,8 +67,13 @@
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>i386</arch>                    
+                </os>                
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android</value>
                 </property>
             </activation>
@@ -145,6 +150,9 @@
             <id>mobile-ios</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>mac</family>
+                </os>                
                 <property>
                     <name>newmobile</name>
                     <value>ios</value>
