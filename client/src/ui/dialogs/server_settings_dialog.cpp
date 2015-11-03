@@ -59,7 +59,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
     safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
-    safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+
+    /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
+    safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);   
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 

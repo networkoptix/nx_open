@@ -47,9 +47,14 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     loadDataToUi();
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
+
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
     safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+
+    /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
+    safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
     safeModeWatcher->addControlledWidget(updatesWidget, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
     safeModeWatcher->addControlledWidget(generalWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
     safeModeWatcher->addControlledWidget(smtpWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
