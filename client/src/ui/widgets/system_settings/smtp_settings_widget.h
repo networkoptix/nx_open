@@ -1,9 +1,5 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
-#include <QtCore/QTimer>
-#include <QtGui/QIntValidator>
-
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
@@ -13,7 +9,9 @@ namespace Ui {
     class SmtpSettingsWidget;
 }
 
-struct QnTestEmailSettingsReply;
+class QnSmtpSimpleSettingsWidget;
+class QnSmtpAdvancedSettingsWidget;
+class QnSmtpTestConnectionWidget;
 
 class QnSmtpSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
@@ -28,32 +26,23 @@ public:
     virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
+
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
 
 private:
     QnEmailSettings settings() const;
-    void stopTesting(const QString &result = QString());
     void finishTesting();
-    void loadSettings(const QString &server, QnEmail::ConnectionType connectionType, int port = 0);
-
-    void validateEmailSimple();
-    void validateEmailAdvanced();
-private slots:
-    void at_portComboBox_currentIndexChanged(int index);
+   
     void at_testButton_clicked();
-
-    void at_cancelTestButton_clicked();
-
-    void at_timer_timeout();
-
     void at_advancedCheckBox_toggled(bool toggled);
-    void at_testEmailSettingsFinished(int status, const QnTestEmailSettingsReply& reply, int handle);
+    
 private:
     QScopedPointer<Ui::SmtpSettingsWidget> ui;
+    
+    QnSmtpSimpleSettingsWidget* m_simpleSettingsWidget;
+    QnSmtpAdvancedSettingsWidget* m_advancedSettingsWidget;
+    QnSmtpTestConnectionWidget* m_testSettingsWidget;
 
-    int m_testHandle;
     bool m_updating;
-
-    QTimer *m_timeoutTimer;
 };
