@@ -234,9 +234,14 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     return m_restConnection;
 }
 
-QnNewMediaServerConnection QnMediaServerResource::newApiConnection()
+QnServerRestConnectionPtr QnMediaServerResource::serverRestConnection()
 {
-    return QnNewMediaServerConnection(getId());
+    QnMutexLocker lock( &m_mutex );
+
+    if (!m_serverRestConnection)
+        m_serverRestConnection = QnServerRestConnectionPtr(new QnServerRestConnection(getId()));
+    
+    return m_serverRestConnection;
 }
 
 QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourceTypeId, const QnResourceParams& /*params*/)
