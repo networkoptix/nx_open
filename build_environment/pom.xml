@@ -168,7 +168,8 @@
             <id>nomobile</id>
             <activation>
                 <property>
-                    <name>!newmobile</name>
+                    <name>newmobile</name>
+                    <value>!true</value>
                 </property>
             </activation>
             <dependencies>
@@ -692,9 +693,12 @@
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
+                    <name>linux</name>
+                    <arch>i386</arch>
                 </os>
                 <property>
                     <name>newmobile</name>
+                    <value>true</value>
                 </property>
             </activation>
             <dependencies>
@@ -713,9 +717,11 @@
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
+                    <name>linux</name>
+                    <arch>i386</arch>                    
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android-desktop</value>
                 </property>
             </activation>
@@ -735,9 +741,11 @@
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
+                    <name>linux</name>
+                    <arch>i386</arch>                    
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android</value>
                 </property>
             </activation>
@@ -766,7 +774,7 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>ios</value>
                 </property>
             </activation>
