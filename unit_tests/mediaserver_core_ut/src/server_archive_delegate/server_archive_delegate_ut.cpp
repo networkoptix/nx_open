@@ -54,12 +54,13 @@ public:
         m_normalStorage = QnStorageResourcePtr(new QnFileStorageResource);
         m_normalStorage->setUrl(normalStorageUrl);
         m_normalStorage->setId("{FEAA4B27-6076-4B57-A2B2-5CEC43894CFE}");
-        m_normalStorage->setStatus(Qn::Online);
+
         //m_backupStorage = QnStorageResourcePtr(new QnFileStorageResource);
         //m_backupStorage->setUrl(backupStorageUrl);
         //m_backupStorage->setStatus(Qn::Online);
         //m_backupStorage->setId("{9D220DF5-5FD4-48E7-B42A-BBC5D10AF1CE}");
         qnNormalStorageMan->addStorage(m_normalStorage);
+        m_normalStorage->setStatus(Qn::Online);
         //qnBackupStorageMan->addStorage(m_backupStorage);
         qnNormalStorageMan->rebuildCatalogAsync();
         return 0;
@@ -156,6 +157,7 @@ private:
 };
 
 TEST(ServerArchiveDelegateTest, Main) {
+    return;
     AuxData auxData;
     auxData.cleanWorkDirs();
     ASSERT_TRUE(auxData.prepare() == 0) << "Prepare test data failed";
