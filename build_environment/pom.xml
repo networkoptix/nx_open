@@ -221,14 +221,14 @@
                 </dependency>
                 <dependency>
                     <groupId>com.digia</groupId>
-                    <version>5.2.1-SNAPSHOT</version>
+                    <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-x86${compile.options}</classifier>
                 </dependency>
                 <dependency>
                     <groupId>com.digia</groupId>
-                    <version>5.2.1-SNAPSHOT</version>
+                    <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-x64${compile.options}</classifier>
@@ -316,7 +316,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.digia</groupId>
-                    <version>5.2.1-SNAPSHOT</version>
+                    <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
@@ -687,30 +687,6 @@
         </profile>
 
         <!-- Mobile client profiles -->
-        <profile>
-            <id>mobile-common</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>i386</arch>
-                </os>
-                <property>
-                    <name>newmobile</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.digia</groupId>
-                    <version>5.5.1-SNAPSHOT</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${qt.classifier}${compile.options}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
         <profile>
             <id>mobile-android-desktop</id>
             <activation>
