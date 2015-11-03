@@ -29,7 +29,7 @@ public:
     struct DummyContentType {};
 
     template <typename ResultType>
-    struct Result { typedef std::function<void (bool, ResultType)> type; };
+    struct Result { typedef std::function<void (bool, QnUuid, ResultType)> type; };
 
     /*
     * !Returns requestID or null guid if it isn't running
@@ -60,20 +60,20 @@ private:
         nx_http::StringType messageBody;
     };
 
-    template <typename ResultType> QnUuid executeGet(const QString& path, const QnRequestParamList& params, std::function<void (bool, ResultType)> callback);
+    template <typename ResultType> QnUuid executeGet(const QString& path, const QnRequestParamList& params, std::function<void (bool, QnUuid, ResultType)> callback);
     template <typename ResultType> QnUuid executePost(
         const QString& path,
         const QnRequestParamList& params,
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody,
-        std::function<void (bool, ResultType)> callback);
-    template <typename ResultType> QnUuid executeRequest(const Request& request, std::function<void (bool, ResultType)> callback);
-    QnUuid executeRequest(const Request& request, std::function<void (bool, DummyContentType)> callback);
+        std::function<void (bool, QnUuid, ResultType)> callback);
+    template <typename ResultType> QnUuid executeRequest(const Request& request, std::function<void (bool, QnUuid, ResultType)> callback);
+    QnUuid executeRequest(const Request& request, std::function<void (bool, QnUuid, DummyContentType)> callback);
 
     QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
     Request prepareRequest(HttpMethod method, const QUrl& url, const nx_http::StringType& contentType = nx_http::StringType(), const nx_http::StringType& messageBody = nx_http::StringType());
 
-    typedef std::function<void (SystemError::ErrorCode, int, nx_http::StringType contentType, nx_http::BufferType msgBody)> HttpCompletionFunc;
+    typedef std::function<void (QnUuid, SystemError::ErrorCode, int, nx_http::StringType contentType, nx_http::BufferType msgBody)> HttpCompletionFunc;
     QnUuid sendRequest(const Request& request, HttpCompletionFunc callback);
 private:
     QnUuid m_serverId;

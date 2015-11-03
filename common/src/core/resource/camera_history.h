@@ -132,7 +132,7 @@ private:
     QnVirtualCameraResourcePtr toCamera(const QnUuid& guid) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
 
-    void at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback);
+    void at_cameraPrepared(bool success, const QnUuid& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback);
 
     /** Mark camera history as dirty and subject to update. */
     void invalidateCameraHistory(const QnUuid &cameraId);

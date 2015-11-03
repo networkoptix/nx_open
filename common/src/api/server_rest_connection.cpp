@@ -67,7 +67,7 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
 }
 
 template <typename ResultType>
-QnUuid QnServerRestConnection::executeGet(const QString& path, const QnRequestParamList& params, std::function<void (bool, ResultType)> callback)
+QnUuid QnServerRestConnection::executeGet(const QString& path, const QnRequestParamList& params, std::function<void (bool, QnUuid, ResultType)> callback)
 {
     Request request = prepareRequest(HttpMethod::Get, prepareUrl(path, params));
     if (!request.isValid())
@@ -80,7 +80,7 @@ QnUuid QnServerRestConnection::executePost(const QString& path,
                                            const QnRequestParamList& params,
                                            const nx_http::StringType& contentType, 
                                            const nx_http::StringType& messageBody, 
-                                           std::function<void (bool, ResultType)> callback)
+                                           std::function<void (bool, QnUuid, ResultType)> callback)
 {
     Request request = prepareRequest(HttpMethod::Post, prepareUrl(path, params), contentType, messageBody);
     if (!request.isValid())
@@ -89,28 +89,28 @@ QnUuid QnServerRestConnection::executePost(const QString& path,
 }
 
 template <typename ResultType>
-QnUuid QnServerRestConnection::executeRequest(const Request& request, std::function<void (bool, ResultType)> callback)
+QnUuid QnServerRestConnection::executeRequest(const Request& request, std::function<void (bool, QnUuid, ResultType)> callback)
 {
-    return sendRequest(request, [callback] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+    return sendRequest(request, [callback] (QnUuid id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
     {
         if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
         {
             bool success = false;
             Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
             ResultType result = parseMessageBody<ResultType>(format, msgBody, &success);
-            callback(success, result);
+            callback(success, id, result);
         }
         else
-            callback(false, ResultType());
+            callback(false, id, ResultType());
     });
 }
 
-QnUuid QnServerRestConnection::executeRequest(const Request& request, std::function<void (bool, DummyContentType)> callback)
+QnUuid QnServerRestConnection::executeRequest(const Request& request, std::function<void (bool, QnUuid, DummyContentType)> callback)
 {
-    return sendRequest(request, [callback] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
+    return sendRequest(request, [callback] (QnUuid id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
     {
         bool ok = osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent;
-        callback(ok, DummyContentType());
+        callback(ok, id, DummyContentType());
     });
 }
 
@@ -222,7 +222,7 @@ QnUuid QnServerRestConnection::sendRequest(const Request& request, HttpCompletio
         }
         m_runningRequests.erase(itr); // free last reference to the object
         if (callback)
-            callback(systemError, statusCode, contentType, messageBody);
+            callback(requestId, systemError, statusCode, contentType, messageBody);
     };
     
     connect(httpClientCaptured.get(), &nx_http::AsyncHttpClient::done, this, requestCompletionFunc, Qt::DirectConnection);
