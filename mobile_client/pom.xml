@@ -154,7 +154,7 @@
                     <family>mac</family>
                 </os>                
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>ios</value>
                 </property>
             </activation>
