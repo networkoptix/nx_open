@@ -293,7 +293,11 @@ int QnScheduleSync::stop()
     m_syncing       = false;
     m_interrupted   = true;
    
-    m_backupFuture.waitForFinished();
+    try {
+        m_backupFuture.waitForFinished();
+    } catch (const std::exception &e) {
+        qWarning() << lit("[QnSchedule::stop] exception: %1").arg(e.what());
+    } 
     return Ok;
 }
 
