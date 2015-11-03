@@ -474,8 +474,8 @@ TEST(Storage_load_balancing_algorithm_test, Main) {
     int64_t totalWrited = 0;
     QnUuid currentStorageId;
     int currentStorageUseCount = 0;
-    int MAX_STORAGE_USE_IN_A_ROW = 10;
-    int MAX_USAGE_DELTA = 1024;
+    const int MAX_STORAGE_USE_IN_A_ROW = 10;
+    const int MAX_USAGE_DELTA = 1024;
 
     for (int i = 0; i < writeCount; ++i) {
         auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
