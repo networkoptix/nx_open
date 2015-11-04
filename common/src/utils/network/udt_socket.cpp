@@ -20,6 +20,8 @@
 
 #define ADDR_(x) reinterpret_cast<sockaddr*>(x)
 
+static const int EPOLL_SIZE = 1024;
+
 // Tracking operation. This operation should be put inside of the DEBUG_
 // macro and also using it will log the error that has happened at last 
 // time using general log macro. This helpful for us to do debugging and
@@ -606,7 +608,7 @@ bool UdtConnector::Connect( const SocketAddress& remoteAddress, int timeouts )
         }
     }
     // Using epoll will ensure that it is correct with any value for the file descriptor. 
-    UdtEpollHandlerHelper epoll_fd(UDT::epoll_create(),impl_->udt_handler());
+    UdtEpollHandlerHelper epoll_fd(UDT::epoll_create(EPOLL_SIZE),impl_->udt_handler());
     int write_ev = UDT_EPOLL_OUT;
     ret = UDT::epoll_add_usock(epoll_fd.epoll_fd,impl_->udt_handler(),&write_ev);
     VERIFY_(ret ==0,"UDT::epoll_add_ssock",impl_->udt_handler());
@@ -1212,7 +1214,7 @@ int UdtPollSetImpl::Poll( int milliseconds ) {
 
 bool UdtPollSetImpl::Initialize() {
     Q_ASSERT(epoll_fd_ <0);
-    epoll_fd_ = UDT::epoll_create();
+    epoll_fd_ = UDT::epoll_create(EPOLL_SIZE);
     if( epoll_fd_ <0 ) {
         DEBUG_(TRACE_("UDT::epoll_create",UDT::INVALID_SOCK));
         SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
