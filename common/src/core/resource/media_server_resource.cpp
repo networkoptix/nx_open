@@ -234,12 +234,12 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     return m_restConnection;
 }
 
-QnServerRestConnectionPtr QnMediaServerResource::serverRestConnection()
+rest::QnConnectionPtr QnMediaServerResource::serverRestConnection()
 {
     QnMutexLocker lock( &m_mutex );
 
     if (!m_serverRestConnection)
-        m_serverRestConnection = QnServerRestConnectionPtr(new QnServerRestConnection(getId()));
+        m_serverRestConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
     
     return m_serverRestConnection;
 }

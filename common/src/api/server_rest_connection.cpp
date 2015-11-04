@@ -1,3 +1,4 @@
+#include <atomic>
 #include "server_rest_connection.h"
 
 #include <api/app_server_connection.h>
@@ -14,6 +15,7 @@
 #include <http/custom_headers.h>
 #include "utils/network/http/httptypes.h"
 #include <utils/network/http/asynchttpclient.h>
+#include "utils/common/delayed.h"
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
@@ -22,26 +24,33 @@ namespace {
 
 // --------------------------- public methods -------------------------------------------
 
-QnServerRestConnection::QnServerRestConnection(const QnUuid& serverId):
+namespace rest
+{
+
+ServerConnection::ServerConnection(const QnUuid& serverId):
     m_serverId(serverId)
 {
-
 }
 
-QnServerRestConnection::~QnServerRestConnection()
+ServerConnection::~ServerConnection()
 {
-    for (auto value: m_runningRequests)
+    QMap<Handle, nx_http::AsyncHttpClientPtr> dataCopy;
+    {
+        QnMutexLocker lock(&m_mutex);
+        std::swap(dataCopy, m_runningRequests);
+    }
+    for (auto value: dataCopy)
         value->terminate();
 }
 
-QnUuid QnServerRestConnection::cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback)
+Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread)
 {
-    return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback);
+    return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------
 
-QUrl QnServerRestConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
+QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
 {
     QUrl result;
     result.setPath(path);
@@ -67,54 +76,58 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
 }
 
 template <typename ResultType>
-QnUuid QnServerRestConnection::executeGet(const QString& path, const QnRequestParamList& params, std::function<void (bool, QnUuid, ResultType)> callback)
+Handle ServerConnection::executeGet(const QString& path, const QnRequestParamList& params, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
     Request request = prepareRequest(HttpMethod::Get, prepareUrl(path, params));
-    if (!request.isValid())
-        return QnUuid();
-    return executeRequest(request, callback);
+    return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
 }
 
 template <typename ResultType>
-QnUuid QnServerRestConnection::executePost(const QString& path, 
+Handle ServerConnection::executePost(const QString& path, 
                                            const QnRequestParamList& params,
                                            const nx_http::StringType& contentType, 
                                            const nx_http::StringType& messageBody, 
-                                           std::function<void (bool, QnUuid, ResultType)> callback)
+                                           REST_CALLBACK(ResultType) callback, 
+                                           QThread* targetThread)
 {
     Request request = prepareRequest(HttpMethod::Post, prepareUrl(path, params), contentType, messageBody);
-    if (!request.isValid())
-        return QnUuid();
-    return executeRequest(request, callback);
+    return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
 }
 
 template <typename ResultType>
-QnUuid QnServerRestConnection::executeRequest(const Request& request, std::function<void (bool, QnUuid, ResultType)> callback)
+void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool success, const Handle& id, const ResultType& result)
 {
-    return sendRequest(request, [callback] (QnUuid id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+    if (targetThread)
+        executeDelayed([callback, success, id, result] { callback(success, id, result); }, 0, targetThread);
+    else
+        callback(success, id, result);
+}
+
+template <typename ResultType>
+Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
+{
+    return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
     {
-        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
-        {
-            bool success = false;
+        bool success = false;
+        ResultType result;
+        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok) {
             Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
-            ResultType result = parseMessageBody<ResultType>(format, msgBody, &success);
-            callback(success, id, result);
+            result = parseMessageBody<ResultType>(format, msgBody, &success);
         }
-        else
-            callback(false, id, ResultType());
+        invoke(callback, targetThread, success, id, result);
     });
 }
 
-QnUuid QnServerRestConnection::executeRequest(const Request& request, std::function<void (bool, QnUuid, DummyContentType)> callback)
+Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread)
 {
-    return sendRequest(request, [callback] (QnUuid id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
+    return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
     {
-        bool ok = osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent;
-        callback(ok, id, DummyContentType());
+        bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+        invoke(callback, targetThread, success, id, EmptyResponseType());
     });
 }
 
-void QnServerRestConnection::cancelRequest(const QnUuid& requestId)
+void ServerConnection::cancelRequest(const Handle& requestId)
 {
     nx_http::AsyncHttpClientPtr httpClient;
     {
@@ -129,7 +142,7 @@ void QnServerRestConnection::cancelRequest(const QnUuid& requestId)
         httpClient->terminate();
 }
 
-QnServerRestConnection::Request QnServerRestConnection::prepareRequest(HttpMethod method, const QUrl& url, const nx_http::StringType& contentType, const nx_http::StringType& messageBody)
+ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, const QUrl& url, const nx_http::StringType& contentType, const nx_http::StringType& messageBody)
 {
     QnMediaServerResourcePtr server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
@@ -188,13 +201,15 @@ QnServerRestConnection::Request QnServerRestConnection::prepareRequest(HttpMetho
     return request;
 }
     
-QnUuid QnServerRestConnection::sendRequest(const Request& request, HttpCompletionFunc callback)
+Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc callback)
 {
+    static std::atomic<Handle> requestNum;
+    Handle requestId = ++requestNum;
+
     auto httpClientCaptured = nx_http::AsyncHttpClient::create();
     httpClientCaptured->setResponseReadTimeoutMs( ResponseReadTimeoutMs );
     httpClientCaptured->setSendTimeoutMs( TcpConnectTimeoutMs );
     httpClientCaptured->addRequestHeaders(request.headers);
-    QnUuid requestId = QnUuid::createUuid();
     
     auto requestCompletionFunc = [requestId, callback, this, httpClientCaptured]
     ( nx_http::AsyncHttpClientPtr httpClient ) mutable
@@ -242,6 +257,8 @@ QnUuid QnServerRestConnection::sendRequest(const Request& request, HttpCompletio
     }
     else {
         disconnect( httpClientCaptured.get(), nullptr, this, nullptr );
-        return QnUuid();
+        return Handle();
     }
 }
+
+} // namespace rest
