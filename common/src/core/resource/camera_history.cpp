@@ -26,12 +26,8 @@ namespace {
         /* Check exact match. */
         if (iter != data.cend() && iter->timestampMs == timestamp)
             return iter;
-
-        /* Check if the first data is already greater than required. */
-        if (iter == data.cbegin())
-            return data.cend();
-
-        /* Otherwise get previous server. */
+        
+        /* get previous server. */
         if (data.cbegin() != iter)
             --iter;
 
