@@ -9,6 +9,7 @@
 
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -495,8 +496,8 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
         return storage.isWritable && storage.isUsed && storage.isBackup;
     }))
         return error(tr("Select at least one backup storage."));
-
-    if (!any_of(qnResPool->getAllCameras(QnResourcePtr(), true), [](const QnVirtualCameraResourcePtr &camera){
+   
+    if (!any_of(qnCameraHistoryPool->getServerFootageCameras(m_server), [](const QnVirtualCameraResourcePtr &camera){
         return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
     }))
         return error(tr("Select at least one camera to backup"));
