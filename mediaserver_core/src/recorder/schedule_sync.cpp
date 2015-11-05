@@ -25,13 +25,41 @@ QnScheduleSync::QnScheduleSync()
       m_interrupted(false),
       m_backupDone(false),
       m_curDow(ec2::backup::Never),
-      m_syncTimePoint(0)
+      m_syncTimePoint(0),
+      m_clientSyncPoint(0)
 {
 }
 
 QnScheduleSync::~QnScheduleSync()
 {
     stop();
+}
+
+void QnScheduleSync::findLastSyncPoint() 
+{
+    while (auto chunkVector = getOldestChunk()) {
+        auto chunkKey = (*chunkVector)[0];
+        auto fromCatalog = qnNormalStorageMan->getFileCatalog(
+            chunkKey.cameraID,
+            chunkKey.catalog
+        );
+        if (!fromCatalog)
+            continue;
+
+        auto toCatalog = qnBackupStorageMan->getFileCatalog(
+            chunkKey.cameraID,
+            chunkKey.catalog
+        );
+        if (!toCatalog)
+            continue;
+
+        if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
+            if (m_clientSyncPoint < chunkKey.chunk.startTimeMs) {
+                m_clientSyncPoint = chunkKey.chunk.startTimeMs;
+            }
+            return;
+        }
+    }
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
@@ -51,17 +79,10 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
         );
         return ChunkKey();
     }
-    int nextFileIndex = 
-        fromCatalog->findNextFileIndex(m_syncTimePoint);
+    int nextFileIndex = fromCatalog->findNextFileIndex(m_syncTimePoint);
     auto chunk = fromCatalog->chunkAt(nextFileIndex);
-    auto catalogSize = fromCatalog->size();
 
     ChunkKey ret = {chunk, cameraId, catalog};
-    {
-        std::lock_guard<std::mutex> lk(m_syncDataMutex);
-        m_syncData[ret] = nextFileIndex == -1 ? 
-                          1.0 : (double)nextFileIndex / catalogSize;
-    }
     return ret;
 }
 
@@ -113,9 +134,7 @@ QnScheduleSync::getOldestChunk()
         }
     }
     
-    if (!ret.empty())
-        m_syncTimePoint = ret[0].chunk.startTimeMs;
-    else
+    if (ret.empty())
         return boost::none;
 
     return ret;
@@ -139,6 +158,29 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 
     if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs)
     {
+        {   // update sync data
+            std::lock_guard<std::mutex> lk(m_syncDataMutex);
+            SyncDataMap::iterator syncDataIt = m_syncData.find(chunkKey);
+            if (syncDataIt == m_syncData.cend()) {
+                SyncData newData = {    
+                    0.0, 
+                    fromCatalog->findFileIndex(
+                        chunkKey.chunk.startTimeMs, 
+                        DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk
+                    )
+                };
+                m_syncData.insert(std::make_pair(chunkKey, newData));
+            } else {
+                auto catalogSize = fromCatalog->size();
+                int curFileIndex = fromCatalog->findFileIndex(
+                    chunkKey.chunk.startTimeMs, 
+                    DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk
+                );
+                syncDataIt->second.coeff = (double)(curFileIndex - syncDataIt->second.startIndex) /
+                                           (double)((catalogSize - 1) - syncDataIt->second.startIndex);
+            }
+        }
+
         QString fromFileFullName = fromCatalog->fullFileName(chunkKey.chunk);            
         auto fromStorage = QnStorageManager::getStorageByUrl(
             fromFileFullName, 
@@ -253,8 +295,15 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     while (1) {
         auto chunkKeyVector = getOldestChunk();
-        if (!chunkKeyVector)
+        if (!chunkKeyVector) {
             break;
+        }
+        else {
+            m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
+            if (m_syncTimePoint > m_clientSyncPoint) {
+                m_clientSyncPoint.store(m_syncTimePoint.load());
+            }
+        }
         for (const auto &chunkKey : *chunkKeyVector) {
             auto err = copyChunk(chunkKey);
             if (err != CopyError::NoError) {
@@ -334,7 +383,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     QnBackupStatusData ret;
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
-    ret.backupTimeMs = m_syncTimePoint;
+    ret.backupTimeMs = m_clientSyncPoint;
     {
         std::lock_guard<std::mutex> lk(m_syncDataMutex);
         auto syncDataSize = (double)m_syncData.size();
@@ -342,9 +391,9 @@ QnBackupStatusData QnScheduleSync::getStatus() const
             m_syncData.cbegin(),
             m_syncData.cend(),
             0.0,
-            [](double ac, const std::map<ChunkKey, double>::value_type &p)
+            [](double ac, const SyncDataMap::value_type &p)
             {
-                return ac + p.second;
+                return ac + p.second.coeff;
             }
         ) / (syncDataSize ? syncDataSize : 1);
     }

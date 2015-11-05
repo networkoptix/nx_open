@@ -25,8 +25,15 @@ private:
         QnServer::ChunksCatalog  catalog;
     };
     friend bool operator < (const ChunkKey &key1, const ChunkKey &key2);
+
+    struct SyncData 
+    {
+        double  coeff;
+        int     startIndex;
+    };
     
-    typedef std::vector<ChunkKey> ChunkKeyVector;
+    typedef std::vector<ChunkKey>         ChunkKeyVector;
+    typedef std::map<ChunkKey, SyncData>  SyncDataMap;
 
 public:
     enum code {
@@ -46,6 +53,8 @@ public:
     int forceStart(); 
     virtual void stop() override;
     int interrupt();
+
+    void findLastSyncPoint();
     QnBackupStatusData getStatus() const;
     virtual void run() override;
 
@@ -110,9 +119,10 @@ private:
 
     QnServerBackupSchedule  m_schedule;
     std::atomic<int64_t>    m_syncTimePoint;
+    std::atomic<int64_t>    m_clientSyncPoint;
 
-    std::map<ChunkKey, double> m_syncData;
-    mutable std::mutex         m_syncDataMutex;
+    SyncDataMap           m_syncData;
+    mutable std::mutex    m_syncDataMutex;
 };
 
 #endif

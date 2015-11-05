@@ -221,6 +221,8 @@ public:
                 qDebug() << "rebuild archive time for storage" << scanData.storage->getUrl() << "is:" << t.elapsed() << "msec";
             }
             m_scanTasks.removeFirst(1);
+            assert(qnBackupStorageMan->scheduleSync());
+            qnBackupStorageMan->scheduleSync()->findLastSyncPoint();
         }
     }
 };
