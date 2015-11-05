@@ -518,7 +518,7 @@ QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
 
     QDateTime now = qnSyncTime->currentDateTime();
 
-    QString result = lit("%1 %2").arg(now.date().toString()).arg(now.time().toString(Qt::DefaultLocaleShortDate));
+    QString result = lit("%1 %2").arg(now.date().toString()).arg(now.time().toString(Qt::SystemLocaleLongDate));
 
     qint64 deltaMs = now.toMSecsSinceEpoch() - backupTimeMs;
     if (deltaMs > minDeltaForMessageMs) {
@@ -545,9 +545,9 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 
     //TODO: #GDM discuss texts
     QString backedUpTo = reply.backupTimeMs > 0
-        ? backupPositionToString(reply.backupTimeMs)
-        : tr("Backup was never started");
-    ui->backupTimeLabel->setText(tr("Backup status: %1").arg(backedUpTo));
+        ? tr("Archive is backup up to: %1.").arg(backupPositionToString(reply.backupTimeMs))
+        : tr("Backup was never started.");
+    ui->backupTimeLabel->setText(backedUpTo);
 
     ui->backupStartButton->setEnabled(canStartBackup);
     ui->backupStopButton->setEnabled(reply.state == Qn::BackupState_InProgress);
