@@ -829,7 +829,7 @@ bool QnServerDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBookm
 
         const auto getFilterValue = [](const QString &text)
         {
-            static const QString filterTemplate = lit("*%1*"); // The star symbol allows prefix search
+            static const QString filterTemplate = lit("%1*"); // The star symbol allows prefix search
             static const QChar delimiter = L' ';
             
             QStringList result;
