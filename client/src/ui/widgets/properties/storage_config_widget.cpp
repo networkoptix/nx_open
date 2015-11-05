@@ -28,7 +28,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
-
+#include <utils/common/synctime.h>
+#include <utils/common/qtimespan.h>
 
 namespace {
     static const int COLUMN_SPACING = 8;
@@ -56,6 +57,7 @@ namespace {
     };
 
 
+    const qint64 minDeltaForMessageMs = 1000ll * 3600 * 24;
 
 } // anonymous namespace
 
@@ -512,6 +514,24 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     return true;
 }
 
+QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
+
+    QDateTime now = qnSyncTime->currentDateTime();
+
+    QString result = lit("%1 %2").arg(now.date().toString()).arg(now.time().toString(Qt::DefaultLocaleShortDate));
+
+    qint64 deltaMs = now.toMSecsSinceEpoch() - backupTimeMs;
+    if (deltaMs > minDeltaForMessageMs) {
+        QTimeSpan span(deltaMs);
+        span.normalize();
+        QString deltaStr = tr("(%1 before now)").arg(span.toApproximateString());
+        return lit("%1 %2").arg(result).arg(deltaStr);
+    } 
+
+    return result;
+}
+
+
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 {
     QString status;
@@ -522,11 +542,16 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
     QString backupInfo;
     bool canStartBackup = this->canStartBackup(reply, &backupInfo);
     ui->backupWarningLabel->setText(backupInfo);
-            
+
+    //TODO: #GDM discuss texts
+    QString backedUpTo = reply.backupTimeMs > 0
+        ? backupPositionToString(reply.backupTimeMs)
+        : tr("Backup was never started");
+    ui->backupTimeLabel->setText(tr("Backup status: %1").arg(backedUpTo));
+
     ui->backupStartButton->setEnabled(canStartBackup);
     ui->backupStopButton->setEnabled(reply.state == Qn::BackupState_InProgress);
     ui->stackedWidgetBackupInfo->setCurrentWidget(reply.state == Qn::BackupState_InProgress ? ui->backupProgressPage : ui->backupPreparePage);
-    //ui->stackedWidgetBackupInfo->setVisible(reply.state == Qn::BackupState_InProgress);
 }
 
 void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply)

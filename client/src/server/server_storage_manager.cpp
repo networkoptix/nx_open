@@ -19,8 +19,8 @@ namespace {
     /** Delay between requests when the backup is running. */ 
     const int updateBackupStatusDelayMs = 500;
 
-    /** Regular check if backup started. */
-    const int updateBackupRegularStatusDelayMs = 500;
+    /** Regular check if backup was started. */
+    const int updateBackupRegularStatusDelayMs = 10 * 60* 1000;
 }
 
 struct ServerPoolInfo {
