@@ -488,7 +488,7 @@
                     <family>unix</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android</value>
                 </property>
             </activation>

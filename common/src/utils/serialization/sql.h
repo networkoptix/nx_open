@@ -96,7 +96,7 @@ namespace QnSql {
     QVariant serialized_field(const T &value) {
         QVariant result;
         QnSql::serialize_field(value, &result);
-        return std::move(result);
+        return result;
     }
 
     template<class T>
@@ -110,7 +110,7 @@ namespace QnSql {
     T deserialized_field(const QVariant &value) {
         T result;
         QnSql::deserialize_field(value, &result);
-        return std::move(result);
+        return result;
     }
 
 } // namespace QnSql

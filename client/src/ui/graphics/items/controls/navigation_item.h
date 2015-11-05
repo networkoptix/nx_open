@@ -53,7 +53,8 @@ private slots:
     void updatePlaybackButtonsPressed();
     void updatePlayButtonChecked();
     void updateJumpButtonsTooltips();
-    
+    void updateBookButtonEnabled();
+
     bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event);
     void at_liveButton_clicked();
     void at_syncButton_clicked();

@@ -8,6 +8,8 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
+#include <core/resource_management/resource_properties.h>
+
 std::unique_ptr<test::StorageTestGlobals> tg;
 
 TEST(AbstractStorageResourceTest, Init)
@@ -316,6 +318,193 @@ TEST(AbstractStorageResourceTest, IODevice)
         ioDevice->close();
         ASSERT_TRUE(storage->removeFile(fileName));
     }
+}
+
+class AbstractMockStorageResource : public QnStorageResource {
+public:
+    virtual QIODevice* open(const QString&, QIODevice::OpenMode) override {
+        return nullptr;
+    }
+
+    virtual float getAvarageWritingUsage() const override {
+        assert(0);
+        return 0.0;
+    }
+
+    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString&) override {
+        assert(0);
+        return QnAbstractStorageResource::FileInfoList();
+    }
+
+    virtual qint64 getFileSize(const QString&) const override {
+        assert(0);
+        return 0;
+    }
+
+    virtual bool removeFile(const QString&) override {
+        assert(0);
+        return true;
+    }
+
+    virtual bool removeDir(const QString&) override {
+        assert(0);
+        return true;
+    }
+
+    virtual bool renameFile(const QString&, const QString&) override {
+        assert(0);
+        return true;
+    }
+
+    virtual bool isFileExists(const QString&) override {
+        return true;
+    }
+
+    virtual bool isDirExists(const QString&) override {
+        assert(0);
+        return true;
+    }
+
+    virtual qint64 getFreeSpace() override {
+        assert(0);
+        return 0;
+    }
+
+    virtual int getCapabilities() const override {
+        assert(0);
+        return 0;
+    }
+
+    virtual bool isAvailable() const override {
+        assert(0);
+        return true;
+    }
+
+    virtual void setUrl(const QString& url) override {
+        QnStorageResource::setUrl(url);
+    }
+
+private:
+    virtual QString getPath() const override {
+        return QnStorageResource::getPath();
+    }
+};
+
+class MockStorageResource1 : public AbstractMockStorageResource {
+public:
+    virtual qint64 getTotalSpace() override {
+        return (qint64)10 * 1024 * 1024 * 1024;
+    }
+};
+
+class MockStorageResource2 : public AbstractMockStorageResource {
+public:
+    virtual qint64 getTotalSpace() override {
+        return (qint64)20 * 1024 * 1024 * 1024;
+    }
+};
+
+class MockStorageResource3 : public AbstractMockStorageResource {
+public:
+    virtual qint64 getTotalSpace() override {
+        return (qint64)30 * 1024 * 1024 * 1024;
+    }
+};
+
+TEST(Storage_load_balancing_algorithm_test, Main) {
+    std::unique_ptr<QnCommonModule> commonModule;
+    if (!qnCommon) {
+        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
+    }
+    commonModule->setModuleGUID("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+
+    std::unique_ptr<QnStorageManager> storageManager;
+    if (!qnNormalStorageMan) {
+        storageManager = std::unique_ptr<QnStorageManager>(new QnStorageManager(QnServer::StoragePool::Normal));
+    }
+    storageManager->stopAsyncTasks();
+
+    std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
+    if (!qnStatusDictionary) {
+        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(new QnResourceStatusDictionary);
+    }
+
+    std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
+    if (!propertyDictionary) {
+        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary);
+    }
+
+    std::unique_ptr<QnStorageDbPool> dbPool;
+    if (!qnStorageDbPool) {
+        dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
+    }
+
+    QnStorageResourcePtr storage1 = QnStorageResourcePtr(new MockStorageResource1); 
+    storage1->setUrl("url1");
+    storage1->setId("{45FF0AD9-649B-4EDC-B032-13603EA37077}"); 
+    storage1->setUsedForWriting(true);
+
+    QnStorageResourcePtr storage2 = QnStorageResourcePtr(new MockStorageResource2);
+    storage2->setUrl("url2");
+    storage2->setId("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}"); 
+    storage2->setUsedForWriting(true);
+
+    QnStorageResourcePtr storage3 = QnStorageResourcePtr(new MockStorageResource3);
+    storage3->setUrl("url3");
+    storage3->setId("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}"); 
+    storage3->setUsedForWriting(true);
+
+    qnNormalStorageMan->addStorage(storage1);
+    qnNormalStorageMan->addStorage(storage2);
+    qnNormalStorageMan->addStorage(storage3);
+
+    storage1->setStatus(Qn::Online, true);
+    storage2->setStatus(Qn::Online, true);
+    storage3->setStatus(Qn::Online, true);
+
+    ASSERT_TRUE(storage1->calcUsageCoeff() == 0.0);
+    ASSERT_TRUE(storage2->calcUsageCoeff() == 0.0);
+    ASSERT_TRUE(storage3->calcUsageCoeff() == 0.0);
+    
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int64_t> dist(1 * 1024 * 1024, 50 * 1024 * 1024);
+    
+    const int writeCount = 1000000;
+    int64_t totalWrited = 0;
+    QnUuid currentStorageId;
+    int currentStorageUseCount = 0;
+    const int MAX_STORAGE_USE_IN_A_ROW = 10;
+    const int MAX_USAGE_DELTA = 1024;
+
+    for (int i = 0; i < writeCount; ++i) {
+        auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
+        ASSERT_TRUE(storage);
+        if (currentStorageId != storage->getId()) {
+            currentStorageId = storage->getId();
+            currentStorageUseCount = 0;
+        } else {
+            ++currentStorageUseCount;
+        }
+        ASSERT_TRUE(currentStorageUseCount < MAX_STORAGE_USE_IN_A_ROW);
+        int64_t fileSize = dist(gen);
+        totalWrited += fileSize;
+        storage->addWrited(fileSize);
+    }
+
+    ASSERT_TRUE(totalWrited > 0);
+
+    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
+    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
+    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
+
+    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage3->calcUsageCoeff()) < MAX_USAGE_DELTA);
+    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage3->calcUsageCoeff()) < MAX_USAGE_DELTA);
+    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage3->calcUsageCoeff()) < MAX_USAGE_DELTA);
+
+    ASSERT_TRUE(qAbs(storage3->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
+    ASSERT_TRUE(qAbs(storage3->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
+    ASSERT_TRUE(qAbs(storage3->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
 }
 
 TEST(AbstractStorageResourceTest, fini)

@@ -22,13 +22,12 @@ class QnToolTipSlider: public Animated<GraphicsSlider>, public ToolTipQueryable 
     typedef Animated<GraphicsSlider> base_type;
 
 public:
-    explicit QnToolTipSlider(QGraphicsItem *parent = NULL
-        , QGraphicsItem *tooltipParent = NULL);
+    explicit QnToolTipSlider(QGraphicsItem *parent = NULL);
+
     virtual ~QnToolTipSlider();
 
     QnToolTipWidget *toolTipItem() const;
-    void setToolTipItem(QnToolTipWidget *toolTipItem
-        , QGraphicsItem *tooltipParent);
+    void setToolTipItem(QnToolTipWidget *toolTipItem);
 
     bool isToolTipAutoHidden() const;
     void setAutoHideToolTip(bool autoHideToolTip);

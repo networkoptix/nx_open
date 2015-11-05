@@ -13,7 +13,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
 
-#include "api/new_server_connection.h"
+#include "api/server_rest_connection_fwd.h"
 
 namespace nx_http {
     class AsyncHttpClientPtr;
@@ -52,8 +52,15 @@ public:
 
     quint16 getPort() const;
 
+    /*
+    * Deprecated server rest connection
+    */
     QnMediaServerConnectionPtr apiConnection();
-    QnNewMediaServerConnection newApiConnection();
+
+    /*
+    * New server rest connection
+    */
+    rest::QnConnectionPtr serverRestConnection();
 
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
@@ -126,7 +133,8 @@ signals:
     void redundancyChanged(const QnResourcePtr &resource);
     void backupScheduleChanged(const QnResourcePtr &resource);
 private:
-    QnMediaServerConnectionPtr m_restConnection;
+    QnMediaServerConnectionPtr m_restConnection; // deprecated
+    rest::QnConnectionPtr m_serverRestConnection; // new one
     QString m_apiUrl;
     QList<SocketAddress> m_netAddrList;
     QList<QUrl> m_additionalUrls;

@@ -66,7 +66,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     connect(ui->ldapSettingsButton,      &QPushButton::clicked,  this,  &QnUserManagementWidget::openLdapSettings);
     connect(ui->fetchButton,             &QPushButton::clicked,  this,  &QnUserManagementWidget::fetchUsers);
 
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnUserManagementWidget::updateFromSettings);
+    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnUserManagementWidget::loadDataToUi);
 
     updateFetchButton();
 
@@ -91,7 +91,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
 QnUserManagementWidget::~QnUserManagementWidget() {
 }
 
-void QnUserManagementWidget::updateFromSettings() {
+void QnUserManagementWidget::loadDataToUi() {
     bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
     ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
     ui->fetchButton->setVisible(!currentUserIsLdap);
@@ -99,6 +99,14 @@ void QnUserManagementWidget::updateFromSettings() {
     ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
     ui->fetchButton->setEnabled(!qnCommon->isReadOnly());
     updateSelection();
+}
+
+void QnUserManagementWidget::applyChanges() {
+    /* All changes are instant. */ 
+}
+
+bool QnUserManagementWidget::hasChanges() const {
+    return false;
 }
 
 void QnUserManagementWidget::updateSelection() {

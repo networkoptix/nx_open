@@ -174,3 +174,15 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
 void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly) {
     ui->restoreButton->setEnabled(!readOnly);
 }
+
+void QnDatabaseManagementWidget::applyChanges() {
+    /* Widget is read-only */
+}
+
+void QnDatabaseManagementWidget::loadDataToUi() {
+    /* Widget is read-only */
+}
+
+bool QnDatabaseManagementWidget::hasChanges() const {
+    return false;
+}

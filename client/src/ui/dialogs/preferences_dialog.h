@@ -29,9 +29,9 @@ public:
 
 protected:
 
-    virtual void submitData() override;
+    virtual void applyChanges() override;
 
-    virtual bool confirm() override;
+    virtual bool canApplyChanges() override;
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)

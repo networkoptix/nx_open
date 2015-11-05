@@ -205,7 +205,8 @@ private:
     void updateBookmarks();
     void updateBookmarksVisibility();
 
-    qint64 getDisplayTimeMs() const;
+    qint64 getDisplayTimeUsec() const;
+    qint64 getUtcCurrentTimeUsec() const;
     qint64 getUtcCurrentTimeMs() const;
 
 private:

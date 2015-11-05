@@ -265,7 +265,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(Qn::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
-    /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
+    /* Qt::QueuedConnection is important! See QnPreferencesDialog::canApplyChanges() for details. */
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
@@ -1375,12 +1375,17 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
-    bool enable = action(Qn::BookmarksModeAction)->isChecked();
+    const auto bookmarkModeAction = action(Qn::BookmarksModeAction);
+    const bool checked = bookmarkModeAction->isChecked();
+    const bool enabled = bookmarkModeAction->isEnabled();
 
-    if (enable)
+    if (enabled)
+        context()->workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
+
+    if (checked)
         menu()->trigger(Qn::StopSmartSearchAction, QnActionParameters(display()->widgets()));
 
-    navigator()->setBookmarksModeEnabled(enable);
+    navigator()->setBookmarksModeEnabled(checked);
 }
 
 void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {

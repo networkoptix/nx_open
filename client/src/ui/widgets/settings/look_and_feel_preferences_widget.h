@@ -22,11 +22,12 @@ public:
     explicit QnLookAndFeelPreferencesWidget(QWidget *parent = 0);
     ~QnLookAndFeelPreferencesWidget();
 
-    virtual void submitToSettings() override;
-    virtual void updateFromSettings() override;
+    virtual void applyChanges() override;
+    virtual void loadDataToUi() override;
+    virtual bool hasChanges() const override;
 
-    virtual bool confirm() override;
-    virtual bool discard() override;
+    virtual bool canApplyChanges() override;
+    virtual bool canDiscardChanges() override;
 
 protected:
     virtual bool event(QEvent *event) override;

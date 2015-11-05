@@ -12,6 +12,11 @@ public:
 
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
+    QList<QString> getStorageProtocols() const;
+    QList<QString> getStoragePaths() const;
+
+
+private:
     QnPlatformMonitor *m_monitor;
 };
 

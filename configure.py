@@ -81,7 +81,10 @@ if __name__ == '__main__':
     print >> sys.stderr, 'branch is: %s\n' % build_branch
     print >> sys.stderr, 'box is: %s\n' % build_box
     if build_arch == 'arm':
-        targetdir = 'build_environment/target-%s' % build_box
+        if build_box != "android" and build_box != "ios":
+            targetdir = 'build_environment/target-%s' % build_box
+        else:
+            targetdir = 'build_environment/target'
     else:
         targetdir = 'build_environment/target'
     print targetdir

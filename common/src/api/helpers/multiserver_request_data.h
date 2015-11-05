@@ -5,8 +5,6 @@
 #include <utils/common/request_param.h>
 
 struct QnMultiserverRequestData {
-    QnMultiserverRequestData();
-
     template <typename T>
     static T fromParams(const QnRequestParamList& params) {
         T request;
@@ -24,4 +22,9 @@ struct QnMultiserverRequestData {
 
     bool isLocal;
     Qn::SerializationFormat format;
+
+protected:
+    /* Avoid creating invalid instances when making local requests. */
+    QnMultiserverRequestData();
+    QnMultiserverRequestData(const QnMultiserverRequestData &src) /* = default //TODO: #GDM default is supported in vs2015 */;
 };

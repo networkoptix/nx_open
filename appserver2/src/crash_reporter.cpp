@@ -31,10 +31,11 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
     #if defined( _WIN32 )
         const QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
         const auto crashFilter = prefix + QString::fromStdString(win32_exception::getCrashPattern());
-    #elif defined ( __linux__ )
+    #elif defined (Q_OS_LINUX) && !defined(Q_OS_ANDROID)
         const QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
         const auto crashFilter = prefix + QString::fromStdString(linux_exception::getCrashPattern());
     #else
+        Q_UNUSED(prefix)
         const QDir crashDir;
         const QString crashFilter;
         return QFileInfoList(); // do nothing. not implemented

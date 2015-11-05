@@ -133,7 +133,7 @@ public:
 
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
-    qint64 timeZoneShift;
+    int timeZoneShift;
 
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs;
@@ -468,11 +468,11 @@ void QnTimeline::setAutoPlay(bool autoPlay) {
         update();
 }
 
-qint64 QnTimeline::timeZoneShift() const {
+int QnTimeline::timeZoneShift() const {
     return d->timeZoneShift;
 }
 
-void QnTimeline::setTimeZoneShift(qint64 timeZoneShift) {
+void QnTimeline::setTimeZoneShift(int timeZoneShift) {
     if (d->timeZoneShift == timeZoneShift)
         return;
 

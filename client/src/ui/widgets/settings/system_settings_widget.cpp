@@ -35,6 +35,11 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
         ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked());
     });
 
+    connect(ui->autoDiscoveryCheckBox,      &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->auditTrailCheckBox,         &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->statisticsReportCheckBox,   &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->autoSettingsCheckBox,       &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
     retranslateUi();
 }
 
@@ -54,7 +59,7 @@ void QnSystemSettingsWidget::retranslateUi() {
 }
 
 
-void QnSystemSettingsWidget::updateFromSettings() {
+void QnSystemSettingsWidget::loadDataToUi() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
 
     QSet<QString> disabledVendors = settings->disabledVendorsSet();
@@ -70,7 +75,7 @@ void QnSystemSettingsWidget::updateFromSettings() {
     ui->statisticsReportCheckBox->setChecked(ec2::Ec2StaticticsReporter::isAllowed(qnResPool->getResources<QnMediaServerResource>()));
 }
 
-void QnSystemSettingsWidget::submitToSettings() {
+void QnSystemSettingsWidget::applyChanges() {
     if (!hasChanges())
         return;
 

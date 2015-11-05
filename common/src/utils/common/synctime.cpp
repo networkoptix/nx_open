@@ -17,8 +17,9 @@ enum {
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
-QnSyncTime::QnSyncTime()
+QnSyncTime::QnSyncTime(QObject *parent)
 :
+    QObject(parent),
     m_lastReceivedTime( 0 ),
     m_lastWarnTime( 0 ),
     m_lastLocalTime( 0 ),

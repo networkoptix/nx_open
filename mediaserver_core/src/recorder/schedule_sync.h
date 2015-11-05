@@ -11,8 +11,10 @@
 #include <api/model/backup_status_reply.h>
 #include <recorder/storage_manager.h>
 #include <core/resource/server_backup_schedule.h>
+#include <nx_ec/data/api_media_server_data.h>
+#include "utils/common/long_runnable.h"
 
-class QnScheduleSync: public QObject
+class QnScheduleSync: public QnLongRunnable
 {
     Q_OBJECT
 private:
@@ -27,8 +29,7 @@ private:
     typedef std::vector<ChunkKey> ChunkKeyVector;
 
 public:
-    enum code
-    {
+    enum code {
         Ok = 0,
         Started,
         Syncing,
@@ -40,20 +41,56 @@ public:
     QnScheduleSync();
     ~QnScheduleSync();
 signals:
-    void backupFinished(qint64 timestampMs);
+    void backupFinished(qint64 timestampMs, QnServer::BackupResultCode status);
 public:
-    static QnScheduleSync *instance();
     int forceStart(); 
-    int stop();
+    virtual void stop() override;
     int interrupt();
     QnBackupStatusData getStatus() const;
-    void start();
+    virtual void run() override;
+
 private:
-    template<typename NeedStopCB>
-    void synchronize(NeedStopCB needStop);
+#define COPY_ERROR_LIST(APPLY) \
+    APPLY(GetCatalogError) \
+    APPLY(NoBackupStorageError) \
+    APPLY(FromStorageError) \
+    APPLY(FileOpenError) \
+    APPLY(ChunkError) \
+    APPLY(NoError) \
+    APPLY(Interrupted)
+
+#define ENUM_APPLY(value) value,
+
+    enum class CopyError {
+        COPY_ERROR_LIST(ENUM_APPLY)
+    };
+
+#define TO_STRING_APPLY(value) case CopyError::value: return lit(#value);
+
+    QString copyErrorString(CopyError error) {
+        switch (error) {
+            COPY_ERROR_LIST(TO_STRING_APPLY)
+        }
+        return QString();
+    }
+
+#undef TO_STRING_APPLY
+#undef ENUM_APPLY
+#undef COPY_ERROR_LIST
+
+    enum class SyncCode {
+        Interrupted,
+        OutOfTime,
+        WrongBackupType,
+        Ok
+    };
+
+private:
+    template<typename NeedMoveOnCB>
+    QnServer::BackupResultCode synchronize(NeedMoveOnCB needMoveOn);
 
     void renewSchedule();
-    void copyChunk(const ChunkKey &chunkKey);
+    CopyError copyChunk(const ChunkKey &chunkKey);
 
     int state() const;
 
@@ -64,18 +101,19 @@ private:
     );
 
 private:
-    std::atomic<bool>    m_backupSyncOn;
-    std::atomic<bool>    m_syncing;
-    std::atomic<bool>    m_forced;
-    QFuture<void>        m_backupFuture;
+    std::atomic<bool>       m_backupSyncOn;
+    std::atomic<bool>       m_syncing;
+    std::atomic<bool>       m_forced;
+    std::atomic<bool>       m_interrupted;
+    bool                    m_backupDone;
+    ec2::backup::DayOfWeek  m_curDow;
+
     QnServerBackupSchedule  m_schedule;
-    std::atomic<int64_t> m_syncTimePoint;
+    std::atomic<int64_t>    m_syncTimePoint;
 
     std::map<ChunkKey, double> m_syncData;
     mutable std::mutex         m_syncDataMutex;
 };
-
-#define qnScheduleSync QnScheduleSync::instance()
 
 #endif
 

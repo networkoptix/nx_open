@@ -13,6 +13,11 @@
 namespace {
     const int secsPerDay = 3600 * 24;
     const int daysPerWeek = 7;
+    const int bitsPerMegabit = 1000000;
+    const int bitsPerByte = 8;
+
+    /** Default format used all over the app. */
+    const QString defaultTimeFormat = lit("hh:mm");
 
     Qt::DayOfWeek nextDay(Qt::DayOfWeek day) {
         static_assert(Qt::Sunday == 7, "Make sure Sunday is the last day");
@@ -20,10 +25,26 @@ namespace {
             return Qt::Monday;
         return static_cast<Qt::DayOfWeek>(day + 1);
     }
+
+    int bytesToMBits(int bytes) {
+        return bytes * bitsPerByte / bitsPerMegabit;
+    }
+
+    int mBitsToBytes(int mBits) {
+        return mBits * bitsPerMegabit / bitsPerByte;
+    }
+
+    int dayToIndex(Qt::DayOfWeek day) {
+        return static_cast<int>(day) - 1;
+    }
+
+    Qt::DayOfWeek indexToDay(int index) {
+        return static_cast<Qt::DayOfWeek>(index + 1);
+    }
 }
 
-QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent, Qt::WindowFlags windowFlags ):
-    base_type(parent, windowFlags),
+QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
+    base_type(parent),
     ui(new Ui::BackupScheduleDialog())
 {
     ui->setupUi(this);
@@ -33,44 +54,73 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent, Qt::WindowFlags 
     ui->comboBoxTimeTo->addItem(tr("Until finished"), -1);
     for (int i = 0; i < 24; ++i) {
         QTime t(i, 0, 0);
-        ui->comboBoxTimeStart->addItem(t.toString(Qt::DefaultLocaleShortDate), i * 3600);
-        ui->comboBoxTimeTo->addItem(t.toString(Qt::DefaultLocaleShortDate), i * 3600);
+        ui->comboBoxTimeStart->addItem(t.toString(defaultTimeFormat), i * 3600);
+        ui->comboBoxTimeTo->addItem(t.toString(defaultTimeFormat), i * 3600);
     }
-    connect(ui->comboBoxBandwidth, QnComboboxCurrentIndexChanged, this, [this](int index){
-        ui->spinBoxBandwidth->setEnabled(index > 0);
-        ui->bandwidthLabel->setEnabled(index > 0);
-    });
 
+    auto updateLimitControls = [this]{
+        bool enabled = ui->limitBandwithCheckBox->isChecked();
+        ui->spinBoxBandwidth->setEnabled(enabled);
+        ui->bandwidthLabel->setEnabled(enabled);
+    };
+
+    connect(ui->limitBandwithCheckBox, &QCheckBox::stateChanged, this, updateLimitControls);
+    updateLimitControls();
 }
 
 QnBackupScheduleDialog::~QnBackupScheduleDialog() 
 {}
 
+const QnBackupScheduleColors & QnBackupScheduleDialog::colors() const {
+    return m_colors;
+}
+
+void QnBackupScheduleDialog::setColors( const QnBackupScheduleColors &colors ) {
+    m_colors = colors;
+    updateDayOfWeekCheckboxes();
+}
+
+QCheckBox* QnBackupScheduleDialog::checkboxByDayOfWeek( Qt::DayOfWeek day ) {
+    return m_dowCheckboxes[dayToIndex(day)];
+}
 
 void QnBackupScheduleDialog::initDayOfWeekCheckboxes() {
+    auto locale = QLocale::system();
 
-    auto locale = QLocale();
     QFont nameFont = this->font();
     nameFont.setCapitalization(QFont::Capitalize);
-
-    qDebug() << locale.weekdays();
 
     Qt::DayOfWeek day = locale.firstDayOfWeek();
     for (int i = 0; i < daysPerWeek; ++i) {
         QCheckBox* checkbox = new QCheckBox(this);
+
+        /* Adding checkboxes to widget in the locale order */
         ui->weekDaysLayout->addWidget(checkbox);
 
-        m_dowCheckboxes[day - 1] = checkbox;
-        checkbox->setText( locale.dayName(day) );
-        checkbox->setFont(nameFont);
-        if (!locale.weekdays().contains(day))
-            setPaletteColor(checkbox, QPalette::Foreground, Qt::red); //TODO: #GDM customize the same way as QnScheduleGridColors
-        
+        m_dowCheckboxes[dayToIndex(day)] = checkbox;
+        checkbox->setFont(nameFont);       
         day = nextDay(day);
     }
 
     ui->weekDaysLayout->addStretch();
+
+    updateDayOfWeekCheckboxes();
 }
+
+void QnBackupScheduleDialog::updateDayOfWeekCheckboxes() {
+    auto locale = QLocale::system();
+
+    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+        Qt::DayOfWeek day = indexToDay(i);
+        QCheckBox* checkbox = m_dowCheckboxes[i];
+
+        checkbox->setText( locale.dayName(day) );
+        if (!locale.weekdays().contains(day))
+            setPaletteColor(checkbox, QPalette::Foreground, m_colors.weekEnd);
+
+    }
+}
+
 
 
 void QnBackupScheduleDialog::setNearestValue(QComboBox* combobox, int time)
@@ -91,49 +141,49 @@ void QnBackupScheduleDialog::setNearestValue(QComboBox* combobox, int time)
 void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& value)
 {
     ec2::backup::DaysOfWeek allowedDays = static_cast<ec2::backup::DaysOfWeek>(value.backupDaysOfTheWeek);
-    for (int i = 1; i <= 7; ++i) {
-        Qt::DayOfWeek day = static_cast<Qt::DayOfWeek>(i);
-        checkboxByDayOfWeek(day)->setChecked(allowedDays.testFlag(ec2::backup::fromQtDOW(day)));
+    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+        Qt::DayOfWeek day = indexToDay(i);
+        QCheckBox* checkbox = m_dowCheckboxes[i];
+        checkbox->setChecked(allowedDays.testFlag(ec2::backup::fromQtDOW(day)));
     }
 
-
-    setNearestValue(ui->comboBoxTimeStart, value.backupStart);
-    if (value.backupDuration == -1)
-        setNearestValue(ui->comboBoxTimeTo, value.backupDuration);
+    setNearestValue(ui->comboBoxTimeStart, value.backupStartSec);
+    if (value.backupDurationSec == -1)
+        setNearestValue(ui->comboBoxTimeTo, value.backupDurationSec);
     else
-        setNearestValue(ui->comboBoxTimeTo, (value.backupStart + value.backupDuration) % secsPerDay);
+        setNearestValue(ui->comboBoxTimeTo, (value.backupStartSec + value.backupDurationSec) % secsPerDay);
 
-    ui->spinBoxBandwidth->setValue(qAbs(value.backupBitrate) * 8 / 1000000);
-    ui->comboBoxBandwidth->setCurrentIndex(value.backupBitrate > 0 ? 1 : 0);
+    ui->spinBoxBandwidth->setValue(qAbs(bytesToMBits(value.backupBitrate)));
+        
+    ui->limitBandwithCheckBox->setChecked(value.backupBitrate > 0);
 }
 
 void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
 {
     QList<Qt::DayOfWeek> days;
-    for (int i = 1; i <= 7; ++i) {
-        Qt::DayOfWeek day = static_cast<Qt::DayOfWeek>(i);
-        if (checkboxByDayOfWeek(day)->isChecked())
+    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+        Qt::DayOfWeek day = indexToDay(i);
+        QCheckBox* checkbox = m_dowCheckboxes[i];
+        if (checkbox->isChecked())
             days << day;
     }
 
     value.backupDaysOfTheWeek = ec2::backup::fromQtDOW(days);
 
-    value.backupStart = ui->comboBoxTimeStart->itemData(ui->comboBoxTimeStart->currentIndex()).toInt();
+    value.backupStartSec = ui->comboBoxTimeStart->itemData(ui->comboBoxTimeStart->currentIndex()).toInt();
     int backupEnd = ui->comboBoxTimeTo->itemData(ui->comboBoxTimeTo->currentIndex()).toInt();
     if (backupEnd == -1) {
-        value.backupDuration = backupEnd;
+        value.backupDurationSec = backupEnd;
     }
     else {
-        if (backupEnd < value.backupStart)
+        if (backupEnd < value.backupStartSec)
             backupEnd += secsPerDay;
-        value.backupDuration = backupEnd - value.backupStart;
+        value.backupDurationSec = backupEnd - value.backupStartSec;
     }
 
-    value.backupBitrate = ui->spinBoxBandwidth->value() * 1000000 / 8;
-    if (ui->comboBoxBandwidth->currentIndex() == 0)
+    value.backupBitrate = mBitsToBytes(ui->spinBoxBandwidth->value());
+    if (!ui->limitBandwithCheckBox->isChecked())
         value.backupBitrate = -value.backupBitrate;
 }
 
-QCheckBox* QnBackupScheduleDialog::checkboxByDayOfWeek( Qt::DayOfWeek day ) {
-    return m_dowCheckboxes[static_cast<int>(day) - 1];
-}
+
