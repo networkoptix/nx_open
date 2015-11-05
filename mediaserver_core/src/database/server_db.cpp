@@ -826,7 +826,21 @@ bool QnServerDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBookm
         checkedBind(":minStartTimeMs", filter.startTimeMs);
         checkedBind(":maxEndTimeMs", filter.endTimeMs);
         //checkedBind(":minDurationMs", filter.minDurationMs);
-        checkedBind(":text", filter.text + lit("*")); // The star symbol allows prefix search
+
+        const auto getFilterValue = [](const QString &text)
+        {
+            static const QString filterTemplate = lit("*%1*"); // The star symbol allows prefix search
+            static const QChar delimiter = L' ';
+            
+            QStringList result;
+            const auto list = text.split(delimiter);
+            for(const auto &item: list)
+                result.push_back(filterTemplate.arg(item));
+
+            return result.join(delimiter);
+        };
+
+        checkedBind(":text", getFilterValue(filter.text)); 
 
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return false;
