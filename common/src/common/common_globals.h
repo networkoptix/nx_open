@@ -774,7 +774,7 @@ public:
      */
     enum BackupType
     {
-        Backup_Disabled,
+        Backup_Manual,
         Backup_RealTime,
         Backup_Schedule
     };

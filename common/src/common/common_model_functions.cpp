@@ -49,7 +49,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTraits,
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupType,
-    (Qn::Backup_Disabled,          "BackupDisabled")
+    (Qn::Backup_Manual,            "BackupManual")
     (Qn::Backup_RealTime,          "BackupRealTime")
     (Qn::Backup_Schedule,          "BackupSchedule")
 )

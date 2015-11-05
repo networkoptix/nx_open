@@ -97,7 +97,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
  
     ui->comboBoxBackupType->addItem(tr("By schedule"), Qn::Backup_Schedule);
     ui->comboBoxBackupType->addItem(tr("Realtime mode"), Qn::Backup_RealTime);
-    ui->comboBoxBackupType->addItem(tr("Never"), Qn::Backup_Disabled);
+    ui->comboBoxBackupType->addItem(tr("Manual only"), Qn::Backup_Manual);
 
     setupGrid(ui->mainStoragesTable, true);
     setupGrid(ui->backupStoragesTable, false);
@@ -495,8 +495,8 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     if (data.state != Qn::BackupState_None) 
         return error(tr("Backup is already in progress."));
 
-    if (m_backupSchedule.backupType != Qn::Backup_Schedule)
-        return error(tr("Manual backup is available only in Schedule mode."));
+    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+        return error(tr("Manual backup is available only in Schedule or Manual mode."));
 
     if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
         return storage.isWritable && storage.isUsed && storage.isBackup;
