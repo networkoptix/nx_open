@@ -8,7 +8,7 @@
 #include <boost/optional.hpp>
 #include <mutex>
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #  include <ws2tcpip.h>
 #  include <iphlpapi.h>
 #  include "win32_socket_tools.h"
@@ -20,7 +20,12 @@
 
 #define ADDR_(x) reinterpret_cast<sockaddr*>(x)
 
+#ifdef __APPLE__
 static const int EPOLL_SIZE = 1024;
+#else
+//TODO #ak rebuild udt for linux and win32
+#define EPOLL_SIZE
+#endif
 
 // Tracking operation. This operation should be put inside of the DEBUG_
 // macro and also using it will log the error that has happened at last 
@@ -608,7 +613,9 @@ bool UdtConnector::Connect( const SocketAddress& remoteAddress, int timeouts )
         }
     }
     // Using epoll will ensure that it is correct with any value for the file descriptor. 
-    UdtEpollHandlerHelper epoll_fd(UDT::epoll_create(EPOLL_SIZE),impl_->udt_handler());
+    UdtEpollHandlerHelper epoll_fd(
+        UDT::epoll_create(EPOLL_SIZE),
+        impl_->udt_handler());
     int write_ev = UDT_EPOLL_OUT;
     ret = UDT::epoll_add_usock(epoll_fd.epoll_fd,impl_->udt_handler(),&write_ev);
     VERIFY_(ret ==0,"UDT::epoll_add_ssock",impl_->udt_handler());
