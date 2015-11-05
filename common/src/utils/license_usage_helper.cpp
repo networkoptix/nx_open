@@ -166,11 +166,7 @@ QString QnLicenseUsageHelper::getRequiredMsg() const {
 }
 
 void QnLicenseUsageHelper::invalidate() {
-    if (m_dirty)
-        return;
-
     m_dirty = true;
-    emit statusUpdated();
 }
 
 void QnLicenseUsageHelper::updateCache() const {
@@ -345,30 +341,38 @@ void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera) {
 /************************************************************************/
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QObject *parent):
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnCamLicenseUsageWatcherPtr &watcher
+    , QObject *parent):
     base_type(parent)
 {
-    init();
+    init(watcher);
 }
 
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent):
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable
+    , const QnCamLicenseUsageWatcherPtr &watcher, QObject *parent):
     base_type(parent)
 {
-    init();
+    init(watcher);
     propose(proposedCameras, proposedEnable);
 }
 
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent):
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable
+    , const QnCamLicenseUsageWatcherPtr &watcher, QObject *parent):
     base_type(parent)
 {
-    init();
-    
+    init(watcher);
     propose(proposedCamera, proposedEnable);
 }
 
-void QnCamLicenseUsageHelper::init() {
-    QnCamLicenseUsageWatcher* usageWatcher = new QnCamLicenseUsageWatcher(this);
-    connect(usageWatcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);
+void QnCamLicenseUsageHelper::init(const QnCamLicenseUsageWatcherPtr &watcher) {
+    m_watcher = (watcher ? watcher
+        : QnCamLicenseUsageWatcherPtr(new QnCamLicenseUsageWatcher()));
+
+    connect(m_watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, [this]()
+    {
+        invalidate();
+        emit licenseUsageChanged();
+    });
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable) {
@@ -438,25 +442,15 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
 
 QnSingleCamLicenceStatusHelper::QnSingleCamLicenceStatusHelper(const QnVirtualCameraResourcePtr &camera)
     : m_camera(camera)
-    , m_helper(camera ? new QnCamLicenseUsageHelper(camera, true) : nullptr)
-    , m_isLicenceUsed(camera ? camera->isLicenseUsed() : false)
+    , m_helper(camera 
+        ? new QnCamLicenseUsageHelper(camera, true, QnCamLicenseUsageWatcherPtr(new QnCamLicenseUsageWatcher(camera))) 
+        : nullptr)
 {
     if (!camera)
         return;
 
-    connect(camera, &QnVirtualCameraResource::licenseUsedChanged
-        , this, [this](const QnResourcePtr & /* resource */)
-    {
-        const bool newVal = m_camera->isLicenseUsed();
-        if (newVal == m_isLicenceUsed)
-            return;
-
-        m_isLicenceUsed = newVal;
-        emit licenceStatusChanged();
-    });
-
-    connect(m_helper, &QnCamLicenseUsageHelper::statusUpdated
-        , this, [this] () { emit licenceStatusChanged(); });
+    connect(m_helper, &QnCamLicenseUsageHelper::licenseUsageChanged
+        , this, &QnSingleCamLicenceStatusHelper::licenceStatusChanged);
 }
 
 QnSingleCamLicenceStatusHelper::~QnSingleCamLicenceStatusHelper()
@@ -473,10 +467,11 @@ QnSingleCamLicenceStatusHelper::CameraLicenseStatus QnSingleCamLicenceStatusHelp
     if (!m_camera)
         return InvalidSource;
 
-    if (m_helper->isOverflowForCamera(m_camera, m_isLicenceUsed))
+    const bool isLicenceUsed = m_camera->isLicenseUsed();
+    if (m_helper->isOverflowForCamera(m_camera, isLicenceUsed))
         return LicenseOverflow;
 
-    return (m_isLicenceUsed ? LicenseUsed : LicenseNotUsed);
+    return (isLicenceUsed ? LicenseUsed : LicenseNotUsed);
 }
 
 

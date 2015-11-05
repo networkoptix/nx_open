@@ -272,7 +272,8 @@ private:
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
 
-    QnSingleCamLicenceStatusHelper m_licenceStatus;
+    typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
+    QnSingleCamLicenceStatusHelperPtr m_licenceStatus;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

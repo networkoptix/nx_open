@@ -95,9 +95,6 @@ public:
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
 
-signals:
-    void statusUpdated();
-
 protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
@@ -137,26 +134,38 @@ private:
     void init(const QnVirtualCameraResourcePtr &camera);
 };
 
+typedef QSharedPointer<QnCamLicenseUsageWatcher> QnCamLicenseUsageWatcherPtr;
+
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
     Q_OBJECT
 
     typedef QnLicenseUsageHelper base_type;
 public:
-    QnCamLicenseUsageHelper(QObject *parent = NULL);
-    QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent = NULL);
-    QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent = NULL);
+    QnCamLicenseUsageHelper(const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr()
+        , QObject *parent = NULL);
+
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable
+        , const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr(), QObject *parent = NULL);
+
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable
+        , const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr(), QObject *parent = NULL);
 
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed);
+
+signals:
+    void licenseUsageChanged();
+
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
-    void init();
-
+    void init(const QnCamLicenseUsageWatcherPtr &watcher);
+    
+    QnCamLicenseUsageWatcherPtr m_watcher;
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
@@ -188,7 +197,6 @@ private:
 
     const QnVirtualCameraResourcePtr m_camera;
     const QnCamLicenseUsageHelperPtr m_helper;
-    bool m_isLicenceUsed;
 };
 
 class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher {
