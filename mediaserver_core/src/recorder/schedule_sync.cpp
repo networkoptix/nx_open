@@ -70,12 +70,9 @@ boost::optional<QnScheduleSync::ChunkKeyVector>
 QnScheduleSync::getOldestChunk() 
 {
     ChunkKeyVector ret;
-    auto mediaServer = qnCommon->currentServer();
-    
-    Q_ASSERT(mediaServer);    
     int64_t minTime = std::numeric_limits<int64_t>::max();
 
-    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(mediaServer, true)) 
+    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true)) 
     {       
         Qn::CameraBackupQualities cameraBackupQualities = camera->getActualBackupQualities();
 
