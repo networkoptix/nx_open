@@ -25,14 +25,14 @@
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} libcloud_db</product.title>
         <!--Global libs-->
-        <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon -ludt</global.libs>
+        <qt.libs>core network concurrent sql xml</qt.libs>
+        <global.libs>-lcommon -ludt -lcloud_db_client -lnxemail</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lnxemail -lavcodec -lavformat -lavutil</linux.oslibs>
-        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
