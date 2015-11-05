@@ -189,6 +189,7 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
 
     item.id = QnStorageResource::fillID(m_server->getId(), item.url);
     item.isBackup = !addToMain;
+    item.isUsed = true;
 
     m_model->addStorage(item);
     updateColumnWidth();
