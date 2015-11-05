@@ -70,12 +70,9 @@ boost::optional<QnScheduleSync::ChunkKeyVector>
 QnScheduleSync::getOldestChunk() 
 {
     ChunkKeyVector ret;
-    auto mediaServer = qnCommon->currentServer();
-    
-    Q_ASSERT(mediaServer);    
     int64_t minTime = std::numeric_limits<int64_t>::max();
 
-    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(mediaServer, true)) 
+    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true)) 
     {       
         Qn::CameraBackupQualities cameraBackupQualities = camera->getActualBackupQualities();
 
@@ -197,6 +194,9 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 
             while (fileSize > 0)
             {
+                if (m_interrupted || !m_backupSyncOn) {
+                    return CopyError::Interrupted;
+                }
                 qint64 startTime = qnSyncTime->currentMSecsSinceEpoch();
                 const qint64 writeSize = CHUNK_SIZE < fileSize ? CHUNK_SIZE : fileSize;
                 auto data = fromFile->read(writeSize);
@@ -221,6 +221,9 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         fromFile.reset();
         toFile.reset();
 
+        if (m_interrupted || !m_backupSyncOn) {
+            return CopyError::Interrupted;
+        }
         // add chunk to catalog
         bool result = qnBackupStorageMan->fileStarted(
             chunkKey.chunk.startTimeMs,
@@ -264,6 +267,8 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                     emit backupFinished(m_syncTimePoint, 
                                         QnServer::BackupResultCode::Failed);
                     return QnServer::BackupResultCode::Failed;
+                } else if (err == CopyError::Interrupted) {
+                    return QnServer::BackupResultCode::Cancelled;
                 }
             }
         }

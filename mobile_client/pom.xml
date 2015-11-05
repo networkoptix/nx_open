@@ -49,6 +49,44 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>      
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>manual-clean</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.apk</include>
+                                        <include>*.ipa</include>
+                                    </includes>
+                                </fileset>                                                                  
+                            </filesets>
+                            <skip>${clean-skip}</skip>							
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>    
+        </plugins>    
+    </build>
+    
     <profiles>
         <profile>
             <id>nobeta</id>

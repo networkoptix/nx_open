@@ -89,6 +89,7 @@ private:
     ArchiveChunkInfo m_currentChunkInfo;
 
     mutable QnMutex m_mutex;
+    QnServer::ChunksCatalog m_lastChunkQuality;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;
