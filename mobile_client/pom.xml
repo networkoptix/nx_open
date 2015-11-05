@@ -50,7 +50,6 @@
     </dependencies>
 
     <build>
-        <directory>${project.build.directory}</directory>
         <plugins>      
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
