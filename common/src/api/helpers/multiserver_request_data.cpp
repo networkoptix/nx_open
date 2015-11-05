@@ -20,6 +20,11 @@ QnMultiserverRequestData::QnMultiserverRequestData()
     , format(defaultFormat())
 {}
 
+QnMultiserverRequestData::QnMultiserverRequestData( const QnMultiserverRequestData &src )
+    : isLocal(src.isLocal)
+    , format(src.format)
+{}
+
 void QnMultiserverRequestData::loadFromParams(const QnRequestParamList& params) {
     isLocal = params.contains(localKey);
     QnLexical::deserialize(params.value(formatKey), &format);
