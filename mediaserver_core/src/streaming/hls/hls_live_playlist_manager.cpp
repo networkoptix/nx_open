@@ -28,11 +28,10 @@ namespace nx_hls
         m_blockID( -1 ),
         m_removedChunksToKeepCount( MSSettings::roSettings()->value(
             nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
-            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() ),
-        m_eventRegistrationID( 0 )
+            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() )
     {
         using namespace std::placeholders;
-        m_eventRegistrationID = m_mediaStreamCache->addKeyFrameEventReceiver( std::bind( &HLSLivePlaylistManager::onKeyFrame, this, _1 ) );
+        m_mediaStreamCache->addEventReceiver( this );
 
         m_inactivityTimer.restart();
     }
@@ -44,7 +43,7 @@ namespace nx_hls
             m_mediaStreamCache->unblockData( m_blockID );
             m_blockID = -1;
         }
-        m_mediaStreamCache->removeKeyFrameEventReceiver( m_eventRegistrationID );
+        m_mediaStreamCache->removeEventReceiver( this );
     }
 
     //!Same as \a generateChunkList, but returns \a chunksToGenerate last chunks of available data
@@ -100,12 +99,18 @@ namespace nx_hls
         m_chunks.clear();
         while( !m_timestampToBlock.empty() )
             m_timestampToBlock.pop();
+        m_currentChunk = AbstractPlaylistManager::ChunkData();
     }
 
     qint64 HLSLivePlaylistManager::inactivityPeriod() const
     {
         QMutexLocker lk( &m_mutex );
         return m_inactivityTimer.elapsed();
+    }
+
+    void HLSLivePlaylistManager::onDiscontinue()
+    {
+        clear();
     }
 
     void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )
