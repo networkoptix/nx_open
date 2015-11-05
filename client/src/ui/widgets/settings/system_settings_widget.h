@@ -15,8 +15,8 @@ public:
     QnSystemSettingsWidget(QWidget *parent = NULL);
     virtual ~QnSystemSettingsWidget();
 
-    virtual void updateFromSettings() override;
-    virtual void submitToSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
     virtual void retranslateUi() override;

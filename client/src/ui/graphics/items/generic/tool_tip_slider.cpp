@@ -45,8 +45,7 @@ public:
 };
 
 
-QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent
-    , QGraphicsItem *tooltipParent):
+QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
     base_type(Qt::Horizontal, parent)
 {
     setOrientation(Qt::Horizontal);
@@ -67,7 +66,7 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent
     m_animationListener.reset(new QnToolTipSliderAnimationListener(this));
     registerAnimation(m_animationListener.data() );
 
-    setToolTipItem(new QnStyledTooltipWidget(this), tooltipParent);
+    setToolTipItem(new QnStyledTooltipWidget(this));
     setAcceptHoverEvents(true);
 
     setFlag(ItemSendsScenePositionChanges, true);
@@ -81,8 +80,7 @@ QnToolTipWidget *QnToolTipSlider::toolTipItem() const {
     return m_tooltipWidget.data();
 }
 
-void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem
-    , QGraphicsItem *tooltipParent) {
+void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem) {
     qreal opacity = 0.0;
     if(toolTipItem()) {
         opacity = toolTipItem()->opacity();
@@ -93,7 +91,6 @@ void QnToolTipSlider::setToolTipItem(QnToolTipWidget *newToolTipItem
 
     if(toolTipItem()) {
         toolTipItem()->setParent(this); /* Claim ownership, but not in graphics item sense. */
-        toolTipItem()->setParentItem(tooltipParent);
         toolTipItem()->setFocusProxy(this);
         toolTipItem()->setOpacity(opacity);
         toolTipItem()->setAcceptHoverEvents(true);

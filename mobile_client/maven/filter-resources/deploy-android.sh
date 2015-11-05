@@ -31,7 +31,7 @@ else
     APK_SUFFIX="debug"
 fi
 
-TARGET_APK=${installer.name}-${project.version.name}.${project.version.code}-$APK_SUFFIX.apk
+TARGET_APK=${product.name.short}-${project.version.name}.${project.version.code}-$APK_SUFFIX.apk
 
 make install --makefile=Makefile.${build.configuration} INSTALL_ROOT=$BUILD_TARGET
 ${libdir}/bin/androiddeployqt $BUILD_TYPE $SIGN --input android-deployment.json --output $BUILD_TARGET $*

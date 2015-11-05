@@ -1,5 +1,4 @@
-#ifndef POPUP_SETTINGS_WIDGET_H
-#define POPUP_SETTINGS_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
@@ -24,12 +23,13 @@ public:
     explicit QnPopupSettingsWidget(QWidget *parent = 0);
     ~QnPopupSettingsWidget();
 
-    virtual void submitToSettings() override;
-    virtual void updateFromSettings() override;
+    virtual void applyChanges() override;
+    virtual void loadDataToUi() override;
+    virtual bool hasChanges() const override;
 
-private slots:
-    void at_showAllCheckBox_toggled(bool checked);
-    void at_showBusinessEvents_valueChanged();
+private:
+    QList<QnBusiness::EventType> watchedEvents() const;
+    quint64 watchedSystemHealth() const;
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
@@ -37,5 +37,3 @@ private:
     QList<QCheckBox* > m_systemHealthCheckBoxes;
     QnBusinessEventsFilterResourcePropertyAdaptor *m_adaptor;
 };
-
-#endif // POPUP_SETTINGS_WIDGET_H

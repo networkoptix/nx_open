@@ -446,7 +446,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setTitleVisible(true, false);
     setTitleUsed(false);
     setNotificationsVisible(true, false);
-    setCalendarOpened(false, false);
     setDayTimeWidgetOpened(false, false);
     setCalendarVisible(false);
     updateControlsVisibility(false);
@@ -463,7 +462,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setSliderOpened(qnSettings->isSliderOpened(), false, false);
     setNotificationsOpened(notificationsOpened, false);
 
-    m_calendarPinButton->setChecked(qnSettings->isCalendarPinned());
+    const bool pinnedCalendar = qnSettings->isCalendarPinned();
+    m_calendarPinButton->setChecked(pinnedCalendar);
+    setCalendarOpened(pinnedCalendar, false);
+
 	if (m_titleBackgroundItem) {
 
 		/* Set up title D&D. */

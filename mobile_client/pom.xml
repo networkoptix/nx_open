@@ -105,11 +105,6 @@
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>i386</arch>                    
-                </os>                
                 <property>
                     <name>box</name>
                     <value>android</value>

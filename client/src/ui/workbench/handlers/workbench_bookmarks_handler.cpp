@@ -50,19 +50,26 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
-    if (!server || server->getStatus() != Qn::Online) {
-        QMessageBox::warning(mainWindow(),
-            tr("Error"),
-            tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
-        return;
+    /*
+     * This check can be safely omitted in release - it is better to add bookmark on another server than do not 
+     * add bookmark at all.
+     * //TODO: #GDM #bookmarks remember this when we will implement bookmarks timeout locking
+     */
+    if (QnAppInfo::beta()) {
+        QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
+        if (!server || server->getStatus() != Qn::Online) {
+            QMessageBox::warning(mainWindow(),
+                tr("Error"),
+                tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
+            return;
+        }
     }
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
     bookmark.name = tr("Bookmark");
     bookmark.startTimeMs = period.startTimeMs;  //this should be assigned before loading data to the dialog
-    bookmark.durationMs = period.durationMs;    //TODO: #GDM #Bookmarks should we generate description based on these values or show them in the dialog?
+    bookmark.durationMs = period.durationMs;
     bookmark.cameraId = camera->getUniqueId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));

@@ -173,7 +173,10 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
 void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
     QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(bookmark.cameraId);
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server || server->getStatus() != Qn::Online) {
+    if (!server || server->getStatus() != Qn::Online)
+        server = qnCommon->currentServer();
+
+    if (!server) {
         executeDelayed([this, callback]{
             callback(false);
         });

@@ -21,8 +21,8 @@ public:
     QnTimeServerSelectionWidget(QWidget *parent = NULL);
     virtual ~QnTimeServerSelectionWidget();
 
-    virtual void updateFromSettings() override;
-    virtual void submitToSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
 

@@ -6,6 +6,8 @@
 
 /*
 *   This class used only for manipulating storage as User Interface entity. 
+*   Additional info like total space is loaded with a separate API request
+*   and is set from outside.
 */
 class QnClientStorageResource
     : public QnStorageResource
@@ -47,6 +49,10 @@ signals:
     void freeSpaceChanged(const QnResourcePtr &storage);
     void totalSpaceChanged(const QnResourcePtr &storage);
     void isWritableChanged(const QnResourcePtr &storage);
+
+protected:
+    /** Check if space info is loaded for the given resource. */
+    bool isSpaceInfoAvailable() const;
 
 private:
     qint64 m_freeSpace;

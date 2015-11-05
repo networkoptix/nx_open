@@ -29,7 +29,9 @@ public:
     QnRecordingStatisticsWidget(QWidget* parent = 0);
     virtual ~QnRecordingStatisticsWidget();
 
-    virtual void updateFromSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
+    virtual bool hasChanges() const override;
 
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
