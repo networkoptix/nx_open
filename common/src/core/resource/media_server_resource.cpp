@@ -27,8 +27,7 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/network/networkoptixmodulerevealcommon.h"
 #include "utils/serialization/lexical.h"
-
-
+#include "api/server_rest_connection.h"
 
 namespace {
     const QString protoVersionPropertyName = lit("protoVersion");

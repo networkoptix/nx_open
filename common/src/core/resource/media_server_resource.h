@@ -13,7 +13,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
 
-#include "api/server_rest_connection.h"
+#include "api/server_rest_connection_fwd.h"
 
 namespace nx_http {
     class AsyncHttpClientPtr;

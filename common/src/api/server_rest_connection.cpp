@@ -70,6 +70,7 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
     case Qn::UbjsonFormat:
         return QnUbjson::deserialized(msgBody, T(), success);
     default:
+        Q_ASSERT_X(0, Q_FUNC_INFO, "Unsupported data format");
         break;
     }
     return T();
