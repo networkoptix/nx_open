@@ -957,55 +957,55 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 
 bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 {
-    #if defined(Q_OS_WIN)
+    #if defined( Q_OS_WIN )
         struct tcp_keepalive ka = { TRUE, info->timeSec * 1000,
                                           info->intervalSec * 1000 }; // s to ms
-        if (WSAIoctl(m_implDelegate.handle(), SIO_KEEPALIVE_VALS,
-                     &ka, sizeof(ka), NULL, 0, NULL, NULL, NULL) != 0)
+        if( WSAIoctl( m_implDelegate.handle(), SIO_KEEPALIVE_VALS,
+                      &ka, sizeof(ka), NULL, 0, NULL, NULL, NULL ) != 0 )
             return false;
 
-        QnMutexLocker lk( &m_mutex );
         m_keepAlive = std::move( info );
-        return true;
-    #elif defined(Q_OS_LINUX)
+    #elif defined( Q_OS_LINUX )
         int isEnabled = info ? 1 : 0;
-        if (setsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
-                       &isEnabled, sizeof(isEnabled)) != 0)
+        if( setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
+                        &isEnabled, sizeof(isEnabled) ) != 0 )
             return false;
 
-        if (!info)
+        if( !info )
             return true;
 
-        if (setsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPIDLE,
-                       &info->timeSec, sizeof(info->timeSec)) < 0)
+        if( setsockopt( m_implDelegate.handle(), SOL_TCP, TCP_KEEPIDLE,
+                        &info->timeSec, sizeof(info->timeSec) ) < 0 )
             return false;
 
-        if (setsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPINTVL,
-                       &info->intervalSec, sizeof(info->intervalSec)) < 0)
+        if( setsockopt( m_implDelegate.handle(), SOL_TCP, TCP_KEEPINTVL,
+                        &info->intervalSec, sizeof(info->intervalSec) ) < 0 )
             return false;
 
-        if (setsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPCNT,
-                       &info->probeCount, sizeof(info->probeCount)) < 0)
+        if( setsockopt( m_implDelegate.handle(), SOL_TCP, TCP_KEEPCNT,
+                        &info->probeCount, sizeof(info->probeCount) ) < 0 )
             return false;
-
-        return true;
+    #elif defined(Q_OS_MAC)
+        int isEnabled = info ? info->timeSec : 0;
+        if( setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
+                        &isEnabled, sizeof(isEnabled)) != 0 )
+            return false;
     #else
         int isEnabled = info ? 1 : 0;
-        if (setsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
-                       &isEnabled, sizeof(isEnabled)) != 0)
+        if( setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
+                        &isEnabled, sizeof(isEnabled)) != 0 )
             return false;
-
-        // TODO: #mu osx impl?
-        return false;
     #endif
+
+    return true;
 }
 
 bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
 {
     int isEnabled = 0;
-    socklen_t length = 0;
-    if (getsockopt(m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
-                   reinterpret_cast<char*>(&isEnabled), &length) != 0)
+    socklen_t length = sizeof(isEnabled);
+    if( getsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
+                    reinterpret_cast<char*>(&isEnabled), &length ) != 0 )
         return false;
 
     if (!isEnabled)
@@ -1015,29 +1015,29 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
     }
 
     #if defined(Q_OS_WIN)
-        QnMutexLocker lk( &m_mutex );
         *result = m_keepAlive;
-        return true;
     #elif defined(Q_OS_LINUX)
         KeepAliveOptions info;
-        if (getsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPIDLE,
-                       &info.timeSec, &length) < 0)
+        if( getsockopt( m_implDelegate.handle(), SOL_TCP, TCP_KEEPIDLE,
+                        &info.timeSec, &length ) < 0 )
             return false;
 
-        if (getsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPINTVL,
-                       &info.intervalSec, &length) < 0)
+        if( getsockopt( m_implDelegate.handle(), SOL_TCP, TCP_KEEPINTVL,
+                        &info.intervalSec, &length ) < 0 )
             return false;
 
-        if (getsockopt(m_implDelegate.handle(), SOL_TCP, TCP_KEEPCNT,
-                       &info.probeCount, &length) < 0)
+        if( getsockopt( m_implDelegate.handle(), SOL_TCP, TCP_KEEPCNT,
+                        &info.probeCount, &length ) < 0 )
             return false;
 
-        *result = std::move(info);
-        return true;
+        *result = std::move( info );
+    #elif defined(Q_OS_MAC)
+        *result = KeepAliveOptions( isEnabled /* TODO: read system defaults */ );
     #else
-        // TODO: #mu osx impl?
         return false;
     #endif
+
+    return true;
 }
 
 //////////////////////////////////////////////////////////
