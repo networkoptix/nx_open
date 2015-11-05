@@ -363,11 +363,13 @@ public:
     //!Set keep alive options
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
+        \note due to some OS limitations some values might not be actually set
     */
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) = 0;
     //!Reads keep alive options
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
+        \note due to some OS limitations some values might be = 0 (meaning system defaults) until \fn setKeepAlive is called
     */
     virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) = 0;
 };

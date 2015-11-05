@@ -255,7 +255,7 @@ private:
     friend class TCPServerSocket;
 
     #if defined(Q_OS_WIN)
-        boost::optional< KeepAliveOptions > m_keepAlive;
+        KeepAliveOptions m_keepAlive;
     #endif
 };
 
