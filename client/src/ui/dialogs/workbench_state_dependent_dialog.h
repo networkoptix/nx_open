@@ -79,8 +79,14 @@ public:
     virtual void forcedUpdate() override;
 
 protected:
-    virtual QString confirmMessageTitle() const;
-    virtual QString confirmMessageText() const;
+
+    /**
+     * @brief           Show the dialog, asking what to do with unsaved changes.
+     * @returns         QMessageBox::Yes if the changes should be saved
+     *                  QMessageBox::No if the changes should be discarded
+     *                  QMessageBox::Cancel to abort the process
+     */
+    virtual QMessageBox::StandardButton showConfirmationDialog();
 };
 
 

@@ -112,14 +112,15 @@ void QnServerSettingsDialog::retranslateUi() {
     }
 }
 
-
-QString QnServerSettingsDialog::confirmMessageTitle() const {
-    return tr("Server not saved");
-}
-
-QString QnServerSettingsDialog::confirmMessageText() const {
+QMessageBox::StandardButton QnServerSettingsDialog::showConfirmationDialog() {
     Q_ASSERT_X(m_server, Q_FUNC_INFO, "Server must exist here");
-    return tr("Apply changes to the server %1?").arg(m_server
-        ? m_server->getName()
-        : QString());    
+
+    return QMessageBox::question(this,
+        tr("Server not saved"),
+        tr("Apply changes to the server %1?")
+        .arg(m_server
+            ? m_server->getName()
+            : QString()),
+        QMessageBox::Yes | QMessageBox::No,
+        QMessageBox::Yes);
 }
