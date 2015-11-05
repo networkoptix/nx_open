@@ -30,7 +30,8 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     //m_sendMotion(false),
     m_eof(false),
     m_quality(MEDIA_Quality_High),
-    m_mutex( QnMutex::Recursive )    //just to be sure no callback can occur and block
+    m_mutex( QnMutex::Recursive ),    //just to be sure no callback can occur and block
+    m_lastChunkQuality(QnServer::LowQualityCatalog)
 {
     m_flags |= Flag_CanSendMotion;
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
@@ -372,7 +373,7 @@ begin_label:
         if (m_afterSeek)
             data->flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_afterSeek = false;
-        if (m_currentChunkCatalog == m_catalogLow)
+        if (m_lastChunkQuality == QnServer::LowQualityCatalog)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
     }
     
@@ -444,6 +445,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_currentChunk = newChunk;
     
     m_currentChunkCatalog[newCatalog->getStoragePool()] = newCatalog;
+    m_lastChunkQuality = newCatalog->getRole();
     QString url = newCatalog->fullFileName(newChunk.toBaseChunk());
 
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));

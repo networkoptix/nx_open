@@ -15,6 +15,7 @@
 
 #include <utils/common/singleton.h>
 #include <utils/common/uuid.h>
+#include "api/server_rest_connection_fwd.h"
 
 /**
  *  Class for maintaining camera history - what server contains which part of the camera archive.
@@ -135,7 +136,7 @@ private:
     QnVirtualCameraResourcePtr toCamera(const QnUuid& guid) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
 
-    void at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback);
+    void at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback);
 
     /** Mark camera history as dirty and subject to update. */
     void invalidateCameraHistory(const QnUuid &cameraId);

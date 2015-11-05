@@ -10,6 +10,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include "api/server_rest_connection.h"
 
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
@@ -102,18 +103,19 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
     request.resList << camera;
     
     using namespace std::placeholders;
-    bool ok = server->newApiConnection().cameraHistoryAsync(request, [this, callback] (bool success, const ec2::ApiCameraHistoryDataList &periods) {
-        at_cameraPrepared(success, periods, callback);
+    bool started = server->serverRestConnection()->cameraHistoryAsync(request, [this, callback] (bool success, rest::Handle id, const ec2::ApiCameraHistoryDataList &periods) {
+        at_cameraPrepared(success, id, periods, callback);
     });
-
-    if (!ok && callback)
+    
+    if (!started && callback)
         executeDelayed([callback] { callback(false); });
 
-    return ok;
+    return started;
 }
 
-void QnCameraHistoryPool::at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback) 
+void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback) 
 {
+    Q_UNUSED(requestId);
     QnMutexLocker lock(&m_mutex);
 
     QSet<QnUuid> loadedCamerasIds;
@@ -149,7 +151,7 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const ec2::ApiCameraHi
 
     lock.unlock();
     if (callback)
-        callback(success);
+        executeDelayed([callback, success] { callback(success); }, kDefaultDelay, this->thread());
 
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
