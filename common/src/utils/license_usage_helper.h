@@ -94,6 +94,10 @@ public:
 
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
+
+signals:
+    void statusUpdated();
+
 protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
@@ -145,6 +149,7 @@ public:
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
+    bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
@@ -154,6 +159,36 @@ private:
 
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
+};
+
+class QnSingleCamLicenceStatusHelper : public Connective<QObject>
+{
+    Q_OBJECT
+
+public:
+    enum CameraLicenseStatus 
+    {
+        InvalidSource
+        , LicenseNotUsed
+        , LicenseOverflow
+        , LicenseUsed
+    };
+
+    QnSingleCamLicenceStatusHelper(const QnVirtualCameraResourcePtr &camera);
+
+    virtual ~QnSingleCamLicenceStatusHelper();
+
+    CameraLicenseStatus status();
+
+signals:
+    void licenceStatusChanged();
+
+private:
+    typedef QScopedPointer<QnCamLicenseUsageHelper> QnCamLicenseUsageHelperPtr;
+
+    const QnVirtualCameraResourcePtr m_camera;
+    const QnCamLicenseUsageHelperPtr m_helper;
+    bool m_isLicenceUsed;
 };
 
 class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher {

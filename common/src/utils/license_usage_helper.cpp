@@ -166,7 +166,11 @@ QString QnLicenseUsageHelper::getRequiredMsg() const {
 }
 
 void QnLicenseUsageHelper::invalidate() {
+    if (m_dirty)
+        return;
+
     m_dirty = true;
+    emit statusUpdated();
 }
 
 void QnLicenseUsageHelper::updateCache() const {
@@ -358,6 +362,7 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePt
     base_type(parent)
 {
     init();
+    
     propose(proposedCamera, proposedEnable);
 }
 
@@ -382,11 +387,16 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
 }
 
 bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera) {
-    bool requiresLicense = camera->isLicenseUsed();
+    return isOverflowForCamera(camera, camera->isLicenseUsed());
+}
+
+bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed) {
+    bool requiresLicense = requiresLicense;
     requiresLicense &= !m_proposedToDisable.contains(camera);
     requiresLicense |= m_proposedToEnable.contains(camera);
     return requiresLicense && !isValid(camera->licenseType());
 }
+
 
 QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
     return QList<Qn::LicenseType>()
@@ -423,6 +433,52 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
             proposedToUse[lt]++;
     }
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+QnSingleCamLicenceStatusHelper::QnSingleCamLicenceStatusHelper(const QnVirtualCameraResourcePtr &camera)
+    : m_camera(camera)
+    , m_helper(camera ? new QnCamLicenseUsageHelper(camera, true) : nullptr)
+    , m_isLicenceUsed(camera ? camera->isLicenseUsed() : false)
+{
+    if (!camera)
+        return;
+
+    connect(camera, &QnVirtualCameraResource::licenseUsedChanged
+        , this, [this](const QnResourcePtr & /* resource */)
+    {
+        const bool newVal = m_camera->isLicenseUsed();
+        if (newVal == m_isLicenceUsed)
+            return;
+
+        m_isLicenceUsed = newVal;
+        emit licenceStatusChanged();
+    });
+
+    connect(m_helper, &QnCamLicenseUsageHelper::statusUpdated
+        , this, [this] () { emit licenceStatusChanged(); });
+}
+
+QnSingleCamLicenceStatusHelper::~QnSingleCamLicenceStatusHelper()
+{
+    if (!m_camera)
+        return;
+
+    disconnect(m_camera, nullptr, this, nullptr);
+    disconnect(m_helper, nullptr, this, nullptr);
+}
+
+QnSingleCamLicenceStatusHelper::CameraLicenseStatus QnSingleCamLicenceStatusHelper::status()
+{
+    if (!m_camera)
+        return InvalidSource;
+
+    if (m_helper->isOverflowForCamera(m_camera, m_isLicenceUsed))
+        return LicenseOverflow;
+
+    return (m_isLicenceUsed ? LicenseUsed : LicenseNotUsed);
+}
+
 
 /************************************************************************/
 /* QnVideoWallLicenseUsageWatcher                                       */
