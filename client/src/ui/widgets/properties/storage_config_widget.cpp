@@ -339,21 +339,14 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
             }
         }
         else {
-            // create new storage
-            QnClientStorageResourcePtr storage(new QnClientStorageResource());
-            storage->setId(storageData.id);
-            QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
-            if (resType)
-                storage->setTypeId(resType->getId());
+            QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(m_server, storageData.url);
+            Q_ASSERT_X(storage->getId() == storageData.id, Q_FUNC_INFO, "Id's must be equal");
 
-            storage->setName(QnUuid::createUuid().toString());
-            storage->setParentId(m_server->getId());
-            storage->setUrl(storageData.url);
             storage->setUsedForWriting(storageData.isUsed);
             storage->setStorageType(storageData.storageType);
             storage->setBackup(storageData.isBackup);
-            qnResPool->addResource(storage);
 
+            qnResPool->addResource(storage);
             result << storage;
         }
     }
