@@ -255,7 +255,6 @@ private:
     friend class TCPServerSocket;
 
     #if defined(Q_OS_WIN)
-        QnMutex m_mutex;
         boost::optional< KeepAliveOptions > m_keepAlive;
     #endif
 };
