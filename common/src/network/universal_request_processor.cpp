@@ -205,6 +205,8 @@ bool QnUniversalRequestProcessor::processRequest()
         d->processor->execute(d->mutex);
         if (!d->processor->isTakeSockOwnership())
             d->processor->releaseSocket();
+        else
+            d->socket.clear();
     }
 
     delete d->processor;
