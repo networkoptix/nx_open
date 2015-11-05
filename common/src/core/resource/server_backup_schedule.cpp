@@ -8,8 +8,8 @@
 QnServerBackupSchedule::QnServerBackupSchedule() 
     : backupType(Qn::Backup_Disabled)
     , backupDaysOfTheWeek(ec2::backup::AllDays) // all days of week
-    , backupStart(0) // midnight
-    , backupDuration(-1) // unlimited duration
+    , backupStartSec(0) // midnight
+    , backupDurationSec(-1) // unlimited duration
     , backupBitrate(-1) // unlimited
 {}
 

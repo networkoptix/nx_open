@@ -569,7 +569,7 @@ public:
 
         LastItemDataRole,
 
-        StorageSpaceDataRole,                       /** return StorageSpaceData object at QnStorageConfigWidget */
+        StorageInfoDataRole,                        /** return QnStorageModelInfo object at QnStorageConfigWidget */
         BackupSettingsDataRole,                     /** return BackupSettingsData, used in BackupSettings model */
         TextWidthDataRole,                          /** used in BackupSettings model */
 

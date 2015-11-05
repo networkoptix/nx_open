@@ -42,8 +42,9 @@ public:
     QString secondaryAudioDeviceName() const;
     void setSecondaryAudioDeviceName(const QString &name);
 
-    virtual void submitToSettings() override;
-    virtual void updateFromSettings() override;
+    virtual void applyChanges() override;
+    virtual void loadDataToUi() override;
+    virtual bool hasChanges() const override;
 signals:
     void recordingSettingsChanged();
 private:

@@ -25,15 +25,33 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ChunksCatalog)
 
-    enum class StoragePool
-    {
-        Normal  = 0,
-        Backup  = 1,
-        None    = 2
+    enum class StoragePool : int {
+        None    = 0,
+        Normal  = 1,
+        Backup  = 2,
+        Both    = Normal | Backup
     };
 
-} // namespace QnServer
+    inline StoragePool 
+    operator | (StoragePool lhs, StoragePool rhs) {
+        return static_cast<StoragePool>
+            (static_cast<int>(lhs) | static_cast<int>(rhs));
+    }
 
+    inline StoragePool 
+    operator & (StoragePool lhs, StoragePool rhs) {
+        return static_cast<StoragePool>
+            (static_cast<int>(lhs) & static_cast<int>(rhs));
+    }
+
+    enum BackupResultCode {
+        Failed,
+        EndOfPeriod,
+        Cancelled,
+        Done
+    };
+} // namespace QnServer
+Q_DECLARE_METATYPE(QnServer::BackupResultCode);
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )
 
 #endif // QN_SERVER_GLOBALS_H

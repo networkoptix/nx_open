@@ -10,7 +10,8 @@
 //// QnCameraUserAttributePool
 ////////////////////////////////////////////////////////////
 
-QnCameraUserAttributePool::QnCameraUserAttributePool()
+QnCameraUserAttributePool::QnCameraUserAttributePool(QObject *parent):
+        QObject(parent)
 {
     setElementInitializer( []( const QnUuid& cameraID, QnCameraUserAttributesPtr& userAttributes ){
         userAttributes = QnCameraUserAttributesPtr( new QnCameraUserAttributes() );

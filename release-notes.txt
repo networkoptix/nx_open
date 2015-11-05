@@ -12,12 +12,14 @@ IMPROVEMENTS
     Implemented "Advanced" Settings for DWC-BVI2IR cameras - VMS-415
     Improved auto discovery - it's faster now - VMS-466
     Added "Connect" button to the "Connection Test" dialog - VMS-263
-    Added layout backgrounds to the Video Wall mode - VMS-741
+    Added layout backgrounds support to the Video Wall mode - VMS-741
     Transcoding is enabled by default for video export from multisensor cameras - VMS-265
     "Timeline mode" is renamed to "Time Mode". Now it affects timeline and timestamps in Event Logs and Audit Trail - VMS-602
     Added tracking of the instant erasing of archive more then one hour length for any camera to the Audit Trail - VMS-1004
     Added notification if maximum number of cameras is exceeded on the Server - VMS-751
     Simplified "Camera recording" action settings. Now just "pre recording" and "post recording" can be configured - VMS-881
+    Improved "Server Settings" and "System Administration" dialogs - VMS-1244, VMS-1180
+    Calendar can be pinned now - VMS-925
     "Search" tab little improvement - Search text-input area is focused automatically - VMS-269
     Long camera names are not shown on the small items any more - VMS-991
     Improved sorting of device list in Web Client. Now it's similar to Desktop Client - VISTA-61
@@ -27,13 +29,18 @@ IMPROVEMENTS
 BUG FIXES
     Digital input/output didn't work for ACTi V23. Fixed. - VMS-1157
     Digital input/output doesn't work for Messoa camera. Fixed. - VMS-1187
+    AV20175DN sensors order was incorrect. Fixed. VMS-1192
+    Axis F44 was displayed as signle-channel resource. Fixed. - VMS-1199
     Changes were not applied in the Client till relogin if Server's port was changed via Web Admin Interface. Fixed. - VMS-1160
     System time could be changed if Server marked as Time Server started later then other Servers. Fixed. - VMS-1149
     Chunks on the timeline weren't loaded if system time was changed back for some reasons. Fixed. - VMS-1142
     Middle-click on the item with any default rotation always led to rotation to 0 degree. Fixed. - VMS-490
     If some filters were disabled in Audit Trail, total activity was not refreshed. Fixed. - VISTA-8
     Chunks on the timeline were displayed with local Server Time for cameras added as HTTP-links. Fixed. - VMS-821
-    Chunks weren't disappear from timeline after Server's stop. Fixed. VMS-929
+    Chunks weren't disappear from timeline after Server's stop. Fixed. - VMS-929
+    Flag "Send usage statistics" was enabled automatically after upgrade. Fixed. - VMS-1227
+    Watching LIVE video wasn't logged in Audit Trail. Fixed. - VMS-555
+    Export with Paxton Plugin has led to the crash. Fixed. - VISTA-72
 
 
 -----------------------------------------------2.4.1.xxxx-----------------------------------------

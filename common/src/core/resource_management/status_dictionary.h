@@ -7,6 +7,8 @@ class QnResourceStatusDictionary: public QObject, public Singleton<QnResourceSta
 {
     Q_OBJECT
 public:
+    QnResourceStatusDictionary(QObject *parent = NULL);
+
     Qn::ResourceStatus value(const QnUuid& resourceId) const;
     void setValue(const QnUuid& resourceId, Qn::ResourceStatus status);
     void clear();

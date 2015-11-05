@@ -8,6 +8,7 @@
 #endif
 
 #include "version.h"
+#include "server/server_globals.h"
 
 QnMediaServerModule::QnMediaServerModule(QObject *parent):
     QObject(parent) 
@@ -23,10 +24,15 @@ QnMediaServerModule::QnMediaServerModule(QObject *parent):
     soapServer->start();     //starting soap server to accept event notifications from onvif cameras
 #endif //ENABLE_ONVIF
 
-    m_common = new QnCommonModule(this);
 
+    m_common = new QnCommonModule(this);
+    initServerMetaTypes();
 }
 
 QnMediaServerModule::~QnMediaServerModule() {
 }
 
+void QnMediaServerModule::initServerMetaTypes()
+{
+    qRegisterMetaType<QnServer::BackupResultCode>("QnServer::BackupResultCode");
+}

@@ -10,9 +10,14 @@
 #include <utils/common/scoped_value_rollback.h>
 
 using boost::algorithm::any_of;
+using boost::algorithm::all_of;
 
-QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */) 
-    : base_type(parent)
+namespace {
+    const int invalidPage = -1;
+}
+
+QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */, Qt::WindowFlags windowFlags /* = 0 */) 
+    : base_type(parent, windowFlags)
     , m_pages()
     , m_tabWidget(nullptr)
     , m_readOnly(false)
@@ -23,13 +28,13 @@ QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */)
 
 int QnGenericTabbedDialog::currentPage() const {
     if (!m_tabWidget)
-        return 0;
+        return invalidPage;
 
     for(const Page &page: m_pages) {
         if (m_tabWidget->currentWidget() == page.widget)
             return page.key;
     }
-    return 0;
+    return invalidPage;
 }
 
 void QnGenericTabbedDialog::setCurrentPage(int key) {
@@ -45,33 +50,47 @@ void QnGenericTabbedDialog::setCurrentPage(int key) {
 }
 
 void QnGenericTabbedDialog::reject() {
-    if (!tryClose(false))
+    if (!forcefullyClose())
         return;
-
-    loadData();
     base_type::reject();
 }
 
 void QnGenericTabbedDialog::accept() {
-    if (!confirm())
+    if (!canApplyChanges())
         return;
 
-    submitData();
+    applyChanges();
     base_type::accept();
 }
 
-void QnGenericTabbedDialog::loadData() {
+bool QnGenericTabbedDialog::forcefullyClose()  {
+    /* Very rare outcome. */
+    if (!canDiscardChanges())
+        return false;
+
+    loadDataToUi();
+    hide();
+    return true;
+}
+
+void QnGenericTabbedDialog::loadDataToUi() {
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
         for(const Page &page: m_pages)
-            page.widget->updateFromSettings();
+            page.widget->loadDataToUi();
     }
+    retranslateUi();
     updateButtonBox();
 }
 
-void QnGenericTabbedDialog::submitData() {
+void QnGenericTabbedDialog::retranslateUi() {
     for(const Page &page: m_pages)
-        page.widget->submitToSettings();
+        page.widget->retranslateUi();
+}
+
+void QnGenericTabbedDialog::applyChanges() {
+    for(const Page &page: m_pages)
+        page.widget->applyChanges();
     updateButtonBox();
 }
 
@@ -148,24 +167,26 @@ void QnGenericTabbedDialog::initializeTabWidget() {
     setTabWidget(tabWidgets[0]);
 }
 
-bool QnGenericTabbedDialog::confirm() {
-    for(const Page &page: m_pages)
-        if (!page.widget->confirm())
-            return false;
-    return true;
+bool QnGenericTabbedDialog::canApplyChanges() {
+    return all_of(m_pages, [](const Page &page){
+        return page.widget->canApplyChanges();
+    });
 }
 
-bool QnGenericTabbedDialog::discard() {
-    for(const Page &page: m_pages)
-        if (!page.widget->discard())
-            return false;
-    return true;
+bool QnGenericTabbedDialog::canDiscardChanges() {
+    return all_of(m_pages, [](const Page &page){
+        return page.widget->canDiscardChanges();
+    });
 }
 
 bool QnGenericTabbedDialog::hasChanges() const {
     return any_of(m_pages, [](const Page &page){
         return page.widget->hasChanges();
     });
+}
+
+QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::allPages() const {
+    return m_pages;
 }
 
 QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::modifiedPages() const {
@@ -186,75 +207,17 @@ void QnGenericTabbedDialog::setReadOnly( bool readOnly ) {
     m_readOnly = readOnly;
 }
 
-QString QnGenericTabbedDialog::confirmMessageTitle() const {
-    return tr("Confirm exit");
-}
-
-QString QnGenericTabbedDialog::confirmMessageText() const {
-    QStringList details;
-    for(const Page &page: modifiedPages())
-        details << tr("* %1").arg(page.title);
-    return tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n');
-}
-
 void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
     base_type::buttonBoxClicked(button);
 
     switch (button) {
     case QDialogButtonBox::Apply:
-        if (!confirm())
-            return;
-        submitData();
+        if (canApplyChanges())
+            applyChanges();
         break;
     default:
         break;
     }
-}
-
-bool QnGenericTabbedDialog::tryClose(bool force) {
-    if (!discard())
-        return false;   //TODO: #dklychkov and what then? see QnWorkbenchConnectHandler
-
-    if (force) {
-        loadData();
-        hide();
-        return true;
-    }
-
-    if (isHidden() || !hasChanges())
-        return true;
-
-    QMessageBox::StandardButton btn =  QMessageBox::question(this,
-        confirmMessageTitle(),
-        confirmMessageText(),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Cancel);
-
-    switch (btn) {
-    case QMessageBox::Yes:
-        if (!confirm())
-            return false;   // Cancel was pressed in the confirmation dialog
-
-        submitData();
-        break;
-    case QMessageBox::No:
-        loadData();
-        break;
-    default:
-        return false;   // Cancel was pressed
-    }
-
-    return true;
-}
-
-void QnGenericTabbedDialog::forcedUpdate() {
-    retranslateUi();
-    loadData();
-}
-
-void QnGenericTabbedDialog::retranslateUi() {
-    for(const Page &page: m_pages)
-        page.widget->retranslateUi();
 }
 
 void QnGenericTabbedDialog::initializeButtonBox() {
@@ -270,3 +233,5 @@ void QnGenericTabbedDialog::updateButtonBox() {
     if (QPushButton *applyButton = buttonBox()->button(QDialogButtonBox::Apply))
         applyButton->setEnabled(!m_readOnly && hasChanges());
 }
+
+

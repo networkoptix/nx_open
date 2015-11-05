@@ -48,17 +48,19 @@ private:
     DeviceFileCatalog::Chunk findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod);
 
 private:
+    typedef std::map<QnServer::StoragePool, DeviceFileCatalogPtr> PoolToCatalogMap;
+
     bool m_opened;
     QnResourcePtr m_resource;
     qint64 m_lastPacketTime;
     
     qint64 m_skipFramesToTime;
-    mutable DeviceFileCatalogPtr m_catalogHi[2];
-    mutable DeviceFileCatalogPtr m_catalogLow[2];
+    mutable PoolToCatalogMap m_catalogHi;
+    mutable PoolToCatalogMap m_catalogLow;
     //QnChunkSequence* m_chunkSequenceHi;
     //QnChunkSequence* m_chunkSequenceLow;
     DeviceFileCatalog::Chunk m_currentChunk;
-    DeviceFileCatalogPtr m_currentChunkCatalog[2];
+    PoolToCatalogMap m_currentChunkCatalog;
 
     QnAviArchiveDelegatePtr m_aviDelegate;
     QnAviResourcePtr m_fileRes;
@@ -87,6 +89,7 @@ private:
     ArchiveChunkInfo m_currentChunkInfo;
 
     mutable QnMutex m_mutex;
+    QnServer::ChunksCatalog m_lastChunkQuality;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

@@ -46,7 +46,6 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
-#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
@@ -206,7 +205,6 @@
 
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
 #include "utils/network/nettools.h"
@@ -443,7 +441,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setParentId(serverId);
     storage->setUrl(path);
     storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
-    storage->setUsedForWriting(storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile);
+    storage->setUsedForWriting(storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
@@ -535,16 +533,36 @@ static QStringList listRecordFolders()
     return folderPaths;
 }
 
+QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
+{
+    QnStorageResourceList result;
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
+    for (const auto& storage: storages)
+    {
+        const qint64 totalSpace = storage->getTotalSpace();
+        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < defaultStorageSpaceLimit)
+            result << storage; // if storage size isn't known do not delete it
+    }
+    return result;
+}
+
+
 QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
 {
     QnStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     for(const QString& folderPath: listRecordFolders())
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
+        const qint64 totalSpace = storage->getTotalSpace();
+        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < defaultStorageSpaceLimit)
+            continue; // if storage size isn't known do not add it by default
+
+
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
@@ -1367,10 +1385,29 @@ void MediaServerProcess::at_storageManager_rebuildFinished(bool isCanceled) {
     qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, isCanceled);
 }
 
-void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs) {
+void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code) {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_archiveBackupFinished(m_mediaServer, backupedToMs);
+    QnBusiness::EventReason reason = QnBusiness::NoReason;
+    switch(code) 
+    {
+        case QnServer::BackupResultCode::Failed:
+            reason = QnBusiness::BackupFailed;
+            break;
+        case QnServer::BackupResultCode::EndOfPeriod:
+            reason = QnBusiness::BackupEndOfPeriod;
+            break;
+        case QnServer::BackupResultCode::Done:
+            reason = QnBusiness::BackupDone;
+            break;
+        case QnServer::BackupResultCode::Cancelled:
+            reason = QnBusiness::BackupCancelled;
+            break;
+        default:
+            break;
+    }
+
+    qnBusinessRuleConnector->at_archiveBackupFinished(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, QString::number(backupedToMs));
 }
 
 void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)
@@ -1564,16 +1601,8 @@ void MediaServerProcess::run()
         QnSSLSocket::initSSLEngine( certData );
     }
 
-    QScopedPointer<QnSyncTime> syncTime(new QnSyncTime());
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
-
-    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
-    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());
-    std::unique_ptr<QnResourceStatusDictionary> statusDict(new QnResourceStatusDictionary());
-    std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary(new QnServerAdditionalAddressesDictionary());
-
 
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
 
@@ -1628,7 +1657,6 @@ void MediaServerProcess::run()
         )
     );
     
-    std::unique_ptr<QnScheduleSync> scheduleSync(new QnScheduleSync);
     std::unique_ptr<QnStorageManager> backupStorageManager(
         new QnStorageManager(
             QnServer::StoragePool::Backup
@@ -2237,7 +2265,16 @@ void MediaServerProcess::run()
             &CloudConnectionManager::cloudBindingStatusChanged,
             [=](bool) { updateCloudProperties(qnResPool->getAdministrator()); });
 
-    QnStorageResourceList storages = m_mediaServer->getStorages();
+    QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+    if (!storagesToRemove.isEmpty()) {
+        ec2::ApiIdDataList idList;
+        for (const auto& value: storagesToRemove)
+            idList.push_back(value->getId());
+        if (ec2Connection->getMediaServerManager()->removeStoragesSync(idList) != ec2::ErrorCode::ok)
+            qWarning() << "Failed to remove deprecated storages on startup. Postpone removing to the next start...";
+        qnResPool->removeResources(storagesToRemove);
+    }
+
     QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
     modifiedStorages.append(updateStorages(m_mediaServer));
     saveStorages(ec2Connection, modifiedStorages);
@@ -2313,7 +2350,7 @@ void MediaServerProcess::run()
         m_moduleFinder->start();
     }
 #endif
-    scheduleSync->start();
+    qnBackupStorageMan->scheduleSync()->start();
     emit started();
     exec();
 

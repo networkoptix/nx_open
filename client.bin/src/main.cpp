@@ -52,6 +52,7 @@ extern "C"
 #include "core/resource/resource_directory_browser.h"
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_plugin_factory.h>
+#include <core/resource/client_camera_factory.h>
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -70,8 +71,6 @@ extern "C"
 #include "core/resource_management/resource_discovery_manager.h"
 
 #include "api/app_server_connection.h"
-#include <plugins/resource/client_camera/client_camera_factory.h>
-
 
 #include "plugins/plugin_manager.h"
 

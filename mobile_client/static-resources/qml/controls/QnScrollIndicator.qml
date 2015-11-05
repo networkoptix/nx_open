@@ -14,7 +14,7 @@ Item {
 
         anchors {
             right: parent.right
-            rightMargin: dp(6)
+            rightMargin: dp(2)
         }
 
         width: dp(4)

@@ -54,10 +54,14 @@ int QnStorageResource::getMaxStoreTime() const
     return m_maxStoreTime;
 }
 
-void QnStorageResource::setUsedForWriting(bool isUsedForWriting) 
-{
-    QnMutexLocker lock(&m_mutex);
-    m_usedForWriting = isUsedForWriting;
+void QnStorageResource::setUsedForWriting(bool isUsedForWriting) {
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_usedForWriting == isUsedForWriting)
+            return;
+        m_usedForWriting = isUsedForWriting;
+    }
+    emit isUsedForWritingChanged(::toSharedPointer(this));
 }
 
 bool QnStorageResource::isUsedForWriting() const 
@@ -123,12 +127,19 @@ void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
     Q_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
     QnResource::updateInner(other, modifiedFields);
 
-    QnStorageResourcePtr storage = other.dynamicCast<QnStorageResource>();
+    QnStorageResource* localOther = dynamic_cast<QnStorageResource*>(other.data());
+    if (localOther) {
+        if (m_usedForWriting != localOther->m_usedForWriting)
+            modifiedFields << "isUsedForWritingChanged";
+        m_usedForWriting = localOther->m_usedForWriting;
 
-    m_spaceLimit = storage->m_spaceLimit;
-    m_maxStoreTime = storage->m_maxStoreTime;
-    m_usedForWriting = storage->m_usedForWriting;
-    m_isBackup = storage->m_isBackup;
+        if (m_isBackup != localOther->m_isBackup)
+            modifiedFields << "isBackupChanged";
+        m_isBackup = localOther->m_isBackup;
+
+        m_spaceLimit = localOther->m_spaceLimit;
+        m_maxStoreTime = localOther->m_maxStoreTime;
+    }
 }
 
 void QnStorageResource::setUrl(const QString& value)
@@ -162,10 +173,14 @@ QString QnStorageResource::toNativeDirPath(const QString &dirPath)
     return result;
 }
 
-void QnStorageResource::setBackup(bool value)
-{
-    QnMutexLocker lk(&m_mutex);
-    m_isBackup = value;
+void QnStorageResource::setBackup(bool value) {
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (m_isBackup == value)
+            return;
+        m_isBackup = value;
+    }
+    emit isBackupChanged(::toSharedPointer(this));
 }
 
 bool QnStorageResource::isBackup() const 
@@ -196,4 +211,8 @@ double QnStorageResource::calcUsageCoeff() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_writed / m_writedCoeff;
+}
+
+bool QnStorageResource::isWritable() const {
+    return (getCapabilities() & QnAbstractStorageResource::cap::WriteFile) == QnAbstractStorageResource::cap::WriteFile;
 }

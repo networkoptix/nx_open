@@ -7,7 +7,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/id.h"
 #include "utils/common/string.h"
-#include "models/filtered_resource_list_model.h"
+#include "models/available_camera_list_model.h"
 #include "camera/camera_thumbnail_cache.h"
 #include "mobile_client/mobile_client_roles.h"
 #include "mobile_client/mobile_client_settings.h"
@@ -17,8 +17,8 @@ namespace {
 
     const qreal defaultAspectRatio = 4.0 / 3.0;
 
-    class QnFilteredCameraListModel : public QnFilteredResourceListModel {
-        typedef QnFilteredResourceListModel base_type;
+    class QnFilteredCameraListModel : public QnAvailableCameraListModel {
+        typedef QnAvailableCameraListModel base_type;
     public:
         QnFilteredCameraListModel(QObject *parent = 0) :
             base_type(parent)
@@ -66,10 +66,8 @@ namespace {
 
     protected:
         virtual bool filterAcceptsResource(const QnResourcePtr &resource) const override {
-            if (!resource->hasFlags(Qn::live_cam))
-                return false;
-
-            if (resource->hasFlags(Qn::desktop_camera) || resource->hasFlags(Qn::io_module))
+            bool accepted = base_type::filterAcceptsResource(resource);
+            if (!accepted)
                 return false;
 
             if (m_serverId.isNull())

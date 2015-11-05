@@ -537,7 +537,10 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
         return Qn::DisabledAction;
 
     QnResourcePtr resource = parameters.resource();
-    if(resource->flags() & Qn::sync) {
+    if (!resource->flags().testFlag(Qn::live))
+        return Qn::InvisibleAction;
+
+    if(resource->flags().testFlag(Qn::sync)) {
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
         if(!periods.intersects(period))
             return Qn::DisabledAction;

@@ -40,15 +40,17 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenBusinessLogAction); } );
     connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
     connect(ui->bookmarksButton,      &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenBookmarksSearchAction); });
+
+    connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
-void QnGeneralSystemAdministrationWidget::updateFromSettings() {
-    ui->systemSettingsWidget->updateFromSettings();
+void QnGeneralSystemAdministrationWidget::loadDataToUi() {
+    ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
 }
 
-void QnGeneralSystemAdministrationWidget::submitToSettings() {
-    ui->systemSettingsWidget->submitToSettings();
+void QnGeneralSystemAdministrationWidget::applyChanges() {
+    ui->systemSettingsWidget->applyChanges();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const  {

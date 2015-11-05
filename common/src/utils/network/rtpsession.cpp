@@ -396,7 +396,7 @@ RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
-    m_userAgent(QByteArray(QN_PRODUCT_NAME_LONG) + QByteArray(" ") + QByteArray(QN_APPLICATION_VERSION)),
+    m_userAgent(nx_http::userAgentString()),
     m_defaultAuthScheme(nx_http::header::AuthScheme::digest)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];

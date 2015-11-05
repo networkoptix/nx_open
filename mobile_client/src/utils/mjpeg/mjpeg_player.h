@@ -15,6 +15,7 @@ class QnMjpegPlayer : public QObject {
     Q_PROPERTY(PlaybackState playbackState READ playbackState NOTIFY playbackStateChanged)
     Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
     Q_PROPERTY(int position READ position NOTIFY positionChanged)
+    Q_PROPERTY(qint64 timestamp READ timestamp NOTIFY timestampChanged)
     Q_PROPERTY(bool reconnectOnPlay READ reconnectOnPlay WRITE setReconnectOnPlay NOTIFY reconnectOnPlayChanged)
 
 public:
@@ -35,6 +36,8 @@ public:
 
     int position() const;
 
+    qint64 timestamp() const;
+
     bool reconnectOnPlay() const;
     void setReconnectOnPlay(bool reconnectOnPlay);
 
@@ -50,6 +53,7 @@ signals:
     void sourceChanged();
     void videoSurfaceChanged();
     void positionChanged();
+    void timestampChanged();
     void reconnectOnPlayChanged();
 
 private:

@@ -181,8 +181,7 @@ void QnServerSettingsWidget::retranslateUi() {
     updateFailoverLabel();
 }
 
-void QnServerSettingsWidget::updateFromSettings() {
-
+void QnServerSettingsWidget::loadDataToUi() {
     if (!m_server)
         return;
 
@@ -213,7 +212,7 @@ void QnServerSettingsWidget::updateFromSettings() {
     updateFailoverLabel();
 }
 
-void QnServerSettingsWidget::submitToSettings() {
+void QnServerSettingsWidget::applyChanges() {
     if (isReadOnly())
         return;
     

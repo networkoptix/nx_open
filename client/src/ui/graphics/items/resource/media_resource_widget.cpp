@@ -119,6 +119,8 @@ namespace
     };
 
     CameraLicenseStatus cameraLicenseStatus(const QnVirtualCameraResourcePtr &camera) {
+        //TODO: #ynikitenkov licenses calculating should not occur too often
+        // possibly we should keep instance of the QnCamLicenseUsageHelper in the widget
         bool licenseUsed = camera->isLicenseUsed();
         bool overflow = QnCamLicenseUsageHelper(camera, true).isOverflowForCamera(camera);
 
@@ -131,10 +133,14 @@ namespace
     const qint64 bookmarksFilterPrecisionMs = 5 * 60 * 1000;
 
     QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs, const QString &text = QString()) {
+        if (positionMs <= 0)
+            return QnCameraBookmarkSearchFilter::invalidFilter();
+
+        QnCameraBookmarkSearchFilter result;
+
         /* Round the current time to reload bookmarks only once a time. */
         qint64 mid = positionMs - (positionMs % bookmarksFilterPrecisionMs);
 
-        QnCameraBookmarkSearchFilter result;
         result.startTimeMs = mid - bookmarksFilterPrecisionMs;
 
         /* Seek forward twice as long so when the mid point changes, next period will be preloaded. */
@@ -1096,9 +1102,11 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     if (m_resource->toResource()->flags() & Qn::utc)
     { 
         /* Do not show time for regular media files. */
+        qint64 datetimeUsec = getDisplayTimeUsec();
         timeString = m_display->camDisplay()->isRealTimeSource() 
             ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(getDisplayTimeMs()).toString(lit("yyyy-MM-dd hh:mm:ss"));
+            : (datetimeUsec == DATETIME_NOW || datetimeUsec == AV_NOPTS_VALUE) ? lit("")
+            : QDateTime::fromMSecsSinceEpoch(datetimeUsec/1000).toString(lit("yyyy-MM-dd hh:mm:ss"));
         
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
@@ -1491,6 +1499,12 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
+    //TODO: #ynikitenkov now this method is called a lot of times even for non-io cameras
+    // we need to check it more smooth way, without recalculating licenses too often
+    // possibly, this code would work well (checking required
+    //     if (!resource()->toResource()->hasFlags(Qn::io_module))
+    //         return;
+
     const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
     const bool ioModule = m_camera && m_camera->hasFlags(Qn::io_module);
     const bool ioBtnChecked = (button && button->isChecked());
@@ -1623,20 +1637,35 @@ void QnMediaResourceWidget::updateBookmarksVisibility() {
     setOverlayWidgetVisibility(m_bookmarksOverlayWidget, visibility);
 }
 
-qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const {
+qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const {
     // get timestamp from the first channel that was painted
     int channel = std::distance(m_paintedChannels.cbegin(),
         std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
     if (channel >= channelCount())
         channel = 0;
 
-    qint64 timestampMs = (m_resource->hasVideo(m_display->mediaProvider()))
-        ? m_renderer->getTimestampOfNextFrameToRender(channel) / 1000
-        : display()->camDisplay()->getCurrentTime() / 1000;
+    qint64 timestampUsec = (m_resource->hasVideo(m_display->mediaProvider()))
+        ? m_renderer->getTimestampOfNextFrameToRender(channel)
+        : display()->camDisplay()->getCurrentTime();
 
-    return timestampMs;
+    return timestampUsec;
 }
 
-qint64 QnMediaResourceWidget::getDisplayTimeMs() const {
-    return getUtcCurrentTimeMs() + context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_resource);
+qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const
+{
+    qint64 datetimeUsec = getUtcCurrentTimeUsec();
+    if (datetimeUsec == DATETIME_NOW)
+        return qnSyncTime->currentMSecsSinceEpoch();
+    else if (datetimeUsec == AV_NOPTS_VALUE)
+        return 0;
+    else
+        return datetimeUsec/1000;
+}
+
+qint64 QnMediaResourceWidget::getDisplayTimeUsec() const 
+{
+    qint64 result = getUtcCurrentTimeUsec();
+    if (result != DATETIME_NOW && result != AV_NOPTS_VALUE)
+        result += context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_resource) * 1000ll;
+    return result;
 }

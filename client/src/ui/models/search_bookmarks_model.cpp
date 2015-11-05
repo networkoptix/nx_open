@@ -181,7 +181,7 @@ void QnSearchBookmarksModel::Impl::sort(int column
         sortBookmarks(m_bookmarks, order, [](const QnCameraBookmark &bookmark) { return bookmark.durationMs; });
         break;
     case kTags:
-        sortBookmarks(m_bookmarks, order, [](const QnCameraBookmark &bookmark) { return bookmark.tagsAsString(); });
+        sortBookmarks(m_bookmarks, order, [](const QnCameraBookmark &bookmark) { return QnCameraBookmark::tagsToString(bookmark.tags); });
         break;
     case kCamera:
         sortBookmarks(m_bookmarks, order, [this](const QnCameraBookmark &bookmark) { return cameraNameFromId(bookmark.cameraId); });
@@ -226,7 +226,7 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
         enum { kNoApproximation = 0};   /// Don't use approximation, because bookmark could have short lifetime 
         return QTimeSpan(bookmark.durationMs).normalized().toApproximateString(kNoApproximation);
     case kTags:
-        return bookmark.tagsAsString();
+        return QnCameraBookmark::tagsToString(bookmark.tags);
     case kCamera:
         return cameraNameFromId(bookmark.cameraId);
     default:
