@@ -11,12 +11,10 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_plugin_factory.h>
-#include <core/resource/client_camera_factory.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec2_lib.h>
 
-#include <plugins/resource/client_camera/client_camera_factory.h>
 #include <plugins/storage/file_storage/qtfile_storage_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
@@ -53,7 +51,7 @@ QnAxClientModule::QnAxClientModule(QObject *parent)
     QApplication::setStyle(style);
 
     auto ec2ConnectionFactory = getConnectionFactory(Qn::PT_DesktopClient);
-    ec2ConnectionFactory->setContext(ec2::ResourceContext(QnClientCameraFactory::instance(), qnResPool, qnResTypePool));
+    ec2ConnectionFactory->setContext(ec2::ResourceContext(QnServerCameraFactory::instance(), qnResPool, qnResTypePool));
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory);
     qnCommon->store<ec2::AbstractECConnectionFactory>(ec2ConnectionFactory);
 
