@@ -410,13 +410,12 @@ void QnNavigationItem::updateBookButtonEnabled()
     const bool motionSearchMode = (currentWidget 
         && currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
 
-    const bool bookmarksEnabled = (!motionSearchMode && currentWidget 
+    const bool bookmarksEnabled = (currentWidget 
         && currentWidget->resource()->flags().testFlag(Qn::live));
 
-
     const auto layout = workbench()->currentLayout();
-    const bool bookmarkMode = bookmarksEnabled 
-        && layout->data(Qn::LayoutBookmarksModeRole).toBool();
+    const bool bookmarkMode = (bookmarksEnabled && !motionSearchMode
+        && layout->data(Qn::LayoutBookmarksModeRole).toBool());
 
     const auto modeAction = action(Qn::BookmarksModeAction);
     modeAction->setEnabled(bookmarksEnabled);
