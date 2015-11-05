@@ -26,17 +26,6 @@
         <final.artifact.name>${installer.name}-client</final.artifact.name>
     </properties>
 
-    <dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>clientexe</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type> 
-			<scope>system</scope>
-	        <systemPath>${root.dir}/client/pom.xml</systemPath>
-		</dependency>			
-    </dependencies>		
-	
     <build>
         <plugins>	
             <plugin>

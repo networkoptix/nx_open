@@ -26,8 +26,8 @@ public:
     virtual ~QnServerSettingsWidget();
 
     virtual bool hasChanges() const override;
-    virtual void updateFromSettings() override;
-    virtual void submitToSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
     virtual void retranslateUi() override;
 
     QnMediaServerResourcePtr server() const;

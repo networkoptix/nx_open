@@ -1,6 +1,4 @@
-#ifndef QNCAMERASMODEL_H
-#define QNCAMERASMODEL_H
-
+#pragma once
 #include <QtCore/QSortFilterProxyModel>
 #include <utils/common/id.h>
 
@@ -64,7 +62,3 @@ private:
     QSet<QString> m_hiddenCameras;
     bool m_hiddenCamerasOnly;
 };
-
-
-
-#endif // QNCAMERASMODEL_H

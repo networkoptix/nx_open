@@ -4,11 +4,12 @@
 
 #include <QtCore/QMetaType>
 
+#include <core/resource/resource_fwd.h>
+
 #include <utils/common/model_functions_fwd.h>
 #include <utils/common/id.h>
 
 struct QnStorageSpaceData {
-    QnStorageSpaceData();
     QString url;
     QnUuid storageId;
     qint64 totalSpace;
@@ -17,9 +18,13 @@ struct QnStorageSpaceData {
     bool isExternal;
     bool isWritable;
     bool isUsedForWriting;
+    bool isBackup;
     QString storageType;
+
+    QnStorageSpaceData();
+    explicit QnStorageSpaceData(const QnStorageResourcePtr &storage);
 };
-#define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)(storageType)
+#define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)(storageType)(isBackup)
 
 struct QnStorageStatusReply {
     bool pluginExists;

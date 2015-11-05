@@ -22,6 +22,10 @@ public:
     QnDatabaseManagementWidget(QWidget *parent = NULL);
     virtual ~QnDatabaseManagementWidget();
 
+    virtual void applyChanges() override;
+    virtual void loadDataToUi() override;
+    virtual bool hasChanges() const override;
+
 protected:
     void setReadOnlyInternal(bool readOnly) override;
 

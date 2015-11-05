@@ -112,7 +112,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_ldapSearchFilterAdaptor
         ;
 
-    m_allAdaptors 
+    m_allAdaptors
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_serverAutoDiscoveryEnabledAdaptor
@@ -120,6 +120,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << emailAdaptors
         << ldapAdaptors
         << m_auditTrailEnabledAdaptor
+        << m_defaultBackupQualitiesAdaptor
         ;
 
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);

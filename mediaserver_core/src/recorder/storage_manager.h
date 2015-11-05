@@ -26,6 +26,7 @@
 #include <atomic>
 #include <future>
 #include <mutex>
+#include <array>
 #include "storage_db_pool.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -33,6 +34,7 @@ class TestStorageThread;
 class RebuildAsyncTask;
 class ScanMediaFilesTask;
 class QnUuid;
+class QnScheduleSync;
 
 class QnStorageManager: public QObject
 {
@@ -67,7 +69,10 @@ public:
     * timeZone server time zone offset in munutes. If value==-1 - current(system) time zone is used
     */
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
-    static QnStorageResourcePtr getStorageByUrl(const QString &storageUrl);
+    static QnStorageResourcePtr getStorageByUrl(const QString &storageUrl, 
+                                                QnServer::StoragePool pool);
+    
+    static const std::array<QnServer::StoragePool, 2> getPools();
 
     bool checkIfMyStorage(const QnStorageResourcePtr &storage) const;
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);
@@ -120,11 +125,13 @@ public:
     * Return camera list with existing archive. Camera Unique ID is used as camera ID
     */
     std::vector<QnUuid> getCamerasWithArchive() const;
+
+    QnScheduleSync* scheduleSync() const;
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
     void rebuildFinished(bool isCanceled);
-    void backupFinished(qint64 backupedToMs);
+    void backupFinished(qint64 backupedToMs, QnServer::BackupResultCode);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
@@ -184,7 +191,6 @@ private:
         const QnStorageResourcePtr  &storage
     );
     static void updateCameraHistory();
-
 private:
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
@@ -225,6 +231,7 @@ private:
     QElapsedTimer m_removeEmtyDirTimer;
     QMap<QString, qint64> m_lastCatalogTimes;
     QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
+    std::unique_ptr<QnScheduleSync> m_scheduleSync;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

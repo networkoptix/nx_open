@@ -16,7 +16,7 @@ class QnSyncTime: public QObject, public Singleton<QnSyncTime> {
     Q_OBJECT;
 
 public:
-    QnSyncTime();
+    QnSyncTime(QObject *parent = NULL);
     virtual ~QnSyncTime();
 
     qint64 currentMSecsSinceEpoch();

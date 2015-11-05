@@ -30,9 +30,12 @@ public:
 
     QnMediaServerUpdateTool *updateTool() const;
 
-    virtual void updateFromSettings() override;
-    virtual bool confirm() override;
-    virtual bool discard() override;
+    virtual void applyChanges() override;
+    virtual void loadDataToUi() override;
+    virtual bool hasChanges() const override;
+
+    virtual bool canApplyChanges() override;
+    virtual bool canDiscardChanges() override;
 
 private slots:
     void at_updateFinished(const QnUpdateResult &result);

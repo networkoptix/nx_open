@@ -131,6 +131,11 @@ struct QnEmailAttachmentData {
             imageName = lit("license.png");
             imagePath = lit(":/skin/email_attachments/server.png");
             break;
+        case QnBusiness::BackupFinishedEvent:
+            templatePath = lit(":/email_templates/backup_finished.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
         case QnBusiness::UserDefinedEvent:
             templatePath = lit(":/email_templates/generic_event.mustache");
             imageName = lit("server.png");
@@ -282,7 +287,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.cameraId = camera->getUniqueId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
-    bookmark.tags = action->getParams().tags.split(QRegExp(lit("[ ,]")), QString::SkipEmptyParts).toSet();
+    bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
 
     return qnServerDb->addBookmark(bookmark);
 }
@@ -633,6 +638,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     case StorageFailureEvent:
     case ServerFailureEvent: 
     case LicenseIssueEvent:
+    case BackupFinishedEvent:
         {
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;

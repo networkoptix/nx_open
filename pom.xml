@@ -117,6 +117,7 @@
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
+        <qt.version>5.2.1-SNAPSHOT</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
@@ -357,14 +358,15 @@
             </modules>
         </profile>
        <profile>
-            <id>nomac</id>
+            <id>nomac-nomobile</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>!mac</family>
                 </os>
                 <property>
-                    <name>!newmobile</name>
+                    <name>newmobile</name>
+                    <value>!true</value>
                 </property>
             </activation>
             <modules>
@@ -471,9 +473,6 @@
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton</module>
                 <module>plugins/acs/paxton-installer</module>
-                <!-- Uncomment this when 2.3.1_paxton is merged -->
-                <!-- <module>plugins/acs/paxton</module>
-                <module>plugins/acs/paxton-installer</module> -->
             </modules>
         </profile>
         <profile>
@@ -555,7 +554,8 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>!newmobile</name>
+                    <name>newmobile</name>
+                    <value>!true</value>
                 </property>
             </activation>
             <properties>
@@ -832,8 +832,12 @@
                 <activeByDefault>false</activeByDefault>
                 <property>
                     <name>newmobile</name>
+                    <value>true</value>
                 </property>
             </activation>
+            <properties>
+                <qt.version>5.5.1-SNAPSHOT</qt.version>
+            </properties>            
             <modules>
                 <module>client.core</module>
                 <module>mobile_client</module>
@@ -843,11 +847,8 @@
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android</value>
                 </property>
             </activation>
@@ -876,7 +877,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android-desktop</value>
                 </property>
             </activation>
@@ -893,7 +894,7 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>ios</value>
                 </property>
             </activation>

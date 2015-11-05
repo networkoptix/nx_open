@@ -167,10 +167,9 @@ public:
     int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 
     /*!
-        \param mainPool returns main storage list if true or backup storage list if false. default value true
-        \returns information about storage.
+        \returns information about storages space.
     */
-    int getStorageSpaceAsync(bool mainPool, QObject *target, const char *slot);
+    int getStorageSpaceAsync(QObject *target, const char *slot);
 
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 

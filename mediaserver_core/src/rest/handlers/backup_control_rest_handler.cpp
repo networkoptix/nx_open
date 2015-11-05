@@ -3,6 +3,7 @@
 #include "utils/common/util.h"
 #include "api/model/backup_status_reply.h"
 #include <recorder/schedule_sync.h>
+#include "recorder/storage_manager.h"
 
 int QnBackupControlRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
@@ -12,11 +13,11 @@ int QnBackupControlRestHandler::executeGet(const QString &path, const QnRequestP
     QnBackupStatusData reply;
     
     if (method == "start")
-        qnScheduleSync->forceStart();
+        qnBackupStorageMan->scheduleSync()->forceStart();
     else if (method == "stop")
-        qnScheduleSync->interrupt();
+        qnBackupStorageMan->scheduleSync()->interrupt();
 
-    reply = qnScheduleSync->getStatus();
+    reply = qnBackupStorageMan->scheduleSync()->getStatus();
 
     result.setReply(reply);
     return CODE_OK;
