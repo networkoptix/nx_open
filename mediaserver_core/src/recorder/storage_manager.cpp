@@ -222,7 +222,11 @@ public:
             }
             m_scanTasks.removeFirst(1);
             assert(qnBackupStorageMan->scheduleSync());
-            qnBackupStorageMan->scheduleSync()->findLastSyncPoint();
+
+            std::lock_guard<std::mutex> lk(
+                qnBackupStorageMan->scheduleSync()->findLastSyncPoint(),
+                std::adopt_lock
+            );
         }
     }
 };

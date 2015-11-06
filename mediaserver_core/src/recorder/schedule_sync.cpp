@@ -34,9 +34,10 @@ QnScheduleSync::~QnScheduleSync()
     stop();
 }
 
-void QnScheduleSync::findLastSyncPoint() 
+std::mutex &QnScheduleSync::findLastSyncPoint() 
 {
-    std::lock_guard<std::mutex> lk(m_syncPointMutex);
+    m_syncPointMutex.lock();
+    std::lock_guard<std::mutex> lk(m_syncPointGetMutex);
     int64_t prevSyncPoint = m_syncTimePoint = 0;
 
     while (auto chunkVector = getOldestChunk()) {
@@ -60,9 +61,10 @@ void QnScheduleSync::findLastSyncPoint()
 
         if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
             m_syncTimePoint = prevSyncPoint;
-            return;
+            return m_syncPointMutex;
         }
     }
+    return m_syncPointMutex;
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
@@ -297,6 +299,8 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 template<typename NeedMoveOnCB>
 QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
+    std::lock_guard<std::mutex> lk(findLastSyncPoint(), std::adopt_lock);
+
     while (1) {
         auto chunkKeyVector = getOldestChunk();
         if (!chunkKeyVector) {
@@ -385,7 +389,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
     {
-        std::lock_guard<std::mutex> lk(m_syncPointMutex);
+        std::lock_guard<std::mutex> lk(m_syncPointGetMutex);
         ret.backupTimeMs = m_syncTimePoint;
     }
     {
@@ -483,7 +487,6 @@ void QnScheduleSync::run()
         if (isItTimeForSync() == SyncCode::Ok) // we are there
         {
             m_syncing = true;
-            findLastSyncPoint();
             auto result = synchronize(isItTimeForSync);
             m_syncData.clear();
             m_forced = false;
