@@ -222,7 +222,7 @@ public:
             }
             m_scanTasks.removeFirst(1);
             assert(qnBackupStorageMan->scheduleSync());
-            qnBackupStorageMan->scheduleSync()->findLastSyncPoint();
+            qnBackupStorageMan->scheduleSync()->updateLastSyncPoint();
         }
     }
 };

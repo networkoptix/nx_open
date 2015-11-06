@@ -60,12 +60,12 @@ public:
     virtual void stop() override;
     int interrupt();
 
-    void findLastSyncPoint();
+    void updateLastSyncPoint();
     QnBackupStatusData getStatus() const;
     virtual void run() override;
 
 private:
-    void findLastSyncPointUnsafe();
+    qint64 findLastSyncPointUnsafe() const;
 
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \
@@ -111,11 +111,11 @@ private:
 
     int state() const;
 
-    boost::optional<ChunkKeyVector> getOldestChunk();    
+    boost::optional<ChunkKeyVector> getOldestChunk() const;
     ChunkKey getOldestChunk(
         const QString           &cameraId,
         QnServer::ChunksCatalog catalog
-    );
+    ) const;
 
 private:
     std::atomic<bool>       m_backupSyncOn;
@@ -126,9 +126,8 @@ private:
     ec2::backup::DayOfWeek  m_curDow;
 
     QnServerBackupSchedule  m_schedule;
-    int64_t                 m_syncTimePoint;
+    std::atomic<qint64>     m_syncTimePoint;
     QnMutex                 m_syncPointMutex;
-    mutable QnMutex         m_syncPointGetMutex;
 
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;

@@ -35,20 +35,21 @@ QnScheduleSync::~QnScheduleSync()
     stop();
 }
 
-void QnScheduleSync::findLastSyncPoint()
+void QnScheduleSync::updateLastSyncPoint()
 {
     QnMutexLocker lock(&m_syncPointMutex);
-    findLastSyncPointUnsafe();
+    m_syncTimePoint = findLastSyncPointUnsafe();
 }
 
-void QnScheduleSync::findLastSyncPointUnsafe() 
+qint64 QnScheduleSync::findLastSyncPointUnsafe() const
 {
-    int64_t prevSyncPoint = m_syncTimePoint = 0;
+    int64_t prevSyncPoint = 0;
+    qint64 result = 0;
 
     while (auto chunkVector = getOldestChunk()) {
         auto chunkKey = (*chunkVector)[0];
         prevSyncPoint = m_syncTimePoint;
-        m_syncTimePoint = chunkKey.chunk.startTimeMs;
+        result = chunkKey.chunk.startTimeMs;
 
         auto fromCatalog = qnNormalStorageMan->getFileCatalog(
             chunkKey.cameraID,
@@ -65,16 +66,17 @@ void QnScheduleSync::findLastSyncPointUnsafe()
             continue;
 
         if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
-            m_syncTimePoint = prevSyncPoint;
-            return;
+            result = prevSyncPoint;
+            break;
         }
     }
+    return result;
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
     const QString           &cameraId,
     QnServer::ChunksCatalog catalog
-)
+) const
 {
     auto fromCatalog = qnNormalStorageMan->getFileCatalog(
         cameraId,
@@ -97,7 +99,7 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
 
 
 boost::optional<QnScheduleSync::ChunkKeyVector> 
-QnScheduleSync::getOldestChunk() 
+QnScheduleSync::getOldestChunk() const
 {
     ChunkKeyVector ret;
     int64_t minTime = std::numeric_limits<int64_t>::max();
@@ -304,7 +306,7 @@ template<typename NeedMoveOnCB>
 QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     QnMutexLocker lock(&m_syncPointMutex);
-    findLastSyncPointUnsafe();
+    m_syncTimePoint = findLastSyncPointUnsafe();
 
     while (1) {
         auto chunkKeyVector = getOldestChunk();
@@ -394,7 +396,6 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
     {
-        QnMutexLocker lk(&m_syncPointGetMutex);
         ret.backupTimeMs = m_syncTimePoint;
     }
     {
