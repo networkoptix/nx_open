@@ -17,7 +17,6 @@
 
 #include <mutex>
 #include <numeric>
-#include <boost/scope_exit.hpp>
 
 QnScheduleSync::QnScheduleSync()
     : m_backupSyncOn(false),
@@ -395,9 +394,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     QnBackupStatusData ret;
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
-    {
-        ret.backupTimeMs = m_syncTimePoint;
-    }
+    ret.backupTimeMs = m_syncTimePoint;
     {
         QnMutexLocker lk(&m_syncDataMutex);
         auto syncDataSize = (double)m_syncData.size();
