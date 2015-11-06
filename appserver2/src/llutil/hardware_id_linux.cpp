@@ -201,7 +201,7 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
     Q_UNUSED(settings)
 
     char MAC_str[13];
-    memset(MAC_str, sizeof(MAC_str), 0);
+    memset(MAC_str, 0, sizeof(MAC_str));
     mac_eth0( MAC_str, nullptr );
 
     // Historycally hardware id is mac + '\0'

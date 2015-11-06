@@ -1,7 +1,5 @@
 #include "system_health_helper.h"
 #include "business/actions/abstract_business_action.h"
-#include "utils/common/synctime.h"
-#include "utils/common/qtimespan.h"
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType) 
 {
@@ -46,24 +44,6 @@ QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType mes
         break;
     }
     return messageTitle(messageType);
-}
-
-QString QnSystemHealthStringsHelper::backupPositionToStr(const QDateTime& dt)
-{
-    static const qint64 MinDeltaForMessageMs = 1000ll * 3600 * 24;
-    
-    QDateTime now = qnSyncTime->currentDateTime();
-
-    QString result = lit("%1 %2").arg(dt.date().toString()).arg(dt.time().toString(Qt::DefaultLocaleShortDate));
-
-    qint64 deltaMs = now.toMSecsSinceEpoch() - dt.toMSecsSinceEpoch();
-    if (deltaMs > MinDeltaForMessageMs) {
-        QTimeSpan span(deltaMs);
-        span.normalize();
-        QString deltaStr = tr("(%1 before now)").arg(span.toApproximateString());
-        result = lit("%1 %2").arg(result).arg(deltaStr);
-    }
-    return result;
 }
 
 QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, const QnAbstractBusinessActionPtr &businessAction, QString resourceName) 

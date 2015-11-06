@@ -26,12 +26,8 @@ namespace {
         /* Check exact match. */
         if (iter != data.cend() && iter->timestampMs == timestamp)
             return iter;
-
-        /* Check if the first data is already greater than required. */
-        if (iter == data.cbegin())
-            return data.cend();
-
-        /* Otherwise get previous server. */
+        
+        /* get previous server. */
         if (data.cbegin() != iter)
             --iter;
 
@@ -325,11 +321,22 @@ void QnCameraHistoryPool::setServerFootageData(const ec2::ApiServerFootageData &
 
 std::vector<QnUuid> QnCameraHistoryPool::getServerFootageData(const QnUuid& serverGuid) const {
     QnMutexLocker lock( &m_mutex );
-    std::vector<QnUuid> result;
-    for(const auto& value: m_archivedCamerasByServer.value(serverGuid))
-        result.push_back(value);
+    return m_archivedCamerasByServer.value(serverGuid);
+}
+
+QnVirtualCameraResourceList QnCameraHistoryPool::getServerFootageCameras( const QnMediaServerResourcePtr &server ) const {
+    QnVirtualCameraResourceList result;
+    if (!server)
+        return result;
+
+    for (const QnUuid &cameraId: getServerFootageData(server->getId())) {
+        if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+            result << camera;
+    }
+
     return result;
 }
+
 
 bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourcePtr &camera)
 {

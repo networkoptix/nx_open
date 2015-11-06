@@ -71,7 +71,7 @@ namespace ec2
         ApiMediaServerUserAttributesData(): 
             maxCameras(0), 
             allowAutoRedundancy(false),
-            backupType(Qn::Backup_Disabled),
+            backupType(Qn::Backup_Manual),
             backupDaysOfTheWeek(backup::AllDays),
             backupStart(0), // midnight
             backupDuration(-1), // unlimited duration

@@ -1379,7 +1379,15 @@ void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
     const bool checked = bookmarkModeAction->isChecked();
     const bool enabled = bookmarkModeAction->isEnabled();
 
-    if (enabled)
+    bool canSaveBookmarksMode = true;    /// if bookmarks mode is going to be enabled than we always can store mode
+    if (!checked)
+    {
+        const auto currentWidget = navigator()->currentWidget();
+        canSaveBookmarksMode = (!currentWidget 
+            || !currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
+    }
+
+    if (enabled && canSaveBookmarksMode)
         context()->workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
 
     if (checked)
