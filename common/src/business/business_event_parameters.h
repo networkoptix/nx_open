@@ -15,6 +15,12 @@ struct QnEventMetaData
 
     QnEventMetaData() {}
 
+    QnEventMetaData(const QnEventMetaData& right)
+    :
+        cameraRefs(right.cameraRefs)
+    {
+    }
+
     QnEventMetaData(QnEventMetaData&& right)
     :
         cameraRefs(std::move(right.cameraRefs))
