@@ -21,6 +21,9 @@ void QnWorkbenchStateDependentButtonBoxDialog::forcedUpdate() {
     tryClose(true);
 }
 
+/************************************************************************/
+/* QnWorkbenchStateDependentTabbedDialog                                */
+/************************************************************************/
 QnWorkbenchStateDependentTabbedDialog::QnWorkbenchStateDependentTabbedDialog( QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/ )
     : base_type(parent, windowFlags)
     , QnWorkbenchStateDelegate(parent)
@@ -36,13 +39,7 @@ bool QnWorkbenchStateDependentTabbedDialog::tryClose( bool force ) {
     if (isHidden() || !hasChanges())
         return true;
 
-    QMessageBox::StandardButton btn =  QMessageBox::question(this,
-        confirmMessageTitle(),
-        confirmMessageText(),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Cancel);
-
-    switch (btn) {
+    switch (showConfirmationDialog()) {
     case QMessageBox::Yes:
         if (!canApplyChanges())
             return false;   // e.g. cancel was pressed in the confirmation dialog
@@ -59,20 +56,23 @@ bool QnWorkbenchStateDependentTabbedDialog::tryClose( bool force ) {
     return true;
 }
 
-/************************************************************************/
-/* QnWorkbenchStateDependentTabbedDialog                                */
-/************************************************************************/
+
 void QnWorkbenchStateDependentTabbedDialog::forcedUpdate() {
     loadDataToUi();
 }
 
-QString QnWorkbenchStateDependentTabbedDialog::confirmMessageTitle() const {
-    return tr("Confirm exit");
-}
 
-QString QnWorkbenchStateDependentTabbedDialog::confirmMessageText() const {
-    QStringList details;
-    for(const Page &page: modifiedPages())
-        details << tr("* %1").arg(page.title);
-    return tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n');
+QMessageBox::StandardButton QnWorkbenchStateDependentTabbedDialog::showConfirmationDialog() {
+    auto confirmMessageText = [this]{
+        QStringList details;
+        for(const Page &page: modifiedPages())
+            details << tr("* %1").arg(page.title);
+        return tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n');
+    };
+
+    return QMessageBox::question(this,
+        tr("Confirm exit"),
+        confirmMessageText(),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
 }

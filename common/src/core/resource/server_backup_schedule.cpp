@@ -6,7 +6,7 @@
 #include <utils/common/model_functions.h>
 
 QnServerBackupSchedule::QnServerBackupSchedule() 
-    : backupType(Qn::Backup_Disabled)
+    : backupType(Qn::Backup_Manual)
     , backupDaysOfTheWeek(ec2::backup::AllDays) // all days of week
     , backupStartSec(0) // midnight
     , backupDurationSec(-1) // unlimited duration
