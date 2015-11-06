@@ -494,8 +494,8 @@ namespace
                 //memset( &waitStopTime, 0, sizeof(waitStopTime) );
                 //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
                 //    continue;   //not updating timeout value
-                //const int millisAlreadySlept = 
-                //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+                //const int millisAlreadySlept =
+                //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
                 //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
                 //if( (unsigned int)millisAlreadySlept < timeout )
                 if( et.elapsed() < timeout )
@@ -604,7 +604,7 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
     iSelRet = ::select(
         m_fd + 1,
         NULL,
-        &wrtFDS, 
+        &wrtFDS,
         NULL,
         timeoutMs >= 0 ? &timeVal : NULL );
 #else
@@ -646,7 +646,7 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
             //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
             //    continue;   //not updating timeout value
             const int millisAlreadySlept = et.elapsed();
-            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
             //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
             if( millisAlreadySlept >= (int)timeoutMs )
                 break;
@@ -709,7 +709,7 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
 #else
             0
 #endif
-	),
+    ),
         sendTimeout );
 #endif
     if (sended < 0)
@@ -958,13 +958,21 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 {
     #if defined( Q_OS_WIN )
-        struct tcp_keepalive ka = { TRUE, info->timeSec * 1000,
-                                          info->intervalSec * 1000 }; // s to ms
+        struct tcp_keepalive ka = { FALSE, 0, 0 };
+        if( info )
+        {
+            ka.onoff = TRUE;
+            ka.keepalivetime = info->timeSec * 1000; // s to ms
+            ka.keepaliveinterval = info->intervalSec * 1000; // s to ms
+        }
+
+        DWORD length = sizeof( ka );
         if( WSAIoctl( m_implDelegate.handle(), SIO_KEEPALIVE_VALS,
-                      &ka, sizeof(ka), NULL, 0, NULL, NULL, NULL ) != 0 )
+                      &ka, sizeof(ka), NULL, 0, &length, NULL, NULL ) )
             return false;
 
-        m_keepAlive = std::move( info );
+        if( info )
+            m_keepAlive = std::move( *info );
     #elif defined( Q_OS_LINUX )
         int isEnabled = info ? 1 : 0;
         if( setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
@@ -1047,7 +1055,7 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
 // TCPServerSocket Code
 
 static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
-/*! 
+/*!
     \return fd (>=0) on success, <0 on error (-2 if timed out)
 */
 static int acceptWithTimeout( int m_fd, int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC )
@@ -1205,7 +1213,7 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
                     static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
                 nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
-                
+
                 QMutexLocker lk(&mtx);
                 cancelled = true;
                 cond.wakeAll();
