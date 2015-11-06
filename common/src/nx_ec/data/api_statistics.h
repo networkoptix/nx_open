@@ -11,6 +11,9 @@
 #include "api_license_data.h"
 #include "api_business_rule_data.h"
 
+// NOTE: structs with suffix 'Statistics' are only used to tell fusion which
+//       fields should be serialized for statistics (to cut out private data
+//       and keep report 100% anonimous)
 
 namespace std
 {
@@ -52,6 +55,7 @@ namespace ec2 {
         ApiMediaServerDataStatistics();
         ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
 
+        // overrides ApiMediaServerDataEx::storages for fusion
         ApiStorageDataStatisticsList storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
