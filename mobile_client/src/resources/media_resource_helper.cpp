@@ -16,6 +16,7 @@
 #include "network/authutil.h"
 #include "utils/common/model_functions.h"
 #include "utils/common/synctime.h"
+#include "utils/network/http/httptypes.h"
 #include "watchers/user_watcher.h"
 #include <mobile_client/mobile_client_settings.h>
 

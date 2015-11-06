@@ -60,8 +60,10 @@ namespace ec2 {
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data)
         : ApiMediaServerDataEx(std::move(data))
     {
-        for (auto s : ApiMediaServerDataEx::storages)
+        for (auto& s : ApiMediaServerDataEx::storages)
             storages.push_back(std::move(s));
+
+        ApiMediaServerDataEx::storages.clear();
     }
 
     ApiLicenseStatistics::ApiLicenseStatistics()
@@ -71,7 +73,7 @@ namespace ec2 {
         : cameraCount(0)
     {
         QMap<QString, QString> parsed;
-        for (auto value : data.licenseBlock.split('\n'))
+        for (const auto& value : data.licenseBlock.split('\n'))
         {
             auto pair = value.split('=');
             if (pair.size() == 2) 
