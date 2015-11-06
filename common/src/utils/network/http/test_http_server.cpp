@@ -5,7 +5,10 @@
 
 #include "test_http_server.h"
 
+#include <QtCore/QFile>
+
 #include "utils/network/http/buffer_source.h"
+
 
 TestHttpServer::TestHttpServer()
 {
@@ -37,8 +40,10 @@ class StaticHandler
     public nx_http::AbstractHttpRequestHandler
 {
 public:
-    StaticHandler( QByteArray response )
-        : m_response( std::move( response ) )
+    StaticHandler(const nx_http::StringType& mimeType, QByteArray response)
+    :
+        m_mimeType(mimeType),
+        m_response(std::move(response))
     {
     }
 
@@ -53,19 +58,39 @@ public:
     {
         completionHandler(
             nx_http::StatusCode::ok,
-            std::make_unique< nx_http::BufferSource >( "text", m_response ) );
+            std::make_unique< nx_http::BufferSource >( m_mimeType, m_response ) );
     }
 
 private:
-    QByteArray m_response;
+    const nx_http::StringType m_mimeType;
+    const QByteArray m_response;
 };
 
-bool TestHttpServer::registerStaticProcessor( const QString& path,
-                                              QByteArray response )
+bool TestHttpServer::registerStaticProcessor(
+    const QString& path,
+    QByteArray response,
+    const nx_http::StringType& mimeType)
 {
     return registerRequestProcessor< StaticHandler >(
         path, [ = ]() -> std::unique_ptr< StaticHandler >
         {
-            return std::make_unique< StaticHandler >( std::move( response ) );
+            return std::make_unique< StaticHandler >(
+                mimeType,
+                std::move( response ) );
         } );
+}
+
+bool TestHttpServer::registerFileProvider(
+    const QString& httpPath,
+    const QString& filePath,
+    const nx_http::StringType& mimeType)
+{
+    QFile f(filePath);
+    if (!f.open(QIODevice::ReadOnly))
+        return false;
+    const auto fileContents = f.readAll();
+    return registerStaticProcessor(
+        httpPath,
+        std::move(fileContents),
+        mimeType);
 }

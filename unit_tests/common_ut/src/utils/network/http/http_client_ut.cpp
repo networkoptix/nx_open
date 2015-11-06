@@ -24,29 +24,36 @@ class HttpClientServerTest
     public ::testing::Test
 {
 protected:
-    static void SetUpTestCase()
+    HttpClientServerTest()
+    :
+        m_testHttpServer(new TestHttpServer())
     {
-        testHttpServer.reset( new TestHttpServer() );
     }
 
-    static void TearDownTestCase()
+    ~HttpClientServerTest()
     {
-        testHttpServer.reset();
     }
 
-    static std::unique_ptr<TestHttpServer> testHttpServer;
+    TestHttpServer* testHttpServer()
+    {
+        return m_testHttpServer.get();
+    }
+
+private:
+    std::unique_ptr<TestHttpServer> m_testHttpServer;
 };
-
-std::unique_ptr<TestHttpServer> HttpClientServerTest::testHttpServer;
 
 TEST_F( HttpClientServerTest, SimpleTest )
 {
-    ASSERT_TRUE( testHttpServer->registerStaticProcessor( "/test", "SimpleTest" ) );
-    ASSERT_TRUE( testHttpServer->bindAndListen() );
+    ASSERT_TRUE( testHttpServer()->registerStaticProcessor(
+        "/test",
+        "SimpleTest",
+        "application/text") );
+    ASSERT_TRUE( testHttpServer()->bindAndListen() );
 
     nx_http::HttpClient client;
     const QUrl url( lit("http://127.0.0.1:%1/test")
-                    .arg( testHttpServer->serverAddress().port) );
+                    .arg( testHttpServer()->serverAddress().port) );
 
     ASSERT_TRUE( client.doGet( url ) );
     ASSERT_TRUE( client.response() );
@@ -61,14 +68,55 @@ TEST_F( HttpClientServerTest, KeepAliveConnection )
 {
 }
 
-//TODO #ak refactor these tests using HttpClientServerTest
-
-TEST( HttpClientTest, DISABLED_KeepAlive )
+TEST_F(HttpClientServerTest, FileDownload)
 {
-    //TODO #ak use local http server
+    QFile f(":/content/Candice-Swanepoel-915.jpg");
+    ASSERT_TRUE(f.open(QIODevice::ReadOnly));
+    const auto fileBody = f.readAll();
+    f.close();
 
-    static const QUrl url( "http://192.168.0.1/girls/candice_swanepoel_07_original.jpg" );
+    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+        "/test.jpg",
+        fileBody,
+        "image/jpeg"));
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+    const QUrl url(lit("http://127.0.0.1:%1/test.jpg")
+        .arg(testHttpServer()->serverAddress().port));
+    nx_http::HttpClient client;
+
+    for (int i=0; i<1024; ++i)
+    {
+        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.response() != nullptr);
+        ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
+        nx_http::BufferType msgBody;
+        //emulating error response from server
+        if (rand() % 10 == 0)
+            continue;
+        while (!client.eof())
+            msgBody += client.fetchMessageBodyBuffer();
+        ASSERT_EQ(fileBody, msgBody);
+    }
+}
+
+TEST_F(HttpClientServerTest, KeepAlive)
+{
     static const int TEST_RUNS = 2;
+
+    QFile f(":/content/Candice-Swanepoel-915.jpg");
+    ASSERT_TRUE(f.open(QIODevice::ReadOnly));
+    const auto fileBody = f.readAll();
+    f.close();
+
+    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+        "/test.jpg",
+        fileBody,
+        "image/jpeg"));
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+    const QUrl url(lit("http://127.0.0.1:%1/test.jpg")
+        .arg(testHttpServer()->serverAddress().port));
 
     nx_http::HttpClient client;
 
@@ -87,6 +135,8 @@ TEST( HttpClientTest, DISABLED_KeepAlive )
             ASSERT_EQ( msgBody, newMsgBody );
     }
 }
+
+//TODO #ak refactor these tests using HttpClientServerTest
 
 TEST( HttpClientTest, DISABLED_KeepAlive2 )
 {

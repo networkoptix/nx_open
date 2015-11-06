@@ -34,7 +34,14 @@ public:
             std::move(factoryFunc) );
     }
 
-    bool registerStaticProcessor( const QString& path, QByteArray response );
+    bool registerStaticProcessor(
+        const QString& path,
+        QByteArray response,
+        const nx_http::StringType& mimeType);
+    bool registerFileProvider(
+        const QString& httpPath,
+        const QString& filePath,
+        const nx_http::StringType& mimeType);
 
 private:
     nx_http::MessageDispatcher m_httpMessageDispatcher;
