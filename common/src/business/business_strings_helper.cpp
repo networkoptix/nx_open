@@ -389,6 +389,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
         result = tr("Archive backup is canceled by user. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        break;
     }
 
     case LicenseRemoved: {

@@ -79,7 +79,13 @@ namespace ec2
             return res;
 
         dbManager_queryOrReturn(ApiLicenseDataList, licenses);
-        for (auto& lic : licenses) outData->licenses.push_back(std::move(lic));
+        for (auto& license : licenses)
+        {
+            QnLicense qnLicense(license.licenseBlock);
+            ApiLicenseStatistics statLicense(std::move(license));
+            statLicense.validation = qnLicense.validationInfo();
+            outData->licenses.push_back(std::move(statLicense));
+        }
 
         dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));

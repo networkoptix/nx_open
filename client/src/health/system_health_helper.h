@@ -13,6 +13,4 @@ public:
 
     /** Text that is used where the full description is required, e.g. in notification hints. */
     static QString messageDescription(QnSystemHealth::MessageType messageType, const QnAbstractBusinessActionPtr &businessAction, QString resourceName);
-private:
-    static QString backupPositionToStr(const QDateTime& dt);
 };

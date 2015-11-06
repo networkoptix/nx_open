@@ -112,24 +112,6 @@ namespace
         }
     }
 
-    enum CameraLicenseStatus {
-        LicenseNotUsed,
-        LicenseOverflow,
-        LicenseUsed
-    };
-
-    CameraLicenseStatus cameraLicenseStatus(const QnVirtualCameraResourcePtr &camera) {
-        //TODO: #ynikitenkov licenses calculating should not occur too often
-        // possibly we should keep instance of the QnCamLicenseUsageHelper in the widget
-        bool licenseUsed = camera->isLicenseUsed();
-        bool overflow = QnCamLicenseUsageHelper(camera, true).isOverflowForCamera(camera);
-
-        /* We are returning overflow even if now all is OK, so user will not be suggested to enable camera. */
-        return overflow ? LicenseOverflow
-                        : (licenseUsed ? LicenseUsed : LicenseNotUsed);
-    }
-
-
     const qint64 bookmarksFilterPrecisionMs = 5 * 60 * 1000;
 
     QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs, const QString &text = QString()) {
@@ -162,7 +144,6 @@ namespace
 
 } // anonymous namespace
 
-
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent)
     : QnResourceWidget(context, item, parent)
     , m_resource(base_type::resource().dynamicCast<QnMediaResource>())
@@ -185,6 +166,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_bookmarksOverlayWidget(nullptr)
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
+    , m_licenceStatus()
 {
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
@@ -287,14 +269,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module)) 
     {
+        m_licenceStatus.reset(new QnSingleCamLicenceStatusHelper(m_camera));
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
         addOverlayWidget(m_ioModuleOverlayWidget, Visible, true, true);
 
-        QnCamLicenseUsageWatcher *watcher = new QnCamLicenseUsageWatcher(m_camera, this);
-        connect(watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, 
-            [this]() { updateIoModuleVisibility(true); });
+        connect(m_licenceStatus, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this
+            , [this]() { updateIoModuleVisibility(true); });
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
@@ -309,7 +291,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(timer,              &QTimer::timeout,                                   this,   &QnMediaResourceWidget::updateIconButton);
         connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
         connect(m_camera,           &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera,           &QnResource::statusChanged,                         this,   [this](){ updateIoModuleVisibility(true); });
+        
+        if (m_camera->hasFlags(Qn::io_module))
+            connect(m_camera, &QnResource::statusChanged, this, [this](){ updateIoModuleVisibility(true); }); /// updateOverlayButton is called by updateIoModuleVisibility
+        else
+            connect(m_camera, &QnResource::statusChanged, this, &QnMediaResourceWidget::updateOverlayButton);
+
         connect(m_camera,           &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
         timer->start(1000 * 60); /* Update icon button every minute. */
 
@@ -673,7 +660,8 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
 
         connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this, [this](bool /* live */)
         {
-            updateIoModuleVisibility(true);
+            if (m_camera && m_camera->hasFlags(Qn::io_module))
+                updateIoModuleVisibility(true);
         });
 
         setChannelLayout(m_display->videoLayout());
@@ -1499,17 +1487,16 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
-    //TODO: #ynikitenkov now this method is called a lot of times even for non-io cameras
-    // we need to check it more smooth way, without recalculating licenses too often
-    // possibly, this code would work well (checking required
-    //     if (!resource()->toResource()->hasFlags(Qn::io_module))
-    //         return;
+    Q_ASSERT_X(m_camera && m_camera->hasFlags(Qn::io_module) && m_licenceStatus
+        , Q_FUNC_INFO, "updateIoModuleVisibility should be called only for io modules");
+
+    if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_licenceStatus)
+        return;
 
     const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
-    const bool ioModule = m_camera && m_camera->hasFlags(Qn::io_module);
     const bool ioBtnChecked = (button && button->isChecked());
-    const bool onlyIoData = (ioModule && m_camera && !m_camera->hasVideo(m_display->mediaProvider()));
-    const bool correctLicenceStatus = !m_camera || (cameraLicenseStatus(m_camera) == LicenseUsed);
+    const bool onlyIoData = (!m_camera->hasVideo(m_display->mediaProvider()));
+    const bool correctLicenceStatus = (m_licenceStatus->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
 
     const auto resource = m_display->resource();
     
@@ -1537,11 +1524,17 @@ void QnMediaResourceWidget::updateOverlayButton() {
                 return;
             }
         } else if (overlay == Qn::IoModuleDisabledOverlay) {
-            switch (cameraLicenseStatus(m_camera)) {
-            case LicenseNotUsed:
+            
+            Q_ASSERT_X(m_licenceStatus, Q_FUNC_INFO, "Query IO status overlay for resource widget that not contains IO module");
+
+            if (!m_licenceStatus)
+                return;
+
+            switch (m_licenceStatus->status()) {
+            case QnSingleCamLicenceStatusHelper::LicenseNotUsed:
                 statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::IoEnableButton);
                 return;
-            case LicenseOverflow:
+            case QnSingleCamLicenceStatusHelper::LicenseOverflow:
                 statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::MoreLicensesButton);
                 return;
             default:
@@ -1559,15 +1552,16 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
-    if (!m_camera)
+    Q_ASSERT_X(m_licenceStatus, Q_FUNC_INFO
+        , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-io modules");
+
+    if (!m_licenceStatus)
         return;
 
-    if (m_camera->isLicenseUsed())
-        return;  
-
-    if (QnCamLicenseUsageHelper(m_camera, true).isOverflowForCamera(m_camera))
+    const auto licenceStatus = m_licenceStatus->status();
+    if (licenceStatus != QnSingleCamLicenceStatusHelper::LicenseNotUsed)
         return;
-        
+    
     qnResourcesChangesManager->saveCamera(m_camera, [](const QnVirtualCameraResourcePtr &camera){
         camera->setLicenseUsed(true);
     });
