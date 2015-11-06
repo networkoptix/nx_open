@@ -60,7 +60,8 @@ public:
     virtual void stop() override;
     int interrupt();
 
-    std::mutex &findLastSyncPoint();
+    QnMutex &findLastSyncPoint();
+    void findLastSyncPointSafe();
     QnBackupStatusData getStatus() const;
     virtual void run() override;
 
@@ -125,11 +126,11 @@ private:
 
     QnServerBackupSchedule  m_schedule;
     int64_t                 m_syncTimePoint;
-    std::mutex              m_syncPointMutex;
-    mutable std::mutex      m_syncPointGetMutex;
+    QnMutex                 m_syncPointMutex;
+    mutable QnMutex         m_syncPointGetMutex;
 
     SyncDataMap           m_syncData;
-    mutable std::mutex    m_syncDataMutex;
+    mutable QnMutex       m_syncDataMutex;
 };
 
 #endif

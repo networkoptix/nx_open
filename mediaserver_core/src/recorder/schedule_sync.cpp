@@ -17,6 +17,7 @@
 
 #include <mutex>
 #include <numeric>
+#include <boost/scope_exit.hpp>
 
 QnScheduleSync::QnScheduleSync()
     : m_backupSyncOn(false),
@@ -34,10 +35,15 @@ QnScheduleSync::~QnScheduleSync()
     stop();
 }
 
-std::mutex &QnScheduleSync::findLastSyncPoint() 
+void QnScheduleSync::findLastSyncPointSafe()
+{
+    findLastSyncPoint().unlock();
+}
+
+QnMutex &QnScheduleSync::findLastSyncPoint() 
 {
     m_syncPointMutex.lock();
-    std::lock_guard<std::mutex> lk(m_syncPointGetMutex);
+    QnMutexLocker lk(&m_syncPointGetMutex);
     int64_t prevSyncPoint = m_syncTimePoint = 0;
 
     while (auto chunkVector = getOldestChunk()) {
@@ -163,7 +169,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 
     if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
         {   // update sync data
-            std::lock_guard<std::mutex> lk(m_syncDataMutex);
+            QnMutexLocker lk(&m_syncDataMutex);
             SyncDataMap::iterator syncDataIt = m_syncData.find(chunkKey);
             if (syncDataIt == m_syncData.cend()) {
                 m_syncData.emplace(
@@ -299,7 +305,10 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 template<typename NeedMoveOnCB>
 QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
-    std::lock_guard<std::mutex> lk(findLastSyncPoint(), std::adopt_lock);
+    findLastSyncPoint();
+    BOOST_SCOPE_EXIT(this_) {
+        this_->m_syncPointMutex.unlock();
+    } BOOST_SCOPE_EXIT_END
 
     while (1) {
         auto chunkKeyVector = getOldestChunk();
@@ -389,11 +398,11 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
     {
-        std::lock_guard<std::mutex> lk(m_syncPointGetMutex);
+        QnMutexLocker lk(&m_syncPointGetMutex);
         ret.backupTimeMs = m_syncTimePoint;
     }
     {
-        std::lock_guard<std::mutex> lk(m_syncDataMutex);
+        QnMutexLocker lk(&m_syncDataMutex);
         auto syncDataSize = (double)m_syncData.size();
         ret.progress = std::accumulate(
             m_syncData.cbegin(),
@@ -488,7 +497,10 @@ void QnScheduleSync::run()
         {
             m_syncing = true;
             auto result = synchronize(isItTimeForSync);
-            m_syncData.clear();
+            {
+                QnMutexLocker lk(&m_syncDataMutex);
+                m_syncData.clear();
+            }
             m_forced = false;
             m_syncing = false;
             emit backupFinished(m_syncTimePoint, result);
