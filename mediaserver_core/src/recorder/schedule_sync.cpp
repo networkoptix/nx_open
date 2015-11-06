@@ -159,20 +159,21 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
     if (!toCatalog)
         return CopyError::GetCatalogError;
 
-    if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs)
-    {
+    if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
         {   // update sync data
             std::lock_guard<std::mutex> lk(m_syncDataMutex);
             SyncDataMap::iterator syncDataIt = m_syncData.find(chunkKey);
             if (syncDataIt == m_syncData.cend()) {
-                SyncData newData = {    
-                    0.0, 
-                    fromCatalog->findFileIndex(
-                        chunkKey.chunk.startTimeMs, 
-                        DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk
+                m_syncData.emplace(
+                    chunkKey,
+                    SyncData(
+                        0.0,
+                        fromCatalog->findFileIndex(
+                            chunkKey.chunk.startTimeMs, 
+                            DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk
+                        )
                     )
-                };
-                m_syncData.insert(std::make_pair(chunkKey, newData));
+                );
             } else {
                 auto catalogSize = fromCatalog->size();
                 int curFileIndex = fromCatalog->findFileIndex(

@@ -30,6 +30,12 @@ private:
     {
         double  coeff;
         int     startIndex;
+
+        SyncData() : coeff(0.0), startIndex(0) {}
+        SyncData(double coeff, int startIndex) 
+            : coeff(coeff),
+              startIndex(startIndex)
+        {}
     };
     
     typedef std::vector<ChunkKey>         ChunkKeyVector;
