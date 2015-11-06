@@ -27,6 +27,14 @@ struct QnEventMetaData
     {
     }
 
+    QnEventMetaData& operator=(const QnEventMetaData& right)
+    {
+        if (&right == this)
+            return *this;
+        cameraRefs = right.cameraRefs;
+        return *this;
+    }
+    
     QnEventMetaData& operator=(QnEventMetaData&& right)
     {
         if (&right == this)
