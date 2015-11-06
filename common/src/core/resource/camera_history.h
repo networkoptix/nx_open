@@ -54,6 +54,9 @@ public:
     /** \return list of camera id's that have footage on the selected server. */
     std::vector<QnUuid> getServerFootageData(const QnUuid& serverGuid) const;
 
+    /** \return list of camera id's that have footage on the selected server. */
+    QnVirtualCameraResourceList getServerFootageCameras(const QnMediaServerResourcePtr &server) const;
+
     /** \return server list where the selected camera has footage. */
     QnMediaServerResourceList getCameraFootageData(const QnUuid &cameraId) const;
 

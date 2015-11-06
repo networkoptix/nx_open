@@ -19,8 +19,14 @@ namespace {
     /** Delay between requests when the backup is running. */ 
     const int updateBackupStatusDelayMs = 500;
 
-    /** Regular check if backup started. */
-    const int updateBackupRegularStatusDelayMs = 500;
+    /** Regular check if backup was started. */
+    const int updateBackupRegularStatusDelayMs = 10 * 60* 1000;
+
+    void processStorage(const QnClientStorageResourcePtr &storage, const QnStorageSpaceData &spaceInfo) {
+        storage->setFreeSpace(spaceInfo.freeSpace);
+        storage->setTotalSpace(spaceInfo.totalSpace);
+        storage->setWritable(spaceInfo.isWritable);
+    }
 }
 
 struct ServerPoolInfo {
@@ -332,11 +338,9 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         QnClientStorageResourcePtr storage = qnResPool->getResourceById<QnClientStorageResource>(spaceInfo.storageId);
         if (!storage)
             continue;
-
+       
+        processStorage(storage, spaceInfo);
         processedStorages.insert(spaceInfo.storageId);
-        storage->setFreeSpace(spaceInfo.freeSpace);
-        storage->setTotalSpace(spaceInfo.totalSpace);
-        storage->setWritable(spaceInfo.isWritable);
     }
 
     /* Requests were invalidated. */
@@ -377,24 +381,10 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         if (!spaceInfo.storageId.isNull())
             continue;
 
-        QnUuid serverId = requestKey.server->getId();
-
-        QnClientStorageResourcePtr storage(new QnClientStorageResource());
-        storage->setId(QnStorageResource::fillID(serverId, spaceInfo.url));
-        QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
-        if (resType)
-            storage->setTypeId(resType->getId());
-
-        storage->setName(QnUuid::createUuid().toString());
-        storage->setParentId(serverId);
-        storage->setUsedForWriting(false);
-        storage->setBackup(false);
-
-        storage->setUrl(spaceInfo.url);
+        QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(requestKey.server, spaceInfo.url);             
         storage->setStorageType(spaceInfo.storageType);
-        storage->setWritable(spaceInfo.isWritable);
-        storage->setFreeSpace(spaceInfo.freeSpace);
-        storage->setTotalSpace(spaceInfo.totalSpace);
+
+        processStorage(storage, spaceInfo);
 
         qnResPool->addResource(storage);
     }

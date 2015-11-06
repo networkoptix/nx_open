@@ -23,6 +23,8 @@ public:
     QnClientStorageResource();
     virtual ~QnClientStorageResource();
 
+    static QnClientStorageResourcePtr newStorage(const QnMediaServerResourcePtr &parentServer, const QString &url);
+
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;

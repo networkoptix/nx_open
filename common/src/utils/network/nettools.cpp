@@ -646,7 +646,7 @@ bool isNewDiscoveryAddressBetter(
 
 int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
-    memset(MAC_str, 0, sizeof(MAC_str));
+    memset(MAC_str, 0, MAC_ADDR_LEN);
     *host = 0;
     for (const auto& iface: QNetworkInterface::allInterfaces())
     {
@@ -762,7 +762,7 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
     if( hwIter == ifNameToLinkAddress.end() )
         return -1;	//ipv4 interface has no link-level address
 
-    strncpy( MAC_str, hwIter->second.c_str(), sizeof(MAC_str)-1 );
+    strncpy( MAC_str, hwIter->second.c_str(), MAC_ADDR_LEN-1 );
     if( host )
         *host = nullptr;
 
