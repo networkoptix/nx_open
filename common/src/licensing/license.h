@@ -63,6 +63,7 @@ public:
      * Check if signature matches other fields, also check hardwareId and brand
      */
     virtual bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    QString validationInfo(ValidationMode mode = VM_Regular) const;
 
     static QString errorMessage(ErrorCode errCode);
 
