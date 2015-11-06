@@ -23,7 +23,10 @@ struct QnEventMetaData
 
     QnEventMetaData& operator=(QnEventMetaData&& right)
     {
+        if (&right == this)
+            return *this;
         cameraRefs = std::move(right.cameraRefs);
+        return *this;
     }
 };
 #define QnEventMetaData_Fields (cameraRefs)
