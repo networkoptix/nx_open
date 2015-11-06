@@ -118,8 +118,8 @@ private:
     ec2::backup::DayOfWeek  m_curDow;
 
     QnServerBackupSchedule  m_schedule;
-    std::atomic<int64_t>    m_syncTimePoint;
-    std::atomic<int64_t>    m_clientSyncPoint;
+    int64_t                 m_syncTimePoint;
+    mutable std::mutex      m_syncPointMutex;
 
     SyncDataMap           m_syncData;
     mutable std::mutex    m_syncDataMutex;
