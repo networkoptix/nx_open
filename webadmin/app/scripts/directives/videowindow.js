@@ -92,6 +92,10 @@ angular.module('webadminApp')
                     var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
                     var weHaveRtsp = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['rtsp'];});
 
+                    if(weHaveHls && canPlayNatively("hls")){
+                        return "native-hls";
+                    }
+
                     // Test native support. Native is always better choice
                     if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
                         if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.osVersion >= 10) {
@@ -101,10 +105,6 @@ angular.module('webadminApp')
                         }else{
                             return "webm";
                         }
-                    }
-
-                    if(weHaveHls && canPlayNatively("hls")){
-                        return "native-hls";
                     }
 
                     // Hardcode native support
@@ -228,6 +228,7 @@ angular.module('webadminApp')
                     scope.native = true;
                     scope.flashls = false;
 
+                    var autoshow = null;
                     nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
@@ -235,6 +236,16 @@ angular.module('webadminApp')
                             $timeout(function () {
                                 scope.loading = !!format;
                             });
+
+                            if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hach for android bug. remove it later
+                                if(autoshow){
+                                    $timeout.cancel(autoshow);
+                                }
+                                autoshow = $timeout(function () {
+                                    scope.loading = false;
+                                    autoshow = null;
+                                },20000);
+                            }
 
                             scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
