@@ -70,9 +70,6 @@ signals:
     void applicationInfoChanged();
     void settingsChanged();
 
-private slots:
-    void at_connectionManager_connectedChanged();
-
 private:
     QnConnectionManager *m_connectionManager;
     QnLoginSessionManager *m_loginSessionManager;

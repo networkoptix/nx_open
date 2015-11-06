@@ -40,6 +40,7 @@ QnObject {
         property bool updateTimeline: false
         property bool dirty: true
         property alias mediaPlayer: playerLoader.item
+        property bool resetUrlOnConnect: false
     }
 
     Loader {
@@ -99,6 +100,20 @@ QnObject {
         interval: 5000
         running: player.playing && d.position >= 0
         onTriggered: d.updateTimeline = true
+    }
+
+    Connections {
+        target: connectionManager
+        onConnectionStateChanged: {
+            if (connectionManager.connectionState == QnConnectionManager.Connected) {
+                if (d.resetUrlOnConnect) {
+                    d.resetUrlOnConnect = false
+                    resourceHelper.setPosition(position)
+                }
+            } else {
+                d.resetUrlOnConnect = true
+            }
+        }
     }
 
     function alignedPosition(pos) {
