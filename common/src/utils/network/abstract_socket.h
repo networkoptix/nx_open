@@ -363,13 +363,15 @@ public:
     //!Set keep alive options
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
-        \note due to some OS limitations some values might not be actually set
+        \note due to some OS limitations some values might not be actually set eg
+            windows: probeCount is not supported
+            macosx: only boolean enabled/disabled is supported
     */
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) = 0;
     //!Reads keep alive options
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
-        \note due to some OS limitations some values might be = 0 (meaning system defaults) until \fn setKeepAlive is called
+        \note due to some OS limitations some values might be = 0 (meaning system defaults)
     */
     virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) = 0;
 };

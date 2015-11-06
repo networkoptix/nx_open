@@ -964,6 +964,9 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
             ka.onoff = TRUE;
             ka.keepalivetime = info->timeSec * 1000; // s to ms
             ka.keepaliveinterval = info->intervalSec * 1000; // s to ms
+
+            // the value can not be changed, 0 means default
+            info->probeCount = 0;
         }
 
         DWORD length = sizeof( ka );
@@ -992,11 +995,6 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 
         if( setsockopt( m_implDelegate.handle(), SOL_TCP, TCP_KEEPCNT,
                         &info->probeCount, sizeof(info->probeCount) ) < 0 )
-            return false;
-    #elif defined(Q_OS_MAC)
-        int isEnabled = info ? info->timeSec : 0;
-        if( setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_KEEPALIVE,
-                        &isEnabled, sizeof(isEnabled)) != 0 )
             return false;
     #else
         int isEnabled = info ? 1 : 0;
@@ -1039,10 +1037,8 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
             return false;
 
         *result = std::move( info );
-    #elif defined(Q_OS_MAC)
-        *result = KeepAliveOptions( isEnabled /* TODO: read system defaults */ );
     #else
-        return false;
+        *result = KeepAliveOptions();
     #endif
 
     return true;
