@@ -35,15 +35,15 @@ QnScheduleSync::~QnScheduleSync()
     stop();
 }
 
-void QnScheduleSync::findLastSyncPointSafe()
+void QnScheduleSync::findLastSyncPoint()
 {
-    findLastSyncPoint().unlock();
+    QnMutexLocker lock(&m_syncPointMutex);
+    findLastSyncPointUnsafe();
 }
 
-QnMutex &QnScheduleSync::findLastSyncPoint() 
+void QnScheduleSync::findLastSyncPointUnsafe() 
 {
-    m_syncPointMutex.lock();
-    QnMutexLocker lk(&m_syncPointGetMutex);
+    QnMutexLocker lk(&m_syncPointMutex);
     int64_t prevSyncPoint = m_syncTimePoint = 0;
 
     while (auto chunkVector = getOldestChunk()) {
@@ -67,10 +67,9 @@ QnMutex &QnScheduleSync::findLastSyncPoint()
 
         if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
             m_syncTimePoint = prevSyncPoint;
-            return m_syncPointMutex;
+            return;
         }
     }
-    return m_syncPointMutex;
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
@@ -305,10 +304,8 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 template<typename NeedMoveOnCB>
 QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
-    findLastSyncPoint();
-    BOOST_SCOPE_EXIT(this_) {
-        this_->m_syncPointMutex.unlock();
-    } BOOST_SCOPE_EXIT_END
+    QnMutexLocker lock(&m_syncPointMutex);
+    findLastSyncPointUnsafe();
 
     while (1) {
         auto chunkKeyVector = getOldestChunk();

@@ -60,12 +60,13 @@ public:
     virtual void stop() override;
     int interrupt();
 
-    QnMutex &findLastSyncPoint();
-    void findLastSyncPointSafe();
+    void findLastSyncPoint();
     QnBackupStatusData getStatus() const;
     virtual void run() override;
 
 private:
+    void findLastSyncPointUnsafe();
+
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \
     APPLY(NoBackupStorageError) \
