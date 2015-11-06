@@ -14,6 +14,8 @@ Item {
     property bool speedEnabled: false
     readonly property alias dragging: d.dragging
 
+    property alias gripTickVisible: tick.visible
+
     width: parent.width
     height: grip.height
 

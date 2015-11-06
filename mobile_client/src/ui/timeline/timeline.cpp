@@ -97,6 +97,7 @@ public:
     bool showLive;
     QSGTexture *stripesDarkTexture;
     QSGTexture *stripesLightTexture;
+    qreal activeLiveOpacity;
     qreal liveOpacity;
     qreal stripesPosition;
     bool stickToEnd;
@@ -122,6 +123,7 @@ public:
     qreal targetZoomLevel;
     qreal textLevel;
     qreal targetTextLevel;
+    qreal textOpacity;
 
     qint64 stickyTime;
     QnKineticHelper<qreal> stickyPointKineticHelper;
@@ -149,6 +151,7 @@ public:
         showLive(true),
         stripesDarkTexture(0),
         stripesLightTexture(0),
+        activeLiveOpacity(0.0),
         liveOpacity(0.0),
         stripesPosition(0.0),
         stickToEnd(false),
@@ -164,6 +167,7 @@ public:
         textTexture(0),
         textLevel(1.0),
         targetTextLevel(1.0),
+        textOpacity(1.0),
         timeZoneShift(0),
         chunkProvider(nullptr)
     {
@@ -327,6 +331,8 @@ public:
 
     void placeDigit(qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D *points);
     int placeText(const MarkInfo &textMark, int textLevel, QSGGeometry::TexturedPoint2D *points);
+
+    bool hasArchive() const;
 };
 
 QnTimeline::QnTimeline(QQuickItem *parent) :
@@ -831,8 +837,8 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
 
     textMarkLevel = cFloor(d->textLevel);
 
-    textOpacityNode->setOpacity(d->textLevel - textMarkLevel);
-    lowerTextOpacityNode->setOpacity(1.0 - textOpacityNode->opacity());
+    textOpacityNode->setOpacity(qMin(d->textLevel - textMarkLevel, d->textOpacity));
+    lowerTextOpacityNode->setOpacity(qMin(1.0 - textOpacityNode->opacity(), d->textOpacity));
 
     int textCount = 0;
     int lowerTextCount = 0;
@@ -900,6 +906,7 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
 QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     QSGGeometry *geometry;
     QSGGeometry *stripesGeometry;
+    QSGOpacityNode *stripesOpacityNode;
     QSGOpacityNode *lightStripesOpacityNode;
     QSGGeometryNode *stripesNode;
     QSGGeometryNode *lightStripesNode;
@@ -927,6 +934,8 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
         stripesLightMaterial->setTexture(d->stripesLightTexture);
         stripesLightMaterial->setHorizontalWrapMode(QSGTexture::Repeat);
 
+        stripesOpacityNode = new QSGOpacityNode();
+
         stripesNode = new QSGGeometryNode();
         stripesNode->setGeometry(stripesGeometry);
         stripesNode->setFlag(QSGNode::OwnsGeometry);
@@ -940,13 +949,15 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
 
         lightStripesOpacityNode = new QSGOpacityNode();
 
-        chunksNode->appendChildNode(stripesNode);
+        chunksNode->appendChildNode(stripesOpacityNode);
+        stripesOpacityNode->appendChildNode(stripesNode);
         stripesNode->appendChildNode(lightStripesOpacityNode);
         lightStripesOpacityNode->appendChildNode(lightStripesNode);
     } else {
         geometry = chunksNode->geometry();
 
-        stripesNode = static_cast<QSGGeometryNode*>(chunksNode->childAtIndex(0));
+        stripesOpacityNode = static_cast<QSGOpacityNode*>(chunksNode->childAtIndex(0));
+        stripesNode = static_cast<QSGGeometryNode*>(stripesOpacityNode->childAtIndex(0));
         lightStripesOpacityNode = static_cast<QSGOpacityNode*>(stripesNode->childAtIndex(0));
         lightStripesNode = static_cast<QSGGeometryNode*>(lightStripesOpacityNode->childAtIndex(0));
         stripesGeometry = stripesNode->geometry();
@@ -1039,7 +1050,8 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
 
     chunksNode->markDirty(QSGNode::DirtyGeometry);
 
-    lightStripesOpacityNode->setOpacity(d->liveOpacity);
+    stripesOpacityNode->setOpacity(d->liveOpacity);
+    lightStripesOpacityNode->setOpacity(d->activeLiveOpacity);
 
     qreal liveX = qMin(width(), d->timeToPixelPos(QDateTime::currentMSecsSinceEpoch()));
     qreal textureX = (width() - liveX) / d->chunkBarHeight;
@@ -1181,14 +1193,30 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         parent->positionChanged();
     }
 
+    qreal targetTextOpacity = hasArchive() ? 1.0 : 0.0;
+    if (!qFuzzyCompare(textOpacity, targetTextOpacity)) {
+        if (textOpacity < targetTextOpacity)
+            textOpacity = qMin(targetTextOpacity, textOpacity + textOpacityAnimationSpeed * dt);
+        else
+            textOpacity = qMax(targetTextOpacity, textOpacity - textOpacityAnimationSpeed * dt);
+    }
+
     bool live = parent->position() + 1000 >= QDateTime::currentMSecsSinceEpoch();
 
-    qreal targetLiveOpacity = live ? 1.0 : 0.0;
+    qreal targetLiveOpacity = hasArchive() ? 1.0 : 0.0;
     if (!qFuzzyCompare(liveOpacity, targetLiveOpacity)) {
         if (liveOpacity < targetLiveOpacity)
             liveOpacity = qMin(targetLiveOpacity, liveOpacity + liveOpacityAnimationSpeed * dt);
         else
             liveOpacity = qMax(targetLiveOpacity, liveOpacity - liveOpacityAnimationSpeed * dt);
+    }
+
+    qreal targetActiveLiveOpacity = live ? 1.0 : 0.0;
+    if (!qFuzzyCompare(activeLiveOpacity, targetActiveLiveOpacity)) {
+        if (activeLiveOpacity < targetActiveLiveOpacity)
+            activeLiveOpacity = qMin(targetActiveLiveOpacity, activeLiveOpacity + liveOpacityAnimationSpeed * dt);
+        else
+            activeLiveOpacity = qMax(targetActiveLiveOpacity, activeLiveOpacity - liveOpacityAnimationSpeed * dt);
     }
 
     if (live) {
@@ -1282,4 +1310,8 @@ int QnTimelinePrivate::placeText(const MarkInfo &textMark, int textLevel, QSGGeo
     }
 
     return shift;
+}
+
+bool QnTimelinePrivate::hasArchive() const {
+    return startBoundTime > 0;
 }

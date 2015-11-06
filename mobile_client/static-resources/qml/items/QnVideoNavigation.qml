@@ -94,6 +94,8 @@ Item {
             QnTimeline {
                 id: timeline
 
+                enabled: startBound > 0
+
                 anchors.bottom: parent.bottom
                 width: parent.width
                 height: dp(150)
@@ -197,6 +199,18 @@ Item {
                 Component.onCompleted: timeline.timelineView.visible = false
             }
 
+            Text {
+                anchors.horizontalCenter: timeline.horizontalCenter
+                text: qsTr("No Archive")
+                font.capitalization: Font.AllUppercase
+                font.pixelSize: sp(12)
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
+                color: QnTheme.windowText
+                visible: timeline.startBound <= 0
+                opacity: 0.5
+            }
+
             Rectangle {
                 id: navigationPanel
                 width: parent.width
@@ -237,7 +251,8 @@ Item {
                     anchors.horizontalCenterOffset: -width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/minus.png"
-                    visible: timeline.startBound > 0
+                    enabled: timeline.startBound > 0
+                    opacity: enabled ? 1.0 : 0.15
                     onClicked: timeline.zoomOut()
                 }
 
@@ -247,7 +262,8 @@ Item {
                     anchors.horizontalCenterOffset: width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/plus.png"
-                    visible: timeline.startBound > 0
+                    enabled: timeline.startBound > 0
+                    opacity: enabled ? 1.0 : 0.15
                     onClicked: timeline.zoomIn()
                 }
 
@@ -327,6 +343,8 @@ Item {
 
                 loading: mediaPlayer.loading
 
+                gripTickVisible: timeline.startBound > 0
+
                 onPausedChanged: {
                     if (paused)
                         mediaPlayer.pause()
@@ -349,6 +367,7 @@ Item {
                 anchors.bottom: parent.bottom
                 width: dp(2)
                 height: timeline.chunkBarHeight + dp(8)
+                visible: timeline.startBound > 0
             }
         }
     }
