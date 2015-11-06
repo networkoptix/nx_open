@@ -663,6 +663,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
     return isH264() &&
+           qnCommon->isArecontRTSPEnabled() &&
            qnCommon->dataPool()->data(toSharedPointer(this)).
                value<bool>(lit("isRTSPSupported"), true);
 }

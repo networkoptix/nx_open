@@ -11,9 +11,6 @@
 #include <utils/network/rtsp/rtsp_types.h>
 
 
-static const int SECOND_STREAM_FPS = 5;
-static const int SECOND_STREAM_BITRATE_KBPS = 512;
-
 QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res)
 :
     parent_type(res),
@@ -59,8 +56,12 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     const auto maxResolution = getMaxSensorSize();
     if (getRole() == Qn::CR_SecondaryLiveVideo)
     {
-        requestStr += lit("&FPS=%1").arg(SECOND_STREAM_FPS);
-        requestStr += lit("&Ratelimit=%1").arg(SECOND_STREAM_BITRATE_KBPS);
+        requestStr += lit("&FPS=%1").arg((int)params.fps);
+        const int desiredBitrateKbps = res->suggestBitrateKbps(
+            params.quality,
+            QSize(maxResolution.width()/2, maxResolution.height()/2),
+            params.fps);
+        requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
     }
     else
     {

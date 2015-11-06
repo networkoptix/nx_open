@@ -34,6 +34,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
     m_transcodingDisabled = false;
+    m_arecontRTSPEnabled = false;
     m_systemIdentityTime = 0;
     m_lowPriorityAdminPassword = false;
     m_localPeerType = Qn::PT_NotDefined;
