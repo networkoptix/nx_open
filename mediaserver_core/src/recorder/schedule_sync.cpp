@@ -43,7 +43,6 @@ void QnScheduleSync::findLastSyncPoint()
 
 void QnScheduleSync::findLastSyncPointUnsafe() 
 {
-    QnMutexLocker lk(&m_syncPointMutex);
     int64_t prevSyncPoint = m_syncTimePoint = 0;
 
     while (auto chunkVector = getOldestChunk()) {
