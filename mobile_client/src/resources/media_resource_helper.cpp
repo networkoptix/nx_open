@@ -206,9 +206,9 @@ void QnMediaResourceHelper::updateUrl() {
     if (protocol == Mjpeg)
         query.addQueryItem(lit("ct"), lit("false"));
 
-    query.addQueryItem(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toString());
-    query.addQueryItem(Qn::CUSTOM_USERNAME_HEADER_NAME, QnAppServerConnectionFactory::url().userName());
-    query.addQueryItem(Qn::USER_AGENT_HEADER_NAME, QLatin1String(nx_http::userAgentString()));
+    query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
+    query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
+    query.addQueryItem(QLatin1String(Qn::USER_AGENT_HEADER_NAME), QLatin1String(nx_http::userAgentString()));
 
     url.setQuery(query);
 
