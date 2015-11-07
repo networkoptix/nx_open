@@ -374,12 +374,10 @@ void QnFileStorageResource::setUrl(const QString& url)
     m_dirty = true;
 }
 
-QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
-    m_storageBitrateCoeff(1.0),
+QnFileStorageResource::QnFileStorageResource():
     m_dirty(false),
     m_valid(false),
-    m_capabilities(0),
-    m_storageManager(storageManager)
+    m_capabilities(0)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
