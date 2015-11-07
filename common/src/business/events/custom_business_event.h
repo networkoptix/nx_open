@@ -23,7 +23,7 @@ private:
     const QString m_resourceName;
     const QString m_caption;
     const QString m_description;
-    const QnEventMetaData& m_metadata;
+    const QnEventMetaData m_metadata;
 };
 
 typedef QSharedPointer<QnCustomBusinessEvent> QnCustomBusinessEventPtr;
