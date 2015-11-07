@@ -55,14 +55,14 @@ private:
 class QnWriterPool
 {
 public:
-    typedef QMap<QString, QueueFileWriter*> WritersMap;
+    typedef QMap<QnUuid, QueueFileWriter*> WritersMap;
 
     QnWriterPool();
     ~QnWriterPool();
 
     static QnWriterPool* instance();
 
-    QueueFileWriter* getWriter(const QString& fileName);
+    QueueFileWriter* getWriter(const QnUuid& writePoolId);
     WritersMap getAllWriters();
 private:
     QnMutex m_mutex;
@@ -77,7 +77,7 @@ public:
     * @param ioBlockSize - IO block size
     * @param minBufferSize - do not empty buffer(after IO operation) less then minBufferSize
     */
-    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize);
+    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize, const QnUuid& writerPoolId);
     virtual ~QBufferedFile();
 
     /*
@@ -120,6 +120,7 @@ private:
     QnByteArray m_cachedBuffer; // cached file begin
     QnByteArray m_tmpBuffer;
     qint64 m_lastSeekPos;
+    QnUuid m_writerPoolId;
 };
 
 #endif // __BUFFERED_FILE_H__
