@@ -97,7 +97,7 @@
                 <param name = "MaxFPS"
                 default_value ="15"/>
                 <param name = "channelsAmount"
-                default_value = "2"/>                
+                default_value = "4"/>                
             </params>
         </resource>
         <resource name = "AXISQ1615" public = "AXISQ1602"/>     

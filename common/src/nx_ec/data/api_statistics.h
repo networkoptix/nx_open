@@ -66,10 +66,10 @@ namespace ec2 {
         ApiLicenseStatistics();
         ApiLicenseStatistics(const ApiLicenseData& data);
 
-        QString name, key, licenseType, version, brand, expiration;
+        QString name, key, licenseType, version, brand, expiration, validation;
         qint64 cameraCount;
 	};
-#define ApiLicenseStatistics_Fields (name)(key)(cameraCount)(licenseType)(version)(brand)(expiration)
+#define ApiLicenseStatistics_Fields (name)(key)(cameraCount)(licenseType)(version)(brand)(expiration)(validation)
 
 	struct ApiBusinessRuleStatistics
 		: ApiBusinessRuleData

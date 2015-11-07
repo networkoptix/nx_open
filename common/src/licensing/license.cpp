@@ -342,6 +342,14 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     return gotError(errCode, NoError);
 }
 
+QString QnLicense::validationInfo(ValidationMode mode) const {
+    ErrorCode code;
+    if (isValid(&code, mode))
+        return lit("Ok");
+
+    return errorMessage(code);
+}
+
 bool QnLicense::isValidEdgeLicense(ErrorCode* errCode, ValidationMode mode) const {
     for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
         // skip other license types and current license itself
