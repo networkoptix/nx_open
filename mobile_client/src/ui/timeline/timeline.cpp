@@ -447,8 +447,12 @@ void QnTimeline::setStickToEnd(bool stickToEnd) {
     if (d->stickToEnd == stickToEnd)
         return;
 
-    if (stickToEnd)
-        d->stickyPointKineticHelper.stop();
+    if (stickToEnd) {
+        if (!d->stickyPointKineticHelper.isStopped()) {
+            d->stickyPointKineticHelper.stop();
+            emit moveFinished();
+        }
+    }
 
     d->setStickToEnd(stickToEnd);
 }
@@ -1179,8 +1183,10 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         else if (time < endBound && delta < 0)
             setStickToEnd(false);
 
-        if (!stickyPointKineticHelper.isMeasuring() && time > endBound + (windowEnd - windowStart))
+        if (!stickyPointKineticHelper.isMeasuring() && time > endBound + (windowEnd - windowStart)) {
             stickyPointKineticHelper.stop();
+            parent->moveFinished();
+        }
     }
 
     if (!qFuzzyCompare(zoomLevel, targetZoomLevel)) {

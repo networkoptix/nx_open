@@ -15,6 +15,7 @@ Item {
     readonly property bool timelineDragging: timeline.dragging
     readonly property bool timelineMoving: timeline.moving
     readonly property real timelinePosition: timeline.position
+    readonly property bool timelineAtLive: timeline.stickToEnd
 
     width: parent ? parent.width : 0
     height: navigator.height + navigationPanel.height

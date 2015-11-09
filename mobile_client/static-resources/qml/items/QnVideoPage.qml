@@ -86,7 +86,7 @@ QnPage {
         target: thumbnailLoader
         property: "position"
         value: d.videoNavigation.timelinePosition
-        when: d.videoNavigation.timelineDragging && !player.atLive
+        when: d.videoNavigation.timelineDragging && !d.videoNavigation.timelineAtLive
     }
 
     QnScalableVideo {
@@ -106,6 +106,10 @@ QnPage {
                 hideUi()
             else
                 showUi()
+        }
+
+        function clearScreenshotSource() {
+            screenshotSource = ""
         }
 
         function bindScreenshotSource() {
@@ -130,8 +134,9 @@ QnPage {
         resourceId: videoPlayer.resourceId
 
         onPlayingChanged: {
+            console.log("Playing: " + playing)
             if (playing)
-                video.screenshotSource = ""
+                video.clearScreenshotSource()
         }
 
         onLoadingChanged: {
@@ -143,6 +148,11 @@ QnPage {
         }
 
         onTimelinePositionRequest: {
+            if (player.playing) {
+                video.clearScreenshotSource()
+                return
+            }
+
             video.bindScreenshotSource()
             thumbnailLoader.forceLoadThumbnail(player.position)
         }
@@ -178,6 +188,8 @@ QnPage {
             onTimelineDraggingChanged: {
                 if (timelineDragging)
                     video.bindScreenshotSource()
+                else if (player.playing)
+                    video.clearScreenshotSource()
             }
         }
     }
