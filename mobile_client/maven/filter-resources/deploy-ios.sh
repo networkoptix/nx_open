@@ -15,5 +15,5 @@ fi
 
 /usr/bin/xcrun -sdk "${TARGET_SDK}" PackageApplication \
     -v "${libdir}/bin/${build.configuration}/${project.artifactId}.app" \
-    -o "${installer.name}/${product.name.short}-${project.version.name}.${project.version.code}-$IPA_SUFFIX.ipa" \
+    -o "${project.build.directory}/${installer.name}-${project.version.name}.${project.version.code}-$IPA_SUFFIX.ipa" \
     --embed "${provisioning_profile}"
