@@ -21,7 +21,7 @@ TEST(hls_LivePlaylistManager, general)
     const int gopSizeFrames = 15;
     const hours testDuration(1);
     const milliseconds targetCacheSize = seconds(10);
-    const milliseconds maxCacheSize = seconds(20);
+    const milliseconds maxCacheSize = std::chrono::duration_cast<milliseconds>(targetDuration)*5;
 
     MediaStreamCache mediaCache(
         targetCacheSize.count(),
