@@ -361,10 +361,13 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     QnBusiness::ActionType actionType = m_model->actionType();
     if (actionType == QnBusiness::CameraRecordingAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
+    if (actionType == QnBusiness::BookmarkAction)
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
     else if (actionType == QnBusiness::CameraOutputAction || actionType == QnBusiness::CameraOutputOnceAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
     else if (actionType == QnBusiness::SendMailAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(this));
+
     dialog.setSelectedResources(m_model->actionResources());
 
     if (dialog.exec() != QDialog::Accepted)
