@@ -89,6 +89,7 @@ public:
     QnTimeline *parent;
 
     QColor textColor;
+    QColor chunkBarColor;
     QColor chunkColor;
 
     int chunkBarHeight;
@@ -147,7 +148,8 @@ public:
     QnTimelinePrivate(QnTimeline *parent):
         parent(parent),
         textColor("#727272"),
-        chunkColor("#2196F3"),
+        chunkBarColor("#223925"),
+        chunkColor("#3a911e"),
         showLive(true),
         stripesDarkTexture(0),
         stripesLightTexture(0),
@@ -676,6 +678,22 @@ void QnTimeline::setChunkColor(const QColor &color) {
     update();
 }
 
+QColor QnTimeline::chunkBarColor() const {
+    return d->chunkBarColor;
+}
+
+void QnTimeline::setChunkBarColor(const QColor &color) {
+    if (d->chunkBarColor == color)
+        return;
+
+    d->chunkBarColor = color;
+
+    emit chunkBarColorChanged();
+
+    d->updateStripesTextures();
+    update();
+}
+
 int QnTimeline::chunkBarHeight() const {
     return d->chunkBarHeight;
 }
@@ -1001,7 +1019,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     QnTimelineChunkPainter chunkPainter(geometry);
     std::array<QColor, Qn::TimePeriodContentCount + 1> colors = chunkPainter.colors();
     colors[Qn::RecordingContent] = d->chunkColor;
-    colors[Qn::TimePeriodContentCount] = d->chunkColor.darker();
+    colors[Qn::TimePeriodContentCount] = d->chunkBarColor;
     chunkPainter.setColors(colors);
     chunkPainter.start(value, position(), QRectF(0, y, width(), height() - y),
                        chunkCount, minimumValue, maximumValue);
@@ -1072,8 +1090,9 @@ void QnTimelinePrivate::updateStripesTextures() {
     if (!window)
         return;
 
-    QImage stripesDark = makeStripesImage(chunkBarHeight, chunkColor.darker(180), chunkColor.darker());
-    QImage stripesLight = makeStripesImage(chunkBarHeight, chunkColor, chunkColor.darker(105));
+    enum { tintAmount = 106 };
+    QImage stripesDark = makeStripesImage(chunkBarHeight, chunkBarColor, chunkBarColor.lighter(tintAmount));
+    QImage stripesLight = makeStripesImage(chunkBarHeight, chunkColor, chunkColor.darker(tintAmount));
 
     stripesDarkTexture = parent->window()->createTextureFromImage(stripesDark);
     stripesLightTexture = parent->window()->createTextureFromImage(stripesLight);
