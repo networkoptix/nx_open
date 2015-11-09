@@ -2385,7 +2385,7 @@ void MediaServerProcess::run()
     }
     TimerManager::instance()->joinAndDeleteTimer( dumpSystemResourceUsageTaskID );
 
-
+    m_ipDiscovery.reset(); // stop it before IO deinitialized
     QnResourceDiscoveryManager::instance()->pleaseStop();
     QnResource::pleaseStopAsyncTasks();
     multicastHttp.reset();

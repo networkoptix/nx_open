@@ -31,7 +31,7 @@ cp -f readme.txt $TARGET_DIR
 
 #Copying integration headers
 cp -f ../common/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
-cp -f ../common/src/plugins/storage/third_party/third_party_storage.h $TARGET_DIR/include/plugins/storage/third_party
+cp -f ../mediaserver_core/src/plugins/storage/third_party/third_party_storage.h $TARGET_DIR/include/plugins/storage/third_party
 
 pluginName=ftpstorageplugin
 

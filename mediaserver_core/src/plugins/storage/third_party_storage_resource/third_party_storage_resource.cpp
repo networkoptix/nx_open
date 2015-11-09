@@ -316,7 +316,8 @@ QIODevice *QnThirdPartyStorageResource::open(
                     )
                 ),
                 ioBlockSize, 
-                ffmpegBufferSize
+                ffmpegBufferSize,
+                getId()
             ) 
         );
         if (!rez->open(openMode))

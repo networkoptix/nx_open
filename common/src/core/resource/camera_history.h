@@ -142,6 +142,8 @@ private:
     void invalidateCameraHistory(const QnUuid &cameraId);
 
 private:
+    void checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam);
+private:
 
     mutable QnMutex m_mutex;
     QMap<QnUuid, std::vector<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
@@ -156,6 +158,7 @@ private:
     QSet<QnUuid> m_runningRequests;
     mutable QnMutex m_syncLoadMutex;
     QnWaitCondition m_syncLoadWaitCond;
+    QSet<QnUuid> m_camerasToCheck;
 };
 
 

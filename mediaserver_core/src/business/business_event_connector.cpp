@@ -65,7 +65,10 @@ void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resour
 
 void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QnResourcePtr &storageRes)
 {
-    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, storageRes->getUrl()));
+    QString url;
+    if (storageRes)
+        url = storageRes->getUrl();
+    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, url));
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
