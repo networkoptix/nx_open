@@ -3,8 +3,9 @@
 #include "common/common_globals.h"
 #include "utils/common/cpp14.h"
 #include "utils/common/log.h"
+#include "utils/network/socket_factory.h"
 
-static const std::chrono::minutes RETRY_INTERVAL( 10 );
+static const std::chrono::milliseconds RETRY_INTERVAL = std::chrono::minutes( 10 );
 
 namespace nx {
 namespace cc {
@@ -14,13 +15,18 @@ MediatorConnector::MediatorConnector()
     , m_endpointFetcher(
         lit( "hpm" ),
         std::make_unique<RandomEndpointSelector>() )
+    , m_timerSocket( SocketFactory::createStreamSocket() )
 {
 }
 
 MediatorConnector::~MediatorConnector()
 {
-    QnMutexLocker lk( &m_mutex );
-    m_isTerminating = true;
+    {
+        QnMutexLocker lk( &m_mutex );
+        m_isTerminating = true;
+    }
+
+    m_timerSocket->terminateAsyncIO( true );
 }
 
 void MediatorConnector::enable( bool waitComplete )
@@ -49,9 +55,8 @@ void MediatorConnector::enable( bool waitComplete )
 
                 // retry after some delay
                 if( !m_isTerminating )
-                    m_timerGuard = TimerManager::instance()->addTimer(
-                        [ this ]( quint64 ) { enable( false ); },
-                        RETRY_INTERVAL );
+                    m_timerSocket->registerTimer( RETRY_INTERVAL.count(),
+                                                  [ this ](){ enable( false ); } );
             }
             else
             {

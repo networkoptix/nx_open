@@ -3,7 +3,6 @@
 
 #include <future>
 
-#include "utils/common/timermanager.h"
 #include "utils/network/stun/async_client.h"
 
 #include "cdb_endpoint_fetcher.h"
@@ -39,7 +38,7 @@ private:
     boost::optional< std::promise< bool > > m_promise;
     boost::optional< SocketAddress > m_endpoint;
     CloudModuleEndPointFetcher m_endpointFetcher;
-    TimerManager::TimerGuard m_timerGuard;
+    std::unique_ptr< AbstractStreamSocket > m_timerSocket;
 };
 
 }   //cc
