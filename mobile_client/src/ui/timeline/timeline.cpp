@@ -209,8 +209,10 @@ public:
 
         prevZoomIndex = -1;
 
-        stickyPointKineticHelper.setMaxSpeed(50);
-        stickyPointKineticHelper.setMinSpeed(-50);
+        enum { maxStickyPointSpeed = 15 };
+
+        stickyPointKineticHelper.setMaxSpeed(maxStickyPointSpeed);
+        stickyPointKineticHelper.setMinSpeed(-maxStickyPointSpeed);
         zoomKineticHelper.setMinSpeed(-4.0);
         zoomKineticHelper.setMaxSpeed(50);
         zoomKineticHelper.setMinimum(0);
@@ -1176,6 +1178,9 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
             setStickToEnd(true);
         else if (time < endBound && delta < 0)
             setStickToEnd(false);
+
+        if (!stickyPointKineticHelper.isMeasuring() && time > endBound + (windowEnd - windowStart))
+            stickyPointKineticHelper.stop();
     }
 
     if (!qFuzzyCompare(zoomLevel, targetZoomLevel)) {
