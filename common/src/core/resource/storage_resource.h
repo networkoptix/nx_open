@@ -2,6 +2,7 @@
 #define __STORAGE_RESOURCE_H__
 
 #include "abstract_storage_resource.h"
+#include <atomic>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -39,7 +40,7 @@ public:
     bool isExternal() const;
 #ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
-    virtual float getStorageBitrateCoeff() const { return 1.0; }
+    virtual float getStorageBitrateCoeff() const { return m_storageBitrateCoeff; }
 
     void addBitrate(QnAbstractMediaStreamDataProvider* provider);
     void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
@@ -82,7 +83,7 @@ private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
     bool m_usedForWriting;
-    float m_storageBitrateCoeff;
+    std::atomic<float> m_storageBitrateCoeff;
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;

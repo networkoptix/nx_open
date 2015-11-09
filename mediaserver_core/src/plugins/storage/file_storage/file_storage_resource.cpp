@@ -84,7 +84,8 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)), 
             ioBlockSize, 
-            ffmpegBufferSize
+            ffmpegBufferSize,
+            getId()
         ) 
     );
     rez->setSystemFlags(systemFlags);
@@ -373,9 +374,7 @@ void QnFileStorageResource::setUrl(const QString& url)
     m_dirty = true;
 }
 
-QnFileStorageResource::QnFileStorageResource()
-    :
-    m_storageBitrateCoeff(1.0),
+QnFileStorageResource::QnFileStorageResource():
     m_dirty(false),
     m_valid(false),
     m_capabilities(0)
@@ -561,13 +560,8 @@ QnStorageResource* QnFileStorageResource::instance(const QString&)
 
 float QnFileStorageResource::getAvarageWritingUsage() const
 {
-    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getPath());
+    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getId());
     return writer ? writer->getAvarageUsage() : 0;
-}
-
-float QnFileStorageResource::getStorageBitrateCoeff() const
-{
-    return m_storageBitrateCoeff;
 }
 
 #ifdef _WIN32

@@ -57,14 +57,17 @@ QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _
     QString key1 = vendor + lit("|") + model;
    
     QnResourceData result;
-    if (!m_cachedResultByKey.contains(key1)) {
-        for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr) {
-			if (wildcardMatch(itr.key(), key1))
-                result.add(itr.value());
+    {
+        QMutexLocker lock(&m_cachedDataMtx);
+        if (!m_cachedResultByKey.contains(key1)) {
+            for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr) {
+			    if (wildcardMatch(itr.key(), key1))
+                    result.add(itr.value());
+            }
+            m_cachedResultByKey.insert(key1, result);
+        } else {
+            result = m_cachedResultByKey[key1];
         }
-        m_cachedResultByKey.insert(key1, result);
-    } else {
-        result = m_cachedResultByKey[key1];
     }
     auto additionData = m_dataByKey.find(key1 + lit("|") + firmware.toLower());
     if (additionData != m_dataByKey.end())
